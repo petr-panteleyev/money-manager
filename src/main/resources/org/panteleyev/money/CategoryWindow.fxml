@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane id="BorderPane" fx:id="self" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TableView fx:id="categoryTable" onMouseClicked="#onTableMouseClick" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <columns>
+            <TableColumn fx:id="colType" prefWidth="75.0" text="%column.Type" />
+          <TableColumn fx:id="colName" editable="false" prefWidth="75.0" text="%column.Name" />
+          <TableColumn fx:id="colDescription" editable="false" prefWidth="75.0" sortable="false" text="%column.Description" />
+        </columns>
+         <contextMenu>
+            <ContextMenu>
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#onMenuAdd" text="%menu.Edit.Add" />
+                  <MenuItem fx:id="ctxEditMenuItem" mnemonicParsing="false" onAction="#onMenuEdit" text="%menu.Edit.Edit" />
+              </items>
+            </ContextMenu>
+         </contextMenu>
+      </TableView>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="%menu.File">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#onClose" text="%menu.File.Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="%menu.Edit">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onMenuAdd" text="%menu.Edit.Add" />
+                  <MenuItem fx:id="editMenuItem" mnemonicParsing="false" onAction="#onMenuEdit" text="%menu.Edit.Edit" />
+               </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="%menu.Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="%menu.Help.About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
