@@ -56,6 +56,11 @@
                               </MenuButton>
                            </children>
                         </HBox>
+                        <Label fx:id="debitedCategoryLabel" text="Label">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
                      </children>
                   </VBox>
                   <VBox spacing="2.0" HBox.hgrow="ALWAYS">
@@ -72,6 +77,11 @@
                               </MenuButton>
                            </children>
                         </HBox>
+                        <Label fx:id="creditedCategoryLabel" text="Label">
+                           <font>
+                              <Font size="11.0" />
+                           </font>
+                        </Label>
                      </children>
                   </VBox>
                   <VBox spacing="2.0" HBox.hgrow="ALWAYS">

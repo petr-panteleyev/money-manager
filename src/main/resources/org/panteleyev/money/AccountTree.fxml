@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+
+<TreeTableView fx:id="tableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="1016.0" showRoot="false" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+  <columns>
+    <TreeTableColumn fx:id="nameColumn" prefWidth="75.0" text="%column.Name" />
+    <TreeTableColumn fx:id="commentColumn" prefWidth="75.0" text="%column.Comment" />
+      <TreeTableColumn fx:id="approvedColumn" prefWidth="75.0" text="%column.Approved" />
+      <TreeTableColumn fx:id="balanceColumn" prefWidth="75.0" text="%column.Balance" />
+      <TreeTableColumn fx:id="waitingColumn" prefWidth="75.0" text="%column.Waiting" />
+  </columns>
+   <contextMenu>
+      <ContextMenu>
+        <items>
+            <MenuItem mnemonicParsing="false" onAction="#onNewAccount" text="%menu.Edit.newAccount" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <CheckMenuItem fx:id="showDeactivatedAccountsMenuItem" mnemonicParsing="false" text="Show deactivated accounts" />
+        </items>
+      </ContextMenu>
+   </contextMenu>
+</TreeTableView>

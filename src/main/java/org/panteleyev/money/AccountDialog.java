@@ -65,11 +65,20 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
     private Collection<Category>            categories;
 
     private final Account account;
+    private final Category initialCategory;
 
     AccountDialog(Account account) {
         super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
 
         this.account = account;
+        this.initialCategory = null;
+    }
+
+    AccountDialog(Category initialCategory) {
+        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+
+        this.account = null;
+        this.initialCategory = initialCategory;
     }
 
     @Override
@@ -110,12 +119,21 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
             initialEdit.setText("0.0");
             activeCheckBox.setSelected(true);
 
-            typeComboBox.getSelectionModel().select(0);
-            onCategoryTypeSelected();
+            if (initialCategory != null) {
+                typeComboBox.getSelectionModel()
+                        .select(dao.getCategoryType(initialCategory.getCatTypeId()).orElse(null));
+                onCategoryTypeSelected();
+                categoryComboBox.getSelectionModel()
+                        .select(dao.getCategory(initialCategory.getId()).orElse(null));
+            } else {
+                typeComboBox.getSelectionModel().select(0);
+                onCategoryTypeSelected();
+            }
 
             dao.getDefaultCurrency().ifPresent(c -> currencyComboBox.getSelectionModel().select(c));
         } else {
             nameEdit.setText(account.getName());
+            commentEdit.setText(account.getComment());
             initialEdit.setText(account.getOpeningBalance().toString());
             activeCheckBox.setSelected(account.isEnabled());
 

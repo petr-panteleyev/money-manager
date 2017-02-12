@@ -247,7 +247,7 @@ public class AccountListWindowController extends BaseController implements Initi
     public void onAddAccount() {
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        new AccountDialog(null).load().showAndWait().ifPresent(builder -> {
+        new AccountDialog((Account)null).load().showAndWait().ifPresent(builder -> {
             MoneyDAO.getInstance().insertAccount(builder
                     .id(dao.generatePrimaryKey(Account.class))
                     .build());

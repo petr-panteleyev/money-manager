@@ -201,13 +201,13 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> {
         TreeTableColumn<TransactionTreeItem, String> typeColumn = new TreeTableColumn<>(BUNDLE.getString("column.Type"));
         typeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("type"));
 
-        TreeTableColumn<TransactionTreeItem, String> accountFromColumn = new TreeTableColumn<>("Account Debited");
+        TreeTableColumn<TransactionTreeItem, String> accountFromColumn = new TreeTableColumn<>(BUNDLE.getString("column.Account.Debited"));
         accountFromColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("accountDebited"));
 
-        TreeTableColumn<TransactionTreeItem, String> accountCreditedColumn = new TreeTableColumn<>("Account Credited");
+        TreeTableColumn<TransactionTreeItem, String> accountCreditedColumn = new TreeTableColumn<>(BUNDLE.getString("column.Account.Credited"));
         accountCreditedColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("accountCredited"));
 
-        TreeTableColumn<TransactionTreeItem, String> contactColumn = new TreeTableColumn<>("Contact");
+        TreeTableColumn<TransactionTreeItem, String> contactColumn = new TreeTableColumn<>(BUNDLE.getString("column.Payer.Payee"));
         contactColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("contact"));
 
         TreeTableColumn<TransactionTreeItem, String> commentColumn = new TreeTableColumn<>(BUNDLE.getString("column.Comment"));

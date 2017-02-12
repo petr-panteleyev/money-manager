@@ -25,17 +25,85 @@
  */
 package org.panteleyev.money;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.Transaction;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AccountsTab extends BorderPane {
-    private final AccountTableView accountsTable = new AccountTableView();
-    private final SplitPane split = new SplitPane(accountsTable);
+    private final AccountTree accountTree = (AccountTree)new AccountTree().load();
+    private final TransactionTableView transactionTable = new TransactionTableView(true);
+    private final SplitPane split = new SplitPane(accountTree.getTableView(), new BorderPane(transactionTable));
+
+    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
+    private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
+            new SimpleMapProperty<>();
+
+    private Account selectedAccount = null;
 
     public AccountsTab() {
         split.setOrientation(Orientation.VERTICAL);
-        split.getItems().add(new BorderPane());
         setCenter(split);
+
+        accountTree.setOnAccountSelected(this::onAccountSelected);
+        transactionTable.setOnCheckTransaction(this::onCheckTransaction);
+
+        MoneyDAO dao = MoneyDAO.getInstance();
+
+        preloadingProperty.bind(dao.preloadingProperty());
+        transactionsProperty.bind(dao.transactionsProperty());
+
+        transactionsProperty.addListener((x,y,z) -> {
+            if (!preloadingProperty.get()) {
+                Platform.runLater(this::reloadTransactions);
+            }
+        });
+
+        preloadingProperty.addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                Platform.runLater(this::reloadTransactions);
+            }
+        });
+    }
+
+    private void onAccountSelected(Account account) {
+        // TODO: make amount of transactions an option
+
+        selectedAccount = account;
+        reloadTransactions();
+    }
+
+    private void onCheckTransaction(List<Transaction> transactions, Boolean check) {
+        MoneyDAO dao = MoneyDAO.getInstance();
+
+        transactions.forEach(t -> {
+            dao.updateTransaction(new Transaction.Builder(t)
+                    .checked(check)
+                    .build());
+        });
+
+        reloadTransactions();
+    }
+
+    private void reloadTransactions() {
+        transactionTable.clear();
+
+        if (selectedAccount != null) {
+            List<Transaction> transactions = MoneyDAO.getInstance()
+                    .getTransactions(selectedAccount)
+                    .stream()
+                    .limit(100)
+                    .collect(Collectors.toList());
+
+            transactionTable.addRecords(transactions);
+            transactionTable.sort();
+        }
     }
 }

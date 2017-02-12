@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2016, 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ import java.util.logging.SimpleFormatter;
 
 public class Logging {
     private static final Logger LOGGER = Logger.getLogger("Money Manager");
-    private static FileHandler fileHandler;
 
     public static Logger getLogger() {
         return LOGGER;
@@ -41,7 +40,7 @@ public class Logging {
     static {
         LOGGER.setUseParentHandlers(false);
         try {
-            fileHandler = new FileHandler("%h/MoneyManager.log", true);
+            FileHandler fileHandler = new FileHandler("%h/MoneyManager.log", true);
             fileHandler.setFormatter(new SimpleFormatter());
             LOGGER.addHandler(fileHandler);
         } catch (IOException ex) {

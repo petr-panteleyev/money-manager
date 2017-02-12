@@ -36,6 +36,7 @@ import org.panteleyev.money.persistence.Category;
 
 public class AccountTreeItem {
     private final ObjectProperty<Account> accountProperty;
+    private final ObjectProperty<Category> categoryProperty;
     private final StringProperty nameProperty;
     private final StringProperty commentProperty;
     private final Integer id;
@@ -45,6 +46,7 @@ public class AccountTreeItem {
         nameProperty = new SimpleStringProperty(this, "name", name);
         commentProperty = new SimpleStringProperty(this, "comment", comment);
         accountProperty = new SimpleObjectProperty<Account>(this,"account", null);
+        categoryProperty = new SimpleObjectProperty<Category>(this, "category", null);
     }
 
     public AccountTreeItem(Account account) {
@@ -52,6 +54,7 @@ public class AccountTreeItem {
         nameProperty = new SimpleStringProperty(this, "name", account.getName());
         commentProperty = new SimpleStringProperty(this, "comment", account.getComment());
         accountProperty = new SimpleObjectProperty<Account>(this,"account", account);
+        categoryProperty = new SimpleObjectProperty<Category>(this, "category", null);
     }
 
     public AccountTreeItem(Category category) {
@@ -59,6 +62,7 @@ public class AccountTreeItem {
         nameProperty = new SimpleStringProperty(this, "name", category.getName());
         commentProperty = new SimpleStringProperty(this, "comment", category.getComment());
         accountProperty = new SimpleObjectProperty<Account>(this,"account", null);
+        categoryProperty = new SimpleObjectProperty<Category>(this, "category", category);
     }
 
     public Integer getId() {
@@ -73,7 +77,11 @@ public class AccountTreeItem {
         return commentProperty;
     }
 
-    public ReadOnlyObjectProperty accountProperty() {
+    public ReadOnlyObjectProperty<Account> accountProperty() {
         return accountProperty;
+    }
+
+    public ReadOnlyObjectProperty<Category> categoryProperty() {
+        return categoryProperty;
     }
 }

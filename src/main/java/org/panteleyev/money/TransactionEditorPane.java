@@ -87,6 +87,8 @@ public class TransactionEditorPane extends Controller implements Initializable {
     @FXML private Spinner<Integer>  referenceSpinner;
     @FXML private TextField         projectEdit;
     @FXML private Label             rateAmoutLabel;
+    @FXML private Label             debitedCategoryLabel;
+    @FXML private Label             creditedCategoryLabel;
 
     @FXML private MenuButton        typeMenuButton;
     @FXML private MenuButton        debitedMenuButton;
@@ -465,7 +467,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         // Check type id
         handleTypeFocusLoss();
         Optional<TransactionType> type = checkTextFieldValue(typeEdit, typeSuggestions, TRANSACTION_TYPE_TO_STRING);
-        builder.transactionTypeId(type.get().getId());
+        builder.transactionTypeId(type.map(TransactionType::getId).orElse(null));
 
         Optional<Account> debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
         if (debitedAccount.isPresent()) {
@@ -581,6 +583,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
             Optional<Account> account = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
+            updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
 
             builder.accountDebitedId(account.isPresent()?
                 account.get().getId() : null);
@@ -591,6 +594,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {
             Optional<Account> account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
+            updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
             builder.accountCreditedId(account.isPresent()?
                 account.get().getId() : null);
@@ -729,6 +733,21 @@ public class TransactionEditorPane extends Controller implements Initializable {
         Platform.runLater(() -> {
             rateAmoutLabel.setText("= " + total.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
         });
+    }
+
+    private void updateCategoryLabel(Label label, Account account) {
+        if (account != null) {
+            MoneyDAO dao = MoneyDAO.getInstance();
+            String typeName = dao.getCategoryType(account.getTypeId())
+                    .map(CategoryType::getTranslatedName)
+                    .orElse("");
+            String catName = dao.getCategory(account.getCategoryId())
+                    .map(Category::getName)
+                    .orElse("");
+            label.setText(typeName + " | " + catName);
+        } else {
+            label.setText("");
+        }
     }
 
 }
