@@ -31,10 +31,6 @@ import javax.sql.DataSource;
 import java.io.File;
 
 public class BaseDaoTest extends BaseTest {
-    static final int CATEGORY_TYPES_SIZE = 7;
-    static final int TRANSACTION_TYPES_SIZE = 21;
-    static final int CONTACT_TYPES_SIZE = 6;
-
     private File TEST_DB_FILE;
 
     private MoneyDAO dao;
@@ -61,7 +57,6 @@ public class BaseDaoTest extends BaseTest {
 
     void initializeEmptyMoneyFile() throws Exception {
         dao.createTables();
-        dao.setupNewDatabase();
         dao.preload();
     }
 }

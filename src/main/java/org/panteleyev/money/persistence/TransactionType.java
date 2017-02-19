@@ -26,96 +26,69 @@
 
 package org.panteleyev.money.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.Objects;
+import java.util.Arrays;
 import java.util.ResourceBundle;
-import org.panteleyev.persistence.Record;
-import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.Table;
 
-@Table("transaction_type")
-public class TransactionType implements Record, Named, Comparable<TransactionType> {
-    private final static ResourceBundle BUNDLE = ResourceBundle.getBundle("org.panteleyev.money.persistence.TransactionType");
+public enum TransactionType implements Named, Comparable<TransactionType> {
+    CARD_PAYMENT(1),
+    CASH_PURCHASE(2),
+    CHEQUE(3),
+    S1,
+    WITHDRAWAL(5),
+    CACHIER(6),
+    DEPOSIT(7),
+    TRANSFER(8),
+    S2,
+    INTEREST(10),
+    DIVIDEND(11),
+    S3,
+    DIRECT_BILLING(13),
+    CHARGE(14),
+    FEE(15),
+    S4,
+    INCOME(17),
+    SALE(18),
+    S5,
+    REFUND(20),
+    UNDEFINED(21);
 
-    public static final int ID_CARD_PAYMENT = 1;
-    public static final int ID_UNDEFINED    = 21;
+    private static final String BUNDLE = "org.panteleyev.money.persistence.TransactionType";
 
-    public static final Map<Integer, String> PREDEFINED = new HashMap<Integer, String>() {{
-        put(ID_CARD_PAYMENT, "/Card Payment"); put(2, "/Cash Purchase"); put(3, "/Cheque");
-        put(4, "-");
-        put(5, "/Withdrawal"); put(6, "/Cashier"); put(7, "/Deposit"); put(8, "/Transfer");
-        put(9, "-");
-        put(10, "/Interest"); put(11, "/Dividend");
-        put(12, "-");
-        put(13, "/Direct Billing"); put(14, "/Charge"); put(15, "/Fee");
-        put(16, "-");
-        put(17, "/Income"); put(18, "/Sale");
-        put(19, "-");
-        put(20, "/Refund"); put(ID_UNDEFINED, "/Undefined");
-    }};
+    private final int id;
+    private final String name;
+    private final boolean separator;
 
-    private final Integer id;
-    private final String  name;
-
-    @SuppressWarnings("FieldMayBeFinal")
-    private String  translatedName;
-
-    @RecordBuilder
-    public TransactionType(
-            @Field(Field.ID) Integer id,
-            @Field("name") String name
-    ) {
-        this.id = id;
-        this.name = name;
-
-        try {
-            translatedName = BUNDLE.getString(name);
-        } catch (MissingResourceException ex) {
-            translatedName = name;
-        }
+    TransactionType() {
+        id = 0;
+        name = null;
+        separator = true;
     }
 
-    @Field(value = Field.ID, primaryKey = true)
-    @Override
+    TransactionType(int id) {
+        ResourceBundle b = ResourceBundle.getBundle(BUNDLE);
+
+        this.id = id;
+        this.name = b.getString("name" + id);
+        this.separator = false;
+    }
+
     public Integer getId() {
         return id;
     }
 
-    @Field("name")
     @Override
     public String getName() {
         return name;
     }
 
-    public String getTranslatedName() {
-        return translatedName;
+    public boolean isSeparator() {
+        return separator;
     }
 
-    @Override
-    public int compareTo(TransactionType o) {
-        return getTranslatedName().compareTo(o.getTranslatedName());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj instanceof TransactionType) {
-            TransactionType that = (TransactionType)obj;
-            return Objects.equals(this.id, that.id)
-                    && Objects.equals(this.name, that.name);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
+    public static TransactionType get(int id) {
+        return Arrays.stream(values())
+                .filter(v -> v.getId() == id)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

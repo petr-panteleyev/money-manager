@@ -41,11 +41,26 @@ import java.util.UUID;
 class BaseTest {
     static final Random RANDOM = new Random(System.currentTimeMillis());
 
-    Account newAccount() {
-        return newAccount(RANDOM.nextInt(), RANDOM.nextInt(), RANDOM.nextInt(), RANDOM.nextInt());
+    CategoryType randomCategoryType() {
+        Integer id = 1 + RANDOM.nextInt(CategoryType.values().length - 1);
+        return CategoryType.get(id);
     }
 
-    Account newAccount(Integer id, Integer typeId, Integer categoryId, Integer currencyId) {
+    ContactType randomContactType() {
+        Integer id = 1 + RANDOM.nextInt(ContactType.values().length - 1);
+        return ContactType.get(id);
+    }
+
+    TransactionType randomTransactionType() {
+        Integer id = 1 + RANDOM.nextInt(TransactionType.values().length - 1);
+        return TransactionType.get(id);
+    }
+
+    Account newAccount() {
+        return newAccount(RANDOM.nextInt(), randomCategoryType(), RANDOM.nextInt(), RANDOM.nextInt());
+    }
+
+    Account newAccount(Integer id, CategoryType type, Integer categoryId, Integer currencyId) {
         return new Account(
                 id,
                 UUID.randomUUID().toString(),
@@ -53,31 +68,23 @@ class BaseTest {
                 new BigDecimal(RANDOM.nextDouble()),
                 new BigDecimal(RANDOM.nextDouble()),
                 new BigDecimal(RANDOM.nextDouble()),
-                typeId,
+                type,
                 categoryId,
                 currencyId,
                 RANDOM.nextBoolean()
         );
     }
 
-    CategoryType newCategoryType(Integer id) {
-        return newCategoryType(id, UUID.randomUUID().toString(), UUID.randomUUID().toString());
-    }
-
-    CategoryType newCategoryType(Integer id, String name, String comment) {
-        return new CategoryType(id, name, comment);
-    }
-
     Category newCategory() {
-        return newCategory(RANDOM.nextInt(), RANDOM.nextInt());
+        return newCategory(RANDOM.nextInt(), randomCategoryType());
     }
 
-    Category newCategory(Integer id, Integer typeId) {
+    Category newCategory(Integer id, CategoryType type) {
         return new Category(
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                typeId,
+                type,
                 RANDOM.nextBoolean()
         );
     }
@@ -101,19 +108,15 @@ class BaseTest {
         );
     }
 
-    ContactType newContactType(Integer id) {
-        return new ContactType(id, UUID.randomUUID().toString());
-    }
-
     Contact newContact() {
-        return newContact(RANDOM.nextInt(), RANDOM.nextInt());
+        return newContact(RANDOM.nextInt());
     }
 
-    Contact newContact(Integer id, Integer typeId) {
+    Contact newContact(Integer id) {
         return new Contact(
                 id,
                 UUID.randomUUID().toString(),
-                typeId,
+                randomContactType(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
@@ -124,10 +127,6 @@ class BaseTest {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString()
         );
-    }
-
-    TransactionType newTransactionType(Integer id) {
-        return new TransactionType(id, UUID.randomUUID().toString());
     }
 
     TransactionGroup newTransactionGroup() {
@@ -144,11 +143,11 @@ class BaseTest {
 
     Transaction newTransaction(
             Integer id,
-            Integer typeId,
+            TransactionType type,
             Integer accountDebitedId,
             Integer accountCreditedId,
-            Integer accountDebitedTypeId,
-            Integer accountCreditedTypeId,
+            CategoryType accountDebitedType,
+            CategoryType accountCreditedType,
             Integer accountDebitedCategoryId,
             Integer accountCreditedCategoryId,
             Integer groupId,
@@ -159,22 +158,20 @@ class BaseTest {
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
-                typeId,
+                type,
                 UUID.randomUUID().toString(),
                 RANDOM.nextBoolean(),
                 accountDebitedId,
                 accountCreditedId,
-                accountDebitedTypeId,
-                accountCreditedTypeId,
+                accountDebitedType,
+                accountCreditedType,
                 accountDebitedCategoryId,
                 accountCreditedCategoryId,
                 groupId,
                 contactId,
                 new BigDecimal(RANDOM.nextDouble()),
                 RANDOM.nextInt(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                RANDOM.nextInt()
+                UUID.randomUUID().toString()
         );
     }
 }

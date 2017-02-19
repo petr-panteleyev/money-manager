@@ -86,12 +86,9 @@ public class ContactListWindowController extends BaseController implements Initi
     public void initialize(URL location, ResourceBundle rb) {
         this.bundle = rb;
 
-        MoneyDAO dao = MoneyDAO.getInstance();
-
-        Collection<ContactType> types = dao.getContactTypes();
         typeChoiceBox.getItems().add(rb.getString("contact.Window.AllTypes"));
         typeChoiceBox.getItems().add(new Separator());
-        types.forEach(item -> typeChoiceBox.getItems().add(item));
+        typeChoiceBox.getItems().addAll(ContactType.values());
 
         typeChoiceBox.getSelectionModel().select(0);
 
@@ -111,10 +108,7 @@ public class ContactListWindowController extends BaseController implements Initi
         nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
             new ReadOnlyObjectWrapper(p.getValue().getName()));
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper(
-                        dao.getContactType(p.getValue().getTypeId())
-                        .map(ContactType::getName)
-                        .orElse("")));
+                new ReadOnlyObjectWrapper(p.getValue().getType().getName()));
         phoneColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
             new ReadOnlyObjectWrapper(p.getValue().getPhone()));
         emailColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
@@ -141,7 +135,7 @@ public class ContactListWindowController extends BaseController implements Initi
         } else {
             ContactType type = (ContactType)newValue;
             ((FilteredList<Contact>)contactTable.getItems())
-                    .setPredicate(x -> x.getTypeId().equals(type.getId()));
+                    .setPredicate(x -> x.getType().equals(type));
         }
     }
 

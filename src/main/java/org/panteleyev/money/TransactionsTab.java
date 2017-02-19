@@ -105,7 +105,7 @@ public class TransactionsTab extends Controller implements Initializable {
         });
     }
 
-    public BorderPane getPane() {
+    BorderPane getPane() {
         return pane;
     }
 
@@ -142,10 +142,6 @@ public class TransactionsTab extends Controller implements Initializable {
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
         transactionTable.setOnExpandGroup(this::onExpandGroup);
 
-        initControls(false);
-    }
-
-    public final void initControls(boolean dbOpen) {
         setCurrentDate();
     }
 
@@ -220,7 +216,7 @@ public class TransactionsTab extends Controller implements Initializable {
     private Contact createContact(String name) {
         Contact.Builder builder = new Contact.Builder()
                 .id(MoneyDAO.getInstance().generatePrimaryKey(Contact.class))
-                .typeId(ContactType.ID_PERSONAL)
+                .type(ContactType.PERSONAL)
                 .name(name);
 
         return MoneyDAO.getInstance()
@@ -273,11 +269,12 @@ public class TransactionsTab extends Controller implements Initializable {
 
         Integer groupId = dao.insertTransactionGroup(group).getId();
 
-        transactions.forEach(t -> {
-            dao.updateTransaction(new Transaction.Builder(t)
-                    .groupId(groupId)
-                    .build());
-        });
+        transactions.forEach(t -> dao.updateTransaction(
+                new Transaction.Builder(t)
+                        .groupId(groupId)
+                        .build()
+                )
+        );
 
         reloadTransactions();
     }
@@ -292,11 +289,12 @@ public class TransactionsTab extends Controller implements Initializable {
 
         Integer groupId = transactions.get(0).getGroupId();
 
-        transactions.forEach(t -> {
-            dao.updateTransaction(new Transaction.Builder(t)
-                    .groupId(0)
-                    .build());
-        });
+        transactions.forEach(t -> dao.updateTransaction(
+                new Transaction.Builder(t)
+                        .groupId(0)
+                        .build()
+                )
+        );
 
         dao.deleteTransactionGroup(groupId);
 
@@ -317,11 +315,12 @@ public class TransactionsTab extends Controller implements Initializable {
     private void onCheckTransaction(List<Transaction> transactions, Boolean check) {
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        transactions.forEach(t -> {
-            dao.updateTransaction(new Transaction.Builder(t)
-                    .checked(check)
-                    .build());
-        });
+        transactions.forEach(t -> dao.updateTransaction(
+                new Transaction.Builder(t)
+                        .checked(check)
+                        .build()
+                )
+        );
 
         reloadTransactions();
     }

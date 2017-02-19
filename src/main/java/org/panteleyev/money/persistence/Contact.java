@@ -23,24 +23,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
-import java.util.Objects;
-import java.util.Optional;
 import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.ReferenceType;
 import org.panteleyev.persistence.annotations.Table;
+import java.util.Objects;
+import java.util.Optional;
 
 @Table("contact")
 public class Contact implements Record, Named, Comparable<Contact> {
 
     public static final class Builder {
         private Integer id;
-        private Integer typeId;
+        private ContactType type;
         private String name;
         private String comment;
         private String email;
@@ -53,13 +50,13 @@ public class Contact implements Record, Named, Comparable<Contact> {
         private String zip;
 
         public Builder() {
-            typeId = ContactType.ID_PERSONAL;
+            type = ContactType.PERSONAL;
         }
 
         public Builder(Contact contact) {
             if (contact != null) {
                 this.id = contact.getId();
-                this.typeId = contact.getTypeId();
+                this.type = contact.getType();
                 this.name = contact.getName();
                 this.comment = contact.getComment();
                 this.email = contact.getEmail();
@@ -82,8 +79,8 @@ public class Contact implements Record, Named, Comparable<Contact> {
             return Optional.ofNullable(id);
         }
 
-        public Builder typeId(Integer typeId) {
-            this.typeId = typeId;
+        public Builder type(ContactType type) {
+            this.type = type;
             return this;
         }
 
@@ -139,13 +136,13 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
         public Contact build() {
             Objects.requireNonNull(id);
-            Objects.requireNonNull(typeId);
+            Objects.requireNonNull(type);
             Objects.requireNonNull(name);
 
             return new Contact(
                     id,
                     name,
-                    typeId,
+                    type,
                     phone,
                     mobile,
                     email,
@@ -160,7 +157,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     private final Integer id;
     private final String name;
-    private final Integer typeId;
+    private final ContactType type;
     private final String comment;
     private final String email;
     private final String web;
@@ -175,7 +172,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
     public Contact(
             @Field(Field.ID) Integer id,
             @Field("name") String name,
-            @Field("type_id") Integer typeId,
+            @Field("type") ContactType type,
             @Field("phone") String phone,
             @Field("mobile") String mobile,
             @Field("email") String email,
@@ -188,7 +185,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
     ) {
         this.id = id;
         this.name = name;
-        this.typeId = typeId;
+        this.type = type;
         this.phone = phone;
         this.mobile = mobile;
         this.email = email;
@@ -212,10 +209,9 @@ public class Contact implements Record, Named, Comparable<Contact> {
         return name;
     }
 
-    @Field(value = "type_id", nullable=false)
-    @ForeignKey(table=ContactType.class, onDelete=ReferenceType.CASCADE)
-    public Integer getTypeId() {
-        return typeId;
+    @Field(value = "type", nullable=false)
+    public ContactType getType() {
+        return type;
     }
 
     @Field("comment")
@@ -273,7 +269,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
             Contact that = (Contact)obj;
             return Objects.equals(this.id, that.id)
                     && Objects.equals(this.name, that.name)
-                    && Objects.equals(this.typeId, that.typeId)
+                    && Objects.equals(this.type, that.type)
                     && Objects.equals(this.comment, that.comment)
                     && Objects.equals(this.email, that.email)
                     && Objects.equals(this.web, that.web)
@@ -290,7 +286,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, typeId, comment, email, web, phone, mobile, street, city, country, zip);
+        return Objects.hash(id, name, type, comment, email, web, phone, mobile, street, city, country, zip);
     }
 
     @Override

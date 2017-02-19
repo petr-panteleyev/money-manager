@@ -27,6 +27,7 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.persistence.Category;
+import org.panteleyev.money.persistence.CategoryType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
@@ -45,7 +46,7 @@ public class TestCategory extends BaseTest {
                 .id(original.getId())
                 .name(original.getName())
                 .comment(original.getComment())
-                .typeId(original.getCatTypeId())
+                .type(original.getCatType())
                 .expanded(original.isExpanded());
 
         Assert.assertEquals(emptyBuilder.id().orElse(null), original.getId());
@@ -60,11 +61,11 @@ public class TestCategory extends BaseTest {
         Integer id = RANDOM.nextInt();
         String name = UUID.randomUUID().toString();
         String comment = UUID.randomUUID().toString();
-        Integer typeId = RANDOM.nextInt();
+        CategoryType type = randomCategoryType();
         Boolean expanded = RANDOM.nextBoolean();
 
-        Category c1 = new Category(id, name, comment, typeId, expanded);
-        Category c2 = new Category(id, name, comment, typeId, expanded);
+        Category c1 = new Category(id, name, comment, type, expanded);
+        Category c2 = new Category(id, name, comment, type, expanded);
 
         Assert.assertEquals(c1, c2);
         Assert.assertEquals(c1.hashCode(), c2.hashCode());

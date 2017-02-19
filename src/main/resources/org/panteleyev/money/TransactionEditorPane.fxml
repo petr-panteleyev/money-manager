@@ -103,38 +103,22 @@
                   <VBox spacing="2.0">
                      <children>
                         <Label text="%sumLabel" />
-                        <HBox>
+                        <HBox spacing="5.0">
                            <children>
                               <TextField fx:id="sumEdit" />
-                              <CheckBox fx:id="checkedCheckBox" mnemonicParsing="false" />
+                              <CheckBox fx:id="checkedCheckBox" alignment="TOP_LEFT" mnemonicParsing="false" />
                            </children>
                         </HBox>
                      </children>
                   </VBox>
                </children>
             </HBox>
-            <HBox>
+            <HBox spacing="5.0">
                <children>
                   <VBox spacing="2.0" HBox.hgrow="ALWAYS">
                      <children>
                         <Label text="%commentLabel" />
                         <TextField fx:id="commentEdit" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="2.0">
-                     <children>
-                        <Label text="%projectLabel" />
-                        <HBox>
-                           <children>
-                              <TextField fx:id="projectEdit" />
-                              <MenuButton fx:id="projectMenuButton" focusTraversable="false" mnemonicParsing="false">
-                                <items>
-                                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                                  <MenuItem mnemonicParsing="false" text="Action 2" />
-                                </items>
-                              </MenuButton>
-                           </children>
-                        </HBox>
                      </children>
                   </VBox>
                   <VBox spacing="2.0">
@@ -161,12 +145,6 @@
                      <children>
                         <Label text="%invoiceLabel" />
                         <TextField fx:id="invoiceNumberEdit" />
-                     </children>
-                  </VBox>
-                  <VBox>
-                     <children>
-                        <Label text="%referenceLabel" />
-                        <Spinner fx:id="referenceSpinner" editable="true" />
                      </children>
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />

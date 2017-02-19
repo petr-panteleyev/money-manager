@@ -25,18 +25,6 @@
  */
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import static java.util.stream.Collectors.groupingBy;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.ActionEvent;
@@ -54,12 +42,22 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.stage.WindowEvent;
-import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import static java.util.stream.Collectors.groupingBy;
 
-class TransactionTableView extends TreeTableView<TransactionTreeItem> {
+class TransactionTableView extends TreeTableView<TransactionTreeItem> implements Styles {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
     private static class TransactionRow extends TreeTableRow<TransactionTreeItem> {
@@ -67,28 +65,34 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> {
         protected void updateItem(TransactionTreeItem item, boolean empty) {
             super.updateItem(item, empty);
             if (!empty) {
-                styleProperty().bind(Bindings.when(item.isGroupProperty())
-                    .then("-fx-font-weight: bold;")
-                    .otherwise(""));
+                if (item.isGroupProperty().get()) {
+                    getStyleClass().add(GROUP_CELL);
+                }
             }
         }
     }
 
     private static class SumCell extends TreeTableCell<TransactionTreeItem, BigDecimal> {
         @Override
-        protected void updateItem(BigDecimal item, boolean empty) {
+        protected void updateItem(final BigDecimal item, boolean empty) {
             super.updateItem(item, empty);
             this.setAlignment(Pos.CENTER_RIGHT);
             if (empty || item == null) {
                 setText("");
             } else {
-                setText(item.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-                if (item.signum() < 0) {
-                    styleProperty().set("-fx-text-fill: #ff0000;");
-                } else {
-                    styleProperty().set("-fx-text-fill: #000000;");
-                }
+                Optional.ofNullable(getTreeTableRow())
+                        .map(TreeTableRow::getTreeItem)
+                        .map(TreeItem::getValue)
+                        .ifPresent(treeItem -> {
+                            getStyleClass().add(treeItem.getStyle());
 
+                            String format = Optional.ofNullable(treeItem.getTransaction())
+                                    .filter(t -> t.getGroupId() != 0)
+                                    .map(t -> "(%s)")
+                                    .orElse("%s");
+
+                            setText(String.format(format, item.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                        });
             }
         }
     }
@@ -111,19 +115,19 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> {
                     Transaction t = item.getTransaction();
 
                     String imageUrl;
-                    switch (t.getAccountCreditedTypeId()) {
-                        case CategoryType.EXPENSES_ID:
-                        case CategoryType.DEBTS_ID:
+                    switch (t.getAccountCreditedType()) {
+                        case EXPENSES:
+                        case DEBTS:
                             imageUrl = "/org/panteleyev/money/res/red-circle-16.png";
                             break;
 
-                        case CategoryType.BANKS_AND_CASH_ID:
-                            switch (t.getAccountDebitedTypeId()) {
-                                case CategoryType.INCOMES_ID:
+                        case BANKS_AND_CASH:
+                            switch (t.getAccountDebitedType()) {
+                                case INCOMES:
                                     imageUrl = "/org/panteleyev/money/res/blue-circle-16.png";
                                     break;
 
-                                case CategoryType.BANKS_AND_CASH_ID:
+                                case BANKS_AND_CASH:
                                     imageUrl = "/org/panteleyev/money/res/green-circle-16.png";
                                     break;
 

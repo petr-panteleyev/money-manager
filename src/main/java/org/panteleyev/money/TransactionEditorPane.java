@@ -28,6 +28,7 @@ package org.panteleyev.money;
 
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
@@ -84,8 +85,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
     @FXML private TextField         rate1Edit;
     @FXML private ComboBox<String>  rateDir1Combo;
     @FXML private TextField         invoiceNumberEdit;
-    @FXML private Spinner<Integer>  referenceSpinner;
-    @FXML private TextField         projectEdit;
     @FXML private Label             rateAmoutLabel;
     @FXML private Label             debitedCategoryLabel;
     @FXML private Label             creditedCategoryLabel;
@@ -94,7 +93,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
     @FXML private MenuButton        debitedMenuButton;
     @FXML private MenuButton        creditedMenuButton;
     @FXML private MenuButton        contactMenuButton;
-    @FXML private MenuButton        projectMenuButton;
 
     @FXML private Button            addButton;
     @FXML private Button            updateButton;
@@ -120,7 +118,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
     private final SimpleMapProperty<Integer, Account> accountsProperty = new SimpleMapProperty<>();
     private final SimpleMapProperty<Integer, Transaction> transactionsProperty = new SimpleMapProperty<>();
     private final SimpleMapProperty<Integer, Contact>     contactsProperty = new SimpleMapProperty<>();
-    private final SimpleMapProperty<Integer, TransactionType> transactionTypesProperty = new SimpleMapProperty<>();
 
     private final Validator<String> DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -138,7 +135,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
     private static final StringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING = new ToStringConverter<TransactionType>() {
         @Override
         public String toString(TransactionType object) {
-            return object.getTranslatedName();
+            return object.getName();
         }
     };
 
@@ -165,13 +162,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
         accountsProperty.bind(dao.accountsProperty());
         transactionsProperty.bind(dao.transactionsProperty());
         contactsProperty.bind(dao.contactsProperty());
-        transactionTypesProperty.bind(dao.transactionTypesProperty());
-
-        transactionTypesProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::onChangedTransactionTypes);
-            }
-        });
 
         contactsProperty.addListener((x,y,z) -> {
             if (!preloadingProperty.get()) {
@@ -210,10 +200,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
         valueFactory.setValue(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         daySpinner.setValueFactory(valueFactory);
 
-        referenceSpinner.getEditor().prefColumnCountProperty().set(10);
-        referenceSpinner.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, 0, 1));
-
         deleteButton.disableProperty().bind(newTransactionProperty);
         updateButton.disableProperty().bind(validation.invalidProperty().or(newTransactionProperty));
         addButton.disableProperty().bind(validation.invalidProperty());
@@ -221,7 +207,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         rateDir1Combo.getItems().setAll("/", "*");
 
         TextFields.bindAutoCompletion(typeEdit, req -> typeSuggestions.stream()
-                .filter(x -> x.getTranslatedName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
+                .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
                 .collect(Collectors.toList()), TRANSACTION_TYPE_TO_STRING);
 
         TextFields.bindAutoCompletion(debitedAccountEdit, req ->debitedSuggestions.stream()
@@ -248,7 +234,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         return (TransactionEditorPane)super.load();
     }
 
-    public TitledPane getPane() {
+    TitledPane getPane() {
         return pane;
     }
 
@@ -268,7 +254,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
     }
 
     private void setupBanksAndCashMenuItems(Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
-        List<Account> banksAnsCash = MoneyDAO.getInstance().getAccountsByType(CategoryType.BANKS_AND_CASH_ID);
+        List<Account> banksAnsCash = MoneyDAO.getInstance().getAccountsByType(CategoryType.BANKS_AND_CASH);
         banksAnsCash.stream()
             .sorted((Account o1, Account o2) -> o1.getName().compareToIgnoreCase(o2.getName()))
             .filter(Account::isEnabled)
@@ -292,14 +278,14 @@ public class TransactionEditorPane extends Controller implements Initializable {
     }
 
     private void setupDebtMenuItems(Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
-        setAccountMenuItemsByCategory(CategoryType.DEBTS_ID, "!", debitedSuggestions, creditedSuggestions);
+        setAccountMenuItemsByCategory(CategoryType.DEBTS, "!", debitedSuggestions, creditedSuggestions);
     }
 
     private void setupAssetsMenuItems(Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
-        setAccountMenuItemsByCategory(CategoryType.ASSETS_ID, ".", debitedSuggestions, creditedSuggestions);
+        setAccountMenuItemsByCategory(CategoryType.ASSETS, ".", debitedSuggestions, creditedSuggestions);
     }
 
-    private void setAccountMenuItemsByCategory(int categoryType, String prefix, Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
+    private void setAccountMenuItemsByCategory(CategoryType categoryType, String prefix, Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
         List<Category> categories = MoneyDAO.getInstance().getCategoriesByType(categoryType);
         categories.stream()
             .sorted((Category o1, Category o2) -> o1.getName().compareToIgnoreCase(o2.getName()))
@@ -347,7 +333,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
         commentEdit.setText("");
         checkedCheckBox.setSelected(false);
         invoiceNumberEdit.setText("");
-        projectEdit.setText("");
         sumEdit.setText("");
     }
 
@@ -361,9 +346,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         pane.setText(BUNDLE.getString("title") + " #" + tr.getId());
 
         // Type
-        typeEdit.setText(dao.getTransactionType(tr.getTransactionTypeId())
-                .map(TransactionType::getTranslatedName)
-                .orElse(""));
+        typeEdit.setText(tr.getTransactionType().getName());
 
         // Accounts
         Optional<Account> accCredited = dao.getAccount(tr.getAccountCreditedId());
@@ -379,7 +362,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
         commentEdit.setText(tr.getComment());
         checkedCheckBox.setSelected(tr.isChecked());
         invoiceNumberEdit.setText(tr.getInvoiceNumber());
-        projectEdit.setText(tr.getProject());
 
         // Rate
 
@@ -448,7 +430,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
     }
 
     private void onTransactionTypeSelected(TransactionType type) {
-        typeEdit.setText(type.getTranslatedName());
+        typeEdit.setText(type.getName());
     }
 
     public void setOnAddTransaction(BiConsumer<Transaction.Builder, String> c) {
@@ -467,14 +449,14 @@ public class TransactionEditorPane extends Controller implements Initializable {
         // Check type id
         handleTypeFocusLoss();
         Optional<TransactionType> type = checkTextFieldValue(typeEdit, typeSuggestions, TRANSACTION_TYPE_TO_STRING);
-        builder.transactionTypeId(type.map(TransactionType::getId).orElse(null));
+        type.ifPresent(t -> builder.transactionType(t));
 
         Optional<Account> debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
         if (debitedAccount.isPresent()) {
             Account acc = debitedAccount.get();
             builder.accountDebitedId(acc.getId());
             builder.accountDebitedCategoryId(acc.getCategoryId());
-            builder.accountDebitedTypeId(acc.getTypeId());
+            builder.accountDebitedType(acc.getType());
         } else {
             return false;
         }
@@ -484,7 +466,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
             Account acc = creditedAccount.get();
             builder.accountCreditedId(acc.getId());
             builder.accountCreditedCategoryId(acc.getCategoryId());
-            builder.accountCreditedTypeId(acc.getTypeId());
+            builder.accountCreditedType(acc.getType());
         } else {
             return false;
         }
@@ -492,9 +474,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         builder.day(daySpinner.getValue());
         builder.comment(commentEdit.getText());
         builder.checked(checkedCheckBox.isSelected());
-        builder.project(projectEdit.getText());
         builder.invoiceNumber(invoiceNumberEdit.getText());
-        builder.reference(referenceSpinner.getValue());
 
         try {
             builder.amount(new BigDecimal(sumEdit.getText()));
@@ -569,9 +549,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
     private void handleTypeFocusLoss() {
         Optional<TransactionType> type = checkTextFieldValue(typeEdit, typeSuggestions, TRANSACTION_TYPE_TO_STRING);
         if (!type.isPresent()) {
-            typeEdit.setText(MoneyDAO.getInstance().getTransactionType(TransactionType.ID_UNDEFINED)
-                    .map(TransactionType::getTranslatedName)
-                    .orElse(""));
+            typeEdit.setText(TransactionType.UNDEFINED.getName());
         }
     }
 
@@ -631,11 +609,11 @@ public class TransactionEditorPane extends Controller implements Initializable {
         typeMenuButton.getItems().clear();
         typeSuggestions.clear();
 
-        MoneyDAO.getInstance().getTransactionTypes().forEach(x -> {
-            if (x.getName().equals("-")) {
+        Arrays.stream(TransactionType.values()).forEach(x -> {
+            if (x.isSeparator()) {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
-                MenuItem m = new MenuItem(x.getTranslatedName());
+                MenuItem m = new MenuItem(x.getName());
                 m.setOnAction(event -> onTransactionTypeSelected(x));
                 typeMenuButton.getItems().add(m);
                 typeSuggestions.add(x);
@@ -653,7 +631,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         setupBanksAndCashMenuItems(debitedSuggestions, creditedSuggestions);
 
         // Incomes to debitable accounts
-        List<Category> incomeCategories = MoneyDAO.getInstance().getCategoriesByType(CategoryType.INCOMES_ID);
+        List<Category> incomeCategories = MoneyDAO.getInstance().getCategoriesByType(CategoryType.INCOMES);
         incomeCategories.stream()
             .sorted((Category o1, Category o2) -> o1.getName().compareToIgnoreCase(o2.getName()))
             .forEach(x -> {
@@ -675,7 +653,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
         }
 
         // Expenses to creditable accounts
-        List<Category> expenseCategories = MoneyDAO.getInstance().getCategoriesByType(CategoryType.EXPENSES_ID);
+        List<Category> expenseCategories = MoneyDAO.getInstance().getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
             .sorted((Category o1, Category o2) -> o1.getName().compareToIgnoreCase(o2.getName()))
             .forEach(x -> {
@@ -730,21 +708,17 @@ public class TransactionEditorPane extends Controller implements Initializable {
             total = amountValue.multiply(rateValue);
         }
 
-        Platform.runLater(() -> {
-            rateAmoutLabel.setText("= " + total.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-        });
+        Platform.runLater(() -> rateAmoutLabel
+                .setText("= " + total.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
     }
 
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
             MoneyDAO dao = MoneyDAO.getInstance();
-            String typeName = dao.getCategoryType(account.getTypeId())
-                    .map(CategoryType::getTranslatedName)
-                    .orElse("");
             String catName = dao.getCategory(account.getCategoryId())
                     .map(Category::getName)
                     .orElse("");
-            label.setText(typeName + " | " + catName);
+            label.setText(account.getType().getName() + " | " + catName);
         } else {
             label.setText("");
         }

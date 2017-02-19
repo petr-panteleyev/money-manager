@@ -26,10 +26,6 @@
 
 package org.panteleyev.money;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -42,7 +38,11 @@ import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.MoneyDAO;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class CategoryDialog extends BaseDialog<Category.Builder> implements Initializable {
     private static final String FXML_PATH = "/org/panteleyev/money/CategoryDialog.fxml";
@@ -53,20 +53,17 @@ public class CategoryDialog extends BaseDialog<Category.Builder> implements Init
 
     private final Category                  category;
 
-    private final MoneyDAO dao;
-
     CategoryDialog(Category category) {
         super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
 
         this.category = category;
-        dao = MoneyDAO.getInstance();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle rb) {
         setTitle(rb.getString("category.Dialog.Title"));
 
-        final Collection<CategoryType> list = dao.getCategoryTypes();
+        final Collection<CategoryType> list = Arrays.asList(CategoryType.values());
         typeComboBox.setItems(FXCollections.observableArrayList(list));
         if (!list.isEmpty()) {
             typeComboBox.getSelectionModel().select(0);
@@ -74,7 +71,7 @@ public class CategoryDialog extends BaseDialog<Category.Builder> implements Init
 
         if (category != null) {
             Optional<CategoryType> type = list.stream()
-                .filter(x -> x.getId().equals(category.getCatTypeId()))
+                .filter(x -> x.equals(category.getCatType()))
                 .findFirst();
             type.ifPresent(categoryType -> typeComboBox.getSelectionModel().select(categoryType));
             nameEdit.setText(category.getName());
@@ -84,7 +81,7 @@ public class CategoryDialog extends BaseDialog<Category.Builder> implements Init
         typeComboBox.setConverter(new StringConverter<CategoryType>() {
             @Override
             public String toString(CategoryType object) {
-                return object.getTranslatedName();
+                return object.getName();
             }
 
             @Override
@@ -98,7 +95,7 @@ public class CategoryDialog extends BaseDialog<Category.Builder> implements Init
                 return new Category.Builder(this.category)
                     .name(nameEdit.getText())
                     .comment(commentEdit.getText())
-                    .typeId(typeComboBox.getSelectionModel().getSelectedItem().getId());
+                    .type(typeComboBox.getSelectionModel().getSelectedItem());
             } else {
                 return null;
             }

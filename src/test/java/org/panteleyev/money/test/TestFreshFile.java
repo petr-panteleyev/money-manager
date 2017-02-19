@@ -42,10 +42,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class TestFreshFile extends BaseDaoTest {
-    private static final int[] CATEGORY_TYPE_IDS = IntStream.rangeClosed(1, CATEGORY_TYPES_SIZE).toArray();
-    private static final int[] TRANSACTION_TYPE_IDS = IntStream.rangeClosed(1, TRANSACTION_TYPES_SIZE).toArray();
-    private static final int[] CONTACT_TYPE_IDS = IntStream.rangeClosed(1, CONTACT_TYPES_SIZE).toArray();
-
     @BeforeMethod
     @Override
     public void setupAndSkip() throws Exception {
@@ -65,27 +61,6 @@ public class TestFreshFile extends BaseDaoTest {
     @Test
     public void testNewFileCreation() throws Exception {
         initializeEmptyMoneyFile();
-
-        Collection<CategoryType> categoryTypes = getDao().getCategoryTypes();
-        Assert.assertEquals(categoryTypes.size(), CATEGORY_TYPES_SIZE);
-        Assert.assertEquals(categoryTypes.stream()
-            .mapToInt(CategoryType::getId)
-            .sorted()
-            .toArray(), CATEGORY_TYPE_IDS);
-
-        Collection<TransactionType> transactionTypes = getDao().getTransactionTypes();
-        Assert.assertEquals(transactionTypes.size(), TRANSACTION_TYPES_SIZE);
-        Assert.assertEquals(transactionTypes.stream()
-            .mapToInt(TransactionType::getId)
-            .sorted()
-            .toArray(), TRANSACTION_TYPE_IDS);
-
-        Collection<ContactType> contactTypes = getDao().getContactTypes();
-        Assert.assertEquals(contactTypes.size(), CONTACT_TYPES_SIZE);
-        Assert.assertEquals(contactTypes.stream()
-            .mapToInt(ContactType::getId)
-            .sorted()
-            .toArray(), CONTACT_TYPE_IDS);
 
         Collection<Currency> currencies = getDao().getCurrencies();
         Assert.assertTrue(currencies.isEmpty());

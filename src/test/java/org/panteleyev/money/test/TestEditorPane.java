@@ -77,7 +77,7 @@ public class TestEditorPane extends BaseDaoTest {
     private Category category = new Category(null,
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            CategoryType.BANKS_AND_CASH_ID,
+            CategoryType.BANKS_AND_CASH,
             false
     );
 
@@ -132,7 +132,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH_ID,
+            CategoryType.BANKS_AND_CASH,
             category.getId(),
             curr_1.getId(),
             true
@@ -145,7 +145,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH_ID,
+            CategoryType.BANKS_AND_CASH,
             category.getId(),
             curr_2.getId(),
             true
@@ -158,7 +158,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH_ID,
+            CategoryType.BANKS_AND_CASH,
             category.getId(),
             curr_1.getId(),
             true
@@ -196,9 +196,7 @@ public class TestEditorPane extends BaseDaoTest {
 
     private void setUserInput(TransactionEditorPane pane, Transaction t, String contactName) {
         // Transaction type
-        TransactionType type = getDao().getTransactionType(t.getTransactionTypeId()).get();
-        getTextField(pane, "typeEdit").setText(type.getTranslatedName());
-        getTextField(pane, "typeEdit").setText(type.getTranslatedName());
+        getTextField(pane, "typeEdit").setText(t.getTransactionType().getName());
 
         // Debited account
         getTextField(pane, "debitedAccountEdit")
@@ -210,7 +208,6 @@ public class TestEditorPane extends BaseDaoTest {
 
         getTextField(pane, "commentEdit").setText(t.getComment());
         getTextField(pane, "sumEdit").setText(t.getAmount().toString());
-        getTextField(pane, "projectEdit").setText(t.getProject());
         getCheckBox(pane, "checkedCheckBox").setSelected(t.isChecked());
 
         if (t.getContactId() != null) {
@@ -258,16 +255,15 @@ public class TestEditorPane extends BaseDaoTest {
     private Transaction createTestTransaction(Account debit, Account credit, Contact contact) {
         Transaction.Builder builder = new Transaction.Builder()
                 .id(RANDOM.nextInt())
-                .transactionTypeId(TransactionType.ID_CARD_PAYMENT)
-                .accountCreditedTypeId(category.getCatTypeId())
-                .accountDebitedTypeId(category.getCatTypeId())
+                .transactionType(TransactionType.CARD_PAYMENT)
+                .accountCreditedType(category.getCatType())
+                .accountDebitedType(category.getCatType())
                 .accountCreditedCategoryId(category.getId())
                 .accountDebitedCategoryId(category.getId())
                 .accountDebitedId(debit.getId())
                 .accountCreditedId(credit.getId())
                 .day(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
                 .comment(UUID.randomUUID().toString())
-                .project(UUID.randomUUID().toString())
                 .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, BigDecimal.ROUND_HALF_UP))
                 .checked(RANDOM.nextBoolean());
 
@@ -285,21 +281,20 @@ public class TestEditorPane extends BaseDaoTest {
     }
 
     private void assertMainFields(Transaction r, Transaction t) {
-        assertEquals(r.getTransactionTypeId(), t.getTransactionTypeId(), "Transaction type ID is invalid");
+        assertEquals(r.getTransactionType(), t.getTransactionType(), "Transaction type ID is invalid");
 
         // Debited account
         assertEquals(r.getAccountDebitedId(), t.getAccountDebitedId(), "Debited account ID is invalid");
         assertEquals(r.getAccountDebitedCategoryId(), t.getAccountDebitedCategoryId(), "Debited account category ID is invalid");
-        assertEquals(r.getAccountDebitedTypeId(), t.getAccountDebitedTypeId(), "Debited account category type ID is invalid");
+        assertEquals(r.getAccountDebitedType(), t.getAccountDebitedType(), "Debited account category type ID is invalid");
 
         // Credited account
         assertEquals(r.getAccountCreditedId(), t.getAccountCreditedId(), "Credited account ID is invalid");
         assertEquals(r.getAccountCreditedCategoryId(), t.getAccountCreditedCategoryId(), "Credited account category ID is invalid");
-        assertEquals(r.getAccountCreditedTypeId(), t.getAccountCreditedTypeId(), "Credited account category type ID is invalid");
+        assertEquals(r.getAccountCreditedType(), t.getAccountCreditedType(), "Credited account category type ID is invalid");
 
         assertEquals(r.getDay(), t.getDay(), "Day is invalid");
         assertEquals(r.getComment(), t.getComment(), "Comment is invalid");
-        assertEquals(r.getProject(), t.getProject(), "Project is invalid");
         assertEquals(r.isChecked(), t.isChecked(), "Checked status is invalid");
     }
 

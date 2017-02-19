@@ -52,16 +52,16 @@ public class Account implements Record, Named, Comparable<Account> {
     }
 
     public static final class Builder {
-        private Integer     id;
-        private String      name;
-        private String      comment;
-        private BigDecimal  openingBalance;
-        private BigDecimal  accountLimit;
-        private BigDecimal  currencyRate;
-        private Integer     typeId;
-        private Integer     categoryId;
-        private Integer     currencyId;
-        private Boolean     enabled;
+        private Integer      id;
+        private String       name;
+        private String       comment;
+        private BigDecimal   openingBalance;
+        private BigDecimal   accountLimit;
+        private BigDecimal   currencyRate;
+        private CategoryType type;
+        private Integer      categoryId;
+        private Integer      currencyId;
+        private Boolean      enabled;
 
         public Builder() {
             openingBalance = BigDecimal.ZERO;
@@ -80,7 +80,7 @@ public class Account implements Record, Named, Comparable<Account> {
                 this.openingBalance = a.getOpeningBalance();
                 this.accountLimit = a.getAccountLimit();
                 this.currencyRate = a.getCurrencyRate();
-                this.typeId = a.getTypeId();
+                this.type = a.getType();
                 this.categoryId = a.getCategoryId();
                 this.currencyId = a.getCurrencyId().orElse(null);
                 this.enabled = a.isEnabled();
@@ -121,8 +121,8 @@ public class Account implements Record, Named, Comparable<Account> {
             return this;
         }
 
-        public Builder typeId(Integer typeId) {
-            this.typeId = typeId;
+        public Builder type(CategoryType type) {
+            this.type = type;
             return this;
         }
 
@@ -144,7 +144,7 @@ public class Account implements Record, Named, Comparable<Account> {
         public Account build() {
             Objects.requireNonNull(id);
             Objects.requireNonNull(name);
-            Objects.requireNonNull(typeId);
+            Objects.requireNonNull(type);
             Objects.requireNonNull(categoryId);
             // TODO: temporarily allow null currency but must be forbidden in the future
             //Objects.requireNonNull(currencyId);
@@ -156,7 +156,7 @@ public class Account implements Record, Named, Comparable<Account> {
                     openingBalance,
                     accountLimit,
                     currencyRate,
-                    typeId,
+                    type,
                     categoryId,
                     currencyId,
                     enabled
@@ -164,16 +164,16 @@ public class Account implements Record, Named, Comparable<Account> {
         }
     }
 
-    private final Integer    id;
-    private final String     name;
-    private final String     comment;
-    private final BigDecimal openingBalance;
-    private final BigDecimal accountLimit;
-    private final BigDecimal currencyRate;
-    private final Integer    typeId;
-    private final Integer    categoryId;
-    private final Integer    currencyId;
-    private final boolean    enabled;
+    private final Integer      id;
+    private final String       name;
+    private final String       comment;
+    private final BigDecimal   openingBalance;
+    private final BigDecimal   accountLimit;
+    private final BigDecimal   currencyRate;
+    private final CategoryType type;
+    private final Integer      categoryId;
+    private final Integer      currencyId;
+    private final boolean      enabled;
 
     @RecordBuilder
     public Account(
@@ -183,7 +183,7 @@ public class Account implements Record, Named, Comparable<Account> {
             @Field("opening") BigDecimal openingBalance,
             @Field("acc_limit") BigDecimal accountLimit,
             @Field("currency_rate") BigDecimal currencyRate,
-            @Field("type_id") Integer typeId,
+            @Field("type") CategoryType type,
             @Field("category_id") Integer categoryId,
             @Field("currency_id") Integer currencyId,
             @Field("enabled") boolean enabled
@@ -194,7 +194,7 @@ public class Account implements Record, Named, Comparable<Account> {
         this.openingBalance = openingBalance;
         this.accountLimit = accountLimit;
         this.currencyRate = currencyRate;
-        this.typeId = typeId;
+        this.type = type;
         this.categoryId = categoryId;
         this.currencyId = currencyId;
         this.enabled = enabled;
@@ -222,10 +222,9 @@ public class Account implements Record, Named, Comparable<Account> {
         return openingBalance;
     }
 
-    @Field(value = "type_id", nullable=false)
-    @ForeignKey(table=CategoryType.class, onDelete=ReferenceType.CASCADE)
-    public Integer getTypeId() {
-        return typeId;
+    @Field(value = "type", nullable=false)
+    public CategoryType getType() {
+        return type;
     }
 
     @Field(value = "category_id", nullable=false)
@@ -257,7 +256,7 @@ public class Account implements Record, Named, Comparable<Account> {
 
     public Account enable(boolean enable) {
         return new Account(id, name, comment, openingBalance, accountLimit, currencyRate,
-                typeId, categoryId, currencyId, enable);
+                type, categoryId, currencyId, enable);
     }
 
     @Override
@@ -274,7 +273,7 @@ public class Account implements Record, Named, Comparable<Account> {
                     && Objects.equals(this.openingBalance, that.openingBalance)
                     && Objects.equals(this.accountLimit, that.accountLimit)
                     && Objects.equals(this.currencyRate, that.currencyRate)
-                    && Objects.equals(this.typeId, that.typeId)
+                    && Objects.equals(this.type, that.type)
                     && Objects.equals(this.categoryId, that.categoryId)
                     && Objects.equals(this.currencyId, that.currencyId)
                     && Objects.equals(this.enabled, that.enabled);
@@ -285,7 +284,7 @@ public class Account implements Record, Named, Comparable<Account> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, openingBalance, accountLimit, currencyRate, typeId, categoryId,
+        return Objects.hash(id, name, comment, openingBalance, accountLimit, currencyRate, type, categoryId,
                 currencyId, enabled);
     }
 

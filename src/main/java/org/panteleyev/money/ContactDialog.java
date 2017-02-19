@@ -65,7 +65,7 @@ public class ContactDialog extends BaseDialog<Contact.Builder> implements Initia
     public void initialize(URL location, ResourceBundle rb) {
         setTitle(rb.getString("contact.Dialog.Title"));
 
-        typeChoiceBox.setItems(FXCollections.observableArrayList(MoneyDAO.getInstance().getContactTypes()));
+        typeChoiceBox.setItems(FXCollections.observableArrayList(ContactType.values()));
         typeChoiceBox.setConverter(new ReadOnlyStringConverter<ContactType>() {
             @Override
             public String toString(ContactType type) {
@@ -74,8 +74,7 @@ public class ContactDialog extends BaseDialog<Contact.Builder> implements Initia
         });
 
         if (contact != null) {
-            ContactType type = MoneyDAO.getInstance().getContactType(contact.getTypeId()).get();
-            typeChoiceBox.getSelectionModel().select(type);
+            typeChoiceBox.getSelectionModel().select(contact.getType());
 
             nameField.setText(contact.getName());
             phoneField.setText(contact.getPhone());
@@ -94,7 +93,7 @@ public class ContactDialog extends BaseDialog<Contact.Builder> implements Initia
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 return new Contact.Builder(this.contact)
-                        .typeId(typeChoiceBox.getSelectionModel().getSelectedItem().getId())
+                        .type(typeChoiceBox.getSelectionModel().getSelectedItem())
                         .name(nameField.getText())
                         .phone(phoneField.getText())
                         .mobile(mobileField.getText())

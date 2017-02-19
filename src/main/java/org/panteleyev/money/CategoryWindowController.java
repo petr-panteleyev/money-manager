@@ -94,11 +94,11 @@ public class CategoryWindowController extends Controller implements Initializabl
         updateList();
 
         colType.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper(dao.getCategoryType(p.getValue().getCatTypeId())
-                    .map(CategoryType::getTranslatedName)
-                    .orElse("")));
-        colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) -> new ReadOnlyObjectWrapper(p.getValue().getName()));
-        colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) -> new ReadOnlyObjectWrapper(p.getValue().getComment()));
+                new ReadOnlyObjectWrapper(p.getValue().getCatType().getName()));
+        colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
+                new ReadOnlyObjectWrapper(p.getValue().getName()));
+        colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
+                new ReadOnlyObjectWrapper(p.getValue().getComment()));
 
         colType.setSortable(true);
         categoryTable.getSortOrder().addAll(colType);

@@ -25,8 +25,10 @@
  */
 package org.panteleyev.money.test;
 
+import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.TransactionType;
 import org.panteleyev.persistence.Record;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -60,32 +62,28 @@ public class TestMoneyDAO extends BaseDaoTest {
 
     @DataProvider(name="testMoneyDAODataProvider")
     public Object[][] testMoneyDAODataProvider() {
-        Integer catTypeID = RANDOM.nextInt();
+        CategoryType catType = randomCategoryType();
         Integer catID = RANDOM.nextInt();
         Integer currID = RANDOM.nextInt();
         Integer accID = RANDOM.nextInt();
-        Integer contactTypeId = RANDOM.nextInt();
         Integer contactId = RANDOM.nextInt();
-        Integer transactionTypeId = RANDOM.nextInt();
+        TransactionType transactionType = randomTransactionType();
         Integer transactionGroupId = RANDOM.nextInt();
         Integer transactionId = RANDOM.nextInt();
 
         return new Object[][] {
-                { newCategoryType(catTypeID) },
-                { newCategory(catID, catTypeID ) },
+                { newCategory(catID, catType ) },
                 { newCurrency(currID) },
-                { newContactType(contactTypeId) },
-                { newContact(contactId, contactTypeId) },
-                { newAccount(accID, catTypeID, catID, currID) },
-                { newTransactionType(transactionTypeId) },
+                { newContact(contactId) },
+                { newAccount(accID, catType, catID, currID) },
                 { newTransactionGroup(transactionGroupId) },
                 { newTransaction(
                         transactionId,
-                        transactionTypeId,
+                        transactionType,
                         accID,
                         accID,
-                        catTypeID,
-                        catTypeID,
+                        catType,
+                        catType,
                         catID,
                         catID,
                         transactionGroupId,

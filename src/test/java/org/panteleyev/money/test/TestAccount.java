@@ -27,6 +27,7 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.CategoryType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
@@ -49,7 +50,7 @@ public class TestAccount extends BaseTest {
                 .openingBalance(original.getOpeningBalance())
                 .accountLimit(original.getAccountLimit())
                 .currencyRate(original.getCurrencyRate())
-                .typeId(original.getTypeId())
+                .type(original.getType())
                 .categoryId(original.getCategoryId())
                 .currencyId(original.getCurrencyId().orElse(null))
                 .enabled(original.isEnabled());
@@ -69,16 +70,16 @@ public class TestAccount extends BaseTest {
         BigDecimal opening = new BigDecimal(RANDOM.nextDouble());
         BigDecimal limit = new BigDecimal(RANDOM.nextDouble());
         BigDecimal rate = new BigDecimal(RANDOM.nextDouble());
-        Integer typeId = RANDOM.nextInt();
+        CategoryType type = randomCategoryType();
         Integer categoryId = RANDOM.nextInt();
         Integer currencyId = RANDOM.nextInt();
         Boolean enabled = RANDOM.nextBoolean();
 
         Account a1 = new Account(
-                id, name, comment, opening, limit, rate, typeId, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type, categoryId, currencyId, enabled
         );
         Account a2 = new Account(
-                id, name, comment, opening, limit, rate, typeId, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type, categoryId, currencyId, enabled
         );
 
         Assert.assertEquals(a1, a2);
@@ -94,6 +95,6 @@ public class TestAccount extends BaseTest {
     @Test(expectedExceptions = {NullPointerException.class})
     public void testBuilderNullTypeId() {
         Account.Builder builder = new Account.Builder(newAccount());
-        builder.typeId(null).build();
+        builder.type(null).build();
     }
 }

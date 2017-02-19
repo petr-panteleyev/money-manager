@@ -26,6 +26,7 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.persistence.Contact;
+import org.panteleyev.money.persistence.ContactType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class TestContact extends BaseTest {
                 .id(original.getId())
                 .name(original.getName())
                 .comment(original.getComment())
-                .typeId(original.getTypeId())
+                .type(original.getType())
                 .phone(original.getPhone())
                 .mobile(original.getMobile())
                 .email(original.getEmail())
@@ -65,7 +66,7 @@ public class TestContact extends BaseTest {
     public void testEquals() {
         Integer id = RANDOM.nextInt();
         String name = UUID.randomUUID().toString();
-        Integer typeId = RANDOM.nextInt();
+        ContactType type = randomContactType();
         String phone = UUID.randomUUID().toString();
         String mobile = UUID.randomUUID().toString();
         String email = UUID.randomUUID().toString();
@@ -76,10 +77,10 @@ public class TestContact extends BaseTest {
         String country = UUID.randomUUID().toString();
         String zip = UUID.randomUUID().toString();
 
-        Contact c1 = new Contact(id, name, typeId, phone, mobile, email, web,
+        Contact c1 = new Contact(id, name, type, phone, mobile, email, web,
                 comment, street, city, country, zip);
 
-        Contact c2 = new Contact(id, name, typeId, phone, mobile, email, web,
+        Contact c2 = new Contact(id, name, type, phone, mobile, email, web,
                 comment, street, city, country, zip);
 
         Assert.assertEquals(c1, c2);

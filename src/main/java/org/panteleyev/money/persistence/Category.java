@@ -25,21 +25,19 @@
  */
 package org.panteleyev.money.persistence;
 
-import java.util.Objects;
-import java.util.Optional;
 import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.ReferenceType;
 import org.panteleyev.persistence.annotations.Table;
+import java.util.Objects;
+import java.util.Optional;
 
 @Table("category")
 public class Category implements Record, Named {
     public static class Builder {
         private Integer id;
         private String  name;
-        private Integer typeId;
+        private CategoryType type;
         private String  comment;
         private Boolean expanded;
 
@@ -53,7 +51,7 @@ public class Category implements Record, Named {
             if (c != null) {
                 this.id = c.getId();
                 this.name = c.getName();
-                this.typeId = c.getCatTypeId();
+                this.type = c.getCatType();
                 this.comment = c.getComment();
                 this.expanded = c.isExpanded();
             }
@@ -73,8 +71,8 @@ public class Category implements Record, Named {
             return this;
         }
 
-        public Builder typeId(Integer typeId) {
-            this.typeId = typeId;
+        public Builder type(CategoryType type) {
+            this.type = type;
             return this;
         }
 
@@ -91,16 +89,16 @@ public class Category implements Record, Named {
         public Category build() {
             Objects.requireNonNull(id);
             Objects.requireNonNull(name);
-            Objects.requireNonNull(typeId);
+            Objects.requireNonNull(type);
 
-            return new Category(id, name, comment, typeId, expanded);
+            return new Category(id, name, comment, type, expanded);
         }
     }
 
     private final Integer id;
     private final String  name;
     private final String  comment;
-    private final int catTypeId;
+    private final CategoryType catType;
     private final boolean expanded;
 
     @RecordBuilder
@@ -108,13 +106,13 @@ public class Category implements Record, Named {
             @Field(Field.ID) Integer id,
             @Field("name") String name,
             @Field("comment") String comment,
-            @Field("cat_type_id") Integer catTypeId,
+            @Field("cat_type") CategoryType catType,
             @Field("expanded") boolean expanded
     ) {
         this.id = id;
         this.name = name;
         this.comment = comment;
-        this.catTypeId = catTypeId;
+        this.catType = catType;
         this.expanded = expanded;
     }
 
@@ -135,10 +133,9 @@ public class Category implements Record, Named {
         return comment;
     }
 
-    @Field(value = "cat_type_id", nullable=false)
-    @ForeignKey(table=CategoryType.class, onDelete=ReferenceType.CASCADE)
-    public Integer getCatTypeId() {
-        return catTypeId;
+    @Field(value = "cat_type", nullable=false)
+    public CategoryType getCatType() {
+        return catType;
     }
 
     @Field("expanded")
@@ -147,7 +144,7 @@ public class Category implements Record, Named {
     }
 
     public Category expand(boolean exp) {
-        return new Category(id, name, comment, catTypeId, exp);
+        return new Category(id, name, comment, catType, exp);
     }
 
     @Override
@@ -161,7 +158,7 @@ public class Category implements Record, Named {
             return Objects.equals(this.id, that.id)
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.comment, that.comment)
-                    && Objects.equals(this.catTypeId, that.catTypeId)
+                    && Objects.equals(this.catType, that.catType)
                     && Objects.equals(this.expanded, that.expanded);
         } else {
             return false;
@@ -170,6 +167,6 @@ public class Category implements Record, Named {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, catTypeId, expanded);
+        return Objects.hash(id, name, comment, catType, expanded);
     }
 }

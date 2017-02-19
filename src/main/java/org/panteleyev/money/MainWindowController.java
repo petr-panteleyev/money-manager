@@ -59,6 +59,7 @@ import org.panteleyev.utilities.fx.WindowManager;
 
 public class MainWindowController extends Controller implements Initializable {
     public static final String UI_BUNDLE_PATH = "org.panteleyev.money.ui";
+    public static final String CSS_PATH = "/org/panteleyev/money/main.css";
 
     @FXML private BorderPane    self;
     @FXML private TabPane       tabPane;
@@ -83,7 +84,7 @@ public class MainWindowController extends Controller implements Initializable {
 
     private final AccountsTab accountsTab = new AccountsTab();
     private final TransactionsTab transactionTab = (TransactionsTab)new TransactionsTab().load();
-    private final RequestTab requestTab = new RequestTab();
+    private final RequestTab requestTab = (RequestTab)new RequestTab().load();
 
     private final BooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
@@ -98,7 +99,7 @@ public class MainWindowController extends Controller implements Initializable {
     };
 
     public MainWindowController() {
-        super("/org/panteleyev/money/MainWindow.fxml", UI_BUNDLE_PATH, true);
+        super("/org/panteleyev/money/MainWindow.fxml", CSS_PATH, UI_BUNDLE_PATH, true);
     }
 
     public BooleanProperty dbOpenProperty() {
@@ -123,7 +124,7 @@ public class MainWindowController extends Controller implements Initializable {
         Tab t2 = new Tab(rb.getString("tab.Transactions"), transactionTab.getPane());
         t2.disableProperty().bind(dbOpenProperty.not());
 
-        Tab t3 = new Tab(rb.getString("tab.Requests"), requestTab);
+        Tab t3 = new Tab(rb.getString("tab.Requests"), requestTab.getRoot());
         t3.disableProperty().bind(dbOpenProperty.not());
 
         tabPane.getTabs().addAll(
@@ -224,7 +225,6 @@ public class MainWindowController extends Controller implements Initializable {
             CompletableFuture.runAsync(() -> {
                 MoneyDAO dao = MoneyDAO.initialize(ds);
                 dao.createTables();
-                dao.setupNewDatabase();
                 dao.preload();
             }).thenRun(() -> dbOpenProperty.set(true));
         }

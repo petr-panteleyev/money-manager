@@ -105,7 +105,7 @@ public class AccountListWindowController extends BaseController implements Initi
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        ObservableList types = FXCollections.observableArrayList(dao.getCategoryTypes());
+        ObservableList types = FXCollections.observableArrayList(CategoryType.values());
         if (!types.isEmpty()) {
             types.add(0, new Separator());
         }
@@ -118,7 +118,7 @@ public class AccountListWindowController extends BaseController implements Initi
             @Override
             public String toString(Object object) {
                 if (object instanceof CategoryType) {
-                    return ((CategoryType)object).getTranslatedName();
+                    return ((CategoryType)object).getName();
                 } else {
                     return (object == null)? "-" : object.toString();
                 }
@@ -153,9 +153,7 @@ public class AccountListWindowController extends BaseController implements Initi
                 new ReadOnlyObjectWrapper(p.getValue().getName()));
 
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-                new ReadOnlyObjectWrapper(dao.getCategoryType(p.getValue().getTypeId())
-                        .map(CategoryType::getTranslatedName)
-                        .orElse(""))
+                new ReadOnlyObjectWrapper(p.getValue().getType().getName())
         );
         categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
                 new ReadOnlyObjectWrapper(dao.getCategory(p.getValue().getCategoryId())
@@ -209,7 +207,7 @@ public class AccountListWindowController extends BaseController implements Initi
         } else {
             Object typeObject = typeChoiceBox.getSelectionModel().getSelectedItem();
             if (typeObject instanceof CategoryType) {
-                accounts = dao.getAccountsByType(((CategoryType)typeObject).getId());
+                accounts = dao.getAccountsByType((CategoryType)typeObject);
             } else {
                 accounts = dao.getAccounts();
             }

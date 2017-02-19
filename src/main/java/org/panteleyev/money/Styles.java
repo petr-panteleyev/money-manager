@@ -23,25 +23,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.money.test;
+package org.panteleyev.money;
 
-import java.util.UUID;
-import junit.framework.Assert;
-import org.panteleyev.money.persistence.CategoryType;
-import org.testng.annotations.Test;
-
-public class TestCategoryType extends BaseTest {
-
-    @Test
-    public void testEquals() throws Exception {
-        Integer id = RANDOM.nextInt();
-        String name = UUID.randomUUID().toString();
-        String comment = UUID.randomUUID().toString();
-
-        CategoryType t1 = new CategoryType(id, name, comment);
-        CategoryType t2 = new CategoryType(id, name, comment);
-
-        Assert.assertEquals(t1, t2);
-        Assert.assertEquals(t1.hashCode(), t2.hashCode());
-    }
+public interface Styles {
+    String BLACK_TEXT   = "blackText";
+    String RED_TEXT     = "redText";
+    String BLUE_TEXT    = "redText";
+    String GROUP_CELL   = "groupCell";
 }

@@ -25,11 +25,6 @@
  */
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -39,13 +34,18 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import org.panteleyev.money.persistence.TransactionType;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class TransactionTreeItem {
+public class TransactionTreeItem implements Styles {
     private final IntegerProperty dayProperty;
     private final IntegerProperty monthProperty;
     private final IntegerProperty yearProperty;
@@ -61,6 +61,7 @@ public class TransactionTreeItem {
 
     private final Transaction transaction;
     private final List<TransactionTreeItem> children;
+    private final String style;
 
     public TransactionTreeItem(Transaction t) {
         transaction = t;
@@ -83,14 +84,23 @@ public class TransactionTreeItem {
                 dao.getContact(t.getContactId()).map(Contact::getName).orElse(""));
 
         typeProperty = new SimpleStringProperty(this, "type",
-                dao.getTransactionType(t.getTransactionTypeId())
-                        .map(TransactionType::getTranslatedName)
-                        .orElse(""));
+                t.getTransactionType().getName());
 
-        sumProperty = new SimpleObjectProperty<>(this, "sum", t.getAmount());
         commentProperty = new SimpleStringProperty(this, "comment", t.getComment());
 
         approvedProperty = new SimpleObjectProperty<>(this, "approved", t.isChecked());
+
+        String s = BLACK_TEXT;
+        if (t.getAccountCreditedType() != t.getAccountDebitedType()) {
+            if (t.getAccountDebitedType() == CategoryType.INCOMES) {
+                s = BLUE_TEXT;
+            } else {
+                s = RED_TEXT;
+            }
+        }
+        style = s;
+
+        sumProperty = new SimpleObjectProperty<>(this, "sum", sumToShow(t));
     }
 
     public TransactionTreeItem(TransactionGroup gr, List<Transaction> trs) {
@@ -118,7 +128,7 @@ public class TransactionTreeItem {
                 year = t.getYear();
             }
 
-            sum = sum.add(t.getAmount());
+            sum = sum.add(sumToShow(t));
 
             if (accountDebitedName == null || accountDebitedName.isEmpty()) {
                 accountDebitedName = dao.getAccount(t.getAccountDebitedId())
@@ -127,9 +137,7 @@ public class TransactionTreeItem {
             }
 
             if (typeName == null || typeName.isEmpty()) {
-                typeName = dao.getTransactionType(t.getTransactionTypeId())
-                        .map(TransactionType::getTranslatedName)
-                        .orElse("");
+                typeName = t.getTransactionType().getName();
             }
 
             if (comment == null || comment.isEmpty()) {
@@ -175,6 +183,17 @@ public class TransactionTreeItem {
         commentProperty = new SimpleStringProperty(this, "comment", comment);
 
         approvedProperty = new SimpleObjectProperty<>(this, "approved", false);
+
+        style = (sum.signum() < 0)? RED_TEXT : BLACK_TEXT;
+    }
+
+    private BigDecimal sumToShow(Transaction t) {
+        BigDecimal sum = t.getAmount();
+        if (t.getAccountCreditedType() != t.getAccountDebitedType()
+                && t.getAccountDebitedType() != CategoryType.INCOMES) {
+            sum = sum.negate();
+        }
+        return sum;
     }
 
     public Transaction getTransaction() {
@@ -185,19 +204,19 @@ public class TransactionTreeItem {
         return children;
     }
 
-    public BooleanProperty isGroupProperty() {
+    BooleanProperty isGroupProperty() {
         return isGroupProperty;
     }
 
-    public IntegerProperty dayProperty() {
+    IntegerProperty dayProperty() {
         return dayProperty;
     }
 
-    public IntegerProperty monthProperty() {
+    IntegerProperty monthProperty() {
         return monthProperty;
     }
 
-    public IntegerProperty yearProperty() {
+    IntegerProperty yearProperty() {
         return yearProperty;
     }
 
@@ -227,5 +246,9 @@ public class TransactionTreeItem {
 
     public ObjectProperty<Boolean> approvedProperty() {
         return approvedProperty;
+    }
+
+    public String getStyle() {
+        return style;
     }
 }

@@ -26,101 +26,49 @@
 
 package org.panteleyev.money.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.Objects;
+import java.util.Arrays;
 import java.util.ResourceBundle;
-import org.panteleyev.persistence.Record;
-import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.Table;
 
-@Table("cat_type")
-public class CategoryType implements Record {
-    private final static ResourceBundle BUNDLE = ResourceBundle.getBundle("org.panteleyev.money.persistence.CategoryType");
+public enum CategoryType implements Named {
+    BANKS_AND_CASH(1),
+    INCOMES(2),
+    EXPENSES(3),
+    DEBTS(4),
+    PORTFOLIO(5),
+    ASSETS(6),
+    STARTUP(7);
 
-    public static final int BANKS_AND_CASH_ID   = 1;
-    public static final int INCOMES_ID          = 2;
-    public static final int EXPENSES_ID         = 3;
-    public static final int DEBTS_ID            = 4;
-    public static final int PORTFOLIO_ID        = 5;
-    public static final int ASSETS_ID           = 6;
-    public static final int STARTUP_ID          = 7;
-
-    public static final Map<Integer, String> PREDEFINED = new HashMap<Integer, String>() {{
-        put(BANKS_AND_CASH_ID, "/Banks &amp; cash");
-        put(INCOMES_ID, "/Incomes");
-        put(EXPENSES_ID, "/Expenses");
-        put(DEBTS_ID, "/Debts");
-        put(PORTFOLIO_ID, "/Portfolio");
-        put(ASSETS_ID, "/Assets");
-        put(STARTUP_ID, "/Startup");
-    }};
+    private static final String BUNDLE = "org.panteleyev.money.persistence.CategoryType";
 
     private final Integer id;
     private final String name;
     private final String comment;
 
-    @SuppressWarnings("FieldMayBeFinal")
-    private String translatedName;
+    CategoryType(int id) {
+        ResourceBundle b = ResourceBundle.getBundle(BUNDLE);
 
-    @RecordBuilder
-    public CategoryType(
-            @Field(Field.ID)  Integer id,
-            @Field("name")    String name,
-            @Field("comment") String comment
-    ) {
         this.id = id;
-        this.name = name;
-        this.comment = comment;
-
-        try {
-            translatedName = (name == null)? null : BUNDLE.getString(name);
-        } catch (MissingResourceException ex) {
-            translatedName = name;
-        }
+        this.name = b.getString("name" + id);
+        this.comment = b.getString("comment" + id);
     }
 
-    @Field(value = Field.ID, primaryKey = true)
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Field("name")
+    @Override
     public String getName() {
         return name;
     }
 
-    @Field("comment")
     public String getComment() {
         return comment;
     }
 
-    public String getTranslatedName() {
-        return translatedName;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj instanceof CategoryType) {
-            CategoryType that = (CategoryType)obj;
-
-            return Objects.equals(this.id, that.id)
-                    && Objects.equals(this.name, that.name)
-                    && Objects.equals(this.comment, that.comment);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, comment);
+    public static CategoryType get(int id) {
+        return Arrays.stream(values())
+                .filter(v -> v.getId() == id)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

@@ -26,198 +26,208 @@
 
 package org.panteleyev.money;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.utilities.fx.Controller;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-class CategoryTypeComboBox extends ComboBox<CategoryType> {
-    // TODO: get rid of these objects
-    private static final CategoryType DUMMY = new CategoryType(0, null, null);
+public class RequestTab extends Controller implements Initializable {
+    private static final String FXML = "/org/panteleyev/money/RequestTab.fxml";
 
+    private final TransactionTableView  transactionTable = new TransactionTableView(true);
 
-    public CategoryTypeComboBox() {
-        setConverter(new ReadOnlyStringConverter<CategoryType>() {
-            @Override
-            public String toString(CategoryType object) {
-                return object == DUMMY? "-- All Types --" : object.getName();
+    @FXML private BorderPane root;
+    @FXML private ChoiceBox categoryTypeChoiceBox;
+    @FXML private ChoiceBox categoryChoiceBox;
+    @FXML private ChoiceBox accountChoiceBox;
+
+    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
+    private final SimpleMapProperty<Integer, Category> categoriesProperty = new SimpleMapProperty<>();
+    private final SimpleMapProperty<Integer, Account> accountsProperty = new SimpleMapProperty<>();
+
+    private final SimpleStringProperty allTypesString = new SimpleStringProperty();
+    private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
+    private final SimpleStringProperty allAccountsString = new SimpleStringProperty();
+
+    public RequestTab() {
+        super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
+
+        MoneyDAO dao = MoneyDAO.getInstance();
+
+        preloadingProperty.bind(dao.preloadingProperty());
+        categoriesProperty.bind(dao.categoriesProperty());
+        accountsProperty.bind(dao.accountsProperty());
+
+        preloadingProperty.addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                Platform.runLater(this::setupCategoryTypesBox);
+            }
+        });
+
+        categoriesProperty.addListener((x,y,z) -> {
+            if (!preloadingProperty.get()) {
+                Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
+            }
+        });
+
+        accountsProperty.addListener((x,y,z) -> {
+            if (!preloadingProperty.get()) {
+                Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
             }
         });
     }
 
-    public CategoryType getCategoryType() {
-        CategoryType type = getSelectionModel().getSelectedItem();
-        return type == DUMMY? null : type;
+    @Override
+    public void initialize(URL location, ResourceBundle rb) {
+        root.setCenter(transactionTable);
+
+        allTypesString.set(rb.getString("account.Window.AllTypes"));
+        allCategoriesString.set(rb.getString("account.Window.AllCategories"));
+        allAccountsString.set(rb.getString("text.All.Accounts"));
+
+        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+            @Override
+            public String toString(Object obj) {
+                return (obj instanceof CategoryType)?
+                        ((CategoryType)obj).getName() : obj.toString();
+            }
+        });
+
+        categoryChoiceBox.setConverter(new ReadOnlyStringConverter() {
+            @Override
+            public String toString(Object obj) {
+                return (obj instanceof Category)?
+                        ((Category)obj).getName() : obj.toString();
+            }
+        });
+
+        accountChoiceBox.setConverter(new ReadOnlyStringConverter() {
+            @Override
+            public String toString(Object obj) {
+                return (obj instanceof Account)?
+                        ((Account)obj).getName() : obj.toString();
+            }
+        });
+
+        categoryTypeChoiceBox.setOnAction(e -> {
+            if (categoryTypeChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
+                setupCategoryBox(null);
+            } else {
+                setupCategoryBox((CategoryType)categoryTypeChoiceBox.getSelectionModel().getSelectedItem());
+            }
+        });
+
+        categoryChoiceBox.setOnAction(e -> {
+            if (categoryChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
+                setupAccountBox(null);
+            } else {
+                setupAccountBox((Category)categoryChoiceBox.getSelectionModel().getSelectedItem());
+            }
+        });
     }
 
-    public void reload(boolean dbOpen) {
-        getItems().clear();
-        getItems().add(DUMMY);
+    public BorderPane getRoot() {
+        return root;
+    }
 
-        if (dbOpen) {
-            getItems().addAll(MoneyDAO.getInstance().getCategoryTypes());
+    private void setupCategoryTypesBox() {
+        categoryTypeChoiceBox.getItems().clear();
+        categoryTypeChoiceBox.getItems().add(allTypesString.get());
+        categoryTypeChoiceBox.getItems().add(new Separator());
+        categoryTypeChoiceBox.getItems().addAll(CategoryType.values());
+
+        categoryTypeChoiceBox.getSelectionModel().select(0);
+
+        setupCategoryBox(null);
+    }
+
+    private void setupCategoryBox(CategoryType type) {
+        categoryChoiceBox.getItems().clear();
+        categoryChoiceBox.getItems().add(allCategoriesString.get());
+
+        if (type != null) {
+            categoryChoiceBox.getItems().addAll(MoneyDAO.getInstance().getCategoriesByType(type));
         }
 
-        getSelectionModel().select(0);
-    }
-}
+        categoryChoiceBox.getSelectionModel().select(0);
 
-class CategoryComboBox extends ComboBox<Category> {
-    // TODO: get rid of these objects
-    private static final Category DUMMY = new Category(0, null, null, 0, false);
-
-    public CategoryComboBox() {
-        setConverter(new ReadOnlyStringConverter<Category>() {
-            @Override
-            public String toString(Category object) {
-                return object == DUMMY? "-- All Categories --" : object.getName();
-            }
-        });
+        setupAccountBox(null);
     }
 
-    public Category getCategory() {
-        Category category = getSelectionModel().getSelectedItem();
-        return category == DUMMY? null : category;
-    }
+    private void setupAccountBox(Category category) {
+        accountChoiceBox.getItems().clear();
+        accountChoiceBox.getItems().add(allAccountsString.get());
 
-    public void reload(boolean dbOpen, CategoryType type) {
-        getItems().clear();
-        getItems().add(DUMMY);
-
-        if (dbOpen && type != null) {
-            getItems().addAll(MoneyDAO.getInstance().getCategoriesByType(type));
-        }
-
-        getSelectionModel().select(0);
-    }
-}
-
-class AccountComboBox extends ComboBox<Account> {
-    // TODO: get rid of these objects
-    private static final Account DUMMY = new Account(null, null, null, null, null, null, null, null, null, false);
-
-    public AccountComboBox() {
-        setConverter(new ReadOnlyStringConverter<Account>() {
-            @Override
-            public String toString(Account object) {
-                return object == DUMMY? "-- All Accounts --" : object.getName();
-            }
-        });
-    }
-
-    public Account getAccount() {
-        Account acc = getSelectionModel().getSelectedItem();
-        return acc == DUMMY? null : acc;
-    }
-
-    public void reload(boolean dbOpen, Category category) {
-        getItems().clear();
-        getItems().add(DUMMY);
-
-        if (dbOpen && category != null) {
-            getItems().addAll(MoneyDAO.getInstance().getAccountsByCategory(category.getId())
-                .stream().filter(Account::isEnabled)
-                .collect(Collectors.toList())
+        if (category != null) {
+            accountChoiceBox.getItems().addAll(MoneyDAO.getInstance().getAccountsByCategory(category.getId())
+                    .stream().filter(Account::isEnabled)
+                    .collect(Collectors.toList())
             );
         }
 
-        getSelectionModel().select(0);
-    }
-}
-
-public class RequestTab extends BorderPane {
-    private final TransactionTableView  transactionTable = new TransactionTableView(true);
-    private final CategoryTypeComboBox categoryTypeComboBox = new CategoryTypeComboBox();
-    private final CategoryComboBox categoryComboBox = new CategoryComboBox();
-    private final AccountComboBox accountComboBox = new AccountComboBox();
-
-    public RequestTab() {
-        setCenter(transactionTable);
-
-        VBox topPanel = new VBox();
-
-        setTop(topPanel);
-
-
-        HBox buttonPanel = new HBox();
-        Button findButton = new Button("Find");
-        findButton.setOnAction(e -> onFindButton());
-
-        Button clearButton = new Button("Clear");
-        clearButton.setOnAction(e -> onClearButton());
-
-        buttonPanel.getChildren().addAll(
-            clearButton,
-            findButton
-        );
-
-        GridPane requestPanel = new GridPane();
-
-        int row = 0;
-
-        requestPanel.add(new Label("In:"), 1, ++row);
-        requestPanel.add(categoryTypeComboBox, 2, row);
-        requestPanel.add(categoryComboBox, 3, row);
-        requestPanel.add(accountComboBox, 4, row);
-
-        topPanel.getChildren().addAll(
-            buttonPanel,
-            requestPanel
-        );
+        accountChoiceBox.getSelectionModel().select(0);
     }
 
-    public void initControls(boolean dbOpen) {
-        categoryTypeComboBox.reload(dbOpen);
-        categoryComboBox.reload(false, null);
-        accountComboBox.reload(false, null);
-
-        categoryTypeComboBox.setOnAction(e -> {
-            accountComboBox.reload(false, null);
-            if (categoryTypeComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                categoryComboBox.reload(false, null);
-            } else {
-                categoryComboBox.reload(true, categoryTypeComboBox.getSelectionModel().getSelectedItem());
-            }
-        });
-
-        categoryComboBox.setOnAction(e -> {
-            if (categoryComboBox.getSelectionModel().getSelectedIndex() == 0) {
-                accountComboBox.reload(false, null);
-            } else {
-                accountComboBox.reload(true, categoryComboBox.getSelectionModel().getSelectedItem());
-            }
-        });
+    private Account getSelectedAccount() {
+        Object obj = accountChoiceBox.getSelectionModel().getSelectedItem();
+        if (obj instanceof Account) {
+            return (Account) obj;
+        } else {
+            return null;
+        }
     }
 
-    private void onFindButton() {
+    private Category getSelectedCategory() {
+        Object obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        if (obj instanceof Category) {
+            return (Category)obj;
+        } else {
+            return null;
+        }
+    }
+
+    private CategoryType getSelectedCategoryType() {
+        Object obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
+        if (obj instanceof CategoryType) {
+            return (CategoryType)obj;
+        } else {
+            return null;
+        }
+    }
+
+    public void onFindButton() {
         Collection<Transaction> transactions;
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        Account account = accountComboBox.getAccount();
+        Account account = getSelectedAccount();
         if (account != null) {
             transactions = dao.getTransactions(Collections.singletonList(account));
         } else {
-            Category category = categoryComboBox.getCategory();
+            Category category = getSelectedCategory();
             if (category != null) {
                 List<Account> accounts = dao.getAccountsByCategory(category.getId());
                 transactions = dao.getTransactions(accounts);
             } else {
-                CategoryType type = categoryTypeComboBox.getCategoryType();
+                CategoryType type = getSelectedCategoryType();
                 if (type != null) {
                     List<Category> categories = dao.getCategoriesByType(type);
                     transactions = dao.getTransactionsByCategories(categories);
@@ -234,11 +244,9 @@ public class RequestTab extends BorderPane {
         transactionTable.sort();
     }
 
-    private void onClearButton() {
+    public void onClearButton() {
         transactionTable.clear();
 
-        categoryTypeComboBox.reload(MoneyDAO.isOpen());
-        categoryComboBox.reload(false, null);
-        accountComboBox.reload(false, null);
+        setupCategoryTypesBox();
     }
 }

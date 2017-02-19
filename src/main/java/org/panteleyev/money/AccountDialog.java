@@ -89,12 +89,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
 
         categories = dao.getCategories();
 
-        typeComboBox.setConverter(new ReadOnlyStringConverter<CategoryType>() {
-            @Override
-            public String toString(CategoryType object) {
-                return object.getTranslatedName();
-            }
-        });
+        typeComboBox.setConverter(new ReadOnlyNamedConverter<>());
         categoryComboBox.setConverter(new ReadOnlyNamedConverter<>());
 
         currencyComboBox.setConverter(new ReadOnlyStringConverter<Currency>() {
@@ -107,8 +102,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
         Collection<Currency> currencyList = dao.getCurrencies();
         currencyComboBox.setItems(FXCollections.observableArrayList(currencyList));
 
-        Collection<CategoryType> tList = dao.getCategoryTypes();
-        typeComboBox.setItems(FXCollections.observableArrayList(tList));
+        typeComboBox.setItems(FXCollections.observableArrayList(CategoryType.values()));
 
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
 
@@ -121,7 +115,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
 
             if (initialCategory != null) {
                 typeComboBox.getSelectionModel()
-                        .select(dao.getCategoryType(initialCategory.getCatTypeId()).orElse(null));
+                        .select(initialCategory.getCatType());
                 onCategoryTypeSelected();
                 categoryComboBox.getSelectionModel()
                         .select(dao.getCategory(initialCategory.getId()).orElse(null));
@@ -138,7 +132,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
             activeCheckBox.setSelected(account.isEnabled());
 
             typeComboBox.getSelectionModel()
-                .select(dao.getCategoryType(account.getTypeId()).orElse(null));
+                .select(account.getType());
             categoryComboBox.getSelectionModel()
                 .select(dao.getCategory(account.getCategoryId()).orElse(null));
 
@@ -159,7 +153,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
                     .comment(commentEdit.getText())
                     .enabled(activeCheckBox.isSelected())
                     .openingBalance(new BigDecimal(initialEdit.getText()))
-                    .typeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
+                    .type(typeComboBox.getSelectionModel().getSelectedItem())
                     .categoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId())
                     .currencyId(selectedCurrency == null? null : selectedCurrency.getId());
             } else {
@@ -176,7 +170,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
         CategoryType type = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<Category> filtered = categories.stream()
-                .filter(x -> x.getCatTypeId().equals(type.getId()))
+                .filter(x -> x.getCatType().equals(type))
                 .collect(Collectors.toList());
 
         categoryComboBox.setItems(FXCollections.observableArrayList(filtered));

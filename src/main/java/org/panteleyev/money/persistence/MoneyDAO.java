@@ -26,6 +26,13 @@
 
 package org.panteleyev.money.persistence;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.FXCollections;
+import org.panteleyev.persistence.DAO;
+import org.panteleyev.persistence.Record;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -34,32 +41,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
-import javafx.collections.FXCollections;
-import javax.sql.DataSource;
-import org.panteleyev.persistence.DAO;
-import org.panteleyev.persistence.Record;
 
 public class MoneyDAO extends DAO {
-
     private static final MoneyDAO INSTANCE = new MoneyDAO();
 
-    private final SimpleMapProperty<Integer, ContactType> contactTypesProperty =
-            new  SimpleMapProperty<>(FXCollections.observableHashMap());
-
-    private final SimpleMapProperty<Integer, CategoryType> categoryTypesProperty =
-            new  SimpleMapProperty<>(FXCollections.observableHashMap());
-
     private final SimpleMapProperty<Integer, Category> categoriesProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
-
-    private final SimpleMapProperty<Integer, TransactionType> transactionTypesProperty =
             new SimpleMapProperty<>(FXCollections.observableHashMap());
 
     private final SimpleMapProperty<Integer, Contact> contactsProperty =
@@ -96,11 +85,8 @@ public class MoneyDAO extends DAO {
     protected void setDatasource(DataSource ds) {
         super.setDatasource(ds);
 
-        contactTypesProperty.set(FXCollections.observableHashMap());
-        categoryTypesProperty.set(FXCollections.observableHashMap());
         categoriesProperty.set(FXCollections.observableHashMap());
         contactsProperty.set(FXCollections.observableHashMap());
-        transactionTypesProperty.set(FXCollections.observableHashMap());
         currencyProperty.set(FXCollections.observableHashMap());
         accountsProperty.set(FXCollections.observableHashMap());
         transactionGroupsProperty.set(FXCollections.observableHashMap());
@@ -109,22 +95,6 @@ public class MoneyDAO extends DAO {
 
     public BooleanProperty preloadingProperty() {
         return preloadingProperty;
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Category types
-    ////////////////////////////////////////////////////////////////////////////
-
-    public SimpleMapProperty<Integer, CategoryType> categoryTypesProperty() {
-        return categoryTypesProperty;
-    }
-
-    public Optional<CategoryType> getCategoryType(Integer id) {
-        return Optional.ofNullable(categoryTypesProperty.get(id));
-    }
-
-    public Collection<CategoryType> getCategoryTypes() {
-        return categoryTypesProperty.values();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -155,16 +125,12 @@ public class MoneyDAO extends DAO {
         return categoriesProperty.values();
     }
 
-    public List<Category> getCategoriesByType(Integer... ids) {
-        List<Integer> idList = Arrays.asList(ids);
+    public List<Category> getCategoriesByType(CategoryType... types) {
+        List<CategoryType> typeList = Arrays.asList(types);
 
         return getCategories().stream()
-                .filter(c -> idList.contains(c.getCatTypeId()))
+                .filter(c -> typeList.contains(c.getCatType()))
                 .collect(Collectors.toList());
-    }
-
-    public List<Category> getCategoriesByType(CategoryType type) {
-        return getCategoriesByType(type.getId());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -202,22 +168,6 @@ public class MoneyDAO extends DAO {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // Contact types
-    ////////////////////////////////////////////////////////////////////////////
-
-    public SimpleMapProperty<Integer, ContactType> contactTypesProperty() {
-        return contactTypesProperty;
-    }
-
-    public Optional<ContactType> getContactType(Integer id) {
-        return Optional.ofNullable(contactTypesProperty.get(id));
-    }
-
-    public Collection<ContactType> getContactTypes() {
-        return contactTypesProperty.values();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
     // Contacts
     ////////////////////////////////////////////////////////////////////////////
 
@@ -243,22 +193,6 @@ public class MoneyDAO extends DAO {
 
     public Collection<Contact> getContacts() {
         return contactsProperty.values();
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
-    // Transaction Types
-    ////////////////////////////////////////////////////////////////////////////
-
-    public SimpleMapProperty<Integer, TransactionType> transactionTypesProperty() {
-        return transactionTypesProperty;
-    }
-
-    public Optional<TransactionType> getTransactionType(Integer id) {
-        return Optional.ofNullable(transactionTypesProperty.get(id));
-    }
-
-    public Collection<TransactionType> getTransactionTypes() {
-        return transactionTypesProperty.values();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -294,9 +228,9 @@ public class MoneyDAO extends DAO {
         return accountsProperty.values();
     }
 
-    public List<Account> getAccountsByType(Integer id) {
+    public List<Account> getAccountsByType(CategoryType type) {
         return accountsProperty.values().stream()
-                .filter(a -> a.getTypeId().equals(id))
+                .filter(a -> a.getType().equals(type))
                 .collect(Collectors.toList());
     }
 
@@ -430,13 +364,10 @@ public class MoneyDAO extends DAO {
 
     private static List<Class<? extends Record>> getTableClasses() {
         return Arrays.asList(
-                CategoryType.class,
                 Category.class,
-                ContactType.class,
                 Contact.class,
                 Currency.class,
                 Account.class,
-                TransactionType.class,
                 TransactionGroup.class,
                 Transaction.class
         );
@@ -446,36 +377,15 @@ public class MoneyDAO extends DAO {
         super.createTables(getTableClasses());
     }
 
-    public void setupNewDatabase() {
-        CategoryType.PREDEFINED.forEach((id, name) ->
-                insert(new CategoryType(id, name, "")));
-
-        TransactionType.PREDEFINED.forEach((id, name) ->
-                insert(new TransactionType(id, name)));
-
-        final ResourceBundle contactTypeBundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.ContactType");
-        ContactType.PREDEFINED.forEach((id, key) ->
-                insert(new ContactType(id, contactTypeBundle.getString(key))));
-    }
-
     public void preload() {
         preloadingProperty.set(true);
 
         preload(getTableClasses());
 
-        contactTypesProperty.set(FXCollections.observableMap(getAll(ContactType.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
-
-        categoryTypesProperty.set(FXCollections.observableMap(getAll(CategoryType.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
-
         categoriesProperty.set(FXCollections.observableMap(getAll(Category.class)
                 .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
 
         contactsProperty.set(FXCollections.observableMap(getAll(Contact.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
-
-        transactionTypesProperty.set(FXCollections.observableMap(getAll(TransactionType.class)
                 .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
 
         currencyProperty.set(FXCollections.observableMap(getAll(Currency.class)

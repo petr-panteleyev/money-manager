@@ -26,71 +26,42 @@
 
 package org.panteleyev.money.persistence;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import org.panteleyev.persistence.Record;
-import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.Table;
+import java.util.Arrays;
+import java.util.ResourceBundle;
 
-@Table("contact_type")
-public class ContactType implements Record, Named {
-    public static final int ID_PERSONAL = 1;
-    public static final int ID_CLIENT   = 2;
-    public static final int ID_SUPPLIER = 3;
-    public static final int ID_EMPLOYEE = 4;
-    public static final int ID_EMPLOYER = 5;
-    public static final int ID_SERVICE  = 6;
+public enum ContactType implements Named {
+    PERSONAL(1),
+    CLIENT(2),
+    SUPPLIER(3),
+    EMPLOYEE(4),
+    EMPLOYER(5),
+    SERVICE(6);
 
-    public static final Map<Integer, String> PREDEFINED = new HashMap<Integer, String>() {{
-        put(ID_PERSONAL, "/personal");
-        put(ID_CLIENT, "/client");
-        put(ID_SUPPLIER, "/supplier");
-        put(ID_EMPLOYEE, "/employee");
-        put(ID_EMPLOYER, "/employer");
-        put(ID_SERVICE, "/service");
-    }};
+    private static final String BUNDLE = "org.panteleyev.money.persistence.ContactType";
 
     private final int    id;
     private final String name;
 
-    @RecordBuilder
-    public ContactType(@Field(Field.ID) Integer id, @Field("name") String name) {
+    ContactType(int id) {
+        ResourceBundle b = ResourceBundle.getBundle(BUNDLE);
+
         this.id = id;
-        this.name = name;
+        this.name = b.getString("name" + id);
     }
 
-    @Field(value = Field.ID, primaryKey = true)
-    @Override
     public Integer getId() {
         return id;
     }
 
-    @Field("name")
     @Override
     public String getName() {
         return name;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj instanceof ContactType) {
-            ContactType that = (ContactType)obj;
-
-            return Objects.equals(this.id, that.id)
-                    && Objects.equals(this.name, that.name);
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
+    public static ContactType get(int id) {
+        return Arrays.stream(values())
+                .filter(v -> v.getId() == id)
+                .findAny()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

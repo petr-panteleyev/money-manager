@@ -50,7 +50,7 @@ import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class AccountTree extends Controller implements Initializable {
+public class AccountTree extends Controller implements Initializable, Styles {
     private static class BalanceCell extends TreeTableCell<AccountTreeItem, Account> {
         private Predicate<Transaction> filter;
         private final boolean total;
@@ -98,9 +98,7 @@ public class AccountTree extends Controller implements Initializable {
                 setText(sum.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
 
                 if (sum.signum() < 0) {
-                    styleProperty().set("-fx-text-fill: #ff0000;");
-                } else {
-                    styleProperty().set("-fx-text-fill: #000000;");
+                    getStyleClass().add(RED_TEXT);
                 }
             }
         }
@@ -120,18 +118,18 @@ public class AccountTree extends Controller implements Initializable {
 
     private final TreeItem<AccountTreeItem> root = new TreeItem<>();
 
-    private final TreeItem<AccountTreeItem> balanceRoot =
-            new TreeItem<>(new AccountTreeItem("Balance", "000"));
     private final TreeItem<AccountTreeItem> banksSubTree =
-            new TreeItem<>(new AccountTreeItem("Banks", "--- banks---"));
+            new TreeItem<>(new AccountTreeItem(CategoryType.BANKS_AND_CASH.getName(), CategoryType.BANKS_AND_CASH.getComment()));
     private final TreeItem<AccountTreeItem> debtsSubTree =
-            new TreeItem<>(new AccountTreeItem("Debts", "Credits, credit cards, etc."));
-    private final TreeItem<AccountTreeItem> expIncRoot =
-            new TreeItem<>(new AccountTreeItem("Income and Expenses", "Income - Expenses"));
-    private final TreeItem<AccountTreeItem> incomeSubTree
-            = new TreeItem<>(new AccountTreeItem("Incomes", "Incomes"));
-    private final TreeItem<AccountTreeItem> expenseSubTree
-            = new TreeItem<>(new AccountTreeItem("Expenses", "Expenses"));
+            new TreeItem<>(new AccountTreeItem(CategoryType.DEBTS.getName(), CategoryType.DEBTS.getComment()));
+    private final TreeItem<AccountTreeItem> portfolioSubTree =
+            new TreeItem<>(new AccountTreeItem(CategoryType.PORTFOLIO.getName(), CategoryType.PORTFOLIO.getComment()));
+    private final TreeItem<AccountTreeItem> assetsSubTree =
+            new TreeItem<>(new AccountTreeItem(CategoryType.ASSETS.getName(), CategoryType.ASSETS.getComment()));
+    private final TreeItem<AccountTreeItem> incomeSubTree =
+            new TreeItem<>(new AccountTreeItem(CategoryType.INCOMES.getName(), CategoryType.INCOMES.getComment()));
+    private final TreeItem<AccountTreeItem> expenseSubTree =
+            new TreeItem<>(new AccountTreeItem(CategoryType.EXPENSES.getName(), CategoryType.EXPENSES.getComment()));
 
     private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
 
@@ -157,7 +155,10 @@ public class AccountTree extends Controller implements Initializable {
     }
 
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    public void initialize(URL location, ResourceBundle rb) {
+        TreeItem<AccountTreeItem> balanceRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.Balance"), ""));
+        TreeItem<AccountTreeItem> expIncRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.IncomesExpenses"), "Income - Expenses"));
+
         tableView.setRoot(root);
 
         nameColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
@@ -182,6 +183,8 @@ public class AccountTree extends Controller implements Initializable {
 
         balanceRoot.getChildren().addAll(
                 banksSubTree,
+                portfolioSubTree,
+                assetsSubTree,
                 debtsSubTree
         );
 
@@ -224,17 +227,19 @@ public class AccountTree extends Controller implements Initializable {
 
     public void clear() {
         banksSubTree.getChildren().clear();
+        portfolioSubTree.getChildren().clear();
+        assetsSubTree.getChildren().clear();
         debtsSubTree.getChildren().clear();
         incomeSubTree.getChildren().clear();
         expenseSubTree.getChildren().clear();
     }
 
-    private void initSubtree(TreeItem rootItem, int categoryTypeId) {
+    private void initSubtree(TreeItem rootItem, CategoryType categoryType) {
         categoryTreeItem = null;
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        dao.getAccountsByType(categoryTypeId)
+        dao.getAccountsByType(categoryType)
                 .stream()
                 .filter(a -> a.isEnabled() || (!a.isEnabled() && Options.getShowDeactivatedAccounts()))
                 .sorted(new Account.AccountCategoryNameComparator()).forEach(a -> {
@@ -256,10 +261,12 @@ public class AccountTree extends Controller implements Initializable {
 
     private void initAccountTree() {
         clear();
-        initSubtree(banksSubTree, CategoryType.BANKS_AND_CASH_ID);
-        initSubtree(debtsSubTree, CategoryType.DEBTS_ID);
-        initSubtree(incomeSubTree, CategoryType.INCOMES_ID);
-        initSubtree(expenseSubTree, CategoryType.EXPENSES_ID);
+        initSubtree(banksSubTree, CategoryType.BANKS_AND_CASH);
+        initSubtree(portfolioSubTree, CategoryType.PORTFOLIO);
+        initSubtree(assetsSubTree, CategoryType.ASSETS);
+        initSubtree(debtsSubTree, CategoryType.DEBTS);
+        initSubtree(incomeSubTree, CategoryType.INCOMES);
+        initSubtree(expenseSubTree, CategoryType.EXPENSES);
     }
 
     @SuppressWarnings("unused")

@@ -27,15 +27,18 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Currency;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 
-public class TestEquals {
+public class TestEquals extends BaseTest {
     @DataProvider(name="testEqualsDataProvider")
     public Object[][] testEqualsDataProvider() {
+        CategoryType type = randomCategoryType();
+
         return new Object[][] {
             {
                 new Currency(1, "2", "3", "4", 1, true, true, new BigDecimal("10.23"), 1, true),
@@ -48,13 +51,13 @@ public class TestEquals {
                 false
             },
             {
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), 11, 12, 13, true),
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), 11, 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
                 true
             },
             {
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), 11, 12, 13, true),
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), 11, 12, 13, false),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, false),
                 false
             },
         };
