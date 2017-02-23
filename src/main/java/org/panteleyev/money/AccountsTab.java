@@ -34,13 +34,15 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class AccountsTab extends BorderPane {
     private final AccountTree accountTree = (AccountTree)new AccountTree().load();
     private final TransactionTableView transactionTable = new TransactionTableView(true);
-    private final SplitPane split = new SplitPane(accountTree.getTableView(), new BorderPane(transactionTable));
+    private final SplitPane split = new SplitPane(accountTree.getPane(), new BorderPane(transactionTable));
 
     private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
     private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
@@ -48,11 +50,14 @@ public class AccountsTab extends BorderPane {
 
     private Account selectedAccount = null;
 
+    private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.getPredicate();
+
     public AccountsTab() {
         split.setOrientation(Orientation.VERTICAL);
         setCenter(split);
 
         accountTree.setOnAccountSelected(this::onAccountSelected);
+        accountTree.setOnTransactionFilterSelected(this::onTransactionFilterSelected);
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
         MoneyDAO dao = MoneyDAO.getInstance();
@@ -71,6 +76,10 @@ public class AccountsTab extends BorderPane {
                 Platform.runLater(this::reloadTransactions);
             }
         });
+    }
+
+    private void onTransactionFilterSelected(Predicate<Transaction> filter) {
+        reloadTransactions(filter);
     }
 
     private void onAccountSelected(Account account) {
@@ -93,13 +102,19 @@ public class AccountsTab extends BorderPane {
     }
 
     private void reloadTransactions() {
+        reloadTransactions(transactionFilter);
+    }
+
+    private void reloadTransactions(Predicate<Transaction> filter) {
+        this.transactionFilter = filter;
+
         transactionTable.clear();
 
         if (selectedAccount != null) {
             List<Transaction> transactions = MoneyDAO.getInstance()
                     .getTransactions(selectedAccount)
                     .stream()
-                    .limit(100)
+                    .filter(filter)
                     .collect(Collectors.toList());
 
             transactionTable.addRecords(transactions);

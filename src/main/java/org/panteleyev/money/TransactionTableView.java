@@ -64,6 +64,7 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
         @Override
         protected void updateItem(TransactionTreeItem item, boolean empty) {
             super.updateItem(item, empty);
+            getStyleClass().remove(GROUP_CELL);
             if (!empty) {
                 if (item.isGroupProperty().get()) {
                     getStyleClass().add(GROUP_CELL);

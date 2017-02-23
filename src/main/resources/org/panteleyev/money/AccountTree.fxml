@@ -1,27 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 
-<TreeTableView fx:id="tableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="1016.0" showRoot="false" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
-  <columns>
-    <TreeTableColumn fx:id="nameColumn" prefWidth="75.0" text="%column.Name" />
-    <TreeTableColumn fx:id="commentColumn" prefWidth="75.0" text="%column.Comment" />
-      <TreeTableColumn fx:id="approvedColumn" prefWidth="75.0" text="%column.Approved" />
-      <TreeTableColumn fx:id="balanceColumn" prefWidth="75.0" text="%column.Balance" />
-      <TreeTableColumn fx:id="waitingColumn" prefWidth="75.0" text="%column.Waiting" />
-  </columns>
-   <contextMenu>
-      <ContextMenu>
-        <items>
-            <MenuItem mnemonicParsing="false" onAction="#onNewAccount" text="%menu.Edit.newAccount" />
-            <SeparatorMenuItem mnemonicParsing="false" />
-            <CheckMenuItem fx:id="showDeactivatedAccountsMenuItem" mnemonicParsing="false" text="Show deactivated accounts" />
-        </items>
-      </ContextMenu>
-   </contextMenu>
-</TreeTableView>
+
+<BorderPane fx:id="pane" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <center>
+      <TreeTableView fx:id="tableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="520.0" prefWidth="1016.0" showRoot="false">
+        <columns>
+          <TreeTableColumn fx:id="nameColumn" prefWidth="75.0" text="%column.Name" />
+          <TreeTableColumn fx:id="commentColumn" prefWidth="75.0" text="%column.Comment" />
+            <TreeTableColumn fx:id="approvedColumn" prefWidth="75.0" text="%column.Approved" />
+            <TreeTableColumn fx:id="balanceColumn" prefWidth="75.0" text="%column.Balance" />
+            <TreeTableColumn fx:id="waitingColumn" prefWidth="75.0" text="%column.Waiting" />
+        </columns>
+         <contextMenu>
+            <ContextMenu>
+              <items>
+                  <MenuItem mnemonicParsing="false" onAction="#onNewAccount" text="%menu.Edit.newAccount" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <CheckMenuItem fx:id="showDeactivatedAccountsMenuItem" mnemonicParsing="false" text="Show deactivated accounts" />
+              </items>
+            </ContextMenu>
+         </contextMenu>
+      </TreeTableView>
+   </center>
+   <top>
+      <HBox spacing="5.0" BorderPane.alignment="CENTER">
+         <children>
+            <ChoiceBox fx:id="accountFilterBox" />
+            <ChoiceBox fx:id="transactionFilterBox" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </BorderPane.margin>
+      </HBox>
+   </top>
+</BorderPane>

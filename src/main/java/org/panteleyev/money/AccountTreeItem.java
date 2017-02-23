@@ -41,28 +41,28 @@ public class AccountTreeItem {
     private final StringProperty commentProperty;
     private final Integer id;
 
-    public AccountTreeItem(String name, String comment) {
+    AccountTreeItem(String name, String comment) {
         id = 0;
         nameProperty = new SimpleStringProperty(this, "name", name);
         commentProperty = new SimpleStringProperty(this, "comment", comment);
-        accountProperty = new SimpleObjectProperty<Account>(this,"account", null);
-        categoryProperty = new SimpleObjectProperty<Category>(this, "category", null);
+        accountProperty = new SimpleObjectProperty<>(this, "account", null);
+        categoryProperty = new SimpleObjectProperty<>(this, "category", null);
     }
 
-    public AccountTreeItem(Account account) {
+    AccountTreeItem(Account account) {
         id = account.getId();
         nameProperty = new SimpleStringProperty(this, "name", account.getName());
         commentProperty = new SimpleStringProperty(this, "comment", account.getComment());
-        accountProperty = new SimpleObjectProperty<Account>(this,"account", account);
-        categoryProperty = new SimpleObjectProperty<Category>(this, "category", null);
+        accountProperty = new SimpleObjectProperty<>(this, "account", account);
+        categoryProperty = new SimpleObjectProperty<>(this, "category", null);
     }
 
-    public AccountTreeItem(Category category) {
+    AccountTreeItem(Category category) {
         id = category.getId();
         nameProperty = new SimpleStringProperty(this, "name", category.getName());
         commentProperty = new SimpleStringProperty(this, "comment", category.getComment());
-        accountProperty = new SimpleObjectProperty<Account>(this,"account", null);
-        categoryProperty = new SimpleObjectProperty<Category>(this, "category", category);
+        accountProperty = new SimpleObjectProperty<>(this, "account", null);
+        categoryProperty = new SimpleObjectProperty<>(this, "category", category);
     }
 
     public Integer getId() {

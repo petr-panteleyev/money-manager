@@ -26,31 +26,41 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleMapProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.TransactionFilter;
 import org.panteleyev.utilities.fx.Controller;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class AccountTree extends Controller implements Initializable, Styles {
+
     private static class BalanceCell extends TreeTableCell<AccountTreeItem, Account> {
         private Predicate<Transaction> filter;
         private final boolean total;
@@ -106,7 +116,12 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
     private static final String FXML = "/org/panteleyev/money/AccountTree.fxml";
 
+    @FXML private BorderPane pane;
     @FXML private TreeTableView<AccountTreeItem> tableView;
+
+    // Filters
+    @FXML private ChoiceBox<Object> accountFilterBox;
+    @FXML private ChoiceBox<Object> transactionFilterBox;
 
     @FXML private TreeTableColumn<AccountTreeItem, String>  nameColumn;
     @FXML private TreeTableColumn<AccountTreeItem, String>  commentColumn;
@@ -117,24 +132,24 @@ public class AccountTree extends Controller implements Initializable, Styles {
     @FXML private CheckMenuItem                             showDeactivatedAccountsMenuItem;
 
     private final TreeItem<AccountTreeItem> root = new TreeItem<>();
+    private TreeItem<AccountTreeItem> balanceRoot;
+    private TreeItem<AccountTreeItem> expIncRoot;
 
-    private final TreeItem<AccountTreeItem> banksSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.BANKS_AND_CASH.getName(), CategoryType.BANKS_AND_CASH.getComment()));
-    private final TreeItem<AccountTreeItem> debtsSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.DEBTS.getName(), CategoryType.DEBTS.getComment()));
-    private final TreeItem<AccountTreeItem> portfolioSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.PORTFOLIO.getName(), CategoryType.PORTFOLIO.getComment()));
-    private final TreeItem<AccountTreeItem> assetsSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.ASSETS.getName(), CategoryType.ASSETS.getComment()));
-    private final TreeItem<AccountTreeItem> incomeSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.INCOMES.getName(), CategoryType.INCOMES.getComment()));
-    private final TreeItem<AccountTreeItem> expenseSubTree =
-            new TreeItem<>(new AccountTreeItem(CategoryType.EXPENSES.getName(), CategoryType.EXPENSES.getComment()));
+    private final TreeItem<AccountTreeItem> banksSubTree;
+    private final TreeItem<AccountTreeItem> debtsSubTree;
+    private final TreeItem<AccountTreeItem> portfolioSubTree;
+    private final TreeItem<AccountTreeItem> assetsSubTree;
+    private final TreeItem<AccountTreeItem> incomeSubTree;
+    private final TreeItem<AccountTreeItem> expenseSubTree;
+
+    private final Map<CategoryType, TreeItem<AccountTreeItem>> subRoots = new EnumMap<>(CategoryType.class);
 
     private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final SimpleMapProperty<Integer, Account> accountsProperty =
             new SimpleMapProperty<>();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
             new SimpleMapProperty<>();
 
@@ -143,23 +158,34 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
     // Listeners
     private Consumer<Account> accountSelectedConsumer = (a) -> {};
+    private Consumer<Predicate<Transaction>> transactionFilterConsumer = (f) -> {};
 
-
-    public AccountTree() {
+    AccountTree() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
 
         MoneyDAO dao = MoneyDAO.getInstance();
         preloadingProperty.bind(dao.preloadingProperty());
         accountsProperty.bind(dao.accountsProperty());
         transactionsProperty.bind(dao.transactionsProperty());
+
+        Arrays.stream(CategoryType.values()).forEachOrdered(type ->
+            subRoots.put(type, new TreeItem<>(new AccountTreeItem(type.getName(), type.getComment())))
+        );
+
+        banksSubTree = subRoots.get(CategoryType.BANKS_AND_CASH);
+        debtsSubTree = subRoots.get(CategoryType.DEBTS);
+        portfolioSubTree = subRoots.get(CategoryType.PORTFOLIO);
+        assetsSubTree = subRoots.get(CategoryType.ASSETS);
+        incomeSubTree = subRoots.get(CategoryType.INCOMES);
+        expenseSubTree = subRoots.get(CategoryType.EXPENSES);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle rb) {
-        TreeItem<AccountTreeItem> balanceRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.Balance"), ""));
-        TreeItem<AccountTreeItem> expIncRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.IncomesExpenses"), "Income - Expenses"));
+        initAccountFilterBox(rb);
 
-        tableView.setRoot(root);
+        balanceRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.Balance"), ""));
+        expIncRoot = new TreeItem<>(new AccountTreeItem(rb.getString("account.Tree.IncomesExpenses"), "Income - Expenses"));
 
         nameColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         commentColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("comment"));
@@ -176,22 +202,7 @@ public class AccountTree extends Controller implements Initializable, Styles {
         balanceColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
         waitingColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
 
-        root.getChildren().addAll(
-                balanceRoot,
-                expIncRoot
-        );
-
-        balanceRoot.getChildren().addAll(
-                banksSubTree,
-                portfolioSubTree,
-                assetsSubTree,
-                debtsSubTree
-        );
-
-        expIncRoot.getChildren().addAll(
-                incomeSubTree,
-                expenseSubTree
-        );
+        initTreeSkeleton();
 
         balanceRoot.setExpanded(true);
         banksSubTree.setExpanded(true);
@@ -200,7 +211,14 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
         showDeactivatedAccountsMenuItem.setSelected(Options.getShowDeactivatedAccounts());
 
-        tableView.getSelectionModel().selectedItemProperty().addListener((x,y,newItem) -> onTreeItemSelected(newItem));
+        tableView.getSelectionModel().selectedItemProperty()
+                .addListener((x,y,newItem) -> onTreeItemSelected(newItem));
+
+        accountFilterBox.getSelectionModel().selectedIndexProperty()
+                .addListener((x,y,newValue) -> onAccountFilterSelected((Integer)newValue));
+
+        transactionFilterBox.getSelectionModel().selectedItemProperty()
+                .addListener((x,y,newValue) -> onTransactionFilterSelected(newValue));
 
         accountsProperty.addListener(((x, y, z) -> {
             if (!preloadingProperty.get()) {
@@ -216,13 +234,14 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
         preloadingProperty.addListener((x, oldValue, newValue) -> {
             if (oldValue && !newValue) {
+                Platform.runLater(this::initTransactionFilterBox);
                 Platform.runLater(this::initAccountTree);
             }
         });
     }
 
-    TreeTableView getTableView() {
-        return tableView;
+    BorderPane getPane() {
+        return pane;
     }
 
     public void clear() {
@@ -234,7 +253,53 @@ public class AccountTree extends Controller implements Initializable, Styles {
         expenseSubTree.getChildren().clear();
     }
 
-    private void initSubtree(TreeItem rootItem, CategoryType categoryType) {
+    private void initAccountFilterBox(ResourceBundle rb) {
+        accountFilterBox.getItems().setAll(
+                rb.getString("text.All.Accounts"),
+                new Separator(),
+                rb.getString("account.Tree.Balance"),
+                rb.getString("account.Tree.IncomesExpenses"),
+                new Separator()
+        );
+
+        Arrays.stream(CategoryType.values()).forEach(type -> accountFilterBox.getItems().add(type.getName()));
+
+        accountFilterBox.getSelectionModel().select(0);
+    }
+
+    private void initTransactionFilterBox() {
+        transactionFilterBox.getItems().setAll(
+                TransactionFilter.ALL,
+                new Separator(),
+                TransactionFilter.CURRENT_YEAR,
+                TransactionFilter.CURRENT_MONTH,
+                TransactionFilter.CURRENT_WEEK,
+                new Separator(),
+                TransactionFilter.LAST_YEAR,
+                TransactionFilter.LAST_QUARTER,
+                TransactionFilter.LAST_MONTH,
+                new Separator()
+        );
+
+        for (int i = TransactionFilter.JANUARY.ordinal(); i <= TransactionFilter.DECEMBER.ordinal(); i++) {
+            transactionFilterBox.getItems().add(TransactionFilter.values()[i]);
+        }
+
+        transactionFilterBox.getItems().add(new Separator());
+
+        MoneyDAO.getInstance().getTransactions().stream()
+                .map(Transaction::getYear)
+                .distinct()
+                .sorted()
+                .forEach(year -> transactionFilterBox.getItems().add(year));
+
+        transactionFilterBox.getSelectionModel().select(0);
+    }
+
+    private void initSubtree(CategoryType categoryType) {
+        final TreeItem<AccountTreeItem> rootItem = subRoots.get(categoryType);
+        rootItem.getChildren().clear();
+
         categoryTreeItem = null;
 
         MoneyDAO dao = MoneyDAO.getInstance();
@@ -248,9 +313,9 @@ public class AccountTree extends Controller implements Initializable, Styles {
                 categoryTreeItem = new TreeItem<>(new AccountTreeItem(category));
                 categoryTreeItem.setExpanded(category.isExpanded());
 
-                categoryTreeItem.expandedProperty().addListener((x, y, newValue) -> {
-                    MoneyDAO.getInstance().updateCategory(category.expand(newValue));
-                });
+                categoryTreeItem.expandedProperty().addListener((x, y, newValue) ->
+                    MoneyDAO.getInstance().updateCategory(category.expand(newValue))
+                );
 
                 rootItem.getChildren().add(categoryTreeItem);
             }
@@ -259,15 +324,61 @@ public class AccountTree extends Controller implements Initializable, Styles {
         });
     }
 
-    private void initAccountTree() {
-        clear();
-        initSubtree(banksSubTree, CategoryType.BANKS_AND_CASH);
-        initSubtree(portfolioSubTree, CategoryType.PORTFOLIO);
-        initSubtree(assetsSubTree, CategoryType.ASSETS);
-        initSubtree(debtsSubTree, CategoryType.DEBTS);
-        initSubtree(incomeSubTree, CategoryType.INCOMES);
-        initSubtree(expenseSubTree, CategoryType.EXPENSES);
+    @SuppressWarnings("unchecked")
+    private void initTreeSkeleton() {
+        root.getChildren().setAll(
+                balanceRoot,
+                expIncRoot
+        );
+
+        balanceRoot.getChildren().setAll(
+                banksSubTree,
+                portfolioSubTree,
+                assetsSubTree,
+                debtsSubTree
+        );
+
+        expIncRoot.getChildren().setAll(
+                incomeSubTree,
+                expenseSubTree
+        );
+
+        tableView.setRoot(root);
     }
+
+    private void initAccountTree() {
+        Arrays.stream(CategoryType.values())
+                .forEachOrdered(this::initSubtree);
+    }
+
+    private void onAccountFilterSelected(Integer newValue) {
+        switch (newValue) {
+            case 0:
+                initTreeSkeleton();
+                break;
+            case 2:
+                tableView.setRoot(balanceRoot);
+                break;
+            case 3:
+                tableView.setRoot(expIncRoot);
+                break;
+            default:
+                CategoryType type = CategoryType.values()[newValue - 5];
+                tableView.setRoot(subRoots.get(type));
+                break;
+        }
+    }
+
+    private void onTransactionFilterSelected(Object newValue) {
+        if (newValue instanceof TransactionFilter) {
+            transactionFilterConsumer.accept(((TransactionFilter)newValue).getPredicate());
+        } else {
+            if (newValue instanceof Integer) {
+                transactionFilterConsumer.accept(t -> t.getYear() == (Integer)newValue);
+            }
+        }
+    }
+
 
     @SuppressWarnings("unused")
     private void onShowDeactivatedAccounts() {
@@ -280,7 +391,7 @@ public class AccountTree extends Controller implements Initializable, Styles {
     public void onNewAccount() {
         Category initialCategory = null;
 
-        MoneyDAO dao = MoneyDAO.getInstance();
+        final MoneyDAO dao = MoneyDAO.getInstance();
 
         TreeItem<AccountTreeItem> selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
@@ -292,19 +403,28 @@ public class AccountTree extends Controller implements Initializable, Styles {
             }
         }
 
-        new AccountDialog(initialCategory).load().showAndWait().ifPresent(builder -> {
-            MoneyDAO.getInstance().insertAccount(builder
+        new AccountDialog(initialCategory).load().showAndWait().ifPresent(builder ->
+            dao.insertAccount(builder
                     .id(dao.generatePrimaryKey(Account.class))
-                    .build());
-        });
+                    .build())
+        );
     }
 
     void setOnAccountSelected(Consumer<Account> consumer) {
         accountSelectedConsumer = consumer;
     }
 
+    void setOnTransactionFilterSelected(Consumer<Predicate<Transaction>> consumer) {
+        transactionFilterConsumer = consumer;
+    }
+
     private void onTreeItemSelected(TreeItem<AccountTreeItem> item) {
-        Account account = item.getValue().accountProperty().getValue();
+        Account account = Optional.ofNullable(item)
+                .map(TreeItem::getValue)
+                .map(AccountTreeItem::accountProperty)
+                .map(ReadOnlyObjectProperty::getValue)
+                .orElse(null);
+
         accountSelectedConsumer.accept(account);
     }
 }
