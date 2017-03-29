@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>1.0.0alpha</version>
+    <version>1.0.0beta</version>
     <packaging>jar</packaging>
     <name>MoneyManager</name>
     <parent>

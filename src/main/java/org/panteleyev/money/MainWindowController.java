@@ -5,11 +5,11 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import java.io.File;
@@ -35,6 +34,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -42,6 +42,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
@@ -51,6 +52,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javax.sql.DataSource;
+import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.persistence.MoneyDAO;
@@ -66,6 +68,7 @@ public class MainWindowController extends Controller implements Initializable {
 
     @FXML private Label         progressLabel;
     @FXML private ProgressBar   progressBar;
+    @FXML private MenuBar       menuBar;
 
     @FXML private Menu          windowMenu;
 
@@ -113,6 +116,8 @@ public class MainWindowController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        menuBar.setUseSystemMenuBar(true);
+
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
 
@@ -123,6 +128,11 @@ public class MainWindowController extends Controller implements Initializable {
 
         Tab t2 = new Tab(rb.getString("tab.Transactions"), transactionTab.getPane());
         t2.disableProperty().bind(dbOpenProperty.not());
+        t2.selectedProperty().addListener((x,y,newValue) -> {
+            if (newValue) {
+                Platform.runLater(() -> transactionTab.getTransactionEditor().clear());
+            }
+        });
 
         Tab t3 = new Tab(rb.getString("tab.Requests"), requestTab.getRoot());
         t3.disableProperty().bind(dbOpenProperty.not());
@@ -145,21 +155,30 @@ public class MainWindowController extends Controller implements Initializable {
             });
         });
 
+        getStage().setOnHiding(e -> onWindowClosing());
+
+        getStage().setWidth(Options.getMainWindowWidth());
+        getStage().setHeight(Options.getMainWindowHeight());
+
         File file;
 
         Application.Parameters params = MoneyApplication.getApplication().getParameters();
         String fileName = params.getNamed().get("file");
         if (fileName != null && !fileName.isEmpty()) {
             file = new File(fileName);
+            if (file.exists()) {
+                open(file, false);
+            } else {
+                newFile(file, false);
+            }
         } else {
             file = Options.getDbFile();
-        }
-
-        if (file != null) {
-            if (file.exists()) {
-                open(file);
-            } else {
-                Options.setDbFile(null);
+            if (file != null) {
+                if (file.exists()) {
+                    open(file, false);
+                } else {
+                    Options.setDbFile(null);
+                }
             }
         }
     }
@@ -174,7 +193,7 @@ public class MainWindowController extends Controller implements Initializable {
     }
 
     public void onExit() {
-        System.exit(0);
+        getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     public void onManageCurrencies() {
@@ -211,11 +230,13 @@ public class MainWindowController extends Controller implements Initializable {
             new FileChooser.ExtensionFilter("SQLite Database", "*.db")
         );
         File file = d.showSaveDialog(null);
-        newFile(file);
+        newFile(file, true);
     }
 
-    private void newFile(File file) {
-        Options.setDbFile(file);
+    private void newFile(File file, boolean overwriteOption) {
+        if (overwriteOption) {
+            Options.setDbFile(file);
+        }
 
         if (file != null) {
             DataSource ds = new MoneyDAO.Builder()
@@ -226,7 +247,10 @@ public class MainWindowController extends Controller implements Initializable {
                 MoneyDAO dao = MoneyDAO.initialize(ds);
                 dao.createTables();
                 dao.preload();
-            }).thenRun(() -> dbOpenProperty.set(true));
+            }).thenRun(() -> Platform.runLater(() -> {
+                setTitle(file);
+                dbOpenProperty.set(true);
+            }));
         }
     }
 
@@ -248,21 +272,28 @@ public class MainWindowController extends Controller implements Initializable {
             new FileChooser.ExtensionFilter("SQLite Database", "*.db")
         );
         File file = d.showOpenDialog(null);
-        open(file);
+        open(file, true);
     }
 
-    private void open(File file) {
-        Options.setDbFile(file);
+    private void open(File file, boolean overwriteOption) {
+        if (overwriteOption) {
+            Options.setDbFile(file);
+        }
 
         if (file != null) {
             DataSource ds = new MoneyDAO.Builder()
-                .file(file.getAbsolutePath())
-                .build();
+                    .file(file.getAbsolutePath())
+                    .build();
             MoneyDAO.initialize(ds);
 
             CompletableFuture
                     .runAsync(() -> MoneyDAO.getInstance().preload())
-                    .thenRun(() -> dbOpenProperty.set(true));
+                    .thenRun(() -> {
+                        Platform.runLater(() -> {
+                            setTitle(file);
+                            dbOpenProperty.set(true);
+                        });
+                    });
         }
     }
 
@@ -273,5 +304,18 @@ public class MainWindowController extends Controller implements Initializable {
     public void onOptions() {
         OptionsDialog d = new OptionsDialog();
         d.showAndWait();
+    }
+
+    private void setTitle(File file) {
+        getStage().setTitle(getTitle() + " - " + file.getAbsolutePath());
+    }
+
+    private void onWindowClosing() {
+        Options.setMainWindowWidth(getStage().widthProperty().doubleValue());
+        Options.setMainWindowHeight(getStage().heightProperty().doubleValue());
+    }
+
+    public void onAbout() {
+        new AboutDialog().load().showAndWait();
     }
 }

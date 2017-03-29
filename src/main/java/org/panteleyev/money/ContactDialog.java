@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import java.net.URL;
@@ -38,6 +37,7 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ContactType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import org.panteleyev.utilities.fx.BaseDialog;
 
 public class ContactDialog extends BaseDialog<Contact.Builder> implements Initializable {
     private static final String FXML = "/org/panteleyev/money/ContactDialog.fxml";

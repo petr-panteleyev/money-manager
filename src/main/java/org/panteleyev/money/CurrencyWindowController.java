@@ -35,6 +35,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -52,6 +53,7 @@ public class CurrencyWindowController extends BaseController implements Initiali
     @FXML private TableColumn<Currency,String> colName;
     @FXML private TableColumn<Currency,String> colDescription;
 
+    @FXML private MenuBar  menuBar;
     @FXML private MenuItem editMenuItem;
     @FXML private MenuItem ctxEditMenuItem;
 
@@ -69,6 +71,8 @@ public class CurrencyWindowController extends BaseController implements Initiali
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         bundle = rb;
+
+        menuBar.setUseSystemMenuBar(true);
 
         currencyList.addAll(currencyProperty.values());
         table.setItems(currencyList);

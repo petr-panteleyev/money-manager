@@ -29,9 +29,14 @@ import java.io.File;
 import java.util.prefs.Preferences;
 
 class Options {
+    private static final double DEFAULT_WIDTH = 1024;
+    private static final double DEFAULT_HEIGHT = 768;
+
     private enum Option {
         DB_FILE("dbFile"),
-        SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts");
+        SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts"),
+        MAIN_WINDOW_WIDTH("mainWindowWidth"),
+        MAIN_WINDOW_HEIGHT("mainWindowHeight");
 
         private final String s;
 
@@ -63,8 +68,23 @@ class Options {
         return PREFS.getBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), false);
     }
 
+    static void setMainWindowWidth(double x) {
+        PREFS.putDouble(Option.MAIN_WINDOW_WIDTH.toString(), x);
+    }
+
+    static double getMainWindowWidth() {
+        return PREFS.getDouble(Option.MAIN_WINDOW_WIDTH.toString(), DEFAULT_WIDTH);
+    }
+
+    static void setMainWindowHeight(double x) {
+        PREFS.putDouble(Option.MAIN_WINDOW_HEIGHT.toString(), x);
+    }
+
+    static double getMainWindowHeight() {
+        return PREFS.getDouble(Option.MAIN_WINDOW_HEIGHT.toString(), DEFAULT_HEIGHT);
+    }
+
     static {
         PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
     }
-
 }

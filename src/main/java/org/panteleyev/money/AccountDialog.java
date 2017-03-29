@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import java.math.BigDecimal;
@@ -50,6 +49,7 @@ import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import org.panteleyev.utilities.fx.BaseDialog;
 
 public final class AccountDialog extends BaseDialog<Account.Builder> implements Initializable {
     private static final String FXML_PATH = "/org/panteleyev/money/AccountDialog.fxml";

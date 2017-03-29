@@ -148,10 +148,10 @@
                      </children>
                   </VBox>
                   <Region HBox.hgrow="ALWAYS" />
-                  <Button mnemonicParsing="false" onAction="#onClearButton" text="%clearButton" />
+                  <Button cancelButton="true" mnemonicParsing="false" onAction="#onClearButton" text="%clearButton" />
                   <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteButton" text="%deleteButton" />
                   <Button fx:id="updateButton" mnemonicParsing="false" onAction="#onUpdateButton" text="%updateButton" />
-                  <Button fx:id="addButton" mnemonicParsing="false" onAction="#onAddButton" text="%addButton" />
+                  <Button fx:id="addButton" defaultButton="true" mnemonicParsing="false" onAction="#onAddButton" text="%addButton" />
                </children>
             </HBox>
          </children>

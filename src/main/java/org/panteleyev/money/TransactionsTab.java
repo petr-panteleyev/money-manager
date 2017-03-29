@@ -120,6 +120,10 @@ public class TransactionsTab extends Controller implements Initializable {
         return pane;
     }
 
+    TransactionEditorPane getTransactionEditor() {
+        return transactionEditor;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle rb) {
         transactionTable.setOnMouseClicked((e) -> onTransactionSelected());

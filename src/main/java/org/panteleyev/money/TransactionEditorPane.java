@@ -26,20 +26,6 @@
 
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -63,9 +49,30 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
-import org.panteleyev.money.persistence.*;
+import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.Category;
+import org.panteleyev.money.persistence.CategoryType;
+import org.panteleyev.money.persistence.Contact;
+import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.Named;
+import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.TransactionType;
 import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.utilities.fx.Controller;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class TransactionEditorPane extends Controller implements Initializable {
     private static final String FXML = "/org/panteleyev/money/TransactionEditorPane.fxml";
@@ -227,6 +234,12 @@ public class TransactionEditorPane extends Controller implements Initializable {
                 .collect(Collectors.toList()));
 
         Platform.runLater(this::createValidationSupport);
+
+        creditedAccountEdit.focusedProperty().addListener((x,oldValue,newValue) -> {
+            if (oldValue && !newValue) {
+                processAutoFill();
+            }
+        });
     }
 
     @Override
@@ -334,6 +347,9 @@ public class TransactionEditorPane extends Controller implements Initializable {
         checkedCheckBox.setSelected(false);
         invoiceNumberEdit.setText("");
         sumEdit.setText("");
+        rateAmoutLabel.setText("");
+
+        daySpinner.requestFocus();
     }
 
     public void setTransaction(Transaction tr) {
@@ -563,8 +579,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
             Optional<Account> account = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
 
-            builder.accountDebitedId(account.isPresent()?
-                account.get().getId() : null);
+            builder.accountDebitedId(account.map(Account::getId).orElse(null));
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, !account.isPresent());
@@ -574,8 +589,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
             Optional<Account> account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
-            builder.accountCreditedId(account.isPresent()?
-                account.get().getId() : null);
+            builder.accountCreditedId(account.map(Account::getId).orElse(null));
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, !account.isPresent());
@@ -724,4 +738,30 @@ public class TransactionEditorPane extends Controller implements Initializable {
         }
     }
 
+    private void processAutoFill() {
+        builder.accountDebitedId().ifPresent(accDebitedId ->
+                builder.accountCreditedId().ifPresent(accCreditedId ->
+                        transactionsProperty.values().stream()
+                                .filter(t -> Objects.equals(t.getAccountCreditedId(), accCreditedId)
+                                        && Objects.equals(t.getAccountDebitedId(), accDebitedId))
+                                .sorted(Transaction.BY_DATE.reversed())
+                                .limit(1)
+                                .findAny()
+                                .ifPresent(t -> {
+                                    if (commentEdit.getText().isEmpty()) {
+                                        commentEdit.setText(t.getComment());
+                                    }
+                                    if (sumEdit.getText().isEmpty()) {
+                                        sumEdit.setText(t.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+                                    }
+                                    Optional.ofNullable(t.getContactId())
+                                            .map(id -> MoneyDAO.getInstance().getContact(id))
+                                            .map(Optional::get)
+                                            .ifPresent(c -> {
+                                                if (contactEdit.getText().isEmpty()) {
+                                                    contactEdit.setText(c.getName());
+                                                }
+                                            });
+                                })));
+    }
 }

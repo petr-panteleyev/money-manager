@@ -29,13 +29,16 @@ package org.panteleyev.money;
 import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -54,6 +57,7 @@ public class CategoryWindowController extends Controller implements Initializabl
     @FXML private TableColumn<Category,String> colName;
     @FXML private TableColumn<Category,String> colDescription;
 
+    @FXML private MenuBar  menuBar;
     @FXML private MenuItem editMenuItem;
     @FXML private MenuItem ctxEditMenuItem;
 
@@ -63,10 +67,16 @@ public class CategoryWindowController extends Controller implements Initializabl
 
     private final MoneyDAO dao;
 
+    private final SimpleMapProperty<Integer, Category> categoriesProperty = new SimpleMapProperty<>();
+
     public CategoryWindowController() {
         super("/org/panteleyev/money/CategoryWindow.fxml", MainWindowController.UI_BUNDLE_PATH, true);
 
         dao = MoneyDAO.getInstance();
+
+        categoriesProperty.bind(dao.categoriesProperty());
+        categoriesProperty.addListener((x, y, z) ->
+                Platform.runLater(this::updateWindow));
     }
 
     public void onClose() {
@@ -89,6 +99,8 @@ public class CategoryWindowController extends Controller implements Initializabl
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         bundle = rb;
+
+        menuBar.setUseSystemMenuBar(true);
 
         categoryTable.setItems(categoryList);
         updateList();
@@ -143,5 +155,11 @@ public class CategoryWindowController extends Controller implements Initializabl
                         .build());
             }
         });
+    }
+
+    private void updateWindow() {
+        int selIndex = categoryTable.getSelectionModel().getSelectedIndex();
+        categoryList.setAll(categoriesProperty.values());
+        categoryTable.getSelectionModel().select(selIndex);
     }
 }

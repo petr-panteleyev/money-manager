@@ -38,6 +38,7 @@ import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
+import org.panteleyev.utilities.fx.BaseDialog;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;

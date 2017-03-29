@@ -44,6 +44,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
@@ -58,29 +59,30 @@ import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 public class AccountListWindowController extends BaseController implements Initializable {
     private static final String FXML = "/org/panteleyev/money/AccountListWindow.fxml";
 
-    private @FXML ChoiceBox             typeChoiceBox;
-    private @FXML ChoiceBox             categoryChoiceBox;
-    private @FXML CheckBox              showActiveCheckBox;
-    private @FXML TableView<Account>    accountListTable;
+    @FXML private ChoiceBox             typeChoiceBox;
+    @FXML private ChoiceBox             categoryChoiceBox;
+    @FXML private CheckBox              showActiveCheckBox;
+    @FXML private TableView<Account>    accountListTable;
 
-    private @FXML TableColumn<Account, Integer>     idColumn;
-    private @FXML TableColumn<Account, String>      nameColumn;
-    private @FXML TableColumn<Account, String>      typeColumn;
-    private @FXML TableColumn<Account, String>      categoryColumn;
-    private @FXML TableColumn<Account, String>      currencyColumn;
-    private @FXML TableColumn<Account, BigDecimal>  balanceColumn;
-    private @FXML TableColumn<Account, CheckBox>    activeColumn;
+    @FXML private TableColumn<Account, Integer>     idColumn;
+    @FXML private TableColumn<Account, String>      nameColumn;
+    @FXML private TableColumn<Account, String>      typeColumn;
+    @FXML private TableColumn<Account, String>      categoryColumn;
+    @FXML private TableColumn<Account, String>      currencyColumn;
+    @FXML private TableColumn<Account, BigDecimal>  balanceColumn;
+    @FXML private TableColumn<Account, CheckBox>    activeColumn;
 
+    @FXML private MenuBar   menuBar;
     // Main menu
-    private @FXML MenuItem  addMenuItem;
-    private @FXML MenuItem  editMenuItem;
-    private @FXML MenuItem  deleteMenuItem;
+    @FXML private MenuItem  addMenuItem;
+    @FXML private MenuItem  editMenuItem;
+    @FXML private MenuItem  deleteMenuItem;
     // Context menu
-    private @FXML MenuItem  ctxAddMenuItem;
-    private @FXML MenuItem  ctxEditMenuItem;
-    private @FXML MenuItem  ctxDeleteMenuItem;
+    @FXML private MenuItem  ctxAddMenuItem;
+    @FXML private MenuItem  ctxEditMenuItem;
+    @FXML private MenuItem  ctxDeleteMenuItem;
 
-    private @FXML Parent    self;
+    @FXML private Parent    self;
 
     private ResourceBundle  bundle;
 
@@ -102,6 +104,8 @@ public class AccountListWindowController extends BaseController implements Initi
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         bundle = rb;
+
+        menuBar.setUseSystemMenuBar(true);
 
         MoneyDAO dao = MoneyDAO.getInstance();
 

@@ -40,6 +40,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
@@ -58,6 +59,7 @@ public class ContactListWindowController extends BaseController implements Initi
     @FXML private ChoiceBox                     typeChoiceBox;
     @FXML private TableView<Contact>            contactTable;
 
+    @FXML private MenuBar                       menuBar;
     @FXML private MenuItem                      editMenuItem;
     @FXML private MenuItem                      ctxEditMenuItem;
 
@@ -85,6 +87,8 @@ public class ContactListWindowController extends BaseController implements Initi
     @Override
     public void initialize(URL location, ResourceBundle rb) {
         this.bundle = rb;
+
+        menuBar.setUseSystemMenuBar(true);
 
         typeChoiceBox.getItems().add(rb.getString("contact.Window.AllTypes"));
         typeChoiceBox.getItems().add(new Separator());

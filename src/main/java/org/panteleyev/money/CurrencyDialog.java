@@ -41,6 +41,7 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.utilities.fx.BaseDialog;
 
 public class CurrencyDialog extends BaseDialog<Currency.Builder> implements Initializable {
     private static final String FXML = "/org/panteleyev/money/CurrencyDialog.fxml";
