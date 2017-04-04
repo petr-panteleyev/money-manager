@@ -7,6 +7,14 @@
     -fx-font-weight: bold;
 }
 
+.transactionTableRow:odd {
+    -fx-background-color: ghostwhite;
+}
+
+.transactionTableRow:focused {
+    -fx-background-color: -fx-focus-color;
+}
+
 .blueText {
     -fx-text-fill: blue;
 }

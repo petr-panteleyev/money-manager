@@ -26,8 +26,7 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.MapChangeListener;
 import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
@@ -39,22 +38,19 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class AccountsTab extends BorderPane {
+class AccountsTab extends BorderPane {
     private static final double DIVIDER_POSITION = 0.85;
 
-    private final AccountTree accountTree = (AccountTree)new AccountTree().load();
     private final TransactionTableView transactionTable = new TransactionTableView(true);
-    private final SplitPane split = new SplitPane(accountTree.getPane(), new BorderPane(transactionTable));
-
-    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
-    private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
-            new SimpleMapProperty<>();
 
     private Account selectedAccount = null;
 
     private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.getPredicate();
 
-    public AccountsTab() {
+    AccountsTab() {
+        AccountTree accountTree = (AccountTree)new AccountTree().load();
+
+        SplitPane split = new SplitPane(accountTree.getPane(), new BorderPane(transactionTable));
         split.setOrientation(Orientation.VERTICAL);
         split.setDividerPosition(0, DIVIDER_POSITION);
         setCenter(split);
@@ -63,18 +59,15 @@ public class AccountsTab extends BorderPane {
         accountTree.setOnTransactionFilterSelected(this::onTransactionFilterSelected);
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
-        MoneyDAO dao = MoneyDAO.getInstance();
+        final MoneyDAO dao = MoneyDAO.getInstance();
 
-        preloadingProperty.bind(dao.preloadingProperty());
-        transactionsProperty.bind(dao.transactionsProperty());
-
-        transactionsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
+        dao.transactionsProperty().addListener((MapChangeListener<Integer,Transaction>) l -> {
+            if (!dao.preloadingProperty().get()) {
                 Platform.runLater(this::reloadTransactions);
             }
         });
 
-        preloadingProperty.addListener((x, oldValue, newValue) -> {
+        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 Platform.runLater(this::reloadTransactions);
             }
@@ -93,11 +86,9 @@ public class AccountsTab extends BorderPane {
     private void onCheckTransaction(List<Transaction> transactions, Boolean check) {
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        transactions.forEach(t -> {
-            dao.updateTransaction(new Transaction.Builder(t)
-                    .checked(check)
-                    .build());
-        });
+        transactions.forEach(t -> dao.updateTransaction(new Transaction.Builder(t)
+                .checked(check)
+                .build()));
 
         reloadTransactions();
     }
@@ -109,6 +100,8 @@ public class AccountsTab extends BorderPane {
     private void reloadTransactions(Predicate<Transaction> filter) {
         this.transactionFilter = filter;
 
+        int index = transactionTable.getSelectionModel().getSelectedIndex();
+        transactionTable.getSelectionModel().clearSelection();
         transactionTable.clear();
 
         if (selectedAccount != null) {
@@ -121,5 +114,7 @@ public class AccountsTab extends BorderPane {
             transactionTable.addRecords(transactions);
             transactionTable.sort();
         }
+
+        transactionTable.getSelectionModel().select(index);
     }
 }

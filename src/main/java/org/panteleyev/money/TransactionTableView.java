@@ -45,6 +45,7 @@ import javafx.stage.WindowEvent;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.persistence.TransactionType;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
@@ -61,9 +62,14 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
     private static class TransactionRow extends TreeTableRow<TransactionTreeItem> {
+        TransactionRow() {
+            getStyleClass().add(TRANSACTION_TABLE_ROW);
+        }
+
         @Override
         protected void updateItem(TransactionTreeItem item, boolean empty) {
             super.updateItem(item, empty);
+
             getStyleClass().remove(GROUP_CELL);
             if (!empty) {
                 if (item.isGroupProperty().get()) {
@@ -85,6 +91,7 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
                         .map(TreeTableRow::getTreeItem)
                         .map(TreeItem::getValue)
                         .ifPresent(treeItem -> {
+                            getStyleClass().removeAll(RED_TEXT, BLUE_TEXT, BLACK_TEXT);
                             getStyleClass().add(treeItem.getStyle());
 
                             String format = Optional.ofNullable(treeItem.getTransaction())
@@ -116,31 +123,36 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
                     Transaction t = item.getTransaction();
 
                     String imageUrl;
-                    switch (t.getAccountCreditedType()) {
-                        case EXPENSES:
-                        case DEBTS:
-                            imageUrl = "/org/panteleyev/money/res/red-circle-16.png";
-                            break;
 
-                        case BANKS_AND_CASH:
-                            switch (t.getAccountDebitedType()) {
-                                case INCOMES:
-                                    imageUrl = "/org/panteleyev/money/res/blue-circle-16.png";
-                                    break;
+                    if (t.getTransactionType() == TransactionType.TRANSFER) {
+                        imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                    } else {
+                        switch (t.getAccountCreditedType()) {
+                            case EXPENSES:
+                            case DEBTS:
+                                imageUrl = "/org/panteleyev/money/res/red-circle-16.png";
+                                break;
 
-                                case BANKS_AND_CASH:
-                                    imageUrl = "/org/panteleyev/money/res/green-circle-16.png";
-                                    break;
+                            case BANKS_AND_CASH:
+                                switch (t.getAccountDebitedType()) {
+                                    case INCOMES:
+                                        imageUrl = "/org/panteleyev/money/res/blue-circle-16.png";
+                                        break;
 
-                                default:
-                                    imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
-                                    break;
-                            }
-                            break;
+                                    case BANKS_AND_CASH:
+                                        imageUrl = "/org/panteleyev/money/res/green-circle-16.png";
+                                        break;
 
-                        default:
-                            imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
-                            break;
+                                    default:
+                                        imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                                        break;
+                                }
+                                break;
+
+                            default:
+                                imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                                break;
+                        }
                     }
 
                     ImageView iv = new ImageView(imageUrl);
@@ -174,13 +186,16 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
     private MenuItem ctxGroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Group"));
     private MenuItem ctxUngroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Ungroup"));
 
+    // Columns
+    private TreeTableColumn<TransactionTreeItem, TransactionTreeItem> dayColumn;
+
     TransactionTableView(boolean fullDate) {
         this.setRoot(root);
         this.showRootProperty().set(false);
 
         this.setRowFactory(x -> new TransactionRow());
 
-        TreeTableColumn<TransactionTreeItem, TransactionTreeItem> dayColumn = new TreeTableColumn<>(BUNDLE.getString("column.Day"));
+        dayColumn = new TreeTableColumn<>(BUNDLE.getString("column.Day"));
         dayColumn.setCellValueFactory((CellDataFeatures<TransactionTreeItem, TransactionTreeItem> p) -> new SimpleObjectProperty<>(p.getValue().getValue()));
         dayColumn.setCellFactory(x -> new DayCell(fullDate));
         dayColumn.setSortable(true);
@@ -417,5 +432,9 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
 
     void setOnExpandGroup(BiConsumer<TransactionGroup, Boolean> c) {
         expandGroupConsumer = c;
+    }
+
+    TreeTableColumn<TransactionTreeItem, TransactionTreeItem> getDayColumn() {
+        return dayColumn;
     }
 }

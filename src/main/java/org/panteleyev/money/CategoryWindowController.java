@@ -23,17 +23,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -43,13 +40,13 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
-import org.panteleyev.utilities.fx.Controller;
+import java.net.URL;
+import java.util.Collection;
+import java.util.ResourceBundle;
 
-public class CategoryWindowController extends Controller implements Initializable {
+public class CategoryWindowController extends BaseController implements Initializable {
     @FXML private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
 
     @FXML private TableView<Category> categoryTable;
@@ -65,22 +62,16 @@ public class CategoryWindowController extends Controller implements Initializabl
 
     private ResourceBundle bundle;
 
-    private final MoneyDAO dao;
-
-    private final SimpleMapProperty<Integer, Category> categoriesProperty = new SimpleMapProperty<>();
+    private final MapChangeListener<Integer,Category> categoriesListener =
+            (MapChangeListener<Integer,Category>)l -> Platform.runLater(this::updateWindow);
 
     public CategoryWindowController() {
         super("/org/panteleyev/money/CategoryWindow.fxml", MainWindowController.UI_BUNDLE_PATH, true);
-
-        dao = MoneyDAO.getInstance();
-
-        categoriesProperty.bind(dao.categoriesProperty());
-        categoriesProperty.addListener((x, y, z) ->
-                Platform.runLater(this::updateWindow));
     }
 
-    public void onClose() {
-        ((Stage)(self.getScene().getWindow())).close();
+    @Override
+    protected Parent getSelf() {
+        return self;
     }
 
     @Override
@@ -90,7 +81,7 @@ public class CategoryWindowController extends Controller implements Initializabl
 
     private void updateList() {
         categoryList.clear();
-        Collection<Category> categories = dao.getCategories();
+        Collection<Category> categories = MoneyDAO.getInstance().getCategories();
         if (categories != null) {
             categoryList.addAll(categories);
         }
@@ -122,6 +113,9 @@ public class CategoryWindowController extends Controller implements Initializabl
         colType.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
         colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
         colDescription.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.6));
+
+        MoneyDAO.getInstance().categoriesProperty()
+                .addListener(new WeakMapChangeListener<>(categoriesListener));
     }
 
     public void onTableMouseClick(Event event) {
@@ -146,6 +140,7 @@ public class CategoryWindowController extends Controller implements Initializabl
     }
 
     private void openCategoryDialog(Category category) {
+        MoneyDAO dao = MoneyDAO.getInstance();
         new CategoryDialog(category).load().showAndWait().ifPresent(builder -> {
             if (builder.id().isPresent()) {
                 dao.updateCategory(builder.build());
@@ -159,7 +154,7 @@ public class CategoryWindowController extends Controller implements Initializabl
 
     private void updateWindow() {
         int selIndex = categoryTable.getSelectionModel().getSelectedIndex();
-        categoryList.setAll(categoriesProperty.values());
+        categoryList.setAll(MoneyDAO.getInstance().categoriesProperty().values());
         categoryTable.getSelectionModel().select(selIndex);
     }
 }

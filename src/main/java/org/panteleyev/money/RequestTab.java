@@ -23,13 +23,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
@@ -59,40 +57,12 @@ public class RequestTab extends Controller implements Initializable {
     @FXML private ChoiceBox categoryChoiceBox;
     @FXML private ChoiceBox accountChoiceBox;
 
-    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
-    private final SimpleMapProperty<Integer, Category> categoriesProperty = new SimpleMapProperty<>();
-    private final SimpleMapProperty<Integer, Account> accountsProperty = new SimpleMapProperty<>();
-
     private final SimpleStringProperty allTypesString = new SimpleStringProperty();
     private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
     private final SimpleStringProperty allAccountsString = new SimpleStringProperty();
 
     public RequestTab() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
-
-        MoneyDAO dao = MoneyDAO.getInstance();
-
-        preloadingProperty.bind(dao.preloadingProperty());
-        categoriesProperty.bind(dao.categoriesProperty());
-        accountsProperty.bind(dao.accountsProperty());
-
-        preloadingProperty.addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
-                Platform.runLater(this::setupCategoryTypesBox);
-            }
-        });
-
-        categoriesProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
-            }
-        });
-
-        accountsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
-            }
-        });
     }
 
     @Override
@@ -140,6 +110,26 @@ public class RequestTab extends Controller implements Initializable {
                 setupAccountBox(null);
             } else {
                 setupAccountBox((Category)categoryChoiceBox.getSelectionModel().getSelectedItem());
+            }
+        });
+
+        final MoneyDAO dao = MoneyDAO.getInstance();
+
+        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                Platform.runLater(this::setupCategoryTypesBox);
+            }
+        });
+
+        dao.categoriesProperty().addListener((MapChangeListener<Integer, Category>) l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
+            }
+        });
+
+        dao.accountsProperty().addListener((MapChangeListener<Integer, Account>) l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
             }
         });
     }

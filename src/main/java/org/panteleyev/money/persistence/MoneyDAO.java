@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
 import javafx.beans.property.BooleanProperty;
@@ -33,6 +32,7 @@ import javafx.collections.FXCollections;
 import org.panteleyev.persistence.DAO;
 import org.panteleyev.persistence.Record;
 import javax.sql.DataSource;
+import javax.swing.text.html.Option;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -106,7 +106,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<Category> getCategory(Integer id) {
-        return Optional.ofNullable(categoriesProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(categoriesProperty.get(id));
     }
 
     public Category insertCategory(Category category) {
@@ -142,7 +144,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<Currency> getCurrency(Integer id) {
-        return Optional.ofNullable(currencyProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(currencyProperty.get(id));
     }
 
     public Currency insertCurrency(Currency currency) {
@@ -176,7 +180,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<Contact> getContact(Integer id) {
-        return Optional.ofNullable(contactsProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(contactsProperty.get(id));
     }
 
     public Contact insertContact(Contact contact) {
@@ -204,7 +210,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<Account> getAccount(Integer id) {
-        return Optional.ofNullable(accountsProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(accountsProperty.get(id));
     }
 
     public Account insertAccount(Account account) {
@@ -257,7 +265,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<TransactionGroup> getTransactionGroup(Integer id) {
-        return Optional.ofNullable(transactionGroupsProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(transactionGroupsProperty.get(id));
     }
 
     public TransactionGroup insertTransactionGroup(TransactionGroup tg) {
@@ -290,7 +300,9 @@ public class MoneyDAO extends DAO {
     }
 
     public Optional<Transaction> getTransaction(Integer id) {
-        return Optional.ofNullable(transactionsProperty.get(id));
+        return id == null?
+                Optional.empty()
+                : Optional.ofNullable(transactionsProperty.get(id));
     }
 
     public Transaction insertTransaction(Transaction transaction) {
@@ -349,6 +361,7 @@ public class MoneyDAO extends DAO {
     public Set<String> getUniqueTransactionComments() {
         return getTransactions().stream()
                 .map(Transaction::getComment)
+                .filter(c -> !c.isEmpty())
                 .distinct()
                 .collect(Collectors.toSet());
     }

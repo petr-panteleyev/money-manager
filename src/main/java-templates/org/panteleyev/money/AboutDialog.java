@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AboutDialog extends BaseDialog implements Initializable {
-    private static final String VERSION = "1.0.0-beta";
+    private static final String VERSION = "${version}";
     private static final String FXML_PATH = "/org/panteleyev/money/AboutDialog.fxml";
 
     @FXML private Label versionLabel;

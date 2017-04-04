@@ -131,6 +131,7 @@ public class MainWindowController extends Controller implements Initializable {
         t2.selectedProperty().addListener((x,y,newValue) -> {
             if (newValue) {
                 Platform.runLater(() -> transactionTab.getTransactionEditor().clear());
+                Platform.runLater(() -> transactionTab.scrollToEnd());
             }
         });
 
@@ -311,6 +312,9 @@ public class MainWindowController extends Controller implements Initializable {
     }
 
     private void onWindowClosing() {
+        WINDOW_CLASSES.forEach(clazz ->
+                WindowManager.find(clazz).ifPresent(c -> ((BaseController)c).onClose()));
+
         Options.setMainWindowWidth(getStage().widthProperty().doubleValue());
         Options.setMainWindowHeight(getStage().heightProperty().doubleValue());
     }

@@ -23,13 +23,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -44,7 +43,9 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
+import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -64,6 +65,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -77,6 +79,41 @@ import java.util.stream.Collectors;
 public class TransactionEditorPane extends Controller implements Initializable {
     private static final String FXML = "/org/panteleyev/money/TransactionEditorPane.fxml";
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.panteleyev.money.TransactionEditorPane");
+    private static final int SUGGESTION_LENGTH = 2;
+
+    private static class CompletionProvider<T extends Named> implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<T>> {
+        private Set<T> set;
+
+        CompletionProvider(Set<T> set) {
+            this.set = set;
+        }
+
+        @Override
+        public Collection<T> call(AutoCompletionBinding.ISuggestionRequest req) {
+            return (req.getUserText().length() < SUGGESTION_LENGTH)?
+                    Collections.emptyList() :
+                    set.stream()
+                            .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
+                            .collect(Collectors.toList());
+        }
+    }
+
+    private static class StringCompletionProvider implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<String>> {
+        private Set<String> set;
+
+        StringCompletionProvider(Set<String> set) {
+            this.set = set;
+        }
+
+        @Override
+        public Collection<String> call(AutoCompletionBinding.ISuggestionRequest req) {
+            return (req.getUserText().length() < SUGGESTION_LENGTH)?
+                    Collections.emptyList() :
+                    set.stream()
+                            .filter(x -> x.toLowerCase().startsWith(req.getUserText().toLowerCase()))
+                            .collect(Collectors.toList());
+        }
+    }
 
     @FXML private TitledPane        pane;
 
@@ -121,11 +158,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
     private final BooleanProperty       newTransactionProperty = new SimpleBooleanProperty(true);
 
-    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
-    private final SimpleMapProperty<Integer, Account> accountsProperty = new SimpleMapProperty<>();
-    private final SimpleMapProperty<Integer, Transaction> transactionsProperty = new SimpleMapProperty<>();
-    private final SimpleMapProperty<Integer, Contact>     contactsProperty = new SimpleMapProperty<>();
-
     private final Validator<String> DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
         try {
@@ -162,40 +194,6 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
     public TransactionEditorPane() {
         super(FXML, "org.panteleyev.money.TransactionEditorPane", false);
-
-        MoneyDAO dao = MoneyDAO.getInstance();
-
-        preloadingProperty.bind(dao.preloadingProperty());
-        accountsProperty.bind(dao.accountsProperty());
-        transactionsProperty.bind(dao.transactionsProperty());
-        contactsProperty.bind(dao.contactsProperty());
-
-        contactsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::setupContactMenu);
-            }
-        });
-
-        accountsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::setupAccountMenus);
-            }
-        });
-
-        transactionsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::setupComments);
-            }
-        });
-
-        preloadingProperty.addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
-                Platform.runLater(this::onChangedTransactionTypes);
-                Platform.runLater(this::setupAccountMenus);
-                Platform.runLater(this::setupContactMenu);
-                Platform.runLater(this::setupComments);
-            }
-        });
     }
 
     @Override
@@ -213,31 +211,52 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         rateDir1Combo.getItems().setAll("/", "*");
 
-        TextFields.bindAutoCompletion(typeEdit, req -> typeSuggestions.stream()
-                .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                .collect(Collectors.toList()), TRANSACTION_TYPE_TO_STRING);
-
-        TextFields.bindAutoCompletion(debitedAccountEdit, req ->debitedSuggestions.stream()
-                .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                .collect(Collectors.toList()), ACCOUNT_TO_STRING);
-
-        TextFields.bindAutoCompletion(creditedAccountEdit, req -> creditedSuggestions.stream()
-                .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                .collect(Collectors.toList()), ACCOUNT_TO_STRING);
-
-        TextFields.bindAutoCompletion(contactEdit, req -> contactSuggestions.stream()
-                .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                .collect(Collectors.toList()), CONTACT_TO_STRING);
-
-        TextFields.bindAutoCompletion(commentEdit, req -> commentSuggestions.stream()
-                .filter(x -> x.toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                .collect(Collectors.toList()));
+        TextFields.bindAutoCompletion(typeEdit, new CompletionProvider<>(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
+        TextFields.bindAutoCompletion(debitedAccountEdit, new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
+        TextFields.bindAutoCompletion(creditedAccountEdit, new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+        TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
+        TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
         Platform.runLater(this::createValidationSupport);
 
         creditedAccountEdit.focusedProperty().addListener((x,oldValue,newValue) -> {
             if (oldValue && !newValue) {
                 processAutoFill();
+            }
+        });
+
+        typeEdit.focusedProperty().addListener((x,oldValue,newValue) -> {
+            if (oldValue && !newValue) {
+                autoFillType();
+            }
+        });
+
+        final MoneyDAO dao = MoneyDAO.getInstance();
+
+        dao.contactsProperty().addListener((MapChangeListener<Integer,Contact>) l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(this::setupContactMenu);
+            }
+        });
+
+        dao.accountsProperty().addListener((MapChangeListener<Integer,Account>)l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(this::setupAccountMenus);
+            }
+        });
+
+        dao.transactionsProperty().addListener((MapChangeListener<Integer,Transaction>)l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(this::setupComments);
+            }
+        });
+
+        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                Platform.runLater(this::onChangedTransactionTypes);
+                Platform.runLater(this::setupAccountMenus);
+                Platform.runLater(this::setupContactMenu);
+                Platform.runLater(this::setupComments);
             }
         });
     }
@@ -349,6 +368,9 @@ public class TransactionEditorPane extends Controller implements Initializable {
         sumEdit.setText("");
         rateAmoutLabel.setText("");
 
+
+        daySpinner.getEditor().setText(Integer.toString(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
+        daySpinner.getEditor().selectAll();
         daySpinner.requestFocus();
     }
 
@@ -487,12 +509,14 @@ public class TransactionEditorPane extends Controller implements Initializable {
             return false;
         }
 
-        builder.day(daySpinner.getValue());
+//        builder.day(daySpinner.getValue());
         builder.comment(commentEdit.getText());
         builder.checked(checkedCheckBox.isSelected());
         builder.invoiceNumber(invoiceNumberEdit.getText());
 
         try {
+            builder.day(Integer.parseInt(daySpinner.getEditor().getText()));
+
             builder.amount(new BigDecimal(sumEdit.getText()));
 
             if (!rate1Edit.isDisabled()) {
@@ -550,6 +574,11 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         rate1Edit.setDisable(disable);
         rateDir1Combo.setDisable(disable);
+
+        if (!disable && rate1Edit.getText().isEmpty()) {
+            rate1Edit.setText("1");
+            rateDir1Combo.getSelectionModel().select(0);
+        }
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value, Collection<T> items, StringConverter<T> converter) {
@@ -741,7 +770,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
     private void processAutoFill() {
         builder.accountDebitedId().ifPresent(accDebitedId ->
                 builder.accountCreditedId().ifPresent(accCreditedId ->
-                        transactionsProperty.values().stream()
+                        MoneyDAO.getInstance().transactionsProperty().values().stream()
                                 .filter(t -> Objects.equals(t.getAccountCreditedId(), accCreditedId)
                                         && Objects.equals(t.getAccountDebitedId(), accDebitedId))
                                 .sorted(Transaction.BY_DATE.reversed())
@@ -754,14 +783,18 @@ public class TransactionEditorPane extends Controller implements Initializable {
                                     if (sumEdit.getText().isEmpty()) {
                                         sumEdit.setText(t.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
                                     }
-                                    Optional.ofNullable(t.getContactId())
-                                            .map(id -> MoneyDAO.getInstance().getContact(id))
-                                            .map(Optional::get)
+                                    MoneyDAO.getInstance().getContact(t.getContactId())
                                             .ifPresent(c -> {
                                                 if (contactEdit.getText().isEmpty()) {
                                                     contactEdit.setText(c.getName());
                                                 }
                                             });
                                 })));
+    }
+
+    private void autoFillType() {
+        if (typeEdit.getText().isEmpty()) {
+            typeEdit.setText(TransactionType.UNDEFINED.getName());
+        }
     }
 }

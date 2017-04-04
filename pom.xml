@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>1.0.0beta</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
     <name>MoneyManager</name>
     <parent>
@@ -32,6 +32,19 @@
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>filtering-java-templates</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.5.0</version>
                 <executions>
@@ -47,6 +60,7 @@
                             </executable>
                             <arguments>
                                 <argument>-deploy</argument>
+                                <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-native</argument>
                                 <argument>exe</argument>
                                 <argument>-name</argument>
@@ -81,6 +95,7 @@
                             </executable>
                             <arguments>
                                 <argument>-deploy</argument>
+                                <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-native</argument>
                                 <argument>dmg</argument>
                                 <argument>-name</argument>
@@ -111,6 +126,7 @@
                             </executable>
                             <arguments>
                                 <argument>-deploy</argument>
+                                <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-native</argument>
                                 <argument>rpm</argument>
                                 <argument>-name</argument>

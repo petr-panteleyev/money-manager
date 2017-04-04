@@ -28,6 +28,7 @@ package org.panteleyev.money;
 public interface Styles {
     String BLACK_TEXT   = "blackText";
     String RED_TEXT     = "redText";
-    String BLUE_TEXT    = "redText";
+    String BLUE_TEXT    = "blueText";
     String GROUP_CELL   = "groupCell";
+    String TRANSACTION_TABLE_ROW = "transactionTableRow";
 }

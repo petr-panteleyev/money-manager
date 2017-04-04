@@ -5,11 +5,11 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -25,13 +25,12 @@
  */
 package org.panteleyev.money;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -41,6 +40,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class CurrencyWindowController extends BaseController implements Initializable {
     private static final String FXML = "/org/panteleyev/money/CurrencyWindow.fxml";
@@ -59,13 +60,11 @@ public class CurrencyWindowController extends BaseController implements Initiali
 
     private ResourceBundle bundle;
 
-    private final SimpleMapProperty<Integer, Currency> currencyProperty = new SimpleMapProperty<>();
+    private final MapChangeListener<Integer,Currency> currencyListener =
+            (MapChangeListener<Integer,Currency>)l -> Platform.runLater(this::updateWindow);
 
     CurrencyWindowController() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, true);
-        currencyProperty.bind(MoneyDAO.getInstance().currencyProperty());
-        currencyProperty.addListener((x, y, z) ->
-                Platform.runLater(this::updateWindow));
     }
 
     @Override
@@ -74,7 +73,7 @@ public class CurrencyWindowController extends BaseController implements Initiali
 
         menuBar.setUseSystemMenuBar(true);
 
-        currencyList.addAll(currencyProperty.values());
+        currencyList.addAll(MoneyDAO.getInstance().currencyProperty().values());
         table.setItems(currencyList);
         colName.setCellValueFactory((TableColumn.CellDataFeatures<Currency, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getSymbol()));
@@ -85,11 +84,15 @@ public class CurrencyWindowController extends BaseController implements Initiali
             .bind(table.getSelectionModel().selectedItemProperty().isNull());
         ctxEditMenuItem.disableProperty()
             .bind(table.getSelectionModel().selectedItemProperty().isNull());
+
+        MoneyDAO.getInstance().currencyProperty()
+                .addListener(new WeakMapChangeListener<>(currencyListener));
     }
 
     @Override
     public String getTitle() {
-        return bundle == null? "Currencies" : bundle.getString("currency.Window.Title");
+        return bundle == null?
+                "Currencies" : bundle.getString("currency.Window.Title");
     }
 
     public void onAddCurrency() {
@@ -116,18 +119,12 @@ public class CurrencyWindowController extends BaseController implements Initiali
 
     private void updateWindow() {
         int selIndex = table.getSelectionModel().getSelectedIndex();
-        currencyList.setAll(currencyProperty.values());
+        currencyList.setAll(MoneyDAO.getInstance().currencyProperty().values());
         table.getSelectionModel().select(selIndex);
     }
 
     @Override
     protected Parent getSelf() {
         return self;
-    }
-
-    @Override
-    public void onClose() {
-        currencyProperty.unbind();
-        super.onClose();
     }
 }

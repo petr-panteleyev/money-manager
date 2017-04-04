@@ -23,17 +23,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -46,7 +43,12 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
-import org.panteleyev.money.persistence.*;
+import org.panteleyev.money.persistence.Contact;
+import org.panteleyev.money.persistence.ContactType;
+import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 public class ContactListWindowController extends BaseController implements Initializable {
     @FXML private Parent        self;
@@ -65,13 +67,11 @@ public class ContactListWindowController extends BaseController implements Initi
 
     private ResourceBundle bundle;
 
-    private final SimpleMapProperty<Integer, Contact> contactsProperty = new SimpleMapProperty<>();
+    private final MapChangeListener<Integer,Contact> contactsListener =
+            (MapChangeListener<Integer,Contact>)l -> Platform.runLater(this::reloadContacts);
 
     public ContactListWindowController() {
         super("/org/panteleyev/money/ContactListWindow.fxml", MainWindowController.UI_BUNDLE_PATH, true);
-
-        contactsProperty.bind(MoneyDAO.getInstance().contactsProperty());
-        contactsProperty.addListener((x,y,z) -> Platform.runLater(this::reloadContacts));
     }
 
     @Override
@@ -124,6 +124,9 @@ public class ContactListWindowController extends BaseController implements Initi
                 .bind(contactTable.getSelectionModel().selectedItemProperty().isNull());
 
         reloadContacts();
+
+        MoneyDAO.getInstance().contactsProperty()
+                .addListener(new WeakMapChangeListener<>(contactsListener));
     }
 
     private void reloadContacts() {
@@ -174,11 +177,5 @@ public class ContactListWindowController extends BaseController implements Initi
                 openContactDialog(c);
             }
         }
-    }
-
-    @Override
-    public void onClose() {
-        contactsProperty.unbind();
-        super.onClose();
     }
 }

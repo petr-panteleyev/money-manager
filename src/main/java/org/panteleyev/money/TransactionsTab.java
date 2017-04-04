@@ -23,13 +23,10 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
-import javafx.event.ActionEvent;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
@@ -41,7 +38,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.CategoryType;
@@ -76,44 +73,8 @@ public class TransactionsTab extends Controller implements Initializable {
     private final TransactionTableView  transactionTable    = new TransactionTableView(false);
     private final TransactionEditorPane transactionEditor   = new TransactionEditorPane().load();
 
-    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
-
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final SimpleMapProperty<Integer, Account> accountsProperty =
-            new SimpleMapProperty<>();
-
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
-            new SimpleMapProperty<>();
-
     TransactionsTab() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
-
-        MoneyDAO dao = MoneyDAO.getInstance();
-
-        preloadingProperty.bind(dao.preloadingProperty());
-        accountsProperty.bind(dao.accountsProperty());
-        transactionsProperty.bind(dao.transactionsProperty());
-
-        accountsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::initAccountFilterBox);
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
-
-        transactionsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
-
-        preloadingProperty.addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
-                Platform.runLater(this::initAccountFilterBox);
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
     }
 
     BorderPane getPane() {
@@ -193,6 +154,28 @@ public class TransactionsTab extends Controller implements Initializable {
 
         accountFilterBox.getSelectionModel().selectedIndexProperty()
                 .addListener((x,y,z) -> Platform.runLater(this::reloadTransactions));
+
+        final MoneyDAO dao = MoneyDAO.getInstance();
+
+        dao.accountsProperty().addListener((MapChangeListener<Integer, Account>) l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(this::initAccountFilterBox);
+                Platform.runLater(this::reloadTransactions);
+            }
+        });
+
+        dao.transactionsProperty().addListener((MapChangeListener<Integer, Transaction>) l -> {
+            if (!dao.preloadingProperty().get()) {
+                Platform.runLater(this::reloadTransactions);
+            }
+        });
+
+        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                Platform.runLater(this::initAccountFilterBox);
+                Platform.runLater(this::reloadTransactions);
+            }
+        });
     }
 
     private void addAccountsToChoiceBox(Collection<Account> aList) {
@@ -365,18 +348,16 @@ public class TransactionsTab extends Controller implements Initializable {
             return;
         }
 
-        MoneyDAO dao = MoneyDAO.getInstance();
-
         Integer groupId = transactions.get(0).getGroupId();
 
-        transactions.forEach(t -> dao.updateTransaction(
+        transactions.forEach(t -> MoneyDAO.getInstance().updateTransaction(
                 new Transaction.Builder(t)
                         .groupId(0)
                         .build()
                 )
         );
 
-        dao.deleteTransactionGroup(groupId);
+        MoneyDAO.getInstance().deleteTransactionGroup(groupId);
 
         reloadTransactions();
     }
@@ -393,9 +374,7 @@ public class TransactionsTab extends Controller implements Initializable {
     }
 
     private void onCheckTransaction(List<Transaction> transactions, Boolean check) {
-        MoneyDAO dao = MoneyDAO.getInstance();
-
-        transactions.forEach(t -> dao.updateTransaction(
+        transactions.forEach(t -> MoneyDAO.getInstance().updateTransaction(
                 new Transaction.Builder(t)
                         .checked(check)
                         .build()
@@ -408,5 +387,13 @@ public class TransactionsTab extends Controller implements Initializable {
     private void onExpandGroup(TransactionGroup group, Boolean expand) {
         MoneyDAO.getInstance().updateTransactionGroup(group.expand(expand));
         reloadTransactions();
+    }
+
+    void scrollToEnd() {
+        if (transactionTable.getDayColumn().getSortType() == TreeTableColumn.SortType.ASCENDING) {
+            transactionTable.scrollTo(MoneyDAO.getInstance().transactionsProperty().size() - 1);
+        } else {
+            transactionTable.scrollTo(0);
+        }
     }
 }

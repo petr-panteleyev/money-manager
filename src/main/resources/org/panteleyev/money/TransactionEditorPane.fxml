@@ -103,10 +103,10 @@
                   <VBox spacing="2.0">
                      <children>
                         <Label text="%sumLabel" />
-                        <HBox spacing="5.0">
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
                            <children>
                               <TextField fx:id="sumEdit" />
-                              <CheckBox fx:id="checkedCheckBox" alignment="TOP_LEFT" mnemonicParsing="false" />
+                              <CheckBox fx:id="checkedCheckBox" alignment="TOP_LEFT" focusTraversable="false" mnemonicParsing="false" />
                            </children>
                         </HBox>
                      </children>

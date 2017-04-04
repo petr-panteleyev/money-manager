@@ -27,8 +27,7 @@ package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
+import javafx.collections.MapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -144,15 +143,6 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
     private final Map<CategoryType, TreeItem<AccountTreeItem>> subRoots = new EnumMap<>(CategoryType.class);
 
-    private final SimpleBooleanProperty preloadingProperty = new SimpleBooleanProperty();
-
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final SimpleMapProperty<Integer, Account> accountsProperty =
-            new SimpleMapProperty<>();
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-    private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
-            new SimpleMapProperty<>();
-
     // tree update globals
     private TreeItem<AccountTreeItem> categoryTreeItem = null;
 
@@ -162,11 +152,6 @@ public class AccountTree extends Controller implements Initializable, Styles {
 
     AccountTree() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
-
-        MoneyDAO dao = MoneyDAO.getInstance();
-        preloadingProperty.bind(dao.preloadingProperty());
-        accountsProperty.bind(dao.accountsProperty());
-        transactionsProperty.bind(dao.transactionsProperty());
 
         Arrays.stream(CategoryType.values()).forEachOrdered(type ->
             subRoots.put(type, new TreeItem<>(new AccountTreeItem(type.getName(), type.getComment())))
@@ -220,19 +205,22 @@ public class AccountTree extends Controller implements Initializable, Styles {
         transactionFilterBox.getSelectionModel().selectedItemProperty()
                 .addListener((x,y,newValue) -> onTransactionFilterSelected(newValue));
 
-        accountsProperty.addListener(((x, y, z) -> {
-            if (!preloadingProperty.get()) {
+
+        final MoneyDAO dao = MoneyDAO.getInstance();
+
+        dao.accountsProperty().addListener((MapChangeListener<Integer,Account>)l -> {
+            if (!dao.preloadingProperty().get()) {
                 Platform.runLater(this::initAccountTree);
             }
-        }));
+        });
 
-        transactionsProperty.addListener((x,y,z) -> {
-            if (!preloadingProperty.get()) {
+        dao.transactionsProperty().addListener((MapChangeListener<Integer,Transaction>)l -> {
+            if (!dao.preloadingProperty().get()) {
                 Platform.runLater(tableView::refresh);
             }
         });
 
-        preloadingProperty.addListener((x, oldValue, newValue) -> {
+        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 Platform.runLater(this::initTransactionFilterBox);
                 Platform.runLater(this::initAccountTree);

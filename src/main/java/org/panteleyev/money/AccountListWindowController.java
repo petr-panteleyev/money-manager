@@ -23,20 +23,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -55,6 +49,12 @@ import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class AccountListWindowController extends BaseController implements Initializable {
     private static final String FXML = "/org/panteleyev/money/AccountListWindow.fxml";
@@ -86,14 +86,11 @@ public class AccountListWindowController extends BaseController implements Initi
 
     private ResourceBundle  bundle;
 
-    private final SimpleMapProperty<Integer, Account> accountsProperty =
-        new SimpleMapProperty<>();
-
+    private final MapChangeListener<Integer,Account> accountsListener =
+            (MapChangeListener<Integer,Account>)l -> Platform.runLater(this::reloadAccounts);
 
     public AccountListWindowController() {
         super(FXML, MainWindowController.UI_BUNDLE_PATH, true);
-
-        accountsProperty.bind(MoneyDAO.getInstance().accountsProperty());
     }
 
     @Override
@@ -195,9 +192,10 @@ public class AccountListWindowController extends BaseController implements Initi
         ctxDeleteMenuItem.disableProperty()
             .bind(accountListTable.getSelectionModel().selectedItemProperty().isNull());
 
-        accountsProperty.addListener((x, y, z) -> Platform.runLater(this::reloadAccounts));
-
         reloadAccounts();
+
+        MoneyDAO.getInstance().accountsProperty()
+                .addListener(new WeakMapChangeListener<>(accountsListener));
     }
 
     private void reloadAccounts() {
@@ -249,11 +247,10 @@ public class AccountListWindowController extends BaseController implements Initi
     public void onAddAccount() {
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        new AccountDialog((Account)null).load().showAndWait().ifPresent(builder -> {
-            MoneyDAO.getInstance().insertAccount(builder
-                    .id(dao.generatePrimaryKey(Account.class))
-                    .build());
-        });
+        new AccountDialog((Account)null).load().showAndWait()
+                .ifPresent(builder -> dao.insertAccount(builder
+                        .id(dao.generatePrimaryKey(Account.class))
+                        .build()));
     }
 
     private Optional<Account> getSelectedAccount() {
@@ -261,11 +258,8 @@ public class AccountListWindowController extends BaseController implements Initi
     }
 
     public void onEditAccount() {
-        getSelectedAccount().ifPresent(account -> {
-            new AccountDialog(account).load().showAndWait().ifPresent(builder -> {
-                MoneyDAO.getInstance().updateAccount(builder.build());
-            });
-        });
+        getSelectedAccount().ifPresent(account -> new AccountDialog(account).load().showAndWait()
+                .ifPresent(builder -> MoneyDAO.getInstance().updateAccount(builder.build())));
     }
 
     public void onDeleteAccount() {
@@ -287,10 +281,5 @@ public class AccountListWindowController extends BaseController implements Initi
     @Override
     protected Parent getSelf() {
         return self;
-    }
-
-    @Override
-    public void onClose() {
-        super.onClose();
     }
 }
