@@ -55,7 +55,7 @@ public class TestContact extends BaseTest {
                 .country(original.getCountry())
                 .zip(original.getZip());
 
-        Assert.assertEquals(emptyBuilder.id().orElse(null), original.getId());
+        Assert.assertEquals(emptyBuilder.id(), original.getId());
 
         newContact = emptyBuilder.build();
         Assert.assertEquals(newContact, original);
@@ -87,10 +87,10 @@ public class TestContact extends BaseTest {
         Assert.assertEquals(c1.hashCode(), c2.hashCode());
     }
 
-    @Test(expectedExceptions = {NullPointerException.class})
+    @Test(expectedExceptions = {IllegalStateException.class})
     public void testBuilderNullId() {
         Contact.Builder builder = new Contact.Builder(newContact());
-        builder.id(null).build();
+        builder.id(0).build();
     }
 
 }

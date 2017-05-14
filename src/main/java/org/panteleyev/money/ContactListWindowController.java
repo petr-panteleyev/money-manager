@@ -32,63 +32,97 @@ import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ContactType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ContactListWindowController extends BaseController implements Initializable {
-    @FXML private Parent        self;
+class ContactListWindowController extends BaseController {
+    private final ResourceBundle     rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private TableColumn<Contact, String>  nameColumn;
-    @FXML private TableColumn<Contact, String>  typeColumn;
-    @FXML private TableColumn<Contact, String>  phoneColumn;
-    @FXML private TableColumn<Contact, String>  emailColumn;
+    private final BorderPane         self = new BorderPane();
 
-    @FXML private ChoiceBox                     typeChoiceBox;
-    @FXML private TableView<Contact>            contactTable;
-
-    @FXML private MenuBar                       menuBar;
-    @FXML private MenuItem                      editMenuItem;
-    @FXML private MenuItem                      ctxEditMenuItem;
-
-    private ResourceBundle bundle;
+    private final ChoiceBox          typeChoiceBox = new ChoiceBox();
+    private final TableView<Contact> contactTable = new TableView<>();
 
     private final MapChangeListener<Integer,Contact> contactsListener =
             (MapChangeListener<Integer,Contact>)l -> Platform.runLater(this::reloadContacts);
 
-    public ContactListWindowController() {
-        super("/org/panteleyev/money/ContactListWindow.fxml", MainWindowController.UI_BUNDLE_PATH, true);
-    }
-
-    @Override
-    protected Parent getSelf() {
-        return self;
+    ContactListWindowController() {
+        super(null);
+        initialize();
+        setupWindow(self);
     }
 
     @Override
     public String getTitle() {
-        return bundle == null? "Contacts" : bundle.getString("contact.Window.Title");
+        return rb.getString("contact.Window.Title");
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
-        this.bundle = rb;
+    private void initialize() {
+        EventHandler<ActionEvent> addHandler = (evt) -> openContactDialog(null);
+        EventHandler<ActionEvent> editHandler = (evt) ->
+                openContactDialog(contactTable.getSelectionModel().getSelectedItem());
 
+        // Menu bar
+        MenuItem closeMenuItem = new MenuItem(rb.getString("menu.File.Close"));
+        closeMenuItem.setOnAction(ACTION_FILE_CLOSE);
+        Menu fileMenu = new Menu(rb.getString("menu.File"), null, closeMenuItem);
+
+        MenuItem addMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        addMenuItem.setOnAction(addHandler);
+        MenuItem editMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        editMenuItem.setOnAction(editHandler);
+        Menu editMenu = new Menu(rb.getString("menu.Edit"), null, addMenuItem, editMenuItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(rb));
         menuBar.setUseSystemMenuBar(true);
+
+        // Context menu
+        MenuItem ctxAddMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        ctxAddMenuItem.setOnAction(addHandler);
+        MenuItem ctxEditMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        ctxEditMenuItem.setOnAction(editHandler);
+        contactTable.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem));
+
+        // Table
+        BorderPane pane = new BorderPane();
+
+        TableColumn<Contact, String>  nameColumn = new TableColumn<>(rb.getString("column.Name"));
+        TableColumn<Contact, String>  typeColumn = new TableColumn<>(rb.getString("column.Type"));
+        TableColumn<Contact, String>  phoneColumn = new TableColumn<>(rb.getString("column.Phone"));
+        TableColumn<Contact, String>  emailColumn = new TableColumn<>(rb.getString("column.Email"));
+
+        contactTable.getColumns().setAll(nameColumn, typeColumn, phoneColumn, emailColumn);
+        contactTable.setOnMouseClicked(this::onTableMouseClick);
+
+        // Toolbox
+        HBox hBox = new HBox(typeChoiceBox);
+
+        pane.setTop(hBox);
+        pane.setCenter(contactTable);
+
+        BorderPane.setMargin(hBox, new Insets(5, 5, 5, 5));
+
+        self.setPrefSize(600, 400);
+        self.setTop(menuBar);
+        self.setCenter(pane);
 
         typeChoiceBox.getItems().add(rb.getString("contact.Window.AllTypes"));
         typeChoiceBox.getItems().add(new Separator());
@@ -125,7 +159,7 @@ public class ContactListWindowController extends BaseController implements Initi
 
         reloadContacts();
 
-        MoneyDAO.getInstance().contactsProperty()
+        MoneyDAO.getInstance().contacts()
                 .addListener(new WeakMapChangeListener<>(contactsListener));
     }
 
@@ -149,10 +183,9 @@ public class ContactListWindowController extends BaseController implements Initi
     private void openContactDialog(Contact contact) {
         MoneyDAO dao = MoneyDAO.getInstance();
         new ContactDialog(contact)
-                .load()
                 .showAndWait()
                 .ifPresent(builder -> {
-                    if (builder.id().isPresent()) {
+                    if (builder.id() != 0) {
                         dao.updateContact(builder.build());
                     } else {
                         builder = builder.id(dao.generatePrimaryKey(Contact.class));
@@ -161,15 +194,7 @@ public class ContactListWindowController extends BaseController implements Initi
                 });
     }
 
-    public void onAddContact() {
-        openContactDialog(null);
-    }
-
-    public void onEditContact() {
-        openContactDialog(contactTable.getSelectionModel().getSelectedItem());
-    }
-
-    public void onTableMouseClick(Event event) {
+    private void onTableMouseClick(Event event) {
         MouseEvent me = (MouseEvent)event;
         if (me.getClickCount() == 2) {
             Contact c = contactTable.getSelectionModel().getSelectedItem();

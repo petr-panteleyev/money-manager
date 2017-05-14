@@ -25,48 +25,70 @@
  */
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.utilities.fx.BaseDialog;
+import java.math.BigDecimal;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-public class CurrencyDialog extends BaseDialog<Currency.Builder> implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/CurrencyDialog.fxml";
+class CurrencyDialog extends BaseDialog<Currency.Builder> implements Styles {
+    private final ResourceBundle    rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private TextField             nameEdit;
-    @FXML private TextField             descrEdit;
-    @FXML private TextField             rateEdit;
-    @FXML private ChoiceBox<String>     rateDirectionChoice;
-    @FXML private CheckBox              defaultCheck;
-    @FXML private CheckBox              showSymbolCheck;
-    @FXML private ComboBox<String>      formatSymbolCombo;
-    @FXML private ChoiceBox<String>     formatSymbolPositionChoice;
-    @FXML private CheckBox              thousandSeparatorCheck;
+    private final TextField         nameEdit = new TextField();
+    private final TextField         descrEdit = new TextField();
+    private final TextField         rateEdit = new TextField();
+    private final ChoiceBox<String> rateDirectionChoice = new ChoiceBox<>();
+    private final CheckBox          defaultCheck = new CheckBox(rb.getString("currency.Dialog.Default"));
+    private final CheckBox          showSymbolCheck = new CheckBox();
+    private final ComboBox<String>  formatSymbolCombo = new ComboBox<>();
+    private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
+    private final CheckBox          thousandSeparatorCheck = new CheckBox(rb.getString("currency.Dialog.ShowSeparator"));
 
-    private final Currency              currency;
+    private final Currency          currency;
 
-    public CurrencyDialog(Currency currency) {
-        super(FXML, MainWindowController.UI_BUNDLE_PATH);
+    CurrencyDialog(Currency currency) {
+        super(MainWindowController.DIALOGS_CSS);
 
         this.currency = currency;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
+    private void initialize() {
         setTitle(rb.getString("currency.Dialog.Title"));
+
+        GridPane pane = new GridPane();
+        pane.getStyleClass().add(GRID_PANE);
+
+        int index = 0;
+        pane.addRow(index++, new Label(rb.getString("label.Symbol")), nameEdit);
+        pane.addRow(index++, new Label(rb.getString("label.Description")), descrEdit);
+        pane.addRow(index++, new Label(rb.getString("label.Rate")), rateEdit, rateDirectionChoice);
+
+        HBox hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setMargin(formatSymbolPositionChoice, new Insets(0, 0, 0, 5));
+        pane.add(hBox, 1, index++);
+
+        pane.add(thousandSeparatorCheck, 1, index++);
+        pane.add(defaultCheck, 1, index);
+
+        nameEdit.setPrefColumnCount(20);
+        formatSymbolCombo.setEditable(true);
 
         rateDirectionChoice.getItems().setAll("/", "*");
 
@@ -114,7 +136,8 @@ public class CurrencyDialog extends BaseDialog<Currency.Builder> implements Init
             }
         });
 
-        createDefaultButtons();
+        getDialogPane().setContent(pane);
+        createDefaultButtons(rb);
 
         Platform.runLater(this::createValidationSupport);
     }

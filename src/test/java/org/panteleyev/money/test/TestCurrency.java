@@ -54,7 +54,7 @@ public class TestCurrency extends BaseTest {
                 .direction(original.getDirection())
                 .useThousandSeparator(original.isUseThousandSeparator());
 
-        Assert.assertEquals(emptyBuilder.id().orElse(null), original.getId());
+        Assert.assertEquals(emptyBuilder.id(), original.getId());
 
         newCurrency = emptyBuilder.build();
         Assert.assertEquals(newCurrency, original);
@@ -88,9 +88,9 @@ public class TestCurrency extends BaseTest {
         Assert.assertEquals(c1.hashCode(), c2.hashCode());
     }
 
-    @Test(expectedExceptions = {NullPointerException.class})
+    @Test(expectedExceptions = {IllegalStateException.class})
     public void testBuilderNullId() {
         Currency.Builder builder = new Currency.Builder(newCurrency());
-        builder.id(null).build();
+        builder.id(0).build();
     }
 }

@@ -48,7 +48,7 @@ public class TestTransaction extends BaseTest {
                 .type(original.getCatType())
                 .expanded(original.isExpanded());
 
-        Assert.assertEquals(emptyBuilder.id().orElse(null), original.getId());
+        Assert.assertEquals(emptyBuilder.id(), original.getId());
 
         newCategory = emptyBuilder.build();
         Assert.assertEquals(newCategory, original);
@@ -70,9 +70,9 @@ public class TestTransaction extends BaseTest {
         Assert.assertEquals(c1.hashCode(), c2.hashCode());
     }
 
-    @Test(expectedExceptions = {NullPointerException.class})
+    @Test(expectedExceptions = {Exception.class})
     public void testBuilderNullId() {
         Category.Builder builder = new Category.Builder(newCategory());
-        builder.id(null).build();
+        builder.id(0).build();
     }
 }

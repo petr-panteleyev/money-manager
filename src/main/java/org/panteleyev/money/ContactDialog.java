@@ -25,45 +25,75 @@
  */
 package org.panteleyev.money;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.geometry.VPos;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Control;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ContactType;
-import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.utilities.fx.BaseDialog;
+import java.util.ResourceBundle;
 
-public class ContactDialog extends BaseDialog<Contact.Builder> implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/ContactDialog.fxml";
+class ContactDialog extends BaseDialog<Contact.Builder> implements Styles {
+    private ResourceBundle               rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private ChoiceBox<ContactType>    typeChoiceBox;
-    @FXML private TextField                 nameField;
-    @FXML private TextField                 phoneField;
-    @FXML private TextField                 mobileField;
-    @FXML private TextField                 emailField;
-    @FXML private TextField                 webField;
-    @FXML private TextArea                  commentEdit;
-    @FXML private TextField                 streetField;
-    @FXML private TextField                 cityField;
-    @FXML private TextField                 countryField;
-    @FXML private TextField                 zipField;
+    private final ChoiceBox<ContactType> typeChoiceBox = new ChoiceBox<>();
+    private final TextField              nameField = new TextField();
+    private final TextField              phoneField = new TextField();
+    private final TextField              mobileField = new TextField();
+    private final TextField              emailField = new TextField();
+    private final TextField              webField = new TextField();
+    private final TextArea               commentEdit = new TextArea();
+    private final TextField              streetField = new TextField();
+    private final TextField              cityField = new TextField();
+    private final TextField              countryField = new TextField();
+    private final TextField              zipField = new TextField();
 
     private final Contact contact;
 
-    public ContactDialog(Contact contact) {
-        super(FXML, MainWindowController.UI_BUNDLE_PATH);
+    ContactDialog(Contact contact) {
+        super(MainWindowController.DIALOGS_CSS);
         this.contact = contact;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
+    private void initialize() {
         setTitle(rb.getString("contact.Dialog.Title"));
+
+        GridPane pane = new GridPane();
+        pane.getStyleClass().add(GRID_PANE);
+
+        int index = 0;
+        pane.addRow(index++, new Label(rb.getString("label.Type")), typeChoiceBox);
+        pane.addRow(index++, new Label(rb.getString("label.Name")), nameField);
+        pane.addRow(index++, new Label(rb.getString("label.Phone")), phoneField);
+        pane.addRow(index++, new Label(rb.getString("label.Mobile")), mobileField);
+        pane.addRow(index++, new Label(rb.getString("label.Email")), emailField);
+        pane.addRow(index++, new Label("URL:"), webField);
+        pane.addRow(index++, new Label(rb.getString("label.Street")), streetField);
+        pane.addRow(index++, new Label(rb.getString("label.City")), cityField);
+        pane.addRow(index++, new Label(rb.getString("label.Country")), countryField);
+        pane.addRow(index++, new Label(rb.getString("label.ZIP")), zipField);
+        pane.addRow(index, new Label(rb.getString("label.Comment")), commentEdit);
+
+        RowConstraints topAlignmentConstraints = new RowConstraints();
+        topAlignmentConstraints.setValignment(VPos.TOP);
+        for (int i = 0; i < index; i++) {
+            pane.getRowConstraints().add(new RowConstraints());
+        }
+        pane.getRowConstraints().add(topAlignmentConstraints);
+
+        nameField.setPrefColumnCount(20);
 
         typeChoiceBox.setItems(FXCollections.observableArrayList(ContactType.values()));
         typeChoiceBox.setConverter(new ReadOnlyStringConverter<ContactType>() {
@@ -109,7 +139,8 @@ public class ContactDialog extends BaseDialog<Contact.Builder> implements Initia
             }
         });
 
-        createDefaultButtons();
+        getDialogPane().setContent(pane);
+        createDefaultButtons(rb);
         Platform.runLater(this::createValidationSupport);
     }
 

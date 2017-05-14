@@ -29,7 +29,6 @@ package org.panteleyev.money.persistence;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.ForeignKey;
@@ -58,7 +57,7 @@ public class Transaction implements Record {
     };
 
     public static final class Builder {
-        private Integer         id;
+        private int             id;
         private BigDecimal      amount;
         private int             day;
         private int             month;
@@ -66,14 +65,14 @@ public class Transaction implements Record {
         private TransactionType transactionType;
         private String          comment;
         private boolean         checked;
-        private Integer         accountDebitedId;
-        private Integer         accountCreditedId;
+        private int             accountDebitedId;
+        private int             accountCreditedId;
         private CategoryType    accountDebitedType;
         private CategoryType    accountCreditedType;
-        private Integer         accountDebitedCategoryId;
-        private Integer         accountCreditedCategoryId;
-        private Integer         groupId;
-        private Integer         contactId;
+        private int             accountDebitedCategoryId;
+        private int             accountCreditedCategoryId;
+        private int             groupId;
+        private int             contactId;
         private BigDecimal      rate;
         private int             rateDirection;
         private String          invoiceNumber;
@@ -83,6 +82,7 @@ public class Transaction implements Record {
             this.rate = BigDecimal.ONE;
             this.rateDirection = 0;
             this.checked = false;
+            this.contactId = 0;
         }
 
         public Builder(Transaction t) {
@@ -111,13 +111,13 @@ public class Transaction implements Record {
             }
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Optional<Integer> id() {
-            return Optional.ofNullable(id);
+        public int id() {
+            return id;
         }
 
         public Builder amount(BigDecimal amount) {
@@ -155,22 +155,22 @@ public class Transaction implements Record {
             return this;
         }
 
-        public Builder accountDebitedId(Integer accountDebitedId) {
+        public Builder accountDebitedId(int accountDebitedId) {
             this.accountDebitedId = accountDebitedId;
             return this;
         }
 
-        public Optional<Integer> accountDebitedId() {
-            return Optional.ofNullable(accountDebitedId);
+        public int getAccountDebitedId() {
+            return accountDebitedId;
         }
 
-        public Builder accountCreditedId(Integer accountCreditedId) {
+        public Builder accountCreditedId(int accountCreditedId) {
             this.accountCreditedId = accountCreditedId;
             return this;
         }
 
-        public Optional<Integer> accountCreditedId() {
-            return Optional.ofNullable(accountCreditedId);
+        public int getAccountCreditedId() {
+            return accountCreditedId;
         }
 
         public Builder accountDebitedType(CategoryType accountDebitedType) {
@@ -183,12 +183,12 @@ public class Transaction implements Record {
             return this;
         }
 
-        public Builder accountDebitedCategoryId(Integer accountDebitedCategoryId) {
+        public Builder accountDebitedCategoryId(int accountDebitedCategoryId) {
             this.accountDebitedCategoryId = accountDebitedCategoryId;
             return this;
         }
 
-        public Builder accountCreditedCategoryId(Integer accountCreditedCategoryId) {
+        public Builder accountCreditedCategoryId(int accountCreditedCategoryId) {
             this.accountCreditedCategoryId = accountCreditedCategoryId;
             return this;
         }
@@ -198,7 +198,7 @@ public class Transaction implements Record {
             return this;
         }
 
-        public Builder contactId(Integer contactId) {
+        public Builder contactId(int contactId) {
             this.contactId = contactId;
             return this;
         }
@@ -219,14 +219,18 @@ public class Transaction implements Record {
         }
 
         public Transaction build() {
-            Objects.requireNonNull(id);
             Objects.requireNonNull(transactionType);
-            Objects.requireNonNull(accountDebitedId);
-            Objects.requireNonNull(accountCreditedId);
+
+            if (id == 0
+                    || accountDebitedId == 0
+                    || accountCreditedId == 0
+                    || accountDebitedCategoryId == 0
+                    || accountCreditedCategoryId == 0) {
+                throw new IllegalStateException();
+            }
+
             Objects.requireNonNull(accountDebitedType);
             Objects.requireNonNull(accountCreditedType);
-            Objects.requireNonNull(accountDebitedCategoryId);
-            Objects.requireNonNull(accountCreditedCategoryId);
 
             return new Transaction(
                     id,
@@ -252,7 +256,7 @@ public class Transaction implements Record {
         }
     }
 
-    private final Integer         id;
+    private final int             id;
     private final BigDecimal      amount;
     private final int             day;
     private final int             month;
@@ -260,21 +264,21 @@ public class Transaction implements Record {
     private final TransactionType transactionType;
     private final String          comment;
     private final boolean         checked;
-    private final Integer         accountDebitedId;
-    private final Integer         accountCreditedId;
+    private final int             accountDebitedId;
+    private final int             accountCreditedId;
     private final CategoryType    accountDebitedType;
     private final CategoryType    accountCreditedType;
-    private final Integer         accountDebitedCategoryId;
-    private final Integer         accountCreditedCategoryId;
-    private final Integer         groupId;
-    private final Integer         contactId;
+    private final int             accountDebitedCategoryId;
+    private final int             accountCreditedCategoryId;
+    private final int             groupId;
+    private final int             contactId;
     private final BigDecimal      rate;
     private final int             rateDirection;
     private final String          invoiceNumber;
 
     @RecordBuilder
     public Transaction(
-            @Field(Field.ID) Integer id,
+            @Field(Field.ID) int id,
             @Field("amount") BigDecimal  amount,
             @Field("date_day") int day,
             @Field("date_month") int month,
@@ -282,14 +286,14 @@ public class Transaction implements Record {
             @Field("transaction_type") TransactionType transactionType,
             @Field("comment") String comment,
             @Field("checked") boolean     checked,
-            @Field("account_debited_id") Integer     accountDebitedId,
-            @Field("account_credited_id") Integer     accountCreditedId,
+            @Field("account_debited_id") int accountDebitedId,
+            @Field("account_credited_id") int accountCreditedId,
             @Field("account_debited_type") CategoryType     accountDebitedType,
             @Field("account_credited_type") CategoryType     accountCreditedType,
-            @Field("account_debited_category_id") Integer     accountDebitedCategoryId,
-            @Field("account_credited_category_id") Integer     accountCreditedCategoryId,
-            @Field("group_id") Integer     groupId,
-            @Field("contact_id") Integer     contactId,
+            @Field("account_debited_category_id") int accountDebitedCategoryId,
+            @Field("account_credited_category_id") int accountCreditedCategoryId,
+            @Field("group_id") int groupId,
+            @Field("contact_id") int contactId,
             @Field("currency_rate") BigDecimal  rate,
             @Field("rate_direction") int         rateDirection,
             @Field("invoice_number") String      invoiceNumber
@@ -317,7 +321,7 @@ public class Transaction implements Record {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -358,25 +362,25 @@ public class Transaction implements Record {
 
     @Field(value = "account_debited_id", nullable=false)
     @ForeignKey(table=Account.class)
-    public Integer getAccountDebitedId() {
+    public int getAccountDebitedId() {
         return accountDebitedId;
     }
 
     @Field(value = "account_credited_id", nullable=false)
     @ForeignKey(table=Account.class)
-    public Integer getAccountCreditedId() {
+    public int getAccountCreditedId() {
         return accountCreditedId;
     }
 
     @Field(value = "group_id", nullable = false)
     @ForeignKey(table=TransactionGroup.class)
-    public Integer getGroupId() {
+    public int getGroupId() {
         return groupId;
     }
 
     @Field("contact_id")
     @ForeignKey(table=Contact.class)
-    public Integer getContactId() {
+    public int getContactId() {
         return contactId;
     }
 
@@ -392,13 +396,13 @@ public class Transaction implements Record {
 
     @Field(value = "account_debited_category_id", nullable=false)
     @ForeignKey(table=Category.class)
-    public Integer getAccountDebitedCategoryId() {
+    public int getAccountDebitedCategoryId() {
         return accountDebitedCategoryId;
     }
 
     @Field(value = "account_credited_category_id", nullable=false)
     @ForeignKey(table=Category.class)
-    public Integer getAccountCreditedCategoryId() {
+    public int getAccountCreditedCategoryId() {
         return accountCreditedCategoryId;
     }
 
@@ -426,24 +430,24 @@ public class Transaction implements Record {
         if (obj instanceof Transaction) {
             Transaction that = (Transaction)obj;
 
-            return Objects.equals(this.id, that.id)
+            return this.id == that.id
                     && Objects.equals(this.amount, that.amount)
-                    && Objects.equals(this.day, that.day)
-                    && Objects.equals(this.month, that.month)
-                    && Objects.equals(this.year, that.year)
+                    && this.day == that.day
+                    && this.month == that.month
+                    && this.year == that.year
                     && Objects.equals(this.transactionType, that.transactionType)
                     && Objects.equals(this.comment, that.comment)
-                    && Objects.equals(this.checked, that.checked)
-                    && Objects.equals(this.accountDebitedId, that.accountDebitedId)
-                    && Objects.equals(this.accountCreditedId, that.accountCreditedId)
+                    && this.checked == that.checked
+                    && this.accountDebitedId == that.accountDebitedId
+                    && this.accountCreditedId == that.accountCreditedId
                     && Objects.equals(this.accountDebitedType, that.accountDebitedType)
                     && Objects.equals(this.accountCreditedType, that.accountCreditedType)
-                    && Objects.equals(this.accountDebitedCategoryId, that.accountDebitedCategoryId)
-                    && Objects.equals(this.accountCreditedCategoryId, that.getAccountCreditedCategoryId())
-                    && Objects.equals(this.groupId, that.groupId)
-                    && Objects.equals(this.contactId, that.contactId)
+                    && this.accountDebitedCategoryId == that.accountDebitedCategoryId
+                    && this.accountCreditedCategoryId == that.accountCreditedCategoryId
+                    && this.groupId == that.groupId
+                    && this.contactId == that.contactId
                     && Objects.equals(this.rate, that.rate)
-                    && Objects.equals(this.rateDirection, that.rateDirection)
+                    && this.rateDirection == that.rateDirection
                     && Objects.equals(this.invoiceNumber, that.invoiceNumber);
         } else {
             return false;

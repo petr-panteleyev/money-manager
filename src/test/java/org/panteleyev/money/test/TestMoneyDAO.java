@@ -37,12 +37,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
-import java.util.Random;
 import java.util.UUID;
 
 public class TestMoneyDAO extends BaseDaoTest {
-    private static final Random RANDOM = new Random(System.currentTimeMillis());
-
     @BeforeClass
     @Override
     public void setupAndSkip() throws Exception {
@@ -104,8 +101,8 @@ public class TestMoneyDAO extends BaseDaoTest {
     @DataProvider(name="testCurrencyUpdateDataProvider")
     public Object[][] testCurrencyUpdateDataProvider() {
         return new Object[][] {
-            { new Currency(null, "2", "3", "4", 1, true, true, new BigDecimal("10.230000"), 1, true) },
-            { new Currency(null, "2", "3", "4", 1, false, true, new BigDecimal("10.230000"), -1, false) },
+            { new Currency(0, "2", "3", "4", 1, true, true, new BigDecimal("10.230000"), 1, true) },
+            { new Currency(0, "2", "3", "4", 1, false, true, new BigDecimal("10.230000"), -1, false) },
         };
     }
 

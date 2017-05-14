@@ -1,0 +1,15 @@
+.gridPane {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+}
+
+.aboutAppNameLabel {
+    -fx-font-family: System;
+    -fx-font-size: 24;
+    -fx-font-weight: bold;
+}
+
+.aboutLabel {
+    -fx-font-family: System;
+    -fx-font-size: 14;
+}

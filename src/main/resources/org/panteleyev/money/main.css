@@ -26,3 +26,12 @@
 .blackText {
     -fx-text-fill: black;
 }
+
+.rateLabel {
+    -fx-font-size: 11;
+    -fx-text-fill: #051aff;
+}
+
+.subLabel {
+    -fx-font-size: 11;
+}

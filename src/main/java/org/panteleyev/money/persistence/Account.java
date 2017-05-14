@@ -29,7 +29,6 @@ package org.panteleyev.money.persistence;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.ForeignKey;
@@ -52,16 +51,16 @@ public class Account implements Record, Named, Comparable<Account> {
     }
 
     public static final class Builder {
-        private Integer      id;
+        private int          id;
         private String       name;
         private String       comment;
         private BigDecimal   openingBalance;
         private BigDecimal   accountLimit;
         private BigDecimal   currencyRate;
         private CategoryType type;
-        private Integer      categoryId;
-        private Integer      currencyId;
-        private Boolean      enabled;
+        private int          categoryId;
+        private int          currencyId;
+        private boolean      enabled;
 
         public Builder() {
             openingBalance = BigDecimal.ZERO;
@@ -82,18 +81,18 @@ public class Account implements Record, Named, Comparable<Account> {
                 this.currencyRate = a.getCurrencyRate();
                 this.type = a.getType();
                 this.categoryId = a.getCategoryId();
-                this.currencyId = a.getCurrencyId().orElse(null);
+                this.currencyId = a.getCurrencyId();
                 this.enabled = a.isEnabled();
             }
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Optional<Integer> id() {
-            return Optional.ofNullable(id);
+        public int id() {
+            return id;
         }
 
         public Builder name(String x) {
@@ -126,12 +125,12 @@ public class Account implements Record, Named, Comparable<Account> {
             return this;
         }
 
-        public Builder categoryId(Integer x) {
+        public Builder categoryId(int x) {
             this.categoryId = x;
             return this;
         }
 
-        public Builder currencyId(Integer x) {
+        public Builder currencyId(int x) {
             this.currencyId = x;
             return this;
         }
@@ -142,10 +141,12 @@ public class Account implements Record, Named, Comparable<Account> {
         }
 
         public Account build() {
-            Objects.requireNonNull(id);
             Objects.requireNonNull(name);
             Objects.requireNonNull(type);
-            Objects.requireNonNull(categoryId);
+
+            if (id == 0 || categoryId == 0) {
+                throw new IllegalStateException();
+            }
             // TODO: temporarily allow null currency but must be forbidden in the future
             //Objects.requireNonNull(currencyId);
 
@@ -164,28 +165,28 @@ public class Account implements Record, Named, Comparable<Account> {
         }
     }
 
-    private final Integer      id;
+    private final int          id;
     private final String       name;
     private final String       comment;
     private final BigDecimal   openingBalance;
     private final BigDecimal   accountLimit;
     private final BigDecimal   currencyRate;
     private final CategoryType type;
-    private final Integer      categoryId;
-    private final Integer      currencyId;
+    private final int          categoryId;
+    private final int          currencyId;
     private final boolean      enabled;
 
     @RecordBuilder
     public Account(
-            @Field(Field.ID) Integer id,
+            @Field(Field.ID) int id,
             @Field("name") String name,
             @Field("comment") String comment,
             @Field("opening") BigDecimal openingBalance,
             @Field("acc_limit") BigDecimal accountLimit,
             @Field("currency_rate") BigDecimal currencyRate,
             @Field("type") CategoryType type,
-            @Field("category_id") Integer categoryId,
-            @Field("currency_id") Integer currencyId,
+            @Field("category_id") int categoryId,
+            @Field("currency_id") int currencyId,
             @Field("enabled") boolean enabled
     ) {
         this.id = id;
@@ -202,7 +203,7 @@ public class Account implements Record, Named, Comparable<Account> {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -229,14 +230,14 @@ public class Account implements Record, Named, Comparable<Account> {
 
     @Field(value = "category_id", nullable=false)
     @ForeignKey(table=Category.class, onDelete=ReferenceType.CASCADE)
-    public Integer getCategoryId() {
+    public int getCategoryId() {
         return categoryId;
     }
 
     @Field("currency_id")
     @ForeignKey(table=Currency.class, onDelete=ReferenceType.CASCADE)
-    public Optional<Integer> getCurrencyId() {
-        return Optional.ofNullable(currencyId);
+    public int getCurrencyId() {
+        return currencyId;
     }
 
     @Field("acc_limit")
@@ -267,16 +268,16 @@ public class Account implements Record, Named, Comparable<Account> {
 
         if (obj instanceof Account) {
             Account that = (Account)obj;
-            return Objects.equals(this.id, that.id)
+            return this.id == that.id
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.comment, that.comment)
                     && Objects.equals(this.openingBalance, that.openingBalance)
                     && Objects.equals(this.accountLimit, that.accountLimit)
                     && Objects.equals(this.currencyRate, that.currencyRate)
                     && Objects.equals(this.type, that.type)
-                    && Objects.equals(this.categoryId, that.categoryId)
-                    && Objects.equals(this.currencyId, that.currencyId)
-                    && Objects.equals(this.enabled, that.enabled);
+                    && this.categoryId == that.categoryId
+                    && this.currencyId == that.currencyId
+                    && this.enabled == that.enabled;
         } else {
             return false;
         }

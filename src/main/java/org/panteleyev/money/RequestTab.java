@@ -28,46 +28,69 @@ package org.panteleyev.money;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.MapChangeListener;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.utilities.fx.Controller;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class RequestTab extends Controller implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/RequestTab.fxml";
-
+class RequestTab extends BorderPane {
     private final TransactionTableView  transactionTable = new TransactionTableView(true);
 
-    @FXML private BorderPane root;
-    @FXML private ChoiceBox categoryTypeChoiceBox;
-    @FXML private ChoiceBox categoryChoiceBox;
-    @FXML private ChoiceBox accountChoiceBox;
+    private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
+
+    private final ChoiceBox categoryTypeChoiceBox = new ChoiceBox();
+    private final ChoiceBox categoryChoiceBox = new ChoiceBox();
+    private final ChoiceBox accountChoiceBox = new ChoiceBox();
 
     private final SimpleStringProperty allTypesString = new SimpleStringProperty();
     private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
     private final SimpleStringProperty allAccountsString = new SimpleStringProperty();
 
-    public RequestTab() {
-        super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
+    private final MapChangeListener<Integer, Category> categoryListener =
+            l -> Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
+    private final MapChangeListener<Integer, Account> accountListener =
+            l -> Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
+
+    RequestTab() {
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
-        root.setCenter(transactionTable);
+    private void initialize() {
+        Button clearButton = new Button(rb.getString("button.Clear"));
+        clearButton.setOnAction((ae) -> onClearButton());
+
+        Button findButton = new Button(rb.getString("button.Find"));
+        findButton.setOnAction((ae) -> onFindButton());
+
+        HBox row1 = new HBox(5, clearButton, findButton);
+        HBox row2 = new HBox(5, new Label(rb.getString("text.In.Semicolon")),
+                categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
+        row2.setAlignment(Pos.CENTER_LEFT);
+
+        VBox vBox = new VBox(5, row1, row2);
+
+        setTop(vBox);
+        setCenter(transactionTable);
+
+        BorderPane.setMargin(vBox, new Insets(5, 5, 5, 5));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         allTypesString.set(rb.getString("account.Window.AllTypes"));
         allCategoriesString.set(rb.getString("account.Window.AllCategories"));
@@ -113,29 +136,17 @@ public class RequestTab extends Controller implements Initializable {
             }
         });
 
-        final MoneyDAO dao = MoneyDAO.getInstance();
+        transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
-        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
+        final MoneyDAO dao = MoneyDAO.getInstance();
+        dao.categories().addListener(categoryListener);
+        dao.accounts().addListener(accountListener);
+
+        dao.preloadingProperty().addListener((x, y, newValue) -> {
+            if (!newValue) {
                 Platform.runLater(this::setupCategoryTypesBox);
             }
         });
-
-        dao.categoriesProperty().addListener((MapChangeListener<Integer, Category>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
-            }
-        });
-
-        dao.accountsProperty().addListener((MapChangeListener<Integer, Account>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
-            }
-        });
-    }
-
-    public BorderPane getRoot() {
-        return root;
     }
 
     private void setupCategoryTypesBox() {
@@ -203,7 +214,7 @@ public class RequestTab extends Controller implements Initializable {
         }
     }
 
-    public void onFindButton() {
+    private void onFindButton() {
         Collection<Transaction> transactions;
 
         MoneyDAO dao = MoneyDAO.getInstance();
@@ -234,9 +245,17 @@ public class RequestTab extends Controller implements Initializable {
         transactionTable.sort();
     }
 
-    public void onClearButton() {
+    private void onClearButton() {
         transactionTable.clear();
 
         setupCategoryTypesBox();
+    }
+
+    private void onCheckTransaction(List<Transaction> transactions, Boolean check) {
+        MoneyDAO dao = MoneyDAO.getInstance();
+
+        transactions.forEach(t -> dao.updateTransaction(new Transaction.Builder(t)
+                .checked(check)
+                .build()));
     }
 }

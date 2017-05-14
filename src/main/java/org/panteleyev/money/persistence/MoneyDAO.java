@@ -27,44 +27,51 @@ package org.panteleyev.money.persistence;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.collections.FXCollections;
 import org.panteleyev.persistence.DAO;
 import org.panteleyev.persistence.Record;
 import javax.sql.DataSource;
-import javax.swing.text.html.Option;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javafx.collections.ObservableMap;
 
 public class MoneyDAO extends DAO {
     private static final MoneyDAO INSTANCE = new MoneyDAO();
 
-    private final SimpleMapProperty<Integer, Category> categoriesProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, Category> categoriesMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, Category> categories =
+            FXCollections.observableMap(categoriesMap);
 
-    private final SimpleMapProperty<Integer, Contact> contactsProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, Contact> contactsMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, Contact> contacts =
+            FXCollections.observableMap(contactsMap);
 
-    private final SimpleMapProperty<Integer, Currency> currencyProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, Currency> currencyMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, Currency> currencies =
+            FXCollections.observableMap(currencyMap);
 
-    private final SimpleMapProperty<Integer, Account> accountsProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, Account> accountsMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, Account> accounts =
+            FXCollections.observableMap(accountsMap);
 
-    private final SimpleMapProperty<Integer, TransactionGroup> transactionGroupsProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, TransactionGroup> transactionGroupsMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, TransactionGroup> transactionGroups =
+            FXCollections.observableMap(transactionGroupsMap);
 
-    private final SimpleMapProperty<Integer, Transaction> transactionsProperty =
-            new SimpleMapProperty<>(FXCollections.observableHashMap());
+    private final Map<Integer, Transaction> transactionsMap = new ConcurrentHashMap<>();
+    private final ObservableMap<Integer, Transaction> transactions =
+            FXCollections.observableMap(transactionsMap);
 
     private final SimpleBooleanProperty preloadingProperty =
             new SimpleBooleanProperty(false);
@@ -85,12 +92,14 @@ public class MoneyDAO extends DAO {
     protected void setDatasource(DataSource ds) {
         super.setDatasource(ds);
 
-        categoriesProperty.set(FXCollections.observableHashMap());
-        contactsProperty.set(FXCollections.observableHashMap());
-        currencyProperty.set(FXCollections.observableHashMap());
-        accountsProperty.set(FXCollections.observableHashMap());
-        transactionGroupsProperty.set(FXCollections.observableHashMap());
-        transactionsProperty.set(FXCollections.observableHashMap());
+        preloadingProperty.set(true);
+        categoriesMap.clear();
+        contactsMap.clear();
+        currencyMap.clear();
+        accountsMap.clear();
+        transactionGroupsMap.clear();
+        transactionsMap.clear();
+        preloadingProperty.set(false);
     }
 
     public BooleanProperty preloadingProperty() {
@@ -101,30 +110,30 @@ public class MoneyDAO extends DAO {
     // Categories
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, Category> categoriesProperty() {
-        return categoriesProperty;
+    public ObservableMap<Integer, Category> categories() {
+        return categories;
     }
 
-    public Optional<Category> getCategory(Integer id) {
-        return id == null?
+    public Optional<Category> getCategory(int id) {
+        return id == 0?
                 Optional.empty()
-                : Optional.ofNullable(categoriesProperty.get(id));
+                : Optional.ofNullable(categories.get(id));
     }
 
     public Category insertCategory(Category category) {
         Category result = insert(category);
-        categoriesProperty.put(result.getId(), result);
+        categories.put(result.getId(), result);
         return result;
     }
 
     public Category updateCategory(Category category) {
         Category result = update(category);
-        categoriesProperty.put(result.getId(), result);
+        categories.put(result.getId(), result);
         return result;
     }
 
     public Collection<Category> getCategories() {
-        return categoriesProperty.values();
+        return categories.values();
     }
 
     public List<Category> getCategoriesByType(CategoryType... types) {
@@ -139,30 +148,30 @@ public class MoneyDAO extends DAO {
     // Currency
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, Currency> currencyProperty() {
-        return currencyProperty;
+    public ObservableMap<Integer, Currency> currencies() {
+        return currencies;
     }
 
-    public Optional<Currency> getCurrency(Integer id) {
-        return id == null?
+    public Optional<Currency> getCurrency(int id) {
+        return id == 0?
                 Optional.empty()
-                : Optional.ofNullable(currencyProperty.get(id));
+                : Optional.ofNullable(currencies.get(id));
     }
 
     public Currency insertCurrency(Currency currency) {
         Currency result = insert(currency);
-        currencyProperty.put(result.getId(), result);
+        currencies.put(result.getId(), result);
         return result;
     }
 
     public Currency updateCurrency(Currency currency) {
         Currency result = update(currency);
-        currencyProperty.put(result.getId(), result);
+        currencies.put(result.getId(), result);
         return result;
     }
 
     public Collection<Currency> getCurrencies() {
-        return currencyProperty.values();
+        return currencies.values();
     }
 
     public Optional<Currency> getDefaultCurrency() {
@@ -175,83 +184,83 @@ public class MoneyDAO extends DAO {
     // Contacts
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, Contact> contactsProperty() {
-        return contactsProperty;
+    public ObservableMap<Integer, Contact> contacts() {
+        return contacts;
     }
 
     public Optional<Contact> getContact(Integer id) {
         return id == null?
                 Optional.empty()
-                : Optional.ofNullable(contactsProperty.get(id));
+                : Optional.ofNullable(contacts.get(id));
     }
 
     public Contact insertContact(Contact contact) {
         Contact result = insert(contact);
-        contactsProperty.put(result.getId(), result);
+        contacts.put(result.getId(), result);
         return result;
     }
 
     public Contact updateContact(Contact contact) {
         Contact result = update(contact);
-        contactsProperty.put(result.getId(), result);
+        contacts.put(result.getId(), result);
         return result;
     }
 
     public Collection<Contact> getContacts() {
-        return contactsProperty.values();
+        return contacts.values();
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Accounts
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, Account> accountsProperty() {
-        return accountsProperty;
+    public ObservableMap<Integer, Account> accounts() {
+        return accounts;
     }
 
-    public Optional<Account> getAccount(Integer id) {
-        return id == null?
+    public Optional<Account> getAccount(int id) {
+        return id == 0?
                 Optional.empty()
-                : Optional.ofNullable(accountsProperty.get(id));
+                : Optional.ofNullable(accounts.get(id));
     }
 
     public Account insertAccount(Account account) {
         Account result = insert(account);
-        accountsProperty.put(result.getId(), result);
+        accounts.put(result.getId(), result);
         return result;
     }
 
     public Account updateAccount(Account account) {
         Account result = update(account);
-        accountsProperty.put(result.getId(), result);
+        accounts.put(result.getId(), result);
         return result;
     }
 
     public void deleteAccount(Account account) {
-        accountsProperty.remove(account.getId());
+        accounts.remove(account.getId());
         delete(account);
     }
 
     public Collection<Account> getAccounts() {
-        return accountsProperty.values();
+        return accounts.values();
     }
 
     public List<Account> getAccountsByType(CategoryType type) {
-        return accountsProperty.values().stream()
+        return accounts.values().stream()
                 .filter(a -> a.getType().equals(type))
                 .collect(Collectors.toList());
     }
 
-    public List<Account> getAccountsByCategory(Integer id) {
-        return accountsProperty.values().stream()
-                .filter(a -> a.getCategoryId().equals(id))
+    public List<Account> getAccountsByCategory(int id) {
+        return accounts.values().stream()
+                .filter(a -> a.getCategoryId() == id)
                 .collect(Collectors.toList());
     }
 
     public List<Account> getAccountsByCategoryId(Integer... ids) {
         List<Integer> idList = Arrays.asList(ids);
 
-        return accountsProperty.values().stream()
+        return accounts.values().stream()
                 .filter(a -> idList.contains(a.getCategoryId()))
                 .collect(Collectors.toList());
     }
@@ -260,70 +269,66 @@ public class MoneyDAO extends DAO {
     // Transaction Groups
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, TransactionGroup> transactionGroupsProperty() {
-        return transactionGroupsProperty;
-    }
-
-    public Optional<TransactionGroup> getTransactionGroup(Integer id) {
-        return id == null?
+    public Optional<TransactionGroup> getTransactionGroup(int id) {
+        return id == 0?
                 Optional.empty()
-                : Optional.ofNullable(transactionGroupsProperty.get(id));
+                : Optional.ofNullable(transactionGroups.get(id));
     }
 
     public TransactionGroup insertTransactionGroup(TransactionGroup tg) {
         TransactionGroup result = insert(tg);
-        transactionGroupsProperty.put(result.getId(), result);
+        transactionGroups.put(result.getId(), result);
         return result;
     }
 
     public TransactionGroup updateTransactionGroup(TransactionGroup tg) {
         TransactionGroup result = update(tg);
-        transactionGroupsProperty.put(result.getId(), result);
+        transactionGroups.put(result.getId(), result);
         return result;
     }
 
-    public void deleteTransactionGroup(Integer id) {
-        transactionGroupsProperty.remove(id);
+    public void deleteTransactionGroup(int id) {
+        transactionGroups.remove(id);
         delete(id, TransactionGroup.class);
     }
 
     public Collection<TransactionGroup> getTransactionGroups() {
-        return transactionGroupsProperty.values();
+        return transactionGroups.values();
     }
 
     ////////////////////////////////////////////////////////////////////////////
     // Transactions
     ////////////////////////////////////////////////////////////////////////////
 
-    public SimpleMapProperty<Integer, Transaction> transactionsProperty() {
-        return transactionsProperty;
+    public ObservableMap<Integer, Transaction> transactions() {
+        return transactions;
     }
 
-    public Optional<Transaction> getTransaction(Integer id) {
-        return id == null?
+    public Optional<Transaction> getTransaction(int id) {
+        return id == 0?
                 Optional.empty()
-                : Optional.ofNullable(transactionsProperty.get(id));
+                : Optional.ofNullable(transactions.get(id));
     }
 
     public Transaction insertTransaction(Transaction transaction) {
         Transaction result = insert(transaction);
-        transactionsProperty.put(result.getId(), result);
+        transactions.put(result.getId(), result);
         return result;
     }
 
     public Transaction updateTransaction(Transaction transaction) {
         Transaction result = update(transaction);
-        transactionsProperty.put(result.getId(), result);
+        transactions.put(result.getId(), result);
         return result;
     }
 
-    public void deleteTransaction(Integer id) {
-        transactionsProperty.remove(id);
+    public void deleteTransaction(int id) {
+        transactions.remove(id);
         delete(id, Transaction.class);
     }
 
     public Collection<Transaction> getTransactions() {
-        return transactionsProperty.values();
+        return transactions.values();
     }
 
     public List<Transaction> getTransactions(Collection<Account> accounts) {
@@ -395,23 +400,23 @@ public class MoneyDAO extends DAO {
 
         preload(getTableClasses());
 
-        categoriesProperty.set(FXCollections.observableMap(getAll(Category.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        categoriesMap.clear();
+        getAll(Category.class, categoriesMap);
 
-        contactsProperty.set(FXCollections.observableMap(getAll(Contact.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        contactsMap.clear();
+        getAll(Contact.class, contactsMap);
 
-        currencyProperty.set(FXCollections.observableMap(getAll(Currency.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        currencyMap.clear();
+        getAll(Currency.class, currencyMap);
 
-        accountsProperty.set(FXCollections.observableMap(getAll(Account.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        accountsMap.clear();
+        getAll(Account.class, accountsMap);
 
-        transactionGroupsProperty.set(FXCollections.observableMap(getAll(TransactionGroup.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        transactionGroupsMap.clear();
+        getAll(TransactionGroup.class, transactionGroupsMap);
 
-        transactionsProperty.set(FXCollections.observableMap(getAll(Transaction.class)
-                .stream().collect(Collectors.toMap(Record::getId, Function.identity()))));
+        transactionsMap.clear();
+        getAll(Transaction.class, transactionsMap);
 
         preloadingProperty.set(false);
     }

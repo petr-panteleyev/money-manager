@@ -27,10 +27,11 @@ package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -39,7 +40,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Contact;
@@ -48,8 +52,6 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import org.panteleyev.utilities.fx.Controller;
-import java.net.URL;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Calendar;
@@ -60,37 +62,72 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-public class TransactionsTab extends Controller implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/TransactionsTab.fxml";
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
+class TransactionsTab extends BorderPane {
+    private final ResourceBundle    rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private BorderPane        pane;
-    @FXML private ChoiceBox<Object> accountFilterBox;
-    @FXML private ChoiceBox<String> monthFilterBox;
-    @FXML private Spinner<Integer>  yearSpinner;
-    @FXML private Label             transactionCountLabel;
+    private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
+    private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
+    private final Spinner<Integer>  yearSpinner = new Spinner<>();
+    private final Label             transactionCountLabel = new Label();
 
     private final TransactionTableView  transactionTable    = new TransactionTableView(false);
-    private final TransactionEditorPane transactionEditor   = new TransactionEditorPane().load();
+    private final TransactionEditorPane transactionEditor   = new TransactionEditorPane();
+
+    private final MapChangeListener<Integer, Account> accountListener = l -> {
+                Platform.runLater(this::initAccountFilterBox);
+                Platform.runLater(this::reloadTransactions);
+            };
+    private final MapChangeListener<Integer, Transaction> transactionListener =
+            l -> Platform.runLater(this::reloadTransactions);
 
     TransactionsTab() {
-        super(FXML, MainWindowController.UI_BUNDLE_PATH, false);
-    }
-
-    BorderPane getPane() {
-        return pane;
+        initialize();
     }
 
     TransactionEditorPane getTransactionEditor() {
         return transactionEditor;
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
+    private ImageView getButtonImage(String name) {
+        ImageView image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
+        image.setFitHeight(16);
+        image.setFitWidth(16);
+        return image;
+    }
+
+    private void initialize() {
+        Button prevButton = new Button("", getButtonImage("arrow-left-16.png"));
+        prevButton.setOnAction((ae) -> onPrevMonth());
+
+        Button todayButton = new Button("", getButtonImage("bullet-black-16.png"));
+        todayButton.setOnAction((ae) -> onCurrentMonth());
+
+        Button nextButton = new Button("", getButtonImage("arrow-right-16.png"));
+        nextButton.setOnAction((ae) -> onNextMonth());
+
+        monthFilterBox.setOnAction((ae) -> onMonthChanged());
+
+        HBox hBox = new HBox(5,
+                accountFilterBox,
+                monthFilterBox,
+                yearSpinner,
+                prevButton,
+                todayButton,
+                nextButton,
+                new Label("Transactions:"),
+                transactionCountLabel
+        );
+        hBox.setAlignment(Pos.CENTER_LEFT);
+
+        setTop(hBox);
+        BorderPane.setMargin(hBox, new Insets(5, 5, 5, 5));
+
         transactionTable.setOnMouseClicked((e) -> onTransactionSelected());
 
-        pane.setCenter(transactionTable);
-        pane.setBottom(transactionEditor.getPane());
+        setCenter(transactionTable);
+        setBottom(transactionEditor);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Workaround for https://bugs.openjdk.java.net/browse/JDK-8146356
         TextStyle textStyle = TextStyle.FULL_STANDALONE;
@@ -156,22 +193,11 @@ public class TransactionsTab extends Controller implements Initializable {
                 .addListener((x,y,z) -> Platform.runLater(this::reloadTransactions));
 
         final MoneyDAO dao = MoneyDAO.getInstance();
+        dao.accounts().addListener(accountListener);
+        dao.transactions().addListener(transactionListener);
 
-        dao.accountsProperty().addListener((MapChangeListener<Integer, Account>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::initAccountFilterBox);
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
-
-        dao.transactionsProperty().addListener((MapChangeListener<Integer, Transaction>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
-
-        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
+        dao.preloadingProperty().addListener((x, y, newValue) -> {
+            if (!newValue) {
                 Platform.runLater(this::initAccountFilterBox);
                 Platform.runLater(this::reloadTransactions);
             }
@@ -191,7 +217,7 @@ public class TransactionsTab extends Controller implements Initializable {
 
     private void initAccountFilterBox() {
         accountFilterBox.getItems().setAll(
-                BUNDLE.getString("text.All.Accounts")
+                rb.getString("text.All.Accounts")
         );
 
         MoneyDAO dao = MoneyDAO.getInstance();
@@ -208,7 +234,7 @@ public class TransactionsTab extends Controller implements Initializable {
         yearSpinner.getValueFactory().setValue(cal.get(Calendar.YEAR));
     }
 
-    public void onPrevMonth() {
+    private void onPrevMonth() {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() - 1;
 
         if (month < 0) {
@@ -221,7 +247,7 @@ public class TransactionsTab extends Controller implements Initializable {
         reloadTransactions();
     }
 
-    public void onNextMonth() {
+    private void onNextMonth() {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
 
         if (month == 12) {
@@ -234,7 +260,7 @@ public class TransactionsTab extends Controller implements Initializable {
         reloadTransactions();
     }
 
-    public void onCurrentMonth() {
+    private void onCurrentMonth() {
         setCurrentDate();
 
         reloadTransactions();
@@ -253,12 +279,12 @@ public class TransactionsTab extends Controller implements Initializable {
 
         List<Transaction> records = original;
         if (accountFilterBox.getSelectionModel().getSelectedIndex() != 0) {
-            Integer id = Optional.ofNullable((Account)accountFilterBox.getSelectionModel().getSelectedItem())
+            int id = Optional.ofNullable((Account)accountFilterBox.getSelectionModel().getSelectedItem())
                     .map(Account::getId)
                     .orElse(0);
 
             records = original.stream()
-                    .filter(t -> t.getAccountCreditedId().equals(id) || t.getAccountDebitedId().equals(id))
+                    .filter(t -> t.getAccountCreditedId() == id || t.getAccountDebitedId() == id)
                     .collect(Collectors.toList());
         }
 
@@ -267,7 +293,7 @@ public class TransactionsTab extends Controller implements Initializable {
         transactionCountLabel.setText(Integer.toString(records.size()));
     }
 
-    public void onMonthChanged() {
+    private void onMonthChanged() {
         reloadTransactions();
     }
 
@@ -391,7 +417,7 @@ public class TransactionsTab extends Controller implements Initializable {
 
     void scrollToEnd() {
         if (transactionTable.getDayColumn().getSortType() == TreeTableColumn.SortType.ASCENDING) {
-            transactionTable.scrollTo(MoneyDAO.getInstance().transactionsProperty().size() - 1);
+            transactionTable.scrollTo(MoneyDAO.getInstance().transactions().size() - 1);
         } else {
             transactionTable.scrollTo(0);
         }

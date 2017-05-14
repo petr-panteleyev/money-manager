@@ -66,10 +66,10 @@ public class TestTransactionGroup extends BaseTest {
         Assert.assertEquals(t1.hashCode(), t2.hashCode());
     }
 
-    @Test(expectedExceptions = {NullPointerException.class})
+    @Test(expectedExceptions = {IllegalStateException.class})
     public void testBuilderNullId() {
         TransactionGroup.Builder builder = new TransactionGroup.Builder(newTransactionGroup());
-        builder.id(null).build();
+        builder.id(0).build();
     }
 
 }

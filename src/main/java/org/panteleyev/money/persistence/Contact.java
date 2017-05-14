@@ -30,13 +30,12 @@ import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
-import java.util.Optional;
 
 @Table("contact")
 public class Contact implements Record, Named, Comparable<Contact> {
 
     public static final class Builder {
-        private Integer id;
+        private int    id;
         private ContactType type;
         private String name;
         private String comment;
@@ -70,13 +69,13 @@ public class Contact implements Record, Named, Comparable<Contact> {
             }
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Optional<Integer> id() {
-            return Optional.ofNullable(id);
+        public int id() {
+            return id;
         }
 
         public Builder type(ContactType type) {
@@ -135,7 +134,9 @@ public class Contact implements Record, Named, Comparable<Contact> {
         }
 
         public Contact build() {
-            Objects.requireNonNull(id);
+            if (id == 0) {
+                throw new IllegalStateException("Contact.id == 0");
+            }
             Objects.requireNonNull(type);
             Objects.requireNonNull(name);
 
@@ -155,7 +156,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
         }
     }
 
-    private final Integer id;
+    private final int    id;
     private final String name;
     private final ContactType type;
     private final String comment;
@@ -170,7 +171,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     @RecordBuilder
     public Contact(
-            @Field(Field.ID) Integer id,
+            @Field(Field.ID) int id,
             @Field("name") String name,
             @Field("type") ContactType type,
             @Field("phone") String phone,
@@ -199,7 +200,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -267,7 +268,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
         if (obj instanceof Contact) {
             Contact that = (Contact)obj;
-            return Objects.equals(this.id, that.id)
+            return this.id == that.id
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.type, that.type)
                     && Objects.equals(this.comment, that.comment)

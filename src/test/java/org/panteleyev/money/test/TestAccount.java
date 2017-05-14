@@ -52,10 +52,10 @@ public class TestAccount extends BaseTest {
                 .currencyRate(original.getCurrencyRate())
                 .type(original.getType())
                 .categoryId(original.getCategoryId())
-                .currencyId(original.getCurrencyId().orElse(null))
+                .currencyId(original.getCurrencyId())
                 .enabled(original.isEnabled());
 
-        Assert.assertEquals(emptyBuilder.id().orElse(null), original.getId());
+        Assert.assertEquals(emptyBuilder.id(), original.getId());
 
         newAccount = emptyBuilder.build();
         Assert.assertEquals(newAccount, original);
@@ -86,10 +86,10 @@ public class TestAccount extends BaseTest {
         Assert.assertEquals(a1.hashCode(), a2.hashCode());
     }
 
-    @Test(expectedExceptions = {NullPointerException.class})
+    @Test(expectedExceptions = {IllegalStateException.class})
     public void testBuilderNullId() {
         Account.Builder builder = new Account.Builder(newAccount());
-        builder.id(null).build();
+        builder.id(0).build();
     }
 
     @Test(expectedExceptions = {NullPointerException.class})

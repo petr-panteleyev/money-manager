@@ -26,9 +26,22 @@
 package org.panteleyev.money;
 
 public interface Styles {
+    int BIG_SPACING = 5;
+    int SMALL_SPACING = 2;
+
     String BLACK_TEXT   = "blackText";
     String RED_TEXT     = "redText";
     String BLUE_TEXT    = "blueText";
     String GROUP_CELL   = "groupCell";
     String TRANSACTION_TABLE_ROW = "transactionTableRow";
+
+    String GRID_PANE    = "gridPane";
+
+    // About Dialog
+    String ABOUT_APP_TITLE_LABEL = "aboutAppNameLabel";
+    String ABOUT_LABEL  = "aboutLabel";
+
+    // Transaction Editor
+    String RATE_LABEL = "rateLabel";
+    String SUB_LABEL = "subLabel";
 }

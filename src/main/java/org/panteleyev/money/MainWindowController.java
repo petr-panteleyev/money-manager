@@ -25,20 +25,12 @@
  */
 package org.panteleyev.money;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.ResourceBundle;
-import java.util.concurrent.CompletableFuture;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Parent;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -49,33 +41,37 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javax.sql.DataSource;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.utilities.fx.Controller;
 import org.panteleyev.utilities.fx.WindowManager;
+import javax.sql.DataSource;
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
 
-public class MainWindowController extends Controller implements Initializable {
+public class MainWindowController extends BaseController {
     public static final String UI_BUNDLE_PATH = "org.panteleyev.money.ui";
-    public static final String CSS_PATH = "/org/panteleyev/money/main.css";
+    static final String DIALOGS_CSS = "/org/panteleyev/money/dialogs.css";
+    private static final String CSS_PATH = "/org/panteleyev/money/main.css";
 
-    @FXML private BorderPane    self;
-    @FXML private TabPane       tabPane;
+    private final ResourceBundle rb = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
-    @FXML private Label         progressLabel;
-    @FXML private ProgressBar   progressBar;
-    @FXML private MenuBar       menuBar;
+    private final BorderPane    self = new BorderPane();
+    private final TabPane       tabPane = new TabPane();
 
-    @FXML private Menu          windowMenu;
+    private final Label         progressLabel = new Label();
+    private final ProgressBar   progressBar = new ProgressBar();
 
-    @FXML private MenuItem      currenciesMenuItem;
-    @FXML private MenuItem      categoriesMenuItem;
-    @FXML private MenuItem      accountsMenuItem;
-    @FXML private MenuItem      contactsMenuItem;
+    private final Menu          windowMenu = new Menu(rb.getString("menu.Window"));
 
     private static final Collection<Class<? extends Controller>> WINDOW_CLASSES =
             Arrays.asList(
@@ -86,12 +82,12 @@ public class MainWindowController extends Controller implements Initializable {
             );
 
     private final AccountsTab accountsTab = new AccountsTab();
-    private final TransactionsTab transactionTab = (TransactionsTab)new TransactionsTab().load();
-    private final RequestTab requestTab = (RequestTab)new RequestTab().load();
+    private final TransactionsTab transactionTab = new TransactionsTab();
+    private final RequestTab requestTab = new RequestTab();
 
     private final BooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
-    public static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
+    static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
         try {
             new BigDecimal(value);
@@ -101,8 +97,10 @@ public class MainWindowController extends Controller implements Initializable {
         return ValidationResult.fromErrorIf(control, null, invalid && !control.isDisabled());
     };
 
-    public MainWindowController() {
-        super("/org/panteleyev/money/MainWindow.fxml", CSS_PATH, UI_BUNDLE_PATH, true);
+    public MainWindowController(Stage stage) {
+        super(stage, CSS_PATH);
+        initialize();
+        setupWindow(self);
     }
 
     public BooleanProperty dbOpenProperty() {
@@ -114,9 +112,59 @@ public class MainWindowController extends Controller implements Initializable {
         return "Money Manager";
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    private void initialize() {
+        // Main menu
+        MenuItem m1 = new MenuItem(rb.getString("menu.File.New"));
+        m1.setOnAction((ae) -> onNew());
+        MenuItem m2 = new MenuItem(rb.getString("menu.File.Open"));
+        m2.setOnAction((ae) -> onOpen());
+        MenuItem m3 = new MenuItem(rb.getString("menu.File.Close"));
+        m3.setOnAction((ae) -> onClose());
+        MenuItem m4 = new MenuItem(rb.getString("menu.File.Exit"));
+        m4.setOnAction((ae) -> onExit());
+
+        Menu fileMenu = new Menu(rb.getString("menu.File"), null,
+                m1, m2, new SeparatorMenuItem(), m3, new SeparatorMenuItem(), m4);
+
+        MenuItem m5 = new MenuItem(rb.getString("menu.Edit.Delete"));
+
+        MenuItem currenciesMenuItem = new MenuItem(rb.getString("menu.Edit.Currencies"));
+        currenciesMenuItem.setOnAction((ae) -> onManageCurrencies());
+        MenuItem categoriesMenuItem = new MenuItem(rb.getString("menu.Edit.Categories"));
+        categoriesMenuItem.setOnAction((ae) -> onManageCategories());
+        MenuItem accountsMenuItem = new MenuItem(rb.getString("menu.Edit.Accounts"));
+        accountsMenuItem.setOnAction((ae) -> onManageAccounts());
+        MenuItem contactsMenuItem = new MenuItem(rb.getString("menu.Edit.Contacts"));
+        contactsMenuItem.setOnAction((ae) -> onManageContacts());
+
+        Menu editMenu = new Menu(rb.getString("menu.Edit"), null,
+                m5, new SeparatorMenuItem(),
+                currenciesMenuItem, categoriesMenuItem, accountsMenuItem, contactsMenuItem);
+
+        MenuItem m6 = new MenuItem(rb.getString("menu.Tools.Export"));
+        m6.setOnAction((ae) -> onExport());
+        MenuItem m7 = new MenuItem(rb.getString("menu.Tools.Options"));
+        m7.setOnAction((ae) -> onOptions());
+
+        Menu toolsMenu = new Menu(rb.getString("menu.Tools"), null,
+                m6, m7);
+
+        /* Dummy menu item is required in order to let onShowing() fire up first time */
+        windowMenu.getItems().setAll(new MenuItem("dummy"));
+
+        MenuBar menuBar = new MenuBar(fileMenu, editMenu, toolsMenu,
+                windowMenu, createHelpMenu(rb));
+
         menuBar.setUseSystemMenuBar(true);
+
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        self.setTop(menuBar);
+        self.setCenter(tabPane);
+        self.setBottom(new HBox(progressLabel, progressBar));
+
+        HBox.setMargin(progressLabel, new Insets(0, 0, 0, 5));
+        HBox.setMargin(progressBar, new Insets(0, 0, 0, 5));
 
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
@@ -126,16 +174,16 @@ public class MainWindowController extends Controller implements Initializable {
         accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
         contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
 
-        Tab t2 = new Tab(rb.getString("tab.Transactions"), transactionTab.getPane());
+        Tab t2 = new Tab(rb.getString("tab.Transactions"), transactionTab);
         t2.disableProperty().bind(dbOpenProperty.not());
         t2.selectedProperty().addListener((x,y,newValue) -> {
             if (newValue) {
                 Platform.runLater(() -> transactionTab.getTransactionEditor().clear());
-                Platform.runLater(() -> transactionTab.scrollToEnd());
+                Platform.runLater(transactionTab::scrollToEnd);
             }
         });
 
-        Tab t3 = new Tab(rb.getString("tab.Requests"), requestTab.getRoot());
+        Tab t3 = new Tab(rb.getString("tab.Requests"), requestTab);
         t3.disableProperty().bind(dbOpenProperty.not());
 
         tabPane.getTabs().addAll(
@@ -184,47 +232,47 @@ public class MainWindowController extends Controller implements Initializable {
         }
     }
 
-    public void onManageCategories() {
+    private void onManageCategories() {
         Controller controller = WindowManager.find(CategoryWindowController.class)
-                .orElseGet(() -> new CategoryWindowController().load());
+                .orElseGet(CategoryWindowController::new);
 
         Stage stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
-    public void onExit() {
+    private void onExit() {
         getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-    public void onManageCurrencies() {
+    private void onManageCurrencies() {
         Controller controller = WindowManager.find(CurrencyWindowController.class)
-                .orElseGet(() -> new CurrencyWindowController().load());
+                .orElseGet(CurrencyWindowController::new);
 
         Stage stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
-    public void onManageAccounts() {
+    private void onManageAccounts() {
         Controller controller = WindowManager.find(AccountListWindowController.class)
-                .orElseGet(() -> new AccountListWindowController().load());
+                .orElseGet(AccountListWindowController::new);
 
         Stage stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
-    public void onManageContacts() {
+    private void onManageContacts() {
         Controller controller = WindowManager.find(ContactListWindowController.class)
-                .orElseGet(() -> new ContactListWindowController().load());
+                .orElseGet(ContactListWindowController::new);
 
         Stage stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
-    public void onNew() {
+    private void onNew() {
         FileChooser d = new FileChooser();
         d.setTitle("New Database File");
         d.getExtensionFilters().addAll(
@@ -266,7 +314,7 @@ public class MainWindowController extends Controller implements Initializable {
         dbOpenProperty.set(false);
     }
 
-    public void onOpen() {
+    private void onOpen() {
         FileChooser d = new FileChooser();
         d.setTitle("Database File");
         d.getExtensionFilters().addAll(
@@ -289,20 +337,18 @@ public class MainWindowController extends Controller implements Initializable {
 
             CompletableFuture
                     .runAsync(() -> MoneyDAO.getInstance().preload())
-                    .thenRun(() -> {
-                        Platform.runLater(() -> {
-                            setTitle(file);
-                            dbOpenProperty.set(true);
-                        });
-                    });
+                    .thenRun(() -> Platform.runLater(() -> {
+                        setTitle(file);
+                        dbOpenProperty.set(true);
+                    }));
         }
     }
 
-    public void onExport() {
+    private void onExport() {
 
     }
 
-    public void onOptions() {
+    private void onOptions() {
         OptionsDialog d = new OptionsDialog();
         d.showAndWait();
     }
@@ -319,7 +365,7 @@ public class MainWindowController extends Controller implements Initializable {
         Options.setMainWindowHeight(getStage().heightProperty().doubleValue());
     }
 
-    public void onAbout() {
-        new AboutDialog().load().showAndWait();
+    protected Parent getSelf() {
+        return self;
     }
 }

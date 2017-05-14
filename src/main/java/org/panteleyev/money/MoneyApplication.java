@@ -48,7 +48,7 @@ public class MoneyApplication extends Application {
 
         Thread.setDefaultUncaughtExceptionHandler(MoneyApplication::uncaughtException);
 
-        new MainWindowController().loadMain(primaryStage);
+        new MainWindowController(primaryStage);
 
         primaryStage.show();
     }

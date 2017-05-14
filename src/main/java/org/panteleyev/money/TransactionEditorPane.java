@@ -29,8 +29,7 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.MapChangeListener;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -43,6 +42,10 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -59,15 +62,12 @@ import org.panteleyev.money.persistence.Named;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionType;
 import org.panteleyev.persistence.annotations.Field;
-import org.panteleyev.utilities.fx.Controller;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -76,13 +76,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class TransactionEditorPane extends Controller implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/TransactionEditorPane.fxml";
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("org.panteleyev.money.TransactionEditorPane");
-    private static final int SUGGESTION_LENGTH = 2;
+public class TransactionEditorPane extends TitledPane implements Styles {
+    private static final int SUGGESTION_LENGTH = 3;
 
     private static class CompletionProvider<T extends Named> implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<T>> {
-        private Set<T> set;
+        private final Set<T> set;
 
         CompletionProvider(Set<T> set) {
             this.set = set;
@@ -93,13 +91,13 @@ public class TransactionEditorPane extends Controller implements Initializable {
             return (req.getUserText().length() < SUGGESTION_LENGTH)?
                     Collections.emptyList() :
                     set.stream()
-                            .filter(x -> x.getName().toLowerCase().startsWith(req.getUserText().toLowerCase()))
+                            .filter(x -> x.getName().toLowerCase().contains(req.getUserText().toLowerCase()))
                             .collect(Collectors.toList());
         }
     }
 
     private static class StringCompletionProvider implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<String>> {
-        private Set<String> set;
+        private final Set<String> set;
 
         StringCompletionProvider(Set<String> set) {
             this.set = set;
@@ -115,32 +113,33 @@ public class TransactionEditorPane extends Controller implements Initializable {
         }
     }
 
-    @FXML private TitledPane        pane;
+    private final ResourceBundle    rb = ResourceBundle.getBundle("org.panteleyev.money.TransactionEditorPane");
 
-    @FXML private Spinner<Integer>  daySpinner;
+    private final Spinner<Integer>  daySpinner = new Spinner<>();
 
-    @FXML private TextField         typeEdit;
-    @FXML private TextField         debitedAccountEdit;
-    @FXML private TextField         creditedAccountEdit;
-    @FXML private TextField         contactEdit;
-    @FXML private TextField         sumEdit;
-    @FXML private CheckBox          checkedCheckBox;
-    @FXML private TextField         commentEdit;
-    @FXML private TextField         rate1Edit;
-    @FXML private ComboBox<String>  rateDir1Combo;
-    @FXML private TextField         invoiceNumberEdit;
-    @FXML private Label             rateAmoutLabel;
-    @FXML private Label             debitedCategoryLabel;
-    @FXML private Label             creditedCategoryLabel;
+    private final TextField         typeEdit = new TextField();
+    private final TextField         debitedAccountEdit = new TextField();
+    private final TextField         creditedAccountEdit = new TextField();
+    private final TextField         contactEdit = new TextField();
+    private final TextField         sumEdit = new TextField();
+    private final CheckBox          checkedCheckBox = new CheckBox();
+    private final TextField         commentEdit = new TextField();
+    private final TextField         rate1Edit = new TextField();
+    private final ComboBox<String>  rateDir1Combo = new ComboBox<>();
+    private final TextField         invoiceNumberEdit = new TextField();
+    private final Label             rateAmoutLabel = new Label();
+    private final Label             debitedCategoryLabel = new Label();
+    private final Label             creditedCategoryLabel = new Label();
 
-    @FXML private MenuButton        typeMenuButton;
-    @FXML private MenuButton        debitedMenuButton;
-    @FXML private MenuButton        creditedMenuButton;
-    @FXML private MenuButton        contactMenuButton;
+    private final MenuButton        typeMenuButton = new MenuButton();
+    private final MenuButton        debitedMenuButton = new MenuButton();
+    private final MenuButton        creditedMenuButton = new MenuButton();
+    private final MenuButton        contactMenuButton = new MenuButton();
 
-    @FXML private Button            addButton;
-    @FXML private Button            updateButton;
-    @FXML private Button            deleteButton;
+    private final Button            addButton = new Button(rb.getString("addButton"));
+    private final Button            updateButton = new Button(rb.getString("updateButton"));
+    private final Button            deleteButton = new Button(rb.getString("deleteButton"));
+    private final Button            clearButton = new Button(rb.getString("clearButton"));
 
     private BiConsumer<Transaction.Builder, String> addTransactionConsumer    = (t, c) -> {};
     private BiConsumer<Transaction.Builder, String> updateTransactionConsumer = (t, c) -> {};
@@ -171,6 +170,12 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
     private String newContactName;
 
+    private final MapChangeListener<Integer, Contact> contactListener =
+            l -> Platform.runLater(this::setupContactMenu);
+    private final MapChangeListener<Integer, Account> accountListener =
+            l -> Platform.runLater(this::setupAccountMenus);
+    private final MapChangeListener<Integer, Transaction> transactionListener = this::transactionChangeListener;
+
     private static final StringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING = new ToStringConverter<TransactionType>() {
         @Override
         public String toString(TransactionType object) {
@@ -193,13 +198,87 @@ public class TransactionEditorPane extends Controller implements Initializable {
     };
 
     public TransactionEditorPane() {
-        super(FXML, "org.panteleyev.money.TransactionEditorPane", false);
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
-        pane.setText(rb.getString("title") + " ###");
+    private void initialize() {
+        VBox debitedBox = new VBox(SMALL_SPACING, new Label(rb.getString("debitedAccountLabel")),
+                new HBox(debitedAccountEdit, debitedMenuButton),
+                debitedCategoryLabel);
+        HBox.setHgrow(debitedAccountEdit, Priority.ALWAYS);
 
+        VBox creditedBox = new VBox(SMALL_SPACING, new Label(rb.getString("creditedAccountLabel")),
+                new HBox(creditedAccountEdit, creditedMenuButton),
+                creditedCategoryLabel);
+        HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
+
+        VBox contactBox = new VBox(SMALL_SPACING, new Label(rb.getString("contactLabel")),
+                new HBox(contactEdit, contactMenuButton));
+        HBox.setHgrow(contactEdit, Priority.ALWAYS);
+
+        HBox hBox1 = new HBox(5, sumEdit, checkedCheckBox);
+        hBox1.setAlignment(Pos.CENTER_LEFT);
+        VBox sumBox = new VBox(SMALL_SPACING, new Label(rb.getString("sumLabel")), hBox1);
+
+        VBox commentBox = new VBox(SMALL_SPACING, new Label(rb.getString("commentLabel")), commentEdit);
+
+        VBox rateBox = new VBox(SMALL_SPACING, new Label(rb.getString("rateLabel")),
+                new HBox(rate1Edit, rateDir1Combo),
+                rateAmoutLabel);
+
+        Region filler = new Region();
+
+        clearButton.setOnAction((ae) -> onClearButton());
+        clearButton.setCancelButton(true);
+
+        addButton.setOnAction((ae) -> onAddButton());
+        addButton.setDefaultButton(true);
+
+        updateButton.setOnAction((ae) -> onUpdateButton());
+
+        deleteButton.setOnAction((ae) -> onDeleteButton());
+
+        HBox row3 = new HBox(BIG_SPACING,
+                new VBox(2, new Label(rb.getString("invoiceLabel")),  invoiceNumberEdit),
+                filler, clearButton, deleteButton, updateButton, addButton);
+        row3.setAlignment(Pos.CENTER_LEFT);
+
+        setContent(new VBox(BIG_SPACING,
+                new HBox(BIG_SPACING,
+                        new VBox(2, new Label(rb.getString("dayLabel")), daySpinner),
+                        new VBox(2, new Label(rb.getString("typeLabel")),
+                                new HBox(typeEdit, typeMenuButton)),
+                        debitedBox, creditedBox, contactBox, sumBox),
+                new HBox(BIG_SPACING, commentBox, rateBox),
+                row3)
+        );
+
+        HBox.setHgrow(debitedBox, Priority.ALWAYS);
+        HBox.setHgrow(creditedBox, Priority.ALWAYS);
+        HBox.setHgrow(contactBox, Priority.ALWAYS);
+        HBox.setHgrow(commentBox, Priority.ALWAYS);
+        HBox.setHgrow(filler, Priority.ALWAYS);
+
+        typeMenuButton.setFocusTraversable(false);
+        checkedCheckBox.setFocusTraversable(false);
+        debitedMenuButton.setFocusTraversable(false);
+        creditedMenuButton.setFocusTraversable(false);
+        contactMenuButton.setFocusTraversable(false);
+
+        rate1Edit.setDisable(true);
+        rate1Edit.setPrefColumnCount(5);
+
+        rateDir1Combo.setDisable(true);
+
+        rateAmoutLabel.getStyleClass().add(RATE_LABEL);
+        debitedCategoryLabel.getStyleClass().add(SUB_LABEL);
+        creditedCategoryLabel.getStyleClass().add(SUB_LABEL);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        setText(rb.getString("title") + " ###");
+
+        daySpinner.setEditable(true);
         daySpinner.getEditor().prefColumnCountProperty().set(4);
         SpinnerValueFactory<Integer> valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 31, 1, 1);
         valueFactory.setValue(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
@@ -232,42 +311,20 @@ public class TransactionEditorPane extends Controller implements Initializable {
         });
 
         final MoneyDAO dao = MoneyDAO.getInstance();
+        dao.contacts().addListener(contactListener);
+        dao.accounts().addListener(accountListener);
+        dao.transactions().addListener(transactionListener);
 
-        dao.contactsProperty().addListener((MapChangeListener<Integer,Contact>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::setupContactMenu);
+        dao.preloadingProperty().addListener((x, y, newValue) -> {
+            if (!newValue) {
+                Platform.runLater(() -> {
+                    onChangedTransactionTypes();
+                    setupAccountMenus();
+                    setupContactMenu();
+                    setupComments();
+                });
             }
         });
-
-        dao.accountsProperty().addListener((MapChangeListener<Integer,Account>)l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::setupAccountMenus);
-            }
-        });
-
-        dao.transactionsProperty().addListener((MapChangeListener<Integer,Transaction>)l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::setupComments);
-            }
-        });
-
-        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
-                Platform.runLater(this::onChangedTransactionTypes);
-                Platform.runLater(this::setupAccountMenus);
-                Platform.runLater(this::setupContactMenu);
-                Platform.runLater(this::setupComments);
-            }
-        });
-    }
-
-    @Override
-    public TransactionEditorPane load() {
-        return (TransactionEditorPane)super.load();
-    }
-
-    TitledPane getPane() {
-        return pane;
     }
 
     public final void initControls() {
@@ -381,7 +438,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        pane.setText(BUNDLE.getString("title") + " #" + tr.getId());
+        setText(rb.getString("title") + " #" + tr.getId());
 
         // Type
         typeEdit.setText(tr.getTransactionType().getName());
@@ -403,10 +460,10 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         // Rate
 
-        Integer debitedCurrencyId = accDebited.map(Account::getCurrencyId).map(Optional::get).orElse(null);
-        Integer creditedCurrencyId = accCredited.map(Account::getCurrencyId).map(Optional::get).orElse(null);
+        int debitedCurrencyId = accDebited.map(Account::getCurrencyId).orElse(0);
+        int creditedCurrencyId = accCredited.map(Account::getCurrencyId).orElse(0);
 
-        if (Objects.equals(debitedCurrencyId, creditedCurrencyId)) {
+        if (debitedCurrencyId == creditedCurrencyId) {
             rate1Edit.setDisable(true);
             rate1Edit.setText("");
         } else {
@@ -432,21 +489,23 @@ public class TransactionEditorPane extends Controller implements Initializable {
         updateRateAmount();
     }
 
-    public void onClearButton() {
+    private void onClearButton() {
         clear();
     }
 
-    public void onDeleteButton() {
-        builder.id().ifPresent(id -> deleteTransactionConsumer.accept(id));
+    private void onDeleteButton() {
+        if (builder.id() != 0) {
+            deleteTransactionConsumer.accept(builder.id());
+        }
     }
 
-    public void onUpdateButton() {
+    private void onUpdateButton() {
         if (buildTransaction()) {
             updateTransactionConsumer.accept(builder, newContactName);
         }
     }
 
-    public void onAddButton() {
+    private void onAddButton() {
         if (buildTransaction()) {
             addTransactionConsumer.accept(builder, newContactName);
         }
@@ -534,7 +593,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
 
         String contactName = contactEdit.getText();
         if (contactName == null || contactName.isEmpty()) {
-            builder.contactId(null);
+            builder.contactId(0);
         } else {
             Optional<Contact> contact = checkTextFieldValue(contactName, contactSuggestions, CONTACT_TO_STRING);
             if (contact.isPresent()) {
@@ -550,26 +609,20 @@ public class TransactionEditorPane extends Controller implements Initializable {
     private void enableDisableRate() {
         boolean disable;
 
-        if (!builder.accountCreditedId().isPresent() || !builder.accountDebitedId().isPresent()) {
+        if (builder.getAccountCreditedId() == 0 || builder.getAccountDebitedId() == 0) {
             disable = true;
         } else {
             MoneyDAO dao = MoneyDAO.getInstance();
 
-            Integer c1 = builder.accountDebitedId()
-                    .map(dao::getAccount)
-                    .map(Optional::get)
+            int c1 = dao.getAccount(builder.getAccountDebitedId())
                     .map(Account::getCurrencyId)
-                    .map(Optional::get)
-                    .orElse(null);
+                    .orElse(0);
 
-            Integer c2 = builder.accountCreditedId()
-                    .map(dao::getAccount)
-                    .map(Optional::get)
+            int c2 = dao.getAccount(builder.getAccountCreditedId())
                     .map(Account::getCurrencyId)
-                    .map(Optional::get)
-                    .orElse(null);
+                    .orElse(0);
 
-            disable = Objects.equals(c1, c2);
+            disable = c1 == c2;
         }
 
         rate1Edit.setDisable(disable);
@@ -608,7 +661,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
             Optional<Account> account = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
 
-            builder.accountDebitedId(account.map(Account::getId).orElse(null));
+            builder.accountDebitedId(account.map(Account::getId).orElse(0));
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, !account.isPresent());
@@ -618,7 +671,7 @@ public class TransactionEditorPane extends Controller implements Initializable {
             Optional<Account> account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
-            builder.accountCreditedId(account.map(Account::getId).orElse(null));
+            builder.accountCreditedId(account.map(Account::getId).orElse(0));
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, !account.isPresent());
@@ -726,6 +779,15 @@ public class TransactionEditorPane extends Controller implements Initializable {
         commentSuggestions.addAll(MoneyDAO.getInstance().getUniqueTransactionComments());
     }
 
+    private void transactionChangeListener(MapChangeListener.Change<? extends Integer, ? extends Transaction> change) {
+        if (change.wasAdded()) {
+            String comment = change.getValueAdded().getComment();
+            if (comment != null && !comment.isEmpty()) {
+                commentSuggestions.add(comment);
+            }
+        }
+    }
+
     private void updateRateAmount() {
         String amount = sumEdit.getText();
         if (amount.isEmpty()) {
@@ -768,28 +830,28 @@ public class TransactionEditorPane extends Controller implements Initializable {
     }
 
     private void processAutoFill() {
-        builder.accountDebitedId().ifPresent(accDebitedId ->
-                builder.accountCreditedId().ifPresent(accCreditedId ->
-                        MoneyDAO.getInstance().transactionsProperty().values().stream()
-                                .filter(t -> Objects.equals(t.getAccountCreditedId(), accCreditedId)
-                                        && Objects.equals(t.getAccountDebitedId(), accDebitedId))
-                                .sorted(Transaction.BY_DATE.reversed())
-                                .limit(1)
-                                .findAny()
-                                .ifPresent(t -> {
-                                    if (commentEdit.getText().isEmpty()) {
-                                        commentEdit.setText(t.getComment());
+        final int accDebitedId = builder.getAccountDebitedId();
+        final int accCreditedId = builder.getAccountCreditedId();
+
+        if (accDebitedId != 0 && accCreditedId != 0) {
+            MoneyDAO.getInstance().getTransactions().stream()
+                    .filter(t -> t.getAccountCreditedId() == accCreditedId && t.getAccountDebitedId() == accDebitedId)
+                    .max(Transaction.BY_DATE)
+                    .ifPresent(t -> {
+                        if (commentEdit.getText().isEmpty()) {
+                            commentEdit.setText(t.getComment());
+                        }
+                        if (sumEdit.getText().isEmpty()) {
+                            sumEdit.setText(t.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+                        }
+                        MoneyDAO.getInstance().getContact(t.getContactId())
+                                .ifPresent(c -> {
+                                    if (contactEdit.getText().isEmpty()) {
+                                        contactEdit.setText(c.getName());
                                     }
-                                    if (sumEdit.getText().isEmpty()) {
-                                        sumEdit.setText(t.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-                                    }
-                                    MoneyDAO.getInstance().getContact(t.getContactId())
-                                            .ifPresent(c -> {
-                                                if (contactEdit.getText().isEmpty()) {
-                                                    contactEdit.setText(c.getName());
-                                                }
-                                            });
-                                })));
+                                });
+                    });
+        }
     }
 
     private void autoFillType() {

@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
 import java.util.Arrays;
@@ -40,7 +39,7 @@ public enum CategoryType implements Named {
 
     private static final String BUNDLE = "org.panteleyev.money.persistence.CategoryType";
 
-    private final Integer id;
+    private final int id;
     private final String name;
     private final String comment;
 
@@ -52,7 +51,7 @@ public enum CategoryType implements Named {
         this.comment = b.getString("comment" + id);
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 

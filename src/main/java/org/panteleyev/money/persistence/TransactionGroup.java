@@ -33,17 +33,17 @@ import org.panteleyev.persistence.annotations.Table;
 
 @Table("transaction_group")
 public class TransactionGroup implements Record {
-    private final Integer id;
-    private final Integer day;
-    private final Integer month;
-    private final Integer year;
-    private final Boolean expanded;
+    private final int id;
+    private final int day;
+    private final int month;
+    private final int year;
+    private final boolean expanded;
 
     public static class Builder {
-        private Integer id;
-        private Integer day;
-        private Integer month;
-        private Integer year;
+        private int id;
+        private int day;
+        private int month;
+        private int year;
         private boolean expanded;
 
         public Builder() {
@@ -57,36 +57,39 @@ public class TransactionGroup implements Record {
             this.expanded = g.isExpanded();
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Builder day(Integer day) {
+        public Builder day(int day) {
             this.day = day;
             return this;
         }
 
-        public Builder month(Integer month) {
+        public Builder month(int month) {
             this.month = month;
             return this;
         }
 
-        public Builder year(Integer year) {
+        public Builder year(int year) {
             this.year = year;
             return this;
         }
 
-        public Builder expanded(Boolean expanded) {
+        public Builder expanded(boolean expanded) {
             this.expanded = expanded;
             return this;
         }
 
         public TransactionGroup build() {
+            if (id == 0) {
+                throw new IllegalStateException("TransactionGroup.id == 0");
+            }
+
             return new TransactionGroup(id, day, month, year, expanded);
         }
     }
-
 
     @RecordBuilder
     public TransactionGroup(
@@ -105,7 +108,7 @@ public class TransactionGroup implements Record {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -142,11 +145,11 @@ public class TransactionGroup implements Record {
         if (obj instanceof TransactionGroup) {
             TransactionGroup that = (TransactionGroup)obj;
 
-            return Objects.equals(this.id, that.id)
-                    && Objects.equals(this.day, that.day)
-                    && Objects.equals(this.month, that.month)
-                    && Objects.equals(this.year, that.year)
-                    && Objects.equals(this.expanded, that.expanded);
+            return this.id == that.id
+                    && this.day == that.day
+                    && this.month == that.month
+                    && this.year == that.year
+                    && this.expanded == that.expanded;
         } else {
             return false;
         }

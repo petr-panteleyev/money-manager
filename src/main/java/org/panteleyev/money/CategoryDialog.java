@@ -23,46 +23,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class CategoryDialog extends BaseDialog<Category.Builder> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/money/CategoryDialog.fxml";
+class CategoryDialog extends BaseDialog<Category.Builder> implements Styles {
+    private final ResourceBundle           rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private ChoiceBox<CategoryType>   typeComboBox;
-    @FXML private TextField                 nameEdit;
-    @FXML private TextField                 commentEdit;
+    private final ChoiceBox<CategoryType>  typeComboBox = new ChoiceBox<>();
+    private final TextField                nameEdit = new TextField();
+    private final TextField                commentEdit = new TextField();
 
-    private final Category                  category;
+    private final Category                 category;
 
     CategoryDialog(Category category) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.DIALOGS_CSS);
 
         this.category = category;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
+    private void initialize() {
+        getDialogPane().getStylesheets().add(MainWindowController.DIALOGS_CSS);
+
         setTitle(rb.getString("category.Dialog.Title"));
+
+        GridPane pane = new GridPane();
+        pane.getStyleClass().add(GRID_PANE);
+
+        int index = 0;
+        pane.addRow(index++, new Label(rb.getString("label.Type")), typeComboBox);
+        pane.addRow(index++, new Label(rb.getString("label.Name")), nameEdit);
+        pane.addRow(index, new Label(rb.getString("label.Comment")), commentEdit);
+
+        nameEdit.setPrefColumnCount(20);
 
         final Collection<CategoryType> list = Arrays.asList(CategoryType.values());
         typeComboBox.setItems(FXCollections.observableArrayList(list));
@@ -102,14 +113,15 @@ public class CategoryDialog extends BaseDialog<Category.Builder> implements Init
             }
         });
 
-        createDefaultButtons();
+        getDialogPane().setContent(pane);
+        createDefaultButtons(rb);
 
         Platform.runLater(this::createValidationSupport);
     }
 
     private void createValidationSupport() {
-        validation.registerValidator(nameEdit, (Control control, String value) -> ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+        validation.registerValidator(nameEdit, (Control control, String value) ->
+                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
         validation.initInitialDecoration();
     }
-
 }

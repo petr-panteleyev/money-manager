@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,31 +25,13 @@
  */
 package org.panteleyev.money;
 
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.layout.GridPane;
+import javafx.scene.image.Image;
 
-class OptionsDialog extends Dialog<ButtonType> {
+interface Images {
+    static Image RED_CIRCLE     = new Image("/org/panteleyev/money/res/red-circle-16.png");
+    static Image BLUE_CIRCLE    = new Image("/org/panteleyev/money/res/blue-circle-16.png");
+    static Image GREEN_CIRCLE   = new Image("/org/panteleyev/money/res/green-circle-16.png");
+    static Image GRAY_CIRCLE    = new Image("/org/panteleyev/money/res/gray-circle-16.png");
 
-    OptionsDialog() {
-        setTitle("Options");
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        initControls();
-
-        GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
-
-        getDialogPane().setContent(pane);
-
-        setResultConverter((ButtonType param) -> {
-            if (param == ButtonType.OK) {
-                // Set options here via Options class
-            }
-            return param;
-        });
-    }
-
-    private void initControls() {
-    }
+    static Image APP_ICON       = new Image("org/panteleyev/money/res/icon48.png");
 }

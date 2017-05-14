@@ -37,16 +37,16 @@ import org.panteleyev.persistence.annotations.Table;
 @Table("currency")
 public class Currency implements Record {
     public static final class Builder {
-        private Integer    id;
+        private int        id;
         private String     symbol;
         private String     description;
         private String     formatSymbol;
-        private Integer    formatSymbolPosition;
-        private Boolean    showFormatSymbol;
-        private Boolean    def;
+        private int        formatSymbolPosition;
+        private boolean    showFormatSymbol;
+        private boolean    def;
         private BigDecimal rate;
-        private Integer    direction;
-        private Boolean    useThousandSeparator;
+        private int        direction;
+        private boolean    useThousandSeparator;
 
         public Builder() {
             formatSymbolPosition = 0;
@@ -72,13 +72,13 @@ public class Currency implements Record {
             }
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Optional<Integer> id() {
-            return Optional.ofNullable(this.id);
+        public int id() {
+            return id;
         }
 
         public Builder symbol(String x) {
@@ -127,7 +127,9 @@ public class Currency implements Record {
         }
 
         public Currency build() {
-            Objects.requireNonNull(id);
+            if (id == 0) {
+                throw new IllegalStateException("Currency.id == 0");
+            }
             Objects.requireNonNull(symbol);
 
             return new Currency(id,
@@ -144,7 +146,7 @@ public class Currency implements Record {
         }
     }
 
-    private final Integer    id;
+    private final int        id;
     private final String     symbol;
     private final String     description;
     private final String     formatSymbol;
@@ -157,16 +159,16 @@ public class Currency implements Record {
 
     @RecordBuilder
     public Currency(
-            @Field(Field.ID) Integer id,
+            @Field(Field.ID) int id,
             @Field("symbol") String symbol,
             @Field("description") String description,
             @Field("format_symbol") String formatSymbol,
-            @Field("format_symbol_position") Integer formatSymbolPosition,
-            @Field("show_format_symbol") Boolean showFormatSymbol,
-            @Field("is_default") Boolean def,
+            @Field("format_symbol_position") int formatSymbolPosition,
+            @Field("show_format_symbol") boolean showFormatSymbol,
+            @Field("is_default") boolean def,
             @Field("rate") BigDecimal rate,
-            @Field("direction") Integer direction,
-            @Field("show_t_separator") Boolean useThousandSeparator
+            @Field("direction") int direction,
+            @Field("show_t_separator") boolean useThousandSeparator
     ) {
         this.id = id;
         this.symbol = symbol;
@@ -182,7 +184,7 @@ public class Currency implements Record {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -239,16 +241,16 @@ public class Currency implements Record {
 
         if (obj instanceof Currency) {
             Currency that = (Currency)obj;
-            return Objects.equals(this.id, that.id)
+            return this.id == that.id
                     && Objects.equals(this.symbol, that.symbol)
                     && Objects.equals(this.description, that.description)
                     && Objects.equals(this.formatSymbol, that.formatSymbol)
-                    && Objects.equals(this.formatSymbolPosition, that.formatSymbolPosition)
-                    && Objects.equals(this.showFormatSymbol, that.showFormatSymbol)
-                    && Objects.equals(this.def, that.def)
+                    && this.formatSymbolPosition == that.formatSymbolPosition
+                    && this.showFormatSymbol == that.showFormatSymbol
+                    && this.def == that.def
                     && Objects.equals(this.rate, that.rate)
-                    && Objects.equals(this.direction, that.direction)
-                    && Objects.equals(this.useThousandSeparator, that.useThousandSeparator);
+                    && this.direction == that.direction
+                    && this.useThousandSeparator == that.useThousandSeparator;
         } else {
             return false;
         }

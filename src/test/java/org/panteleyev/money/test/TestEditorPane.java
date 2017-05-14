@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.test;
 
 import java.lang.reflect.Field;
@@ -60,21 +59,21 @@ import org.testng.annotations.Test;
 public class TestEditorPane extends BaseDaoTest {
     private static final Random RANDOM = new Random(System.currentTimeMillis());
 
-    private Currency curr_1 = new Currency(null,
+    private Currency curr_1 = new Currency(0,
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             1, false, false, new BigDecimal(RANDOM.nextDouble()), 1, false
     );
 
-    private Currency curr_2 = new Currency(null,
+    private Currency curr_2 = new Currency(0,
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             1, false, false, new BigDecimal(RANDOM.nextDouble()), 1, false
     );
 
-    private Category category = new Category(null,
+    private Category category = new Category(0,
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
             CategoryType.BANKS_AND_CASH,
@@ -88,7 +87,7 @@ public class TestEditorPane extends BaseDaoTest {
     private Account acc_3;  // same currency as (1)
 
     private Transaction.Builder resultedBuilder;
-    private Integer resultedId;
+    private int resultedId;
 
     @BeforeClass
     @Override
@@ -185,7 +184,7 @@ public class TestEditorPane extends BaseDaoTest {
     }
 
     private TransactionEditorPane createEditorPane() {
-        TransactionEditorPane pane = new TransactionEditorPane().load();
+        TransactionEditorPane pane = new TransactionEditorPane();
         pane.initControls();
         callPrivateMethod(pane, "onChangedTransactionTypes");
         callPrivateMethod(pane, "setupContactMenu");
@@ -210,7 +209,7 @@ public class TestEditorPane extends BaseDaoTest {
         getTextField(pane, "sumEdit").setText(t.getAmount().toString());
         getCheckBox(pane, "checkedCheckBox").setSelected(t.isChecked());
 
-        if (t.getContactId() != null) {
+        if (t.getContactId() != 0) {
             Contact cntct = getDao().getContact(t.getContactId()).get();
             getTextField(pane, "contactEdit").setText(cntct.getName());
         }
@@ -267,7 +266,7 @@ public class TestEditorPane extends BaseDaoTest {
                 .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, BigDecimal.ROUND_HALF_UP))
                 .checked(RANDOM.nextBoolean());
 
-        if (debit.getCurrencyId().equals(credit.getCurrencyId())) {
+        if (debit.getCurrencyId() == credit.getCurrencyId()) {
             builder.rate(BigDecimal.ONE);
         } else {
             builder.rate(new BigDecimal(RANDOM.nextDouble()));
@@ -329,7 +328,7 @@ public class TestEditorPane extends BaseDaoTest {
 
         assertNotNull(resultedBuilder);
 
-        Transaction resultedTransaction = resultedBuilder.id(0).build();
+        Transaction resultedTransaction = resultedBuilder.id(1).build();
 
         assertMainFields(resultedTransaction, transaction);
         assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
@@ -368,7 +367,7 @@ public class TestEditorPane extends BaseDaoTest {
 
         assertNotNull(resultedBuilder);
 
-        Transaction resultedTransaction = resultedBuilder.id(0).build();
+        Transaction resultedTransaction = resultedBuilder.id(1).build();
 
         assertMainFields(resultedTransaction, transaction);
         assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
@@ -409,10 +408,10 @@ public class TestEditorPane extends BaseDaoTest {
 
         assertNotNull(resultedBuilder);
 
-        Transaction resultedTransaction = resultedBuilder.id(0).build();
+        Transaction resultedTransaction = resultedBuilder.id(1).build();
 
         assertMainFields(resultedTransaction, transaction);
-        assertNull(resultedTransaction.getContactId(), "Contact ID is invalid");
+        assertEquals(resultedTransaction.getContactId(), 0, "Contact ID is invalid");
         assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
         assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
     }

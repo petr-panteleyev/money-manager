@@ -31,52 +31,43 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.MoneyDAO;
-import java.net.URL;
 import java.util.Collection;
 import java.util.ResourceBundle;
 
-public class CategoryWindowController extends BaseController implements Initializable {
-    @FXML private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
+public class CategoryWindowController extends BaseController {
+    private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private TableView<Category> categoryTable;
-    @FXML private TableColumn<Category,String> colType;
-    @FXML private TableColumn<Category,String> colName;
-    @FXML private TableColumn<Category,String> colDescription;
+    private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
 
-    @FXML private MenuBar  menuBar;
-    @FXML private MenuItem editMenuItem;
-    @FXML private MenuItem ctxEditMenuItem;
+    private final TableView<Category> categoryTable = new TableView<>();
 
-    @FXML private Parent self;
-
-    private ResourceBundle bundle;
+    private final BorderPane self = new BorderPane();
 
     private final MapChangeListener<Integer,Category> categoriesListener =
             (MapChangeListener<Integer,Category>)l -> Platform.runLater(this::updateWindow);
 
     public CategoryWindowController() {
-        super("/org/panteleyev/money/CategoryWindow.fxml", MainWindowController.UI_BUNDLE_PATH, true);
-    }
-
-    @Override
-    protected Parent getSelf() {
-        return self;
+        super(null);
+        initialize();
+        setupWindow(self);
     }
 
     @Override
     public String getTitle() {
-        return bundle == null? "Categories" : bundle.getString("category.Window.Title");
+        return rb.getString("category.Window.Title");
     }
 
     private void updateList() {
@@ -87,11 +78,44 @@ public class CategoryWindowController extends BaseController implements Initiali
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        bundle = rb;
+    private void initialize() {
+        // Event handlers
+        EventHandler<ActionEvent> addHandler = this::onMenuAdd;
+        EventHandler<ActionEvent> editHandler = this::onMenuEdit;
 
+        // Main Menu
+        MenuItem closeMenuItem = new MenuItem(rb.getString("menu.File.Close"));
+        closeMenuItem.setOnAction(ACTION_FILE_CLOSE);
+        Menu fileMenu = new Menu(rb.getString("menu.File"), null, closeMenuItem);
+
+        MenuItem addMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        addMenuItem.setOnAction(addHandler);
+        MenuItem editMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        editMenuItem.setOnAction(editHandler);
+        Menu editMenu = new Menu(rb.getString("menu.Edit"), null, addMenuItem, editMenuItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(rb));
         menuBar.setUseSystemMenuBar(true);
+
+        // Context Menu
+        MenuItem ctxAddMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        ctxAddMenuItem.setOnAction(addHandler);
+        MenuItem ctxEditMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        ctxEditMenuItem.setOnAction(editHandler);
+        categoryTable.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem));
+
+        // Table
+        TableColumn<Category,String> colType = new TableColumn<>(rb.getString("column.Type"));
+        TableColumn<Category,String> colName = new TableColumn<>(rb.getString("column.Name"));
+        TableColumn<Category,String> colDescription = new TableColumn<>(rb.getString("column.Description"));
+
+        categoryTable.getColumns().setAll(colType, colName, colDescription);
+
+        categoryTable.setOnMouseClicked(this::onTableMouseClick);
+
+        self.setPrefSize(600, 400);
+        self.setTop(menuBar);
+        self.setCenter(categoryTable);
 
         categoryTable.setItems(categoryList);
         updateList();
@@ -114,7 +138,7 @@ public class CategoryWindowController extends BaseController implements Initiali
         colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
         colDescription.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.6));
 
-        MoneyDAO.getInstance().categoriesProperty()
+        MoneyDAO.getInstance().categories()
                 .addListener(new WeakMapChangeListener<>(categoriesListener));
     }
 
@@ -128,21 +152,21 @@ public class CategoryWindowController extends BaseController implements Initiali
         }
     }
 
-    public void onMenuEdit() {
+    private void onMenuEdit(ActionEvent evt) {
         Category category = categoryTable.getSelectionModel().getSelectedItem();
         if (category != null) {
             openCategoryDialog(category);
         }
     }
 
-    public void onMenuAdd() {
+    private void onMenuAdd(ActionEvent evt) {
         openCategoryDialog(null);
     }
 
     private void openCategoryDialog(Category category) {
         MoneyDAO dao = MoneyDAO.getInstance();
-        new CategoryDialog(category).load().showAndWait().ifPresent(builder -> {
-            if (builder.id().isPresent()) {
+        new CategoryDialog(category).showAndWait().ifPresent(builder -> {
+            if (builder.id() != 0) {
                 dao.updateCategory(builder.build());
             } else {
                 dao.insertCategory(builder
@@ -154,7 +178,7 @@ public class CategoryWindowController extends BaseController implements Initiali
 
     private void updateWindow() {
         int selIndex = categoryTable.getSelectionModel().getSelectedIndex();
-        categoryList.setAll(MoneyDAO.getInstance().categoriesProperty().values());
+        categoryList.setAll(MoneyDAO.getInstance().categories().values());
         categoryTable.getSelectionModel().select(selIndex);
     }
 }

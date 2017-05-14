@@ -47,10 +47,13 @@ class AccountsTab extends BorderPane {
 
     private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.getPredicate();
 
-    AccountsTab() {
-        AccountTree accountTree = (AccountTree)new AccountTree().load();
+    private final MapChangeListener<Integer,Transaction> transactionListener =
+            l -> Platform.runLater(this::reloadTransactions);
 
-        SplitPane split = new SplitPane(accountTree.getPane(), new BorderPane(transactionTable));
+    AccountsTab() {
+        AccountTree accountTree = new AccountTree();
+
+        SplitPane split = new SplitPane(accountTree, new BorderPane(transactionTable));
         split.setOrientation(Orientation.VERTICAL);
         split.setDividerPosition(0, DIVIDER_POSITION);
         setCenter(split);
@@ -60,15 +63,9 @@ class AccountsTab extends BorderPane {
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
         final MoneyDAO dao = MoneyDAO.getInstance();
-
-        dao.transactionsProperty().addListener((MapChangeListener<Integer,Transaction>) l -> {
-            if (!dao.preloadingProperty().get()) {
-                Platform.runLater(this::reloadTransactions);
-            }
-        });
-
-        dao.preloadingProperty().addListener((x, oldValue, newValue) -> {
-            if (oldValue && !newValue) {
+        dao.transactions().addListener(transactionListener);
+        dao.preloadingProperty().addListener((x, y, newValue) -> {
+            if (!newValue) {
                 Platform.runLater(this::reloadTransactions);
             }
         });

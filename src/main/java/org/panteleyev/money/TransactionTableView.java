@@ -57,6 +57,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
+import javafx.scene.image.Image;
 
 class TransactionTableView extends TreeTableView<TransactionTreeItem> implements Styles {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
@@ -105,7 +106,7 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
         }
     }
 
-    private static class DayCell extends TreeTableCell<TransactionTreeItem, TransactionTreeItem> {
+    private static class DayCell extends TreeTableCell<TransactionTreeItem, TransactionTreeItem> implements Images {
         private final boolean fullDate;
 
         DayCell(boolean fullDate) {
@@ -122,40 +123,40 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
                 if (!item.isGroupProperty().get()) {
                     Transaction t = item.getTransaction();
 
-                    String imageUrl;
+                    Image image;
 
                     if (t.getTransactionType() == TransactionType.TRANSFER) {
-                        imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                        image = GRAY_CIRCLE;
                     } else {
                         switch (t.getAccountCreditedType()) {
                             case EXPENSES:
                             case DEBTS:
-                                imageUrl = "/org/panteleyev/money/res/red-circle-16.png";
+                                image = RED_CIRCLE;
                                 break;
 
                             case BANKS_AND_CASH:
                                 switch (t.getAccountDebitedType()) {
                                     case INCOMES:
-                                        imageUrl = "/org/panteleyev/money/res/blue-circle-16.png";
+                                        image = BLUE_CIRCLE;
                                         break;
 
                                     case BANKS_AND_CASH:
-                                        imageUrl = "/org/panteleyev/money/res/green-circle-16.png";
+                                        image = GREEN_CIRCLE;
                                         break;
 
                                     default:
-                                        imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                                        image = GRAY_CIRCLE;
                                         break;
                                 }
                                 break;
 
                             default:
-                                imageUrl = "/org/panteleyev/money/res/gray-circle-16.png";
+                                image = GRAY_CIRCLE;
                                 break;
                         }
                     }
 
-                    ImageView iv = new ImageView(imageUrl);
+                    ImageView iv = new ImageView(image);
                     iv.setFitHeight(8);
                     iv.setFitWidth(8);
                     setGraphic(iv);
@@ -331,9 +332,9 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
 
                     // All transactions must have same day and debited account
                     int day = transactions.get(0).getDay();
-                    Integer debitedId = transactions.get(0).getAccountDebitedId();
+                    int debitedId = transactions.get(0).getAccountDebitedId();
 
-                    disableGroup = transactions.stream().anyMatch(x -> x.getDay() != day || !x.getAccountDebitedId().equals(debitedId));
+                    disableGroup = transactions.stream().anyMatch(x -> x.getDay() != day || x.getAccountDebitedId() != debitedId);
                 }
             }
         }

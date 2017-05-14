@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
 import java.util.Arrays;
@@ -49,7 +48,7 @@ public enum ContactType implements Named {
         this.name = b.getString("name" + id);
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 

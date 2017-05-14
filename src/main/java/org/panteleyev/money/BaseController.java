@@ -5,11 +5,11 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -23,21 +23,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money;
 
-import javafx.scene.Parent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import org.panteleyev.utilities.fx.Controller;
+import java.util.ResourceBundle;
 
-abstract class BaseController extends Controller {
-    abstract protected Parent getSelf();
+class BaseController extends Controller {
+    // Common actions for menu and context menu items
+    final EventHandler<ActionEvent> ACTION_FILE_CLOSE = (evt) -> onClose();
 
-    BaseController(String fxml, String bundlePath, boolean setupWindow) {
-        super(fxml, bundlePath, setupWindow);
+    BaseController(Stage stage, String css) {
+        super(stage, css);
+    }
+
+    BaseController(String css) {
+        super(css);
     }
 
     public void onClose() {
-        ((Stage)(getSelf().getScene().getWindow())).close();
+        getStage().close();
+    }
+
+    Menu createHelpMenu(ResourceBundle rb) {
+        MenuItem item = new MenuItem(rb.getString("menu.Help.About"));
+        item.setOnAction((evt) -> new AboutDialog().showAndWait());
+        return new Menu(rb.getString("menu.Help"), null, item);
     }
 }

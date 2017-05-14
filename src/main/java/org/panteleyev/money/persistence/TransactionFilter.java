@@ -25,6 +25,7 @@
  */
 package org.panteleyev.money.persistence;
 
+import org.panteleyev.money.Logging;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -100,7 +101,17 @@ public enum TransactionFilter {
             LocalDate now = LocalDate.now();
             return t.getYear() == now.getYear() && t.getMonth() == month.getValue();
         };
-        this.description = month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault());
+
+        // Workaround for https://bugs.openjdk.java.net/browse/JDK-8146356
+        TextStyle textStyle = TextStyle.FULL_STANDALONE;
+        String testMonth = Month.JANUARY.getDisplayName(textStyle, Locale.getDefault());
+        if (testMonth.equals("1")) {
+            textStyle = TextStyle.FULL;
+        } else {
+            Logging.getLogger().info("JDK-8146356 has been resolved");
+        }
+
+        this.description = month.getDisplayName(textStyle, Locale.getDefault());
     }
 
     public Predicate<Transaction> getPredicate() {

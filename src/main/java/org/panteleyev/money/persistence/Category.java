@@ -35,11 +35,11 @@ import java.util.Optional;
 @Table("category")
 public class Category implements Record, Named {
     public static class Builder {
-        private Integer id;
+        private int id;
         private String  name;
         private CategoryType type;
         private String  comment;
-        private Boolean expanded;
+        private boolean expanded;
 
         public Builder() {
             expanded = false;
@@ -57,13 +57,13 @@ public class Category implements Record, Named {
             }
         }
 
-        public Builder id(Integer id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public Optional<Integer> id() {
-            return Optional.ofNullable(id);
+        public int id() {
+            return id;
         }
 
         public Builder name(String name) {
@@ -87,7 +87,10 @@ public class Category implements Record, Named {
         }
 
         public Category build() {
-            Objects.requireNonNull(id);
+            if (id == 0) {
+                throw new IllegalStateException("Category.id == 0");
+            }
+
             Objects.requireNonNull(name);
             Objects.requireNonNull(type);
 
@@ -95,7 +98,7 @@ public class Category implements Record, Named {
         }
     }
 
-    private final Integer id;
+    private final int id;
     private final String  name;
     private final String  comment;
     private final CategoryType catType;
@@ -103,7 +106,7 @@ public class Category implements Record, Named {
 
     @RecordBuilder
     public Category(
-            @Field(Field.ID) Integer id,
+            @Field(Field.ID) int id,
             @Field("name") String name,
             @Field("comment") String comment,
             @Field("cat_type") CategoryType catType,
@@ -118,7 +121,7 @@ public class Category implements Record, Named {
 
     @Field(value = Field.ID, primaryKey = true)
     @Override
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -155,11 +158,11 @@ public class Category implements Record, Named {
 
         if (obj instanceof Category) {
             Category that = (Category)obj;
-            return Objects.equals(this.id, that.id)
+            return this.id == that.id
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.comment, that.comment)
                     && Objects.equals(this.catType, that.catType)
-                    && Objects.equals(this.expanded, that.expanded);
+                    && this.expanded == that.expanded;
         } else {
             return false;
         }

@@ -26,28 +26,47 @@
  */
 package org.panteleyev.money;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-public class AboutDialog extends BaseDialog implements Initializable {
-    private static final String VERSION = "${version}";
-    private static final String FXML_PATH = "/org/panteleyev/money/AboutDialog.fxml";
+class AboutDialog extends BaseDialog implements Styles, Images {
+    private final static String APP_TITLE = "Money Manager";
 
-    @FXML private Label versionLabel;
+    private final Label label_1 = new Label(APP_TITLE);
+    private final Label label_2 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
+    private final Label label_3 = new Label("${version}");
 
-    public AboutDialog() {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+    AboutDialog() {
+        super(MainWindowController.DIALOGS_CSS);
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        setTitle("Money Manager");
-        versionLabel.setText("Version " + VERSION);
+    private void initialize() {
+        setTitle(APP_TITLE);
+
+        BorderPane pane = new BorderPane();
+
+        ImageView icon = new ImageView(APP_ICON);
+        icon.setFitWidth(48);
+        icon.setFitHeight(48);
+
+        VBox vBox = new VBox(10, label_1, label_2, label_3);
+        label_1.getStyleClass().add(ABOUT_APP_TITLE_LABEL);
+        label_2.getStyleClass().add(ABOUT_LABEL);
+        label_3.getStyleClass().add(ABOUT_LABEL);
+
+        pane.setLeft(icon);
+        pane.setCenter(vBox);
+
+        BorderPane.setMargin(vBox, new Insets(0, 0, 0, 10));
+
+        getDialogPane().setContent(pane);
         getDialogPane().getButtonTypes().add(ButtonType.OK);
     }
 }

@@ -25,55 +25,82 @@
  */
 package org.panteleyev.money;
 
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Parent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
-import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CurrencyWindowController extends BaseController implements Initializable {
-    private static final String FXML = "/org/panteleyev/money/CurrencyWindow.fxml";
-
+public class CurrencyWindowController extends BaseController {
     private final ObservableList<Currency> currencyList = FXCollections.observableArrayList();
 
-    @FXML private Parent self;
+    private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private TableView<Currency> table;
-    @FXML private TableColumn<Currency,String> colName;
-    @FXML private TableColumn<Currency,String> colDescription;
+    private final BorderPane root = new BorderPane();
 
-    @FXML private MenuBar  menuBar;
-    @FXML private MenuItem editMenuItem;
-    @FXML private MenuItem ctxEditMenuItem;
+    private final TableView<Currency> table = new TableView<>();
 
-    private ResourceBundle bundle;
-
-    private final MapChangeListener<Integer,Currency> currencyListener =
-            (MapChangeListener<Integer,Currency>)l -> Platform.runLater(this::updateWindow);
+    private final MapChangeListener<Integer, Currency> currencyListener = this::onCurrencyUpdate;
 
     CurrencyWindowController() {
-        super(FXML, MainWindowController.UI_BUNDLE_PATH, true);
+        super(null);
+        initialize();
+        setupWindow(root);
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        bundle = rb;
+    private void initialize() {
+        EventHandler<ActionEvent> addHandler = (evt) -> openCurrencyDialog(null);
+        EventHandler<ActionEvent> editHandler = (evt) -> {
+            Currency currency = table.getSelectionModel().getSelectedItem();
+            if (currency != null) {
+                openCurrencyDialog(currency);
+            }
+        };
 
+        // Menu Bar
+        MenuItem closeMenuItem = new MenuItem(rb.getString("menu.File.Close"));
+        closeMenuItem.setOnAction(ACTION_FILE_CLOSE);
+        Menu fileMenu = new Menu(rb.getString("menu.File"), null, closeMenuItem);
+
+        MenuItem addMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        addMenuItem.setOnAction(addHandler);
+        MenuItem editMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        editMenuItem.setOnAction(editHandler);
+        Menu editMenu = new Menu(rb.getString("menu.Edit"), null, addMenuItem, editMenuItem);
+
+        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(rb));
         menuBar.setUseSystemMenuBar(true);
 
-        currencyList.addAll(MoneyDAO.getInstance().currencyProperty().values());
+        // Context Menu
+        MenuItem ctxAddMenuItem = new MenuItem(rb.getString("menu.Edit.Add"));
+        ctxAddMenuItem.setOnAction(addHandler);
+        MenuItem ctxEditMenuItem = new MenuItem(rb.getString("menu.Edit.Edit"));
+        ctxEditMenuItem.setOnAction(editHandler);
+        table.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem));
+
+        // Table
+        TableColumn<Currency,String> colName = new TableColumn<>(rb.getString("column.Name"));
+        TableColumn<Currency,String> colDescription = new TableColumn<>(rb.getString("column.Description"));
+
+        table.getColumns().setAll(colName, colDescription);
+
+        root.setPrefSize(600, 400);
+        root.setTop(menuBar);
+        root.setCenter(table);
+
+        currencyList.addAll(MoneyDAO.getInstance().currencies().values());
         table.setItems(currencyList);
         colName.setCellValueFactory((TableColumn.CellDataFeatures<Currency, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getSymbol()));
@@ -85,31 +112,19 @@ public class CurrencyWindowController extends BaseController implements Initiali
         ctxEditMenuItem.disableProperty()
             .bind(table.getSelectionModel().selectedItemProperty().isNull());
 
-        MoneyDAO.getInstance().currencyProperty()
+        MoneyDAO.getInstance().currencies()
                 .addListener(new WeakMapChangeListener<>(currencyListener));
     }
 
     @Override
     public String getTitle() {
-        return bundle == null?
-                "Currencies" : bundle.getString("currency.Window.Title");
-    }
-
-    public void onAddCurrency() {
-        openCurrencyDialog(null);
-    }
-
-    public void onEditCurrency() {
-        Currency currency = table.getSelectionModel().getSelectedItem();
-        if (currency != null) {
-            openCurrencyDialog(currency);
-        }
+        return rb.getString("currency.Window.Title");
     }
 
     private void openCurrencyDialog(Currency currency) {
         MoneyDAO dao = MoneyDAO.getInstance();
-        new CurrencyDialog(currency).load().showAndWait().ifPresent(builder -> {
-            if (builder.id().isPresent()) {
+        new CurrencyDialog(currency).showAndWait().ifPresent(builder -> {
+            if (builder.id() != 0) {
                 dao.updateCurrency(builder.build());
             } else {
                 dao.insertCurrency(builder.id(dao.generatePrimaryKey(Currency.class)).build());
@@ -117,14 +132,26 @@ public class CurrencyWindowController extends BaseController implements Initiali
         });
     }
 
-    private void updateWindow() {
-        int selIndex = table.getSelectionModel().getSelectedIndex();
-        currencyList.setAll(MoneyDAO.getInstance().currencyProperty().values());
-        table.getSelectionModel().select(selIndex);
-    }
+    private void onCurrencyUpdate(MapChangeListener.Change<? extends Integer, ? extends Currency> change) {
+        if (change.wasAdded()) {
+            Currency currency = change.getValueAdded();
 
-    @Override
-    protected Parent getSelf() {
-        return self;
+            // find if we have item with this id
+            int index = currencyList.stream()
+                    .filter(c -> c.getId() == currency.getId())
+                    .findAny()
+                    .map(currencyList::indexOf)
+                    .orElse(-1);
+
+            if (index != -1) {
+                currencyList.remove(index);
+                currencyList.add(index, currency);
+            } else {
+                // simply add
+                currencyList.add(currency);
+            }
+
+            table.getSelectionModel().select(currency);
+        }
     }
 }

@@ -25,22 +25,15 @@
  */
 package org.panteleyev.money;
 
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
@@ -50,40 +43,64 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.utilities.fx.BaseDialog;
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-public final class AccountDialog extends BaseDialog<Account.Builder> implements Initializable {
-    private static final String FXML_PATH = "/org/panteleyev/money/AccountDialog.fxml";
+final class AccountDialog extends BaseDialog<Account.Builder> implements Styles {
+    private final ResourceBundle          rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    @FXML private TextField                 nameEdit;
-    @FXML private TextField                 initialEdit;
-    @FXML private TextField                 commentEdit;
-    @FXML private ComboBox<CategoryType>    typeComboBox;
-    @FXML private ComboBox<Category>        categoryComboBox;
-    @FXML private ComboBox<Currency>        currencyComboBox;
-    @FXML private CheckBox                  activeCheckBox;
+    private final TextField               nameEdit = new TextField();
+    private final TextField               initialEdit = new TextField();
+    private final TextField               commentEdit = new TextField();
+    private final ComboBox<CategoryType>  typeComboBox = new ComboBox<>();
+    private final ComboBox<Category>      categoryComboBox = new ComboBox<>();
+    private final ComboBox<Currency>      currencyComboBox = new ComboBox<>();
+    private final CheckBox                activeCheckBox = new CheckBox(rb.getString("account.Dialog.Active"));
 
-    private Collection<Category>            categories;
+    private Collection<Category>    categories;
 
-    private final Account account;
-    private final Category initialCategory;
+    private final Account           account;
+    private final Category          initialCategory;
 
     AccountDialog(Account account) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.DIALOGS_CSS);
 
         this.account = account;
         this.initialCategory = null;
+
+        initialize();
     }
 
     AccountDialog(Category initialCategory) {
-        super(FXML_PATH, MainWindowController.UI_BUNDLE_PATH);
+        super(MainWindowController.DIALOGS_CSS);
 
         this.account = null;
         this.initialCategory = initialCategory;
+
+        initialize();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle rb) {
+    private void initialize() {
         setTitle(rb.getString("account.Dialog.Title"));
+
+        GridPane pane = new GridPane();
+        pane.getStyleClass().add(GRID_PANE);
+
+        int index = 0;
+        pane.addRow(index++, new Label(rb.getString("label.Name")), nameEdit);
+        pane.addRow(index++, new Label(rb.getString("label.Type")), typeComboBox);
+        pane.addRow(index++, new Label(rb.getString("label.Category")), categoryComboBox);
+        pane.addRow(index++, new Label(rb.getString("account.Dialog.InitialBalance")), initialEdit);
+        pane.addRow(index++, new Label(rb.getString("label.Comment")), commentEdit);
+        pane.addRow(index++, new Label(rb.getString("account.Dialog.Currency")), currencyComboBox);
+        pane.add(activeCheckBox, 1, index);
+
+        nameEdit.setPrefColumnCount(20);
+
+        getDialogPane().setContent(pane);
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
@@ -137,9 +154,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
                 .select(dao.getCategory(account.getCategoryId()).orElse(null));
 
             currencyComboBox.getSelectionModel()
-                    .select(account.getCurrencyId()
-                            .map(dao::getCurrency)
-                            .orElse(Optional.empty())
+                    .select(dao.getCurrency(account.getCurrencyId())
                             .orElse(null));
         }
 
@@ -161,7 +176,7 @@ public final class AccountDialog extends BaseDialog<Account.Builder> implements 
             }
         });
 
-        createDefaultButtons();
+        createDefaultButtons(rb);
 
         Platform.runLater(this::createValidationSupport);
     }
