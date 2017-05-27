@@ -29,9 +29,9 @@ package org.panteleyev.money;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.panteleyev.utilities.fx.BaseDialog;
 
@@ -40,7 +40,6 @@ class AboutDialog extends BaseDialog implements Styles, Images {
 
     private final Label label_1 = new Label(APP_TITLE);
     private final Label label_2 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");
-    private final Label label_3 = new Label("${version}");
 
     AboutDialog() {
         super(MainWindowController.DIALOGS_CSS);
@@ -56,10 +55,14 @@ class AboutDialog extends BaseDialog implements Styles, Images {
         icon.setFitWidth(48);
         icon.setFitHeight(48);
 
-        VBox vBox = new VBox(10, label_1, label_2, label_3);
+        GridPane grid = new GridPane();
+        grid.getStyleClass().add(GRID_PANE);
+        grid.addRow(0, new Label("Version:"), new Label("${version}"));
+        grid.addRow(1, new Label("Build:"), new Label("${timestamp}"));
+
+        VBox vBox = new VBox(10, label_1, label_2, grid);
         label_1.getStyleClass().add(ABOUT_APP_TITLE_LABEL);
         label_2.getStyleClass().add(ABOUT_LABEL);
-        label_3.getStyleClass().add(ABOUT_LABEL);
 
         pane.setLeft(icon);
         pane.setCenter(vBox);

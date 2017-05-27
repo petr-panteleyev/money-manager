@@ -25,31 +25,43 @@
  */
 package org.panteleyev.money;
 
+import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import org.panteleyev.utilities.fx.BaseDialog;
+import java.util.ResourceBundle;
 
-class OptionsDialog extends Dialog<ButtonType> {
+class OptionsDialog extends BaseDialog<ButtonType> {
+    private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
+
+    private final ChoiceBox<Integer> autoCompleteLength =
+            new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
 
     OptionsDialog() {
-        setTitle("Options");
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        initControls();
+        super(MainWindowController.DIALOGS_CSS);
+        setTitle(rb.getString("options.Dialog.Title"));
+        createDefaultButtons(rb);
 
         GridPane pane = new GridPane();
-        pane.setHgap(5);
-        pane.setVgap(5);
+        pane.getStyleClass().add(Styles.GRID_PANE);
+
+        pane.addRow(0, new Label(rb.getString("options.Dialog.Prefix.Length")), autoCompleteLength);
 
         getDialogPane().setContent(pane);
 
+        initControls();
+
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
-                // Set options here via Options class
+                Options.setAutoCompleteLength(autoCompleteLength.getValue());
             }
             return param;
         });
     }
 
     private void initControls() {
+        autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
     }
 }

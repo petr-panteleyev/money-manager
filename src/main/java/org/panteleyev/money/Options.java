@@ -31,12 +31,14 @@ import java.util.prefs.Preferences;
 class Options {
     private static final double DEFAULT_WIDTH = 1024;
     private static final double DEFAULT_HEIGHT = 768;
+    private static final int    AUTO_COMPLETE_LENGTH = 3;
 
     private enum Option {
         DB_FILE("dbFile"),
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts"),
         MAIN_WINDOW_WIDTH("mainWindowWidth"),
-        MAIN_WINDOW_HEIGHT("mainWindowHeight");
+        MAIN_WINDOW_HEIGHT("mainWindowHeight"),
+        AUTO_COMPLETE_LENGTH("autoCompleteLength");
 
         private final String s;
 
@@ -50,6 +52,9 @@ class Options {
     }
 
     private static final Preferences PREFS;
+
+    // Cached values
+    private static int autoCompleteLength = AUTO_COMPLETE_LENGTH;
 
     static void setDbFile(File file) {
         PREFS.put(Option.DB_FILE.toString(), (file == null)? "" : file.getAbsolutePath());
@@ -84,7 +89,19 @@ class Options {
         return PREFS.getDouble(Option.MAIN_WINDOW_HEIGHT.toString(), DEFAULT_HEIGHT);
     }
 
+    static int getAutoCompleteLength() {
+        return autoCompleteLength;
+    }
+
+    static void setAutoCompleteLength(int x) {
+        autoCompleteLength = x;
+        PREFS.putInt(Option.AUTO_COMPLETE_LENGTH.toString(), x);
+    }
+
     static {
         PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
+
+        // Load values into cache
+        autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
     }
 }

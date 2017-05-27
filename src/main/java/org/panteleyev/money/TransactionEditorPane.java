@@ -77,39 +77,56 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class TransactionEditorPane extends TitledPane implements Styles {
-    private static final int SUGGESTION_LENGTH = 3;
 
-    private static class CompletionProvider<T extends Named> implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<T>> {
+    private static abstract class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<T>>{
         private final Set<T> set;
 
-        CompletionProvider(Set<T> set) {
+        BaseCompletionProvider(Set<T> set) {
             this.set = set;
         }
+
+        abstract String getElementString(T element);
 
         @Override
         public Collection<T> call(AutoCompletionBinding.ISuggestionRequest req) {
-            return (req.getUserText().length() < SUGGESTION_LENGTH)?
-                    Collections.emptyList() :
-                    set.stream()
-                            .filter(x -> x.getName().toLowerCase().contains(req.getUserText().toLowerCase()))
-                            .collect(Collectors.toList());
+            if (req.getUserText().length() >= Options.getAutoCompleteLength()) {
+                final String userText = req.getUserText();
+
+                List<T> result = set.stream()
+                        .filter(x -> getElementString(x).toLowerCase().contains(userText.toLowerCase()))
+                        .collect(Collectors.toList());
+
+                if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
+                    /* If there is a single case sensitive match then no suggestions must be shown. */
+                    return Collections.emptyList();
+                } else {
+                    return result;
+                }
+            } else {
+                return Collections.emptyList();
+            }
         }
     }
 
-    private static class StringCompletionProvider implements Callback<AutoCompletionBinding.ISuggestionRequest,Collection<String>> {
-        private final Set<String> set;
-
-        StringCompletionProvider(Set<String> set) {
-            this.set = set;
+    private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
+        CompletionProvider(Set<T> set) {
+            super(set);
         }
 
         @Override
-        public Collection<String> call(AutoCompletionBinding.ISuggestionRequest req) {
-            return (req.getUserText().length() < SUGGESTION_LENGTH)?
-                    Collections.emptyList() :
-                    set.stream()
-                            .filter(x -> x.toLowerCase().startsWith(req.getUserText().toLowerCase()))
-                            .collect(Collectors.toList());
+        String getElementString(T element) {
+            return element.getName();
+        }
+    }
+
+    private static class StringCompletionProvider extends BaseCompletionProvider<String> {
+        StringCompletionProvider(Set<String> set) {
+            super(set);
+        }
+
+        @Override
+        String getElementString(String element) {
+            return element;
         }
     }
 

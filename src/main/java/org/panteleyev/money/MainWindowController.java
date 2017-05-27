@@ -99,6 +99,7 @@ public class MainWindowController extends BaseController {
 
     public MainWindowController(Stage stage) {
         super(stage, CSS_PATH);
+        stage.getIcons().add(Images.APP_ICON);
         initialize();
         setupWindow(self);
     }
