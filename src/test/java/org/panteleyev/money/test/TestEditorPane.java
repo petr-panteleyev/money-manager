@@ -76,7 +76,7 @@ public class TestEditorPane extends BaseDaoTest {
     private Category category = new Category(0,
             UUID.randomUUID().toString(),
             UUID.randomUUID().toString(),
-            CategoryType.BANKS_AND_CASH,
+            CategoryType.BANKS_AND_CASH.getId(),
             false
     );
 
@@ -131,7 +131,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH,
+            CategoryType.BANKS_AND_CASH.getId(),
             category.getId(),
             curr_1.getId(),
             true
@@ -144,7 +144,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH,
+            CategoryType.BANKS_AND_CASH.getId(),
             category.getId(),
             curr_2.getId(),
             true
@@ -157,7 +157,7 @@ public class TestEditorPane extends BaseDaoTest {
             BigDecimal.ZERO,
             BigDecimal.ZERO,
             BigDecimal.ONE,
-            CategoryType.BANKS_AND_CASH,
+            CategoryType.BANKS_AND_CASH.getId(),
             category.getId(),
             curr_1.getId(),
             true
@@ -255,8 +255,8 @@ public class TestEditorPane extends BaseDaoTest {
         Transaction.Builder builder = new Transaction.Builder()
                 .id(RANDOM.nextInt())
                 .transactionType(TransactionType.CARD_PAYMENT)
-                .accountCreditedType(category.getCatType())
-                .accountDebitedType(category.getCatType())
+                .accountCreditedType(category.getType())
+                .accountDebitedType(category.getType())
                 .accountCreditedCategoryId(category.getId())
                 .accountDebitedCategoryId(category.getId())
                 .accountDebitedId(debit.getId())

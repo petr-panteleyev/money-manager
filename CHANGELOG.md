@@ -1,5 +1,11 @@
 # Change Log
 
+## [2.0.0] - 2017-06-04
+
+- Migrated to MySQL
+- Enum fields replaced by integer id
+- Database schema added to docs
+
 ## [1.1.1] - 2017-05-27
 
 - No autocompletion menu in case of a single match

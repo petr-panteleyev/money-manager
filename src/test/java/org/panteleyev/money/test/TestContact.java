@@ -77,10 +77,10 @@ public class TestContact extends BaseTest {
         String country = UUID.randomUUID().toString();
         String zip = UUID.randomUUID().toString();
 
-        Contact c1 = new Contact(id, name, type, phone, mobile, email, web,
+        Contact c1 = new Contact(id, name, type.getId(), phone, mobile, email, web,
                 comment, street, city, country, zip);
 
-        Contact c2 = new Contact(id, name, type, phone, mobile, email, web,
+        Contact c2 = new Contact(id, name, type.getId(), phone, mobile, email, web,
                 comment, street, city, country, zip);
 
         Assert.assertEquals(c1, c2);

@@ -36,7 +36,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     public static final class Builder {
         private int    id;
-        private ContactType type;
+        private int    typeId;
         private String name;
         private String comment;
         private String email;
@@ -49,13 +49,13 @@ public class Contact implements Record, Named, Comparable<Contact> {
         private String zip;
 
         public Builder() {
-            type = ContactType.PERSONAL;
+            typeId = ContactType.PERSONAL.getId();
         }
 
         public Builder(Contact contact) {
             if (contact != null) {
                 this.id = contact.getId();
-                this.type = contact.getType();
+                this.typeId = contact.getTypeId();
                 this.name = contact.getName();
                 this.comment = contact.getComment();
                 this.email = contact.getEmail();
@@ -79,7 +79,12 @@ public class Contact implements Record, Named, Comparable<Contact> {
         }
 
         public Builder type(ContactType type) {
-            this.type = type;
+            this.typeId = type.getId();
+            return this;
+        }
+
+        public Builder typeId(int typeId) {
+            this.typeId = typeId;
             return this;
         }
 
@@ -137,13 +142,12 @@ public class Contact implements Record, Named, Comparable<Contact> {
             if (id == 0) {
                 throw new IllegalStateException("Contact.id == 0");
             }
-            Objects.requireNonNull(type);
             Objects.requireNonNull(name);
 
             return new Contact(
                     id,
                     name,
-                    type,
+                    typeId,
                     phone,
                     mobile,
                     email,
@@ -158,7 +162,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     private final int    id;
     private final String name;
-    private final ContactType type;
+    private final int    typeId;
     private final String comment;
     private final String email;
     private final String web;
@@ -169,11 +173,13 @@ public class Contact implements Record, Named, Comparable<Contact> {
     private final String country;
     private final String zip;
 
+    private final ContactType type;
+
     @RecordBuilder
     public Contact(
             @Field(Field.ID) int id,
             @Field("name") String name,
-            @Field("type") ContactType type,
+            @Field("type_id") int typeId,
             @Field("phone") String phone,
             @Field("mobile") String mobile,
             @Field("email") String email,
@@ -186,7 +192,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
     ) {
         this.id = id;
         this.name = name;
-        this.type = type;
+        this.typeId = typeId;
         this.phone = phone;
         this.mobile = mobile;
         this.email = email;
@@ -196,6 +202,8 @@ public class Contact implements Record, Named, Comparable<Contact> {
         this.city = city;
         this.country = country;
         this.zip = zip;
+
+        this.type = ContactType.get(typeId);
     }
 
     @Field(value = Field.ID, primaryKey = true)
@@ -210,7 +218,11 @@ public class Contact implements Record, Named, Comparable<Contact> {
         return name;
     }
 
-    @Field(value = "type", nullable=false)
+    @Field(value = "type_id", nullable=false)
+    public int getTypeId() {
+        return typeId;
+    }
+
     public ContactType getType() {
         return type;
     }
@@ -270,7 +282,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
             Contact that = (Contact)obj;
             return this.id == that.id
                     && Objects.equals(this.name, that.name)
-                    && Objects.equals(this.type, that.type)
+                    && this.typeId == that.typeId
                     && Objects.equals(this.comment, that.comment)
                     && Objects.equals(this.email, that.email)
                     && Objects.equals(this.web, that.web)
@@ -287,7 +299,7 @@ public class Contact implements Record, Named, Comparable<Contact> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, comment, email, web, phone, mobile, street, city, country, zip);
+        return Objects.hash(id, name, typeId, comment, email, web, phone, mobile, street, city, country, zip);
     }
 
     @Override

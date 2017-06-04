@@ -36,7 +36,7 @@ import javafx.scene.layout.VBox;
 import org.panteleyev.utilities.fx.BaseDialog;
 
 class AboutDialog extends BaseDialog implements Styles, Images {
-    private final static String APP_TITLE = "Money Manager";
+    final static String APP_TITLE = "Money Manager";
 
     private final Label label_1 = new Label(APP_TITLE);
     private final Label label_2 = new Label("Copyright (c) 2016, 2017, Petr Panteleyev");

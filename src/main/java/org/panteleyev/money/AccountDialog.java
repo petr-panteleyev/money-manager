@@ -132,7 +132,7 @@ final class AccountDialog extends BaseDialog<Account.Builder> implements Styles 
 
             if (initialCategory != null) {
                 typeComboBox.getSelectionModel()
-                        .select(initialCategory.getCatType());
+                        .select(initialCategory.getType());
                 onCategoryTypeSelected();
                 categoryComboBox.getSelectionModel()
                         .select(dao.getCategory(initialCategory.getId()).orElse(null));
@@ -185,7 +185,7 @@ final class AccountDialog extends BaseDialog<Account.Builder> implements Styles 
         CategoryType type = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<Category> filtered = categories.stream()
-                .filter(x -> x.getCatType().equals(type))
+                .filter(x -> x.getType().equals(type))
                 .collect(Collectors.toList());
 
         categoryComboBox.setItems(FXCollections.observableArrayList(filtered));

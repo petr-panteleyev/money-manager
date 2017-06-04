@@ -85,6 +85,9 @@ public enum TransactionType implements Named, Comparable<TransactionType> {
     }
 
     public static TransactionType get(int id) {
+        if (id == 0) {
+            throw new IllegalArgumentException();
+        }
         return Arrays.stream(values())
                 .filter(v -> v.getId() == id)
                 .findAny()

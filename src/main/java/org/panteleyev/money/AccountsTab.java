@@ -104,7 +104,6 @@ class AccountsTab extends BorderPane {
         if (selectedAccount != null) {
             List<Transaction> transactions = MoneyDAO.getInstance()
                     .getTransactions(selectedAccount)
-                    .stream()
                     .filter(filter)
                     .collect(Collectors.toList());
 

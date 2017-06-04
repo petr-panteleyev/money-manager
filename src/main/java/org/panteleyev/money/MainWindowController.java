@@ -42,12 +42,12 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.MySQLBuilder;
 import org.panteleyev.utilities.fx.Controller;
 import org.panteleyev.utilities.fx.WindowManager;
 import javax.sql.DataSource;
@@ -116,9 +116,9 @@ public class MainWindowController extends BaseController {
     private void initialize() {
         // Main menu
         MenuItem m1 = new MenuItem(rb.getString("menu.File.New"));
-        m1.setOnAction((ae) -> onNew());
+        m1.setOnAction((ae) -> onNewConnection());
         MenuItem m2 = new MenuItem(rb.getString("menu.File.Open"));
-        m2.setOnAction((ae) -> onOpen());
+        m2.setOnAction((ae) -> onOpenConnection());
         MenuItem m3 = new MenuItem(rb.getString("menu.File.Close"));
         m3.setOnAction((ae) -> onClose());
         MenuItem m4 = new MenuItem(rb.getString("menu.File.Exit"));
@@ -212,23 +212,49 @@ public class MainWindowController extends BaseController {
 
         File file;
 
+        /*
+         * Application parameters:
+         * --host=<host>
+         * --port=<port>
+         * --user=<user>
+         * --password=<password>
+         * --name=<name>
+         */
         Application.Parameters params = MoneyApplication.getApplication().getParameters();
-        String fileName = params.getNamed().get("file");
-        if (fileName != null && !fileName.isEmpty()) {
-            file = new File(fileName);
-            if (file.exists()) {
-                open(file, false);
-            } else {
-                newFile(file, false);
+        String name = params.getNamed().get("name");
+        if (name != null) {
+            // check mandatory parameters
+            String host = params.getNamed().getOrDefault("host", "localhost");
+            int port = Integer.parseInt(params.getNamed().getOrDefault("port", "3306"));
+            String user = params.getNamed().get("user");
+            String password = params.getNamed().getOrDefault("password", "");
+
+            if (user == null) {
+                throw new IllegalArgumentException("User name cannot be empty");
             }
+
+            MySQLBuilder builder = new MySQLBuilder()
+                    .host(host)
+                    .port(port)
+                    .user(user)
+                    .password(password)
+                    .name(name);
+            open(builder, false);
         } else {
-            file = Options.getDbFile();
-            if (file != null) {
-                if (file.exists()) {
-                    open(file, false);
-                } else {
-                    Options.setDbFile(null);
-                }
+            if (Options.getAutoConnect()) {
+                String host = Options.getDatabaseHost();
+                int port = Options.getDatabasePort();
+                String user = Options.getDatabaseUser();
+                String password = Options.getDatabasePassword();
+                name = Options.getDatabaseName();
+
+                MySQLBuilder builder = new MySQLBuilder()
+                        .host(host)
+                        .port(port)
+                        .user(user)
+                        .password(password)
+                        .name(name);
+                open(builder, false);
             }
         }
     }
@@ -273,35 +299,19 @@ public class MainWindowController extends BaseController {
         stage.toFront();
     }
 
-    private void onNew() {
-        FileChooser d = new FileChooser();
-        d.setTitle("New Database File");
-        d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
-        );
-        File file = d.showSaveDialog(null);
-        newFile(file, true);
-    }
-
-    private void newFile(File file, boolean overwriteOption) {
-        if (overwriteOption) {
-            Options.setDbFile(file);
-        }
-
-        if (file != null) {
-            DataSource ds = new MoneyDAO.Builder()
-                .file(file.getAbsolutePath())
-                .build();
+    private void onNewConnection() {
+        new ConnectionDialog(true).showAndWait().ifPresent(builder -> {
+            DataSource ds = builder.build();
 
             CompletableFuture.runAsync(() -> {
-                MoneyDAO dao = MoneyDAO.initialize(ds);
-                dao.createTables();
-                dao.preload();
+               MoneyDAO dao = MoneyDAO.initialize(ds);
+               dao.createTables();
+               dao.preload();
             }).thenRun(() -> Platform.runLater(() -> {
-                setTitle(file);
+                setTitle(AboutDialog.APP_TITLE + " - " + builder.connectionString());
                 dbOpenProperty.set(true);
             }));
-        }
+        });
     }
 
     public void onClose() {
@@ -310,36 +320,35 @@ public class MainWindowController extends BaseController {
 
         tabPane.getSelectionModel().select(0);
 
+        setTitle(AboutDialog.APP_TITLE);
         MoneyDAO.initialize(null);
-        Options.setDbFile(null);
         dbOpenProperty.set(false);
     }
 
-    private void onOpen() {
-        FileChooser d = new FileChooser();
-        d.setTitle("Database File");
-        d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("SQLite Database", "*.db")
-        );
-        File file = d.showOpenDialog(null);
-        open(file, true);
+    private void onOpenConnection() {
+        new ConnectionDialog(false).showAndWait().ifPresent(builder -> {
+            open(builder, true);
+        });
     }
 
-    private void open(File file, boolean overwriteOption) {
+    private void open(MySQLBuilder builder, boolean overwriteOption) {
         if (overwriteOption) {
-            Options.setDbFile(file);
+            Options.putDatabaseHost(builder.host());
+            Options.putDatabasePort(builder.port());
+            Options.putDatabaseUser(builder.user());
+            Options.putDatabasePassword(builder.password());
+            Options.putDatabaseName(builder.name());
         }
 
-        if (file != null) {
-            DataSource ds = new MoneyDAO.Builder()
-                    .file(file.getAbsolutePath())
-                    .build();
+        if (builder != null) {
+            DataSource ds = builder.build();
+
             MoneyDAO.initialize(ds);
 
             CompletableFuture
                     .runAsync(() -> MoneyDAO.getInstance().preload())
                     .thenRun(() -> Platform.runLater(() -> {
-                        setTitle(file);
+                        setTitle(AboutDialog.APP_TITLE + " - " + builder.connectionString());
                         dbOpenProperty.set(true);
                     }));
         }
@@ -354,8 +363,8 @@ public class MainWindowController extends BaseController {
         d.showAndWait();
     }
 
-    private void setTitle(File file) {
-        getStage().setTitle(getTitle() + " - " + file.getAbsolutePath());
+    private void setTitle(String title) {
+        getStage().setTitle(title);
     }
 
     private void onWindowClosing() {

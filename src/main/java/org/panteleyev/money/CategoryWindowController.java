@@ -121,11 +121,11 @@ public class CategoryWindowController extends BaseController {
         updateList();
 
         colType.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getCatType().getName()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getType().getName()));
         colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getName()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getName()));
         colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getComment()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
 
         colType.setSortable(true);
         categoryTable.getSortOrder().addAll(colType);

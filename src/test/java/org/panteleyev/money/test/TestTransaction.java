@@ -45,7 +45,7 @@ public class TestTransaction extends BaseTest {
                 .id(original.getId())
                 .name(original.getName())
                 .comment(original.getComment())
-                .type(original.getCatType())
+                .type(original.getType())
                 .expanded(original.isExpanded());
 
         Assert.assertEquals(emptyBuilder.id(), original.getId());
@@ -63,8 +63,8 @@ public class TestTransaction extends BaseTest {
         CategoryType type = randomCategoryType();
         Boolean expanded = RANDOM.nextBoolean();
 
-        Category c1 = new Category(id, name, comment, type, expanded);
-        Category c2 = new Category(id, name, comment, type, expanded);
+        Category c1 = new Category(id, name, comment, type.getId(), expanded);
+        Category c2 = new Category(id, name, comment, type.getId(), expanded);
 
         Assert.assertEquals(c1, c2);
         Assert.assertEquals(c1.hashCode(), c2.hashCode());

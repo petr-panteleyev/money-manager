@@ -23,17 +23,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.Objects;
 import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.Objects;
 
 @Table("transact")
 public class Transaction implements Record {
@@ -62,13 +61,13 @@ public class Transaction implements Record {
         private int             day;
         private int             month;
         private int             year;
-        private TransactionType transactionType;
+        private int             transactionTypeId;
         private String          comment;
         private boolean         checked;
         private int             accountDebitedId;
         private int             accountCreditedId;
-        private CategoryType    accountDebitedType;
-        private CategoryType    accountCreditedType;
+        private int             accountDebitedTypeId;
+        private int             accountCreditedTypeId;
         private int             accountDebitedCategoryId;
         private int             accountCreditedCategoryId;
         private int             groupId;
@@ -94,13 +93,13 @@ public class Transaction implements Record {
                 this.day = t.getDay();
                 this.month = t.getMonth();
                 this.year = t.getYear();
-                this.transactionType = t.getTransactionType();
+                this.transactionTypeId = t.getTransactionTypeId();
                 this.comment = t.getComment();
                 this.checked = t.isChecked();
                 this.accountDebitedId = t.getAccountDebitedId();
                 this.accountCreditedId = t.getAccountCreditedId();
-                this.accountDebitedType = t.getAccountDebitedType();
-                this.accountCreditedType = t.getAccountCreditedType();
+                this.accountDebitedTypeId = t.getAccountDebitedTypeId();
+                this.accountCreditedTypeId = t.getAccountCreditedTypeId();
                 this.accountDebitedCategoryId = t.getAccountDebitedCategoryId();
                 this.accountCreditedCategoryId = t.getAccountCreditedCategoryId();
                 this.groupId = t.getGroupId();
@@ -140,8 +139,13 @@ public class Transaction implements Record {
             return this;
         }
 
+        public Builder transactionTypeId(int transactionTypeId) {
+            this.transactionTypeId = transactionTypeId;
+            return this;
+        }
+
         public Builder transactionType(TransactionType transactionType) {
-            this.transactionType = transactionType;
+            this.transactionTypeId = transactionType.getId();
             return this;
         }
 
@@ -173,13 +177,23 @@ public class Transaction implements Record {
             return accountCreditedId;
         }
 
+        public Builder accountDebitedTypeId(int accountDebitedTypeId) {
+            this.accountDebitedTypeId = accountDebitedTypeId;
+            return this;
+        }
+
         public Builder accountDebitedType(CategoryType accountDebitedType) {
-            this.accountDebitedType = accountDebitedType;
+            this.accountDebitedTypeId = accountDebitedType.getId();
+            return this;
+        }
+
+        public Builder accountCreditedTypeId(int accountCreditedTypeId) {
+            this.accountCreditedTypeId = accountCreditedTypeId;
             return this;
         }
 
         public Builder accountCreditedType(CategoryType accountCreditedType) {
-            this.accountCreditedType = accountCreditedType;
+            this.accountCreditedTypeId = accountCreditedType.getId();
             return this;
         }
 
@@ -219,18 +233,19 @@ public class Transaction implements Record {
         }
 
         public Transaction build() {
-            Objects.requireNonNull(transactionType);
+            if (transactionTypeId == 0) {
+                transactionTypeId = TransactionType.UNDEFINED.getId();
+            }
 
             if (id == 0
                     || accountDebitedId == 0
                     || accountCreditedId == 0
+                    || accountDebitedTypeId == 0
+                    || accountCreditedTypeId == 0
                     || accountDebitedCategoryId == 0
                     || accountCreditedCategoryId == 0) {
                 throw new IllegalStateException();
             }
-
-            Objects.requireNonNull(accountDebitedType);
-            Objects.requireNonNull(accountCreditedType);
 
             return new Transaction(
                     id,
@@ -238,13 +253,13 @@ public class Transaction implements Record {
                     day,
                     month,
                     year,
-                    transactionType,
+                    transactionTypeId,
                     comment,
                     checked,
                     accountDebitedId,
                     accountCreditedId,
-                    accountDebitedType,
-                    accountCreditedType,
+                    accountDebitedTypeId,
+                    accountCreditedTypeId,
                     accountDebitedCategoryId,
                     accountCreditedCategoryId,
                     groupId,
@@ -261,13 +276,13 @@ public class Transaction implements Record {
     private final int             day;
     private final int             month;
     private final int             year;
-    private final TransactionType transactionType;
+    private final int             transactionTypeId;
     private final String          comment;
     private final boolean         checked;
     private final int             accountDebitedId;
     private final int             accountCreditedId;
-    private final CategoryType    accountDebitedType;
-    private final CategoryType    accountCreditedType;
+    private final int             accountDebitedTypeId;
+    private final int             accountCreditedTypeId;
     private final int             accountDebitedCategoryId;
     private final int             accountCreditedCategoryId;
     private final int             groupId;
@@ -276,40 +291,44 @@ public class Transaction implements Record {
     private final int             rateDirection;
     private final String          invoiceNumber;
 
+    private final TransactionType transactionType;
+    private final CategoryType    accountDebitedType;
+    private final CategoryType    accountCreditedType;
+
     @RecordBuilder
     public Transaction(
-            @Field(Field.ID) int id,
-            @Field("amount") BigDecimal  amount,
-            @Field("date_day") int day,
-            @Field("date_month") int month,
-            @Field("date_year") int year,
-            @Field("transaction_type") TransactionType transactionType,
-            @Field("comment") String comment,
-            @Field("checked") boolean     checked,
-            @Field("account_debited_id") int accountDebitedId,
-            @Field("account_credited_id") int accountCreditedId,
-            @Field("account_debited_type") CategoryType     accountDebitedType,
-            @Field("account_credited_type") CategoryType     accountCreditedType,
-            @Field("account_debited_category_id") int accountDebitedCategoryId,
-            @Field("account_credited_category_id") int accountCreditedCategoryId,
-            @Field("group_id") int groupId,
-            @Field("contact_id") int contactId,
-            @Field("currency_rate") BigDecimal  rate,
-            @Field("rate_direction") int         rateDirection,
-            @Field("invoice_number") String      invoiceNumber
+            @Field(Field.ID)                        int         id,
+            @Field("amount")                        BigDecimal  amount,
+            @Field("date_day")                      int         day,
+            @Field("date_month")                    int         month,
+            @Field("date_year")                     int         year,
+            @Field("transaction_type_id")           int         transactionTypeId,
+            @Field("comment")                       String      comment,
+            @Field("checked")                       boolean     checked,
+            @Field("account_debited_id")            int         accountDebitedId,
+            @Field("account_credited_id")           int         accountCreditedId,
+            @Field("account_debited_type_id")       int         accountDebitedTypeId,
+            @Field("account_credited_type_id")      int         accountCreditedTypeId,
+            @Field("account_debited_category_id")   int         accountDebitedCategoryId,
+            @Field("account_credited_category_id")  int         accountCreditedCategoryId,
+            @Field("group_id")                      int         groupId,
+            @Field("contact_id")                    int         contactId,
+            @Field("currency_rate")                 BigDecimal  rate,
+            @Field("rate_direction")                int         rateDirection,
+            @Field("invoice_number")                String      invoiceNumber
     ) {
         this.id = id;
         this.amount = amount;
         this.day = day;
         this.month = month;
         this.year = year;
-        this.transactionType = transactionType;
+        this.transactionTypeId = transactionTypeId;
         this.comment = comment;
         this.checked = checked;
         this.accountDebitedId = accountDebitedId;
         this.accountCreditedId = accountCreditedId;
-        this.accountDebitedType = accountDebitedType;
-        this.accountCreditedType = accountCreditedType;
+        this.accountDebitedTypeId = accountDebitedTypeId;
+        this.accountCreditedTypeId = accountCreditedTypeId;
         this.accountDebitedCategoryId = accountDebitedCategoryId;
         this.accountCreditedCategoryId = accountCreditedCategoryId;
         this.groupId = groupId;
@@ -317,6 +336,10 @@ public class Transaction implements Record {
         this.rate = rate;
         this.rateDirection = rateDirection;
         this.invoiceNumber = invoiceNumber;
+
+        this.transactionType = TransactionType.get(transactionTypeId);
+        this.accountDebitedType = CategoryType.get(accountDebitedTypeId);
+        this.accountCreditedType = CategoryType.get(accountCreditedTypeId);
     }
 
     @Field(value = Field.ID, primaryKey = true)
@@ -345,7 +368,11 @@ public class Transaction implements Record {
         return year;
     }
 
-    @Field("transaction_type")
+    @Field("transaction_type_id")
+    public int getTransactionTypeId() {
+        return transactionTypeId;
+    }
+
     public TransactionType getTransactionType() {
         return transactionType;
     }
@@ -373,23 +400,29 @@ public class Transaction implements Record {
     }
 
     @Field(value = "group_id", nullable = false)
-    @ForeignKey(table=TransactionGroup.class)
     public int getGroupId() {
         return groupId;
     }
 
     @Field("contact_id")
-    @ForeignKey(table=Contact.class)
     public int getContactId() {
         return contactId;
     }
 
-    @Field(value = "account_debited_type", nullable=false)
+    @Field(value = "account_debited_type_id", nullable=false)
+    public int getAccountDebitedTypeId() {
+        return accountDebitedTypeId;
+    }
+
     public CategoryType getAccountDebitedType() {
         return accountDebitedType;
     }
 
-    @Field(value = "account_credited_type", nullable=false)
+    @Field(value = "account_credited_type_id", nullable=false)
+    public int getAccountCreditedTypeId() {
+        return accountCreditedTypeId;
+    }
+
     public CategoryType getAccountCreditedType() {
         return accountCreditedType;
     }

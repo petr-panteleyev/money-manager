@@ -24,51 +24,75 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.test;
+package org.panteleyev.money.persistence;
 
-import org.panteleyev.money.persistence.MoneyDAO;
-import org.panteleyev.money.persistence.MySQLBuilder;
-import org.testng.SkipException;
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import javax.sql.DataSource;
-import java.io.File;
-import java.sql.Connection;
-import java.sql.Statement;
 
-public class BaseDaoTest extends BaseTest {
-    private static String TEST_DB_NAME = "TestDB";
-
-    private MoneyDAO dao;
-    private DataSource dataSource;
+public class MySQLBuilder {
+    private String host = "localhost";
+    private int    port = 3306;
     private String dbName;
+    private String user;
+    private String password;
 
-    public void setupAndSkip() throws Exception {
-        dbName = System.getProperty("mysql.database", TEST_DB_NAME);
-        String host = System.getProperty("mysql.host", "localhost");
-        String user = System.getProperty("mysql.user");
-        String password = System.getProperty("mysql.password");
-
-        if (user == null || password == null) {
-            throw new SkipException("Test config is not set");
-        }
-
-        dataSource = new MySQLBuilder()
-                .host(host)
-                .user(user)
-                .password(password)
-                .build();
-
-        dao = MoneyDAO.initialize(dataSource);
+    public DataSource build() {
+        MysqlDataSource ds = new MysqlDataSource();
+        ds.setEncoding("utf8");
+        ds.setPort(port);
+        ds.setServerName(host);
+        ds.setUser(user);
+        ds.setPassword(password);
+        ds.setDatabaseName(dbName);
+        return ds;
     }
 
-    public void cleanup() throws Exception {
+    public MySQLBuilder host(String host) {
+        this.host = host;
+        return this;
     }
 
-    MoneyDAO getDao() {
-        return dao;
+    public String host() {
+        return host;
     }
 
-    void initializeEmptyMoneyFile() throws Exception {
-        dao.createTables();
-        dao.preload();
+    public MySQLBuilder port(int port) {
+        this.port = port;
+        return this;
+    }
+
+    public int port() {
+        return port;
+    }
+
+    public MySQLBuilder name(String name) {
+        this.dbName = name;
+        return this;
+    }
+
+    public MySQLBuilder user(String user) {
+        this.user = user;
+        return this;
+    }
+
+    public String user() {
+        return user;
+    }
+
+    public MySQLBuilder password(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public String password() {
+        return password;
+    }
+
+    public String name() {
+        return dbName;
+    }
+
+    public String connectionString() {
+        return "mysql://" + host + ":" + port + "/" + dbName;
     }
 }

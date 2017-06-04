@@ -76,10 +76,10 @@ public class TestAccount extends BaseTest {
         Boolean enabled = RANDOM.nextBoolean();
 
         Account a1 = new Account(
-                id, name, comment, opening, limit, rate, type, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type.getId(), categoryId, currencyId, enabled
         );
         Account a2 = new Account(
-                id, name, comment, opening, limit, rate, type, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type.getId(), categoryId, currencyId, enabled
         );
 
         Assert.assertEquals(a1, a2);

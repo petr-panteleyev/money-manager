@@ -27,6 +27,7 @@ package org.panteleyev.money;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -38,6 +39,7 @@ class OptionsDialog extends BaseDialog<ButtonType> {
 
     private final ChoiceBox<Integer> autoCompleteLength =
             new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
+    private final CheckBox autoConnectCheck = new CheckBox(rb.getString("connect.Dialog.autoCheck"));
 
     OptionsDialog() {
         super(MainWindowController.DIALOGS_CSS);
@@ -48,6 +50,8 @@ class OptionsDialog extends BaseDialog<ButtonType> {
         pane.getStyleClass().add(Styles.GRID_PANE);
 
         pane.addRow(0, new Label(rb.getString("options.Dialog.Prefix.Length")), autoCompleteLength);
+        pane.addRow(1, autoConnectCheck);
+        GridPane.setColumnSpan(autoConnectCheck, 2);
 
         getDialogPane().setContent(pane);
 
@@ -56,6 +60,7 @@ class OptionsDialog extends BaseDialog<ButtonType> {
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
                 Options.setAutoCompleteLength(autoCompleteLength.getValue());
+                Options.putAutoConnect(autoConnectCheck.isSelected());
             }
             return param;
         });
@@ -63,5 +68,6 @@ class OptionsDialog extends BaseDialog<ButtonType> {
 
     private void initControls() {
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
+        autoConnectCheck.setSelected(Options.getAutoConnect());
     }
 }

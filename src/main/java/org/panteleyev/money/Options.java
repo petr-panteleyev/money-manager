@@ -34,7 +34,13 @@ class Options {
     private static final int    AUTO_COMPLETE_LENGTH = 3;
 
     private enum Option {
-        DB_FILE("dbFile"),
+        DB_USER("dbUser"),
+        DB_PASSWORD("dbPassword"),
+        DB_HOST("dbHost"),
+        DB_PORT("dbPort"),
+        DB_NAME("dbName"),
+        DB_AUTO("dbAuto"),
+
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts"),
         MAIN_WINDOW_WIDTH("mainWindowWidth"),
         MAIN_WINDOW_HEIGHT("mainWindowHeight"),
@@ -55,15 +61,6 @@ class Options {
 
     // Cached values
     private static int autoCompleteLength = AUTO_COMPLETE_LENGTH;
-
-    static void setDbFile(File file) {
-        PREFS.put(Option.DB_FILE.toString(), (file == null)? "" : file.getAbsolutePath());
-    }
-
-    static File getDbFile() {
-        String path = PREFS.get(Option.DB_FILE.toString(), null);
-        return (path == null || path.isEmpty()) ? null : new File(path);
-    }
 
     static void setShowDeactivatedAccounts(boolean show) {
         PREFS.putBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), show);
@@ -96,6 +93,56 @@ class Options {
     static void setAutoCompleteLength(int x) {
         autoCompleteLength = x;
         PREFS.putInt(Option.AUTO_COMPLETE_LENGTH.toString(), x);
+    }
+
+    // DB
+
+    static void putDatabaseHost(String host) {
+        PREFS.put(Option.DB_HOST.toString(), host);
+    }
+
+    static String getDatabaseHost() {
+        return PREFS.get(Option.DB_HOST.toString(), "localhost");
+    }
+
+    static void putDatabasePort(int port) {
+        PREFS.putInt(Option.DB_PORT.toString(), port);
+    }
+
+    static int getDatabasePort() {
+        return PREFS.getInt(Option.DB_PORT.toString(), 3306);
+    }
+
+    static void putDatabaseUser(String user) {
+        PREFS.put(Option.DB_USER.toString(), user);
+    }
+
+    static String getDatabaseUser() {
+        return PREFS.get(Option.DB_USER.toString(), "");
+    }
+
+    static void putDatabasePassword(String password) {
+        PREFS.put(Option.DB_PASSWORD.toString(), password);
+    }
+
+    static String getDatabasePassword() {
+        return PREFS.get(Option.DB_PASSWORD.toString(), "");
+    }
+
+    static void putDatabaseName(String name) {
+        PREFS.put(Option.DB_NAME.toString(), name);
+    }
+
+    static String getDatabaseName() {
+        return PREFS.get(Option.DB_NAME.toString(), "");
+    }
+
+    static void putAutoConnect(boolean autoConnect) {
+        PREFS.putBoolean(Option.DB_AUTO.toString(), autoConnect);
+    }
+
+    static boolean getAutoConnect() {
+        return PREFS.getBoolean(Option.DB_AUTO.toString(), false);
     }
 
     static {

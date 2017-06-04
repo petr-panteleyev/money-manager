@@ -5,11 +5,11 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -30,14 +30,13 @@ import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
-import java.util.Optional;
 
 @Table("category")
 public class Category implements Record, Named {
     public static class Builder {
-        private int id;
+        private int     id;
         private String  name;
-        private CategoryType type;
+        private int     typeId;
         private String  comment;
         private boolean expanded;
 
@@ -51,7 +50,7 @@ public class Category implements Record, Named {
             if (c != null) {
                 this.id = c.getId();
                 this.name = c.getName();
-                this.type = c.getCatType();
+                this.typeId = c.getCatTypeId();
                 this.comment = c.getComment();
                 this.expanded = c.isExpanded();
             }
@@ -71,8 +70,8 @@ public class Category implements Record, Named {
             return this;
         }
 
-        public Builder type(CategoryType type) {
-            this.type = type;
+        public Builder typeId(int typeId) {
+            this.typeId = typeId;
             return this;
         }
 
@@ -86,37 +85,45 @@ public class Category implements Record, Named {
             return this;
         }
 
+        public Builder type(CategoryType type) {
+            this.typeId = type.getId();
+            return this;
+        }
+
         public Category build() {
             if (id == 0) {
                 throw new IllegalStateException("Category.id == 0");
             }
 
             Objects.requireNonNull(name);
-            Objects.requireNonNull(type);
 
-            return new Category(id, name, comment, type, expanded);
+            return new Category(id, name, comment, typeId, expanded);
         }
     }
 
-    private final int id;
+    private final int     id;
     private final String  name;
     private final String  comment;
-    private final CategoryType catType;
+    private final int     catTypeId;
     private final boolean expanded;
+
+    private final CategoryType type;
 
     @RecordBuilder
     public Category(
             @Field(Field.ID) int id,
             @Field("name") String name,
             @Field("comment") String comment,
-            @Field("cat_type") CategoryType catType,
+            @Field("type_id") int catTypeId,
             @Field("expanded") boolean expanded
     ) {
         this.id = id;
         this.name = name;
         this.comment = comment;
-        this.catType = catType;
+        this.catTypeId = catTypeId;
         this.expanded = expanded;
+
+        this.type = CategoryType.get(catTypeId);
     }
 
     @Field(value = Field.ID, primaryKey = true)
@@ -136,9 +143,9 @@ public class Category implements Record, Named {
         return comment;
     }
 
-    @Field(value = "cat_type", nullable=false)
-    public CategoryType getCatType() {
-        return catType;
+    @Field(value = "type_id", nullable=false)
+    public int getCatTypeId() {
+        return catTypeId;
     }
 
     @Field("expanded")
@@ -147,7 +154,11 @@ public class Category implements Record, Named {
     }
 
     public Category expand(boolean exp) {
-        return new Category(id, name, comment, catType, exp);
+        return new Category(id, name, comment, catTypeId, exp);
+    }
+
+    public CategoryType getType() {
+        return type;
     }
 
     @Override
@@ -161,7 +172,7 @@ public class Category implements Record, Named {
             return this.id == that.id
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.comment, that.comment)
-                    && Objects.equals(this.catType, that.catType)
+                    && this.catTypeId == that.catTypeId
                     && this.expanded == that.expanded;
         } else {
             return false;
@@ -170,6 +181,6 @@ public class Category implements Record, Named {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, catType, expanded);
+        return Objects.hash(id, name, comment, catTypeId, expanded);
     }
 }

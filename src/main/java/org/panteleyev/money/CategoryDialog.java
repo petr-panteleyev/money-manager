@@ -83,7 +83,7 @@ class CategoryDialog extends BaseDialog<Category.Builder> implements Styles {
 
         if (category != null) {
             Optional<CategoryType> type = list.stream()
-                .filter(x -> x.equals(category.getCatType()))
+                .filter(x -> x.equals(category.getType()))
                 .findFirst();
             type.ifPresent(categoryType -> typeComboBox.getSelectionModel().select(categoryType));
             nameEdit.setText(category.getName());

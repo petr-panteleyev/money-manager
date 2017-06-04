@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.persistence.Account;
@@ -51,13 +50,13 @@ public class TestEquals extends BaseTest {
                 false
             },
             {
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type.getId(), 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type.getId(), 12, 13, true),
                 true
             },
             {
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, true),
-                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type, 12, 13, false),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type.getId(), 12, 13, true),
+                new Account(10, "Account name", "Account comment", new BigDecimal("10.23"), new BigDecimal("100.23"), new BigDecimal("10.23"), type.getId(), 12, 13, false),
                 false
             },
         };

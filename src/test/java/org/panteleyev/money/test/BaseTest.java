@@ -68,7 +68,7 @@ class BaseTest {
                 new BigDecimal(RANDOM.nextDouble()),
                 new BigDecimal(RANDOM.nextDouble()),
                 new BigDecimal(RANDOM.nextDouble()),
-                type,
+                type.getId(),
                 categoryId,
                 currencyId,
                 RANDOM.nextBoolean()
@@ -84,7 +84,7 @@ class BaseTest {
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                type,
+                type.getId(),
                 RANDOM.nextBoolean()
         );
     }
@@ -116,7 +116,7 @@ class BaseTest {
         return new Contact(
                 id,
                 UUID.randomUUID().toString(),
-                randomContactType(),
+                randomContactType().getId(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
@@ -158,13 +158,13 @@ class BaseTest {
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
-                type,
+                type.getId(),
                 UUID.randomUUID().toString(),
                 RANDOM.nextBoolean(),
                 accountDebitedId,
                 accountCreditedId,
-                accountDebitedType,
-                accountCreditedType,
+                accountDebitedType.getId(),
+                accountCreditedType.getId(),
                 accountDebitedCategoryId,
                 accountCreditedCategoryId,
                 groupId,

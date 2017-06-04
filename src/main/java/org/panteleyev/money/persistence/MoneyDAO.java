@@ -28,23 +28,19 @@ package org.panteleyev.money.persistence;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import org.panteleyev.persistence.DAO;
 import org.panteleyev.persistence.Record;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javafx.collections.ObservableMap;
 
 public class MoneyDAO extends DAO {
     private static final MoneyDAO INSTANCE = new MoneyDAO();
@@ -80,7 +76,7 @@ public class MoneyDAO extends DAO {
     }
 
     public static MoneyDAO initialize(DataSource ds) {
-        INSTANCE.setDatasource(ds);
+        INSTANCE.setDataSource(ds);
         return INSTANCE;
     }
 
@@ -89,8 +85,8 @@ public class MoneyDAO extends DAO {
     }
 
     @Override
-    protected void setDatasource(DataSource ds) {
-        super.setDatasource(ds);
+    public void setDataSource(DataSource ds) {
+        super.setDataSource(ds);
 
         preloadingProperty.set(true);
         categoriesMap.clear();
@@ -140,7 +136,7 @@ public class MoneyDAO extends DAO {
         List<CategoryType> typeList = Arrays.asList(types);
 
         return getCategories().stream()
-                .filter(c -> typeList.contains(c.getCatType()))
+                .filter(c -> typeList.contains(c.getType()))
                 .collect(Collectors.toList());
     }
 
@@ -345,12 +341,11 @@ public class MoneyDAO extends DAO {
                 .collect(Collectors.toList());
     }
 
-    public List<Transaction> getTransactions(Account account) {
+    public Stream<Transaction> getTransactions(Account account) {
         int id = account.getId();
 
         return getTransactions().stream()
-                .filter(t -> t.getAccountDebitedId() == id || t.getAccountCreditedId() == id)
-                .collect(Collectors.toList());
+                .filter(t -> t.getAccountDebitedId() == id || t.getAccountCreditedId() == id);
     }
 
     public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
@@ -423,20 +418,5 @@ public class MoneyDAO extends DAO {
 
     public static boolean isOpen() {
         return getInstance() != null && getInstance().getDataSource() != null;
-    }
-
-    /**
-     * Special insert method that call no listeners. Used for database import.
-     * @param record record
-     */
-    public void directInsert(Record record) {
-        Objects.requireNonNull(record.getId());
-
-        try (Connection conn = getDataSource().getConnection();
-             PreparedStatement ps = getPreparedStatement(record, conn, false)) {
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }

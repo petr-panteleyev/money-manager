@@ -23,7 +23,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package org.panteleyev.money.persistence;
 
 import java.math.BigDecimal;
@@ -33,7 +32,7 @@ import org.panteleyev.persistence.Record;
 import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.ReferenceType;
+import org.panteleyev.persistence.annotations.ReferenceOption;
 import org.panteleyev.persistence.annotations.Table;
 
 @Table("account")
@@ -57,7 +56,7 @@ public class Account implements Record, Named, Comparable<Account> {
         private BigDecimal   openingBalance;
         private BigDecimal   accountLimit;
         private BigDecimal   currencyRate;
-        private CategoryType type;
+        private int          typeId;
         private int          categoryId;
         private int          currencyId;
         private boolean      enabled;
@@ -79,7 +78,7 @@ public class Account implements Record, Named, Comparable<Account> {
                 this.openingBalance = a.getOpeningBalance();
                 this.accountLimit = a.getAccountLimit();
                 this.currencyRate = a.getCurrencyRate();
-                this.type = a.getType();
+                this.typeId = a.getTypeId();
                 this.categoryId = a.getCategoryId();
                 this.currencyId = a.getCurrencyId();
                 this.enabled = a.isEnabled();
@@ -120,8 +119,13 @@ public class Account implements Record, Named, Comparable<Account> {
             return this;
         }
 
+        public Builder typeId(int typeId) {
+            this.typeId = typeId;
+            return this;
+        }
+
         public Builder type(CategoryType type) {
-            this.type = type;
+            this.typeId = type.getId();
             return this;
         }
 
@@ -142,7 +146,6 @@ public class Account implements Record, Named, Comparable<Account> {
 
         public Account build() {
             Objects.requireNonNull(name);
-            Objects.requireNonNull(type);
 
             if (id == 0 || categoryId == 0) {
                 throw new IllegalStateException();
@@ -157,7 +160,7 @@ public class Account implements Record, Named, Comparable<Account> {
                     openingBalance,
                     accountLimit,
                     currencyRate,
-                    type,
+                    typeId,
                     categoryId,
                     currencyId,
                     enabled
@@ -171,10 +174,12 @@ public class Account implements Record, Named, Comparable<Account> {
     private final BigDecimal   openingBalance;
     private final BigDecimal   accountLimit;
     private final BigDecimal   currencyRate;
-    private final CategoryType type;
+    private final int          typeId;
     private final int          categoryId;
     private final int          currencyId;
     private final boolean      enabled;
+
+    private final CategoryType type;
 
     @RecordBuilder
     public Account(
@@ -184,7 +189,7 @@ public class Account implements Record, Named, Comparable<Account> {
             @Field("opening") BigDecimal openingBalance,
             @Field("acc_limit") BigDecimal accountLimit,
             @Field("currency_rate") BigDecimal currencyRate,
-            @Field("type") CategoryType type,
+            @Field("type_id") int typeId,
             @Field("category_id") int categoryId,
             @Field("currency_id") int currencyId,
             @Field("enabled") boolean enabled
@@ -195,10 +200,12 @@ public class Account implements Record, Named, Comparable<Account> {
         this.openingBalance = openingBalance;
         this.accountLimit = accountLimit;
         this.currencyRate = currencyRate;
-        this.type = type;
+        this.typeId = typeId;
         this.categoryId = categoryId;
         this.currencyId = currencyId;
         this.enabled = enabled;
+
+        this.type = CategoryType.get(typeId);
     }
 
     @Field(value = Field.ID, primaryKey = true)
@@ -223,19 +230,22 @@ public class Account implements Record, Named, Comparable<Account> {
         return openingBalance;
     }
 
-    @Field(value = "type", nullable=false)
+    @Field(value = "type_id", nullable=false)
+    public int getTypeId() {
+        return typeId;
+    }
+
     public CategoryType getType() {
         return type;
     }
 
     @Field(value = "category_id", nullable=false)
-    @ForeignKey(table=Category.class, onDelete=ReferenceType.CASCADE)
+    @ForeignKey(table=Category.class, onDelete= ReferenceOption.CASCADE)
     public int getCategoryId() {
         return categoryId;
     }
 
     @Field("currency_id")
-    @ForeignKey(table=Currency.class, onDelete=ReferenceType.CASCADE)
     public int getCurrencyId() {
         return currencyId;
     }
@@ -257,7 +267,7 @@ public class Account implements Record, Named, Comparable<Account> {
 
     public Account enable(boolean enable) {
         return new Account(id, name, comment, openingBalance, accountLimit, currencyRate,
-                type, categoryId, currencyId, enable);
+                typeId, categoryId, currencyId, enable);
     }
 
     @Override
@@ -274,7 +284,7 @@ public class Account implements Record, Named, Comparable<Account> {
                     && Objects.equals(this.openingBalance, that.openingBalance)
                     && Objects.equals(this.accountLimit, that.accountLimit)
                     && Objects.equals(this.currencyRate, that.currencyRate)
-                    && Objects.equals(this.type, that.type)
+                    && this.typeId == that.typeId
                     && this.categoryId == that.categoryId
                     && this.currencyId == that.currencyId
                     && this.enabled == that.enabled;
@@ -285,7 +295,7 @@ public class Account implements Record, Named, Comparable<Account> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, openingBalance, accountLimit, currencyRate, type, categoryId,
+        return Objects.hash(id, name, comment, openingBalance, accountLimit, currencyRate, typeId, categoryId,
                 currencyId, enabled);
     }
 

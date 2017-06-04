@@ -52,7 +52,6 @@ import org.panteleyev.money.persistence.TransactionFilter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -77,13 +76,12 @@ public class AccountTree extends BorderPane implements Styles {
         @Override
         protected void updateItem(Account account, boolean empty) {
             super.updateItem(account, empty);
-            this.setAlignment(Pos.CENTER_RIGHT);
+            setAlignment(Pos.CENTER_RIGHT);
+
             if (empty || account == null) {
                 setText("");
             } else {
-                List<Transaction> transactions = MoneyDAO.getInstance().getTransactions(account);
-
-                BigDecimal sum = transactions.stream()
+                BigDecimal sum = MoneyDAO.getInstance().getTransactions(account)
                         .filter(filter)
                         .map(t -> {
                             BigDecimal amount = t.getAmount();
