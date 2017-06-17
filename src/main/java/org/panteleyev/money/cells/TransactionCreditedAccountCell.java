@@ -23,26 +23,26 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.money;
+package org.panteleyev.money.cells;
 
-public interface Styles {
-    int BIG_SPACING = 5;
-    int SMALL_SPACING = 2;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.SplitTransaction;
+import org.panteleyev.money.persistence.Transaction;
 
-    String BLACK_TEXT   = "blackText";
-    String RED_TEXT     = "redText";
-    String BLUE_TEXT    = "blueText";
-    String GROUP_CELL   = "groupCell";
-    String GROUP_MEMBER_CELL = "groupMemberCell";
-    String TRANSACTION_CELL = "transactionCell";
-
-    String GRID_PANE    = "gridPane";
-
-    // About Dialog
-    String ABOUT_APP_TITLE_LABEL = "aboutAppNameLabel";
-    String ABOUT_LABEL  = "aboutLabel";
-
-    // Transaction Editor
-    String RATE_LABEL = "rateLabel";
-    String SUB_LABEL = "subLabel";
+public class TransactionCreditedAccountCell extends TableCell<Transaction, Transaction> {
+    @Override
+    protected void updateItem(Transaction transaction, boolean empty) {
+        super.updateItem(transaction, empty);
+        if (empty || transaction == null) {
+            setText("");
+        } else {
+            if (transaction instanceof SplitTransaction) {
+                setText(((SplitTransaction)transaction).getAccountCreditedString());
+            } else {
+                setText(MoneyDAO.getInstance().getAccount(transaction.getAccountCreditedId()).map(Account::getName).orElse(""));
+            }
+        }
+    }
 }

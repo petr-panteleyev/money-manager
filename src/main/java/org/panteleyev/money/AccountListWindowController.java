@@ -56,6 +56,7 @@ import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -66,8 +67,8 @@ public class AccountListWindowController extends BaseController {
 
     private final BorderPane         self = new BorderPane();
 
-    private final ChoiceBox          typeChoiceBox = new ChoiceBox();
-    private final ChoiceBox          categoryChoiceBox = new ChoiceBox();
+    private final ChoiceBox<Object>  typeChoiceBox = new ChoiceBox<>();
+    private final ChoiceBox<Object>  categoryChoiceBox = new ChoiceBox<>();
     private final CheckBox           showActiveCheckBox = new CheckBox(rb.getString("account.Window.ShowOnlyActive"));
     private final TableView<Account> accountListTable = new TableView<>();
 
@@ -127,8 +128,9 @@ public class AccountListWindowController extends BaseController {
         TableColumn<Account, BigDecimal> balanceColumn = new TableColumn<>(rb.getString("column.InitialBalance"));
         TableColumn<Account, CheckBox> activeColumn = new TableColumn<>("A");
 
-        accountListTable.getColumns().setAll(idColumn, nameColumn, typeColumn, categoryColumn,
-                currencyColumn, balanceColumn, activeColumn);
+        accountListTable.getColumns().setAll(Arrays.asList(
+                        idColumn, nameColumn, typeColumn, categoryColumn,
+                        currencyColumn, balanceColumn, activeColumn));
 
         // Content
         BorderPane pane = new BorderPane();
@@ -151,7 +153,7 @@ public class AccountListWindowController extends BaseController {
 
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        ObservableList types = FXCollections.observableArrayList(CategoryType.values());
+        ObservableList<Object> types = FXCollections.observableArrayList(CategoryType.values());
         if (!types.isEmpty()) {
             types.add(0, new Separator());
         }
@@ -160,7 +162,7 @@ public class AccountListWindowController extends BaseController {
         typeChoiceBox.setItems(types);
         typeChoiceBox.getSelectionModel().select(0);
 
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object object) {
                 if (object instanceof CategoryType) {
@@ -171,11 +173,9 @@ public class AccountListWindowController extends BaseController {
             }
         });
 
-        typeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            onTypeChanged(newValue);
-        });
+        typeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> onTypeChanged(newValue));
 
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object object) {
                 if (object instanceof Category) {
@@ -194,25 +194,25 @@ public class AccountListWindowController extends BaseController {
         showActiveCheckBox.setOnAction(event -> reloadAccounts());
 
         idColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Integer> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getId()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getId()));
         nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getName()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getName()));
 
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getType().getName())
+                new ReadOnlyObjectWrapper<>(p.getValue().getType().getName())
         );
         categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-                new ReadOnlyObjectWrapper(dao.getCategory(p.getValue().getCategoryId())
+                new ReadOnlyObjectWrapper<>(dao.getCategory(p.getValue().getCategoryId())
                         .map(Category::getName)
                         .orElse(""))
         );
         currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-                new ReadOnlyObjectWrapper(dao.getCurrency(p.getValue().getCurrencyId())
+                new ReadOnlyObjectWrapper<>(dao.getCurrency(p.getValue().getCurrencyId())
                         .map(Currency::getSymbol)
                         .orElse(""))
         );
         balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, BigDecimal> p) ->
-            new ReadOnlyObjectWrapper(p.getValue().getOpeningBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
+            new ReadOnlyObjectWrapper<>(p.getValue().getOpeningBalance().setScale(2, BigDecimal.ROUND_HALF_UP))
         );
         activeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, CheckBox> p) -> {
             Account account = p.getValue();
@@ -225,7 +225,7 @@ public class AccountListWindowController extends BaseController {
                 dao.updateAccount(account.enable(!enabled));
             });
 
-            return new ReadOnlyObjectWrapper(cb);
+            return new ReadOnlyObjectWrapper<>(cb);
         });
 
         editMenuItem.disableProperty()
@@ -270,7 +270,7 @@ public class AccountListWindowController extends BaseController {
     }
 
     private void onTypeChanged(Object newValue) {
-        ObservableList items;
+        ObservableList<Object> items;
 
         if (newValue instanceof String) {
             items = FXCollections.observableArrayList(rb.getString("account.Window.AllCategories"));
@@ -316,9 +316,7 @@ public class AccountListWindowController extends BaseController {
             } else {
                 new Alert(Alert.AlertType.CONFIRMATION, rb.getString("text.AreYouSure"), ButtonType.OK, ButtonType.CANCEL).showAndWait()
                     .filter(response -> response == ButtonType.OK)
-                    .ifPresent(response -> {
-                        MoneyDAO.getInstance().deleteAccount(account);
-                    });
+                    .ifPresent(response -> MoneyDAO.getInstance().deleteAccount(account));
             }
         });
     }

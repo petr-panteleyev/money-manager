@@ -59,7 +59,7 @@ public class CategoryWindowController extends BaseController {
     private final MapChangeListener<Integer,Category> categoriesListener =
             (MapChangeListener<Integer,Category>)l -> Platform.runLater(this::updateWindow);
 
-    public CategoryWindowController() {
+    CategoryWindowController() {
         super(null);
         initialize();
         setupWindow(self);
@@ -128,7 +128,7 @@ public class CategoryWindowController extends BaseController {
                 new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
 
         colType.setSortable(true);
-        categoryTable.getSortOrder().addAll(colType);
+        categoryTable.getSortOrder().add(colType);
         colType.setSortType(TableColumn.SortType.ASCENDING);
 
         editMenuItem.disableProperty().bind(categoryTable.getSelectionModel().selectedItemProperty().isNull());
@@ -142,7 +142,7 @@ public class CategoryWindowController extends BaseController {
                 .addListener(new WeakMapChangeListener<>(categoriesListener));
     }
 
-    public void onTableMouseClick(Event event) {
+    private void onTableMouseClick(Event event) {
         MouseEvent me = (MouseEvent)event;
         if (me.getClickCount() == 2) {
             Category category = categoryTable.getSelectionModel().getSelectedItem();

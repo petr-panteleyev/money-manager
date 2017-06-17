@@ -65,9 +65,9 @@ class BaseTest {
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                new BigDecimal(RANDOM.nextDouble()),
-                new BigDecimal(RANDOM.nextDouble()),
-                new BigDecimal(RANDOM.nextDouble()),
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
                 type.getId(),
                 categoryId,
                 currencyId,
@@ -102,7 +102,7 @@ class BaseTest {
                 RANDOM.nextInt(),
                 RANDOM.nextBoolean(),
                 RANDOM.nextBoolean(),
-                new BigDecimal(RANDOM.nextDouble()),
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
                 RANDOM.nextInt(),
                 RANDOM.nextBoolean()
         );
@@ -153,8 +153,36 @@ class BaseTest {
             Integer groupId,
             Integer contactId)
     {
+        return newTransaction(id,
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                type,
+                accountDebitedId,
+                accountCreditedId,
+                accountDebitedType,
+                accountCreditedType,
+                accountDebitedCategoryId,
+                accountCreditedCategoryId,
+                groupId,
+                contactId);
+    }
+
+    Transaction newTransaction(
+            Integer id,
+            BigDecimal amount,
+            BigDecimal rate,
+            TransactionType type,
+            Integer accountDebitedId,
+            Integer accountCreditedId,
+            CategoryType accountDebitedType,
+            CategoryType accountCreditedType,
+            Integer accountDebitedCategoryId,
+            Integer accountCreditedCategoryId,
+            Integer groupId,
+            Integer contactId)
+    {
         return new Transaction(id,
-                new BigDecimal(RANDOM.nextDouble()),
+                amount,
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
                 RANDOM.nextInt(),
@@ -169,7 +197,7 @@ class BaseTest {
                 accountCreditedCategoryId,
                 groupId,
                 contactId,
-                new BigDecimal(RANDOM.nextDouble()),
+                rate,
                 RANDOM.nextInt(),
                 UUID.randomUUID().toString()
         );

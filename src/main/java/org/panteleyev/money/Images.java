@@ -28,10 +28,5 @@ package org.panteleyev.money;
 import javafx.scene.image.Image;
 
 interface Images {
-    Image RED_CIRCLE     = new Image("/org/panteleyev/money/res/red-circle-16.png");
-    Image BLUE_CIRCLE    = new Image("/org/panteleyev/money/res/blue-circle-16.png");
-    Image GREEN_CIRCLE   = new Image("/org/panteleyev/money/res/green-circle-16.png");
-    Image GRAY_CIRCLE    = new Image("/org/panteleyev/money/res/gray-circle-16.png");
-
     Image APP_ICON       = new Image("org/panteleyev/money/res/icon48.png");
 }

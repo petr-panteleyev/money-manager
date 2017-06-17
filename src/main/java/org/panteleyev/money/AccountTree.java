@@ -29,7 +29,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
@@ -37,19 +36,18 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import org.panteleyev.money.cells.AccountBalanceCell;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Map;
@@ -59,59 +57,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class AccountTree extends BorderPane implements Styles {
-
-    private static class BalanceCell extends TreeTableCell<AccountTreeItem, Account> {
-        private Predicate<Transaction> filter;
-        private final boolean total;
-
-        BalanceCell(boolean total, Predicate<Transaction> filter) {
-            this.total = total;
-            this.filter = filter;
-        }
-
-        BalanceCell(Predicate<Transaction> filter) {
-            this(false, filter);
-        }
-
-        @Override
-        protected void updateItem(Account account, boolean empty) {
-            super.updateItem(account, empty);
-            setAlignment(Pos.CENTER_RIGHT);
-
-            if (empty || account == null) {
-                setText("");
-            } else {
-                BigDecimal sum = MoneyDAO.getInstance().getTransactions(account)
-                        .filter(filter)
-                        .map(t -> {
-                            BigDecimal amount = t.getAmount();
-                            if (account.getId() == t.getAccountCreditedId()) {
-                                // handle conversion rate
-                                BigDecimal rate = t.getRate();
-                                if (rate.compareTo(BigDecimal.ZERO) != 0) {
-                                    if (t.getRateDirection() == 0) {
-                                        amount = amount.divide(rate, BigDecimal.ROUND_HALF_UP);
-                                    } else {
-                                        amount = amount.multiply(rate);
-                                    }
-                                }
-                            } else {
-                                amount = amount.negate();
-                            }
-
-                            return amount;
-                        })
-                        .reduce(total ? account.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
-
-                setText(sum.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-
-                if (sum.signum() < 0) {
-                    getStyleClass().add(RED_TEXT);
-                }
-            }
-        }
-    }
-
     private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
     private final TreeTableView<AccountTreeItem> tableView = new TreeTableView<>();
@@ -170,8 +115,9 @@ public class AccountTree extends BorderPane implements Styles {
         TreeTableColumn<AccountTreeItem, Account> balanceColumn = new TreeTableColumn<>(rb.getString("column.Balance"));
         TreeTableColumn<AccountTreeItem, Account> waitingColumn = new TreeTableColumn<>(rb.getString("column.Waiting"));
 
-        tableView.getColumns().setAll(nameColumn, commentColumn, approvedColumn,
-                balanceColumn, waitingColumn);
+        tableView.getColumns().setAll(Arrays.asList(
+                nameColumn, commentColumn, approvedColumn,
+                balanceColumn, waitingColumn));
 
         // Context menu
         MenuItem item = new MenuItem(rb.getString("menu.Edit.newAccount"));
@@ -198,11 +144,11 @@ public class AccountTree extends BorderPane implements Styles {
         nameColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         commentColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("comment"));
         approvedColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("account"));
-        approvedColumn.setCellFactory(x -> new BalanceCell(true, Transaction::isChecked));
+        approvedColumn.setCellFactory(x -> new AccountBalanceCell(true, Transaction::isChecked));
         balanceColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("account"));
-        balanceColumn.setCellFactory(x -> new BalanceCell(true, t -> true));
+        balanceColumn.setCellFactory(x -> new AccountBalanceCell(true, t -> true));
         waitingColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("account"));
-        waitingColumn.setCellFactory(x -> new BalanceCell(t -> !t.isChecked()));
+        waitingColumn.setCellFactory(x -> new AccountBalanceCell(t -> !t.isChecked()));
 
         nameColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.3));
         commentColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.4));
@@ -306,15 +252,16 @@ public class AccountTree extends BorderPane implements Styles {
                 .filter(a -> a.isEnabled() || (!a.isEnabled() && Options.getShowDeactivatedAccounts()))
                 .sorted(new Account.AccountCategoryNameComparator()).forEach(a -> {
             if (categoryTreeItem == null || a.getCategoryId() != categoryTreeItem.getValue().getId()) {
-                Category category = dao.getCategory(a.getCategoryId()).get();
-                categoryTreeItem = new TreeItem<>(new AccountTreeItem(category));
-                categoryTreeItem.setExpanded(category.isExpanded());
+                dao.getCategory(a.getCategoryId()).ifPresent(category -> {
+                    categoryTreeItem = new TreeItem<>(new AccountTreeItem(category));
+                    categoryTreeItem.setExpanded(category.isExpanded());
 
-                categoryTreeItem.expandedProperty().addListener((x, y, newValue) ->
-                    MoneyDAO.getInstance().updateCategory(category.expand(newValue))
-                );
+                    categoryTreeItem.expandedProperty().addListener((x, y, newValue) ->
+                            MoneyDAO.getInstance().updateCategory(category.expand(newValue))
+                    );
 
-                rootItem.getChildren().add(categoryTreeItem);
+                    rootItem.getChildren().add(categoryTreeItem);
+                });
             }
 
             categoryTreeItem.getChildren().add(new TreeItem<>(new AccountTreeItem(a)));

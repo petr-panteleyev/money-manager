@@ -25,7 +25,6 @@
  */
 package org.panteleyev.money;
 
-import java.io.File;
 import java.util.prefs.Preferences;
 
 class Options {

@@ -25,21 +25,17 @@
  */
 package org.panteleyev.money.test;
 
-import java.util.Collection;
-import java.util.stream.IntStream;
 import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Contact;
-import org.panteleyev.money.persistence.ContactType;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import org.panteleyev.money.persistence.TransactionType;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import java.util.Collection;
 
 public class TestFreshFile extends BaseDaoTest {
     @BeforeMethod

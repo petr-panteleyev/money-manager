@@ -121,4 +121,19 @@ public enum TransactionFilter {
     public String toString() {
         return description;
     }
+
+    public static Predicate<Transaction> byAccount(int id) {
+        return transaction ->
+                transaction.getAccountDebitedId() == id || transaction.getAccountCreditedId() == id;
+    }
+
+    public static Predicate<Transaction> byCategory(int id) {
+        return transaction ->
+                transaction.getAccountDebitedCategoryId() == id || transaction.getAccountCreditedCategoryId() == id;
+    }
+
+    public static Predicate<Transaction> byCategoryType(int id) {
+        return transaction ->
+                transaction.getAccountDebitedTypeId() == id || transaction.getAccountCreditedTypeId() == id;
+    }
 }

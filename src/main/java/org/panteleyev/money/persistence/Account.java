@@ -281,9 +281,9 @@ public class Account implements Record, Named, Comparable<Account> {
             return this.id == that.id
                     && Objects.equals(this.name, that.name)
                     && Objects.equals(this.comment, that.comment)
-                    && Objects.equals(this.openingBalance, that.openingBalance)
-                    && Objects.equals(this.accountLimit, that.accountLimit)
-                    && Objects.equals(this.currencyRate, that.currencyRate)
+                    && this.openingBalance.compareTo(that.openingBalance) == 0
+                    && this.accountLimit.compareTo(that.accountLimit) == 0
+                    && this.currencyRate.compareTo(that.currencyRate) == 0
                     && this.typeId == that.typeId
                     && this.categoryId == that.categoryId
                     && this.currencyId == that.currencyId
@@ -295,8 +295,11 @@ public class Account implements Record, Named, Comparable<Account> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, openingBalance, accountLimit, currencyRate, typeId, categoryId,
-                currencyId, enabled);
+        return Objects.hash(id, name, comment,
+                openingBalance.stripTrailingZeros(),
+                accountLimit.stripTrailingZeros(),
+                currencyRate.stripTrailingZeros(),
+                typeId, categoryId, currencyId, enabled);
     }
 
     @Override

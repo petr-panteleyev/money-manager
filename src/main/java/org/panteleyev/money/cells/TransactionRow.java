@@ -23,26 +23,32 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.money;
+package org.panteleyev.money.cells;
 
-public interface Styles {
-    int BIG_SPACING = 5;
-    int SMALL_SPACING = 2;
+import javafx.scene.control.TableRow;
+import org.panteleyev.money.persistence.SplitTransaction;
+import org.panteleyev.money.persistence.Transaction;
+import static org.panteleyev.money.Styles.GROUP_CELL;
+import static org.panteleyev.money.Styles.GROUP_MEMBER_CELL;
+import static org.panteleyev.money.Styles.TRANSACTION_CELL;
 
-    String BLACK_TEXT   = "blackText";
-    String RED_TEXT     = "redText";
-    String BLUE_TEXT    = "blueText";
-    String GROUP_CELL   = "groupCell";
-    String GROUP_MEMBER_CELL = "groupMemberCell";
-    String TRANSACTION_CELL = "transactionCell";
-
-    String GRID_PANE    = "gridPane";
-
-    // About Dialog
-    String ABOUT_APP_TITLE_LABEL = "aboutAppNameLabel";
-    String ABOUT_LABEL  = "aboutLabel";
-
-    // Transaction Editor
-    String RATE_LABEL = "rateLabel";
-    String SUB_LABEL = "subLabel";
+public class TransactionRow extends TableRow<Transaction> {
+    @Override
+    protected void updateItem(Transaction item, boolean empty) {
+        super.updateItem(item, empty);
+        getStyleClass().removeAll(GROUP_CELL, GROUP_MEMBER_CELL, TRANSACTION_CELL);
+        if (!empty) {
+            if (item instanceof SplitTransaction) {
+                getStyleClass().add(GROUP_CELL);
+            } else {
+                if (item.getGroupId() != 0) {
+                    getStyleClass().add(GROUP_MEMBER_CELL);
+                } else {
+                    getStyleClass().add(TRANSACTION_CELL);
+                }
+            }
+        } else {
+            getStyleClass().add(TRANSACTION_CELL);
+        }
+    }
 }

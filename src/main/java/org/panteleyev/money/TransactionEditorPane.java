@@ -445,7 +445,7 @@ public class TransactionEditorPane extends TitledPane implements Styles {
 
         daySpinner.getEditor().setText(Integer.toString(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
         daySpinner.getEditor().selectAll();
-        daySpinner.requestFocus();
+//        daySpinner.requestFocus();
     }
 
     public void setTransaction(Transaction tr) {
@@ -508,6 +508,7 @@ public class TransactionEditorPane extends TitledPane implements Styles {
 
     private void onClearButton() {
         clear();
+        daySpinner.requestFocus();
     }
 
     private void onDeleteButton() {
@@ -519,12 +520,14 @@ public class TransactionEditorPane extends TitledPane implements Styles {
     private void onUpdateButton() {
         if (buildTransaction()) {
             updateTransactionConsumer.accept(builder, newContactName);
+            daySpinner.requestFocus();
         }
     }
 
     private void onAddButton() {
         if (buildTransaction()) {
             addTransactionConsumer.accept(builder, newContactName);
+            daySpinner.requestFocus();
         }
     }
 

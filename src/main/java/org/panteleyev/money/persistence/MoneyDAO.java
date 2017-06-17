@@ -265,6 +265,10 @@ public class MoneyDAO extends DAO {
     // Transaction Groups
     ////////////////////////////////////////////////////////////////////////////
 
+    public ObservableMap<Integer, TransactionGroup> transactionGroups() {
+        return transactionGroups;
+    }
+
     public Optional<TransactionGroup> getTransactionGroup(int id) {
         return id == 0?
                 Optional.empty()
@@ -373,7 +377,6 @@ public class MoneyDAO extends DAO {
                 .filter(t -> t.getAccountDebitedId() == id || t.getAccountCreditedId() == id)
                 .count();
     }
-
 
     private static List<Class<? extends Record>> getTableClasses() {
         return Arrays.asList(

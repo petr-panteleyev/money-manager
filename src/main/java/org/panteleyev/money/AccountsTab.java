@@ -36,7 +36,6 @@ import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 class AccountsTab extends BorderPane {
     private static final double DIVIDER_POSITION = 0.85;
@@ -95,22 +94,15 @@ class AccountsTab extends BorderPane {
     }
 
     private void reloadTransactions(Predicate<Transaction> filter) {
-        this.transactionFilter = filter;
-
-        int index = transactionTable.getSelectionModel().getSelectedIndex();
-        transactionTable.getSelectionModel().clearSelection();
-        transactionTable.clear();
+        transactionFilter = filter;
 
         if (selectedAccount != null) {
-            List<Transaction> transactions = MoneyDAO.getInstance()
-                    .getTransactions(selectedAccount)
-                    .filter(filter)
-                    .collect(Collectors.toList());
-
-            transactionTable.addRecords(transactions);
-            transactionTable.sort();
+            filter = filter.and(t -> t.getAccountDebitedId() == selectedAccount.getId()
+                    || t.getAccountCreditedId() == selectedAccount.getId());
+        } else {
+            filter = transaction -> false;
         }
 
-        transactionTable.getSelectionModel().select(index);
+        transactionTable.setTransactionFilter(filter);
     }
 }

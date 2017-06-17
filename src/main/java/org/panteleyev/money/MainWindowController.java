@@ -57,6 +57,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class MainWindowController extends BaseController {
     public static final String UI_BUNDLE_PATH = "org.panteleyev.money.ui";
@@ -303,14 +305,16 @@ public class MainWindowController extends BaseController {
         new ConnectionDialog(true).showAndWait().ifPresent(builder -> {
             DataSource ds = builder.build();
 
-            CompletableFuture.runAsync(() -> {
-               MoneyDAO dao = MoneyDAO.initialize(ds);
-               dao.createTables();
-               dao.preload();
+            Future newResult = CompletableFuture.runAsync(() -> {
+                MoneyDAO dao = MoneyDAO.initialize(ds);
+                dao.createTables();
+                dao.preload();
             }).thenRun(() -> Platform.runLater(() -> {
                 setTitle(AboutDialog.APP_TITLE + " - " + builder.connectionString());
                 dbOpenProperty.set(true);
             }));
+
+            checkFutureException(newResult);
         });
     }
 
@@ -345,17 +349,29 @@ public class MainWindowController extends BaseController {
 
             MoneyDAO.initialize(ds);
 
-            CompletableFuture
+            Future loadResult = CompletableFuture
                     .runAsync(() -> MoneyDAO.getInstance().preload())
                     .thenRun(() -> Platform.runLater(() -> {
                         setTitle(AboutDialog.APP_TITLE + " - " + builder.connectionString());
                         dbOpenProperty.set(true);
                     }));
+
+            checkFutureException(loadResult);
         }
     }
 
     private void onExport() {
 
+    }
+
+    private void checkFutureException(Future f) {
+        try {
+            f.get();
+        } catch (ExecutionException ex) {
+            MoneyApplication.uncaughtException(Thread.currentThread(), ex.getCause());
+        } catch (InterruptedException ex) {
+            MoneyApplication.uncaughtException(Thread.currentThread(), ex);
+        }
     }
 
     private void onOptions() {

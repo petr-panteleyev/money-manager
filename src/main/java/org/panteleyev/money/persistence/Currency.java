@@ -248,7 +248,7 @@ public class Currency implements Record {
                     && this.formatSymbolPosition == that.formatSymbolPosition
                     && this.showFormatSymbol == that.showFormatSymbol
                     && this.def == that.def
-                    && Objects.equals(this.rate, that.rate)
+                    && this.rate.compareTo(that.rate) == 0
                     && this.direction == that.direction
                     && this.useThousandSeparator == that.useThousandSeparator;
         } else {
@@ -259,6 +259,6 @@ public class Currency implements Record {
     @Override
     public int hashCode() {
         return Objects.hash(id, symbol, description, formatSymbol, formatSymbolPosition, showFormatSymbol, def,
-                rate, direction, useThousandSeparator);
+                rate.stripTrailingZeros(), direction, useThousandSeparator);
     }
 }

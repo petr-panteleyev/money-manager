@@ -39,7 +39,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TableColumn;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
 class TransactionsTab extends BorderPane {
     private final ResourceBundle    rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
@@ -77,8 +77,6 @@ class TransactionsTab extends BorderPane {
                 Platform.runLater(this::initAccountFilterBox);
                 Platform.runLater(this::reloadTransactions);
             };
-    private final MapChangeListener<Integer, Transaction> transactionListener =
-            l -> Platform.runLater(this::reloadTransactions);
 
     TransactionsTab() {
         initialize();
@@ -124,6 +122,8 @@ class TransactionsTab extends BorderPane {
 
         transactionTable.setOnMouseClicked((e) -> onTransactionSelected());
 
+        transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
+
         setCenter(transactionTable);
         setBottom(transactionEditor);
 
@@ -154,7 +154,6 @@ class TransactionsTab extends BorderPane {
         transactionTable.setOnAddGroup(this::onAddGroup);
         transactionTable.setOnDeleteGroup(this::onDeleteGroup);
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
-        transactionTable.setOnExpandGroup(this::onExpandGroup);
 
         setCurrentDate();
 
@@ -194,7 +193,6 @@ class TransactionsTab extends BorderPane {
 
         final MoneyDAO dao = MoneyDAO.getInstance();
         dao.accounts().addListener(accountListener);
-        dao.transactions().addListener(transactionListener);
 
         dao.preloadingProperty().addListener((x, y, newValue) -> {
             if (!newValue) {
@@ -275,22 +273,18 @@ class TransactionsTab extends BorderPane {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        List<Transaction> original = MoneyDAO.getInstance().getTransactions(month, year);
+        Predicate<Transaction> filter = t -> t.getMonth() == month && t.getYear() == year;
 
-        List<Transaction> records = original;
         if (accountFilterBox.getSelectionModel().getSelectedIndex() != 0) {
             int id = Optional.ofNullable((Account)accountFilterBox.getSelectionModel().getSelectedItem())
                     .map(Account::getId)
                     .orElse(0);
 
-            records = original.stream()
-                    .filter(t -> t.getAccountCreditedId() == id || t.getAccountDebitedId() == id)
-                    .collect(Collectors.toList());
+            filter = filter.and(t -> t.getAccountCreditedId() == id || t.getAccountDebitedId() == id);
         }
 
-        transactionTable.addRecords(records);
+        transactionTable.setTransactionFilter(filter);
         transactionTable.sort();
-        transactionCountLabel.setText(Integer.toString(records.size()));
     }
 
     private void onMonthChanged() {
@@ -299,7 +293,9 @@ class TransactionsTab extends BorderPane {
 
     private void onTransactionSelected() {
         transactionEditor.clear();
-        transactionTable.getSelectedTransaction().ifPresent(transactionEditor::setTransaction);
+        if (transactionTable.getSelectedTransactionCount() == 1) {
+            transactionTable.getSelectedTransaction().ifPresent(transactionEditor::setTransaction);
+        }
     }
 
     private Contact createContact(String name) {
@@ -329,8 +325,8 @@ class TransactionsTab extends BorderPane {
             .year(year)
             .groupId(0);
 
+        transactionEditor.clear();
         dao.insertTransaction(builder.build());
-        reloadTransactions();
     }
 
     private void onUpdateTransaction(Transaction.Builder builder, String c) {
@@ -345,18 +341,18 @@ class TransactionsTab extends BorderPane {
         int year = yearSpinner.getValue();
         builder.year(year);
 
+        transactionEditor.clear();
         MoneyDAO.getInstance().updateTransaction(builder.build());
-        reloadTransactions();
     }
 
     private void onAddGroup(TransactionGroup.Builder builder, List<Transaction> transactions) {
         MoneyDAO dao = MoneyDAO.getInstance();
 
-        TransactionGroup group = builder
-                .id(dao.generatePrimaryKey(TransactionGroup.class))
-                .build();
+        int groupId = dao.generatePrimaryKey(TransactionGroup.class);
 
-        Integer groupId = dao.insertTransactionGroup(group).getId();
+        TransactionGroup group = builder
+                .id(groupId)
+                .build();
 
         transactions.forEach(t -> dao.updateTransaction(
                 new Transaction.Builder(t)
@@ -365,7 +361,7 @@ class TransactionsTab extends BorderPane {
                 )
         );
 
-        reloadTransactions();
+        dao.insertTransactionGroup(group);
     }
 
     private void onDeleteGroup(List<Transaction> transactions) {
@@ -384,8 +380,6 @@ class TransactionsTab extends BorderPane {
         );
 
         MoneyDAO.getInstance().deleteTransactionGroup(groupId);
-
-        reloadTransactions();
     }
 
     private void onDeleteTransaction(Integer id) {
@@ -393,8 +387,8 @@ class TransactionsTab extends BorderPane {
                 .showAndWait()
                 .ifPresent(r -> {
                     if (r == ButtonType.OK) {
+                        transactionEditor.clear();
                         MoneyDAO.getInstance().deleteTransaction(id);
-                        reloadTransactions();
                     }
                 });
     }
@@ -406,17 +400,10 @@ class TransactionsTab extends BorderPane {
                         .build()
                 )
         );
-
-        reloadTransactions();
-    }
-
-    private void onExpandGroup(TransactionGroup group, Boolean expand) {
-        MoneyDAO.getInstance().updateTransactionGroup(group.expand(expand));
-        reloadTransactions();
     }
 
     void scrollToEnd() {
-        if (transactionTable.getDayColumn().getSortType() == TreeTableColumn.SortType.ASCENDING) {
+        if (transactionTable.getDayColumn().getSortType() == TableColumn.SortType.ASCENDING) {
             transactionTable.scrollTo(MoneyDAO.getInstance().transactions().size() - 1);
         } else {
             transactionTable.scrollTo(0);

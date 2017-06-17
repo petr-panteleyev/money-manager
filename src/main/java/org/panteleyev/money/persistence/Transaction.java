@@ -454,6 +454,13 @@ public class Transaction implements Record {
         return invoiceNumber;
     }
 
+    public BigDecimal getSignedAmount() {
+        BigDecimal sum = getAmount();
+
+        return (getAccountCreditedType() != getAccountDebitedType()
+                && getAccountDebitedType() != CategoryType.INCOMES)? sum.negate() : sum;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -464,7 +471,7 @@ public class Transaction implements Record {
             Transaction that = (Transaction)obj;
 
             return this.id == that.id
-                    && Objects.equals(this.amount, that.amount)
+                    && this.amount.compareTo(that.amount) == 0
                     && this.day == that.day
                     && this.month == that.month
                     && this.year == that.year
@@ -479,7 +486,7 @@ public class Transaction implements Record {
                     && this.accountCreditedCategoryId == that.accountCreditedCategoryId
                     && this.groupId == that.groupId
                     && this.contactId == that.contactId
-                    && Objects.equals(this.rate, that.rate)
+                    && this.rate.compareTo(that.rate) == 0
                     && this.rateDirection == that.rateDirection
                     && Objects.equals(this.invoiceNumber, that.invoiceNumber);
         } else {
@@ -489,9 +496,9 @@ public class Transaction implements Record {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, amount, day, month, year, transactionType, comment, checked,
+        return Objects.hash(id, amount.stripTrailingZeros(), day, month, year, transactionType, comment, checked,
                 accountDebitedId, accountCreditedId, accountDebitedType, accountCreditedType,
-                accountDebitedCategoryId, accountCreditedCategoryId, groupId, contactId, rate, rateDirection,
-                invoiceNumber);
+                accountDebitedCategoryId, accountCreditedCategoryId, groupId, contactId, rate.stripTrailingZeros(),
+                rateDirection, invoiceNumber);
     }
 }

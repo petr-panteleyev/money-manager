@@ -53,7 +53,7 @@ public class MoneyApplication extends Application {
         primaryStage.show();
     }
 
-    private static void uncaughtException(Thread t, Throwable e) {
+    static void uncaughtException(Thread t, Throwable e) {
         Logging.getLogger().log(Level.SEVERE, "Uncaught exception", e);
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.toString());

@@ -51,6 +51,7 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ContactType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 class ContactListWindowController extends BaseController {
@@ -58,7 +59,7 @@ class ContactListWindowController extends BaseController {
 
     private final BorderPane         self = new BorderPane();
 
-    private final ChoiceBox          typeChoiceBox = new ChoiceBox();
+    private final ChoiceBox<Object>  typeChoiceBox = new ChoiceBox<>();
     private final TableView<Contact> contactTable = new TableView<>();
 
     private final MapChangeListener<Integer,Contact> contactsListener =
@@ -109,7 +110,8 @@ class ContactListWindowController extends BaseController {
         TableColumn<Contact, String>  phoneColumn = new TableColumn<>(rb.getString("column.Phone"));
         TableColumn<Contact, String>  emailColumn = new TableColumn<>(rb.getString("column.Email"));
 
-        contactTable.getColumns().setAll(nameColumn, typeColumn, phoneColumn, emailColumn);
+        contactTable.getColumns().setAll(Arrays.asList(
+                nameColumn, typeColumn, phoneColumn, emailColumn));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox
@@ -130,7 +132,7 @@ class ContactListWindowController extends BaseController {
 
         typeChoiceBox.getSelectionModel().select(0);
 
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object object) {
                 if (object instanceof ContactType) {
@@ -144,13 +146,13 @@ class ContactListWindowController extends BaseController {
         typeChoiceBox.valueProperty().addListener((observable, oldValue, newValue) -> onTypeChanged(newValue));
 
         nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper(p.getValue().getName()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper(p.getValue().getType().getName()));
+                new ReadOnlyObjectWrapper<>(p.getValue().getType().getName()));
         phoneColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper(p.getValue().getPhone()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getPhone()));
         emailColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper(p.getValue().getEmail()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getEmail()));
 
         editMenuItem.disableProperty()
                 .bind(contactTable.getSelectionModel().selectedItemProperty().isNull());
@@ -172,7 +174,7 @@ class ContactListWindowController extends BaseController {
 
     private void onTypeChanged(Object newValue) {
         if (newValue instanceof String) {
-            ((FilteredList)contactTable.getItems()).setPredicate(x -> true);
+            ((FilteredList<Contact>)contactTable.getItems()).setPredicate(x -> true);
         } else {
             ContactType type = (ContactType)newValue;
             ((FilteredList<Contact>)contactTable.getItems())

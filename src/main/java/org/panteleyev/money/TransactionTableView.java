@@ -25,28 +25,32 @@
  */
 package org.panteleyev.money;
 
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
+import javafx.collections.MapChangeListener;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
-import javafx.scene.control.TreeTableRow;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
-import javafx.scene.image.ImageView;
-import javafx.stage.WindowEvent;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import org.panteleyev.money.cells.TransactionContactCell;
+import org.panteleyev.money.cells.TransactionCreditedAccountCell;
+import org.panteleyev.money.cells.TransactionDayCell;
+import org.panteleyev.money.cells.TransactionDebitedAccountCell;
+import org.panteleyev.money.cells.TransactionRow;
+import org.panteleyev.money.cells.TransactionSumCell;
+import org.panteleyev.money.cells.TransactionTypeCell;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.SplitTransaction;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import org.panteleyev.money.persistence.TransactionType;
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -55,218 +59,140 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
-import javafx.scene.image.Image;
 
-class TransactionTableView extends TreeTableView<TransactionTreeItem> implements Styles {
+class TransactionTableView extends TableView<Transaction> {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
-
-    private static class TransactionRow extends TreeTableRow<TransactionTreeItem> {
-        TransactionRow() {
-            getStyleClass().add(TRANSACTION_TABLE_ROW);
-        }
-
-        @Override
-        protected void updateItem(TransactionTreeItem item, boolean empty) {
-            super.updateItem(item, empty);
-
-            getStyleClass().remove(GROUP_CELL);
-            if (!empty) {
-                if (item.isGroupProperty().get()) {
-                    getStyleClass().add(GROUP_CELL);
-                }
-            }
-        }
-    }
-
-    private static class SumCell extends TreeTableCell<TransactionTreeItem, BigDecimal> {
-        @Override
-        protected void updateItem(final BigDecimal item, boolean empty) {
-            super.updateItem(item, empty);
-            this.setAlignment(Pos.CENTER_RIGHT);
-            if (empty || item == null) {
-                setText("");
-            } else {
-                Optional.ofNullable(getTreeTableRow())
-                        .map(TreeTableRow::getTreeItem)
-                        .map(TreeItem::getValue)
-                        .ifPresent(treeItem -> {
-                            getStyleClass().removeAll(RED_TEXT, BLUE_TEXT, BLACK_TEXT);
-                            getStyleClass().add(treeItem.getStyle());
-
-                            String format = Optional.ofNullable(treeItem.getTransaction())
-                                    .filter(t -> t.getGroupId() != 0)
-                                    .map(t -> "(%s)")
-                                    .orElse("%s");
-
-                            setText(String.format(format, item.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
-                        });
-            }
-        }
-    }
-
-    private static class DayCell extends TreeTableCell<TransactionTreeItem, TransactionTreeItem> implements Images {
-        private final boolean fullDate;
-
-        DayCell(boolean fullDate) {
-            this.fullDate = fullDate;
-        }
-
-        @Override
-        protected void updateItem(TransactionTreeItem item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-                setGraphic(null);
-                setText("");
-            } else {
-                if (!item.isGroupProperty().get()) {
-                    Transaction t = item.getTransaction();
-
-                    Image image;
-
-                    if (t.getTransactionType() == TransactionType.TRANSFER) {
-                        image = GRAY_CIRCLE;
-                    } else {
-                        switch (t.getAccountCreditedType()) {
-                            case EXPENSES:
-                            case DEBTS:
-                                image = RED_CIRCLE;
-                                break;
-
-                            case BANKS_AND_CASH:
-                                switch (t.getAccountDebitedType()) {
-                                    case INCOMES:
-                                        image = BLUE_CIRCLE;
-                                        break;
-
-                                    case BANKS_AND_CASH:
-                                        image = GREEN_CIRCLE;
-                                        break;
-
-                                    default:
-                                        image = GRAY_CIRCLE;
-                                        break;
-                                }
-                                break;
-
-                            default:
-                                image = GRAY_CIRCLE;
-                                break;
-                        }
-                    }
-
-                    ImageView iv = new ImageView(image);
-                    iv.setFitHeight(8);
-                    iv.setFitWidth(8);
-                    setGraphic(iv);
-                } else {
-                    setGraphic(null);
-                }
-
-                if (fullDate) {
-                    setText(String.format("%02d.%02d.%04d",
-                        item.dayProperty().get(),
-                        item.monthProperty().get(),
-                        item.yearProperty().get()));
-                } else {
-                    setText(Integer.toString(item.dayProperty().get()));
-                }
-            }
-        }
-    }
-
-    private final TreeItem<TransactionTreeItem> root = new TreeItem<>();
 
     private BiConsumer<TransactionGroup.Builder, List<Transaction>> addGroupConsumer = (t, l) -> {};
     private Consumer<List<Transaction>> ungroupConsumer = (l) -> {};
     private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (t, c) -> {};
-    private BiConsumer<TransactionGroup, Boolean> expandGroupConsumer = (g, e) -> {};
 
     // Menu items
     private MenuItem ctxGroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Group"));
     private MenuItem ctxUngroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Ungroup"));
 
     // Columns
-    private TreeTableColumn<TransactionTreeItem, TransactionTreeItem> dayColumn;
+    private TableColumn<Transaction, Transaction> dayColumn;
+
+    // Transaction filter
+    private Predicate<Transaction> transactionFilter = t -> false;
+
+    // List size property
+    private IntegerProperty listSizeProperty = new SimpleIntegerProperty(0);
 
     TransactionTableView(boolean fullDate) {
-        this.setRoot(root);
-        this.showRootProperty().set(false);
+        setRowFactory(x -> new TransactionRow());
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        this.setRowFactory(x -> new TransactionRow());
-
-        dayColumn = new TreeTableColumn<>(BUNDLE.getString("column.Day"));
-        dayColumn.setCellValueFactory((CellDataFeatures<TransactionTreeItem, TransactionTreeItem> p) -> new SimpleObjectProperty<>(p.getValue().getValue()));
-        dayColumn.setCellFactory(x -> new DayCell(fullDate));
+        dayColumn = new TableColumn<>(BUNDLE.getString("column.Day"));
+        dayColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
+                new SimpleObjectProperty<>(p.getValue()));
+        dayColumn.setCellFactory(x -> new TransactionDayCell(fullDate));
         dayColumn.setSortable(true);
 
         if (fullDate) {
             dayColumn.comparatorProperty().set((o1, o2) -> {
-                int res = o1.yearProperty().get() - o2.yearProperty().get();
+                int res = o1.getYear() - o2.getYear();
                 if (res != 0) {
                     return res;
                 }
 
-                res = o1.monthProperty().get() - o2.monthProperty().get();
+                res = o1.getMonth() - o2.getMonth();
                 if (res != 0) {
                     return res;
                 }
 
-                return o1.dayProperty().get() - o2.dayProperty().get();
+                return o1.getDay() - o2.getDay();
             });
         } else {
-            dayColumn.comparatorProperty().set(Comparator.comparingInt(o -> o.dayProperty().get()));
+            dayColumn.comparatorProperty().set(Comparator.comparingInt(Transaction::getDay));
         }
 
-        TreeTableColumn<TransactionTreeItem, String> typeColumn = new TreeTableColumn<>(BUNDLE.getString("column.Type"));
-        typeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("type"));
+        setSortPolicy(new TransactionTableSortPolicy());
 
-        TreeTableColumn<TransactionTreeItem, String> accountFromColumn = new TreeTableColumn<>(BUNDLE.getString("column.Account.Debited"));
-        accountFromColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("accountDebited"));
+        TableColumn<Transaction, Transaction> typeColumn = new TableColumn<>(BUNDLE.getString("column.Type"));
+        typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) -> {
+            Transaction v = (p.getValue() instanceof SplitTransaction || p.getValue().getGroupId() == 0)?
+                    p.getValue() : null;
 
-        TreeTableColumn<TransactionTreeItem, String> accountCreditedColumn = new TreeTableColumn<>(BUNDLE.getString("column.Account.Credited"));
-        accountCreditedColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("accountCredited"));
+            return new ReadOnlyObjectWrapper<>(v);
+        });
+        typeColumn.setCellFactory(x -> new TransactionTypeCell());
 
-        TreeTableColumn<TransactionTreeItem, String> contactColumn = new TreeTableColumn<>(BUNDLE.getString("column.Payer.Payee"));
-        contactColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("contact"));
+        typeColumn.setComparator(
+                Comparator.comparingInt((Transaction t) -> t.getTransactionType().getId())
+                        .thenComparing(dayColumn.getComparator())
+        );
+        typeColumn.setSortable(true);
 
-        TreeTableColumn<TransactionTreeItem, String> commentColumn = new TreeTableColumn<>(BUNDLE.getString("column.Comment"));
-        commentColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("comment"));
+        TableColumn<Transaction, Transaction> accountFromColumn = new TableColumn<>(BUNDLE.getString("column.Account.Debited"));
+        accountFromColumn.setCellFactory(x -> new TransactionDebitedAccountCell());
+        accountFromColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) -> {
+            Transaction v = (p.getValue() instanceof SplitTransaction || p.getValue().getGroupId() == 0)?
+                    p.getValue() : null;
+
+            return new ReadOnlyObjectWrapper<>(v);
+        });
+        accountFromColumn.setComparator(
+                Comparator.comparingInt(Transaction::getAccountDebitedId)
+                        .thenComparing(dayColumn.getComparator())
+        );
+        typeColumn.setSortable(true);
+
+        TableColumn<Transaction, Transaction> accountCreditedColumn = new TableColumn<>(BUNDLE.getString("column.Account.Credited"));
+        accountCreditedColumn.setCellFactory(x -> new TransactionCreditedAccountCell());
+        accountCreditedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
+                new ReadOnlyObjectWrapper<>(p.getValue()));
+        accountCreditedColumn.setSortable(false);
+
+        TableColumn<Transaction, Transaction> contactColumn = new TableColumn<>(BUNDLE.getString("column.Payer.Payee"));
+        contactColumn.setCellFactory(x -> new TransactionContactCell());
+        contactColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) -> new ReadOnlyObjectWrapper<>(p.getValue()));
+        contactColumn.setSortable(false);
+
+        TableColumn<Transaction, String> commentColumn = new TableColumn<>(BUNDLE.getString("column.Comment"));
+        commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, String> p) ->
+                new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
         commentColumn.setSortable(false);
 
-        TreeTableColumn<TransactionTreeItem, BigDecimal> sumColumn = new TreeTableColumn<>(BUNDLE.getString("column.Sum"));
-        sumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("sum"));
-        sumColumn.setCellFactory(x -> new SumCell());
+        TableColumn<Transaction, Transaction> sumColumn = new TableColumn<>(BUNDLE.getString("column.Sum"));
+        sumColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
+                new ReadOnlyObjectWrapper<>(p.getValue()));
+        sumColumn.setCellFactory(x -> new TransactionSumCell());
+        sumColumn.setComparator(Comparator.comparing(Transaction::getSignedAmount));
+        sumColumn.setSortable(true);
 
-        TreeTableColumn<TransactionTreeItem, CheckBox> approvedColumn = new TreeTableColumn<>("");
+        TableColumn<Transaction, CheckBox> approvedColumn = new TableColumn<>("");
 
         approvedColumn.setCellValueFactory(p -> {
             CheckBox cb = new CheckBox();
 
-            final TransactionTreeItem value = p.getValue().getValue();
-            if (value.isGroupProperty().get()) {
-                List<Transaction> transactions = value.getChildren().stream()
-                        .map(TransactionTreeItem::getTransaction)
-                        .collect(Collectors.toList());
+            final Transaction value = p.getValue();
+            if (value instanceof SplitTransaction) {
+                List<Transaction> transactions = getTransactionsByGroup(value.getGroupId());
 
                 boolean groupApproved = transactions.stream()
                         .map(Transaction::isChecked)
-                        .reduce(true, (x,y)-> x && y);
+                        .reduce(Boolean.TRUE, Boolean::logicalAnd);
                 cb.setSelected(groupApproved);
 
                 cb.setOnAction(event ->
                         onCheckTransaction(transactions, cb.isSelected()));
             } else {
-                cb.setSelected(value.getTransaction().isChecked());
+                cb.setDisable(value.getGroupId() != 0);
+                cb.setSelected(value.isChecked());
                 cb.setOnAction(event ->
-                        onCheckTransaction(Collections.singletonList(value.getTransaction()), cb.isSelected()));
+                        onCheckTransaction(Collections.singletonList(value), cb.isSelected()));
             }
 
             return new ReadOnlyObjectWrapper<>(cb);
         });
+        approvedColumn.setSortable(false);
 
-        getColumns().addAll(dayColumn,
+        getColumns().setAll(Arrays.asList(dayColumn,
             typeColumn,
             accountFromColumn,
             accountCreditedColumn,
@@ -274,10 +200,10 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
             commentColumn,
             sumColumn,
             approvedColumn
-        );
+        ));
 
-        getSortOrder().addAll(dayColumn);
-        dayColumn.setSortType(TreeTableColumn.SortType.ASCENDING);
+        getSortOrder().add(dayColumn);
+        dayColumn.setSortType(TableColumn.SortType.ASCENDING);
 
         // Column width. Temporary solution, there should be a better option.
         dayColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
@@ -294,47 +220,51 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
             getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
             // Context menu
-            ctxGroupMenuItem.setOnAction(this::onGroup);
-            ctxUngroupMenuItem.setOnAction(this::onUngroup);
+            ctxGroupMenuItem.setOnAction((e) -> onGroup());
+            ctxUngroupMenuItem.setOnAction((e) -> onUngroup());
 
             ContextMenu ctxMenu = new ContextMenu(ctxGroupMenuItem, ctxUngroupMenuItem);
 
-            ctxMenu.setOnShowing(this::onShowingContextMenu);
+            ctxMenu.setOnShowing((e) -> onShowingContextMenu());
             setContextMenu(ctxMenu);
         }
+
+        MoneyDAO.getInstance().transactions().addListener(this::transactionListener);
+        MoneyDAO.getInstance().transactionGroups().addListener(this::transactionGroupListener);
     }
 
-    private void onShowingContextMenu(WindowEvent windowEvent) {
+    ReadOnlyIntegerProperty listSizeProperty() {
+        return listSizeProperty;
+    }
+
+    private void onShowingContextMenu() {
         boolean disableGroup;
         boolean disableUngroup;
 
-        List<TreeItem<TransactionTreeItem>> selectedItems = getSelectionModel().getSelectedItems();
+        List<Transaction> selectedItems = getSelectionModel().getSelectedItems();
         if (selectedItems.isEmpty()) {
             disableGroup = true;
             disableUngroup = true;
         } else {
             if (selectedItems.size() == 1) {
                 disableGroup = true;
-                TransactionTreeItem item = selectedItems.get(0).getValue();
-                disableUngroup = !item.isGroupProperty().get();
+                Transaction item = selectedItems.get(0);
+                disableUngroup = !(item instanceof SplitTransaction);
             } else {
                 disableUngroup = true;
 
-                // Check if we don't have groups selected
-                boolean hasGroups = selectedItems.stream().anyMatch(x -> x.getValue().isGroupProperty().get());
+                // Check if we don't have groups or group members selected
+                boolean hasGroups = selectedItems.stream()
+                        .anyMatch(x -> x.getGroupId() != 0);
                 if (hasGroups) {
                     disableGroup = true;
                 } else {
-                    // List of transactions
-                    List<Transaction> transactions = selectedItems.stream()
-                            .map(x -> x.getValue().getTransaction())
-                            .collect(Collectors.toList());
-
                     // All transactions must have same day and debited account
-                    int day = transactions.get(0).getDay();
-                    int debitedId = transactions.get(0).getAccountDebitedId();
+                    int day = selectedItems.get(0).getDay();
+                    int debitedId = selectedItems.get(0).getAccountDebitedId();
 
-                    disableGroup = transactions.stream().anyMatch(x -> x.getDay() != day || x.getAccountDebitedId() != debitedId);
+                    disableGroup = selectedItems.stream()
+                            .anyMatch(x -> x.getDay() != day || x.getAccountDebitedId() != debitedId);
                 }
             }
         }
@@ -344,56 +274,63 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
     }
 
     void clear() {
-        root.getChildren().clear();
+        getItems().clear();
     }
 
-    void addRecords(List<Transaction> transactions) {
+    private void addRecords(List<Transaction> transactions) {
         // Add transactions with no group
         transactions.stream()
-            .filter(x -> x.getGroupId() == 0)
-            .forEach(x -> root.getChildren().add(new TreeItem<>(new TransactionTreeItem(x))));
+                .filter(x -> x.getGroupId() == 0)
+                .forEach(x -> getItems().add(x));
 
         // Add groups
         Map<Integer, List<Transaction>> transactionsByGroup = transactions.stream()
-            .filter(x -> x.getGroupId() != 0)
-            .collect(groupingBy(Transaction::getGroupId));
+                .filter(x -> x.getGroupId() != 0)
+                .collect(groupingBy(Transaction::getGroupId));
 
         transactionsByGroup.keySet().forEach(groupId -> {
-            TransactionGroup group = MoneyDAO.getInstance().getTransactionGroup(groupId).get();
-            TransactionTreeItem groupItem = new TransactionTreeItem(group, transactionsByGroup.get(groupId));
-            TreeItem<TransactionTreeItem> groupTreeItem = new TreeItem<>(groupItem);
-            groupTreeItem.setExpanded(group.isExpanded());
+            List<Transaction> group = transactionsByGroup.get(groupId);
 
-            groupTreeItem.expandedProperty().addListener((observable, oldValue, newValue) ->
-                    expandGroupConsumer.accept(group, newValue));
-
-            groupItem.getChildren()
-                .forEach(t -> groupTreeItem.getChildren().add(new TreeItem<>(t)));
-
-            root.getChildren().add(groupTreeItem);
+            SplitTransaction split = new SplitTransaction(groupId, transactionsByGroup.get(groupId));
+            getItems().add(split);
+            getItems().addAll(group);
         });
+
+        listSizeProperty.set(getItems().size());
+    }
+
+    void setTransactionFilter(Predicate<Transaction> filter) {
+        this.transactionFilter = filter;
+
+        getSelectionModel().clearSelection();
+        clear();
+        addRecords(MoneyDAO.getInstance().getTransactions().stream()
+                .filter(filter)
+                .collect(Collectors.toList()));
+        sort();
+    }
+
+    int getSelectedTransactionCount() {
+        return getSelectionModel().getSelectedIndices().size();
     }
 
     Optional<Transaction> getSelectedTransaction() {
-        TreeItem<TransactionTreeItem> treeItem = getSelectionModel().getSelectedItem();
-        if (treeItem == null) {
+        Transaction transaction = getSelectionModel().getSelectedItem();
+        if (transaction == null) {
             return Optional.empty();
         } else {
-            TransactionTreeItem item = treeItem.getValue();
-            if (item.isGroupProperty().get()) {
+            if (transaction instanceof SplitTransaction) {
                 return Optional.empty();
             } else {
-                return Optional.of(item.getTransaction());
+                return Optional.of(transaction);
             }
         }
     }
 
     // Method assumes that all checks are done in onShowingContextMenu method
-    private void onGroup(ActionEvent event) {
+    private void onGroup() {
         // List of selected transactions
-        List<Transaction> transactions = getSelectionModel().getSelectedItems().stream()
-                .map(x -> x.getValue().getTransaction())
-                .collect(Collectors.toList());
+        List<Transaction> transactions = getSelectionModel().getSelectedItems();
 
         Transaction first = transactions.get(0);
 
@@ -402,17 +339,14 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
                 .month(first.getMonth())
                 .year(first.getYear());
 
-        addGroupConsumer.accept(builder, transactions);
+        addGroupConsumer.accept(builder, new ArrayList<>(transactions));
     }
 
     // Method assumes that all checks are done in onShowingContextMenu method
-    private void onUngroup(ActionEvent event) {
-        List<Transaction> transactions = getSelectionModel().getSelectedItem().getValue().getChildren()
-                .stream()
-                .map(TransactionTreeItem::getTransaction)
-                .collect(Collectors.toList());
-
-        ungroupConsumer.accept(transactions);
+    private void onUngroup() {
+        ungroupConsumer.accept(
+                getTransactionsByGroup(
+                        getSelectionModel().getSelectedItem().getGroupId()));
     }
 
     private void onCheckTransaction(List<Transaction> t, boolean checked) {
@@ -431,11 +365,67 @@ class TransactionTableView extends TreeTableView<TransactionTreeItem> implements
         checkTransactionConsumer = c;
     }
 
-    void setOnExpandGroup(BiConsumer<TransactionGroup, Boolean> c) {
-        expandGroupConsumer = c;
+    TableColumn<Transaction, Transaction> getDayColumn() {
+        return dayColumn;
     }
 
-    TreeTableColumn<TransactionTreeItem, TransactionTreeItem> getDayColumn() {
-        return dayColumn;
+    private List<Transaction> getTransactionsByGroup(int groupId) {
+        return getItems().stream()
+                .filter(t -> t.getGroupId() == groupId && !(t instanceof SplitTransaction))
+                .collect(Collectors.toList());
+    }
+
+    private void transactionListener(MapChangeListener.Change<? extends Integer,? extends Transaction> change) {
+        Transaction added = change.wasAdded() && transactionFilter.test(change.getValueAdded())?
+                change.getValueAdded() : null;
+
+        int index = change.wasRemoved()?
+                getItems().indexOf(change.getValueRemoved()) : -1;
+
+        if (index != -1) {
+            if (added != null) {
+                getItems().set(index, added);
+            } else {
+                getItems().remove(index);
+            }
+        } else {
+            if (added != null) {
+                getItems().add(added);
+            }
+        }
+
+        listSizeProperty.set(getItems().size());
+
+        Platform.runLater(() -> {
+            sort();
+            if (added != null) {
+                getSelectionModel().clearSelection();
+                getSelectionModel().select(added);
+            }
+        });
+    }
+
+    private void transactionGroupListener(MapChangeListener.Change<? extends Integer,? extends TransactionGroup> change) {
+        if (change.wasRemoved()) {
+            // find appropriate group
+            getItems().stream()
+                    .filter(t -> t.getGroupId() == change.getValueRemoved().getId() && t instanceof SplitTransaction)
+                    .findFirst()
+                    .ifPresent(t -> getItems().remove(t));
+        }
+
+        if (change.wasAdded()) {
+            // check if this list has transactions from this group
+            List<Transaction> group = getItems().stream()
+                    .filter(t -> t.getGroupId() == change.getValueAdded().getId() && !(t instanceof SplitTransaction))
+                    .collect(Collectors.toList());
+            if (!group.isEmpty()) {
+                SplitTransaction split = new SplitTransaction(change.getValueAdded().getId(), group);
+                getItems().add(split);
+                Platform.runLater(this::sort);
+            }
+        }
+
+        listSizeProperty.set(getItems().size());
     }
 }

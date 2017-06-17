@@ -43,10 +43,10 @@ import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
-import java.util.Collection;
-import java.util.Collections;
+import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 class RequestTab extends BorderPane {
@@ -54,9 +54,9 @@ class RequestTab extends BorderPane {
 
     private final ResourceBundle rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH);
 
-    private final ChoiceBox categoryTypeChoiceBox = new ChoiceBox();
-    private final ChoiceBox categoryChoiceBox = new ChoiceBox();
-    private final ChoiceBox accountChoiceBox = new ChoiceBox();
+    private final ChoiceBox<Object> categoryTypeChoiceBox = new ChoiceBox<>();
+    private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
+    private final ChoiceBox<Object> accountChoiceBox = new ChoiceBox<>();
 
     private final SimpleStringProperty allTypesString = new SimpleStringProperty();
     private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
@@ -96,7 +96,7 @@ class RequestTab extends BorderPane {
         allCategoriesString.set(rb.getString("account.Window.AllCategories"));
         allAccountsString.set(rb.getString("text.All.Accounts"));
 
-        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object obj) {
                 return (obj instanceof CategoryType)?
@@ -104,7 +104,7 @@ class RequestTab extends BorderPane {
             }
         });
 
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object obj) {
                 return (obj instanceof Category)?
@@ -112,7 +112,7 @@ class RequestTab extends BorderPane {
             }
         });
 
-        accountChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        accountChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
             @Override
             public String toString(Object obj) {
                 return (obj instanceof Account)?
@@ -215,38 +215,28 @@ class RequestTab extends BorderPane {
     }
 
     private void onFindButton() {
-        Collection<Transaction> transactions;
-
-        MoneyDAO dao = MoneyDAO.getInstance();
+        Predicate<Transaction> filter = t -> true;
 
         Account account = getSelectedAccount();
         if (account != null) {
-            transactions = dao.getTransactions(Collections.singletonList(account));
+            filter = TransactionFilter.byAccount(account.getId());
         } else {
             Category category = getSelectedCategory();
             if (category != null) {
-                List<Account> accounts = dao.getAccountsByCategory(category.getId());
-                transactions = dao.getTransactions(accounts);
+                filter = TransactionFilter.byCategory(category.getId());
             } else {
                 CategoryType type = getSelectedCategoryType();
                 if (type != null) {
-                    List<Category> categories = dao.getCategoriesByType(type);
-                    transactions = dao.getTransactionsByCategories(categories);
-                } else {
-                    transactions = dao.getTransactions();
+                    filter = TransactionFilter.byCategoryType(type.getId());
                 }
             }
         }
 
-        transactionTable.clear();
-        transactionTable.addRecords(transactions.stream()
-            .sorted(Transaction.BY_DATE)
-            .collect(Collectors.toList()));
-        transactionTable.sort();
+        transactionTable.setTransactionFilter(filter);
     }
 
     private void onClearButton() {
-        transactionTable.clear();
+        transactionTable.setTransactionFilter(t -> false);
 
         setupCategoryTypesBox();
     }

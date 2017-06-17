@@ -26,13 +26,21 @@
 
 package org.panteleyev.money.test;
 
+import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.Category;
+import org.panteleyev.money.persistence.Contact;
+import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.MySQLBuilder;
+import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.TransactionGroup;
 import org.testng.SkipException;
 import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.List;
 
 public class BaseDaoTest extends BaseTest {
     private static String TEST_DB_NAME = "TestDB";
@@ -55,6 +63,7 @@ public class BaseDaoTest extends BaseTest {
                 .host(host)
                 .user(user)
                 .password(password)
+                .name(dbName)
                 .build();
 
         dao = MoneyDAO.initialize(dataSource);
@@ -70,5 +79,29 @@ public class BaseDaoTest extends BaseTest {
     void initializeEmptyMoneyFile() throws Exception {
         dao.createTables();
         dao.preload();
+    }
+
+    int newCategoryId() {
+        return dao.generatePrimaryKey(Category.class);
+    }
+
+    int newAccountId() {
+        return dao.generatePrimaryKey(Account.class);
+    }
+
+    int newCurrencyId() {
+        return dao.generatePrimaryKey(Currency.class);
+    }
+
+    int newContactId() {
+        return dao.generatePrimaryKey(Contact.class);
+    }
+
+    int newTransactionGroupId() {
+        return dao.generatePrimaryKey(TransactionGroup.class);
+    }
+
+    int newTransactionId() {
+        return dao.generatePrimaryKey(Transaction.class);
     }
 }

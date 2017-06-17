@@ -25,6 +25,7 @@
  */
 package org.panteleyev.money.test;
 
+import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.MoneyDAO;
@@ -46,6 +47,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         try {
             super.setupAndSkip();
             getDao().createTables();
+            getDao().preload();
         } catch (Exception ex) {
             throw new SkipException("Database not configured");
         }
@@ -60,31 +62,99 @@ public class TestMoneyDAO extends BaseDaoTest {
     @DataProvider(name="testMoneyDAODataProvider")
     public Object[][] testMoneyDAODataProvider() {
         CategoryType catType = randomCategoryType();
-        Integer catID = RANDOM.nextInt();
-        Integer currID = RANDOM.nextInt();
-        Integer accID = RANDOM.nextInt();
-        Integer contactId = RANDOM.nextInt();
+        Integer catID = newCategoryId();
+        Integer currID = newCurrencyId();
+        Integer accID = newAccountId();
+        Integer contactId = newContactId();
         TransactionType transactionType = randomTransactionType();
-        Integer transactionGroupId = RANDOM.nextInt();
-        Integer transactionId = RANDOM.nextInt();
+        Integer transactionGroupId = newTransactionGroupId();
+        Integer transactionId = newTransactionId();
 
         return new Object[][] {
-                { newCategory(catID, catType ) },
-                { newCurrency(currID) },
-                { newContact(contactId) },
-                { newAccount(accID, catType, catID, currID) },
-                { newTransactionGroup(transactionGroupId) },
-                { newTransaction(
-                        transactionId,
-                        transactionType,
-                        accID,
-                        accID,
-                        catType,
-                        catType,
-                        catID,
-                        catID,
-                        transactionGroupId,
-                        contactId)
+                {
+                    newCategory(catID, catType )
+                },
+                {
+                    newCurrency(currID)
+                },
+                {
+                    new Currency(
+                            newCurrencyId(),
+                            UUID.randomUUID().toString(),
+                            UUID.randomUUID().toString(),
+                            UUID.randomUUID().toString(),
+                            RANDOM.nextInt(),
+                            RANDOM.nextBoolean(),
+                            RANDOM.nextBoolean(),
+                            BigDecimal.ZERO,
+                            RANDOM.nextInt(),
+                            RANDOM.nextBoolean()
+                    )
+                },
+                {
+                    new Currency(
+                            newCurrencyId(),
+                            UUID.randomUUID().toString(),
+                            UUID.randomUUID().toString(),
+                            UUID.randomUUID().toString(),
+                            RANDOM.nextInt(),
+                            RANDOM.nextBoolean(),
+                            RANDOM.nextBoolean(),
+                            BigDecimal.TEN,
+                            RANDOM.nextInt(),
+                            RANDOM.nextBoolean()
+                    )
+                },
+                {
+                    newContact(contactId)
+                },
+                {
+                    newAccount(accID, catType, catID, currID)
+                },
+                {
+                    new Account(
+                            newAccountId(),
+                            UUID.randomUUID().toString(),
+                            UUID.randomUUID().toString(),
+                            BigDecimal.ZERO,
+                            BigDecimal.TEN,
+                            BigDecimal.ONE,
+                            randomCategoryType().getId(),
+                            catID,
+                            currID,
+                            RANDOM.nextBoolean()
+                    )
+                },
+                {
+                    newTransactionGroup(transactionGroupId)
+                },
+                {
+                    newTransaction(
+                            transactionId,
+                            transactionType,
+                            accID,
+                            accID,
+                            catType,
+                            catType,
+                            catID,
+                            catID,
+                            transactionGroupId,
+                            contactId)
+                },
+                {
+                    newTransaction(
+                            newTransactionId(),
+                            BigDecimal.TEN,
+                            BigDecimal.ONE,
+                            transactionType,
+                            accID,
+                            accID,
+                            catType,
+                            catType,
+                            catID,
+                            catID,
+                            transactionGroupId,
+                            contactId)
                 },
         };
     }
@@ -96,6 +166,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         dao.insert(item);
         Record newItem = dao.get(item.getId(), item.getClass());
         Assert.assertEquals(newItem, item);
+        Assert.assertEquals(newItem.hashCode(), item.hashCode());
     }
 
     @DataProvider(name="testCurrencyUpdateDataProvider")
@@ -111,7 +182,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         MoneyDAO dao = getDao();
 
         Currency.Builder builder = new Currency.Builder(c)
-                .id(dao.generatePrimaryKey(Currency.class));
+                .id(newCurrencyId());
 
         Currency original = builder.build();
 

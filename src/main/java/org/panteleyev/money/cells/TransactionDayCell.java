@@ -23,26 +23,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package org.panteleyev.money;
+package org.panteleyev.money.cells;
 
-public interface Styles {
-    int BIG_SPACING = 5;
-    int SMALL_SPACING = 2;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.persistence.SplitTransaction;
+import org.panteleyev.money.persistence.Transaction;
 
-    String BLACK_TEXT   = "blackText";
-    String RED_TEXT     = "redText";
-    String BLUE_TEXT    = "blueText";
-    String GROUP_CELL   = "groupCell";
-    String GROUP_MEMBER_CELL = "groupMemberCell";
-    String TRANSACTION_CELL = "transactionCell";
+public class TransactionDayCell extends TableCell<Transaction, Transaction> {
+    private final boolean fullDate;
 
-    String GRID_PANE    = "gridPane";
+    public TransactionDayCell(boolean fullDate) {
+        this.fullDate = fullDate;
+    }
 
-    // About Dialog
-    String ABOUT_APP_TITLE_LABEL = "aboutAppNameLabel";
-    String ABOUT_LABEL  = "aboutLabel";
-
-    // Transaction Editor
-    String RATE_LABEL = "rateLabel";
-    String SUB_LABEL = "subLabel";
+    @Override
+    protected void updateItem(Transaction transaction, boolean empty) {
+        super.updateItem(transaction, empty);
+        if (empty || transaction == null) {
+            setText("");
+        } else {
+            if (transaction instanceof SplitTransaction || transaction.getGroupId() == 0) {
+                if (fullDate) {
+                    setText(String.format("%02d.%02d.%04d",
+                            transaction.getDay(),
+                            transaction.getMonth(),
+                            transaction.getYear()));
+                } else {
+                    setText(Integer.toString(transaction.getDay()));
+                }
+            } else {
+                setText("");
+            }
+        }
+    }
 }
