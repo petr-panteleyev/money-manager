@@ -21,19 +21,12 @@ cd <persistence>
 mvn install
 ```
 
-## Building JAR File
-
-```
-cd <money>
-mvn package
-```
-
 ## Building Standalone JAR
 
 ```
 cd <money>
 mvn clean
-mvn package -P fatjar
+mvn package
 ```
 
 ## Building Native Packages
@@ -41,7 +34,7 @@ mvn package -P fatjar
 ```
 cd <money>
 mvn clean
-mvn package -P fatjar
+mvn package
 mvn exec:exec@<native-dist>
 ```
 
