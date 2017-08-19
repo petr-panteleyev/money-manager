@@ -46,12 +46,20 @@ class TestContact : BaseTest() {
         val city = UUID.randomUUID().toString()
         val country = UUID.randomUUID().toString()
         val zip = UUID.randomUUID().toString()
+        val uuid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
         val c1 = Contact(id, name, type.id, phone, mobile, email, web,
-                comment, street, city, country, zip)
+                comment, street, city, country, zip,
+                guid = uuid,
+                modified = modified
+        )
 
         val c2 = Contact(id, name, type.id, phone, mobile, email, web,
-                comment, street, city, country, zip)
+                comment, street, city, country, zip,
+                guid = uuid,
+                modified = modified
+        )
 
         Assert.assertEquals(c1, c2)
         Assert.assertEquals(c1.hashCode(), c2.hashCode())

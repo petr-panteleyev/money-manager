@@ -152,7 +152,7 @@ class CategoryWindowController : BaseController() {
             if (c.id != 0) {
                 MoneyDAO.updateCategory(c)
             } else {
-                MoneyDAO.insertCategory(c.copy(_id = MoneyDAO.generatePrimaryKey(Category::class.java)))
+                MoneyDAO.insertCategory(c.copy(id = MoneyDAO.generatePrimaryKey(Category::class)))
             }
         }
     }

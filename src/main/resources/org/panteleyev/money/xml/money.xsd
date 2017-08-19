@@ -1,0 +1,313 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+            Money Database export file schema.
+            Copyright (c) 2017, Petr Panteleyev
+        </xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:element name="Money">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Accounts">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Account"
+                                         type="Account"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="AccountUniqueId">
+                        <xsd:selector xpath="Account"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="AccountUniqueUUID">
+                        <xsd:selector xpath="Account"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Categories">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Category"
+                                         type="Category"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="CategoryUniqueId">
+                        <xsd:selector xpath="Category"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="CategoryUniqueUUID">
+                        <xsd:selector xpath="Category"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Contacts">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Contact"
+                                         type="Contact"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="ContactUniqueId">
+                        <xsd:selector xpath="Contact"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="ContactUniqueUUID">
+                        <xsd:selector xpath="Contact"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Currencies">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Currency"
+                                         type="Currency"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="CurrencyUniqueId">
+                        <xsd:selector xpath="Currency"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="CurrencyUniqueUUID">
+                        <xsd:selector xpath="Currency"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="TransactionGroups">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="TransactionGroup"
+                                         type="TransactionGroup"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="TransactionGroupUniqueId">
+                        <xsd:selector xpath="TransactionGroup"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="TransactionGroupUniqueUUID">
+                        <xsd:selector xpath="TransactionGroup"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Transactions">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Transaction"
+                                         type="Transaction"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="TransactionUniqueId">
+                        <xsd:selector xpath="Transaction"/>
+                        <xsd:field xpath="@id"/>
+                    </xsd:unique>
+                    <xsd:unique name="TransactionUniqueUUID">
+                        <xsd:selector xpath="Transaction"/>
+                        <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:complexType name="Account">
+        <xsd:all>
+            <xsd:element name="accountLimit" type="xsd:decimal"/>
+            <xsd:element name="categoryId" type="Id"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="currencyId" type="OptionalId"/>
+            <xsd:element name="currencyRate" type="xsd:decimal"/>
+            <xsd:element name="enabled" type="xsd:boolean"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="openingBalance" type="xsd:decimal"/>
+            <xsd:element name="typeId" type="CategoryType"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Category">
+        <xsd:all>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="catTypeId" type="CategoryType"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="expanded" type="xsd:boolean"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Contact">
+        <xsd:all>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="typeId" type="ContactType"/>
+            <xsd:element name="email" type="xsd:string"/>
+            <xsd:element name="web" type="xsd:string"/>
+            <xsd:element name="mobile" type="xsd:string"/>
+            <xsd:element name="phone" type="xsd:string"/>
+            <xsd:element name="street" type="xsd:string"/>
+            <xsd:element name="city" type="xsd:string"/>
+            <xsd:element name="country" type="xsd:string"/>
+            <xsd:element name="zip" type="xsd:string"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Currency">
+        <xsd:all>
+            <xsd:element name="default" type="xsd:boolean"/>
+            <xsd:element name="description" type="xsd:string"/>
+            <xsd:element name="direction" type="Switch"/>
+            <xsd:element name="formatSymbol" type="xsd:string"/>
+            <xsd:element name="formatSymbolPosition" type="Switch"/>
+            <xsd:element name="rate" type="xsd:decimal"/>
+            <xsd:element name="showFormatSymbol" type="xsd:boolean"/>
+            <xsd:element name="symbol" type="xsd:string"/>
+            <xsd:element name="useThousandSeparator" type="xsd:boolean"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="TransactionGroup">
+        <xsd:all>
+            <xsd:element name="day" type="Day"/>
+            <xsd:element name="expanded" type="xsd:boolean"/>
+            <xsd:element name="month" type="Month"/>
+            <xsd:element name="year" type="Year"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Transaction">
+        <xsd:all>
+            <xsd:element name="accountCreditedCategoryId" type="Id"/>
+            <xsd:element name="accountCreditedId" type="Id"/>
+            <xsd:element name="accountCreditedTypeId" type="CategoryType"/>
+            <xsd:element name="accountDebitedCategoryId" type="Id"/>
+            <xsd:element name="accountDebitedId" type="Id"/>
+            <xsd:element name="accountDebitedTypeId" type="CategoryType"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="checked" type="xsd:boolean"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="contactId" type="OptionalId"/>
+            <xsd:element name="day" type="Day"/>
+            <xsd:element name="groupId" type="OptionalId"/>
+            <xsd:element name="invoiceNumber" type="xsd:string"/>
+            <xsd:element name="month" type="Month"/>
+            <xsd:element name="rate" type="xsd:decimal"/>
+            <xsd:element name="rateDirection" type="Switch"/>
+            <xsd:element name="transactionTypeId" type="TransactionType"/>
+            <xsd:element name="year" type="Year"/>
+            <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+        <xsd:attribute name="id" type="Id"/>
+    </xsd:complexType>
+
+    <xsd:simpleType name="UUID">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Switch">
+        <xsd:restriction base="xsd:int">
+            <xsd:enumeration value="0"/>
+            <xsd:enumeration value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Day">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+            <xsd:maxInclusive value="31"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Month">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+            <xsd:maxInclusive value="12"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Year">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="0"/>
+            <xsd:maxInclusive value="3000"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="CategoryType">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+            <xsd:maxInclusive value="7"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ContactType">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+            <xsd:maxInclusive value="6"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="TransactionType">
+        <xsd:restriction base="xsd:int">
+            <xsd:enumeration value="1"/>
+            <xsd:enumeration value="2"/>
+            <xsd:enumeration value="3"/>
+            <xsd:enumeration value="5"/>
+            <xsd:enumeration value="6"/>
+            <xsd:enumeration value="7"/>
+            <xsd:enumeration value="8"/>
+            <xsd:enumeration value="10"/>
+            <xsd:enumeration value="11"/>
+            <xsd:enumeration value="13"/>
+            <xsd:enumeration value="14"/>
+            <xsd:enumeration value="15"/>
+            <xsd:enumeration value="17"/>
+            <xsd:enumeration value="18"/>
+            <xsd:enumeration value="20"/>
+            <xsd:enumeration value="21"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="OptionalId">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="0"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Id">
+        <xsd:restriction base="xsd:int">
+            <xsd:minInclusive value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Timestamp">
+        <xsd:restriction base="xsd:long">
+            <xsd:minInclusive value="0"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

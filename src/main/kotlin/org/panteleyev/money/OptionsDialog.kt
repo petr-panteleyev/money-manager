@@ -35,7 +35,7 @@ import javafx.scene.layout.GridPane
 import org.panteleyev.utilities.fx.BaseDialog
 import java.util.ResourceBundle
 
-class OptionsDialog : BaseDialog<ButtonType>(MainWindowController.DIALOGS_CSS) {
+class OptionsDialog : BaseDialog<ButtonType>(MainWindowController.CSS_PATH) {
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
     private val autoCompleteLength = ChoiceBox(FXCollections.observableArrayList(2, 3, 4, 5))

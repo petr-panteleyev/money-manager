@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Money>
+    <Accounts/>
+    <Categories/>
+    <Contacts>
+        <Contact id="235">
+            <city></city>
+            <comment></comment>
+            <country></country>
+            <email></email>
+            <guid>3e6f322a-7470-11e7-857e-389c6424842b</guid>
+            <mobile></mobile>
+            <modified>1000</modified>
+            <name>Train Station</name>
+            <phone></phone>
+            <street></street>
+            <typeId>1</typeId>
+            <web></web>
+            <zip></zip>
+        </Contact>
+        <Contact id="235">
+            <city></city>
+            <comment></comment>
+            <country></country>
+            <email></email>
+            <guid>3e6f52d2-7470-11e7-857e-389c6424842b</guid>
+            <mobile></mobile>
+            <modified>1000</modified>
+            <name>Bar</name>
+            <phone></phone>
+            <street></street>
+            <typeId>1</typeId>
+            <web></web>
+            <zip></zip>
+        </Contact>
+    </Contacts>
+    <Currencies/>
+    <TransactionGroups/>
+    <Transactions/>
+</Money>

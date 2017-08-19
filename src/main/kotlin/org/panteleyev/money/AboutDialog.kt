@@ -36,7 +36,7 @@ import javafx.scene.layout.VBox
 import org.panteleyev.utilities.fx.BaseDialog
 import java.util.ResourceBundle
 
-class AboutDialog : BaseDialog<Any>(MainWindowController.DIALOGS_CSS) {
+class AboutDialog : BaseDialog<Any>(MainWindowController.CSS_PATH) {
     companion object {
         const val APP_TITLE = "Money Manager"
         const val COPYRIGHT = "Copyright (c) 2016, 2017, Petr Panteleyev"

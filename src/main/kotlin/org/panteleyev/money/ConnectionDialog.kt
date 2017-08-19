@@ -39,7 +39,7 @@ import org.panteleyev.money.persistence.MySQLBuilder
 import org.panteleyev.utilities.fx.BaseDialog
 import java.util.ResourceBundle
 
-class ConnectionDialog(newConnection : Boolean) : BaseDialog<MySQLBuilder>(MainWindowController.DIALOGS_CSS) {
+class ConnectionDialog(newConnection : Boolean) : BaseDialog<MySQLBuilder>(MainWindowController.CSS_PATH) {
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
     private val hostEdit = TextField()

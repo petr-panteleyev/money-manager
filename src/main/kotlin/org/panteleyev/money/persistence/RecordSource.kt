@@ -26,6 +26,15 @@
 
 package org.panteleyev.money.persistence
 
-interface Named {
-    val name : String
+/**
+ * Represents record storage capable to retrieve record by its id. Main purpose is to mock
+ * MoneyDAO in various tests.
+ */
+interface RecordSource {
+    fun getCategory(id: Int): Category?
+    fun getCurrency(id: Int): Currency?
+    fun getContact(id: Int): Contact?
+    fun getAccount(id: Int): Account?
+    fun getTransactionGroup(id: Int): TransactionGroup?
+    fun getTransaction(id: Int): Transaction?
 }

@@ -36,8 +36,10 @@ import javafx.scene.control.CheckBox
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.MenuItem
 import javafx.scene.control.SelectionMode
+import javafx.scene.control.SeparatorMenuItem
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
+import javafx.stage.FileChooser
 import org.panteleyev.money.cells.TransactionContactCell
 import org.panteleyev.money.cells.TransactionCreditedAccountCell
 import org.panteleyev.money.cells.TransactionDayCell
@@ -49,16 +51,20 @@ import org.panteleyev.money.persistence.MoneyDAO
 import org.panteleyev.money.persistence.SplitTransaction
 import org.panteleyev.money.persistence.Transaction
 import org.panteleyev.money.persistence.TransactionGroup
+import org.panteleyev.money.xml.Export
+import java.io.FileOutputStream
 import java.util.ArrayList
 import java.util.Arrays
 import java.util.Comparator
 import java.util.ResourceBundle
+import java.util.UUID
+import java.util.concurrent.CompletableFuture
 import java.util.function.Predicate
 
 internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>() {
 
     private var addGroupConsumer: (TransactionGroup, List<Transaction>) -> Unit = { _, _ -> }
-    private var ungroupConsumer: (List<Transaction>) -> Unit = {  }
+    private var ungroupConsumer: (List<Transaction>) -> Unit = { }
     private var checkTransactionConsumer: (List<Transaction>, Boolean) -> Unit = { _, _ -> }
 
     // Menu items
@@ -135,26 +141,30 @@ internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>(
         val accountCreditedColumn = TableColumn<Transaction, Transaction>(BUNDLE.getString("column.Account.Credited"))
         accountCreditedColumn.setCellFactory { TransactionCreditedAccountCell() }
         accountCreditedColumn.setCellValueFactory {
-            p: TableColumn.CellDataFeatures<Transaction, Transaction> -> ReadOnlyObjectWrapper(p.value)
+            p: TableColumn.CellDataFeatures<Transaction, Transaction> ->
+            ReadOnlyObjectWrapper(p.value)
         }
         accountCreditedColumn.isSortable = false
 
         val contactColumn = TableColumn<Transaction, Transaction>(BUNDLE.getString("column.Payer.Payee"))
         contactColumn.setCellFactory { TransactionContactCell() }
         contactColumn.setCellValueFactory {
-            p: TableColumn.CellDataFeatures<Transaction, Transaction> -> ReadOnlyObjectWrapper(p.value)
+            p: TableColumn.CellDataFeatures<Transaction, Transaction> ->
+            ReadOnlyObjectWrapper(p.value)
         }
         contactColumn.isSortable = false
 
         val commentColumn = TableColumn<Transaction, String>(BUNDLE.getString("column.Comment"))
         commentColumn.setCellValueFactory {
-            p: TableColumn.CellDataFeatures<Transaction, String> -> ReadOnlyObjectWrapper(p.value.comment)
+            p: TableColumn.CellDataFeatures<Transaction, String> ->
+            ReadOnlyObjectWrapper(p.value.comment)
         }
         commentColumn.isSortable = false
 
         val sumColumn = TableColumn<Transaction, Transaction>(BUNDLE.getString("column.Sum"))
         sumColumn.setCellValueFactory {
-            p: TableColumn.CellDataFeatures<Transaction, Transaction> -> ReadOnlyObjectWrapper(p.value)
+            p: TableColumn.CellDataFeatures<Transaction, Transaction> ->
+            ReadOnlyObjectWrapper(p.value)
         }
         sumColumn.setCellFactory { TransactionSumCell() }
         sumColumn.setComparator({ t1, t2 -> t1.signedAmount.compareTo(t2.signedAmount) })
@@ -203,21 +213,29 @@ internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>(
         sumColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05))
         approvedColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05))
 
+        selectionModel.selectionMode = SelectionMode.MULTIPLE
+        val exportMenuItem = MenuItem(BUNDLE.getString("menu.Context.Export")).apply {
+            setOnAction { onExportTransactions() }
+        }
+
+        contextMenu = ContextMenu(exportMenuItem).apply {
+            setOnShowing { onShowingContextMenu() }
+        }
+
         // No full date means we are in the transaction editing enabled mode
         if (!fullDate) {
-            selectionModel.selectionMode = SelectionMode.MULTIPLE
-
             // Context menu
             ctxGroupMenuItem.setOnAction { onGroup() }
             ctxUngroupMenuItem.setOnAction { onUngroup() }
 
-            val ctxMenu = ContextMenu(ctxGroupMenuItem, ctxUngroupMenuItem)
-
-            ctxMenu.setOnShowing { onShowingContextMenu() }
-            contextMenu = ctxMenu
+            contextMenu.items.addAll(
+                    SeparatorMenuItem(),
+                    ctxGroupMenuItem,
+                    ctxUngroupMenuItem
+            )
         }
 
-        with (MoneyDAO) {
+        with(MoneyDAO) {
             transactions().addListener(MapChangeListener<Int, Transaction> { transactionListener(it) })
             transactionGroups().addListener(MapChangeListener<Int, TransactionGroup> { transactionGroupListener(it) })
         }
@@ -272,7 +290,7 @@ internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>(
 
         // Add groups
         val transactionsByGroup = transactions
-                .filter { it.groupId != 0}
+                .filter { it.groupId != 0 }
                 .groupBy { it.groupId }
 
         transactionsByGroup.keys.forEach { groupId ->
@@ -317,7 +335,14 @@ internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>(
 
         val first = transactions[0]
 
-        val tg = TransactionGroup(0, first.day, first.month, first.year, false)
+        val tg = TransactionGroup(id = 0,
+                day = first.day,
+                month = first.month,
+                year = first.year,
+                expanded = false,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
+        )
 
         addGroupConsumer(tg, ArrayList(transactions))
     }
@@ -345,6 +370,30 @@ internal class TransactionTableView(fullDate: Boolean) : TableView<Transaction>(
 
     private fun getTransactionsByGroup(groupId: Int): List<Transaction> {
         return items.filter { it.groupId == groupId && it !is SplitTransaction }
+    }
+
+    private fun onExportTransactions() {
+        val toExport = selectionModel.selectedItems
+                .filterNot { it is SplitTransaction }
+
+        if (!toExport.isEmpty()) {
+            val selected = FileChooser().apply {
+                title = "Export to file"
+                extensionFilters.addAll(
+                        FileChooser.ExtensionFilter("XML Files", "*.xml"),
+                        FileChooser.ExtensionFilter("All Files", "*.*")
+                )
+            }.showSaveDialog(null)
+
+            selected?.let {
+                CompletableFuture.runAsync {
+                    FileOutputStream(selected).use {
+                        Export().withTransactions(toExport, withDeps = true)
+                                .export(it)
+                    }
+                }
+            }
+        }
     }
 
     private fun transactionListener(change: MapChangeListener.Change<out Int, out Transaction>) {

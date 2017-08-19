@@ -37,6 +37,8 @@ object Styles {
     const val GROUP_MEMBER_CELL = "groupMemberCell"
     const val TRANSACTION_CELL = "transactionCell"
 
+    const val BOLD_TEXT = "boldText"
+
     const val GRID_PANE = "gridPane"
 
     // About Dialog

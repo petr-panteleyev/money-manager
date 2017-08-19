@@ -275,7 +275,7 @@ internal class TransactionsTab : BorderPane() {
 
     private fun createContact(name: String): Contact {
         return MoneyDAO.insertContact(Contact(
-                _id = MoneyDAO.generatePrimaryKey(Contact::class.java),
+                id = MoneyDAO.generatePrimaryKey(Contact::class),
                 name = name))
     }
 
@@ -289,7 +289,7 @@ internal class TransactionsTab : BorderPane() {
         val month = monthFilterBox.selectionModel.selectedIndex + 1
         val year = yearSpinner.value
 
-        builder.id(MoneyDAO.generatePrimaryKey(Transaction::class.java)!!)
+        builder.id(MoneyDAO.generatePrimaryKey(Transaction::class))
                 .month(month)
                 .year(year)
                 .groupId(0)
@@ -315,9 +315,9 @@ internal class TransactionsTab : BorderPane() {
     }
 
     private fun onAddGroup(group: TransactionGroup, transactions: List<Transaction>) {
-        val groupId = MoneyDAO.generatePrimaryKey(TransactionGroup::class.java)!!
+        val groupId = MoneyDAO.generatePrimaryKey(TransactionGroup::class)
 
-        val grp = group.copy(_id = groupId)
+        val grp = group.copy(id = groupId)
 
         transactions.forEach {
             MoneyDAO.updateTransaction(

@@ -58,7 +58,9 @@ class TestEditorPane : BaseDaoTest() {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                1, false, false, BigDecimal(RANDOM.nextDouble()), 1, false
+                1, false, false, BigDecimal(RANDOM.nextDouble()), 1, false,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
@@ -67,7 +69,9 @@ class TestEditorPane : BaseDaoTest() {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                1, false, false, BigDecimal(RANDOM.nextDouble()), 1, false
+                1, false, false, BigDecimal(RANDOM.nextDouble()), 1, false,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
@@ -76,12 +80,14 @@ class TestEditorPane : BaseDaoTest() {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 CategoryType.BANKS_AND_CASH.id,
-                false
+                false,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
     private val contact by lazy {
-        Contact(_id = newContactId(), name = UUID.randomUUID().toString())
+        Contact(id = newContactId(), name = UUID.randomUUID().toString())
     }
 
     private val acc_1: Account by lazy {
@@ -94,7 +100,9 @@ class TestEditorPane : BaseDaoTest() {
                 CategoryType.BANKS_AND_CASH.id,
                 category.id,
                 curr_1.id,
-                true
+                enabled = true,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
@@ -109,7 +117,9 @@ class TestEditorPane : BaseDaoTest() {
                 CategoryType.BANKS_AND_CASH.id,
                 category.id,
                 curr_2.id,
-                true
+                enabled = true,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
@@ -124,7 +134,9 @@ class TestEditorPane : BaseDaoTest() {
                 CategoryType.BANKS_AND_CASH.id,
                 category.id,
                 curr_1.id,
-                true
+                enabled = true,
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 

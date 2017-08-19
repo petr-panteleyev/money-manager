@@ -41,8 +41,9 @@ import org.panteleyev.money.persistence.CategoryType
 import org.panteleyev.utilities.fx.BaseDialog
 import java.util.Arrays
 import java.util.ResourceBundle
+import java.util.UUID
 
-class CategoryDialog(val category : Category?) : BaseDialog<Category>(MainWindowController.DIALOGS_CSS) {
+class CategoryDialog(val category: Category?) : BaseDialog<Category>(MainWindowController.CSS_PATH) {
 
     private val typeComboBox = ChoiceBox<CategoryType>()
     private val nameEdit = TextField()
@@ -51,14 +52,14 @@ class CategoryDialog(val category : Category?) : BaseDialog<Category>(MainWindow
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
     init {
-        dialogPane.stylesheets.add(MainWindowController.DIALOGS_CSS)
+        dialogPane.stylesheets.add(MainWindowController.CSS_PATH)
 
         title = rb.getString("category.Dialog.Title")
 
         val pane = GridPane()
 
         var index = 0
-        with (pane) {
+        with(pane) {
             pane.styleClass.add(Styles.GRID_PANE)
             addRow(index++, Label(rb.getString("label.Type")), typeComboBox)
             addRow(index++, Label(rb.getString("label.Name")), nameEdit)
@@ -86,8 +87,15 @@ class CategoryDialog(val category : Category?) : BaseDialog<Category>(MainWindow
 
         setResultConverter { b: ButtonType ->
             if (b == ButtonType.OK) {
-                return@setResultConverter category?.copy(name = nameEdit.text, comment = commentEdit.text, catTypeId = typeComboBox.selectionModel.selectedItem.id)
-                        ?:Category(0, name = nameEdit.text, comment = commentEdit.text, catTypeId = typeComboBox.selectionModel.selectedItem.id, expanded = false)
+                return@setResultConverter category?.copy(name = nameEdit.text, comment = commentEdit.text, catTypeId = typeComboBox.selectionModel.selectedItem.id) ?:
+                        Category(id = 0,
+                                name = nameEdit.text,
+                                comment = commentEdit.text,
+                                catTypeId = typeComboBox.selectionModel.selectedItem.id,
+                                expanded = false,
+                                guid = UUID.randomUUID().toString(),
+                                modified = System.currentTimeMillis()
+                        )
             } else {
                 return@setResultConverter null
             }
@@ -101,7 +109,8 @@ class CategoryDialog(val category : Category?) : BaseDialog<Category>(MainWindow
 
     private fun createValidationSupport() {
         validation.registerValidator(nameEdit) { control: Control, value: String ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty()) }
+            ValidationResult.fromErrorIf(control, null, value.isEmpty())
+        }
         validation.initInitialDecoration()
     }
 }

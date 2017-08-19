@@ -44,8 +44,9 @@ import org.panteleyev.money.persistence.MoneyDAO
 import org.panteleyev.utilities.fx.BaseDialog
 import java.math.BigDecimal
 import java.util.ResourceBundle
+import java.util.UUID
 
-class CurrencyDialog(val currency : Currency?) : BaseDialog<Currency>(MainWindowController.DIALOGS_CSS) {
+class CurrencyDialog(val currency: Currency?) : BaseDialog<Currency>(MainWindowController.CSS_PATH) {
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
     private val nameEdit = TextField()
@@ -111,7 +112,7 @@ class CurrencyDialog(val currency : Currency?) : BaseDialog<Currency>(MainWindow
 
         setResultConverter { b: ButtonType ->
             if (b == ButtonType.OK) {
-                return@setResultConverter Currency(currency?.id?:0,
+                return@setResultConverter Currency(currency?.id ?: 0,
                         symbol = nameEdit.text,
                         description = descrEdit.text,
                         def = defaultCheck.isSelected,
@@ -120,7 +121,10 @@ class CurrencyDialog(val currency : Currency?) : BaseDialog<Currency>(MainWindow
                         formatSymbol = formatSymbolCombo.selectionModel.selectedItem,
                         formatSymbolPosition = formatSymbolPositionChoice.selectionModel.selectedIndex,
                         showFormatSymbol = showSymbolCheck.isSelected,
-                        useThousandSeparator = thousandSeparatorCheck.isSelected)
+                        useThousandSeparator = thousandSeparatorCheck.isSelected,
+                        guid = currency?.guid ?: UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
+                )
             } else {
                 return@setResultConverter null
             }
@@ -133,7 +137,9 @@ class CurrencyDialog(val currency : Currency?) : BaseDialog<Currency>(MainWindow
 
     private fun createValidationSupport() {
         validation.registerValidator(nameEdit) { control: Control,
-                                                 value: String -> ValidationResult.fromErrorIf(control, null, value.isEmpty()) }
+                                                 value: String ->
+            ValidationResult.fromErrorIf(control, null, value.isEmpty())
+        }
         validation.registerValidator(rateEdit, MainWindowController.BIG_DECIMAL_VALIDATOR)
         validation.initInitialDecoration()
     }

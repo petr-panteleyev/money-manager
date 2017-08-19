@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Money>
+    <Accounts/>
+    <Categories/>
+    <Contacts/>
+    <Currencies>
+        <Currency id="2">
+            <default>true</default>
+            <description>Russia, Rubles</description>
+            <direction>0</direction>
+            <formatSymbol></formatSymbol>
+            <formatSymbolPosition>0</formatSymbolPosition>
+            <guid>3e75c388-7470-11e7-857e-389c6424842b</guid>
+            <modified>1000</modified>
+            <rate>1.000000</rate>
+            <showFormatSymbol>false</showFormatSymbol>
+            <symbol>RUB</symbol>
+            <useThousandSeparator>true</useThousandSeparator>
+        </Currency>
+        <Currency id="3">
+            <default>true</default>
+            <description>Russia, Rubles</description>
+            <direction>0</direction>
+            <formatSymbol></formatSymbol>
+            <formatSymbolPosition>0</formatSymbolPosition>
+            <guid>3e75c388-7470-11e7-857e-389c6424842b</guid>
+            <modified>1000</modified>
+            <rate>1.000000</rate>
+            <showFormatSymbol>false</showFormatSymbol>
+            <symbol>RUB</symbol>
+            <useThousandSeparator>true</useThousandSeparator>
+        </Currency>
+    </Currencies>
+    <TransactionGroups/>
+    <Transactions/>
+</Money>

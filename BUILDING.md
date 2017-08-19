@@ -8,16 +8,14 @@ The following repositories must be cloned to build Money Manager:
 2. git clone https://github.com/petr-panteleyev/java-persistence.git persistence
 3. git clone https://github.com/petr-panteleyev/java-money.git money
 
-Persistence is available from Maven Central which means it should be cloned only if full sources are required for IDE project.
-
 ## Building Dependencies
 
 ```
 cd <utilities>
 mvn install
 
-(optionally)
 cd <persistence>
+git checkout develop
 mvn install
 ```
 

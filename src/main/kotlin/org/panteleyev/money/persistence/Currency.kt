@@ -26,7 +26,6 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.RecordBuilder
 import org.panteleyev.persistence.annotations.Table
@@ -35,8 +34,9 @@ import java.util.Objects
 
 @Table("currency")
 data class Currency @RecordBuilder constructor (
-        @Field(Field.ID)
-        val _id : Int,
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id : Int,
 
         @param:Field("symbol")
         @get:Field("symbol")
@@ -72,14 +72,19 @@ data class Currency @RecordBuilder constructor (
 
         @param:Field("show_t_separator")
         @get:Field("show_t_separator")
-        val useThousandSeparator : Boolean
-) : Record {
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
+        val useThousandSeparator : Boolean,
 
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
+
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+) : MoneyRecord {
     override fun equals(other: Any?): Boolean {
         return if (other is Currency) {
-            this._id == other._id
+            this.id == other.id
                 && this.symbol == other.symbol
                 && this.description == other.description
                 && this.formatSymbol == other.formatSymbol
@@ -89,12 +94,16 @@ data class Currency @RecordBuilder constructor (
                 && this.rate.compareTo(other.rate) == 0
                 && this.direction == other.direction
                 && this.useThousandSeparator == other.useThousandSeparator
+                && this.guid == other.guid
+                && this.modified == other.modified
         } else {
             false
         }
     }
 
     override fun hashCode(): Int =
-        Objects.hash(_id, symbol, description, formatSymbol, formatSymbolPosition, showFormatSymbol,
-                def, rate.stripTrailingZeros(), direction, useThousandSeparator)
+        Objects.hash(id, symbol, description, formatSymbol, formatSymbolPosition, showFormatSymbol,
+                def, rate.stripTrailingZeros(), direction, useThousandSeparator, guid,
+                modified
+        )
 }

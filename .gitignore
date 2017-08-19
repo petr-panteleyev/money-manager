@@ -6,7 +6,7 @@ build
 
 dependency-reduced-pom.xml
 
-/target/
+**/target/
 
 nbactions.xml
 *.iml

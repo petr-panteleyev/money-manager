@@ -120,7 +120,7 @@ class CurrencyWindowController : BaseController() {
             if (c.id != 0) {
                 MoneyDAO.updateCurrency(c)
             } else {
-                MoneyDAO.insertCurrency(c.copy(_id = MoneyDAO.generatePrimaryKey(Currency::class.java)))
+                MoneyDAO.insertCurrency(c.copy(id = MoneyDAO.generatePrimaryKey(Currency::class)))
             }
         }
     }

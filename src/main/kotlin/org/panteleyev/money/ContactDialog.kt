@@ -43,8 +43,9 @@ import org.panteleyev.money.persistence.ContactType
 import org.panteleyev.money.persistence.ReadOnlyStringConverter
 import org.panteleyev.utilities.fx.BaseDialog
 import java.util.ResourceBundle
+import java.util.UUID
 
-class ContactDialog(val contact : Contact?) : BaseDialog<Contact>(MainWindowController.DIALOGS_CSS) {
+class ContactDialog(val contact: Contact?) : BaseDialog<Contact>(MainWindowController.CSS_PATH) {
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
     private val typeChoiceBox = ChoiceBox<ContactType>()
@@ -114,7 +115,7 @@ class ContactDialog(val contact : Contact?) : BaseDialog<Contact>(MainWindowCont
 
         setResultConverter { b: ButtonType ->
             if (b == ButtonType.OK) {
-                return@setResultConverter Contact(contact?.id?:0,
+                return@setResultConverter Contact(contact?.id ?: 0,
                         typeId = typeChoiceBox.selectionModel.selectedItem.id,
                         name = nameField.text,
                         phone = phoneField.text,
@@ -125,7 +126,9 @@ class ContactDialog(val contact : Contact?) : BaseDialog<Contact>(MainWindowCont
                         street = streetField.text,
                         city = cityField.text,
                         country = countryField.text,
-                        zip = zipField.text
+                        zip = zipField.text,
+                        guid = contact?.guid ?: UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
                 )
             } else {
                 return@setResultConverter null
@@ -138,7 +141,8 @@ class ContactDialog(val contact : Contact?) : BaseDialog<Contact>(MainWindowCont
 
     private fun createValidationSupport() {
         validation.registerValidator(nameField) {
-            control: Control, value: String -> ValidationResult.fromErrorIf(control, null, value.isEmpty())
+            control: Control, value: String ->
+            ValidationResult.fromErrorIf(control, null, value.isEmpty())
         }
         validation.initInitialDecoration()
     }

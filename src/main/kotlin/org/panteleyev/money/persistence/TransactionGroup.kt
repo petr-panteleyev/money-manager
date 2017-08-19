@@ -26,19 +26,19 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.RecordBuilder
 import org.panteleyev.persistence.annotations.Table
 
 @Table("transaction_group")
 data class TransactionGroup @RecordBuilder constructor (
-        @param:Field(Field.ID)
-        val _id: Int,
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id: Int,
 
         @param:Field("date_day")
         @get:Field("date_day")
-        val day : Int,
+        val day: Int,
 
         @param:Field("date_month")
         @get:Field("date_month")
@@ -50,8 +50,13 @@ data class TransactionGroup @RecordBuilder constructor (
 
         @param:Field("expanded")
         @get:Field("expanded")
-        val expanded : Boolean
-): Record {
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
-}
+        val expanded : Boolean,
+
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
+
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+): MoneyRecord

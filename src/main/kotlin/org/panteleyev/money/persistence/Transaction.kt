@@ -26,18 +26,19 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.ForeignKey
 import org.panteleyev.persistence.annotations.RecordBuilder
 import org.panteleyev.persistence.annotations.Table
 import java.math.BigDecimal
 import java.util.Objects
+import java.util.UUID
 
 @Table("transact")
 open class Transaction @RecordBuilder constructor (
-        @param:Field(Field.ID)
-        val _id : Int,
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id : Int,
 
         @param:Field("amount")
         @get:Field("amount")
@@ -111,11 +112,16 @@ open class Transaction @RecordBuilder constructor (
 
         @param:Field("invoice_number")
         @get:Field("invoice_number")
-        val invoiceNumber : String
-) : Record {
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
+        val invoiceNumber : String,
 
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
+
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+) : MoneyRecord {
     val transactionType = TransactionType.get(transactionTypeId)
     val accountDebitedType = CategoryType.get(accountDebitedTypeId)
     val accountCreditedType = CategoryType.get(accountCreditedTypeId)
@@ -128,7 +134,7 @@ open class Transaction @RecordBuilder constructor (
 
     override fun equals(other: Any?): Boolean {
         return if (other is Transaction) {
-            this._id == other._id
+            this.id == other.id
                 && this.amount.compareTo(other.amount) == 0
                 && this.day == other.day
                 && this.month == other.month
@@ -147,11 +153,13 @@ open class Transaction @RecordBuilder constructor (
                 && this.rate.compareTo(other.rate) == 0
                 && this.rateDirection == other.rateDirection
                 && this.invoiceNumber == other.invoiceNumber
+                && this.guid == other.guid
+                && this.modified == other.modified
         } else false
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_id,
+        return Objects.hash(id,
                 amount.stripTrailingZeros(),
                 day, month, year, transactionTypeId, comment, checked,
                 accountDebitedId, accountCreditedId,
@@ -159,9 +167,42 @@ open class Transaction @RecordBuilder constructor (
                 accountDebitedCategoryId, accountCreditedCategoryId,
                 groupId, contactId,
                 rate.stripTrailingZeros(),
-                rateDirection, invoiceNumber
+                rateDirection, invoiceNumber, guid,
+                modified
         )
     }
+
+    fun copy(id: Int, accountDebitedId: Int, accountCreditedId: Int, accountDebitedCategoryId: Int,
+             accountCreditedCategoryId: Int, groupId: Int, contactId: Int): Transaction {
+        return Transaction(
+                id = id,
+                amount = this.amount,
+                day = this.day,
+                month = this.month,
+                year = this.year,
+                transactionTypeId = this.transactionTypeId,
+                comment = this.comment,
+                checked = this.checked,
+                accountDebitedId = accountDebitedId,
+                accountCreditedId = accountCreditedId,
+                accountDebitedTypeId = this.accountDebitedTypeId,
+                accountCreditedTypeId = this.accountCreditedTypeId,
+                accountDebitedCategoryId = accountDebitedCategoryId,
+                accountCreditedCategoryId = accountCreditedCategoryId,
+                groupId = groupId,
+                contactId = contactId,
+                rate = this.rate,
+                rateDirection = this.rateDirection,
+                invoiceNumber = this.invoiceNumber,
+                guid = this.guid,
+                modified = this.modified
+        )
+    }
+
+    override fun toString() : String {
+        return "[Transaction id=$id, amount=$amount], accountDebitedId=$accountDebitedId accountCreditedId=$accountCreditedId"
+    }
+
 
     companion object {
         val BY_DATE : Comparator<Transaction> = Comparator { x, y ->
@@ -204,10 +245,12 @@ open class Transaction @RecordBuilder constructor (
         var rate : BigDecimal = BigDecimal.ONE
         var rateDirection = 0
         var invoiceNumber = ""
+        var created = 0L
+        var modified = 0L
 
         constructor(t : Transaction?) : this() {
             if (t != null) {
-                this.id = t._id
+                this.id = t.id
                 this.amount = t.amount
                 this.day = t.day
                 this.month = t.month
@@ -226,6 +269,7 @@ open class Transaction @RecordBuilder constructor (
                 this.rate = t.rate
                 this.rateDirection = t.rateDirection
                 this.invoiceNumber = t.invoiceNumber
+                this.modified = t.modified
             }
         }
 
@@ -268,7 +312,7 @@ open class Transaction @RecordBuilder constructor (
             }
 
             return Transaction(
-                    _id = id,
+                    id = id,
                     amount = amount,
                     day = day,
                     month = month,
@@ -286,7 +330,9 @@ open class Transaction @RecordBuilder constructor (
                     contactId = contactId,
                     rate = rate,
                     rateDirection = rateDirection,
-                    invoiceNumber = invoiceNumber
+                    invoiceNumber = invoiceNumber,
+                    guid = UUID.randomUUID().toString(),
+                    modified = System.currentTimeMillis()
             )
         }
     }

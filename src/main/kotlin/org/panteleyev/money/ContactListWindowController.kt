@@ -188,7 +188,7 @@ class ContactListWindowController : BaseController() {
                     if (c.id != 0) {
                         MoneyDAO.updateContact(c)
                     } else {
-                        MoneyDAO.insertContact(c.copy(_id = MoneyDAO.generatePrimaryKey(Contact::class.java)))
+                        MoneyDAO.insertContact(c.copy(id = MoneyDAO.generatePrimaryKey(Contact::class)))
                     }
                 }
     }

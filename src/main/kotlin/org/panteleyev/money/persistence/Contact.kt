@@ -26,15 +26,16 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.RecordBuilder
 import org.panteleyev.persistence.annotations.Table
+import java.util.UUID
 
 @Table("contact")
 data class Contact @RecordBuilder constructor (
-        @param:Field(Field.ID)
-        val _id : Int,
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id : Int,
 
         @param:Field("name")
         @get:Field("name")
@@ -78,15 +79,22 @@ data class Contact @RecordBuilder constructor (
 
         @param:Field("zip")
         @get:Field("zip")
-        val zip : String?
-) : Record, Named, Comparable<Contact> {
+        val zip : String?,
+
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
+
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+) : MoneyRecord, Named, Comparable<Contact> {
     val type = ContactType.get(typeId)
 
-    constructor(_id: Int, name: String) : this(_id, name, ContactType.PERSONAL.id,
-            "", "", "", "", "", "", "", "", "")
-
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
+    constructor(id: Int, name: String) : this(id, name, ContactType.PERSONAL.id,
+            "", "", "", "", "", "", "", "", "", UUID.randomUUID().toString(),
+            System.currentTimeMillis()
+    )
 
     override fun compareTo(other: Contact): Int = name.compareTo(other.name, true)
 }

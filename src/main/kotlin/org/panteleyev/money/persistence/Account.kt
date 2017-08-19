@@ -26,7 +26,6 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.ForeignKey
 import org.panteleyev.persistence.annotations.RecordBuilder
@@ -37,83 +36,92 @@ import java.util.Comparator
 import java.util.Objects
 
 @Table("account")
-data class Account @RecordBuilder constructor (
-        @param:Field(Field.ID)
-        val _id : Int,
+data class Account @RecordBuilder constructor(
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id: Int,
 
         @param:Field("name")
         @get:Field("name")
-        override val name : String,
+        override val name: String,
 
         @param:Field("comment")
         @get:Field("comment")
-        val comment : String,
+        val comment: String,
 
         @param:Field("opening")
         @get:Field("opening")
-        val openingBalance : BigDecimal,
+        val openingBalance: BigDecimal,
 
         @param:Field("acc_limit")
         @get:Field("acc_limit")
-        val accountLimit : BigDecimal,
+        val accountLimit: BigDecimal,
 
         @param:Field("currency_rate")
         @get:Field("currency_rate")
-        val currencyRate : BigDecimal,
+        val currencyRate: BigDecimal,
 
         @param:Field("type_id")
         @get:Field("type_id", nullable = false)
-        val typeId : Int,
+        val typeId: Int,
 
         @param:Field("category_id")
         @get:Field("category_id")
         @get:ForeignKey(table = Category::class, onDelete = ReferenceOption.CASCADE)
-        val categoryId : Int,
+        val categoryId: Int,
 
         @param:Field("currency_id")
         @get:Field("currency_id")
-        val currencyId : Int,
+        val currencyId: Int,
 
         @param:Field("enabled")
         @get:Field("enabled")
-        val enabled : Boolean
-) : Record, Named, Comparable<Account> {
-    val type : CategoryType = CategoryType.get(typeId)
+        val enabled: Boolean,
 
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
 
-    override fun compareTo(other: Account) : Int = this.name.compareTo(other.name, ignoreCase = true)
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+) : MoneyRecord, Named, Comparable<Account> {
+    val type: CategoryType = CategoryType.get(typeId)
+
+    override fun compareTo(other: Account): Int = this.name.compareTo(other.name, ignoreCase = true)
 
     fun enable(e: Boolean): Account = copy(enabled = e)
 
     override fun equals(other: Any?): Boolean {
         return if (other is Account) {
-            this._id == other._id
-                && this.name == other.name
-                && this.comment == other.comment
-                && this.openingBalance.compareTo(other.openingBalance) == 0
-                && this.accountLimit.compareTo(other.accountLimit) == 0
-                && this.currencyRate.compareTo(other.currencyRate) == 0
-                && this.typeId == other.typeId
-                && this.categoryId == other.categoryId
-                && this.currencyId == other.currencyId
-                && this.enabled == other.enabled
+            this.id == other.id
+                    && this.name == other.name
+                    && this.comment == other.comment
+                    && this.openingBalance.compareTo(other.openingBalance) == 0
+                    && this.accountLimit.compareTo(other.accountLimit) == 0
+                    && this.currencyRate.compareTo(other.currencyRate) == 0
+                    && this.typeId == other.typeId
+                    && this.categoryId == other.categoryId
+                    && this.currencyId == other.currencyId
+                    && this.enabled == other.enabled
+                    && this.guid == other.guid
+                    && this.modified == other.modified
         } else false
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(_id, name, comment,
+        return Objects.hash(id, name, comment,
                 openingBalance.stripTrailingZeros(),
                 accountLimit.stripTrailingZeros(),
                 currencyRate.stripTrailingZeros(),
-                typeId, categoryId, currencyId, enabled)
+                typeId, categoryId, currencyId, enabled, guid,
+                modified)
     }
 
     class AccountCategoryNameComparator : Comparator<Account> {
         override fun compare(o1: Account, o2: Account): Int {
-            val name1 = MoneyDAO.getCategory(o1.categoryId)?.name?:""
-            val name2 = MoneyDAO.getCategory(o2.categoryId)?.name?:""
+            val name1 = MoneyDAO.getCategory(o1.categoryId)?.name ?: ""
+            val name2 = MoneyDAO.getCategory(o2.categoryId)?.name ?: ""
             return name1.compareTo(name2, ignoreCase = true)
         }
     }

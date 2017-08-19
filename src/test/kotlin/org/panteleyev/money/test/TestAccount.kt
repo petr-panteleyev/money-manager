@@ -45,12 +45,16 @@ class TestAccount : BaseTest() {
         val categoryId = BaseTest.RANDOM.nextInt()
         val currencyId = BaseTest.RANDOM.nextInt()
         val enabled = BaseTest.RANDOM.nextBoolean()
+        val uuid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
         val a1 = Account(
-                id, name, comment, opening, limit, rate, type.id, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type.id, categoryId, currencyId, enabled, uuid,
+                modified
         )
         val a2 = Account(
-                id, name, comment, opening, limit, rate, type.id, categoryId, currencyId, enabled
+                id, name, comment, opening, limit, rate, type.id, categoryId, currencyId, enabled, uuid,
+                modified
         )
 
         Assert.assertEquals(a1, a2)

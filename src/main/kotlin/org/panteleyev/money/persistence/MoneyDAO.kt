@@ -30,13 +30,41 @@ import javafx.beans.property.BooleanProperty
 import javafx.beans.property.SimpleBooleanProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableMap
+import org.panteleyev.money.MoneyApplication
+import org.panteleyev.money.xml.Import
 import org.panteleyev.persistence.DAO
 import org.panteleyev.persistence.Record
+import java.sql.Connection
 import java.util.Arrays
 import java.util.concurrent.ConcurrentHashMap
 import javax.sql.DataSource
+import kotlin.reflect.KClass
 
-object MoneyDAO : DAO() {
+interface Named {
+    val name : String
+}
+
+interface MoneyRecord : Record {
+    override val id: Int
+    val guid: String
+    val modified: Long
+}
+
+internal enum class ImportAction {
+    INSERT,
+    UPDATE,
+    IGNORE
+}
+
+internal typealias ImportMap = MutableMap<Int, Pair<Int, ImportAction>>
+
+internal fun ImportMap.getMappedId(id: Int): Int = this[id]?.first ?: id
+
+object MoneyDAO : DAO(null), RecordSource {
+    const val FIELD_SCALE = 6
+
+    private const val BATCH_SIZE = 1000
+
     private val categoriesMap = ConcurrentHashMap<Int, Category>()
     private val categories = FXCollections.observableMap(categoriesMap)
 
@@ -57,19 +85,6 @@ object MoneyDAO : DAO() {
 
     private val preloadingProperty = SimpleBooleanProperty(false)
 
-    override fun setDataSource(ds: DataSource) {
-        super.setDataSource(ds)
-
-        preloadingProperty.set(true)
-        categoriesMap.clear()
-        contactsMap.clear()
-        currencyMap.clear()
-        accountsMap.clear()
-        transactionGroupsMap.clear()
-        transactionsMap.clear()
-        preloadingProperty.set(false)
-    }
-
     fun preloadingProperty(): BooleanProperty {
         return preloadingProperty
     }
@@ -82,19 +97,19 @@ object MoneyDAO : DAO() {
         return categories
     }
 
-    fun getCategory(id: Int): Category? {
+    override fun getCategory(id: Int): Category? {
         return categoriesMap[id]
     }
 
     fun insertCategory(category: Category): Category {
         val result = insert(category)
-        categories.put(result.id, result)
+        categories.put(result!!.id, result)
         return result
     }
 
     fun updateCategory(category: Category): Category {
         val result = update(category)
-        categories.put(result.id, result)
+        categories.put(result!!.id, result)
         return result
     }
 
@@ -116,19 +131,19 @@ object MoneyDAO : DAO() {
         return currencies
     }
 
-    fun getCurrency(id: Int): Currency? {
+    override fun getCurrency(id: Int): Currency? {
         return if (id == 0) null else currencyMap[id]
     }
 
     fun insertCurrency(currency: Currency): Currency {
         val result = insert(currency)
-        currencies.put(result.id, result)
+        currencies.put(result!!.id, result)
         return result
     }
 
     fun updateCurrency(currency: Currency): Currency {
         val result = update(currency)
-        currencies.put(result.id, result)
+        currencies.put(result!!.id, result)
         return result
     }
 
@@ -147,19 +162,19 @@ object MoneyDAO : DAO() {
         return contacts
     }
 
-    fun getContact(id: Int): Contact? {
+    override fun getContact(id: Int): Contact? {
         return if (id == 0) null else contactsMap[id]
     }
 
     fun insertContact(contact: Contact): Contact {
         val result = insert(contact)
-        contacts.put(result.id, result)
+        contacts.put(result!!.id, result)
         return result
     }
 
     fun updateContact(contact: Contact): Contact {
         val result = update(contact)
-        contacts.put(result.id, result)
+        contacts.put(result!!.id, result)
         return result
     }
 
@@ -175,19 +190,19 @@ object MoneyDAO : DAO() {
         return accounts
     }
 
-    fun getAccount(id: Int): Account? {
+    override fun getAccount(id: Int): Account? {
         return if (id == 0) null else accountsMap[id]
     }
 
     fun insertAccount(account: Account): Account {
         val result = insert(account)
-        accounts.put(result.id, result)
+        accounts.put(result!!.id, result)
         return result
     }
 
     fun updateAccount(account: Account): Account {
         val result = update(account)
-        accounts.put(result.id, result)
+        accounts.put(result!!.id, result)
         return result
     }
 
@@ -220,25 +235,25 @@ object MoneyDAO : DAO() {
         return transactionGroups
     }
 
-    fun getTransactionGroup(id: Int): TransactionGroup? {
+    override fun getTransactionGroup(id: Int): TransactionGroup? {
         return if (id == 0) null else transactionGroupsMap[id]
     }
 
     fun insertTransactionGroup(tg: TransactionGroup): TransactionGroup {
         val result = insert(tg)
-        transactionGroups.put(result.id, result)
+        transactionGroups.put(result!!.id, result)
         return result
     }
 
     fun updateTransactionGroup(tg: TransactionGroup): TransactionGroup {
         val result = update(tg)
-        transactionGroups.put(result.id, result)
+        transactionGroups.put(result!!.id, result)
         return result
     }
 
     fun deleteTransactionGroup(id: Int) {
         transactionGroups.remove(id)
-        delete(id, TransactionGroup::class.java)
+        delete(id, TransactionGroup::class)
     }
 
     fun getTransactionGroups(): Collection<TransactionGroup> {
@@ -253,25 +268,25 @@ object MoneyDAO : DAO() {
         return transactions
     }
 
-    fun getTransaction(id: Int): Transaction? {
+    override fun getTransaction(id: Int): Transaction? {
         return if (id == 0) null else transactionsMap[id]
     }
 
     fun insertTransaction(transaction: Transaction): Transaction {
         val result = insert(transaction)
-        transactions.put(result.id, result)
+        transactions.put(result!!.id, result)
         return result
     }
 
     fun updateTransaction(transaction: Transaction): Transaction {
         val result = update(transaction)
-        transactions.put(result.id, result)
+        transactions.put(result!!.id, result)
         return result
     }
 
     fun deleteTransaction(id: Int) {
         transactions.remove(id)
-        delete(id, Transaction::class.java)
+        delete(id, Transaction::class)
     }
 
     fun getTransactions(): Collection<Transaction> {
@@ -316,44 +331,212 @@ object MoneyDAO : DAO() {
         super.createTables(tableClasses)
     }
 
-    fun preload() {
+    fun dropTables() {
+        super.dropTables(tableClasses.reversed())
+    }
+
+    fun preload(progress: (String) -> Unit = {}) {
         preloadingProperty.set(true)
 
+        progress("Preloading primary keys... ")
         preload(tableClasses)
+        progress(" done\n")
 
+        progress("Preloading data...\n")
+
+        progress("    categories... ")
         categoriesMap.clear()
-        getAll(Category::class.java, categoriesMap)
+        getAll(Category::class, categoriesMap)
+        progress("done\n")
 
+        progress("    contacts... ")
         contactsMap.clear()
-        getAll(Contact::class.java, contactsMap)
+        getAll(Contact::class, contactsMap)
+        progress("done\n")
 
+        progress("    currencies... ")
         currencyMap.clear()
-        getAll(Currency::class.java, currencyMap)
+        getAll(Currency::class, currencyMap)
+        progress("done\n")
 
+        progress("    accounts... ")
         accountsMap.clear()
-        getAll(Account::class.java, accountsMap)
+        getAll(Account::class, accountsMap)
+        progress("done\n")
 
+        progress("    transaction groups... ")
         transactionGroupsMap.clear()
-        getAll(TransactionGroup::class.java, transactionGroupsMap)
+        getAll(TransactionGroup::class, transactionGroupsMap)
+        progress("done\n")
 
+        progress("    transactions... ")
         transactionsMap.clear()
-        getAll(Transaction::class.java, transactionsMap)
+        getAll(Transaction::class, transactionsMap)
+        progress("done\n")
 
+        progress("done\n")
         preloadingProperty.set(false)
+    }
+
+    private fun deleteAll(conn: Connection, tables: List<KClass<out Record>>) {
+        tables.forEach {
+            deleteAll(it, conn)
+            resetPrimaryKey(it)
+        }
+    }
+
+    fun importFullDump(imp: Import, progress: (String) -> Unit) {
+        connection.use { conn ->
+            progress("Truncating tables... ")
+            deleteAll(conn, tableClasses.reversed())
+            progress(" done\n")
+
+            progress("Importing data...\n")
+
+            progress("    categories... ")
+            insert(conn, BATCH_SIZE, imp.categories)
+            progress("done\n")
+
+            progress("    currencies... ")
+            insert(conn, BATCH_SIZE, imp.currencies)
+            progress("done\n")
+
+            progress("    accounts... ")
+            insert(conn, BATCH_SIZE, imp.accounts)
+            progress("done\n")
+
+            progress("    contacts... ")
+            insert(conn, BATCH_SIZE, imp.contacts)
+            progress("done\n")
+
+            progress("    transaction groups... ")
+            insert(conn, BATCH_SIZE, imp.transactionGroups)
+            progress("done\n")
+
+            progress("    transactions... ")
+            insert(conn, BATCH_SIZE, imp.transactions)
+            progress("done\n")
+
+            progress("done\n")
+        }
+    }
+
+    fun importRecords(imp: Import, progress: (String) -> Unit) {
+
+        fun Collection<MoneyRecord>.findByGuid(guid: String): MoneyRecord? {
+            return this.find { it.guid == guid }
+        }
+
+        fun mapImportedIds(idMap: ImportMap, existing: Collection<MoneyRecord>, toImport: List<MoneyRecord>) {
+            toImport.forEach {
+                val found = existing.findByGuid(it.guid)
+                if (found != null) {
+                    if (it.modified > found.modified) {
+                        idMap[it.id] = Pair(found.id, ImportAction.UPDATE)
+                    } else {
+                        idMap[it.id] = Pair(found.id, ImportAction.IGNORE)
+                    }
+                } else {
+                    idMap[it.id] = Pair(generatePrimaryKey(it::class), ImportAction.INSERT)
+                }
+            }
+        }
+
+        fun importTable(conn: Connection, toImport: List<MoneyRecord>, idMap: ImportMap,
+                        replacement: (MoneyRecord) -> MoneyRecord) {
+            toImport.forEach {
+                val action = idMap[it.id]!!.second
+
+                if (action != ImportAction.IGNORE) {
+                    val replaced = replacement(it)
+
+                    if (action == ImportAction.INSERT) {
+                        insert(conn, replaced)
+                    } else {
+                        update(conn, replaced)
+                    }
+                }
+            }
+        }
+
+        val categoryIdMap: ImportMap = mutableMapOf()
+        val currencyIdMap: ImportMap = mutableMapOf()
+        val contactIdMap: ImportMap = mutableMapOf()
+        val accountIdMap: ImportMap = mutableMapOf()
+        val transactionGroupIdMap: ImportMap = mutableMapOf()
+        val transactionIdMap: ImportMap = mutableMapOf()
+
+        mapImportedIds(currencyIdMap, currencyMap.values, imp.currencies)
+        mapImportedIds(categoryIdMap, categoriesMap.values, imp.categories)
+        mapImportedIds(contactIdMap, contactsMap.values, imp.contacts)
+        mapImportedIds(accountIdMap, accountsMap.values, imp.accounts)
+        mapImportedIds(transactionGroupIdMap, transactionGroupsMap.values, imp.transactionGroups)
+        mapImportedIds(transactionIdMap, transactionsMap.values, imp.transactions)
+
+        dataSource!!.connection.use { conn ->
+            conn.autoCommit = false
+
+            try {
+                importTable(conn, imp.categories, categoryIdMap, {
+                    (it as Category).copy(id = categoryIdMap.getMappedId(it.id))
+                })
+
+                importTable(conn, imp.currencies, currencyIdMap, {
+                    (it as Currency).copy(id = currencyIdMap.getMappedId(it.id))
+                })
+
+                importTable(conn, imp.contacts, contactIdMap, {
+                    (it as Contact).copy(id = contactIdMap.getMappedId(it.id))
+                })
+
+                importTable(conn, imp.accounts, accountIdMap, {
+                    (it as Account).copy(id = accountIdMap.getMappedId(it.id),
+                            categoryId = categoryIdMap.getMappedId(it.categoryId))
+                })
+
+                importTable(conn, imp.transactionGroups, transactionGroupIdMap, {
+                    (it as TransactionGroup).copy(id = transactionGroupIdMap.getMappedId(it.id))
+                })
+
+                importTable(conn, imp.transactions, transactionIdMap, {
+                    (it as Transaction).copy(id = transactionIdMap.getMappedId(it.id),
+                            accountDebitedId = accountIdMap.getMappedId(it.accountDebitedId),
+                            accountCreditedId = accountIdMap.getMappedId(it.accountCreditedId),
+                            accountDebitedCategoryId = categoryIdMap.getMappedId(it.accountDebitedCategoryId),
+                            accountCreditedCategoryId = categoryIdMap.getMappedId(it.accountCreditedCategoryId),
+                            contactId = contactIdMap.getMappedId(it.contactId),
+                            groupId = transactionGroupIdMap.getMappedId(it.groupId))
+                })
+
+                conn.commit()
+            } catch (ex: Exception) {
+                conn.rollback()
+                MoneyApplication.uncaughtException(ex)
+            }
+        }
     }
 
     fun initialize(ds: DataSource?) {
         dataSource = ds
+
+        preloadingProperty.set(true)
+        categoriesMap.clear()
+        contactsMap.clear()
+        currencyMap.clear()
+        accountsMap.clear()
+        transactionGroupsMap.clear()
+        transactionsMap.clear()
+        preloadingProperty.set(false)
     }
 
-    private val tableClasses: List<Class<out Record>>
-        get() = Arrays.asList(
-                Category::class.java,
-                Contact::class.java,
-                Currency::class.java,
-                Account::class.java,
-                TransactionGroup::class.java,
-                Transaction::class.java
+    private val tableClasses: List<KClass<out Record>>
+        get() = listOf(
+                Category::class,
+                Contact::class,
+                Currency::class,
+                Account::class,
+                TransactionGroup::class,
+                Transaction::class
         )
 
     val open: Boolean

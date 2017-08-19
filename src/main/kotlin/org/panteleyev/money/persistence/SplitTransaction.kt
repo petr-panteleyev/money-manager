@@ -27,9 +27,10 @@
 package org.panteleyev.money.persistence
 
 import java.math.BigDecimal
+import java.util.UUID
 
 class SplitTransaction(id : Int, group : List<Transaction>) : Transaction (
-        _id = group[0].id,
+        id = group[0].id,
         amount = calculateTotal(group),
         day = group[0].day, month = group[0].month, year = group[0].year,
         transactionTypeId = calculateTransactionType(group).id,
@@ -45,7 +46,9 @@ class SplitTransaction(id : Int, group : List<Transaction>) : Transaction (
         contactId = 0,
         rate = BigDecimal.ONE,
         rateDirection = 0,
-        invoiceNumber = ""
+        invoiceNumber = "",
+        guid = UUID.randomUUID().toString(),
+        modified = 0L
 ) {
     val contactString : String
     val accountCreditedString : String

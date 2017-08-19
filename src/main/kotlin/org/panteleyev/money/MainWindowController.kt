@@ -40,13 +40,16 @@ import javafx.scene.control.Tab
 import javafx.scene.control.TabPane
 import javafx.scene.layout.BorderPane
 import javafx.scene.layout.HBox
+import javafx.stage.FileChooser
 import javafx.stage.Stage
 import javafx.stage.WindowEvent
 import org.controlsfx.validation.ValidationResult
 import org.panteleyev.money.persistence.MoneyDAO
 import org.panteleyev.money.persistence.MySQLBuilder
+import org.panteleyev.money.xml.Export
 import org.panteleyev.utilities.fx.Controller
 import org.panteleyev.utilities.fx.WindowManager
+import java.io.FileOutputStream
 import java.math.BigDecimal
 import java.util.Arrays
 import java.util.ResourceBundle
@@ -111,13 +114,19 @@ class MainWindowController(stage: Stage) : BaseController(stage, MainWindowContr
                 m5, SeparatorMenuItem(),
                 currenciesMenuItem, categoriesMenuItem, accountsMenuItem, contactsMenuItem)
 
-        val m6 = MenuItem(rb.getString("menu.Tools.Export"))
-        m6.setOnAction { onExport() }
+        val dumpXmlMenuItem = MenuItem(rb.getString("menu.Tools.Export")).apply {
+            setOnAction { xmlDump() }
+        }
+
+        val importMenuItem = MenuItem(RB.getString("word.Import") + "...").apply {
+            setOnAction { onImport() }
+        }
+
         val m7 = MenuItem(rb.getString("menu.Tools.Options"))
         m7.setOnAction { onOptions() }
 
         val toolsMenu = Menu(rb.getString("menu.Tools"), null,
-                m6, m7)
+                dumpXmlMenuItem, importMenuItem, SeparatorMenuItem(), m7)
 
         /* Dummy menu item is required in order to let onShowing() fire up first time */
         windowMenu.items.setAll(MenuItem("dummy"))
@@ -143,6 +152,9 @@ class MainWindowController(stage: Stage) : BaseController(stage, MainWindowContr
         categoriesMenuItem.disableProperty().bind(dbOpenProperty.not())
         accountsMenuItem.disableProperty().bind(dbOpenProperty.not())
         contactsMenuItem.disableProperty().bind(dbOpenProperty.not())
+
+        dumpXmlMenuItem.disableProperty().bind(dbOpenProperty.not())
+        importMenuItem.disableProperty().bind(dbOpenProperty.not())
 
         val t2 = Tab(rb.getString("tab.Transactions"), transactionTab)
         t2.disableProperty().bind(dbOpenProperty.not())
@@ -318,10 +330,6 @@ class MainWindowController(stage: Stage) : BaseController(stage, MainWindowContr
         checkFutureException(loadResult)
     }
 
-    private fun onExport() {
-
-    }
-
     private fun checkFutureException(f: Future<*>) {
         try {
             f.get()
@@ -348,10 +356,40 @@ class MainWindowController(stage: Stage) : BaseController(stage, MainWindowContr
         Options.mainWindowHeight = stage.heightProperty().doubleValue()
     }
 
+    private fun xmlDump() {
+        val selected = FileChooser().apply {
+            title = "Export to file"
+            extensionFilters.addAll(
+                    FileChooser.ExtensionFilter("XML Files", "*.xml"),
+                    FileChooser.ExtensionFilter("All Files", "*.*")
+            )
+        }.showSaveDialog(null)
+
+        selected?.let {
+            CompletableFuture.runAsync {
+                FileOutputStream(selected).use {
+                    Export()
+                            .withCategories(MoneyDAO.getCategories())
+                            .withAccounts(MoneyDAO.getAccounts())
+                            .withCurrencies(MoneyDAO.getCurrencies())
+                            .withContacts(MoneyDAO.getContacts())
+                            .withTransactionGroups(MoneyDAO.getTransactionGroups())
+                            .withTransactions(MoneyDAO.getTransactions())
+                            .export(it)
+                }
+            }
+        }
+    }
+
+    private fun onImport() {
+        ImportWizard().showAndWait()
+    }
+
     companion object {
         val UI_BUNDLE_PATH = "org.panteleyev.money.res.ui"
-        val DIALOGS_CSS = "/org/panteleyev/money/res/dialogs.css"
         val CSS_PATH = "/org/panteleyev/money/res/main.css"
+
+        val RB = ResourceBundle.getBundle(UI_BUNDLE_PATH)
 
         private val WINDOW_CLASSES = Arrays.asList<Class<out Controller>>(
                 ContactListWindowController::class.java,

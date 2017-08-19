@@ -45,15 +45,21 @@ class TestCurrency : BaseTest() {
         val rate = BigDecimal(RANDOM.nextDouble())
         val direction = BaseTest.RANDOM.nextInt()
         val useSeparator = BaseTest.RANDOM.nextBoolean()
+        val uuid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
         val c1 = Currency(id, symbol, description, formatSymbol,
                 formatSymbolPosition, showFormatSymbol,
-                def, rate, direction, useSeparator
+                def, rate, direction, useSeparator,
+                guid = uuid,
+                modified = modified
         )
 
         val c2 = Currency(id, symbol, description, formatSymbol,
                 formatSymbolPosition, showFormatSymbol,
-                def, rate, direction, useSeparator
+                def, rate, direction, useSeparator,
+                guid = uuid,
+                modified = modified
         )
 
         Assert.assertEquals(c1, c2)

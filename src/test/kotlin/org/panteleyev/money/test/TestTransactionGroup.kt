@@ -29,6 +29,7 @@ package org.panteleyev.money.test
 import org.panteleyev.money.persistence.TransactionGroup
 import org.testng.Assert
 import org.testng.annotations.Test
+import java.util.UUID
 
 class TestTransactionGroup : BaseTest() {
     @Test
@@ -38,9 +39,17 @@ class TestTransactionGroup : BaseTest() {
         val month = BaseTest.RANDOM.nextInt()
         val year = BaseTest.RANDOM.nextInt()
         val expanded = BaseTest.RANDOM.nextBoolean()
+        val uuid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
-        val t1 = TransactionGroup(id, day, month, year, expanded)
-        val t2 = TransactionGroup(id, day, month, year, expanded)
+        val t1 = TransactionGroup(id, day, month, year, expanded,
+                guid = uuid,
+                modified = modified
+        )
+        val t2 = TransactionGroup(id, day, month, year, expanded,
+                guid = uuid,
+                modified = modified
+        )
 
         Assert.assertEquals(t1, t2)
         Assert.assertEquals(t1.hashCode(), t2.hashCode())

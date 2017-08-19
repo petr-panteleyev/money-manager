@@ -26,24 +26,84 @@
 
 package org.panteleyev.money.test
 
-import org.panteleyev.money.persistence.Category
+import org.panteleyev.money.persistence.Transaction
 import org.testng.Assert
 import org.testng.annotations.Test
+import java.math.BigDecimal
 import java.util.UUID
 
 class TestTransaction : BaseTest() {
     @Test
     fun testEquals() {
         val id = BaseTest.RANDOM.nextInt()
-        val name = UUID.randomUUID().toString()
+        val amount = BigDecimal(BaseTest.RANDOM.nextDouble())
+        val day = BaseTest.RANDOM.nextInt()
+        val month = BaseTest.RANDOM.nextInt()
+        val year = BaseTest.RANDOM.nextInt()
+        val transactionTypeId = randomTransactionType().id
         val comment = UUID.randomUUID().toString()
-        val type = randomCategoryType()
-        val expanded = BaseTest.RANDOM.nextBoolean()
+        val checked = BaseTest.RANDOM.nextBoolean()
+        val accountDebitedId = BaseTest.RANDOM.nextInt()
+        val accountCreditedId = BaseTest.RANDOM.nextInt()
+        val accountDebitedTypeId = randomCategoryType().id
+        val accountCreditedTypeId = randomCategoryType().id
+        val accountDebitedCategoryId = BaseTest.RANDOM.nextInt()
+        val accountCreditedCategoryId = BaseTest.RANDOM.nextInt()
+        val groupId = BaseTest.RANDOM.nextInt()
+        val contactId = BaseTest.RANDOM.nextInt()
+        val rate = BigDecimal(BaseTest.RANDOM.nextDouble())
+        val rateDirection = BaseTest.RANDOM.nextInt()
+        val invoiceNumber = UUID.randomUUID().toString()
+        val guid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
-        val c1 = Category(id, name, comment, type.id, expanded)
-        val c2 = Category(id, name, comment, type.id, expanded)
+        val t1 = Transaction(id = id,
+                amount = amount,
+                day = day,
+                month = month,
+                year = year,
+                transactionTypeId = transactionTypeId,
+                comment = comment,
+                checked = checked,
+                accountDebitedId = accountDebitedId,
+                accountCreditedId = accountCreditedId,
+                accountDebitedTypeId = accountDebitedTypeId,
+                accountCreditedTypeId = accountCreditedTypeId,
+                accountDebitedCategoryId = accountDebitedCategoryId,
+                accountCreditedCategoryId = accountCreditedCategoryId,
+                groupId = groupId,
+                contactId = contactId,
+                rate = rate,
+                rateDirection = rateDirection,
+                invoiceNumber = invoiceNumber,
+                guid = guid,
+                modified = modified
+        )
 
-        Assert.assertEquals(c1, c2)
-        Assert.assertEquals(c1.hashCode(), c2.hashCode())
+        val t2 = Transaction(id = id,
+                amount = amount,
+                day = day,
+                month = month,
+                year = year,
+                transactionTypeId = transactionTypeId,
+                comment = comment,
+                checked = checked,
+                accountDebitedId = accountDebitedId,
+                accountCreditedId = accountCreditedId,
+                accountDebitedTypeId = accountDebitedTypeId,
+                accountCreditedTypeId = accountCreditedTypeId,
+                accountDebitedCategoryId = accountDebitedCategoryId,
+                accountCreditedCategoryId = accountCreditedCategoryId,
+                groupId = groupId,
+                contactId = contactId,
+                rate = rate,
+                rateDirection = rateDirection,
+                invoiceNumber = invoiceNumber,
+                guid = guid,
+                modified = modified
+        )
+
+        Assert.assertEquals(t1, t2)
+        Assert.assertEquals(t1.hashCode(), t2.hashCode())
     }
 }

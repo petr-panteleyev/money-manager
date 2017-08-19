@@ -262,7 +262,7 @@ class AccountListWindowController : BaseController() {
     private fun onAddAccount() {
         AccountDialog(null, null).showAndWait()
                 .ifPresent { a ->
-                    MoneyDAO.insertAccount(a.copy(_id = MoneyDAO.generatePrimaryKey(Account::class.java)))
+                    MoneyDAO.insertAccount(a.copy(id = MoneyDAO.generatePrimaryKey(Account::class)))
                 }
     }
 

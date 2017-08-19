@@ -58,6 +58,7 @@ class TestMoneyDAO : BaseDaoTest() {
     @AfterClass
     @Throws(Exception::class)
     override fun cleanup() {
+        MoneyDAO.dropTables()
         super.cleanup()
     }
 
@@ -85,7 +86,10 @@ class TestMoneyDAO : BaseDaoTest() {
                         BaseTest.RANDOM.nextBoolean(),
                         BigDecimal.ZERO,
                         BaseTest.RANDOM.nextInt(),
-                        BaseTest.RANDOM.nextBoolean())),
+                        BaseTest.RANDOM.nextBoolean(),
+                        guid = UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
+                )),
                 arrayOf<Record>(Currency(
                         newCurrencyId(),
                         UUID.randomUUID().toString(),
@@ -96,7 +100,10 @@ class TestMoneyDAO : BaseDaoTest() {
                         BaseTest.RANDOM.nextBoolean(),
                         BigDecimal.TEN,
                         BaseTest.RANDOM.nextInt(),
-                        BaseTest.RANDOM.nextBoolean())),
+                        BaseTest.RANDOM.nextBoolean(),
+                        guid = UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
+                )),
                 arrayOf<Record>(newContact(contactId)),
                 arrayOf<Record>(newAccount(accID, catType, catID, currID)),
                 arrayOf<Record>(Account(
@@ -109,7 +116,10 @@ class TestMoneyDAO : BaseDaoTest() {
                         randomCategoryType().id,
                         catID,
                         currID,
-                        BaseTest.RANDOM.nextBoolean())),
+                        BaseTest.RANDOM.nextBoolean(),
+                        guid = UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
+                )),
                 arrayOf<Record>(newTransactionGroup(transactionGroupId)),
                 arrayOf<Record>(newTransaction(
                         transactionId,
@@ -142,23 +152,51 @@ class TestMoneyDAO : BaseDaoTest() {
     @Throws(Exception::class)
     fun testMoneyDAOInsert(item: Record) {
         MoneyDAO.insert(item)
-        val newItem = MoneyDAO.get(item.id, item.javaClass)
+        val newItem = MoneyDAO.get(item.id, item.javaClass.kotlin)
         Assert.assertEquals(newItem, item)
-        Assert.assertEquals(newItem.hashCode(), item.hashCode())
+        Assert.assertEquals(newItem?.hashCode()?:0, item.hashCode())
     }
 
     @DataProvider(name = "testCurrencyUpdateDataProvider")
     fun testCurrencyUpdateDataProvider(): Array<Array<Any>> {
         return arrayOf(
-                arrayOf<Any>(Currency(0, "2", "3", "4", 1, true, true, BigDecimal("10.230000"), 1, true)),
-                arrayOf<Any>(Currency(0, "2", "3", "4", 1, false, true, BigDecimal("10.230000"), -1, false))
+                arrayOf<Any>(
+                        Currency(id = 0,
+                                symbol = "2",
+                                description = "3",
+                                formatSymbol = "4",
+                                formatSymbolPosition = 1,
+                                showFormatSymbol = true,
+                                def = true,
+                                rate = BigDecimal("10.230000"),
+                                direction = 1,
+                                useThousandSeparator = true,
+                                guid = UUID.randomUUID().toString(),
+                                modified = System.currentTimeMillis()
+                        )
+                ),
+                arrayOf<Any>(
+                        Currency(id = 0,
+                                symbol = "2",
+                                description = "3",
+                                formatSymbol = "4",
+                                formatSymbolPosition = 1,
+                                showFormatSymbol = false,
+                                def = true,
+                                rate = BigDecimal("10.230000"),
+                                direction = -1,
+                                useThousandSeparator = false,
+                                guid = UUID.randomUUID().toString(),
+                                modified = System.currentTimeMillis()
+                        )
+                )
         )
     }
 
     @Test(dataProvider = "testCurrencyUpdateDataProvider")
     @Throws(Exception::class)
     fun testCurrencyUpdate(c: Currency) {
-        val original = c.copy(_id = newCurrencyId())
+        val original = c.copy(id = newCurrencyId())
 
         MoneyDAO.insertCurrency(original)
 

@@ -28,40 +28,37 @@ package org.panteleyev.money.persistence
 
 import java.util.ResourceBundle
 
-enum class TransactionType(val id : Int = 0) {
+enum class TransactionType(val id : Int, val separator: Boolean = false) {
     CARD_PAYMENT(1),
     CASH_PURCHASE(2),
     CHEQUE(3),
-    S1,
+    S1(4, true),
     WITHDRAWAL(5),
     CACHIER(6),
     DEPOSIT(7),
     TRANSFER(8),
-    S2,
+    S2(9, true),
     INTEREST(10),
     DIVIDEND(11),
-    S3,
+    S3(12, true),
     DIRECT_BILLING(13),
     CHARGE(14),
     FEE(15),
-    S4,
+    S4(16, true),
     INCOME(17),
     SALE(18),
-    S5,
+    S5(19, true),
     REFUND(20),
     UNDEFINED(21);
 
     val typeName : String
-    val separator : Boolean
 
     init {
-        if (id == 0) {
+        if (separator) {
             typeName = ""
-            separator = true
         } else {
             val bundle : ResourceBundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.res.TransactionType")
             typeName = bundle.getString("name" + id)
-            separator = false
         }
     }
 

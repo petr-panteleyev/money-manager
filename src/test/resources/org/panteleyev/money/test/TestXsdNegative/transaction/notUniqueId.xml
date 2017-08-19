@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Money>
+    <Accounts/>
+    <Categories/>
+    <Contacts/>
+    <Currencies/>
+    <TransactionGroups/>
+    <Transactions>
+        <Transaction id="1000">
+            <accountCreditedCategoryId>29</accountCreditedCategoryId>
+            <accountCreditedId>117</accountCreditedId>
+            <accountCreditedTypeId>1</accountCreditedTypeId>
+            <accountDebitedCategoryId>1</accountDebitedCategoryId>
+            <accountDebitedId>253</accountDebitedId>
+            <accountDebitedTypeId>1</accountDebitedTypeId>
+            <amount>700.000000</amount>
+            <checked>false</checked>
+            <comment></comment>
+            <contactId>0</contactId>
+            <day>29</day>
+            <groupId>0</groupId>
+            <guid>3e96baca-7470-11e7-857e-389c6424842b</guid>
+            <invoiceNumber></invoiceNumber>
+            <modified>1000</modified>
+            <month>7</month>
+            <rate>1.000000</rate>
+            <rateDirection>1</rateDirection>
+            <transactionTypeId>8</transactionTypeId>
+            <year>2017</year>
+        </Transaction>
+        <Transaction id="1000">
+            <accountCreditedCategoryId>4</accountCreditedCategoryId>
+            <accountCreditedId>3</accountCreditedId>
+            <accountCreditedTypeId>3</accountCreditedTypeId>
+            <accountDebitedCategoryId>29</accountDebitedCategoryId>
+            <accountDebitedId>117</accountDebitedId>
+            <accountDebitedTypeId>1</accountDebitedTypeId>
+            <amount>702.780000</amount>
+            <checked>false</checked>
+            <comment></comment>
+            <contactId>10</contactId>
+            <day>29</day>
+            <groupId>0</groupId>
+            <guid>3e96bca0-7470-11e7-857e-389c6424842b</guid>
+            <invoiceNumber></invoiceNumber>
+            <modified>1000</modified>
+            <month>7</month>
+            <rate>1.000000</rate>
+            <rateDirection>1</rateDirection>
+            <transactionTypeId>1</transactionTypeId>
+            <year>2017</year>
+        </Transaction>
+    </Transactions>
+</Money>

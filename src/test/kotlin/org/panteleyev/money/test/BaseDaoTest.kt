@@ -74,27 +74,27 @@ open class BaseDaoTest : BaseTest() {
     }
 
     fun newCategoryId(): Int {
-        return MoneyDAO.generatePrimaryKey(Category::class.java)!!
+        return MoneyDAO.generatePrimaryKey(Category::class)
     }
 
     fun newAccountId(): Int {
-        return MoneyDAO.generatePrimaryKey(Account::class.java)!!
+        return MoneyDAO.generatePrimaryKey(Account::class)
     }
 
     fun newCurrencyId(): Int {
-        return MoneyDAO.generatePrimaryKey(Currency::class.java)!!
+        return MoneyDAO.generatePrimaryKey(Currency::class)
     }
 
     fun newContactId(): Int {
-        return MoneyDAO.generatePrimaryKey(Contact::class.java)!!
+        return MoneyDAO.generatePrimaryKey(Contact::class)
     }
 
     fun newTransactionGroupId(): Int {
-        return MoneyDAO.generatePrimaryKey(TransactionGroup::class.java)!!
+        return MoneyDAO.generatePrimaryKey(TransactionGroup::class)
     }
 
     fun newTransactionId(): Int {
-        return MoneyDAO.generatePrimaryKey(Transaction::class.java)!!
+        return MoneyDAO.generatePrimaryKey(Transaction::class)
     }
 
     companion object {

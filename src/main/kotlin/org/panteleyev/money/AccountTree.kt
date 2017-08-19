@@ -313,7 +313,7 @@ class AccountTree : BorderPane() {
         }
 
         AccountDialog(initialCategory).showAndWait().ifPresent {
-            MoneyDAO.insertAccount(it.copy(_id = MoneyDAO.generatePrimaryKey(Account::class.java)))
+            MoneyDAO.insertAccount(it.copy(id = MoneyDAO.generatePrimaryKey(Account::class)))
         }
     }
 

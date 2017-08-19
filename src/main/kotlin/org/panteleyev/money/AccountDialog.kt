@@ -46,9 +46,10 @@ import org.panteleyev.money.persistence.ReadOnlyStringConverter
 import org.panteleyev.utilities.fx.BaseDialog
 import java.math.BigDecimal
 import java.util.ResourceBundle
+import java.util.UUID
 
-class AccountDialog(val account : Account?, initialCategory : Category? = null)
-    : BaseDialog<Account>(MainWindowController.DIALOGS_CSS) {
+class AccountDialog(val account: Account?, initialCategory: Category? = null)
+    : BaseDialog<Account>(MainWindowController.CSS_PATH) {
 
     private val rb = ResourceBundle.getBundle(MainWindowController.UI_BUNDLE_PATH)
 
@@ -60,9 +61,9 @@ class AccountDialog(val account : Account?, initialCategory : Category? = null)
     private val currencyComboBox = ComboBox<Currency>()
     private val activeCheckBox = CheckBox(rb.getString("account.Dialog.Active"))
 
-    private var categories : Collection<Category>
+    private var categories: Collection<Category>
 
-    constructor(initialCategory : Category?) : this(null, initialCategory)
+    constructor(initialCategory: Category?) : this(null, initialCategory)
 
     init {
         title = rb.getString("account.Dialog.Title")
@@ -137,16 +138,18 @@ class AccountDialog(val account : Account?, initialCategory : Category? = null)
                 // TODO: reconsider using null currency value
                 val selectedCurrency = currencyComboBox.selectionModel.selectedItem
 
-                return@setResultConverter Account(_id = account?.id?:0,
+                return@setResultConverter Account(id = account?.id ?: 0,
                         name = nameEdit.text,
                         comment = commentEdit.text,
                         enabled = activeCheckBox.isSelected,
                         openingBalance = BigDecimal(initialEdit.text),
                         typeId = typeComboBox.selectionModel.selectedItem.id,
                         categoryId = categoryComboBox.selectionModel.selectedItem.id,
-                        currencyId = selectedCurrency?.id?:0,
+                        currencyId = selectedCurrency?.id ?: 0,
                         accountLimit = BigDecimal.ZERO,
-                        currencyRate = BigDecimal.ONE
+                        currencyRate = BigDecimal.ONE,
+                        guid = account?.guid ?: UUID.randomUUID().toString(),
+                        modified = System.currentTimeMillis()
                 )
             } else {
                 return@setResultConverter null
@@ -172,10 +175,12 @@ class AccountDialog(val account : Account?, initialCategory : Category? = null)
 
     private fun createValidationSupport() {
         validation.registerValidator(nameEdit) {
-            control: Control, value: String -> ValidationResult.fromErrorIf(control, null, value.isEmpty())
+            control: Control, value: String ->
+            ValidationResult.fromErrorIf(control, null, value.isEmpty())
         }
         validation.registerValidator(categoryComboBox) {
-            control: Control, value: Category? -> ValidationResult.fromErrorIf(control, null, value == null)
+            control: Control, value: Category? ->
+            ValidationResult.fromErrorIf(control, null, value == null)
         }
         validation.registerValidator(initialEdit, MainWindowController.BIG_DECIMAL_VALIDATOR)
         validation.initInitialDecoration()

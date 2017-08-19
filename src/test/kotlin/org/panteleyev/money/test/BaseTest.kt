@@ -35,11 +35,19 @@ import org.panteleyev.money.persistence.Currency
 import org.panteleyev.money.persistence.Transaction
 import org.panteleyev.money.persistence.TransactionGroup
 import org.panteleyev.money.persistence.TransactionType
+import java.io.InputStream
 import java.math.BigDecimal
 import java.util.Random
 import java.util.UUID
+import javax.xml.XMLConstants
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
 
 open class BaseTest {
+    fun randomId(): Int = RANDOM.nextInt(Integer.MAX_VALUE) + 1
+    fun randomDay(): Int = 1 + RANDOM.nextInt(31)
+    fun randomMonth(): Int = 1 + RANDOM.nextInt(12)
+    fun randomYear(): Int = 1 + RANDOM.nextInt(3000)
 
     fun randomCategoryType(): CategoryType {
         val id = 1 + RANDOM.nextInt(CategoryType.values().size - 1)
@@ -52,12 +60,17 @@ open class BaseTest {
     }
 
     fun randomTransactionType(): TransactionType {
-        val id = 1 + RANDOM.nextInt(TransactionType.values().size - 1)
-        return TransactionType.get(id)
+        while (true) {
+            val id = 1 + RANDOM.nextInt(TransactionType.values().size - 1)
+            val type = TransactionType.get(id)
+            if (!type.separator) {
+                return type
+            }
+        }
     }
 
-    internal fun newAccount(id: Int = RANDOM.nextInt(), type: CategoryType = randomCategoryType(),
-                            categoryId: Int = RANDOM.nextInt(), currencyId: Int = RANDOM.nextInt()): Account {
+    internal fun newAccount(id: Int = randomId(), type: CategoryType = randomCategoryType(),
+                            categoryId: Int = randomId(), currencyId: Int = randomId()): Account {
         return Account(
                 id,
                 UUID.randomUUID().toString(),
@@ -68,36 +81,59 @@ open class BaseTest {
                 type.id,
                 categoryId,
                 currencyId,
-                RANDOM.nextBoolean()
+                RANDOM.nextBoolean(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
-    internal fun newCategory(id: Int = RANDOM.nextInt(), type: CategoryType = randomCategoryType()): Category {
+    internal fun newAccount(id: Int = randomId(), category: Category, currency: Currency): Account {
+        return Account(
+                id,
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                category.type.id,
+                category.id,
+                currency.id,
+                RANDOM.nextBoolean(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
+        )
+    }
+
+    internal fun newCategory(id: Int = randomId(), type: CategoryType = randomCategoryType()): Category {
         return Category(
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 type.id,
-                RANDOM.nextBoolean()
+                RANDOM.nextBoolean(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
-    internal fun newCurrency(id: Int = RANDOM.nextInt()): Currency {
+    internal fun newCurrency(id: Int = randomId()): Currency {
         return Currency(
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                RANDOM.nextInt(),
+                RANDOM.nextInt(2),
                 RANDOM.nextBoolean(),
                 RANDOM.nextBoolean(),
                 BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
-                RANDOM.nextInt(),
-                RANDOM.nextBoolean()
+                RANDOM.nextInt(2),
+                RANDOM.nextBoolean(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
-    internal fun newContact(id: Int = RANDOM.nextInt()): Contact {
+    internal fun newContact(id: Int = randomId()): Contact {
         return Contact(
                 id,
                 UUID.randomUUID().toString(),
@@ -110,29 +146,35 @@ open class BaseTest {
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
-                UUID.randomUUID().toString()
+                UUID.randomUUID().toString(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
     }
 
-    internal fun newTransactionGroup(id: Int = RANDOM.nextInt()): TransactionGroup {
-        return TransactionGroup(id,
-                RANDOM.nextInt(),
-                RANDOM.nextInt(),
-                RANDOM.nextInt(),
-                RANDOM.nextBoolean())
+    internal fun newTransactionGroup(id: Int = randomId()): TransactionGroup {
+        return TransactionGroup(id = id,
+                day = randomDay(),
+                month = randomMonth(),
+                year = randomYear(),
+                expanded = RANDOM.nextBoolean(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
+        )
     }
 
     fun newTransaction(
-            id: Int,
-            type: TransactionType,
-            accountDebitedId: Int,
-            accountCreditedId: Int,
-            accountDebitedType: CategoryType,
-            accountCreditedType: CategoryType,
-            accountDebitedCategoryId: Int,
-            accountCreditedCategoryId: Int,
-            groupId: Int,
-            contactId: Int): Transaction {
+            id: Int = randomId(),
+            type: TransactionType = randomTransactionType(),
+            accountDebitedId: Int = randomId(),
+            accountCreditedId: Int = randomId(),
+            accountDebitedType: CategoryType = randomCategoryType(),
+            accountCreditedType: CategoryType = randomCategoryType(),
+            accountDebitedCategoryId: Int = randomId(),
+            accountCreditedCategoryId: Int = randomId(),
+            groupId: Int = randomId(),
+            contactId: Int = randomId()
+    ): Transaction {
         return newTransaction(id,
                 BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
                 BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
@@ -144,7 +186,41 @@ open class BaseTest {
                 accountDebitedCategoryId,
                 accountCreditedCategoryId,
                 groupId,
-                contactId)
+                contactId
+        )
+    }
+
+    fun newTransaction(
+            id: Int = randomId(),
+            type: TransactionType = randomTransactionType(),
+            accountDebited: Account,
+            accountCredited: Account,
+            group: TransactionGroup? = null,
+            contact: Contact? = null
+    ): Transaction {
+        return Transaction(
+                id = id,
+                amount = BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                day = randomDay(),
+                month = randomMonth(),
+                year = randomYear(),
+                transactionTypeId = type.id,
+                comment = UUID.randomUUID().toString(),
+                checked = RANDOM.nextBoolean(),
+                accountDebitedId = accountDebited.id,
+                accountCreditedId = accountCredited.id,
+                accountDebitedTypeId = accountDebited.typeId,
+                accountCreditedTypeId = accountCredited.typeId,
+                accountDebitedCategoryId = accountDebited.categoryId,
+                accountCreditedCategoryId = accountCredited.categoryId,
+                groupId = group?.id ?: 0,
+                contactId = contact?.id ?: 0,
+                rate = BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP),
+                rateDirection = 0,
+                invoiceNumber = UUID.randomUUID().toString(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
+        )
     }
 
     fun newTransaction(
@@ -160,26 +236,35 @@ open class BaseTest {
             accountCreditedCategoryId: Int,
             groupId: Int,
             contactId: Int): Transaction {
-        return Transaction(id,
-                amount,
-                RANDOM.nextInt(),
-                RANDOM.nextInt(),
-                RANDOM.nextInt(),
-                type.id,
-                UUID.randomUUID().toString(),
-                RANDOM.nextBoolean(),
-                accountDebitedId,
-                accountCreditedId,
-                accountDebitedType.id,
-                accountCreditedType.id,
-                accountDebitedCategoryId,
-                accountCreditedCategoryId,
-                groupId,
-                contactId,
-                rate,
-                RANDOM.nextInt(),
-                UUID.randomUUID().toString()
+        return Transaction(id = id,
+                amount = amount,
+                day = randomDay(),
+                month = randomMonth(),
+                year = randomYear(),
+                transactionTypeId = type.id,
+                comment = UUID.randomUUID().toString(),
+                checked = RANDOM.nextBoolean(),
+                accountDebitedId = accountDebitedId,
+                accountCreditedId = accountCreditedId,
+                accountDebitedTypeId = accountDebitedType.id,
+                accountCreditedTypeId = accountCreditedType.id,
+                accountDebitedCategoryId = accountDebitedCategoryId,
+                accountCreditedCategoryId = accountCreditedCategoryId,
+                groupId = groupId,
+                contactId = contactId,
+                rate = rate,
+                rateDirection = RANDOM.nextInt(2),
+                invoiceNumber = UUID.randomUUID().toString(),
+                guid = UUID.randomUUID().toString(),
+                modified = System.currentTimeMillis()
         )
+    }
+
+    protected fun validateXML(input: InputStream) {
+        val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+        val schema = schemaFactory.newSchema(this::class.java.getResource("/org/panteleyev/money/xml/money.xsd"))
+        val validator = schema.newValidator()
+        validator.validate(StreamSource(input))
     }
 
     companion object {

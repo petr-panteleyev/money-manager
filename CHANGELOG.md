@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.1.0] - 2017-08-19
+
+- Export/import of the entire database and selected transactions
+- Import utility
+
 ## [2.0.0] - 2017-06-04
 
 - Migrated to MySQL

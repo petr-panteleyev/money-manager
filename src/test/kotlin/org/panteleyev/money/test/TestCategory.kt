@@ -39,9 +39,11 @@ class TestCategory : BaseTest() {
         val comment = UUID.randomUUID().toString()
         val type = randomCategoryType()
         val expanded = BaseTest.RANDOM.nextBoolean()
+        val uuid = UUID.randomUUID().toString()
+        val modified = System.currentTimeMillis()
 
-        val c1 = Category(id, name, comment, type.id, expanded)
-        val c2 = Category(id, name, comment, type.id, expanded)
+        val c1 = Category(id, name, comment, type.id, expanded, uuid, modified)
+        val c2 = Category(id, name, comment, type.id, expanded, uuid, modified)
 
         Assert.assertEquals(c1, c2)
         Assert.assertEquals(c1.hashCode(), c2.hashCode())

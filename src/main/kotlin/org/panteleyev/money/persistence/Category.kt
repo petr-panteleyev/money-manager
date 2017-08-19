@@ -26,15 +26,15 @@
 
 package org.panteleyev.money.persistence
 
-import org.panteleyev.persistence.Record
 import org.panteleyev.persistence.annotations.Field
 import org.panteleyev.persistence.annotations.RecordBuilder
 import org.panteleyev.persistence.annotations.Table
 
 @Table("category")
 data class Category @RecordBuilder constructor (
-        @param:Field(Field.ID)
-        val _id: Int,
+        @param:Field("id")
+        @get:Field(value = "id", primaryKey = true)
+        override val id : Int,
 
         @param:Field("name")
         @get:Field("name")
@@ -50,12 +50,17 @@ data class Category @RecordBuilder constructor (
 
         @param:Field("expanded")
         @get:Field("expanded")
-        val expanded : Boolean
-) : Record, Named {
-    val type : CategoryType = CategoryType.get(catTypeId)
+        val expanded : Boolean,
 
-    @Field(value = Field.ID, primaryKey = true)
-    override fun getId(): Int = _id
+        @param:Field("guid")
+        @get:Field("guid")
+        override val guid: String,
+
+        @param:Field("modified")
+        @get:Field("modified")
+        override val modified: Long
+) : MoneyRecord, Named {
+    val type : CategoryType = CategoryType.get(catTypeId)
 
     fun expand(exp: Boolean) = copy(expanded = exp)
 }

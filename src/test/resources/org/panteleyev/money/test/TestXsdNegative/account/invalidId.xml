@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Money>
+    <Accounts>
+        <Account id="0">
+            <accountLimit>0.000000</accountLimit>
+            <categoryId>6</categoryId>
+            <comment></comment>
+            <currencyId>2</currencyId>
+            <currencyRate>0.000000</currencyRate>
+            <enabled>true</enabled>
+            <guid>3e6219be-7470-11e7-857e-389c6424842b</guid>
+            <modified>1000</modified>
+            <name>Cash</name>
+            <openingBalance>-137373.710000</openingBalance>
+            <typeId>1</typeId>
+        </Account>
+    </Accounts>
+    <Categories/>
+    <Contacts/>
+    <Currencies/>
+    <TransactionGroups/>
+    <Transactions/>
+</Money>

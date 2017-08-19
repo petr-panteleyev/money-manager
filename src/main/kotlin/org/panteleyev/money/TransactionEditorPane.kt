@@ -60,7 +60,6 @@ import org.panteleyev.money.persistence.MoneyDAO
 import org.panteleyev.money.persistence.Named
 import org.panteleyev.money.persistence.Transaction
 import org.panteleyev.money.persistence.TransactionType
-import org.panteleyev.persistence.annotations.Field
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.ResourceBundle
@@ -435,7 +434,7 @@ class TransactionEditorPane : TitledPane() {
 
             var rate: BigDecimal? = tr.rate
             if (BigDecimal.ZERO.compareTo(rate!!) == 0) {
-                rate = BigDecimal.ONE.setScale(Field.SCALE, BigDecimal.ROUND_HALF_UP)
+                rate = BigDecimal.ONE.setScale(MoneyDAO.FIELD_SCALE, BigDecimal.ROUND_HALF_UP)
             }
             if (rate != null) {
                 rate1Edit.text = rate.toString()
@@ -757,7 +756,7 @@ class TransactionEditorPane : TitledPane() {
         }
 
         val amountValue = BigDecimal(amount)
-                .setScale(Field.SCALE, BigDecimal.ROUND_HALF_UP)
+                .setScale(MoneyDAO.FIELD_SCALE, BigDecimal.ROUND_HALF_UP)
 
         var rate = rate1Edit.text
         if (rate.isEmpty()) {
@@ -765,7 +764,7 @@ class TransactionEditorPane : TitledPane() {
         }
 
         val rateValue = BigDecimal(rate)
-                .setScale(Field.SCALE, BigDecimal.ROUND_HALF_UP)
+                .setScale(MoneyDAO.FIELD_SCALE, BigDecimal.ROUND_HALF_UP)
 
         val total: BigDecimal
 
