@@ -1,5 +1,10 @@
 # Change Log
 
+## [2.2.0] - 2017-10-15
+
+- Connection profiles replaced manual connection and single option
+- Parser for Raiffeisen Bank (Russia) credit card statement
+
 ## [2.1.0] - 2017-08-19
 
 - Export/import of the entire database and selected transactions

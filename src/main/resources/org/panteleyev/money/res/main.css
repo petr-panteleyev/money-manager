@@ -54,6 +54,10 @@
     -fx-text-fill: red;
 }
 
+.greenText {
+    -fx-text-fill: green
+}
+
 .blackText {
     -fx-text-fill: black;
 }
