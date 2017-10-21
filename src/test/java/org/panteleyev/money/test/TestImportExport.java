@@ -130,7 +130,7 @@ public class TestImportExport extends BaseTest {
     public void testAccountsWithDependencies() throws Exception {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-        new Export(mock).withAccounts(Collections.EMPTY_LIST, true).doExport(outStream);
+        new Export(mock).withAccounts(List.of(), true).doExport(outStream);
         byte[] bytes1 = outStream.toByteArray();
         validateXML(new ByteArrayInputStream(bytes1));
 

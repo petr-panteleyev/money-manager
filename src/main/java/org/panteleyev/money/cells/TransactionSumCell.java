@@ -32,6 +32,7 @@ import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.SplitTransaction;
 import org.panteleyev.money.persistence.Transaction;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import static org.panteleyev.money.Styles.BLACK_TEXT;
 import static org.panteleyev.money.Styles.BLUE_TEXT;
 import static org.panteleyev.money.Styles.RED_TEXT;
@@ -65,7 +66,7 @@ public class TransactionSumCell extends TableCell<Transaction, Transaction> {
             }
 
             String format = item instanceof SplitTransaction || item.getGroupId() == 0 ? "%s" : "(%s)";
-            setText(String.format(format, amount.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+            setText(String.format(format, amount.setScale(2, RoundingMode.HALF_UP).toString()));
         }
     }
 }

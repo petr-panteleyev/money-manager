@@ -8,6 +8,17 @@ The following repositories must be cloned to build Money Manager:
 2. git clone https://github.com/petr-panteleyev/java-persistence.git persistence
 3. git clone https://github.com/petr-panteleyev/java-money.git money
 
+Temporary Maven repository
+
+In order to use custom jar files with module-info setup additional Maven repository in settings.xml and make it appear first:
+
+```
+<repository>
+  <id>panteleyev.org</id>
+  <url>http://www.panteleyev.org/maven/</url>
+</repository>
+```
+
 ## Building Dependencies
 
 ```
@@ -15,7 +26,6 @@ cd <utilities>
 mvn install
 
 cd <persistence>
-git checkout develop
 mvn install
 ```
 
@@ -23,16 +33,14 @@ mvn install
 
 ```
 cd <money>
-mvn clean
-mvn package
+mvn clean package
 ```
 
 ## Building Native Packages
 
 ```
 cd <money>
-mvn clean
-mvn package
+mvn clean package
 mvn exec:exec@<native-dist>
 ```
 

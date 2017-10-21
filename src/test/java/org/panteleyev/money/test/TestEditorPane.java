@@ -48,6 +48,7 @@ import org.testng.annotations.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
@@ -270,7 +271,7 @@ public class TestEditorPane extends BaseDaoTest {
                 .accountCreditedId(credit.getId())
                 .day(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
                 .comment(UUID.randomUUID().toString())
-                .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, BigDecimal.ROUND_HALF_UP))
+                .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
                 .checked(RANDOM.nextBoolean());
 
         if (debit.getCurrencyId() == credit.getCurrencyId()) {

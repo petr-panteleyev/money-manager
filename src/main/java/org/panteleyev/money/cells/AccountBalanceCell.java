@@ -32,6 +32,7 @@ import org.panteleyev.money.AccountTreeItem;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Transaction;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.function.Predicate;
 import static org.panteleyev.money.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -67,7 +68,7 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
                             BigDecimal rate = t.getRate();
                             if (rate.compareTo(BigDecimal.ZERO) != 0) {
                                 amount = t.getRateDirection() == 0 ?
-                                        amount.divide(rate, BigDecimal.ROUND_HALF_UP) : amount.multiply(rate);
+                                        amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
                             }
                         } else {
                             amount = amount.negate();
@@ -79,7 +80,7 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
                 sum = sum.add(account.getOpeningBalance());
             }
 
-            setText(sum.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+            setText(sum.setScale(2, RoundingMode.HALF_UP).toString());
 
             getStyleClass().remove(RED_TEXT);
             if (sum.signum() < 0) {

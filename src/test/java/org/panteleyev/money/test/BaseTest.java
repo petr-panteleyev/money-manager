@@ -45,6 +45,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -73,7 +74,7 @@ public class BaseTest {
     }
 
     BigDecimal randomBigDecimal() {
-        return new BigDecimal(RANDOM.nextDouble()).setScale(6, BigDecimal.ROUND_HALF_UP);
+        return new BigDecimal(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
     CategoryType randomCategoryType() {

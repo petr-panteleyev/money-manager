@@ -61,7 +61,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
@@ -101,7 +100,7 @@ public class MainWindowController extends BaseController {
         return ValidationResult.fromErrorIf(control, null, invalid && !control.isDisabled());
     };
 
-    private static final List<Class<? extends Controller>> WINDOW_CLASSES = Arrays.asList(
+    private static final List<Class<? extends Controller>> WINDOW_CLASSES = List.of(
             ContactListWindowController.class,
             AccountListWindowController.class,
             CategoryWindowController.class,
@@ -229,9 +228,11 @@ public class MainWindowController extends BaseController {
             windowMenu.getItems().add(new SeparatorMenuItem());
 
             WindowManager.getFrames().forEach(frame -> {
-                MenuItem item = new MenuItem(frame.getTitle());
-                item.setOnAction(action -> frame.getStage().toFront());
-                windowMenu.getItems().add(item);
+                if (frame != this) {
+                    MenuItem item = new MenuItem(frame.getTitle());
+                    item.setOnAction(action -> frame.getStage().toFront());
+                    windowMenu.getItems().add(item);
+                }
             });
         });
 

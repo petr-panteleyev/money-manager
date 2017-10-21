@@ -38,7 +38,6 @@ import org.panteleyev.persistence.Record;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +62,7 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public static final Consumer<String> IGNORE_PROGRESS = x -> {};
 
-    private static final List<Class<? extends Record>> TABLE_CLASSES = Arrays.asList(
+    private static final List<Class<? extends Record>> TABLE_CLASSES = List.of(
             Category.class,
             Contact.class,
             Currency.class,
@@ -72,7 +71,7 @@ public class MoneyDAO extends DAO implements RecordSource {
             Transaction.class
     );
 
-    private static final List<Class<? extends Record>> TABLE_CLASSES_REVERSED = Arrays.asList(
+    private static final List<Class<? extends Record>> TABLE_CLASSES_REVERSED = List.of(
             Transaction.class,
             TransactionGroup.class,
             Account.class,
@@ -135,7 +134,7 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     public List<Category> getCategoriesByType(CategoryType... types) {
-        List<CategoryType> typeList = Arrays.asList(types);
+        List<CategoryType> typeList = List.of(types);
 
         return getCategories().stream()
                 .filter(category -> typeList.contains(category.getType()))
@@ -248,7 +247,7 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     public List<Account> getAccountsByCategoryId(Integer... ids) {
-        List<Integer> catIDs = Arrays.asList(ids);
+        List<Integer> catIDs = List.of(ids);
 
         return accountsMap.values().stream()
                 .filter(account -> catIDs.contains(account.getCategoryId()))

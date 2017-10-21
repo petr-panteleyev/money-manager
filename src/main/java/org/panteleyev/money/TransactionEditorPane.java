@@ -61,6 +61,7 @@ import org.panteleyev.money.persistence.Named;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionType;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
@@ -509,7 +510,7 @@ public class TransactionEditorPane extends TitledPane {
 
             BigDecimal rate = tr.getRate();
             if (BigDecimal.ZERO.compareTo(rate) == 0) {
-                rate = BigDecimal.ONE.setScale(FIELD_SCALE, BigDecimal.ROUND_HALF_UP);
+                rate = BigDecimal.ONE.setScale(FIELD_SCALE, RoundingMode.HALF_UP);
             }
             if (rate != null) {
                 rate1Edit.setText(rate.toString());
@@ -523,7 +524,7 @@ public class TransactionEditorPane extends TitledPane {
         daySpinner.getValueFactory().setValue(tr.getDay());
 
         // Sum
-        sumEdit.setText(tr.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+        sumEdit.setText(tr.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
         updateRateAmount();
     }
 
@@ -851,7 +852,7 @@ public class TransactionEditorPane extends TitledPane {
         }
 
         BigDecimal amountValue = new BigDecimal(amount)
-                .setScale(FIELD_SCALE, BigDecimal.ROUND_HALF_UP);
+                .setScale(FIELD_SCALE, RoundingMode.HALF_UP);
 
         String rate = rate1Edit.getText();
         if (rate.isEmpty()) {
@@ -859,18 +860,18 @@ public class TransactionEditorPane extends TitledPane {
         }
 
         BigDecimal rateValue = new BigDecimal(rate)
-                .setScale(FIELD_SCALE, BigDecimal.ROUND_HALF_UP);
+                .setScale(FIELD_SCALE, RoundingMode.HALF_UP);
 
         BigDecimal total;
 
         if (rateDir1Combo.getSelectionModel().getSelectedIndex() == 0) {
-            total = amountValue.divide(rateValue, BigDecimal.ROUND_HALF_UP);
+            total = amountValue.divide(rateValue, RoundingMode.HALF_UP);
         } else {
             total = amountValue.multiply(rateValue);
         }
 
         Platform.runLater(() ->
-                rateAmoutLabel.setText("= " + total.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+                rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP).toString()));
     }
 
     private void updateCategoryLabel(Label label, Account account) {
@@ -896,7 +897,7 @@ public class TransactionEditorPane extends TitledPane {
                             commentEdit.setText(it.getComment());
                         }
                         if (sumEdit.getText().isEmpty()) {
-                            sumEdit.setText(it.getAmount().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+                            sumEdit.setText(it.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
                         }
 
                         getDao().getContact(it.getContactId()).ifPresent(contact -> {

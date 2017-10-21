@@ -56,6 +56,7 @@ import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -63,11 +64,11 @@ import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class AccountListWindowController extends BaseController {
+class AccountListWindowController extends BaseController {
     private BorderPane self = new BorderPane();
 
-    private ChoiceBox typeChoiceBox = new ChoiceBox<>();
-    private ChoiceBox categoryChoiceBox = new ChoiceBox<>();
+    private ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
+    private ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
     private CheckBox showActiveCheckBox = new CheckBox(RB.getString("account.Window.ShowOnlyActive"));
     private TableView<Account> accountListTable = new TableView<>();
 
@@ -75,7 +76,7 @@ public class AccountListWindowController extends BaseController {
     private final MapChangeListener<Integer, Account> accountsListener =
             change -> Platform.runLater(this::reloadAccounts);
 
-    public AccountListWindowController() {
+    AccountListWindowController() {
         // Event handlers
         EventHandler<ActionEvent> addHandler = event -> onAddAccount();
         EventHandler<ActionEvent> editHandler = event -> onEditAccount();
@@ -139,7 +140,7 @@ public class AccountListWindowController extends BaseController {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        ObservableList types = FXCollections.observableArrayList(CategoryType.values());
+        ObservableList<Object> types = FXCollections.observableArrayList(CategoryType.values());
         if (!types.isEmpty()) {
             types.add(0, new Separator());
         }
@@ -148,7 +149,7 @@ public class AccountListWindowController extends BaseController {
         typeChoiceBox.setItems(types);
         typeChoiceBox.getSelectionModel().select(0);
 
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object object) {
                 if (object instanceof CategoryType) {
@@ -161,7 +162,7 @@ public class AccountListWindowController extends BaseController {
 
         typeChoiceBox.valueProperty().addListener((x, y, newValue) -> onTypeChanged(newValue));
 
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object object) {
                 if (object instanceof Category) {
@@ -190,7 +191,7 @@ public class AccountListWindowController extends BaseController {
         currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
                 new ReadOnlyObjectWrapper<>(getDao().getCurrency(p.getValue().getCurrencyId()).map(Currency::getSymbol).orElse("")));
         balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, BigDecimal> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getOpeningBalance().setScale(2, BigDecimal.ROUND_HALF_UP)));
+                new ReadOnlyObjectWrapper<>(p.getValue().getOpeningBalance().setScale(2, RoundingMode.HALF_UP)));
         activeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, CheckBox> p) -> {
             Account account = p.getValue();
 
@@ -250,7 +251,7 @@ public class AccountListWindowController extends BaseController {
     }
 
     private void onTypeChanged(Object newValue) {
-        ObservableList items;
+        ObservableList<Object> items;
 
         if (newValue instanceof String) {
             items = FXCollections.observableArrayList(RB.getString("account.Window.AllCategories"));

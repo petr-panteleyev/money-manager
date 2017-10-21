@@ -55,12 +55,12 @@ import java.util.function.Predicate;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class AccountTree extends BorderPane {
+class AccountTree extends BorderPane {
     private final TreeTableView<AccountTreeItem> tableView = new TreeTableView<>();
 
     // Filters
-    private final ChoiceBox accountFilterBox = new ChoiceBox();
-    private final ChoiceBox transactionFilterBox = new ChoiceBox();
+    private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
+    private final ChoiceBox<Object> transactionFilterBox = new ChoiceBox<>();
 
     private final CheckMenuItem showDeactivatedAccountsMenuItem = new CheckMenuItem("Show deactivated accounts");
 
@@ -93,7 +93,7 @@ public class AccountTree extends BorderPane {
     private final MapChangeListener<Integer, Transaction> transactionListener =
             change -> Platform.runLater(tableView::refresh);
 
-    public AccountTree() {
+    AccountTree() {
         for (CategoryType type : CategoryType.values()) {
             subRoots.put(type, new TreeItem<>(new AccountTreeItem(type.getTypeName(), type.getComment())));
         }
@@ -112,6 +112,7 @@ public class AccountTree extends BorderPane {
         TreeTableColumn<AccountTreeItem, Account> balanceColumn = new TreeTableColumn<>(RB.getString("column.Balance"));
         TreeTableColumn<AccountTreeItem, Account> waitingColumn = new TreeTableColumn<>(RB.getString("column.Waiting"));
 
+        //noinspection unchecked
         tableView.getColumns().setAll(nameColumn, commentColumn, approvedColumn, balanceColumn, waitingColumn);
 
         // Context menu
@@ -246,7 +247,7 @@ public class AccountTree extends BorderPane {
                 .forEach(it -> {
                     if (categoryTreeItem == null || it.getCategoryId() != categoryTreeItem.getValue().getId()) {
                         getDao().getCategory(it.getCategoryId()).ifPresent(category -> {
-                            categoryTreeItem = new TreeItem(new AccountTreeItem(category));
+                            categoryTreeItem = new TreeItem<>(new AccountTreeItem(category));
                             categoryTreeItem.setExpanded(category.getExpanded());
 
                             categoryTreeItem.expandedProperty().addListener((x, y, newValue) ->
@@ -256,10 +257,11 @@ public class AccountTree extends BorderPane {
                         });
                     }
 
-                    categoryTreeItem.getChildren().add(new TreeItem(new AccountTreeItem(it)));
+                    categoryTreeItem.getChildren().add(new TreeItem<>(new AccountTreeItem(it)));
                 });
     }
 
+    @SuppressWarnings("unchecked")
     private void initTreeSkeleton() {
         root.getChildren().setAll(balanceRoot, expIncRoot);
         balanceRoot.getChildren().setAll(banksSubTree, portfolioSubTree, assetsSubTree, debtsSubTree);

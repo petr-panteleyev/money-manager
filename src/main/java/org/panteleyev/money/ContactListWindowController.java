@@ -124,7 +124,7 @@ public class ContactListWindowController extends BaseController {
         typeChoiceBox.getItems().addAll(ContactType.values());
         typeChoiceBox.getSelectionModel().select(0);
 
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter() {
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
                 if (obj instanceof ContactType) {
                     return ((ContactType) obj).getTypeName();

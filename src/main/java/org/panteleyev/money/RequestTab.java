@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class RequestTab extends BorderPane {
+class RequestTab extends BorderPane {
     private static final ResourceBundle rb = MainWindowController.RB;
 
 
@@ -70,7 +70,7 @@ public class RequestTab extends BorderPane {
             Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
 
 
-    public RequestTab() {
+    RequestTab() {
         Button clearButton = new Button(rb.getString("button.Clear"));
         clearButton.setOnAction(event -> onClearButton());
 
@@ -95,7 +95,7 @@ public class RequestTab extends BorderPane {
         allCategoriesString.set(rb.getString("account.Window.AllCategories"));
         allAccountsString.set(rb.getString("text.All.Accounts"));
 
-        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
+        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
                 if (obj instanceof CategoryType) {
@@ -106,7 +106,7 @@ public class RequestTab extends BorderPane {
             }
         });
 
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
+        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
                 if (obj instanceof Category) {
                     return ((Category) obj).getName();
@@ -116,7 +116,7 @@ public class RequestTab extends BorderPane {
             }
         });
 
-        accountChoiceBox.setConverter(new ReadOnlyStringConverter<Object>() {
+        accountChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
                 if (obj instanceof Account) {
                     return ((Account) obj).getName();
