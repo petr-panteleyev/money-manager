@@ -57,8 +57,8 @@ import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -117,7 +117,7 @@ class AccountListWindowController extends BaseController {
         TableColumn<Account, BigDecimal> balanceColumn = new TableColumn<>(RB.getString("column.InitialBalance"));
         TableColumn<Account, CheckBox> activeColumn = new TableColumn<>("A");
 
-        accountListTable.getColumns().setAll(Arrays.asList(
+        accountListTable.getColumns().setAll(List.of(
                 idColumn, nameColumn, typeColumn, categoryColumn,
                 currencyColumn, balanceColumn, activeColumn));
 

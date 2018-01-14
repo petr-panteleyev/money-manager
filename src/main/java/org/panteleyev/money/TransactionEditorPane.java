@@ -72,7 +72,6 @@ import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import static java.util.Collections.emptyList;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -117,12 +116,12 @@ public class TransactionEditorPane extends TitledPane {
 
                 if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
                     /* If there is a single case sensitive match then no suggestions must be shown. */
-                    return emptyList();
+                    return List.of();
                 } else {
                     return result;
                 }
             } else {
-                return emptyList();
+                return List.of();
             }
         }
     }
@@ -435,11 +434,8 @@ public class TransactionEditorPane extends TitledPane {
 
                                     debitedSuggestions.add(acc);
                                     creditedSuggestions.add(acc);
-
                                 });
-
                     }
-
                 });
 
 
@@ -466,7 +462,6 @@ public class TransactionEditorPane extends TitledPane {
         sumEdit.setText("");
         rateAmoutLabel.setText("");
 
-
         daySpinner.getEditor().setText(Integer.toString(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
         daySpinner.getEditor().selectAll();
         //        daySpinner.requestFocus();
@@ -474,7 +469,6 @@ public class TransactionEditorPane extends TitledPane {
 
     public void setTransaction(Transaction tr) {
         builder = new Transaction.Builder(tr);
-
 
         newTransactionProperty.set(false);
 
@@ -498,7 +492,6 @@ public class TransactionEditorPane extends TitledPane {
         invoiceNumberEdit.setText(tr.getInvoiceNumber());
 
         // Rate
-
         int debitedCurrencyId = accDebited.map(Account::getCurrencyId).orElse(0);
         int creditedCurrencyId = accCredited.map(Account::getCurrencyId).orElse(0);
 

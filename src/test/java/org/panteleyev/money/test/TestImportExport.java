@@ -39,7 +39,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,12 +70,12 @@ public class TestImportExport extends BaseTest {
     private final Transaction tr4 = newTransaction(acc1, acc3, con2);
 
     private final MoneyDAOMock mock = new MoneyDAOMock(
-            Arrays.asList(cat1, cat2, cat3),
-            Arrays.asList(acc1, acc2, acc3),
-            Arrays.asList(con1, con2, con3),
-            Arrays.asList(curr1, curr2, curr3),
-            Collections.singletonList(tg),
-            Arrays.asList(tr1, tr2, tr3, tr4)
+            List.of(cat1, cat2, cat3),
+            List.of(acc1, acc2, acc3),
+            List.of(con1, con2, con3),
+            List.of(curr1, curr2, curr3),
+            List.of(tg),
+            List.of(tr1, tr2, tr3, tr4)
     );
 
     @DataProvider(name = "importExportData")
@@ -84,17 +83,16 @@ public class TestImportExport extends BaseTest {
         return new Object[][]{
                 {
                         // Empty lists
-                        Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST,
-                        Collections.EMPTY_LIST, Collections.EMPTY_LIST, Collections.EMPTY_LIST
+                        List.of(), List.of(), List.of(), List.of(), List.of(), List.of()
                 },
                 {
-                        Arrays.asList(newCategory(), newCategory()),
-                        Arrays.asList(newAccount(), newAccount(), newAccount()),
-                        Arrays.asList(newContact(), newContact()),
-                        Arrays.asList(newCurrency(), newCurrency(), newCurrency()),
-                        Arrays.asList(newTransactionGroup(), newTransactionGroup(), newTransactionGroup(),
+                        List.of(newCategory(), newCategory()),
+                        List.of(newAccount(), newAccount(), newAccount()),
+                        List.of(newContact(), newContact()),
+                        List.of(newCurrency(), newCurrency(), newCurrency()),
+                        List.of(newTransactionGroup(), newTransactionGroup(), newTransactionGroup(),
                                 newTransactionGroup()),
-                        Arrays.asList(newTransaction(), newTransaction(), newTransaction(), newTransaction())
+                        List.of(newTransaction(), newTransaction(), newTransaction(), newTransaction())
                 }
         };
     }
@@ -143,7 +141,7 @@ public class TestImportExport extends BaseTest {
         assertEmpty(imp1.getAccounts());
 
         outStream.reset();
-        new Export(mock).withAccounts(Arrays.asList(acc1, acc2, acc3), true).doExport(outStream);
+        new Export(mock).withAccounts(List.of(acc1, acc2, acc3), true).doExport(outStream);
         byte[] bytes2 = outStream.toByteArray();
         validateXML(new ByteArrayInputStream(bytes2));
 
@@ -173,7 +171,7 @@ public class TestImportExport extends BaseTest {
 
 
         outStream.reset();
-        new Export(mock).withAccounts(Arrays.asList(acc1, acc2), true).doExport(outStream);
+        new Export(mock).withAccounts(List.of(acc1, acc2), true).doExport(outStream);
         byte[] bytes4 = outStream.toByteArray();
         validateXML(new ByteArrayInputStream(bytes4));
 
@@ -191,7 +189,7 @@ public class TestImportExport extends BaseTest {
     public void testTransactionsWithDependencies() throws Exception {
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
-        new Export(mock).withTransactions(Arrays.asList(tr1, tr2, tr3), true).doExport(outStream);
+        new Export(mock).withTransactions(List.of(tr1, tr2, tr3), true).doExport(outStream);
         byte[] bytes1 = outStream.toByteArray();
         validateXML(new ByteArrayInputStream(bytes1));
 

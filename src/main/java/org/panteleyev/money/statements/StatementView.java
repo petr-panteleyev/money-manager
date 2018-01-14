@@ -31,7 +31,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.cells.LocalDateCell;
-import java.math.BigDecimal;
+import org.panteleyev.money.cells.StatementSumCell;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -65,10 +65,10 @@ class StatementView extends BorderPane {
         placeColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
 
-        TableColumn<StatementRecord, BigDecimal> amountColumn = new TableColumn<>(RB.getString("column.Sum"));
-        amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, BigDecimal> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getAmountDecimal().orElse(BigDecimal.ZERO)));
-
+        TableColumn<StatementRecord, StatementRecord> amountColumn = new TableColumn<>(RB.getString("column.Sum"));
+        amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, StatementRecord> p) ->
+                new ReadOnlyObjectWrapper<>(p.getValue()));
+        amountColumn.setCellFactory(x -> new StatementSumCell());
 
         actualDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
         executionDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
@@ -100,5 +100,9 @@ class StatementView extends BorderPane {
     void setStatement(Statement statement) {
         tableView.getItems().clear();
         tableView.getItems().addAll(statement.getRecords());
+    }
+
+    void clear() {
+        tableView.getItems().clear();
     }
 }

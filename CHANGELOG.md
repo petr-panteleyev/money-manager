@@ -1,8 +1,13 @@
 # Change Log
 
-## [2.3.0] - UNRELEASED
+## [18.1.0] - 2018-01-14
 
 - Java 9
+- Support for Raiffeisen Bank (Russia) OFX statement
+
+### Fixed
+
+- NPE while reloading statement
 
 ## [2.2.0] - 2017-10-15
 

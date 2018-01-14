@@ -51,7 +51,7 @@ import javafx.scene.layout.HBox;
 import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ContactType;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -103,8 +103,7 @@ public class ContactListWindowController extends BaseController {
         TableColumn<Contact, String> phoneColumn = new TableColumn<>(RB.getString("column.Phone"));
         TableColumn<Contact, String> emailColumn = new TableColumn<>(RB.getString("column.Email"));
 
-        contactTable.getColumns().setAll(Arrays.asList(
-                nameColumn, typeColumn, phoneColumn, emailColumn));
+        contactTable.getColumns().setAll(List.of(nameColumn, typeColumn, phoneColumn, emailColumn));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox

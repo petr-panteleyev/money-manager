@@ -30,6 +30,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TreeTableCell;
 import org.panteleyev.money.AccountTreeItem;
 import org.panteleyev.money.persistence.Account;
+import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -74,13 +75,12 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
                             amount = amount.negate();
                         }
                         return amount;
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    })
+                    .reduce(total ? account.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
 
-            if (total) {
-                sum = sum.add(account.getOpeningBalance());
-            }
-
-            setText(sum.setScale(2, RoundingMode.HALF_UP).toString());
+            setText(getDao().getCurrency(account.getCurrencyId())
+                    .map(curr -> curr.formatValue(sum))
+                    .orElse(Currency.defaultFormatValue(sum)));
 
             getStyleClass().remove(RED_TEXT);
             if (sum.signum() < 0) {

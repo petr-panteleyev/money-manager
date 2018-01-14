@@ -46,7 +46,6 @@ import javax.xml.validation.Validator;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -359,6 +358,6 @@ public class BaseTest {
 
     static <T extends Record> void assertRecords(Collection<T> c, Record... records) {
         Assert.assertEquals(c.size(), records.length);
-        Assert.assertTrue(c.containsAll(Arrays.asList(records)));
+        Assert.assertTrue(c.containsAll(List.of(records)));
     }
 }

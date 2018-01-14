@@ -28,9 +28,9 @@ package org.panteleyev.money.persistence;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class SplitTransaction extends Transaction {
@@ -70,7 +70,7 @@ public class SplitTransaction extends Transaction {
                 .map(Transaction::getContactId)
                 .distinct()
                 .map(getDao()::getContact)
-                .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                .flatMap(Optional::stream)
                 .map(Contact::getName)
                 .collect(Collectors.joining(","));
 

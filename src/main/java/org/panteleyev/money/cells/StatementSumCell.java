@@ -24,51 +24,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.statements;
+package org.panteleyev.money.cells;
 
-import java.util.List;
-import java.util.Objects;
+import javafx.geometry.Pos;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.statements.StatementRecord;
+import java.math.BigDecimal;
+import static org.panteleyev.money.Styles.BLACK_TEXT;
+import static org.panteleyev.money.Styles.RED_TEXT;
 
-public final class Statement {
-    public enum StatementType {
-        UNKNOWN,
-        RAIFFEISEN_CREDIT_CARD_CSV,
-        RAIFFEISEN_CARD_OFX
-    }
-
-    private final StatementType type;
-    private final List<StatementRecord> records;
-
-    public Statement(StatementType type, List<StatementRecord> records) {
-        this.type = type;
-        this.records = records;
-    }
-
-    public StatementType getType() {
-        return type;
-    }
-
-    public List<StatementRecord> getRecords() {
-        return records;
-    }
-
+public class StatementSumCell extends TableCell<StatementRecord, StatementRecord> {
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    public void updateItem(StatementRecord item, boolean empty) {
+        super.updateItem(item, empty);
+
+        setAlignment(Pos.CENTER_RIGHT);
+
+        if (empty || item == null) {
+            setText("");
+        } else {
+            BigDecimal amount = item.getAmountDecimal().orElse(BigDecimal.ZERO);
+
+            getStyleClass().removeAll(RED_TEXT, BLACK_TEXT);
+            getStyleClass().add(amount.signum() < 0 ? RED_TEXT : BLACK_TEXT);
+
+            setText(amount.toString());
         }
-
-        if (!(o instanceof Statement)) {
-            return false;
-        }
-
-        Statement that = (Statement) o;
-        return type == that.type
-                && Objects.equals(records, that.records);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, records);
     }
 }

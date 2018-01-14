@@ -30,6 +30,7 @@ import org.panteleyev.persistence.annotations.Field;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 @Table("currency")
@@ -178,5 +179,20 @@ public final class Currency implements MoneyRecord {
     public int hashCode() {
         return Objects.hash(id, symbol, description, formatSymbol, formatSymbolPosition, showFormatSymbol, def,
                 rate.stripTrailingZeros(), direction, useThousandSeparator, guid, modified);
+    }
+
+    public String formatValue(BigDecimal value) {
+        String sumString = value.abs().setScale(2, RoundingMode.HALF_UP).toString();
+        String signString = value.signum() < 0 ? "-" : "";
+
+        sumString = formatSymbolPosition == 0 ?
+                signString + formatSymbol + sumString :
+                signString + sumString + formatSymbol;
+
+        return sumString;
+    }
+
+    public static String defaultFormatValue(BigDecimal value) {
+        return value.setScale(2, RoundingMode.HALF_UP).toString();
     }
 }

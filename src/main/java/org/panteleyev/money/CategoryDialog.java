@@ -39,7 +39,6 @@ import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.Category;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.utilities.fx.BaseDialog;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -65,7 +64,7 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         nameEdit.setPrefColumnCount(20);
 
-        List<CategoryType> list = Arrays.asList(CategoryType.values());
+        List<CategoryType> list = List.of(CategoryType.values());
         typeComboBox.setItems(FXCollections.observableArrayList(list));
         if (!list.isEmpty()) {
             typeComboBox.getSelectionModel().select(0);
@@ -81,7 +80,7 @@ final class CategoryDialog extends BaseDialog<Category> {
             commentEdit.setText(category.getComment());
         }
 
-        typeComboBox.setConverter(new StringConverter<CategoryType>() {
+        typeComboBox.setConverter(new StringConverter<>() {
             @Override
             public String toString(CategoryType type) {
                 return type.getTypeName();

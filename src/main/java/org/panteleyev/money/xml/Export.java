@@ -44,9 +44,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 @XmlRootElement(name = "Money")
@@ -125,7 +125,7 @@ public class Export {
                     .map(AccountXml::getCategoryId)
                     .distinct()
                     .map(source::getCategory)
-                    .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .map(CategoryXml::new)
                     .collect(Collectors.toList());
 
@@ -133,7 +133,7 @@ public class Export {
                     .map(AccountXml::getCurrencyId)
                     .distinct()
                     .map(source::getCurrency)
-                    .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .map(CurrencyXml::new)
                     .collect(Collectors.toList());
         }
@@ -173,7 +173,7 @@ public class Export {
                     .map(TransactionXml::getGroupId)
                     .distinct()
                     .map(source::getTransactionGroup)
-                    .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .map(TransactionGroupXml::new)
                     .collect(Collectors.toList());
 
@@ -182,7 +182,7 @@ public class Export {
                     .map(TransactionXml::getContactId)
                     .distinct()
                     .map(source::getContact)
-                    .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .map(ContactXml::new)
                     .collect(Collectors.toList());
 
@@ -193,7 +193,7 @@ public class Export {
             }
             withAccounts(accIdList.stream()
                     .map(source::getAccount)
-                    .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+                    .flatMap(Optional::stream)
                     .collect(Collectors.toList()), true);
         }
 

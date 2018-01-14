@@ -27,7 +27,6 @@
 package org.panteleyev.money.statements;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -40,7 +39,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.TransactionTableView;
 import org.panteleyev.money.persistence.Account;
@@ -62,13 +60,19 @@ public class StatementTab extends BorderPane {
     private final TransactionTableView transactionTable = new TransactionTableView(true);
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();
-    private final ComboBox<Statement.StatementType> statementTypeComboBox =
-            new ComboBox<>(FXCollections.observableArrayList(Statement.StatementType.values()));
     private final TextField statementFileEdit = new TextField();
     private final CheckBox ignoreExecutionDate = new CheckBox(RB.getString("check.IgnoreExecutionDate"));
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Account> accountListener = change ->
             Platform.runLater(this::setupAccountComboBox);
+
+    private static final FileChooser.ExtensionFilter OFX_EXTENSION =
+            new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
+    private static final FileChooser.ExtensionFilter RBA_STATEMENT_CSV =
+            new FileChooser.ExtensionFilter("Raiffeisen Statement", "*.csv");
+
+    private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
     public StatementTab() {
         Button browseButton = new Button("...");
@@ -76,6 +80,7 @@ public class StatementTab extends BorderPane {
 
         Button loadButton = new Button(RB.getString("button.Load"));
         loadButton.setOnAction(event -> onLoad());
+        loadButton.disableProperty().bind(statementFileEdit.textProperty().isEmpty());
 
         Button clearButton = new Button(RB.getString("button.Clear"));
         clearButton.setOnAction(event -> onClear());
@@ -83,8 +88,6 @@ public class StatementTab extends BorderPane {
         HBox hBox = new HBox(5.0,
                 new Label(RB.getString("label.Account")),
                 accountComboBox,
-                new Label(RB.getString("label.StatementType")),
-                statementTypeComboBox,
                 statementFileEdit,
                 browseButton,
                 loadButton,
@@ -92,7 +95,7 @@ public class StatementTab extends BorderPane {
                 ignoreExecutionDate
         );
 
-        HBox.setHgrow(statementFileEdit, Priority.ALWAYS);
+        statementFileEdit.setPrefColumnCount(40);
         hBox.setAlignment(Pos.CENTER_LEFT);
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
@@ -101,7 +104,6 @@ public class StatementTab extends BorderPane {
         splitPane.setDividerPosition(0, 0.9);
 
         accountComboBox.setConverter(new ReadOnlyNamedConverter<>());
-        statementTypeComboBox.getSelectionModel().select(0);
 
         setTop(hBox);
         setCenter(splitPane);
@@ -145,23 +147,37 @@ public class StatementTab extends BorderPane {
         FileChooser chooser = new FileChooser();
         chooser.setTitle(RB.getString("Statement"));
         chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("CSV Files", "*.csv"),
-                new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
+                RBA_STATEMENT_CSV,
+                OFX_EXTENSION
         );
 
         File selected = chooser.showOpenDialog(null);
+        if (selected != null) {
+            FileChooser.ExtensionFilter filter = chooser.getSelectedExtensionFilter();
+            if (OFX_EXTENSION.equals(filter)) {
+                statementType = Statement.StatementType.RAIFFEISEN_CARD_OFX;
+            } else if (RBA_STATEMENT_CSV.equals(filter)) {
+                statementType = Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV;
+            } else {
+                statementType = Statement.StatementType.UNKNOWN;
+            }
+        }
+
         statementFileEdit.setText(selected != null ? selected.getAbsolutePath() : "");
     }
 
     private void onLoad() {
+        if (statementType.equals(Statement.StatementType.UNKNOWN)) {
+            return;
+        }
+
         File file = new File(statementFileEdit.getText());
         if (!file.exists()) {
             return;
         }
 
         try (InputStream in = new FileInputStream(file)) {
-            Statement statement = StatementParser.parse(statementTypeComboBox.getValue(), in);
+            Statement statement = StatementParser.parse(statementType, in);
             analyzeStatement(statement);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
@@ -173,6 +189,8 @@ public class StatementTab extends BorderPane {
     }
 
     private void onClear() {
-
+        statementFileEdit.setText("");
+        statementType = Statement.StatementType.UNKNOWN;
+        statementTable.clear();
     }
 }

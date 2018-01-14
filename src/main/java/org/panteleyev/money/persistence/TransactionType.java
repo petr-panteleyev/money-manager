@@ -93,6 +93,6 @@ public enum TransactionType {
     }
 
     public static List<TransactionType> valuesAsList() {
-        return Arrays.asList(TransactionType.values());
+        return List.of(TransactionType.values());
     }
 }

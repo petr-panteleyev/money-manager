@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.List;
 
 public class TestStatements {
     private static final String RESOURCES = "src/test/resources/org/panteleyev/money/test/TestStatements/";
@@ -43,7 +43,7 @@ public class TestStatements {
     @Test
     public void testRaiffeisenStatement() throws Exception {
         Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV,
-                Arrays.asList(
+                List.of(
                         new StatementRecord(
                                 LocalDate.of(2017, 9, 7),
                                 LocalDate.of(2017, 9, 9),

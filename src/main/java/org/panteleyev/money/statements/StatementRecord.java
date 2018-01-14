@@ -28,12 +28,60 @@ package org.panteleyev.money.statements;
 
 import org.panteleyev.money.persistence.Currency;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public final class StatementRecord {
+    public static class Builder {
+        private LocalDate actual;
+        private LocalDate execution;
+        private String description;
+        private String counterParty;
+        private String place;
+        private String country;
+        private String currency;
+        private String amount = "0.00";
+        private String accountCurrency;
+        private String accountAmount = "0.00";
+
+        public StatementRecord build() {
+            if (execution == null) {
+                execution = actual;
+            }
+
+            if (accountAmount == null) {
+                accountAmount = amount;
+            }
+
+            return new StatementRecord(actual, execution, description, counterParty, place, country, currency, amount,
+                    accountCurrency, accountAmount);
+        }
+
+        public Builder actual(LocalDate actual) {
+            this.actual = actual;
+            return this;
+        }
+
+        public Builder execution(LocalDate execution) {
+            this.execution = execution;
+            return this;
+        }
+
+        public Builder counterParty(String counterParty) {
+            this.counterParty = counterParty;
+            return this;
+        }
+
+        public Builder amount(String amount) {
+            this.amount = amount;
+            return this;
+        }
+    }
+
+
     private final LocalDate actual;
     private final LocalDate execution;
     private final String description;
@@ -141,7 +189,7 @@ public final class StatementRecord {
 
     private static BigDecimal toBigDecimal(String value) {
         try {
-            return new BigDecimal(value);
+            return new BigDecimal(value).setScale(2, RoundingMode.HALF_UP);
         } catch (NumberFormatException ex) {
             return null;
         }

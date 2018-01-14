@@ -46,6 +46,10 @@ class StatementPredicate implements Predicate<Transaction> {
 
     @Override
     public boolean test(Transaction transaction) {
+        if (record == null || transaction == null) {
+            return false;
+        }
+
         boolean result = (transaction.getAccountDebitedId() == accountId
                 || transaction.getAccountCreditedId() == accountId)
                 && (compareDate(record.getActual(), transaction)
