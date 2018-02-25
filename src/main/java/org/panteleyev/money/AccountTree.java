@@ -297,11 +297,9 @@ class AccountTree extends BorderPane {
 
     private void onTransactionFilterSelected(Object newValue) {
         if (newValue instanceof TransactionFilter) {
-            transactionFilterConsumer.accept(((TransactionFilter) newValue).getPredicate());
-        } else {
-            if (newValue instanceof Integer) {
-                transactionFilterConsumer.accept(t -> t.getYear() == (int) newValue);
-            }
+            transactionFilterConsumer.accept(((TransactionFilter) newValue).predicate());
+        } else if (newValue instanceof Integer) {
+            transactionFilterConsumer.accept(TransactionFilter.byYear((int) newValue));
         }
     }
 

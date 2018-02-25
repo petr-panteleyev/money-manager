@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MoneyDAO extends DAO implements RecordSource {
@@ -232,6 +233,10 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public Collection<Account> getAccounts() {
         return accountsMap.values();
+    }
+
+    public Collection<Account> getAccounts(Predicate<Account> filter) {
+        return accountsMap.values().stream().filter(filter).collect(Collectors.toList());
     }
 
     public List<Account> getAccountsByType(CategoryType type) {

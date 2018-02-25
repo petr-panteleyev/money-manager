@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,6 +49,8 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.statements.StatementRecord;
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Calendar;
@@ -139,7 +141,7 @@ final class TransactionsTab extends BorderPane {
 
         setCurrentDate();
 
-        accountFilterBox.setConverter(new ReadOnlyStringConverter<Object>() {
+        accountFilterBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
                 if (obj instanceof String) {
                     return obj.toString();
@@ -168,7 +170,7 @@ final class TransactionsTab extends BorderPane {
         });
 
         accountFilterBox.getSelectionModel().selectedIndexProperty()
-                .addListener ((x, y, z) -> Platform.runLater(this::reloadTransactions));
+                .addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
 
         getDao().accounts().addListener(accountListener);
 
@@ -219,6 +221,11 @@ final class TransactionsTab extends BorderPane {
         yearSpinner.getValueFactory().setValue(cal.get(Calendar.YEAR));
     }
 
+    private void setDate(LocalDate date) {
+        monthFilterBox.getSelectionModel().select(date.getMonth().getValue() - 1);
+        yearSpinner.getValueFactory().setValue(date.getYear());
+    }
+
     private void onPrevMonth() {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() - 1;
 
@@ -253,8 +260,6 @@ final class TransactionsTab extends BorderPane {
 
     private void reloadTransactions() {
         transactionTable.clear();
-        transactionEditor.clear();
-
         transactionTable.getSelectionModel().select(null);
 
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
@@ -372,5 +377,12 @@ final class TransactionsTab extends BorderPane {
         } else {
             transactionTable.scrollTo(0);
         }
+    }
+
+    public void handleStatementRecord(StatementRecord record, Account account) {
+        Platform.runLater(() -> {
+            setDate(record.getActual());
+            transactionEditor.setTransactionFromStatement(record, account);
+        });
     }
 }

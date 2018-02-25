@@ -11,8 +11,8 @@ open module org.panteleyev.money {
     requires org.panteleyev.persistence;
     requires org.panteleyev.utilities;
 
-    // Automatic modules
     requires mysql.connector.java;
     requires commons.csv;
     requires controlsfx;
+    requires org.jsoup;
 }

@@ -32,8 +32,10 @@ import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.ReferenceOption;
 import org.panteleyev.persistence.annotations.Table;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 @Table("account")
@@ -211,5 +213,31 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             String name2 = getDao().getCategory(o2.getCategoryId()).map(Category::getName).orElse("");
             return name1.compareToIgnoreCase(name2);
         }
+    }
+
+    /**
+     * Calculates balance of all transactions related to this account.
+     *
+     * @param total whether initial balance should be added to the result
+     * @return account balance
+     */
+    public BigDecimal calculateBalance(boolean total, Predicate<Transaction> filter) {
+        return getDao().getTransactions(this).stream()
+                .filter(filter)
+                .map(t -> {
+                    BigDecimal amount = t.getAmount();
+                    if (this.getId() == t.getAccountCreditedId()) {
+                        // handle conversion rate
+                        BigDecimal rate = t.getRate();
+                        if (rate.compareTo(BigDecimal.ZERO) != 0) {
+                            amount = t.getRateDirection() == 0 ?
+                                    amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
+                        }
+                    } else {
+                        amount = amount.negate();
+                    }
+                    return amount;
+                })
+                .reduce(total ? this.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
     }
 }

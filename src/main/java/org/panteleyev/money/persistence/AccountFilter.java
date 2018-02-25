@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,52 +24,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.statements;
+package org.panteleyev.money.persistence;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
 
-public final class Statement {
-    public enum StatementType {
-        UNKNOWN,
-        RAIFFEISEN_CREDIT_CARD_CSV,
-        RAIFFEISEN_CARD_OFX,
-        SBERBANK_HTML
+public enum AccountFilter {
+    ALL(it -> true),
+    ENABLED(Account::getEnabled);
+
+    private final Predicate<Account> predicate;
+
+    AccountFilter(Predicate<Account> predicate) {
+        this.predicate = predicate;
     }
 
-    private final StatementType type;
-    private final List<StatementRecord> records;
-
-    public Statement(StatementType type, List<StatementRecord> records) {
-        this.type = type;
-        this.records = records;
+    public Predicate<Account> predicate() {
+        return predicate;
     }
 
-    public StatementType getType() {
-        return type;
+    public static Predicate<Account> byAccount(int id) {
+        return it -> it.getId() == id;
     }
 
-    public List<StatementRecord> getRecords() {
-        return records;
+    public static Predicate<Account> byCategory(int id) {
+        return it -> it.getCategoryId() == id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (!(o instanceof Statement)) {
-            return false;
-        }
-
-        Statement that = (Statement) o;
-        return type == that.type
-                && Objects.equals(records, that.records);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, records);
+    public static Predicate<Account> byCategoryType(int id) {
+        return it -> it.getTypeId() == id;
     }
 }

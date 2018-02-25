@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,6 +51,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -71,8 +73,13 @@ public class StatementTab extends BorderPane {
             new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
     private static final FileChooser.ExtensionFilter RBA_STATEMENT_CSV =
             new FileChooser.ExtensionFilter("Raiffeisen Statement", "*.csv");
+    private static final FileChooser.ExtensionFilter SBERBANK_HTML =
+            new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
+
+    private BiConsumer<StatementRecord, Account> newTransactionCallback = (x, y) -> {
+    };
 
     public StatementTab() {
         Button browseButton = new Button("...");
@@ -124,6 +131,11 @@ public class StatementTab extends BorderPane {
                 Platform.runLater(this::setupAccountComboBox);
             }
         });
+
+        statementTable.setNewTransactionCallback(record -> {
+            Account account = accountComboBox.getSelectionModel().getSelectedItem();
+            newTransactionCallback.accept(record, account);
+        });
     }
 
     private void setupAccountComboBox() {
@@ -148,7 +160,8 @@ public class StatementTab extends BorderPane {
         chooser.setTitle(RB.getString("Statement"));
         chooser.getExtensionFilters().addAll(
                 RBA_STATEMENT_CSV,
-                OFX_EXTENSION
+                OFX_EXTENSION,
+                SBERBANK_HTML
         );
 
         File selected = chooser.showOpenDialog(null);
@@ -158,6 +171,8 @@ public class StatementTab extends BorderPane {
                 statementType = Statement.StatementType.RAIFFEISEN_CARD_OFX;
             } else if (RBA_STATEMENT_CSV.equals(filter)) {
                 statementType = Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV;
+            } else if (SBERBANK_HTML.equals(filter)) {
+                statementType = Statement.StatementType.SBERBANK_HTML;
             } else {
                 statementType = Statement.StatementType.UNKNOWN;
             }
@@ -192,5 +207,10 @@ public class StatementTab extends BorderPane {
         statementFileEdit.setText("");
         statementType = Statement.StatementType.UNKNOWN;
         statementTable.clear();
+    }
+
+    public void setNewTransactionCallback(BiConsumer<StatementRecord, Account> callback) {
+        Objects.requireNonNull(callback);
+        newTransactionCallback = callback;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import org.panteleyev.money.TransactionEditorPane;
 import org.panteleyev.money.persistence.Account;
@@ -40,6 +41,7 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionType;
+import org.panteleyev.money.statements.StatementRecord;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
@@ -49,9 +51,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TestEditorPane extends BaseDaoTest {
@@ -63,12 +68,9 @@ public class TestEditorPane extends BaseDaoTest {
     private Account acc_2;
     private Account acc_3;
 
-    private Transaction.Builder resultedBuilder = null;
-    private int resultedId = 0;
-
     @BeforeClass
     @Override
-    public void setupAndSkip() throws Exception {
+    public void setupAndSkip() {
         try {
             super.setupAndSkip();
             getDao().createTables();
@@ -287,6 +289,13 @@ public class TestEditorPane extends BaseDaoTest {
         return builder.build();
     }
 
+    private StatementRecord createTestStatementRecord() {
+        StatementRecord.Builder builder = new StatementRecord.Builder()
+                .actual(LocalDate.now())
+                .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
+        return builder.build();
+    }
+
     private void assertMainFields(Transaction r, Transaction t) {
         Assert.assertEquals(r.getTransactionType(), t.getTransactionType(),
                 "Transaction type ID is invalid");
@@ -312,13 +321,23 @@ public class TestEditorPane extends BaseDaoTest {
         Assert.assertEquals(r.getChecked(), t.getChecked(), "Checked status is invalid");
     }
 
+    private void assertStatementRecord(TransactionEditorPane pane, StatementRecord record) {
+        TextField sumEdit = getControl(pane, "sumEdit");
+        Assert.assertEquals(sumEdit.getText(), record.getAmount());
+
+        Spinner<Integer> daySpinner = getControl(pane, "daySpinner");
+        Assert.assertEquals((int) daySpinner.getValueFactory().getValue(), record.getActual().getDayOfMonth());
+    }
+
+    private void failOnEmptyBuilder() {
+        Assert.fail("Builder is null");
+    }
+
     @Test
     public void testNewTransactionSameCurrencyNoContact() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, null);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
@@ -327,37 +346,29 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
                 Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressAddButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
-
-        Assert.assertNotNull(resultedBuilder);
-
-        Transaction resultedTransaction = resultedBuilder.id(1).build();
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.id(1).build();
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
+                    "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
+                    "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testNewTransactionSameCurrencyExistingContact() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, contact);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
@@ -366,37 +377,28 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
                 Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressAddButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
-
-        Assert.assertNotNull(resultedBuilder);
-
-        Transaction resultedTransaction = resultedBuilder.id(1).build();
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.id(1).build();
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
+                    "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testNewTransactionSameCurrencyNewContact() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, contact);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         String newContact = UUID.randomUUID().toString();
 
@@ -407,37 +409,27 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertEquals(c, newContact);
                 Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressAddButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
-
-        Assert.assertNotNull(resultedBuilder);
-
-        Transaction resultedTransaction = resultedBuilder.id(1).build();
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), 0, "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.id(1).build();
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), 0, "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testEditorFieldsInitialStateSameCurrency() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, contact);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
@@ -446,38 +438,31 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
                 Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressAddButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.build();
+            Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
 
-        Assert.assertNotNull(resultedBuilder);
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
+                    "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(), "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
 
-        Transaction resultedTransaction = resultedBuilder.build();
-        Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(), "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testEditorFieldsInitialStateDifferentCurrency() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_2, contact);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
@@ -486,38 +471,32 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
                 Assert.assertFalse(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressAddButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.build();
+            Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
 
-        Assert.assertNotNull(resultedBuilder);
-
-        Transaction resultedTransaction = resultedBuilder.build();
-        Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(), "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
+                    "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(),
+                    "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
+                    "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testUpdatedTransactionSameCurrencyNoContact() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, null);
 
-        resultedBuilder = null;
-
-        final Object lock = new Object();
+        BlockingQueue<Optional<Transaction.Builder>> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
@@ -526,57 +505,57 @@ public class TestEditorPane extends BaseDaoTest {
             pane.setOnUpdateTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
                 Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
-
-                synchronized (lock) {
-                    resultedBuilder = builder;
-                    lock.notify();
-                }
+                queue.add(Optional.ofNullable(builder));
             });
 
             pressUpdateButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
+        Optional<Transaction.Builder> result = queue.take();
+        result.ifPresentOrElse(builder -> {
+            Transaction resultedTransaction = builder.build();
+            Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
 
-        Assert.assertNotNull(resultedBuilder);
-
-        Transaction resultedTransaction = resultedBuilder.build();
-        Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
-
-        assertMainFields(resultedTransaction, transaction);
-        Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
-        Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-        Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            assertMainFields(resultedTransaction, transaction);
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+        }, this::failOnEmptyBuilder);
     }
 
     @Test
     public void testDeleteButton() throws Exception {
         Transaction transaction = createTestTransaction(acc_1, acc_3, null);
 
-        final Object lock = new Object();
+        BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
             TransactionEditorPane pane = createEditorPane();
 
             callPrivateMethod(pane, "setupContactMenu");
             pane.setTransaction(transaction);
-
-            pane.setOnDeleteTransaction(rId -> {
-                synchronized (lock) {
-                    resultedId = rId;
-                    lock.notify();
-                }
-            });
+            pane.setOnDeleteTransaction(queue::add);
 
             pressDeleteButton(pane);
         });
 
-        synchronized (lock) {
-            lock.wait();
-        }
-
+        int resultedId = queue.take();
         Assert.assertEquals(resultedId, transaction.getId());
+    }
+
+    @Test
+    public void testStatementRecord() throws Exception {
+        StatementRecord record = createTestStatementRecord();
+
+        BlockingQueue<TransactionEditorPane> queue = new ArrayBlockingQueue<>(1);
+
+        Platform.runLater(() -> {
+            TransactionEditorPane pane = createEditorPane();
+            pane.setTransactionFromStatement(record, null);
+            queue.add(pane);
+        });
+
+        TransactionEditorPane pane = queue.take();
+        assertStatementRecord(pane, record);
     }
 }

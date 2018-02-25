@@ -63,6 +63,9 @@ public final class StatementParser {
             case RAIFFEISEN_CARD_OFX:
                 return parseRaiffeisenOfx(inStream);
 
+            case SBERBANK_HTML:
+                return SberbankParser.parseCreditCardHtml(inStream);
+
             default:
                 throw new IllegalArgumentException();
 
@@ -151,5 +154,9 @@ public final class StatementParser {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private static Statement parseSberbankHtml(InputStream inStream) {
+        return null;
     }
 }

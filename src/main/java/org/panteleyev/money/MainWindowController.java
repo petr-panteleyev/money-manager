@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
+import org.panteleyev.money.charts.ChartsTab;
 import org.panteleyev.money.profiles.ConnectDialog;
 import org.panteleyev.money.profiles.ConnectionProfile;
 import org.panteleyev.money.profiles.ConnectionProfileManager;
@@ -86,6 +87,7 @@ public class MainWindowController extends BaseController {
     private TransactionsTab transactionTab = new TransactionsTab();
     private RequestTab requestTab = new RequestTab();
     private final StatementTab statementsTab = new StatementTab();
+    private final ChartsTab chartsTab = new ChartsTab();
 
     private SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
@@ -205,7 +207,6 @@ public class MainWindowController extends BaseController {
         t2.disableProperty().bind(dbOpenProperty.not());
         t2.selectedProperty().addListener((x, y, newValue) -> {
             if (newValue) {
-                Platform.runLater(() -> transactionTab.getTransactionEditor().clear());
                 Platform.runLater(() -> transactionTab.scrollToEnd());
             }
         });
@@ -216,10 +217,18 @@ public class MainWindowController extends BaseController {
         Tab t4 = new Tab(RB.getString("Statement"), statementsTab);
         t4.disableProperty().bind(dbOpenProperty.not());
 
+        Tab t5 = new Tab(RB.getString("tab.Charts"), chartsTab);
+        t5.disableProperty().bind(dbOpenProperty.not());
+
         tabPane.getTabs().addAll(
                 new Tab(RB.getString("tab.Accouts"), accountsTab),
-                t2, t3, t4
+                t2, t3, t4, t5
         );
+
+        statementsTab.setNewTransactionCallback((record, account) -> {
+            tabPane.getSelectionModel().select(t2);
+            transactionTab.handleStatementRecord(record, account);
+        });
 
         windowMenu.setOnShowing(event -> {
             windowMenu.getItems().clear();

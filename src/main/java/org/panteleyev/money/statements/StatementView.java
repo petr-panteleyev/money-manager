@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,17 +27,26 @@
 package org.panteleyev.money.statements;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.cells.LocalDateCell;
 import org.panteleyev.money.cells.StatementSumCell;
 import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import static org.panteleyev.money.MainWindowController.RB;
 
 class StatementView extends BorderPane {
     private final TableView<StatementRecord> tableView = new TableView<>();
+    private Consumer<StatementRecord> newTransactionCallback = x -> {
+    };
 
     private Consumer<StatementRecord> recordSelectedCallback = x -> {
     };
@@ -65,6 +74,10 @@ class StatementView extends BorderPane {
         placeColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
 
+        TableColumn<StatementRecord, String> countryColumn = new TableColumn<>(RB.getString("column.Country"));
+        countryColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
+                new ReadOnlyObjectWrapper<>(p.getValue().getCountry()));
+
         TableColumn<StatementRecord, StatementRecord> amountColumn = new TableColumn<>(RB.getString("column.Sum"));
         amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, StatementRecord> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue()));
@@ -74,7 +87,8 @@ class StatementView extends BorderPane {
         executionDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
         descriptionColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.5));
         counterPartyColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.15));
-        placeColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.15));
+        placeColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.10));
+        countryColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
         amountColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.10));
 
         //noinspection unchecked
@@ -83,18 +97,42 @@ class StatementView extends BorderPane {
                 descriptionColumn,
                 counterPartyColumn,
                 placeColumn,
+                countryColumn,
                 amountColumn
         );
 
+        createMenu();
+
         setCenter(tableView);
 
-        tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) -> {
-            recordSelectedCallback.accept(newValue);
-        });
+        tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) ->
+                recordSelectedCallback.accept(newValue));
+    }
+
+    private Optional<StatementRecord> getSelectedRecord() {
+        return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
+    }
+
+    private void createMenu() {
+        ContextMenu menu = new ContextMenu();
+
+        MenuItem addMenuItem = new MenuItem(MainWindowController.RB.getString("menu.Edit.Add"));
+        addMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
+        addMenuItem.setOnAction(event -> onAddTransaction());
+
+        menu.getItems().addAll(addMenuItem);
+
+        tableView.setContextMenu(menu);
     }
 
     void setRecordSelectedCallback(Consumer<StatementRecord> callback) {
+        Objects.requireNonNull(callback);
         this.recordSelectedCallback = callback;
+    }
+
+    void setNewTransactionCallback(Consumer<StatementRecord> callback) {
+        Objects.requireNonNull(callback);
+        this.newTransactionCallback = callback;
     }
 
     void setStatement(Statement statement) {
@@ -104,5 +142,9 @@ class StatementView extends BorderPane {
 
     void clear() {
         tableView.getItems().clear();
+    }
+
+    private void onAddTransaction() {
+        getSelectedRecord().ifPresent(st -> newTransactionCallback.accept(st));
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,6 +60,7 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.Named;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionType;
+import org.panteleyev.money.statements.StatementRecord;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Calendar;
@@ -77,19 +78,19 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionEditorPane extends TitledPane {
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
-            new ToStringConverter<TransactionType>() {
+            new ToStringConverter<>() {
                 public String toString(TransactionType obj) {
                     return obj.getTypeName();
                 }
             };
 
-    private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<Contact>() {
+    private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
         public String toString(Contact obj) {
             return obj.getName();
         }
     };
 
-    private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<Account>() {
+    private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
         public String toString(Account obj) {
             return obj.getName();
         }
@@ -148,7 +149,7 @@ public class TransactionEditorPane extends TitledPane {
     }
 
     private class StringCompletionProvider extends BaseCompletionProvider<String> {
-        public StringCompletionProvider(Set<String> set) {
+        StringCompletionProvider(Set<String> set) {
             super(set);
         }
 
@@ -519,6 +520,22 @@ public class TransactionEditorPane extends TitledPane {
         // Sum
         sumEdit.setText(tr.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
         updateRateAmount();
+    }
+
+    public void setTransactionFromStatement(StatementRecord record, Account account) {
+        clear();
+
+        daySpinner.getValueFactory().setValue(record.getActual().getDayOfMonth());
+
+        BigDecimal amount = record.getAmountDecimal().orElse(BigDecimal.ZERO);
+        sumEdit.setText(amount.abs().setScale(2, RoundingMode.HALF_UP).toString());
+
+        String accountString = account == null ? "" : account.getName();
+        if (amount.signum() <= 0) {
+            debitedAccountEdit.setText(accountString);
+        } else {
+            creditedAccountEdit.setText(accountString);
+        }
     }
 
     private void onClearButton() {

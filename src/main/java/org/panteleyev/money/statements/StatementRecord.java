@@ -79,6 +79,21 @@ public final class StatementRecord {
             this.amount = amount;
             return this;
         }
+
+        public Builder place(String place) {
+            this.place = place;
+            return this;
+        }
+
+        public Builder country(String country) {
+            this.country = country;
+            return this;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
     }
 
 
@@ -109,12 +124,12 @@ public final class StatementRecord {
         this.place = place;
         this.country = country;
         this.currency = currency;
-        this.amount = amount;
+        this.amount = normaliseAmount(amount);
         this.accountCurrency = accountCurrency;
-        this.accountAmount = accountAmount;
+        this.accountAmount = normaliseAmount(accountAmount);
 
-        this.amountDecimal = toBigDecimal(amount);
-        this.accountAmountDecimal = toBigDecimal(accountAmount);
+        this.amountDecimal = toBigDecimal(this.amount);
+        this.accountAmountDecimal = toBigDecimal(this.accountAmount);
 
         currencyId = getDao().getCurrencies().stream()
                 .filter(c -> c.getDescription().equalsIgnoreCase(currency)
@@ -222,5 +237,41 @@ public final class StatementRecord {
     public int hashCode() {
         return Objects.hash(actual, execution, description, counterParty, place, country,
                 currency, amount, accountCurrency, accountAmount);
+    }
+
+    public String toString() {
+        return "StatementRecord ["
+                + "counterParty=" + counterParty + ","
+                + "description=" + description + ","
+                + "place=" + place + ","
+                + "country=" + country + ","
+                + "currency=" + currency + ","
+                + "actual=" + actual + ","
+                + "execution=" + execution + ","
+                + "amount=" + amount + ","
+                + "amountDecimal=" + amountDecimal
+                + "]";
+    }
+
+    private static String normaliseAmount(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (char ch : str.toCharArray()) {
+            switch (ch) {
+                case ',':
+                    result.append('.');
+                    break;
+                case ' ':
+                case 160:
+                    break;
+                default:
+                    result.append(ch);
+            }
+        }
+
+        return result.toString();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.function.Predicate;
 import static org.panteleyev.money.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -60,23 +59,7 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
         if (empty || account == null) {
             setText("");
         } else {
-            BigDecimal sum = getDao().getTransactions(account).stream()
-                    .filter(filter)
-                    .map(t -> {
-                        BigDecimal amount = t.getAmount();
-                        if (account.getId() == t.getAccountCreditedId()) {
-                            // handle conversion rate
-                            BigDecimal rate = t.getRate();
-                            if (rate.compareTo(BigDecimal.ZERO) != 0) {
-                                amount = t.getRateDirection() == 0 ?
-                                        amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
-                            }
-                        } else {
-                            amount = amount.negate();
-                        }
-                        return amount;
-                    })
-                    .reduce(total ? account.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal sum = account.calculateBalance(total, filter);
 
             setText(getDao().getCurrency(account.getCurrencyId())
                     .map(curr -> curr.formatValue(sum))

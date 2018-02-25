@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,49 +26,22 @@
 
 package org.panteleyev.money;
 
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class RequestTab extends BorderPane {
     private static final ResourceBundle rb = MainWindowController.RB;
 
+    private final TransactionTableView table = new TransactionTableView(true);
 
-    private final TransactionTableView transactionTable = new TransactionTableView(true);
-
-    private final ChoiceBox<Object> categoryTypeChoiceBox = new ChoiceBox<>();
-    private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
-    private final ChoiceBox<Object> accountChoiceBox = new ChoiceBox<>();
-
-    private final SimpleStringProperty allTypesString = new SimpleStringProperty();
-    private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
-    private final SimpleStringProperty allAccountsString = new SimpleStringProperty();
-
-    private final MapChangeListener<Integer, Category> categoryListener = change ->
-            Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
-
-    private final MapChangeListener<Integer, Account> accountListener = change ->
-            Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
-
+    private final AccountFilterSelectionBox accBox = new AccountFilterSelectionBox();
 
     RequestTab() {
         Button clearButton = new Button(rb.getString("button.Clear"));
@@ -78,157 +51,24 @@ class RequestTab extends BorderPane {
         findButton.setOnAction(event -> onFindButton());
 
         HBox row1 = new HBox(5.0, clearButton, findButton);
-        HBox row2 = new HBox(5.0, new Label(rb.getString("text.In.Semicolon")),
-                categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
-        row2.setAlignment(Pos.CENTER_LEFT);
 
-        VBox vBox = new VBox(5.0, row1, row2);
+        VBox vBox = new VBox(5.0, row1, accBox);
 
         setTop(vBox);
-        setCenter(transactionTable);
+        setCenter(table);
 
         BorderPane.setMargin(vBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        allTypesString.set(rb.getString("account.Window.AllTypes"));
-        allCategoriesString.set(rb.getString("account.Window.AllCategories"));
-        allAccountsString.set(rb.getString("text.All.Accounts"));
-
-        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(Object obj) {
-                if (obj instanceof CategoryType) {
-                    return ((CategoryType) obj).getTypeName();
-                } else {
-                    return obj.toString();
-                }
-            }
-        });
-
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            public String toString(Object obj) {
-                if (obj instanceof Category) {
-                    return ((Category) obj).getName();
-                } else {
-                    return obj.toString();
-                }
-            }
-        });
-
-        accountChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            public String toString(Object obj) {
-                if (obj instanceof Account) {
-                    return ((Account) obj).getName();
-                } else {
-                    return obj.toString();
-                }
-            }
-        });
-
-        categoryTypeChoiceBox.setOnAction(event -> {
-            if (categoryTypeChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
-                setupCategoryBox(null);
-            } else {
-                setupCategoryBox((CategoryType) categoryTypeChoiceBox.getSelectionModel().getSelectedItem());
-            }
-        });
-
-        categoryChoiceBox.setOnAction(event -> {
-            if (categoryChoiceBox.getSelectionModel().getSelectedIndex() == 0) {
-                setupAccountBox(null);
-            } else {
-                setupAccountBox((Category) categoryChoiceBox.getSelectionModel().getSelectedItem());
-            }
-        });
-
-        transactionTable.setOnCheckTransaction(this::onCheckTransaction);
-
-        getDao().categories().addListener(categoryListener);
-        getDao().accounts().addListener(accountListener);
-
-        getDao().preloadingProperty().addListener((x, y, newValue) -> {
-            if (!newValue) {
-                Platform.runLater(this::setupCategoryTypesBox);
-            }
-        });
-    }
-
-    private void setupCategoryTypesBox() {
-        categoryTypeChoiceBox.getItems().clear();
-        categoryTypeChoiceBox.getItems().add(allTypesString.get());
-        categoryTypeChoiceBox.getItems().add(new Separator());
-        categoryTypeChoiceBox.getItems().addAll(CategoryType.values());
-
-        categoryTypeChoiceBox.getSelectionModel().select(0);
-
-        setupCategoryBox(null);
-    }
-
-    private void setupCategoryBox(CategoryType type) {
-        categoryChoiceBox.getItems().clear();
-        categoryChoiceBox.getItems().add(allCategoriesString.get());
-
-        if (type != null) {
-            getDao().getCategoriesByType(type).forEach(t -> categoryChoiceBox.getItems().add(t));
-        }
-
-        categoryChoiceBox.getSelectionModel().clearAndSelect(0);
-        setupAccountBox(null);
-    }
-
-    private void setupAccountBox(Category category) {
-        accountChoiceBox.getItems().clear();
-        accountChoiceBox.getItems().add(allAccountsString.get());
-
-        if (category != null) {
-            getDao().getAccountsByCategory(category.getId()).stream()
-                    .filter(Account::getEnabled)
-                    .forEach(a -> accountChoiceBox.getItems().add(a));
-        }
-
-        accountChoiceBox.getSelectionModel().clearAndSelect(0);
-    }
-
-    private Account getSelectedAccount() {
-        Object obj = accountChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Account ? (Account) obj : null;
-    }
-
-    private Category getSelectedCategory() {
-        Object obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Category ? (Category) obj : null;
-    }
-
-    private CategoryType getSelectedCategoryType() {
-        Object obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof CategoryType ? (CategoryType) obj : null;
+        table.setOnCheckTransaction(this::onCheckTransaction);
     }
 
     private void onFindButton() {
-        Predicate<Transaction> filter = x -> true;
-
-        Account account = getSelectedAccount();
-        if (account != null) {
-            filter = TransactionFilter.byAccount(account.getId());
-        } else {
-            Category category = getSelectedCategory();
-            if (category != null) {
-                filter = TransactionFilter.byCategory(category.getId());
-            } else {
-                CategoryType type = getSelectedCategoryType();
-                if (type != null) {
-                    filter = TransactionFilter.byCategoryType(type.getId());
-                }
-            }
-        }
-
-        transactionTable.setTransactionFilter(filter);
+        table.setTransactionFilter(accBox.getTransactionFilter());
     }
 
     private void onClearButton() {
-        transactionTable.setTransactionFilter(x -> false);
-        setupCategoryTypesBox();
+        table.setTransactionFilter(x -> false);
+        accBox.setupCategoryTypesBox();
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {

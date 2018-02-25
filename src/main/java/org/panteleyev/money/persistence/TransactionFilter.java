@@ -109,7 +109,7 @@ public enum TransactionFilter {
         description = month.getDisplayName(textStyle, Locale.getDefault());
     }
 
-    public Predicate<Transaction> getPredicate() {
+    public Predicate<Transaction> predicate() {
         return predicate;
     }
 
@@ -134,8 +134,16 @@ public enum TransactionFilter {
         return it -> it.getAccountDebitedTypeId() == id || it.getAccountCreditedTypeId() == id;
     }
 
-    private static boolean checkRange(Transaction t, LocalDate from, LocalDate now) {
+    public static Predicate<Transaction> byYear(int year) {
+        return it -> it.getYear() == year;
+    }
+
+    public static Predicate<Transaction> byDates(LocalDate from, LocalDate to) {
+        return it -> checkRange(it, from , to);
+    }
+
+    private static boolean checkRange(Transaction t, LocalDate from, LocalDate to) {
         LocalDate date = LocalDate.of(t.getYear(), t.getMonth(), t.getDay());
-        return date.compareTo(from) >= 0 && date.compareTo(now) <= 0;
+        return date.compareTo(from) >= 0 && date.compareTo(to) <= 0;
     }
 }

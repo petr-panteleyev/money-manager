@@ -1,5 +1,11 @@
 # Change Log
 
+## [18.2.0] - 2018-02-25
+
+- Parser for Sberbank credit and debit cards statements (HTML)
+- Adding new transaction from statement view
+- Basic pie charts
+
 ## [18.1.0] - 2018-01-14
 
 - Java 9

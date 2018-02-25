@@ -43,7 +43,7 @@ final class AccountsTab extends BorderPane {
 
     private TransactionTableView transactionTable = new TransactionTableView(true);
     private Account selectedAccount = null;
-    private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.getPredicate();
+    private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.predicate();
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Transaction> transactionListener =
