@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,14 +26,12 @@
 package org.panteleyev.money;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import org.panteleyev.money.persistence.SplitTransaction;
 import org.panteleyev.money.persistence.Transaction;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,30 +43,28 @@ public class TransactionTableSortPolicy implements Callback<TableView<Transactio
                 .filter(column -> column.getSortType() != null)
                 .findFirst()
                 .ifPresent(column -> {
-                    ObservableList<Transaction> items = tableView.getItems();
+                    var items = tableView.getItems();
 
-                    Comparator<Transaction> comparator =
-                            ((TableColumn<Transaction, Transaction>) column).getComparator()
-                                    .thenComparingInt(Transaction::getId);
+                    var comparator = ((TableColumn<Transaction, Transaction>) column).getComparator()
+                            .thenComparingInt(Transaction::getId);
 
                     if (column.getSortType() == TableColumn.SortType.DESCENDING) {
                         comparator = comparator.reversed();
                     }
 
                     // Check if table items include at least one split transaction
-                    boolean hasSplit = items.stream()
-                            .anyMatch(t -> t instanceof SplitTransaction);
+                    var hasSplit = items.stream().anyMatch(t -> t instanceof SplitTransaction);
 
                     if (hasSplit) {
-                        List<Transaction> sortedItems = items.stream()
+                        var sortedItems = items.stream()
                                 .filter(t -> t.getGroupId() == 0 || t instanceof SplitTransaction)
                                 .sorted(comparator)
                                 .map(t -> {
                                     if (t instanceof SplitTransaction) {
                                         return Stream.concat(Stream.of(t),
                                                 items.stream()
-                                                        .filter(gm -> !(gm instanceof SplitTransaction) && gm
-                                                                .getGroupId() == t.getGroupId())
+                                                        .filter(gm -> !(gm instanceof SplitTransaction)
+                                                                && gm.getGroupId() == t.getGroupId())
                                                         .sorted(Comparator.comparingInt(Transaction::getId)));
                                     } else {
                                         return Stream.of(t);

@@ -58,6 +58,7 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 
 public class TestEditorPane extends BaseDaoTest {
     private Currency curr_1;

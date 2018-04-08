@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,24 +37,22 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Category;
 import java.util.Optional;
+import static org.panteleyev.money.FXFactory.newMenuBar;
+import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryWindowController extends BaseController {
-    private ObservableList<Category> categoryList = FXCollections.observableArrayList();
+    private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
+    private final TableView<Category> categoryTable = new TableView<>();
 
-    private TableView<Category> categoryTable = new TableView<>();
-
-    private BorderPane self = new BorderPane();
-
+    @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Category> categoriesListener = change ->
             Platform.runLater(this::updateWindow);
 
@@ -64,36 +62,32 @@ final class CategoryWindowController extends BaseController {
         EventHandler<ActionEvent> addHandler = event -> onMenuAdd();
         EventHandler<ActionEvent> editHandler = event -> onMenuEdit();
 
-        // Main Menu
-        MenuItem closeMenuItem = new MenuItem(RB.getString("menu.File.Close"));
-        closeMenuItem.setOnAction(event -> onClose());
-        Menu fileMenu = new Menu(RB.getString("menu.File"), null, closeMenuItem);
+        var disableBinding = categoryTable.getSelectionModel().selectedItemProperty().isNull();
 
-        MenuItem addMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        addMenuItem.setOnAction(addHandler);
-        MenuItem editMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        editMenuItem.setOnAction(editHandler);
-        Menu editMenu = new Menu(RB.getString("menu.Edit"), null, addMenuItem, editMenuItem);
-
-        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(RB));
-        menuBar.setUseSystemMenuBar(true);
+        var menuBar = newMenuBar(
+                new Menu(RB.getString("menu.File"), null,
+                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
+                new Menu(RB.getString("menu.Edit"), null,
+                        newMenuItem(RB, "menu.Edit.Add", addHandler),
+                        newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+                createHelpMenu(RB));
 
         // Context Menu
-        MenuItem ctxAddMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        ctxAddMenuItem.setOnAction(addHandler);
-        MenuItem ctxEditMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        ctxEditMenuItem.setOnAction(editHandler);
-        categoryTable.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem));
+        categoryTable.setContextMenu(new ContextMenu(
+                newMenuItem(RB, "menu.Edit.Add", addHandler),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
-        TableColumn<Category, String> colType = new TableColumn<>(RB.getString("column.Type"));
-        TableColumn<Category, String> colName = new TableColumn<>(RB.getString("column.Name"));
-        TableColumn<Category, String> colDescription = new TableColumn<>(RB.getString("column.Description"));
+        var colType = new TableColumn<Category, String>(RB.getString("column.Type"));
+        var colName = new TableColumn<Category, String>(RB.getString("column.Name"));
+        var colDescription = new TableColumn<Category, String>(RB.getString("column.Description"));
 
+        //noinspection unchecked
         categoryTable.getColumns().setAll(colType, colName, colDescription);
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
+        var self = new BorderPane();
         self.setPrefSize(600.0, 400.0);
         self.setTop(menuBar);
         self.setCenter(categoryTable);
@@ -111,9 +105,6 @@ final class CategoryWindowController extends BaseController {
         colType.setSortable(true);
         categoryTable.getSortOrder().add(colType);
         colType.setSortType(TableColumn.SortType.ASCENDING);
-
-        editMenuItem.disableProperty().bind(categoryTable.getSelectionModel().selectedItemProperty().isNull());
-        ctxEditMenuItem.disableProperty().bind(categoryTable.getSelectionModel().selectedItemProperty().isNull());
 
         colType.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
         colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
@@ -137,7 +128,7 @@ final class CategoryWindowController extends BaseController {
     }
 
     private void onTableMouseClick(Event event) {
-        MouseEvent me = (MouseEvent) event;
+        var me = (MouseEvent) event;
         if (me.getClickCount() == 2) {
             getSelectedCategory().ifPresent(this::openCategoryDialog);
         }

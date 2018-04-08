@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,21 +31,38 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.profiles.ConnectionProfileManager;
+import java.io.File;
+import java.util.Optional;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class MoneyApplication extends Application {
+    private final static Logger LOGGER = Logger.getLogger(MoneyApplication.class.getName());
+    private final static String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
+    private final static String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+
     public static MoneyApplication application;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         application = this;
 
+        if (initLogDirectory()) {
+            String formatProperty = System.getProperty(FORMAT_PROP);
+            if (formatProperty == null) {
+                System.setProperty(FORMAT_PROP, FORMAT);
+            }
+            LogManager.getLogManager()
+                    .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
+        }
+
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
         try {
             ConnectionProfileManager.loadProfiles();
         } catch (Exception ex) {
-            Logging.getLogger().log(Level.WARNING, "Unable to load profiles", ex);
+            LOGGER.log(Level.WARNING, "Unable to load profiles", ex);
         }
 
         new MainWindowController(primaryStage);
@@ -54,11 +71,18 @@ public class MoneyApplication extends Application {
     }
 
     public static void uncaughtException(Throwable e) {
-        Logging.getLogger().log(Level.SEVERE, "Uncaught exception", e);
-        Platform.runLater(()-> {
+        LOGGER.log(Level.SEVERE, "Uncaught exception", e);
+        Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR, e.toString());
             alert.showAndWait();
         });
+    }
+
+    private static boolean initLogDirectory() {
+        File optionsDir = Options.getSettingsDirectory();
+        File logDir = new File(optionsDir, "logs");
+
+        return logDir.exists() ? logDir.isDirectory() : logDir.mkdir();
     }
 
     public static void main(String[] args) {

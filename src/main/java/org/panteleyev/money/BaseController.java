@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ import org.panteleyev.utilities.fx.Controller;
 import java.util.ResourceBundle;
 
 public class BaseController extends Controller {
-    BaseController() {
+    protected BaseController() {
         super(null);
     }
 
@@ -46,7 +46,7 @@ public class BaseController extends Controller {
     }
 
     Menu createHelpMenu(ResourceBundle rb) {
-        MenuItem item = new MenuItem(rb.getString("menu.Help.About"));
+        var item = new MenuItem(rb.getString("menu.Help.About"));
         item.setOnAction(a -> new AboutDialog().showAndWait());
         return new Menu(rb.getString("menu.Help"), null, item);
     }

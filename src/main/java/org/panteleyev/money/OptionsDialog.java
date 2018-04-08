@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,32 +30,36 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.layout.GridPane;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.util.ResourceBundle;
+import static org.panteleyev.money.MainWindowController.RB;
 
-public class OptionsDialog extends BaseDialog<ButtonType> {
-
-    private final static ResourceBundle rb = MainWindowController.RB;
-
+class OptionsDialog extends BaseDialog<ButtonType> {
     private ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
+    private PasswordField ymToken = new PasswordField();
 
-    public OptionsDialog() {
+    OptionsDialog() {
         super(MainWindowController.CSS_PATH);
 
-        setTitle(rb.getString("options.Dialog.Title"));
-        createDefaultButtons(rb);
+        setTitle(RB.getString("options.Dialog.Title"));
+        createDefaultButtons(RB);
 
-        GridPane pane = new GridPane();
+        var pane = new GridPane();
         pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(0, new Label(rb.getString("options.Dialog.Prefix.Length")), autoCompleteLength);
+        pane.addRow(0, new Label(RB.getString("options.Dialog.Prefix.Length")), autoCompleteLength);
+        pane.addRow(1, new Label(RB.getString("label.YandexMoneyToken")), ymToken);
         getDialogPane().setContent(pane);
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
+        ymToken.setText(Options.getYandexMoneyToken());
+        ymToken.setPrefColumnCount(10);
 
-        setResultConverter ((ButtonType param) -> {
+        setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
                 Options.setAutoCompleteLength(autoCompleteLength.getValue());
+                Options.setYandexMoneyToken(ymToken.getText());
             }
             return param;
         });

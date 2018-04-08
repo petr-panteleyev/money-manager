@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class AccountDialog extends BaseDialog<Account> {
+class AccountDialog extends BaseDialog<Account> {
     private final TextField nameEdit = new TextField();
     private final TextField initialEdit = new TextField();
     private final TextField commentEdit = new TextField();
@@ -62,21 +62,17 @@ public class AccountDialog extends BaseDialog<Account> {
 
     private final Collection<Category> categories;
 
-    public AccountDialog(Account account) {
-        this(account, null);
-    }
-
-    public AccountDialog(Category initialCategory) {
+    AccountDialog(Category initialCategory) {
         this(null, initialCategory);
     }
 
-    public AccountDialog(Account account, Category initialCategory) {
+    AccountDialog(Account account, Category initialCategory) {
         super(MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("account.Dialog.Title"));
 
 
-        GridPane gridPane = new GridPane();
+        var gridPane = new GridPane();
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
         int index = 0;
@@ -94,21 +90,21 @@ public class AccountDialog extends BaseDialog<Account> {
 
         categories = getDao().getCategories();
 
-        typeComboBox.setConverter(new ReadOnlyStringConverter<CategoryType>() {
+        typeComboBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(CategoryType object) {
                 return object.getTypeName();
             }
         });
         categoryComboBox.setConverter(new ReadOnlyNamedConverter<>());
-        currencyComboBox.setConverter(new ReadOnlyStringConverter<Currency>() {
+        currencyComboBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Currency currency) {
                 return currency.getSymbol();
             }
         });
 
-        Collection<Currency> currencyList = getDao().getCurrencies();
+        var currencyList = getDao().getCurrencies();
         currencyComboBox.setItems(FXCollections.observableArrayList(currencyList));
         typeComboBox.setItems(FXCollections.observableArrayList(CategoryType.values()));
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
@@ -147,7 +143,7 @@ public class AccountDialog extends BaseDialog<Account> {
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 // TODO: reconsider using null currency value
-                Currency selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+                var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
 
                 return new Account(account != null ? account.getId() : 0,
                         nameEdit.getText(),
@@ -173,7 +169,7 @@ public class AccountDialog extends BaseDialog<Account> {
     }
 
     private void onCategoryTypeSelected() {
-        CategoryType type = typeComboBox.getSelectionModel().getSelectedItem();
+        var type = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<Category> filtered = categories.stream()
                 .filter(c -> c.getType().equals(type))

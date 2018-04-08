@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 
 package org.panteleyev.money.statements;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,16 +34,24 @@ public final class Statement {
     public enum StatementType {
         UNKNOWN,
         RAIFFEISEN_CREDIT_CARD_CSV,
+        RAIFFEISEN_ACCOUNT_CSV,
         RAIFFEISEN_CARD_OFX,
-        SBERBANK_HTML
+        SBERBANK_HTML,
+        YANDEX_MONEY
     }
 
     private final StatementType type;
     private final List<StatementRecord> records;
+    private final BigDecimal balance;
 
     public Statement(StatementType type, List<StatementRecord> records) {
+        this(type, records, BigDecimal.ZERO);
+    }
+
+    public Statement(StatementType type, List<StatementRecord> records, BigDecimal balance) {
         this.type = type;
         this.records = records;
+        this.balance = balance;
     }
 
     public StatementType getType() {
@@ -51,6 +60,10 @@ public final class Statement {
 
     public List<StatementRecord> getRecords() {
         return records;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
     }
 
     @Override
@@ -63,7 +76,7 @@ public final class Statement {
             return false;
         }
 
-        Statement that = (Statement) o;
+        var that = (Statement) o;
         return type == that.type
                 && Objects.equals(records, that.records);
     }

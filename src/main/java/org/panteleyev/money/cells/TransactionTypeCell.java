@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,11 +33,6 @@ public class TransactionTypeCell extends TableCell<Transaction, Transaction> {
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
-
-        if (empty || transaction == null) {
-            setText("");
-        } else {
-            setText(transaction.getTransactionType().getTypeName());
-        }
+        setText(empty || transaction == null ? "" : transaction.getTransactionType().getTypeName());
     }
 }

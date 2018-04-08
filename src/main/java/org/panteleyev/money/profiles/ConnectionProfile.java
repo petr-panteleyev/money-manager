@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,10 @@ import javax.sql.DataSource;
 import java.util.Objects;
 
 public class ConnectionProfile {
-    static final String DEFAULT_HOST = "localhost";
-    static final int DEFAULT_PORT = 3306;
-    static final String DEFAULT_SCHEMA = "money";
-    static final int DEFAULT_SSH_PORT = 22;
+    private static final String DEFAULT_HOST = "localhost";
+    private static final int DEFAULT_PORT = 3306;
+    private static final String DEFAULT_SCHEMA = "money";
+    private static final int DEFAULT_SSH_PORT = 22;
 
     private final String name;
     private final ConnectionType type;
@@ -128,7 +128,7 @@ public class ConnectionProfile {
     }
 
     public DataSource build() {
-        MysqlDataSource ds = new MysqlDataSource();
+        var ds = new MysqlDataSource();
 
         ds.setEncoding("utf8");
         ds.setPort(dataBasePort);
@@ -150,7 +150,7 @@ public class ConnectionProfile {
             return false;
         }
 
-        ConnectionProfile that = (ConnectionProfile) o;
+        var that = (ConnectionProfile) o;
 
         return Objects.equals(this.name, that.name)
                 && Objects.equals(this.type, that.type)

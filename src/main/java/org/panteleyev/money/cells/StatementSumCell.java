@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ public class StatementSumCell extends TableCell<StatementRecord, StatementRecord
         if (empty || item == null) {
             setText("");
         } else {
-            BigDecimal amount = item.getAmountDecimal().orElse(BigDecimal.ZERO);
+            var amount = item.getAmountDecimal().orElse(BigDecimal.ZERO);
 
             getStyleClass().removeAll(RED_TEXT, BLACK_TEXT);
             getStyleClass().add(amount.signum() < 0 ? RED_TEXT : BLACK_TEXT);

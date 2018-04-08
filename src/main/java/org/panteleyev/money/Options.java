@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
 package org.panteleyev.money;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 public class Options {
@@ -41,9 +42,11 @@ public class Options {
 
     private enum Option {
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts"),
-                MAIN_WINDOW_WIDTH("mainWindowWidth"),
-                MAIN_WINDOW_HEIGHT("mainWindowHeight"),
-                AUTO_COMPLETE_LENGTH("autoCompleteLength");
+        MAIN_WINDOW_WIDTH("mainWindowWidth"),
+        MAIN_WINDOW_HEIGHT("mainWindowHeight"),
+        AUTO_COMPLETE_LENGTH("autoCompleteLength"),
+        YM_TOKEN("ym_token"),
+        LAST_STATEMENT_DIR("lastStatementDir");
 
         private final String s;
 
@@ -95,6 +98,22 @@ public class Options {
         PREFS.putInt(Option.AUTO_COMPLETE_LENGTH.toString(), x);
     }
 
+    public static void setLastStatementDir(String dir) {
+        PREFS.put(Option.LAST_STATEMENT_DIR.toString(), dir);
+    }
+
+    public static String getLastStatementDir() {
+        return PREFS.get(Option.LAST_STATEMENT_DIR.toString(), "");
+    }
+
+    public static void setYandexMoneyToken(String token) {
+        PREFS.put(Option.YM_TOKEN.toString(), token);
+    }
+
+    public static String getYandexMoneyToken() {
+        return PREFS.get(Option.YM_TOKEN.toString(), null);
+    }
+
     static {
 
         // Load values into cache
@@ -102,7 +121,7 @@ public class Options {
     }
 
     public static File getSettingsDirectory() {
-        File dir = new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY);
+        var dir = new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY);
         if (!dir.exists()) {
             dir.mkdir();
         } else {

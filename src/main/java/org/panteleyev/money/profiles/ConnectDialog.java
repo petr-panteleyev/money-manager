@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
 
         setTitle(RB.getString("connection.Dialog.Title"));
 
-        GridPane pane = new GridPane();
+        var pane = new GridPane();
         pane.getStyleClass().add(Styles.GRID_PANE);
         pane.addRow(0, new Label(RB.getString("label.Profile")), profileComboBox);
         pane.addRow(1, defaultCheck);
@@ -81,18 +81,18 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     }
 
     private ComboBox<ConnectionProfile> initProfileComboBox() {
-        ComboBox<ConnectionProfile> cb = new ComboBox<>();
+        var cb = new ComboBox<ConnectionProfile>();
 
         cb.setItems(FXCollections.observableArrayList(ConnectionProfileManager.getAll()));
 
-        ConnectionProfile defaultProfile = ConnectionProfileManager.getDefaultProfile();
+        var defaultProfile = ConnectionProfileManager.getDefaultProfile();
         if (defaultProfile != null) {
             cb.getSelectionModel().select(defaultProfile);
         } else if (ConnectionProfileManager.size() > 0) {
             cb.getSelectionModel().select(0);
         }
 
-        cb.setConverter(new ToStringConverter<ConnectionProfile>() {
+        cb.setConverter(new ToStringConverter<>() {
             public String toString(ConnectionProfile profile) {
                 return profile != null ? profile.getName() : "";
             }
@@ -107,14 +107,14 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     }
 
     private CheckBox initDefaultCheck() {
-        CheckBox check = new CheckBox(RB.getString("check.Default.Profile"));
+        var check = new CheckBox(RB.getString("check.Default.Profile"));
         check.setSelected(Objects.equals(ConnectionProfileManager.getDefaultProfile(),
                 profileComboBox.getSelectionModel().getSelectedItem()));
         return check;
     }
 
     private CheckBox initAutoConnectCheck() {
-        CheckBox check = new CheckBox(RB.getString("connect.Dialog.autoCheck"));
+        var check = new CheckBox(RB.getString("connect.Dialog.autoCheck"));
         check.disableProperty().bind(defaultCheck.selectedProperty().not());
         check.setSelected(defaultCheck.isSelected() && ConnectionProfileManager.getAutoConnect());
         return check;

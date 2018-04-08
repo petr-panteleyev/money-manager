@@ -37,7 +37,7 @@ public class MySQLBuilder {
     private String password = "";
 
     public DataSource build() {
-        MysqlDataSource ds = new MysqlDataSource();
+        var ds = new MysqlDataSource();
         ds.setEncoding("utf8");
         ds.setPort(port);
         ds.setServerName(host);

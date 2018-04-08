@@ -31,7 +31,6 @@ import org.jsoup.nodes.Attributes;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.panteleyev.money.Logging;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -46,10 +45,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import static java.util.Map.entry;
 
 class SberbankParser {
+    private final static Logger LOGGER = Logger.getLogger(SberbankParser.class.getName());
+
     private enum Param {
         TEMPLATE_VALUE,
         TABLE, RECORD, HEADER, DETAIL, CATEGORY,
@@ -140,65 +142,65 @@ class SberbankParser {
         List<StatementRecord> records = new ArrayList<>();
 
         try {
-            Document document = Jsoup.parse(inputStream, StandardCharsets.UTF_8.name(), "");
+            var document = Jsoup.parse(inputStream, StandardCharsets.UTF_8.name(), "");
 
             // Find template version
-            Format format = parseTemplateFormat(document);
+            var format = parseTemplateFormat(document);
 
             // Transaction table
-            Element transactionTable = document.getElementsByClass(format.getString(Param.TABLE)).first();
+            var transactionTable = document.getElementsByClass(format.getString(Param.TABLE)).first();
             if (transactionTable == null) {
-                Logging.getLogger().warning("Transactions not found in statement");
+                LOGGER.warning("Transactions not found in statement");
                 return new Statement(Statement.StatementType.SBERBANK_HTML, records);
             }
 
-            Elements transactionList = transactionTable.getElementsByClass(format.getString(Param.RECORD));
+            var transactionList = transactionTable.getElementsByClass(format.getString(Param.RECORD));
             if (transactionList.isEmpty()) {
-                Logging.getLogger().warning("Transactions not found in statement");
+                LOGGER.warning("Transactions not found in statement");
                 return new Statement(Statement.StatementType.SBERBANK_HTML, records);
             }
 
-            for (Element transaction : transactionList) {
-                Element head = transaction.getElementsByClass(format.getString(Param.HEADER)).first();
+            for (var transaction : transactionList) {
+                var head = transaction.getElementsByClass(format.getString(Param.HEADER)).first();
                 if (head == null) {
                     continue;
                 }
 
-                StatementRecord.Builder builder = new StatementRecord.Builder();
+                var builder = new StatementRecord.Builder();
 
-                Element nameElement = head.getElementsByClass(format.getString(Param.NAME)).first();
+                var nameElement = head.getElementsByClass(format.getString(Param.NAME)).first();
                 checkElement(nameElement);
                 builder = builder.counterParty(nameElement.text());
 
                 // Transaction actual date
-                Element dateElement = head.getElementsByClass(format.getString(Param.ACTUAL_DATE)).first();
+                var dateElement = head.getElementsByClass(format.getString(Param.ACTUAL_DATE)).first();
                 checkElement(dateElement);
-                LocalDate transactionDate = parseDate(dateElement, format);
+                var transactionDate = parseDate(dateElement, format);
                 builder = builder.actual(transactionDate);
 
                 // Transaction amount
                 builder = builder.amount(parseTransactionAmount(head, format));
 
                 // Transaction category
-                Element catElement = head.getElementsByClass(format.getString(Param.CATEGORY)).first();
-                String category = catElement != null ? catElement.text() : "";
+                var catElement = head.getElementsByClass(format.getString(Param.CATEGORY)).first();
+                var category = catElement != null ? catElement.text() : "";
                 builder = builder.description(category);
 
                 // Additional details
-                Elements detailsList = transaction.getElementsByClass(format.getString(Param.DETAIL));
-                for (Element detail : detailsList) {
-                    Set<String> classNames = detail.classNames();
+                var detailsList = transaction.getElementsByClass(format.getString(Param.DETAIL));
+                for (var detail : detailsList) {
+                    var classNames = detail.classNames();
 
                     if (classNames.contains(format.getString(Param.EXECUTION_DATE))) {
                         builder = builder.execution(parseDate(
                                 detail.getElementsByClass(format.getString(Param.VALUE)).first(), format));
                     } else if (classNames.contains(format.getString(Param.GEO))) {
-                        Element countryElement =
+                        var countryElement =
                                 detail.getElementsByClass(format.getString(Param.COUNTRY)).first();
                         if (countryElement != null) {
                             builder = builder.country(countryElement.text());
                         }
-                        Element cityElement = detail.getElementsByClass(format.getString(Param.CITY)).first();
+                        var cityElement = detail.getElementsByClass(format.getString(Param.CITY)).first();
                         if (cityElement != null) {
                             builder = builder.place(cityElement.text());
                         }
@@ -215,35 +217,33 @@ class SberbankParser {
     }
 
     private static Format parseTemplateFormat(Document document) {
-        Format format = Format.UNKNOWN;
-        String version = "";
-        Element versionElement =
+        var format = Format.UNKNOWN;
+        var version = "";
+        var versionElement =
                 document.getElementsByAttributeValue(TEMPLATE_ATTRIBUTE_NAME, TEMPLATE_ATTRIBUTE_VALUE).first();
         if (versionElement != null) {
-            Attributes attributes = versionElement.attributes();
+            var attributes = versionElement.attributes();
             version = attributes.get(TEMPLATE_VALUE);
             format = Format.detectFormat(version);
         }
 
-        if (format != Format.UNKNOWN) {
-            Logging.getLogger().info("Sberbank format recognized: " + format.getFormatString());
-        } else {
-            Logging.getLogger().info("Sberbank format not recognized: " + version);
+        if (format == Format.UNKNOWN) {
+            LOGGER.warning("Sberbank format not recognized: " + version);
         }
 
         return format;
     }
 
     private static String parseTransactionAmount(Element head, Format format) {
-        Element sumElement = head.getElementsByClass(format.getString(Param.SUM)).first();
+        var sumElement = head.getElementsByClass(format.getString(Param.SUM)).first();
         checkElement(sumElement);
-        Element amountElement = sumElement.getElementsByClass(format.getString(Param.AMOUNT)).first();
+        var amountElement = sumElement.getElementsByClass(format.getString(Param.AMOUNT)).first();
         checkElement(amountElement);
-        String sumString = amountElement.text();
+        var sumString = amountElement.text();
 
         // Check if transaction is credit to the account
         boolean credit = false;
-        for (String crClass : format.creditClasses()) {
+        for (var crClass : format.creditClasses()) {
             if (!sumElement.getElementsByClass(crClass).isEmpty()) {
                 credit = true;
                 break;

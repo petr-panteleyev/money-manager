@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,25 @@
 package org.panteleyev.money.profiles;
 
 import org.panteleyev.money.Options;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.UncheckedIOException;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static org.panteleyev.money.XMLUtils.closeTag;
+import static org.panteleyev.money.XMLUtils.openTag;
+import static org.panteleyev.money.XMLUtils.writeTag;
+import static org.panteleyev.money.XMLUtils.writeXmlHeader;
 
 public final class ConnectionProfileManager {
     private static final String PROFILES_FILE = "profiles.xml";
@@ -65,41 +76,56 @@ public final class ConnectionProfileManager {
         profList.forEach(p -> profiles.put(p.getName(), p));
     }
 
-    public static void saveProfiles() {
-        ProfileListXml xmlList = new ProfileListXml(autoConnect,
-                defaultProfile == null ? "" : defaultProfile.getName(),
-                profiles.values());
+    public static void saveProfiles(OutputStream out) throws IOException {
+        try (var w = new PrintWriter(out)) {
+            writeXmlHeader(w);
 
-        try {
-            Marshaller marshaller = getContext().createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(xmlList, new File(Options.getSettingsDirectory(), PROFILES_FILE));
-        } catch (JAXBException ex) {
-            throw new RuntimeException(ex);
+            openTag(w, "MoneyManager");
+            writeTag(w, "autoConnect", autoConnect);
+            writeTag(w, "defaultProfileName", defaultProfile == null ? "" : defaultProfile.getName());
+
+            openTag(w, "profiles");
+
+            for (var profile : profiles.values()) {
+                exportProfile(w, profile);
+            }
+
+            closeTag(w, "profiles");
+            closeTag(w, "MoneyManager");
         }
+    }
+
+    public static void saveProfiles() {
+        var file = new File(Options.getSettingsDirectory(), PROFILES_FILE);
+        try (var out = new FileOutputStream(file)) {
+            saveProfiles(out);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public static void loadProfiles(InputStream inputStream) throws Exception {
+        var factory = SAXParserFactory.newInstance();
+        var parser = factory.newSAXParser();
+
+        var importParser = new ProfileXmlParser();
+        parser.parse(inputStream, importParser);
+
+        autoConnect = importParser.isAutoConnect();
+        importParser.getProfiles().forEach(p -> profiles.put(p.getName(), p));
+        defaultProfile = profiles.get(importParser.getDefaultProfileName());
     }
 
     public static void loadProfiles() {
         profiles.clear();
 
-        File file = new File(Options.getSettingsDirectory(), PROFILES_FILE);
+        var file = new File(Options.getSettingsDirectory(), PROFILES_FILE);
         if (!file.exists()) {
             return;
         }
 
-        try {
-            ProfileListXml loaded = (ProfileListXml) getContext().createUnmarshaller().unmarshal(file);
-            autoConnect = loaded.isAutoConnect();
-            loaded.getProfiles().forEach(p -> profiles.put(p.getName(), p.profile()));
-            defaultProfile = profiles.get(loaded.getDefaultProfileName());
-        } catch (JAXBException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private static JAXBContext getContext() {
-        try {
-            return JAXBContext.newInstance(ProfileListXml.class, ProfileXml.class);
+        try (var inputStream = new FileInputStream(file)) {
+            loadProfiles(inputStream);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -130,5 +156,21 @@ public final class ConnectionProfileManager {
     }
 
     private ConnectionProfileManager() {
+    }
+
+    private static void exportProfile(Writer w, ConnectionProfile profile) throws IOException {
+        openTag(w, "profile");
+
+        writeTag(w, "name", profile.getName());
+        writeTag(w, "type", profile.getType().name());
+        writeTag(w, "dataBaseHost", profile.getDataBaseHost());
+        writeTag(w, "dataBasePort", Integer.toString(profile.getDataBasePort()));
+        writeTag(w, "dataBaseUser", profile.getDataBaseUser());
+        writeTag(w, "dataBasePassword", profile.getDataBasePassword());
+        writeTag(w, "schema", profile.getSchema());
+        writeTag(w, "remoteHost", profile.getRemoteHost());
+        writeTag(w, "remotePort", profile.getRemotePort());
+
+        closeTag(w, "profile");
     }
 }

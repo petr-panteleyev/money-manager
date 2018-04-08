@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
 
 public class TestAccount extends BaseTest {
     @Test
@@ -45,7 +48,7 @@ public class TestAccount extends BaseTest {
         CategoryType type = randomCategoryType();
         int categoryId = randomId();
         int currencyId = randomId();
-        boolean enabled = BaseTest.RANDOM.nextBoolean();
+        boolean enabled = RANDOM.nextBoolean();
         String uuid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
 

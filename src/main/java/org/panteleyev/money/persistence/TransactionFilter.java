@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.money.Logging;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -40,31 +39,31 @@ public enum TransactionFilter {
     CURRENT_YEAR(it -> it.getYear() == LocalDate.now().getYear()),
 
     CURRENT_MONTH(it -> {
-        LocalDate now = LocalDate.now();
+        var now = LocalDate.now();
         return it.getYear() == now.getYear() && it.getMonth() == now.getMonthValue();
     }),
 
     CURRENT_WEEK(it -> {
-        LocalDate now = LocalDate.now();
-        LocalDate from = now.minusDays(now.getDayOfWeek().getValue() - 1);
+        var now = LocalDate.now();
+        var from = now.minusDays(now.getDayOfWeek().getValue() - 1);
         return checkRange(it, from, now);
     }),
 
     LAST_YEAR(it -> {
-        LocalDate now = java.time.LocalDate.now();
-        LocalDate from = now.minusYears(1);
+        var now = java.time.LocalDate.now();
+        var from = now.minusYears(1);
         return checkRange(it, from, now);
     }),
 
     LAST_QUARTER(it -> {
-        LocalDate now = java.time.LocalDate.now();
-        LocalDate from = now.minusMonths(3);
+        var now = java.time.LocalDate.now();
+        var from = now.minusMonths(3);
         return checkRange(it, from, now);
     }),
 
     LAST_MONTH(it -> {
-        LocalDate now = LocalDate.now();
-        LocalDate from = now.minusMonths(1);
+        var now = LocalDate.now();
+        var from = now.minusMonths(1);
         return checkRange(it, from, now);
     }),
 
@@ -87,26 +86,17 @@ public enum TransactionFilter {
     TransactionFilter(Predicate<Transaction> p) {
         predicate = p;
 
-        ResourceBundle bundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.res.TransactionFilter");
+        var bundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.res.TransactionFilter");
         description = bundle.getString(name());
     }
 
     TransactionFilter(Month month) {
         predicate = (t) -> {
-            LocalDate now = LocalDate.now();
+            var now = LocalDate.now();
             return t.getYear() == now.getYear() && t.getMonth() == month.getValue();
         };
 
-        // Workaround for https://bugs.openjdk.java.net/browse/JDK-8146356
-        TextStyle textStyle = TextStyle.FULL_STANDALONE;
-        String testMonth = Month.JANUARY.getDisplayName(textStyle, Locale.getDefault());
-        if (testMonth.equals("1")) {
-            textStyle = TextStyle.FULL;
-        } else {
-            Logging.getLogger().info("JDK-8146356 has been resolved");
-        }
-
-        description = month.getDisplayName(textStyle, Locale.getDefault());
+        description = month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault());
     }
 
     public Predicate<Transaction> predicate() {
@@ -143,7 +133,7 @@ public enum TransactionFilter {
     }
 
     private static boolean checkRange(Transaction t, LocalDate from, LocalDate to) {
-        LocalDate date = LocalDate.of(t.getYear(), t.getMonth(), t.getDay());
+        var date = LocalDate.of(t.getYear(), t.getMonth(), t.getDay());
         return date.compareTo(from) >= 0 && date.compareTo(to) <= 0;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,11 @@ import org.panteleyev.money.persistence.TransactionGroup;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomDay;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
+import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.test.BaseTestUtils.randomYear;
 
 public class TestTransactionGroup extends BaseTest {
     @Test
@@ -38,7 +43,7 @@ public class TestTransactionGroup extends BaseTest {
         int day = randomDay();
         int month = randomMonth();
         int year = randomYear();
-        boolean expanded = BaseTest.RANDOM.nextBoolean();
+        boolean expanded = RANDOM.nextBoolean();
         String uuid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
 

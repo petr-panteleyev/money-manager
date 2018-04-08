@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,11 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.cells.AccountBalanceCell;
@@ -49,9 +54,11 @@ import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -94,7 +101,7 @@ class AccountTree extends BorderPane {
             change -> Platform.runLater(tableView::refresh);
 
     AccountTree() {
-        for (CategoryType type : CategoryType.values()) {
+        for (var type : CategoryType.values()) {
             subRoots.put(type, new TreeItem<>(new AccountTreeItem(type.getTypeName(), type.getComment())));
         }
 
@@ -106,24 +113,35 @@ class AccountTree extends BorderPane {
         expenseSubTree = subRoots.get(CategoryType.EXPENSES);
 
         // Table
-        TreeTableColumn<AccountTreeItem, String> nameColumn = new TreeTableColumn<>(RB.getString("column.Name"));
-        TreeTableColumn<AccountTreeItem, String> commentColumn = new TreeTableColumn<>(RB.getString("column.Comment"));
-        TreeTableColumn<AccountTreeItem, Account> approvedColumn = new TreeTableColumn<>(RB.getString("column.Approved"));
-        TreeTableColumn<AccountTreeItem, Account> balanceColumn = new TreeTableColumn<>(RB.getString("column.Balance"));
-        TreeTableColumn<AccountTreeItem, Account> waitingColumn = new TreeTableColumn<>(RB.getString("column.Waiting"));
+        var nameColumn = new TreeTableColumn<AccountTreeItem, String>(RB.getString("column.Name"));
+        var commentColumn = new TreeTableColumn<AccountTreeItem, String>(RB.getString("column.Comment"));
+        var approvedColumn = new TreeTableColumn<AccountTreeItem, Account>(RB.getString("column.Approved"));
+        var balanceColumn = new TreeTableColumn<AccountTreeItem, Account>(RB.getString("column.Balance"));
+        var waitingColumn = new TreeTableColumn<AccountTreeItem, Account>(RB.getString("column.Waiting"));
 
         //noinspection unchecked
         tableView.getColumns().setAll(nameColumn, commentColumn, approvedColumn, balanceColumn, waitingColumn);
 
         // Context menu
-        MenuItem item = new MenuItem(RB.getString("menu.Edit.newAccount"));
-        item.setOnAction(event -> onNewAccount());
+        var m1 = newMenuItem(RB, "menu.Edit.newAccount", event -> onNewAccount());
+        var m2 = new MenuItem(RB.getString("menu.CopyName"));
+        m2.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
+        m2.setOnAction(event -> onCopyName());
 
-        tableView.setContextMenu(new ContextMenu(item, new SeparatorMenuItem(), showDeactivatedAccountsMenuItem));
+        tableView.setContextMenu(
+                new ContextMenu(
+                        m1,
+                        new SeparatorMenuItem(),
+                        m2,
+                        new SeparatorMenuItem(),
+                        showDeactivatedAccountsMenuItem
+                )
+        );
+
         tableView.setShowRoot(false);
 
         // Tool box
-        HBox hBox = new HBox(5.0, accountFilterBox, transactionFilterBox);
+        var hBox = new HBox(5.0, accountFilterBox, transactionFilterBox);
 
         setTop(hBox);
         setCenter(tableView);
@@ -199,7 +217,7 @@ class AccountTree extends BorderPane {
                 new Separator()
         );
 
-        for (CategoryType t : CategoryType.values()) {
+        for (var t : CategoryType.values()) {
             accountFilterBox.getItems().add(t.getTypeName());
         }
 
@@ -236,7 +254,7 @@ class AccountTree extends BorderPane {
     }
 
     private void initSubtree(CategoryType categoryType) {
-        TreeItem<AccountTreeItem> rootItem = subRoots.get(categoryType);
+        var rootItem = subRoots.get(categoryType);
         rootItem.getChildren().clear();
 
         categoryTreeItem = null;
@@ -270,7 +288,7 @@ class AccountTree extends BorderPane {
     }
 
     private void initAccountTree() {
-        for (CategoryType t : CategoryType.values()) {
+        for (var t : CategoryType.values()) {
             initSubtree(t);
         }
     }
@@ -313,9 +331,9 @@ class AccountTree extends BorderPane {
     private void onNewAccount() {
         Category initialCategory = null;
 
-        TreeItem<AccountTreeItem> selectedItem = tableView.getSelectionModel().getSelectedItem();
+        var selectedItem = tableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
-            Account account = selectedItem.getValue().accountProperty().getValue();
+            var account = selectedItem.getValue().accountProperty().getValue();
             initialCategory = account != null ?
                     getDao().getCategory(account.getCategoryId()).orElse(null) :
                     selectedItem.getValue().categoryProperty().getValue();
@@ -336,5 +354,17 @@ class AccountTree extends BorderPane {
 
     private void onTreeItemSelected(TreeItem<AccountTreeItem> item) {
         accountSelectedConsumer.accept(item.getValue().accountProperty().getValue());
+    }
+
+    private void onCopyName() {
+        Optional.ofNullable(tableView.getSelectionModel().getSelectedItem())
+                .map(TreeItem::getValue)
+                .map(item -> item.nameProperty().get())
+                .ifPresent(name -> {
+                    Clipboard cb = Clipboard.getSystemClipboard();
+                    ClipboardContent ct = new ClipboardContent();
+                    ct.putString(name);
+                    cb.setContent(ct);
+                });
     }
 }

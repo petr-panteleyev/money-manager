@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,16 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.test.BaseTestUtils.randomDay;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
+import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.test.BaseTestUtils.randomYear;
 
 public class TestTransaction extends BaseTest {
     @Test
-    public void testEquals() throws Exception {
+    public void testEquals() {
         int id = randomId();
         BigDecimal amount = randomBigDecimal();
         int day = randomDay();
@@ -42,7 +48,7 @@ public class TestTransaction extends BaseTest {
         int year = randomYear();
         int transactionTypeId = randomTransactionType().getId();
         String comment = UUID.randomUUID().toString();
-        boolean checked = BaseTest.RANDOM.nextBoolean();
+        boolean checked = RANDOM.nextBoolean();
         int accountDebitedId = randomId();
         int accountCreditedId = randomId();
         int accountDebitedTypeId = randomCategoryType().getId();
@@ -52,7 +58,7 @@ public class TestTransaction extends BaseTest {
         int groupId = randomId();
         int contactId = randomId();
         BigDecimal rate = randomBigDecimal();
-        int rateDirection = BaseTest.RANDOM.nextInt();
+        int rateDirection = RANDOM.nextInt();
         String invoiceNumber = UUID.randomUUID().toString();
         String guid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
@@ -76,7 +82,7 @@ public class TestTransaction extends BaseTest {
     }
 
     @Test
-    public void testCheck() throws Exception {
+    public void testCheck() {
         int id = randomId();
         BigDecimal amount = randomBigDecimal();
         int day = randomDay();
@@ -84,7 +90,7 @@ public class TestTransaction extends BaseTest {
         int year = randomYear();
         int transactionTypeId = randomTransactionType().getId();
         String comment = UUID.randomUUID().toString();
-        boolean checked = BaseTest.RANDOM.nextBoolean();
+        boolean checked = RANDOM.nextBoolean();
         int accountDebitedId = randomId();
         int accountCreditedId = randomId();
         int accountDebitedTypeId = randomCategoryType().getId();
@@ -94,7 +100,7 @@ public class TestTransaction extends BaseTest {
         int groupId = randomId();
         int contactId = randomId();
         BigDecimal rate = randomBigDecimal();
-        int rateDirection = BaseTest.RANDOM.nextInt();
+        int rateDirection = RANDOM.nextInt();
         String invoiceNumber = UUID.randomUUID().toString();
         String guid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
@@ -132,7 +138,7 @@ public class TestTransaction extends BaseTest {
     }
 
     @Test
-    public void testSetGroupId() throws Exception {
+    public void testSetGroupId() {
         int id = randomId();
         BigDecimal amount = randomBigDecimal();
         int day = randomDay();
@@ -140,7 +146,7 @@ public class TestTransaction extends BaseTest {
         int year = randomYear();
         int transactionTypeId = randomTransactionType().getId();
         String comment = UUID.randomUUID().toString();
-        boolean checked = BaseTest.RANDOM.nextBoolean();
+        boolean checked = RANDOM.nextBoolean();
         int accountDebitedId = randomId();
         int accountCreditedId = randomId();
         int accountDebitedTypeId = randomCategoryType().getId();
@@ -150,7 +156,7 @@ public class TestTransaction extends BaseTest {
         int groupId = randomId();
         int contactId = randomId();
         BigDecimal rate = randomBigDecimal();
-        int rateDirection = BaseTest.RANDOM.nextInt();
+        int rateDirection = RANDOM.nextInt();
         String invoiceNumber = UUID.randomUUID().toString();
         String guid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();

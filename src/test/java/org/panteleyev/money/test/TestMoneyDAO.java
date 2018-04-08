@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,11 +40,12 @@ import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 
 public class TestMoneyDAO extends BaseDaoTest {
     @BeforeClass
     @Override
-    public void setupAndSkip() throws Exception {
+    public void setupAndSkip() {
         try {
             super.setupAndSkip();
             getDao().createTables();
@@ -85,12 +86,12 @@ public class TestMoneyDAO extends BaseDaoTest {
                                 UUID.randomUUID().toString(),
                                 UUID.randomUUID().toString(),
                                 UUID.randomUUID().toString(),
-                                BaseTest.RANDOM.nextInt(),
-                                BaseTest.RANDOM.nextBoolean(),
-                                BaseTest.RANDOM.nextBoolean(),
+                                RANDOM.nextInt(),
+                                RANDOM.nextBoolean(),
+                                RANDOM.nextBoolean(),
                                 BigDecimal.ZERO,
-                                BaseTest.RANDOM.nextInt(),
-                                BaseTest.RANDOM.nextBoolean(),
+                                RANDOM.nextInt(),
+                                RANDOM.nextBoolean(),
                                 UUID.randomUUID().toString(),
                                 System.currentTimeMillis()
                         )
@@ -101,12 +102,12 @@ public class TestMoneyDAO extends BaseDaoTest {
                                 UUID.randomUUID().toString(),
                                 UUID.randomUUID().toString(),
                                 UUID.randomUUID().toString(),
-                                BaseTest.RANDOM.nextInt(),
-                                BaseTest.RANDOM.nextBoolean(),
-                                BaseTest.RANDOM.nextBoolean(),
+                                RANDOM.nextInt(),
+                                RANDOM.nextBoolean(),
+                                RANDOM.nextBoolean(),
                                 BigDecimal.TEN,
-                                BaseTest.RANDOM.nextInt(),
-                                BaseTest.RANDOM.nextBoolean(),
+                                RANDOM.nextInt(),
+                                RANDOM.nextBoolean(),
                                 UUID.randomUUID().toString(),
                                 System.currentTimeMillis()
                         )
@@ -128,7 +129,7 @@ public class TestMoneyDAO extends BaseDaoTest {
                                 randomCategoryType().getId(),
                                 catID,
                                 currID,
-                                BaseTest.RANDOM.nextBoolean(),
+                                RANDOM.nextBoolean(),
                                 UUID.randomUUID().toString(),
                                 System.currentTimeMillis()
                         )

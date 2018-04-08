@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,7 @@ class StatementPredicate implements Predicate<Transaction> {
     private final boolean ignoreExecutionDate;
 
     StatementPredicate(Account account, StatementRecord record, boolean ignoreExecutionDate) {
-        this.accountId = account.getId();
+        this.accountId = account == null ? 0 : account.getId();
         this.record = record;
         this.ignoreExecutionDate = ignoreExecutionDate;
     }
@@ -50,7 +50,7 @@ class StatementPredicate implements Predicate<Transaction> {
             return false;
         }
 
-        boolean result = (transaction.getAccountDebitedId() == accountId
+        var result = (transaction.getAccountDebitedId() == accountId
                 || transaction.getAccountCreditedId() == accountId)
                 && (compareDate(record.getActual(), transaction)
                 || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));

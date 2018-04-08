@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.money.persistence.CategoryType;
 import org.panteleyev.money.persistence.SplitTransaction;
 import org.panteleyev.money.persistence.Transaction;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import static org.panteleyev.money.Styles.BLACK_TEXT;
 import static org.panteleyev.money.Styles.BLUE_TEXT;
@@ -47,14 +46,14 @@ public class TransactionSumCell extends TableCell<Transaction, Transaction> {
         if (empty || item == null) {
             setText("");
         } else {
-            BigDecimal amount = item.getSignedAmount();
+            var amount = item.getSignedAmount();
 
             getStyleClass().removeAll(RED_TEXT, BLUE_TEXT, BLACK_TEXT);
 
             if (item instanceof SplitTransaction) {
                 getStyleClass().add(amount.signum() < 0 ? RED_TEXT : BLACK_TEXT);
             } else {
-                String s = BLACK_TEXT;
+                var s = BLACK_TEXT;
                 if (item.getAccountCreditedType() != item.getAccountDebitedType()) {
                     if (item.getAccountDebitedType() == CategoryType.INCOMES) {
                         s = BLUE_TEXT;
@@ -65,7 +64,7 @@ public class TransactionSumCell extends TableCell<Transaction, Transaction> {
                 getStyleClass().add(s);
             }
 
-            String format = item instanceof SplitTransaction || item.getGroupId() == 0 ? "%s" : "(%s)";
+            var format = item instanceof SplitTransaction || item.getGroupId() == 0 ? "%s" : "(%s)";
             setText(String.format(format, amount.setScale(2, RoundingMode.HALF_UP).toString()));
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 final class AccountsTab extends BorderPane {
     private static final double DIVIDER_POSITION = 0.85;
 
-    private TransactionTableView transactionTable = new TransactionTableView(true);
+    private final TransactionTableView transactionTable = new TransactionTableView(true);
     private Account selectedAccount = null;
     private Predicate<Transaction> transactionFilter = TransactionFilter.ALL.predicate();
 
@@ -50,9 +50,9 @@ final class AccountsTab extends BorderPane {
             change -> Platform.runLater(this::reloadTransactions);
 
     AccountsTab() {
-        AccountTree accountTree = new AccountTree();
+        var accountTree = new AccountTree();
 
-        SplitPane pane = new SplitPane(accountTree, new BorderPane(transactionTable));
+        var pane = new SplitPane(accountTree, new BorderPane(transactionTable));
         pane.setOrientation(Orientation.VERTICAL);
         pane.setDividerPosition(0, DIVIDER_POSITION);
         setCenter(pane);
@@ -80,7 +80,7 @@ final class AccountsTab extends BorderPane {
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
-        for (Transaction t : transactions) {
+        for (var t : transactions) {
             getDao().updateTransaction(t.check(check));
         }
 
@@ -95,8 +95,8 @@ final class AccountsTab extends BorderPane {
         transactionFilter = filter;
 
         if (selectedAccount != null) {
-            filter = filter.and(t -> t.getAccountDebitedId() == selectedAccount.getId() || t.getAccountCreditedId()
-                    == selectedAccount.getId());
+            filter = filter.and(t -> t.getAccountDebitedId() == selectedAccount.getId()
+                    || t.getAccountCreditedId() == selectedAccount.getId());
         } else {
             filter = t -> false;
         }

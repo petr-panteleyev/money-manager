@@ -31,6 +31,7 @@ import org.panteleyev.money.persistence.ContactType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
 
 public class TestContact extends BaseTest {
     @Test

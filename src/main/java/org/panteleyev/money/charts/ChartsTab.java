@@ -36,12 +36,8 @@ import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.panteleyev.money.AccountFilterSelectionBox;
 import org.panteleyev.money.TransactionFilterBox;
-import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.AccountFilter;
-import org.panteleyev.money.persistence.Transaction;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -54,8 +50,8 @@ public class ChartsTab extends BorderPane {
     private final PieChart pieChart = new PieChart();
 
     public ChartsTab() {
-        HBox topPanel = new HBox(5.0);
-        Button button = new Button(RB.getString("button.Refresh"));
+        var topPanel = new HBox(5.0);
+        var button = new Button(RB.getString("button.Refresh"));
         button.setOnAction(event -> updateChart());
 
         topPanel.getChildren().addAll(selectionBox, transactionFilterBox, button);
@@ -69,14 +65,14 @@ public class ChartsTab extends BorderPane {
     }
 
     private void updateChart() {
-        Predicate<Account> accountFilter = selectionBox.getAccountFilter()
+        var accountFilter = selectionBox.getAccountFilter()
                 .and(AccountFilter.ENABLED.predicate());
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
 
-        Predicate<Transaction> transactionFilter = transactionFilterBox.getTransactionFilter();
+        var transactionFilter = transactionFilterBox.getTransactionFilter();
 
-        List<Pair<String, BigDecimal>> list = getDao().getAccounts(accountFilter).stream()
+        var list = getDao().getAccounts(accountFilter).stream()
                 .map(a -> new Pair<>(a.getName(), a.calculateBalance(true, transactionFilter).abs()))
                 .filter(p -> BigDecimal.ZERO.compareTo(p.getValue()) != 0)
                 .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))

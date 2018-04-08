@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,10 +36,6 @@ public class LocalDateCell<T> extends TableCell<T, LocalDate> {
     @Override
     public void updateItem(LocalDate date, boolean empty) {
         super.updateItem(date, empty);
-        if (empty || date == null) {
-            setText("");
-        } else {
-            setText(FORMATTER.format(date));
-        }
+        setText(empty || date == null ? "" : FORMATTER.format(date));
     }
 }

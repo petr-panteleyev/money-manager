@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ public class TestStatements {
     private static final String RESOURCES = "src/test/resources/org/panteleyev/money/test/TestStatements/";
 
     @Test
-    public void testRaiffeisenStatement() throws Exception {
+    public void testRaiffeisenCardStatement() throws Exception {
         Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV,
                 List.of(
                         new StatementRecord(
@@ -110,6 +110,56 @@ public class TestStatements {
         File file = new File(RESOURCES + "rba_credit_card_statement.csv");
         try (InputStream inputStream = new FileInputStream(file)) {
             Statement actual = StatementParser.parse(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV, inputStream);
+            Assert.assertEquals(actual, expected);
+        }
+    }
+
+    @Test
+    public void testRaiffeisenAccountStatement() throws Exception {
+        Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV,
+                List.of(
+                        new StatementRecord(
+                                LocalDate.of(1998, 1, 1),
+                                LocalDate.of(1998, 1, 1),
+                                "Interest",
+                                "",
+                                "",
+                                "",
+                                "RUB",
+                                "10.12",
+                                "RUB",
+                                "10.12"
+                        ),
+                        new StatementRecord(
+                                LocalDate.of(1998, 1, 3),
+                                LocalDate.of(1998, 1, 3),
+                                "Transfer",
+                                "",
+                                "",
+                                "",
+                                "RUB",
+                                "-12456.67",
+                                "RUB",
+                                "-12456.67"
+                        ),
+                        new StatementRecord(
+                                LocalDate.of(1998, 1, 10),
+                                LocalDate.of(1998, 1, 10),
+                                "SALARY",
+                                "",
+                                "",
+                                "",
+                                "RUB",
+                                "1000.00",
+                                "RUB",
+                                "1000.00"
+                        )
+                )
+        );
+
+        File file = new File(RESOURCES + "rba_account_statement.csv");
+        try (InputStream inputStream = new FileInputStream(file)) {
+            Statement actual = StatementParser.parse(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV, inputStream);
             Assert.assertEquals(actual, expected);
         }
     }

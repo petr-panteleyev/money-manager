@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import static org.panteleyev.money.MainWindowController.RB;
 
-class StatementView extends BorderPane {
+public class StatementView extends BorderPane {
     private final TableView<StatementRecord> tableView = new TableView<>();
     private Consumer<StatementRecord> newTransactionCallback = x -> {
     };
@@ -52,33 +52,33 @@ class StatementView extends BorderPane {
     };
 
     StatementView() {
-        TableColumn<StatementRecord, LocalDate> actualDateColumn = new TableColumn<>(RB.getString("column.Date"));
+        var actualDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.Date"));
         actualDateColumn.setCellFactory(x -> new LocalDateCell<>());
         actualDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getActual()));
 
-        TableColumn<StatementRecord, LocalDate> executionDateColumn = new TableColumn<>(RB.getString("column.ExecutionDate"));
+        var executionDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.ExecutionDate"));
         executionDateColumn.setCellFactory(x -> new LocalDateCell<>());
         executionDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getExecution()));
 
-        TableColumn<StatementRecord, String> descriptionColumn = new TableColumn<>(RB.getString("column.Description"));
+        var descriptionColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Description"));
         descriptionColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
 
-        TableColumn<StatementRecord, String> counterPartyColumn = new TableColumn<>(RB.getString("column.Payer.Payee"));
+        var counterPartyColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Payer.Payee"));
         counterPartyColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getCounterParty()));
 
-        TableColumn<StatementRecord, String> placeColumn = new TableColumn<>(RB.getString("column.Place"));
+        var placeColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Place"));
         placeColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
 
-        TableColumn<StatementRecord, String> countryColumn = new TableColumn<>(RB.getString("column.Country"));
+        var countryColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Country"));
         countryColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getCountry()));
 
-        TableColumn<StatementRecord, StatementRecord> amountColumn = new TableColumn<>(RB.getString("column.Sum"));
+        var amountColumn = new TableColumn<StatementRecord, StatementRecord>(RB.getString("column.Sum"));
         amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, StatementRecord> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue()));
         amountColumn.setCellFactory(x -> new StatementSumCell());
@@ -114,9 +114,9 @@ class StatementView extends BorderPane {
     }
 
     private void createMenu() {
-        ContextMenu menu = new ContextMenu();
+        var menu = new ContextMenu();
 
-        MenuItem addMenuItem = new MenuItem(MainWindowController.RB.getString("menu.Edit.Add"));
+        var addMenuItem = new MenuItem(MainWindowController.RB.getString("menu.Edit.Add"));
         addMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
         addMenuItem.setOnAction(event -> onAddTransaction());
 
@@ -135,7 +135,7 @@ class StatementView extends BorderPane {
         this.newTransactionCallback = callback;
     }
 
-    void setStatement(Statement statement) {
+    public void setStatement(Statement statement) {
         tableView.getItems().clear();
         tableView.getItems().addAll(statement.getRecords());
     }

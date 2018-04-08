@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
 
 public class TestCurrency extends BaseTest {
     @Test
@@ -39,12 +42,12 @@ public class TestCurrency extends BaseTest {
         String symbol = UUID.randomUUID().toString();
         String description = UUID.randomUUID().toString();
         String formatSymbol = UUID.randomUUID().toString();
-        int formatSymbolPosition = BaseTest.RANDOM.nextInt();
-        boolean showFormatSymbol = BaseTest.RANDOM.nextBoolean();
-        boolean def = BaseTest.RANDOM.nextBoolean();
+        int formatSymbolPosition = RANDOM.nextInt();
+        boolean showFormatSymbol = RANDOM.nextBoolean();
+        boolean def = RANDOM.nextBoolean();
         BigDecimal rate = randomBigDecimal();
-        int direction = BaseTest.RANDOM.nextInt();
-        boolean useSeparator = BaseTest.RANDOM.nextBoolean();
+        int direction = RANDOM.nextInt();
+        boolean useSeparator = RANDOM.nextBoolean();
         String uuid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
 

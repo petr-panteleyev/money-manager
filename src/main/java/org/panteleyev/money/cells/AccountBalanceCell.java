@@ -32,7 +32,6 @@ import org.panteleyev.money.AccountTreeItem;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
-import java.math.BigDecimal;
 import java.util.function.Predicate;
 import static org.panteleyev.money.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -59,7 +58,7 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
         if (empty || account == null) {
             setText("");
         } else {
-            BigDecimal sum = account.calculateBalance(total, filter);
+            var sum = account.calculateBalance(total, filter);
 
             setText(getDao().getCurrency(account.getCurrencyId())
                     .map(curr -> curr.formatValue(sum))

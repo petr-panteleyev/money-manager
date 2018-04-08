@@ -36,12 +36,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.Currency;
+import java.util.Optional;
+import static org.panteleyev.money.FXFactory.newMenuBar;
+import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -56,46 +57,31 @@ final class CurrencyWindowController extends BaseController {
 
     CurrencyWindowController() {
         EventHandler<ActionEvent> addHandler = event -> openCurrencyDialog(null);
-        EventHandler<ActionEvent> editHandler = event -> {
-            Currency currency = table.getSelectionModel().getSelectedItem();
-            if (currency != null) {
-                openCurrencyDialog(currency);
-            }
-        };
+        EventHandler<ActionEvent> editHandler = event -> getSelectedCurrency().ifPresent(this::openCurrencyDialog);
 
-        // Menu Bar
-        MenuItem closeMenuItem = new MenuItem(RB.getString("menu.File.Close"));
-        closeMenuItem.setOnAction(event -> onClose());
+        var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
-        Menu fileMenu = new Menu(RB.getString("menu.File"), null, closeMenuItem);
-
-        MenuItem addMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        addMenuItem.setOnAction(addHandler);
-
-        MenuItem editMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        editMenuItem.setOnAction(editHandler);
-
-        Menu editMenu = new Menu(RB.getString("menu.Edit"), null, addMenuItem, editMenuItem);
-
-        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(RB));
-        menuBar.setUseSystemMenuBar(true);
+        var menuBar = newMenuBar(
+                new Menu(RB.getString("menu.File"), null,
+                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
+                new Menu(RB.getString("menu.Edit"), null,
+                        newMenuItem(RB, "menu.Edit.Add", addHandler),
+                        newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+                createHelpMenu(RB));
 
         // Context Menu
-        MenuItem ctxAddMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        ctxAddMenuItem.setOnAction(addHandler);
-
-        MenuItem ctxEditMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        ctxEditMenuItem.setOnAction(editHandler);
-
-        table.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem));
+        table.setContextMenu(new ContextMenu(
+                newMenuItem(RB, "menu.Edit.Add", addHandler),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
-        TableColumn<Currency,String> colName = new TableColumn<>(RB.getString("column.Name"));
-        TableColumn<Currency,String> colDescription = new TableColumn<>(RB.getString("column.Description"));
+        var colName = new TableColumn<Currency, String>(RB.getString("column.Name"));
+        var colDescription = new TableColumn<Currency, String>(RB.getString("column.Description"));
 
+        //noinspection unchecked
         table.getColumns().setAll(colName, colDescription);
 
-        BorderPane root = new BorderPane();
+        var root = new BorderPane();
         root.setPrefSize(600.0, 400.0);
         root.setTop(menuBar);
         root.setCenter(table);
@@ -105,19 +91,17 @@ final class CurrencyWindowController extends BaseController {
         colName.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getSymbol()));
         colDescription.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
 
-        editMenuItem.disableProperty()
-                .bind(table.getSelectionModel().selectedItemProperty().isNull());
-        ctxEditMenuItem.disableProperty()
-                .bind(table.getSelectionModel().selectedItemProperty().isNull());
-
         getDao().currencies().addListener(new WeakMapChangeListener<>(currencyListener));
-
         setupWindow(root);
     }
 
     @Override
     public String getTitle() {
         return RB.getString("currency.Window.Title");
+    }
+
+    private Optional<Currency> getSelectedCurrency() {
+        return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
     }
 
     private void openCurrencyDialog(Currency currency) {
@@ -132,7 +116,7 @@ final class CurrencyWindowController extends BaseController {
 
     private void onCurrencyUpdate(MapChangeListener.Change<? extends Integer, ? extends Currency> change) {
         if (change.wasAdded()) {
-            Currency currency = change.getValueAdded();
+            var currency = change.getValueAdded();
 
             // find if we have item with this id
             int index = currencyList.stream()

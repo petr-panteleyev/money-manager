@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,17 @@ import org.panteleyev.money.persistence.CategoryType;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
 
 public class TestCategory extends BaseTest {
     @Test
-    public void testEquals() throws Exception {
+    public void testEquals() {
         int id = randomId();
         String name = UUID.randomUUID().toString();
         String comment = UUID.randomUUID().toString();
         CategoryType type = randomCategoryType();
-        boolean expanded = BaseTest.RANDOM.nextBoolean();
+        boolean expanded = RANDOM.nextBoolean();
         String uuid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
 

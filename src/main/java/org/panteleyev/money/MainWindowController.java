@@ -56,10 +56,8 @@ import org.panteleyev.money.xml.Export;
 import org.panteleyev.utilities.fx.Controller;
 import org.panteleyev.utilities.fx.WindowManager;
 import javax.sql.DataSource;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -67,9 +65,12 @@ import java.util.ResourceBundle;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Logger;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController {
+    private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
+
     private static final String UI_BUNDLE_PATH = "org.panteleyev.money.res.ui";
     public static final String CSS_PATH = "/org/panteleyev/money/res/main.css";
 
@@ -125,44 +126,44 @@ public class MainWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         // Main menu
-        MenuItem m2 = new MenuItem(RB.getString("menu.File.Connect"));
+        var m2 = new MenuItem(RB.getString("menu.File.Connect"));
         m2.setOnAction(event -> onOpenConnection());
-        MenuItem m3 = new MenuItem(RB.getString("menu.File.Close"));
+        var m3 = new MenuItem(RB.getString("menu.File.Close"));
         m3.setOnAction(event -> onClose());
-        MenuItem m4 = new MenuItem(RB.getString("menu.File.Exit"));
+        var m4 = new MenuItem(RB.getString("menu.File.Exit"));
         m4.setOnAction(event -> onExit());
 
-        Menu fileMenu = new Menu(RB.getString("menu.File"), null,
+        var fileMenu = new Menu(RB.getString("menu.File"), null,
                 m2, new SeparatorMenuItem(), m3, new SeparatorMenuItem(), m4);
 
-        MenuItem m5 = new MenuItem(RB.getString("menu.Edit.Delete"));
+        var m5 = new MenuItem(RB.getString("menu.Edit.Delete"));
 
-        MenuItem currenciesMenuItem = new MenuItem(RB.getString("menu.Edit.Currencies"));
+        var currenciesMenuItem = new MenuItem(RB.getString("menu.Edit.Currencies"));
         currenciesMenuItem.setOnAction(event -> onManageCurrencies());
-        MenuItem categoriesMenuItem = new MenuItem(RB.getString("menu.Edit.Categories"));
+        var categoriesMenuItem = new MenuItem(RB.getString("menu.Edit.Categories"));
         categoriesMenuItem.setOnAction(event -> onManageCategories());
-        MenuItem accountsMenuItem = new MenuItem(RB.getString("menu.Edit.Accounts"));
+        var accountsMenuItem = new MenuItem(RB.getString("menu.Edit.Accounts"));
         accountsMenuItem.setOnAction(event -> onManageAccounts());
-        MenuItem contactsMenuItem = new MenuItem(RB.getString("menu.Edit.Contacts"));
+        var contactsMenuItem = new MenuItem(RB.getString("menu.Edit.Contacts"));
         contactsMenuItem.setOnAction(event -> onManageContacts());
 
-        Menu editMenu = new Menu(RB.getString("menu.Edit"), null,
+        var editMenu = new Menu(RB.getString("menu.Edit"), null,
                 m5, new SeparatorMenuItem(),
                 currenciesMenuItem, categoriesMenuItem, accountsMenuItem, contactsMenuItem);
 
-        MenuItem dumpXmlMenuItem = new MenuItem(RB.getString("menu.Tools.Export"));
+        var dumpXmlMenuItem = new MenuItem(RB.getString("menu.Tools.Export"));
         dumpXmlMenuItem.setOnAction(event -> xmlDump());
 
-        MenuItem importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
+        var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
         importMenuItem.setOnAction(event -> onImport());
 
-        MenuItem profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
+        var profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
         profilesMenuItem.setOnAction(event -> onProfiles());
 
-        MenuItem m7 = new MenuItem(RB.getString("menu.Tools.Options"));
+        var m7 = new MenuItem(RB.getString("menu.Tools.Options"));
         m7.setOnAction(event -> onOptions());
 
-        Menu toolsMenu = new Menu(RB.getString("menu.Tools"), null,
+        var toolsMenu = new Menu(RB.getString("menu.Tools"), null,
                 dumpXmlMenuItem,
                 importMenuItem,
                 new SeparatorMenuItem(),
@@ -174,7 +175,7 @@ public class MainWindowController extends BaseController {
         /* Dummy menu item is required in order to let onShowing() fire up first time */
         windowMenu.getItems().setAll(new MenuItem("dummy"));
 
-        MenuBar menuBar = new MenuBar(fileMenu, editMenu, toolsMenu,
+        var menuBar = new MenuBar(fileMenu, editMenu, toolsMenu,
                 windowMenu, createHelpMenu(RB));
 
         menuBar.setUseSystemMenuBar(true);
@@ -203,26 +204,18 @@ public class MainWindowController extends BaseController {
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
 
-        Tab t2 = new Tab(RB.getString("tab.Transactions"), transactionTab);
-        t2.disableProperty().bind(dbOpenProperty.not());
+        var t2 = new Tab(RB.getString("tab.Transactions"), transactionTab);
         t2.selectedProperty().addListener((x, y, newValue) -> {
             if (newValue) {
                 Platform.runLater(() -> transactionTab.scrollToEnd());
             }
         });
 
-        Tab t3 = new Tab(RB.getString("tab.Requests"), requestTab);
-        t3.disableProperty().bind(dbOpenProperty.not());
-
-        Tab t4 = new Tab(RB.getString("Statement"), statementsTab);
-        t4.disableProperty().bind(dbOpenProperty.not());
-
-        Tab t5 = new Tab(RB.getString("tab.Charts"), chartsTab);
-        t5.disableProperty().bind(dbOpenProperty.not());
-
         tabPane.getTabs().addAll(
                 new Tab(RB.getString("tab.Accouts"), accountsTab),
-                t2, t3, t4, t5
+                t2, new Tab(RB.getString("tab.Requests"), requestTab),
+                new Tab(RB.getString("Statement"), statementsTab),
+                new Tab(RB.getString("tab.Charts"), chartsTab)
         );
 
         statementsTab.setNewTransactionCallback((record, account) -> {
@@ -238,7 +231,7 @@ public class MainWindowController extends BaseController {
 
             WindowManager.getFrames().forEach(frame -> {
                 if (frame != this) {
-                    MenuItem item = new MenuItem(frame.getTitle());
+                    var item = new MenuItem(frame.getTitle());
                     item.setOnAction(action -> frame.getStage().toFront());
                     windowMenu.getItems().add(item);
                 }
@@ -262,32 +255,32 @@ public class MainWindowController extends BaseController {
          */
         Application.Parameters params = MoneyApplication.application.getParameters();
 
-        String profileName = params.getNamed().get("profile");
+        var profileName = params.getNamed().get("profile");
         if (profileName != null) {
-            ConnectionProfile profile = ConnectionProfileManager.get(profileName);
+            var profile = ConnectionProfileManager.get(profileName);
             if (profile == null) {
-                Logging.getLogger().warning("Profile $profileName not found");
+                LOGGER.warning("Profile $profileName not found");
             } else {
                 open(profile);
             }
         } else {
-            String name = params.getNamed().get("name");
+            var name = params.getNamed().get("name");
             if (name != null) {
                 // check mandatory parameters
-                String host = params.getNamed().getOrDefault("host", "localhost");
-                int port = Integer.parseInt(params.getNamed().getOrDefault("port", "3306"));
-                String user = params.getNamed().get("user");
-                String password = params.getNamed().getOrDefault("password", "");
+                var host = params.getNamed().getOrDefault("host", "localhost");
+                var port = Integer.parseInt(params.getNamed().getOrDefault("port", "3306"));
+                var user = params.getNamed().get("user");
+                var password = params.getNamed().getOrDefault("password", "");
 
                 if (user == null) {
                     throw new IllegalArgumentException("User name cannot be empty");
                 }
 
-                ConnectionProfile profile = new ConnectionProfile("", host, port, user, password, name);
+                var profile = new ConnectionProfile("", host, port, user, password, name);
                 open(profile);
             } else {
                 if (ConnectionProfileManager.getAutoConnect()) {
-                    ConnectionProfile profile = ConnectionProfileManager.getDefaultProfile();
+                    var profile = ConnectionProfileManager.getDefaultProfile();
                     if (profile != null) {
                         open(profile);
                     }
@@ -301,10 +294,10 @@ public class MainWindowController extends BaseController {
     }
 
     private void onManageCategories() {
-        Controller controller = WindowManager.find(CategoryWindowController.class)
+        var controller = WindowManager.find(CategoryWindowController.class)
                 .orElseGet(CategoryWindowController::new);
 
-        Stage stage = controller.getStage();
+        var stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
@@ -314,35 +307,35 @@ public class MainWindowController extends BaseController {
     }
 
     private void onManageCurrencies() {
-        Controller controller = WindowManager.find(CurrencyWindowController.class)
+        var controller = WindowManager.find(CurrencyWindowController.class)
                 .orElseGet(CurrencyWindowController::new);
 
-        Stage stage = controller.getStage();
+        var stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
     private void onManageAccounts() {
-        Controller controller = WindowManager.find(AccountListWindowController.class)
+        var controller = WindowManager.find(AccountListWindowController.class)
                 .orElseGet(AccountListWindowController::new);
 
-        Stage stage = controller.getStage();
+        var stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
     private void onManageContacts() {
-        Controller controller = WindowManager.find(ContactListWindowController.class)
+        var controller = WindowManager.find(ContactListWindowController.class)
                 .orElseGet(ContactListWindowController::new);
 
-        Stage stage = controller.getStage();
+        var stage = controller.getStage();
         stage.show();
         stage.toFront();
     }
 
     @Override
     public void onClose() {
-        for (Class<? extends Controller> clazz : WINDOW_CLASSES) {
+        for (var clazz : WINDOW_CLASSES) {
             WindowManager.find(clazz).ifPresent(c -> ((BaseController) c).onClose());
         }
 
@@ -397,16 +390,16 @@ public class MainWindowController extends BaseController {
     }
 
     private void xmlDump() {
-        FileChooser fileChooser = new FileChooser();
+        var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML Files", "*.xml"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
 
-        File selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(null);
 
         if (selected != null) {
             CompletableFuture.runAsync(() -> {
-                try (OutputStream outputStream = new FileOutputStream(selected)) {
+                try (var outputStream = new FileOutputStream(selected)) {
                     new Export()
                             .withCategories(getDao().getCategories())
                             .withAccounts(getDao().getAccounts(), false)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -51,28 +51,23 @@ import org.panteleyev.money.persistence.SplitTransaction;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
 import org.panteleyev.money.xml.Export;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionTableView extends TableView<Transaction> {
-    private static final ResourceBundle BUNDLE = MainWindowController.RB;
-
     private BiConsumer<TransactionGroup, List<Transaction>> addGroupConsumer = (x, y) -> {
     };
     private Consumer<List<Transaction>> ungroupConsumer = x -> {
@@ -81,8 +76,8 @@ public class TransactionTableView extends TableView<Transaction> {
     };
 
     // Menu items
-    private final MenuItem ctxGroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Group"));
-    private final MenuItem ctxUngroupMenuItem = new MenuItem(BUNDLE.getString("menu.Edit.Ungroup"));
+    private final MenuItem ctxGroupMenuItem = new MenuItem(RB.getString("menu.Edit.Group"));
+    private final MenuItem ctxUngroupMenuItem = new MenuItem(RB.getString("menu.Edit.Ungroup"));
 
     // Columns
     private final TableColumn<Transaction, Transaction> dayColumn;
@@ -98,7 +93,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        dayColumn = new TableColumn<>(BUNDLE.getString("column.Day"));
+        dayColumn = new TableColumn<>(RB.getString("column.Day"));
         dayColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
                 new SimpleObjectProperty<>(p.getValue()));
         dayColumn.setCellFactory(x -> new TransactionDayCell(fullDate));
@@ -124,7 +119,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         setSortPolicy(new TransactionTableSortPolicy());
 
-        TableColumn<Transaction, Transaction> typeColumn = new TableColumn<>(BUNDLE.getString("column.Type"));
+        var typeColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Type"));
         typeColumn.setCellValueFactory(
                 (TableColumn.CellDataFeatures<Transaction, Transaction> p) -> {
                     Transaction v = (p.getValue() instanceof SplitTransaction || p.getValue().getGroupId() == 0) ?
@@ -138,7 +133,7 @@ public class TransactionTableView extends TableView<Transaction> {
                 .thenComparing(dayColumn.getComparator()));
         typeColumn.setSortable(true);
 
-        TableColumn<Transaction, Transaction> accountFromColumn = new TableColumn<>(BUNDLE.getString("column.Account.Debited"));
+        var accountFromColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Account.Debited"));
         accountFromColumn.setCellFactory(x -> new TransactionDebitedAccountCell());
         accountFromColumn.setCellValueFactory(
                 (TableColumn.CellDataFeatures<Transaction, Transaction> p) -> {
@@ -153,38 +148,38 @@ public class TransactionTableView extends TableView<Transaction> {
 
         typeColumn.setSortable(true);
 
-        TableColumn<Transaction, Transaction> accountCreditedColumn = new TableColumn<>(BUNDLE.getString("column.Account.Credited"));
+        var accountCreditedColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Account.Credited"));
         accountCreditedColumn.setCellFactory(x -> new TransactionCreditedAccountCell());
         accountCreditedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue()));
         accountCreditedColumn.setSortable(false);
 
-        TableColumn<Transaction, Transaction> contactColumn = new TableColumn<>(BUNDLE.getString("column.Payer.Payee"));
+        var contactColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Payer.Payee"));
         contactColumn.setCellFactory(x -> new TransactionContactCell());
         contactColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue()));
         contactColumn.setSortable(false);
 
-        TableColumn<Transaction, String> commentColumn = new TableColumn<>(BUNDLE.getString("column.Comment"));
+        var commentColumn = new TableColumn<Transaction, String>(RB.getString("column.Comment"));
         commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, String> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
         commentColumn.setSortable(false);
 
-        TableColumn<Transaction, Transaction> sumColumn = new TableColumn<>(BUNDLE.getString("column.Sum"));
+        var sumColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Sum"));
         sumColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue()));
         sumColumn.setCellFactory(x -> new TransactionSumCell());
         sumColumn.setComparator(Comparator.comparing(Transaction::getSignedAmount));
         sumColumn.setSortable(true);
 
-        TableColumn<Transaction, CheckBox> approvedColumn = new TableColumn<>("");
+        var approvedColumn = new TableColumn<Transaction, CheckBox>("");
 
         approvedColumn.setCellValueFactory(p -> {
-            CheckBox cb = new CheckBox();
+            var cb = new CheckBox();
 
-            Transaction value = p.getValue();
+            var value = p.getValue();
             if (value instanceof SplitTransaction) {
-                List<Transaction> transactions = getTransactionsByGroup(value.getGroupId());
+                var transactions = getTransactionsByGroup(value.getGroupId());
                 cb.setSelected(transactions.stream().allMatch(Transaction::getChecked));
                 cb.setOnAction(event -> onCheckTransaction(transactions, cb.isSelected()));
             } else {
@@ -221,10 +216,10 @@ public class TransactionTableView extends TableView<Transaction> {
         approvedColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        MenuItem exportMenuItem = new MenuItem(BUNDLE.getString("menu.Context.Export"));
-            exportMenuItem.setOnAction(event -> onExportTransactions());
+        var exportMenuItem = new MenuItem(RB.getString("menu.Context.Export"));
+        exportMenuItem.setOnAction(event -> onExportTransactions());
 
-        ContextMenu ctxMenu = new ContextMenu(exportMenuItem);
+        var ctxMenu = new ContextMenu(exportMenuItem);
         ctxMenu.setOnShowing(event -> onShowingContextMenu());
 
         // No full date means we are in the transaction editing enabled mode
@@ -265,14 +260,13 @@ public class TransactionTableView extends TableView<Transaction> {
         } else {
             if (selectedItems.size() == 1) {
                 disableGroup = true;
-                Transaction item = selectedItems.get(0);
+                var item = selectedItems.get(0);
                 disableUngroup = !(item instanceof SplitTransaction);
             } else {
                 disableUngroup = true;
 
                 // Check if we don't have groups or group members selected
-                boolean hasGroups = selectedItems.stream()
-                        .anyMatch(t -> t.getGroupId() != 0);
+                var hasGroups = selectedItems.stream().anyMatch(t -> t.getGroupId() != 0);
 
                 if (hasGroups) {
                     disableGroup = true;
@@ -302,7 +296,7 @@ public class TransactionTableView extends TableView<Transaction> {
                 .forEach(t -> getItems().add(t));
 
 
-        Map<Integer, List<Transaction>> transactionsByGroup = transactions.stream()
+        var transactionsByGroup = transactions.stream()
                 .filter(t -> t.getGroupId() != 0)
                 .collect(Collectors.groupingBy(Transaction::getGroupId));
 
@@ -323,16 +317,16 @@ public class TransactionTableView extends TableView<Transaction> {
         getSelectionModel().clearSelection();
         clear();
 
-        addRecords(getDao().getTransactions().stream().filter(filter::test).collect(Collectors.toList()));
+        addRecords(getDao().getTransactions().stream().filter(filter).collect(Collectors.toList()));
         sort();
     }
 
-    public int getSelectedTransactionCount() {
+    int getSelectedTransactionCount() {
         return getSelectionModel().getSelectedIndices().size();
     }
 
-    public Optional<Transaction> getSelectedTransaction() {
-        Transaction t = getSelectionModel().getSelectedItem();
+    Optional<Transaction> getSelectedTransaction() {
+        var t = getSelectionModel().getSelectedItem();
         if (t instanceof SplitTransaction) {
             return Optional.empty();
         } else {
@@ -343,11 +337,11 @@ public class TransactionTableView extends TableView<Transaction> {
     // Method assumes that all checks are done in onShowingContextMenu method
     private void onGroup() {
         // List of selected transactions
-        List<Transaction> transactions = getSelectionModel().getSelectedItems();
+        var transactions = getSelectionModel().getSelectedItems();
 
-        Transaction first = transactions.get(0);
+        var first = transactions.get(0);
 
-        TransactionGroup tg = new TransactionGroup(0, first.getDay(), first.getMonth(), first.getYear(),
+        var tg = new TransactionGroup(0, first.getDay(), first.getMonth(), first.getYear(),
                 false, UUID.randomUUID().toString(), System.currentTimeMillis());
 
         addGroupConsumer.accept(tg, new ArrayList<>(transactions));
@@ -362,11 +356,11 @@ public class TransactionTableView extends TableView<Transaction> {
         checkTransactionConsumer.accept(t, checked);
     }
 
-    public void setOnAddGroup(BiConsumer<TransactionGroup, List<Transaction>> bc) {
+    void setOnAddGroup(BiConsumer<TransactionGroup, List<Transaction>> bc) {
         addGroupConsumer = bc;
     }
 
-    public void setOnDeleteGroup(Consumer<List<Transaction>> c) {
+    void setOnDeleteGroup(Consumer<List<Transaction>> c) {
         ungroupConsumer = c;
     }
 
@@ -381,21 +375,21 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void onExportTransactions() {
-        List<Transaction> toExport = getSelectionModel().getSelectedItems().stream()
+        var toExport = getSelectionModel().getSelectedItems().stream()
                 .filter(t -> !(t instanceof SplitTransaction))
                 .collect(Collectors.toList());
 
         if (!toExport.isEmpty()) {
-            FileChooser fileChooser = new FileChooser();
+            var fileChooser = new FileChooser();
             fileChooser.setTitle("Export to file");
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("XML Files", "*.xml"),
                     new FileChooser.ExtensionFilter("All Files", "*.*")
             );
-            File selected = fileChooser.showSaveDialog(null);
+            var selected = fileChooser.showSaveDialog(null);
             if (selected != null) {
                 CompletableFuture.runAsync(() -> {
-                    try (OutputStream out = new FileOutputStream(selected)) {
+                    try (var out = new FileOutputStream(selected)) {
                         new Export().withTransactions(toExport, true)
                                 .doExport(out);
                     } catch (IOException ex) {
@@ -407,10 +401,10 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void transactionListener(MapChangeListener.Change<? extends Integer, ? extends Transaction> change) {
-        Transaction added = change.wasAdded() && transactionFilter.test(change.getValueAdded())?
+        var added = change.wasAdded() && transactionFilter.test(change.getValueAdded()) ?
                 change.getValueAdded() : null;
 
-        int index = change.wasRemoved()?
+        int index = change.wasRemoved() ?
                 getItems().indexOf(change.getValueRemoved()) : -1;
 
         if (index != -1) {
@@ -427,7 +421,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         listSizeProperty.set(getItems().size());
 
-        Platform.runLater(() ->{
+        Platform.runLater(() -> {
             sort();
             if (added != null) {
                 getSelectionModel().clearSelection();
@@ -447,11 +441,11 @@ public class TransactionTableView extends TableView<Transaction> {
 
         if (change.wasAdded()) {
             // check if this list has transactions from this group
-            List<Transaction> group = getItems().stream()
+            var group = getItems().stream()
                     .filter(t -> t.getGroupId() == change.getValueAdded().getId() && !(t instanceof SplitTransaction))
                     .collect(Collectors.toList());
             if (!group.isEmpty()) {
-                SplitTransaction split = new SplitTransaction(change.getValueAdded().getId(), group);
+                var split = new SplitTransaction(change.getValueAdded().getId(), group);
                 getItems().add(split);
                 Platform.runLater(this::sort);
             }

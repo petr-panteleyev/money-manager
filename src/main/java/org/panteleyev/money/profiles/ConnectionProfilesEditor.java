@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,7 +73,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
     private Label testStatusLabel = new Label();
 
     private static final Validator<String> INTEGER_VALIDATOR = (Control control, String text) -> {
-        boolean invalid = false;
+        var invalid = false;
         try {
             //noinspection ResultOfMethodCallIgnored
             Integer.parseInt(text);
@@ -88,12 +88,12 @@ public class ConnectionProfilesEditor extends BaseDialog {
 
         setTitle(RB.getString("text.Profiles"));
 
-        ButtonType newButtonType = new ButtonType(RB.getString("button.NewProfile"), ButtonBar.ButtonData.LEFT);
-        ButtonType deleteButtonType = new ButtonType(RB.getString("button.Delete"), ButtonBar.ButtonData.LEFT);
-        ButtonType testButtonType = new ButtonType(RB.getString("button.TestConnection"), ButtonBar.ButtonData.BIG_GAP);
-        ButtonType saveButtonType = new ButtonType(RB.getString("button.Save"), ButtonBar.ButtonData.SMALL_GAP);
+        var newButtonType = new ButtonType(RB.getString("button.NewProfile"), ButtonBar.ButtonData.LEFT);
+        var deleteButtonType = new ButtonType(RB.getString("button.Delete"), ButtonBar.ButtonData.LEFT);
+        var testButtonType = new ButtonType(RB.getString("button.TestConnection"), ButtonBar.ButtonData.BIG_GAP);
+        var saveButtonType = new ButtonType(RB.getString("button.Save"), ButtonBar.ButtonData.SMALL_GAP);
 
-        DialogPane dp = getDialogPane();
+        var dp = getDialogPane();
 
         dp.getButtonTypes().addAll(newButtonType, deleteButtonType, testButtonType, saveButtonType, ButtonType.CLOSE);
 
@@ -102,21 +102,21 @@ public class ConnectionProfilesEditor extends BaseDialog {
             event.consume();
         });
 
-        Button deleteButton = (Button) getDialogPane().lookupButton(deleteButtonType);
+        var deleteButton = (Button) getDialogPane().lookupButton(deleteButtonType);
         deleteButton.disableProperty().bind(profileListView.getSelectionModel().selectedItemProperty().isNull());
         deleteButton.addEventFilter(ActionEvent.ACTION, event -> {
             newDeleteButton();
             event.consume();
         });
 
-        Button saveButton = (Button) getDialogPane().lookupButton(saveButtonType);
+        var saveButton = (Button) getDialogPane().lookupButton(saveButtonType);
         saveButton.disableProperty().bind(profileNameValidation.invalidProperty());
         saveButton.addEventFilter(ActionEvent.ACTION, event -> {
             onSaveButton();
             event.consume();
         });
 
-        Button testButton = (Button) getDialogPane().lookupButton(testButtonType);
+        var testButton = (Button) getDialogPane().lookupButton(testButtonType);
         testButton.disableProperty().bind(validation.invalidProperty());
         testButton.addEventFilter(ActionEvent.ACTION, event -> {
             onTestButton();
@@ -125,7 +125,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
 
         ((Button) getDialogPane().lookupButton(ButtonType.CLOSE)).setText(RB.getString("button.Close"));
 
-        BorderPane root = new BorderPane();
+        var root = new BorderPane();
         root.setLeft(initLeftPane());
         root.setCenter(initCenterPane());
 
@@ -141,11 +141,11 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private ListView<ConnectionProfile> initProfileListView() {
-        ListView<ConnectionProfile> listView = new ListView<>();
+        var listView = new ListView<ConnectionProfile>();
 
         listView.setCellFactory(param -> {
             TextFieldListCell<ConnectionProfile> cell = new TextFieldListCell<>();
-            cell.setConverter(new ReadOnlyStringConverter<ConnectionProfile>() {
+            cell.setConverter(new ReadOnlyStringConverter<>() {
                 @Override
                 public String toString(ConnectionProfile profile) {
                     return profile.getName() != null ? profile.getName() : "";
@@ -180,7 +180,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private void onSaveButton() {
-        ConnectionProfile prof = buildConnectionProfile();
+        var prof = buildConnectionProfile();
         int index = profileListView.getSelectionModel().getSelectedIndex();
 
         profileListView.getItems().set(index, prof);
@@ -202,13 +202,13 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private void onTestButton() {
-        ConnectionProfile profile = buildConnectionProfile();
+        var profile = buildConnectionProfile();
 
-        String TEST_QUERY = "SHOW TABLES FROM " + profile.getSchema();
+        var TEST_QUERY = "SHOW TABLES FROM " + profile.getSchema();
 
-        DataSource ds = profile.build();
+        var ds = profile.build();
 
-        try (Connection conn = ds.getConnection(); Statement st = conn.createStatement()) {
+        try (var conn = ds.getConnection(); var st = conn.createStatement()) {
             st.execute(TEST_QUERY);
             testSuccess();
         } catch (SQLException ex) {
@@ -253,7 +253,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private void onNewButton() {
-        ConnectionProfile profile = new ConnectionProfile("New Profile" + (++counter), "money");
+        var profile = new ConnectionProfile("New Profile" + (++counter), "money");
         profileListView.getItems().add(profile);
         profileListView.getSelectionModel().select(profile);
     }
@@ -272,7 +272,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
         validation.initInitialDecoration();
 
         profileNameValidation.registerValidator(profileNameEdit, (Control control, String value) -> {
-            ConnectionProfile selected = getSelectedProfile().orElse(null);
+            var selected = getSelectedProfile().orElse(null);
 
             return ValidationResult.fromErrorIf(control, null,
                     profileListView.getItems().stream().anyMatch(p -> p != selected && p.getName().equals(value)));
@@ -282,9 +282,9 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private BorderPane initLeftPane() {
-        BorderPane pane = new BorderPane();
+        var pane = new BorderPane();
 
-        TitledPane titled = new TitledPane(RB.getString("text.Profiles"), profileListView);
+        var titled = new TitledPane(RB.getString("text.Profiles"), profileListView);
         titled.setCollapsible(false);
         titled.setMaxHeight(Double.MAX_VALUE);
 
@@ -293,15 +293,15 @@ public class ConnectionProfilesEditor extends BaseDialog {
     }
 
     private BorderPane initCenterPane() {
-        BorderPane pane = new BorderPane();
+        var pane = new BorderPane();
 
-        HBox hBox = new HBox(new Label(RB.getString("label.ProfileName")), profileNameEdit);
+        var hBox = new HBox(new Label(RB.getString("label.ProfileName")), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
         pane.setTop(hBox);
 
         pane.setBottom(testStatusLabel);
 
-        TitledPane titled = new TitledPane(RB.getString("text.Connection"), tcpEditor);
+        var titled = new TitledPane(RB.getString("text.Connection"), tcpEditor);
         titled.setCollapsible(false);
         pane.setCenter(titled);
 

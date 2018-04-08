@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,43 +32,33 @@ import org.panteleyev.money.persistence.Contact;
 import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import org.xml.sax.SAXException;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Import {
     private static final String SCHEMA = "/org/panteleyev/money/xml/money.xsd";
 
-    private final List<Category> categories = new ArrayList<>();
-    private final List<Account> accounts = new ArrayList<>();
-    private final List<Contact> contacts = new ArrayList<>();
-    private final List<Currency> currencies = new ArrayList<>();
-    private final List<TransactionGroup> transactionGroups = new ArrayList<>();
-    private final List<Transaction> transactions = new ArrayList<>();
+    private final List<Category> categories;
+    private final List<Account> accounts;
+    private final List<Contact> contacts;
+    private final List<Currency> currencies;
+    private final List<TransactionGroup> transactionGroups;
+    private final List<Transaction> transactions;
 
     private static Schema moneySchema = null;
 
-    private Import(Export export) {
-        categories.addAll(export.getCategories().stream()
-                .map(CategoryXml::toCategory).collect(Collectors.toList()));
-        accounts.addAll(export.getAccounts().stream()
-                .map(AccountXml::toAccount).collect(Collectors.toList()));
-        contacts.addAll(export.getContacts().stream()
-                .map(ContactXml::toContact).collect(Collectors.toList()));
-        currencies.addAll(export.getCurrencies().stream()
-                .map(CurrencyXml::toCurrency).collect(Collectors.toList()));
-        transactionGroups.addAll(export.getTransactionGroups().stream()
-                .map(TransactionGroupXml::toTransactionGroup).collect(Collectors.toList()));
-        transactions.addAll(export.getTransactions().stream()
-                .map(TransactionXml::toTransaction).collect(Collectors.toList()));
+    private Import(ImportParser importParser) {
+        categories = importParser.getCategories();
+        accounts = importParser.getAccounts();
+        contacts = importParser.getContacts();
+        currencies = importParser.getCurrencies();
+        transactionGroups = importParser.getTransactionGroups();
+        transactions = importParser.getTransactions();
     }
 
     public List<Category> getCategories() {
@@ -98,17 +88,20 @@ public class Import {
     public static Import doImport(InputStream inStream) {
         try {
             if (moneySchema == null) {
-                SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                var factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 moneySchema = factory.newSchema(Import.class.getResource(SCHEMA));
             }
 
-            JAXBContext ctx = JAXBContext.newInstance(Export.class, AccountXml.class);
-            Unmarshaller unmarshaller = ctx.createUnmarshaller();
-            unmarshaller.setSchema(moneySchema);
+            var factory = SAXParserFactory.newInstance();
+            factory.setSchema(moneySchema);
+            factory.setValidating(true);
+            var parser = factory.newSAXParser();
 
-            Export export = (Export) unmarshaller.unmarshal(inStream);
-            return new Import(export);
-        } catch (JAXBException | SAXException ex) {
+            var importParser = new ImportParser();
+            parser.parse(inStream, importParser);
+
+            return new Import(importParser);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }

@@ -1,5 +1,12 @@
 # Change Log
 
+## [18.3.0] - 2018-04-08
+
+- Parser for Raiffeisen Bank account CSV statement
+- Log file moved to .money-manager/logs directory
+- Operation history download from Yandex Money account
+- Java 10
+
 ## [18.2.0] - 2018-02-25
 
 - Parser for Sberbank credit and debit cards statements (HTML)

@@ -210,8 +210,12 @@ public class Transaction implements MoneyRecord {
     }
 
     public String toString() {
-        return "[Transaction id=" + this.getId() + ", amount=" + this.amount + "], accountDebitedId=" + this
-                .accountDebitedId + " accountCreditedId=" + this.accountCreditedId;
+        return "[Transaction id=" + this.getId()
+                + " amount=" + this.amount
+                + " accountDebitedId=" + this.accountDebitedId
+                + " accountCreditedId=" + this.accountCreditedId
+                + " comment=" + this.comment
+                + "]";
     }
 
     @Field(value = "id", primaryKey = true)

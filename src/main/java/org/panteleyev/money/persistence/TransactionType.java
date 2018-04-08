@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ public enum TransactionType {
         if (separator) {
             typeName = "";
         } else {
-            ResourceBundle bundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.res.TransactionType");
+            var bundle = ResourceBundle.getBundle("org.panteleyev.money.persistence.res.TransactionType");
             typeName = bundle.getString("name" + id);
         }
     }

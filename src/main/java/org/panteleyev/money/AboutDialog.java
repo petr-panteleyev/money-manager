@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
-    private static final String COPYRIGHT = "Copyright (c) 2016, 2017, Petr Panteleyev";
+    private static final String COPYRIGHT = "Copyright (c) 2016, 2018, Petr Panteleyev";
     private static final String BUILD_INFO = "org.panteleyev.money.res.buildInfo";
 
     AboutDialog() {
@@ -46,26 +46,26 @@ final class AboutDialog extends BaseDialog {
 
         setTitle(APP_TITLE);
 
-        ImageView icon = new ImageView(Images.APP_ICON);
+        var icon = new ImageView(Images.APP_ICON);
         icon.setFitHeight(48);
         icon.setFitWidth(48);
 
-        ResourceBundle rb = ResourceBundle.getBundle(BUILD_INFO);
+        var rb = ResourceBundle.getBundle(BUILD_INFO);
 
-        GridPane grid = new GridPane();
+        var grid = new GridPane();
         grid.getStyleClass().add(Styles.GRID_PANE);
         grid.addRow(0, new Label("Version:"), new Label(rb.getString("version")));
         grid.addRow(1, new Label("Build:"), new Label(rb.getString("timestamp")));
 
-        Label appLabel = new Label(APP_TITLE);
+        var appLabel = new Label(APP_TITLE);
         appLabel.getStyleClass().add(Styles.ABOUT_APP_TITLE_LABEL);
 
-        Label copyrightLabel = new Label(COPYRIGHT);
+        var copyrightLabel = new Label(COPYRIGHT);
         copyrightLabel.getStyleClass().add(Styles.ABOUT_LABEL);
 
-        VBox vBox = new VBox(10, appLabel, copyrightLabel, grid);
+        var vBox = new VBox(10, appLabel, copyrightLabel, grid);
 
-        BorderPane pane = new BorderPane();
+        var pane = new BorderPane();
         pane.setLeft(icon);
         pane.setCenter(vBox);
 

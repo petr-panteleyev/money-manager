@@ -8,9 +8,10 @@ The following repositories must be cloned to build Money Manager:
 2. git clone https://github.com/petr-panteleyev/java-persistence.git persistence
 3. git clone https://github.com/petr-panteleyev/java-money.git money
 
-Temporary Maven repository
+## Patched Modules
 
-In order to use custom jar files with module-info setup additional Maven repository in settings.xml and make it appear first:
+In order to use custom jar files with module-info setup additional Maven repository in settings.xml and make it appear
+last:
 
 ```
 <repository>

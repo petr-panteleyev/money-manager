@@ -32,8 +32,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -42,8 +40,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
@@ -61,71 +57,60 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static org.panteleyev.money.FXFactory.newMenuBar;
+import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class AccountListWindowController extends BaseController {
-    private BorderPane self = new BorderPane();
-
-    private ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
-    private ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
-    private CheckBox showActiveCheckBox = new CheckBox(RB.getString("account.Window.ShowOnlyActive"));
-    private TableView<Account> accountListTable = new TableView<>();
+    private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
+    private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
+    private final CheckBox showActiveCheckBox = new CheckBox(RB.getString("account.Window.ShowOnlyActive"));
+    private final TableView<Account> accountListTable = new TableView<>();
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Account> accountsListener =
             change -> Platform.runLater(this::reloadAccounts);
 
     AccountListWindowController() {
-        // Event handlers
-        EventHandler<ActionEvent> addHandler = event -> onAddAccount();
-        EventHandler<ActionEvent> editHandler = event -> onEditAccount();
-        EventHandler<ActionEvent> deleteHandler = event -> onDeleteAccount();
+        var disableBinding = accountListTable.getSelectionModel().selectedItemProperty().isNull();
 
-        // Main menu
-        MenuItem closeMenuItem = new MenuItem(RB.getString("menu.File.Close"));
-        closeMenuItem.setOnAction(event -> onClose());
-        Menu fileMenu = new Menu(RB.getString("menu.File"), null, closeMenuItem);
-
-        MenuItem addMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        addMenuItem.setOnAction(addHandler);
-        MenuItem editMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        editMenuItem.setOnAction(editHandler);
-        MenuItem deleteMenuItem = new MenuItem(RB.getString("menu.Edit.Delete"));
-        deleteMenuItem.setOnAction(deleteHandler);
-        Menu editMenu = new Menu(RB.getString("menu.Edit"), null,
-                addMenuItem, editMenuItem, new SeparatorMenuItem(), deleteMenuItem);
-
-        MenuBar menuBar = new MenuBar(fileMenu, editMenu, createHelpMenu(RB));
-        menuBar.setUseSystemMenuBar(true);
+        var menuBar = newMenuBar(
+                new Menu(RB.getString("menu.File"), null,
+                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
+                new Menu(RB.getString("menu.Edit"), null,
+                        newMenuItem(RB, "menu.Edit.Add", event -> onAddAccount()),
+                        newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount(), disableBinding),
+                        new SeparatorMenuItem(),
+                        newMenuItem(RB, "menu.Edit.Delete", event -> onDeleteAccount(), disableBinding)),
+                createHelpMenu(RB));
 
         // Context menu
-        MenuItem ctxAddMenuItem = new MenuItem(RB.getString("menu.Edit.Add"));
-        ctxAddMenuItem.setOnAction(addHandler);
-        MenuItem ctxEditMenuItem = new MenuItem(RB.getString("menu.Edit.Edit"));
-        ctxEditMenuItem.setOnAction(editHandler);
-        MenuItem ctxDeleteMenuItem = new MenuItem(RB.getString("menu.Edit.Delete"));
-        ctxDeleteMenuItem.setOnAction(deleteHandler);
-        accountListTable.setContextMenu(new ContextMenu(ctxAddMenuItem, ctxEditMenuItem, new SeparatorMenuItem(), ctxDeleteMenuItem));
+        accountListTable.setContextMenu(new ContextMenu(
+                newMenuItem(RB, "menu.Edit.Add", event -> onAddAccount()),
+                newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount(), disableBinding),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.Edit.Delete", event -> onDeleteAccount(), disableBinding))
+        );
 
         // Table
-        TableColumn<Account, Integer> idColumn = new TableColumn<>("ID");
-        TableColumn<Account, String> nameColumn = new TableColumn<>(RB.getString("column.Name"));
-        TableColumn<Account, String> typeColumn = new TableColumn<>(RB.getString("column.Type"));
-        TableColumn<Account, String> categoryColumn = new TableColumn<>(RB.getString("column.Category"));
-        TableColumn<Account, String> currencyColumn = new TableColumn<>(RB.getString("column.Currency"));
-        TableColumn<Account, BigDecimal> balanceColumn = new TableColumn<>(RB.getString("column.InitialBalance"));
-        TableColumn<Account, CheckBox> activeColumn = new TableColumn<>("A");
+        var idColumn = new TableColumn<Account, Integer>("ID");
+        var nameColumn = new TableColumn<Account, String>(RB.getString("column.Name"));
+        var typeColumn = new TableColumn<Account, String>(RB.getString("column.Type"));
+        var categoryColumn = new TableColumn<Account, String>(RB.getString("column.Category"));
+        var currencyColumn = new TableColumn<Account, String>(RB.getString("column.Currency"));
+        var balanceColumn = new TableColumn<Account, BigDecimal>(RB.getString("column.InitialBalance"));
+        var activeColumn = new TableColumn<Account, CheckBox>("A");
 
         accountListTable.getColumns().setAll(List.of(
                 idColumn, nameColumn, typeColumn, categoryColumn,
                 currencyColumn, balanceColumn, activeColumn));
 
         // Content
-        BorderPane pane = new BorderPane();
+        var pane = new BorderPane();
 
         // Toolbox
-        HBox hBox = new HBox(typeChoiceBox, categoryChoiceBox, showActiveCheckBox);
+        var hBox = new HBox(typeChoiceBox, categoryChoiceBox, showActiveCheckBox);
         hBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setMargin(categoryChoiceBox, new Insets(0.0, 0.0, 0.0, 5.0));
         HBox.setMargin(showActiveCheckBox, new Insets(0.0, 0.0, 0.0, 10.0));
@@ -134,6 +119,7 @@ class AccountListWindowController extends BaseController {
         pane.setCenter(accountListTable);
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
+        var self = new BorderPane();
         self.setPrefSize(800.0, 400.0);
         self.setTop(menuBar);
         self.setCenter(pane);
@@ -193,11 +179,10 @@ class AccountListWindowController extends BaseController {
         balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, BigDecimal> p) ->
                 new ReadOnlyObjectWrapper<>(p.getValue().getOpeningBalance().setScale(2, RoundingMode.HALF_UP)));
         activeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, CheckBox> p) -> {
-            Account account = p.getValue();
+            var account = p.getValue();
+            var cb = new CheckBox();
 
-            CheckBox cb = new CheckBox();
             cb.setSelected(account.getEnabled());
-
             cb.setOnAction(event -> {
                 boolean enabled = account.getEnabled();
                 getDao().updateAccount(account.enable(!enabled));
@@ -205,15 +190,6 @@ class AccountListWindowController extends BaseController {
 
             return new ReadOnlyObjectWrapper<>(cb);
         });
-
-        editMenuItem.disableProperty()
-                .bind(accountListTable.getSelectionModel().selectedItemProperty().isNull());
-        deleteMenuItem.disableProperty()
-                .bind(accountListTable.getSelectionModel().selectedItemProperty().isNull());
-        ctxEditMenuItem.disableProperty()
-                .bind(accountListTable.getSelectionModel().selectedItemProperty().isNull());
-        ctxDeleteMenuItem.disableProperty()
-                .bind(accountListTable.getSelectionModel().selectedItemProperty().isNull());
 
         reloadAccounts();
 
@@ -229,11 +205,11 @@ class AccountListWindowController extends BaseController {
     private void reloadAccounts() {
         Collection<Account> accounts;
 
-        Object catObject = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        var catObject = categoryChoiceBox.getSelectionModel().getSelectedItem();
         if (catObject instanceof Category) {
             accounts = getDao().getAccountsByCategory(((Category) catObject).getId());
         } else {
-            Object typeObject = typeChoiceBox.getSelectionModel().getSelectedItem();
+            var typeObject = typeChoiceBox.getSelectionModel().getSelectedItem();
             if (typeObject instanceof CategoryType) {
                 accounts = getDao().getAccountsByType((CategoryType) typeObject);
             } else {
@@ -270,12 +246,11 @@ class AccountListWindowController extends BaseController {
 
     private void onAddAccount() {
         new AccountDialog(null, null).showAndWait()
-                .ifPresent(a -> getDao().insertAccount(a.copy(getDao().generatePrimaryKey(Account.class)))
-                );
+                .ifPresent(a -> getDao().insertAccount(a.copy(getDao().generatePrimaryKey(Account.class))));
     }
 
     private Optional<Account> getSelectedAccount() {
-        return Optional.of(accountListTable.getSelectionModel().getSelectedItem());
+        return Optional.ofNullable(accountListTable.getSelectionModel().getSelectedItem());
     }
 
     private void onEditAccount() {
@@ -289,7 +264,7 @@ class AccountListWindowController extends BaseController {
             long count = getDao().getTransactionCount(account);
             if (count != 0L) {
                 new Alert(Alert.AlertType.ERROR,
-                        "Unable to delete account\nwith $count associated transactions",
+                        "Unable to delete account\nwith " + count + " associated transactions",
                         ButtonType.CLOSE).showAndWait();
             } else {
                 new Alert(Alert.AlertType.CONFIRMATION, RB.getString("text.AreYouSure"), ButtonType.OK, ButtonType.CANCEL)

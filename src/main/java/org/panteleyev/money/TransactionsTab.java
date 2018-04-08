@@ -58,10 +58,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class TransactionsTab extends BorderPane {
+    private final static Logger LOGGER = Logger.getLogger(TransactionsTab.class.getName());
 
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
@@ -110,20 +112,9 @@ final class TransactionsTab extends BorderPane {
         setCenter(transactionTable);
         setBottom(transactionEditor);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // Workaround for https://bugs.openjdk.java.net/browse/JDK-8146356
-        TextStyle textStyle = TextStyle.FULL_STANDALONE;
-        String testMonth = Month.JANUARY.getDisplayName(textStyle, Locale.getDefault());
-        if (testMonth.equals("1")) {
-            textStyle = TextStyle.FULL;
-        } else {
-            Logging.getLogger().info("JDK-8146356 has been resolved");
-        }
-
         for (int i = 1; i <= 12; i++) {
             monthFilterBox.getItems()
-                    .add(Month.of(i).getDisplayName(textStyle, Locale.getDefault()));
+                    .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
         }
 
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
@@ -341,7 +332,7 @@ final class TransactionsTab extends BorderPane {
 
     private void onDeleteGroup(List<Transaction> transactions) {
         if (transactions.isEmpty()) {
-            Logging.getLogger().warning("Attempt to delete empty transaction group");
+            LOGGER.warning("Attempt to delete empty transaction group");
             return;
         }
 

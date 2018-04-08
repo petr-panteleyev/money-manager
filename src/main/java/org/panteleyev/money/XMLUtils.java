@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,28 +27,45 @@
 package org.panteleyev.money;
 
 import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
+import java.io.Writer;
+import java.math.BigDecimal;
 
-public class Logging {
-    private Logging() {
+public interface XMLUtils {
+    static void writeXmlHeader(Writer w) throws IOException {
+        w.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
     }
 
-    private static Logger logger = Logger.getLogger("Money Manager");
-
-    public static Logger getLogger() {
-        return logger;
+    static void writeTag(Writer w, String tag, String value) throws IOException {
+        w.write("<" + tag + ">"
+                + (value == null ? "" : value)
+                + "</" + tag + ">");
     }
 
-    static {
-        logger.setUseParentHandlers(false);
-        try {
-            FileHandler fileHandler = new FileHandler("%h/MoneyManager.log", true);
-            fileHandler.setFormatter(new SimpleFormatter());
-            logger.addHandler(fileHandler);
-        } catch (IOException ex) {
-            logger.warning("Unable to initialize log file handler");
-        }
+    static void writeTag(Writer w, String tag, int value) throws IOException {
+        writeTag(w, tag, Integer.toString(value));
+    }
+
+    static void writeTag(Writer w, String tag, long value) throws IOException {
+        writeTag(w, tag, Long.toString(value));
+    }
+
+    static void writeTag(Writer w, String tag, boolean value) throws IOException {
+        writeTag(w, tag, Boolean.toString(value));
+    }
+
+    static void writeTag(Writer w, String tag, BigDecimal value) throws IOException {
+        writeTag(w, tag, value.toString());
+    }
+
+    static void openTag(Writer w, String tag) throws IOException {
+        w.write("<" + tag + ">");
+    }
+
+    static void openTag(Writer w, String tag, int id) throws IOException {
+        w.write("<" + tag + " id=\"" + Integer.toString(id) + "\">");
+    }
+
+    static void closeTag(Writer w, String tag) throws IOException {
+        w.write("</" + tag + ">");
     }
 }

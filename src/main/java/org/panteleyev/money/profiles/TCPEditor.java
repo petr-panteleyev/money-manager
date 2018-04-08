@@ -65,14 +65,14 @@ class TCPEditor extends VBox {
     private final Button sshKeyFileButton = new Button("...");
 
     TCPEditor() {
-        HBox typePane = new HBox(new Label(RB.getString("label.ConnectionMethod")), typeList);
+        var typePane = new HBox(new Label(RB.getString("label.ConnectionMethod")), typeList);
         typePane.setAlignment(Pos.CENTER_LEFT);
 
-        HBox keyFilePane = new HBox(sshKeyFileEdit, sshKeyFileButton);
+        var keyFilePane = new HBox(sshKeyFileEdit, sshKeyFileButton);
 
         HBox.setMargin(typeList, new Insets(0.0, 0.0, 0.0, 5.0));
 
-        GridPane mySqlGrid = new GridPane();
+        var mySqlGrid = new GridPane();
         mySqlGrid.getStyleClass().add(Styles.GRID_PANE);
 
         mySqlGrid.addRow(0, new Label(RB.getString("label.Host")), dataBaseHostEdit,
@@ -84,10 +84,10 @@ class TCPEditor extends VBox {
         mySqlGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
                 newColumnConstraints(Priority.ALWAYS));
 
-        TitledPane mySqlPane = new TitledPane("MySQL", mySqlGrid);
+        var mySqlPane = new TitledPane("MySQL", mySqlGrid);
         mySqlPane.setCollapsible(false);
 
-        GridPane sshGrid = new GridPane();
+        var sshGrid = new GridPane();
         sshGrid.getStyleClass().add(Styles.GRID_PANE);
 
         sshGrid.addRow(0, new Label(RB.getString("label.Host")), sshHostEdit,
@@ -99,7 +99,7 @@ class TCPEditor extends VBox {
         sshGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
                 newColumnConstraints(Priority.ALWAYS));
 
-        TitledPane sshPane = new TitledPane("SSH", sshGrid);
+        var sshPane = new TitledPane("SSH", sshGrid);
         sshPane.setCollapsible(false);
         sshPane.visibleProperty().bind(typeList.getSelectionModel().selectedItemProperty()
                 .isEqualTo(ConnectionType.TCP_OVER_SSH));
@@ -182,7 +182,7 @@ class TCPEditor extends VBox {
     }
 
     private static ComboBox<ConnectionType> initTypeList() {
-        ComboBox<ConnectionType> typeList = new ComboBox<>();
+        var typeList = new ComboBox<ConnectionType>();
         //typeList.setItems(FXCollections.observableArrayList(ConnectionType.values()));
         typeList.setItems(FXCollections.observableArrayList(Collections.singletonList(ConnectionType.TCP_IP)));
         typeList.getSelectionModel().select(0);
@@ -190,13 +190,13 @@ class TCPEditor extends VBox {
     }
 
     private TextField initSchemaEdit() {
-        TextField schemaEdit = new TextField();
+        var schemaEdit = new TextField();
         schemaEdit.setMaxWidth(Double.MAX_VALUE);
         return schemaEdit;
     }
 
     private static ColumnConstraints newColumnConstraints(Priority hGrow) {
-        ColumnConstraints constraints = new ColumnConstraints();
+        var constraints = new ColumnConstraints();
         constraints.setHgrow(hGrow);
         return constraints;
     }

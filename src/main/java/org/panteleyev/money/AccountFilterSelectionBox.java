@@ -27,7 +27,6 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
@@ -51,9 +50,9 @@ public class AccountFilterSelectionBox extends HBox {
     private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
     private final ChoiceBox<Object> accountChoiceBox = new ChoiceBox<>();
 
-    private final SimpleStringProperty allTypesString = new SimpleStringProperty();
-    private final SimpleStringProperty allCategoriesString = new SimpleStringProperty();
-    private final SimpleStringProperty allAccountsString = new SimpleStringProperty();
+    private final static String ALL_TYPES_STRING = RB.getString("account.Window.AllTypes");
+    private final static String ALL_CATEGORIES_STRING = RB.getString("account.Window.AllCategories");
+    private final static String ALL_ACCOUNTS_STRING = RB.getString("text.All.Accounts");
 
     public AccountFilterSelectionBox() {
         super(5.0);
@@ -62,38 +61,24 @@ public class AccountFilterSelectionBox extends HBox {
         getChildren().addAll(new Label(RB.getString("text.In.Semicolon")),
                 categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
 
-        allTypesString.set(RB.getString("account.Window.AllTypes"));
-        allCategoriesString.set(RB.getString("account.Window.AllCategories"));
-        allAccountsString.set(RB.getString("text.All.Accounts"));
-
         categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
-                if (obj instanceof CategoryType) {
-                    return ((CategoryType) obj).getTypeName();
-                } else {
-                    return obj.toString();
-                }
+                return obj instanceof CategoryType ? ((CategoryType) obj).getTypeName() : obj.toString();
             }
         });
 
         categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
+            @Override
             public String toString(Object obj) {
-                if (obj instanceof Category) {
-                    return ((Category) obj).getName();
-                } else {
-                    return obj.toString();
-                }
+                return obj instanceof Category ? ((Category) obj).getName() : obj.toString();
             }
         });
 
         accountChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
+            @Override
             public String toString(Object obj) {
-                if (obj instanceof Account) {
-                    return ((Account) obj).getName();
-                } else {
-                    return obj.toString();
-                }
+                return obj instanceof Account ? ((Account) obj).getName() : obj.toString();
             }
         });
 
@@ -115,56 +100,61 @@ public class AccountFilterSelectionBox extends HBox {
         });
     }
 
-    public void setupCategoryTypesBox() {
-        categoryTypeChoiceBox.getItems().clear();
-        categoryTypeChoiceBox.getItems().add(allTypesString.get());
-        categoryTypeChoiceBox.getItems().add(new Separator());
-        categoryTypeChoiceBox.getItems().addAll(CategoryType.values());
-
-        categoryTypeChoiceBox.getSelectionModel().select(0);
+    void setupCategoryTypesBox() {
+        var items = categoryTypeChoiceBox.getItems();
+        items.setAll(ALL_TYPES_STRING, new Separator());
+        items.addAll(CategoryType.values());
+        categoryTypeChoiceBox.getSelectionModel().selectFirst();
         setupCategoryBox(Optional.empty());
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void setupCategoryBox(Optional<CategoryType> categoryType) {
-        categoryChoiceBox.getItems().clear();
-        categoryChoiceBox.getItems().add(allCategoriesString.get());
+        var items = categoryChoiceBox.getItems();
+        items.setAll(ALL_CATEGORIES_STRING);
 
-        categoryType.ifPresent(type -> getDao().getCategoriesByType(type)
-                .forEach(t -> categoryChoiceBox.getItems().add(t)));
+        categoryType.ifPresent(type -> items.addAll(getDao().getCategoriesByType(type)));
 
-        categoryChoiceBox.getSelectionModel().clearAndSelect(0);
+        if (items.size() > 1) {
+            items.add(1, new Separator());
+        }
+
+        categoryChoiceBox.getSelectionModel().selectFirst();
         setupAccountBox(Optional.empty());
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void setupAccountBox(Optional<Category> category) {
-        accountChoiceBox.getItems().clear();
-        accountChoiceBox.getItems().add(allAccountsString.get());
+        var items = accountChoiceBox.getItems();
+        items.setAll(ALL_ACCOUNTS_STRING);
 
         category.ifPresent(cat -> getDao().getAccountsByCategory(cat.getId()).stream()
                 .filter(Account::getEnabled)
-                .forEach(a -> accountChoiceBox.getItems().add(a)));
+                .forEach(items::add));
 
-        accountChoiceBox.getSelectionModel().clearAndSelect(0);
+        if (items.size() > 1) {
+            items.add(1, new Separator());
+        }
+
+        accountChoiceBox.getSelectionModel().selectFirst();
     }
 
     private Optional<Account> getSelectedAccount() {
-        Object obj = accountChoiceBox.getSelectionModel().getSelectedItem();
+        var obj = accountChoiceBox.getSelectionModel().getSelectedItem();
         return obj instanceof Account ? Optional.of((Account) obj) : Optional.empty();
     }
 
     private Optional<Category> getSelectedCategory() {
-        Object obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
+        var obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
         return obj instanceof Category ? Optional.of((Category) obj) : Optional.empty();
     }
 
     private Optional<CategoryType> getSelectedCategoryType() {
-        Object obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
+        var obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
         return obj instanceof CategoryType ? Optional.of((CategoryType) obj) : Optional.empty();
     }
 
-    public Predicate<Transaction> getTransactionFilter() {
+    Predicate<Transaction> getTransactionFilter() {
         return getSelectedAccount().map(a -> TransactionFilter.byAccount(a.getId()))
                 .orElseGet(() -> getSelectedCategory().map(c -> TransactionFilter.byCategory(c.getId()))
                         .orElseGet(() -> getSelectedCategoryType().map(t -> TransactionFilter.byCategoryType(t.getId()))

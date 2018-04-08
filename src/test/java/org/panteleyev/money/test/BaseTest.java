@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,37 +45,19 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.test.BaseTestUtils.randomDay;
+import static org.panteleyev.money.test.BaseTestUtils.randomId;
+import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.test.BaseTestUtils.randomYear;
 
 public class BaseTest {
-    static final Random RANDOM = new Random(System.currentTimeMillis());
-
-    int randomId() {
-        return RANDOM.nextInt(Integer.MAX_VALUE) + 1;
-    }
-
-    int randomDay() {
-        return 1 + RANDOM.nextInt(31);
-    }
-
-    int randomMonth() {
-        return 1 + RANDOM.nextInt(12);
-    }
-
-    int randomYear() {
-        return 1 + RANDOM.nextInt(3000);
-    }
-
-    BigDecimal randomBigDecimal() {
-        return new BigDecimal(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
-    }
-
     CategoryType randomCategoryType() {
         int id = 1 + RANDOM.nextInt(CategoryType.values().length - 1);
         return CategoryType.get(id);
