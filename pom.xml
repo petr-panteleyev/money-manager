@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>18.3.0</version>
+    <version>18.4.0</version>
     <packaging>jar</packaging>
     <name>MoneyManager</name>
 
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>persistence</artifactId>
-            <version>3.2.1</version>
+            <version>18.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -149,6 +149,8 @@
                                 <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-BjvmOptions=--add-exports javafx.base/com.sun.javafx.event=controlsfx
                                 </argument>
+                                <argument>-BjvmOptions=--add-reads org.panteleyev.persistence=org.panteleyev.money
+                                </argument>
                                 <argument>-BjvmOptions=-Dfile.encoding=UTF-8</argument>
                                 <argument>-native</argument>
                                 <argument>exe</argument>
@@ -187,6 +189,8 @@
                                 <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-BjvmOptions=--add-exports javafx.base/com.sun.javafx.event=controlsfx
                                 </argument>
+                                <argument>-BjvmOptions=--add-reads org.panteleyev.persistence=org.panteleyev.money
+                                </argument>
                                 <argument>-BjvmOptions=-Dfile.encoding=UTF-8</argument>
                                 <argument>-native</argument>
                                 <argument>pkg</argument>
@@ -220,6 +224,8 @@
                                 <argument>-deploy</argument>
                                 <argument>-BjvmOptions=-XX:NewRatio=1</argument>
                                 <argument>-BjvmOptions=--add-exports javafx.base/com.sun.javafx.event=controlsfx
+                                </argument>
+                                <argument>-BjvmOptions=--add-reads org.panteleyev.persistence=org.panteleyev.money
                                 </argument>
                                 <argument>-BjvmOptions=-Dfile.encoding=UTF-8</argument>
                                 <argument>-native</argument>

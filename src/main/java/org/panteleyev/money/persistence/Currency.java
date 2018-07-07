@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.math.BigDecimal;
@@ -35,32 +35,44 @@ import java.util.Objects;
 
 @Table("currency")
 public final class Currency implements MoneyRecord {
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("symbol")
     private final String symbol;
+    @Column("description")
     private final String description;
+    @Column("format_symbol")
     private final String formatSymbol;
+    @Column("format_symbol_position")
     private final int formatSymbolPosition;
+    @Column("show_format_symbol")
     private final boolean showFormatSymbol;
+    @Column("is_default")
     private final boolean def;
+    @Column("rate")
     private final BigDecimal rate;
+    @Column("direction")
     private final int direction;
+    @Column("show_t_separator")
     private final boolean useThousandSeparator;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     @RecordBuilder
-    public Currency(@Field("id") int id,
-                    @Field("symbol") String symbol,
-                    @Field("description") String description,
-                    @Field("format_symbol") String formatSymbol,
-                    @Field("format_symbol_position") int formatSymbolPosition,
-                    @Field("show_format_symbol") boolean showFormatSymbol,
-                    @Field("is_default") boolean def,
-                    @Field("rate") BigDecimal rate,
-                    @Field("direction") int direction,
-                    @Field("show_t_separator") boolean useThousandSeparator,
-                    @Field("guid") String guid,
-                    @Field("modified") long modified) {
+    public Currency(@Column("id") int id,
+                    @Column("symbol") String symbol,
+                    @Column("description") String description,
+                    @Column("format_symbol") String formatSymbol,
+                    @Column("format_symbol_position") int formatSymbolPosition,
+                    @Column("show_format_symbol") boolean showFormatSymbol,
+                    @Column("is_default") boolean def,
+                    @Column("rate") BigDecimal rate,
+                    @Column("direction") int direction,
+                    @Column("show_t_separator") boolean useThousandSeparator,
+                    @Column("guid") String guid,
+                    @Column("modified") long modified) {
         this.id = id;
         this.symbol = symbol;
         this.description = description;
@@ -86,65 +98,52 @@ public final class Currency implements MoneyRecord {
     }
 
     @Override
-    @Field(value = "id", primaryKey = true)
     public int getId() {
         return this.id;
     }
 
-    @Field("symbol")
     public String getSymbol() {
         return this.symbol;
     }
 
-    @Field("description")
     public String getDescription() {
         return this.description;
     }
 
-    @Field("format_symbol")
     public String getFormatSymbol() {
         return this.formatSymbol;
     }
 
-    @Field("format_symbol_position")
     public int getFormatSymbolPosition() {
         return this.formatSymbolPosition;
     }
 
-    @Field("show_format_symbol")
     public boolean getShowFormatSymbol() {
         return this.showFormatSymbol;
     }
 
-    @Field("is_default")
     public boolean getDef() {
         return this.def;
     }
 
-    @Field("rate")
     public BigDecimal getRate() {
         return this.rate;
     }
 
-    @Field("direction")
     public int getDirection() {
         return this.direction;
     }
 
-    @Field("show_t_separator")
     public boolean getUseThousandSeparator() {
         return this.useThousandSeparator;
     }
 
     @Override
-    @Field("guid")
-
     public String getGuid() {
         return this.guid;
     }
 
     @Override
-    @Field("modified")
     public long getModified() {
         return this.modified;
     }

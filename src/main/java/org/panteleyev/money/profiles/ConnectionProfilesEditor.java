@@ -26,6 +26,7 @@
 
 package org.panteleyev.money.profiles;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -36,7 +37,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -51,12 +51,10 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.Styles;
+import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.utilities.fx.BaseDialog;
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -97,31 +95,23 @@ public class ConnectionProfilesEditor extends BaseDialog {
 
         dp.getButtonTypes().addAll(newButtonType, deleteButtonType, testButtonType, saveButtonType, ButtonType.CLOSE);
 
-        dp.lookupButton(newButtonType).addEventFilter(ActionEvent.ACTION, event -> {
-            onNewButton();
-            event.consume();
-        });
+        dp.lookupButton(newButtonType).addEventFilter(ActionEvent.ACTION, this::onNewButton);
 
         var deleteButton = (Button) getDialogPane().lookupButton(deleteButtonType);
         deleteButton.disableProperty().bind(profileListView.getSelectionModel().selectedItemProperty().isNull());
-        deleteButton.addEventFilter(ActionEvent.ACTION, event -> {
-            newDeleteButton();
-            event.consume();
-        });
+        deleteButton.addEventFilter(ActionEvent.ACTION, this::newDeleteButton);
 
         var saveButton = (Button) getDialogPane().lookupButton(saveButtonType);
         saveButton.disableProperty().bind(profileNameValidation.invalidProperty());
-        saveButton.addEventFilter(ActionEvent.ACTION, event -> {
-            onSaveButton();
-            event.consume();
-        });
+        saveButton.addEventFilter(ActionEvent.ACTION, this::onSaveButton);
+
+        var initButton = tcpEditor.getCreateSchemaButton();
+        initButton.disableProperty().bind(validation.invalidProperty());
+        initButton.addEventFilter(ActionEvent.ACTION, this::onInitButton);
 
         var testButton = (Button) getDialogPane().lookupButton(testButtonType);
         testButton.disableProperty().bind(validation.invalidProperty());
-        testButton.addEventFilter(ActionEvent.ACTION, event -> {
-            onTestButton();
-            event.consume();
-        });
+        testButton.addEventFilter(ActionEvent.ACTION, this::onTestButton);
 
         ((Button) getDialogPane().lookupButton(ButtonType.CLOSE)).setText(RB.getString("button.Close"));
 
@@ -167,7 +157,8 @@ public class ConnectionProfilesEditor extends BaseDialog {
         return listView;
     }
 
-    private void newDeleteButton() {
+    private void newDeleteButton(ActionEvent event) {
+        event.consume();
         getSelectedProfile().ifPresent(selected ->
                 new Alert(Alert.AlertType.CONFIRMATION, RB.getString("text.AreYouSure"), ButtonType.OK, ButtonType.CANCEL)
                         .showAndWait()
@@ -179,7 +170,9 @@ public class ConnectionProfilesEditor extends BaseDialog {
                         }));
     }
 
-    private void onSaveButton() {
+    private void onSaveButton(ActionEvent event) {
+        event.consume();
+
         var prof = buildConnectionProfile();
         int index = profileListView.getSelectionModel().getSelectedIndex();
 
@@ -201,7 +194,28 @@ public class ConnectionProfilesEditor extends BaseDialog {
         );
     }
 
-    private void onTestButton() {
+    private void onInitButton(ActionEvent event) {
+        event.consume();
+
+        new Alert(Alert.AlertType.CONFIRMATION, RB.getString("text.AreYouSure"), ButtonType.OK, ButtonType.CANCEL)
+                .showAndWait()
+                .filter(response -> response == ButtonType.OK)
+                .ifPresent(b -> {
+                    var profile = buildConnectionProfile();
+                    var ds = (MysqlDataSource) profile.build();
+
+                    Exception ex = MoneyDAO.initDatabase(ds, profile.getSchema());
+                    if (ex != null) {
+                        testFail(ex.getMessage());
+                    } else {
+                        testSuccess();
+                    }
+                });
+    }
+
+    private void onTestButton(ActionEvent event) {
+        event.consume();
+
         var profile = buildConnectionProfile();
 
         var TEST_QUERY = "SHOW TABLES FROM " + profile.getSchema();
@@ -252,7 +266,9 @@ public class ConnectionProfilesEditor extends BaseDialog {
         }
     }
 
-    private void onNewButton() {
+    private void onNewButton(ActionEvent event) {
+        event.consume();
+
         var profile = new ConnectionProfile("New Profile" + (++counter), "money");
         profileListView.getItems().add(profile);
         profileListView.getSelectionModel().select(profile);

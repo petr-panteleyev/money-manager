@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,31 +26,38 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
 
 @Table("category")
 public final class Category implements MoneyRecord, Named {
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("name")
     private final String name;
+    @Column("comment")
     private final String comment;
+    @Column("type_id")
     private final int catTypeId;
+    @Column("expanded")
     private final boolean expanded;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     private final CategoryType type;
 
     @RecordBuilder
-    public Category(@Field("id") int id,
-                    @Field("name") String name,
-                    @Field("comment") String comment,
-                    @Field("type_id") int catTypeId,
-                    @Field("expanded") boolean expanded,
-                    @Field("guid") String guid,
-                    @Field("modified") long modified) {
+    public Category(@Column("id") int id,
+                    @Column("name") String name,
+                    @Column("comment") String comment,
+                    @Column("type_id") int catTypeId,
+                    @Column("expanded") boolean expanded,
+                    @Column("guid") String guid,
+                    @Column("modified") long modified) {
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -66,11 +73,11 @@ public final class Category implements MoneyRecord, Named {
         return new Category(id, newName, newComment, newCatTypeId, expanded, guid, System.currentTimeMillis());
     }
 
-    public final CategoryType getType() {
+    public CategoryType getType() {
         return type;
     }
 
-    public final Category expand(boolean exp) {
+    public Category expand(boolean exp) {
         return new Category(id, name, comment, catTypeId, exp, guid, modified);
     }
 
@@ -79,40 +86,33 @@ public final class Category implements MoneyRecord, Named {
     }
 
     @Override
-    @Field(value = "id", primaryKey = true)
     public int getId() {
         return id;
     }
 
     @Override
-    @Field("name")
     public String getName() {
         return name;
     }
 
-    @Field("comment")
-    public final String getComment() {
+    public String getComment() {
         return comment;
     }
 
-    @Field("type_id")
-    public final int getCatTypeId() {
+    public int getCatTypeId() {
         return catTypeId;
     }
 
-    @Field("expanded")
-    public final boolean getExpanded() {
+    public boolean getExpanded() {
         return expanded;
     }
 
     @Override
-    @Field("guid")
     public String getGuid() {
         return guid;
     }
 
     @Override
-    @Field("modified")
     public long getModified() {
         return modified;
     }

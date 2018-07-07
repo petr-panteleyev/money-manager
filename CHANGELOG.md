@@ -1,5 +1,10 @@
 # Change Log
 
+## [18.4.0] - 2018-07-07
+
+- Performance optimizations
+- Ability to create database schema from UI
+
 ## [18.3.0] - 2018-04-08
 
 - Parser for Raiffeisen Bank account CSV statement

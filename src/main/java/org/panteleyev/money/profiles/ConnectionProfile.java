@@ -168,4 +168,18 @@ public class ConnectionProfile {
         return Objects.hash(name, type, dataBaseHost, dataBasePort, dataBaseUser, dataBasePassword, schema,
                 remoteHost, remotePort);
     }
+
+    @Override
+    public String toString() {
+        return super.toString()
+                + " name=" + name
+                + " type=" + type
+                + " dataBaseHost=" + dataBaseHost
+                + " dataBasePort=" + dataBasePort
+                + " dataBaseUser=" + dataBaseUser
+                + " dataBasePassword=" + dataBasePassword
+                + " schema=" + schema
+                + " remoteHost=" + remoteHost
+                + " remotePort=" + remotePort;
+    }
 }

@@ -56,6 +56,12 @@
             <class name="org.panteleyev.money.test.TestXsdNegative"/>
         </classes>
     </test>
+    <test name="Profiles">
+        <classes>
+            <class name="org.panteleyev.money.test.profiles.TestConnectionProfile"/>
+            <class name="org.panteleyev.money.test.profiles.TestConnectionProfileManager"/>
+        </classes>
+    </test>
     <test name="Misc">
         <classes>
             <class name="org.panteleyev.money.test.TestEditorPane"/>

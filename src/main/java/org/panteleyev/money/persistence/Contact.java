@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
@@ -34,38 +34,52 @@ import java.util.UUID;
 
 @Table("contact")
 public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("name")
     private final String name;
+    @Column("type_id")
     private final int typeId;
+    @Column("phone")
     private final String phone;
+    @Column("mobile")
     private final String mobile;
+    @Column("email")
     private final String email;
+    @Column("web")
     private final String web;
+    @Column("comment")
     private final String comment;
+    @Column("street")
     private final String street;
+    @Column("city")
     private final String city;
+    @Column("country")
     private final String country;
+    @Column("zip")
     private final String zip;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     private final ContactType type;
 
     @RecordBuilder
-    public Contact(@Field("id") int id,
-                   @Field("name") String name,
-                   @Field("type_id") int typeId,
-                   @Field("phone") String phone,
-                   @Field("mobile") String mobile,
-                   @Field("email") String email,
-                   @Field("web") String web,
-                   @Field("comment") String comment,
-                   @Field("street") String street,
-                   @Field("city") String city,
-                   @Field("country") String country,
-                   @Field("zip") String zip,
-                   @Field("guid") String guid,
-                   @Field("modified") long modified) {
+    public Contact(@Column("id") int id,
+                   @Column("name") String name,
+                   @Column("type_id") int typeId,
+                   @Column("phone") String phone,
+                   @Column("mobile") String mobile,
+                   @Column("email") String email,
+                   @Column("web") String web,
+                   @Column("comment") String comment,
+                   @Column("street") String street,
+                   @Column("city") String city,
+                   @Column("country") String country,
+                   @Column("zip") String zip,
+                   @Column("guid") String guid,
+                   @Column("modified") long modified) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
@@ -104,75 +118,61 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
     }
 
     @Override
-    @Field(value = "id", primaryKey = true)
     public int getId() {
         return id;
     }
 
     @Override
-    @Field("name")
     public String getName() {
         return name;
     }
 
-    @Field("type_id")
     public int getTypeId() {
         return typeId;
     }
 
-    @Field("phone")
     public String getPhone() {
         return phone;
     }
 
-    @Field("mobile")
     public String getMobile() {
         return mobile;
     }
 
-    @Field("email")
     public String getEmail() {
         return email;
     }
 
-    @Field("web")
     public String getWeb() {
         return web;
     }
 
-    @Field("comment")
     public String getComment() {
         return comment;
     }
 
-    @Field("street")
     public String getStreet() {
         return street;
     }
 
-    @Field("city")
     public String getCity() {
         return city;
     }
 
-    @Field("country")
     public String getCountry() {
         return country;
     }
 
-    @Field("zip")
     public String getZip() {
         return zip;
     }
 
     @Override
-    @Field("guid")
     public String getGuid() {
         return guid;
     }
 
     @Override
-    @Field("modified")
     public long getModified() {
         return modified;
     }

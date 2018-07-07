@@ -27,7 +27,8 @@
 package org.panteleyev.money.profiles;
 
 import org.panteleyev.money.Options;
-import javax.xml.parsers.SAXParser;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,17 +36,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.UncheckedIOException;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.panteleyev.money.XMLUtils.closeTag;
-import static org.panteleyev.money.XMLUtils.openTag;
-import static org.panteleyev.money.XMLUtils.writeTag;
-import static org.panteleyev.money.XMLUtils.writeXmlHeader;
+import static org.panteleyev.money.XMLUtils.appendElement;
+import static org.panteleyev.money.XMLUtils.appendTextNode;
+import static org.panteleyev.money.XMLUtils.createDocument;
+import static org.panteleyev.money.XMLUtils.writeDocument;
 
 public final class ConnectionProfileManager {
     private static final String PROFILES_FILE = "profiles.xml";
@@ -76,26 +75,22 @@ public final class ConnectionProfileManager {
         profList.forEach(p -> profiles.put(p.getName(), p));
     }
 
-    public static void saveProfiles(OutputStream out) throws IOException {
-        try (var w = new PrintWriter(out)) {
-            writeXmlHeader(w);
+    public static void saveProfiles(OutputStream out) {
+        var rootElement = createDocument("MoneyManager");
+        var doc = rootElement.getOwnerDocument();
 
-            openTag(w, "MoneyManager");
-            writeTag(w, "autoConnect", autoConnect);
-            writeTag(w, "defaultProfileName", defaultProfile == null ? "" : defaultProfile.getName());
+        appendTextNode(rootElement, "autoConnect", autoConnect);
+        appendTextNode(rootElement, "defaultProfileName", defaultProfile == null ? "" : defaultProfile.getName());
 
-            openTag(w, "profiles");
-
-            for (var profile : profiles.values()) {
-                exportProfile(w, profile);
-            }
-
-            closeTag(w, "profiles");
-            closeTag(w, "MoneyManager");
+        var profileRoot = appendElement(rootElement, "profiles");
+        for (var profile : profiles.values()) {
+            profileRoot.appendChild(exportProfile(doc, profile));
         }
+
+        writeDocument(doc, out);
     }
 
-    public static void saveProfiles() {
+    static void saveProfiles() {
         var file = new File(Options.getSettingsDirectory(), PROFILES_FILE);
         try (var out = new FileOutputStream(file)) {
             saveProfiles(out);
@@ -147,7 +142,7 @@ public final class ConnectionProfileManager {
         return profiles.size();
     }
 
-    public static void deleteProfile(ConnectionProfile profile) {
+    static void deleteProfile(ConnectionProfile profile) {
         profiles.remove(profile.getName());
         if (defaultProfile == profile) {
             defaultProfile = null;
@@ -158,19 +153,19 @@ public final class ConnectionProfileManager {
     private ConnectionProfileManager() {
     }
 
-    private static void exportProfile(Writer w, ConnectionProfile profile) throws IOException {
-        openTag(w, "profile");
+    private static Element exportProfile(Document doc, ConnectionProfile profile) {
+        var e = doc.createElement("profile");
 
-        writeTag(w, "name", profile.getName());
-        writeTag(w, "type", profile.getType().name());
-        writeTag(w, "dataBaseHost", profile.getDataBaseHost());
-        writeTag(w, "dataBasePort", Integer.toString(profile.getDataBasePort()));
-        writeTag(w, "dataBaseUser", profile.getDataBaseUser());
-        writeTag(w, "dataBasePassword", profile.getDataBasePassword());
-        writeTag(w, "schema", profile.getSchema());
-        writeTag(w, "remoteHost", profile.getRemoteHost());
-        writeTag(w, "remotePort", profile.getRemotePort());
+        appendTextNode(e, "name", profile.getName());
+        appendTextNode(e, "type", profile.getType().name());
+        appendTextNode(e, "dataBaseHost", profile.getDataBaseHost());
+        appendTextNode(e, "dataBasePort", Integer.toString(profile.getDataBasePort()));
+        appendTextNode(e, "dataBaseUser", profile.getDataBaseUser());
+        appendTextNode(e, "dataBasePassword", profile.getDataBasePassword());
+        appendTextNode(e, "schema", profile.getSchema());
+        appendTextNode(e, "remoteHost", profile.getRemoteHost());
+        appendTextNode(e, "remotePort", profile.getRemotePort());
 
-        closeTag(w, "profile");
+        return e;
     }
 }

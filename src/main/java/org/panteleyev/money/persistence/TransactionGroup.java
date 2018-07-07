@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,36 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
 
 @Table("transaction_group")
 public final class TransactionGroup implements MoneyRecord {
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("date_day")
     private final int day;
+    @Column("date_month")
     private final int month;
+    @Column("date_year")
     private final int year;
+    @Column("expanded")
     private final boolean expanded;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     @RecordBuilder
-    public TransactionGroup(@Field("id") int id,
-                            @Field("date_day") int day,
-                            @Field("date_month") int month,
-                            @Field("date_year") int year,
-                            @Field("expanded") boolean expanded,
-                            @Field("guid") String guid,
-                            @Field("modified") long modified) {
+    public TransactionGroup(@Column("id") int id,
+                            @Column("date_day") int day,
+                            @Column("date_month") int month,
+                            @Column("date_year") int year,
+                            @Column("expanded") boolean expanded,
+                            @Column("guid") String guid,
+                            @Column("modified") long modified) {
         this.id = id;
         this.day = day;
         this.month = month;
@@ -62,37 +69,30 @@ public final class TransactionGroup implements MoneyRecord {
         return new TransactionGroup(newId, day, month, year, expanded, guid, modified);
     }
 
-    @Field(value = "id", primaryKey = true)
     public int getId() {
         return this.id;
     }
 
-    @Field("date_day")
-    public final int getDay() {
+    public int getDay() {
         return this.day;
     }
 
-    @Field("date_month")
-    public final int getMonth() {
+    public int getMonth() {
         return this.month;
     }
 
-    @Field("date_year")
-    public final int getYear() {
+    public int getYear() {
         return this.year;
     }
 
-    @Field("expanded")
-    public final boolean getExpanded() {
+    public boolean getExpanded() {
         return this.expanded;
     }
 
-    @Field("guid")
     public String getGuid() {
         return this.guid;
     }
 
-    @Field("modified")
     public long getModified() {
         return this.modified;
     }

@@ -54,6 +54,7 @@ import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -71,7 +72,7 @@ class AccountTree extends BorderPane {
 
     private final CheckMenuItem showDeactivatedAccountsMenuItem = new CheckMenuItem("Show deactivated accounts");
 
-    private final TreeItem<AccountTreeItem> root = new TreeItem<>();
+    private final TreeItem<AccountTreeItem> root = new TreeItem<>(new AccountTreeItem("root", "root"));
     private TreeItem<AccountTreeItem> balanceRoot;
     private TreeItem<AccountTreeItem> expIncRoot;
 
@@ -94,9 +95,12 @@ class AccountTree extends BorderPane {
     private Consumer<Predicate<Transaction>> transactionFilterConsumer = x -> {
     };
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Account> accountListener =
-            change -> Platform.runLater(this::initAccountTree);
+            (MapChangeListener.Change<? extends Integer, ? extends Account> change) ->
+                    Platform.runLater(() -> handleAccountMapChange(change));
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Transaction> transactionListener =
             change -> Platform.runLater(tableView::refresh);
 
@@ -150,7 +154,7 @@ class AccountTree extends BorderPane {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        initAccountFilterBox(RB);
+        initAccountFilterBox();
 
         balanceRoot = new TreeItem<>(new AccountTreeItem(RB.getString("account.Tree.Balance"), ""));
         expIncRoot = new TreeItem<>(new AccountTreeItem(RB.getString("account.Tree.IncomesExpenses"), "Income - Expenses"));
@@ -208,12 +212,12 @@ class AccountTree extends BorderPane {
         expenseSubTree.getChildren().clear();
     }
 
-    private void initAccountFilterBox(ResourceBundle rb) {
+    private void initAccountFilterBox() {
         accountFilterBox.getItems().setAll(
-                rb.getString("text.All.Accounts"),
+                RB.getString("text.All.Accounts"),
                 new Separator(),
-                rb.getString("account.Tree.Balance"),
-                rb.getString("account.Tree.IncomesExpenses"),
+                RB.getString("account.Tree.Balance"),
+                RB.getString("account.Tree.IncomesExpenses"),
                 new Separator()
         );
 
@@ -263,7 +267,7 @@ class AccountTree extends BorderPane {
                 .filter(a -> a.getEnabled() || (!a.getEnabled() && Options.getShowDeactivatedAccounts()))
                 .sorted(new Account.AccountCategoryNameComparator())
                 .forEach(it -> {
-                    if (categoryTreeItem == null || it.getCategoryId() != categoryTreeItem.getValue().getId()) {
+                    if (categoryTreeItem == null || it.getCategoryId() != categoryTreeItem.getValue().getCategoryId()) {
                         getDao().getCategory(it.getCategoryId()).ifPresent(category -> {
                             categoryTreeItem = new TreeItem<>(new AccountTreeItem(category));
                             categoryTreeItem.setExpanded(category.getExpanded());
@@ -366,5 +370,67 @@ class AccountTree extends BorderPane {
                     ct.putString(name);
                     cb.setContent(ct);
                 });
+    }
+
+    private TreeItem<AccountTreeItem> findAccountTreeItem(TreeItem<AccountTreeItem> node, int accountId) {
+        if (node.getValue().getAccountId() == accountId) {
+            return node;
+        }
+
+        for (var child : node.getChildren()) {
+            var found = findAccountTreeItem(child, accountId);
+            if (found != null) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    private TreeItem<AccountTreeItem> findCategoryTreeItem(TreeItem<AccountTreeItem> node, int categoryId) {
+        if (node.getValue().getCategoryId() == categoryId) {
+            return node;
+        }
+
+        for (var child : node.getChildren()) {
+            var found = findCategoryTreeItem(child, categoryId);
+            if (found != null) {
+                return found;
+            }
+        }
+
+        return null;
+    }
+
+    // Must be executed in UI thread
+    private void handleAccountMapChange(MapChangeListener.Change<? extends Integer, ? extends Account> change) {
+        var removedAccount = change.getValueRemoved();
+        var addedAccount = change.getValueAdded();
+        if (removedAccount == null && addedAccount == null) {
+            return;
+        }
+
+        if (removedAccount == null) {
+            // Add account
+            var categoryNode = findCategoryTreeItem(root, addedAccount.getCategoryId());
+            if (categoryNode == null) {
+                throw new IllegalStateException("Cannot find node for category id: " + addedAccount.getCategoryId());
+            }
+
+            categoryNode.getChildren().add(new TreeItem<>(new AccountTreeItem(addedAccount)));
+        } else {
+            var node = findAccountTreeItem(root, change.getKey());
+            if (node == null) {
+                throw new IllegalStateException("Cannot find node for changed account id: " + change.getKey());
+            }
+
+            if (addedAccount == null) {
+                // Remove account
+                node.getParent().getChildren().remove(node);
+            } else {
+                // Update account
+                node.setValue(new AccountTreeItem(addedAccount));
+            }
+        }
     }
 }

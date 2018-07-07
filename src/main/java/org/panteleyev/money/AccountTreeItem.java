@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,15 +33,18 @@ import javafx.beans.property.SimpleStringProperty;
 import org.panteleyev.money.persistence.Account;
 import org.panteleyev.money.persistence.Category;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class AccountTreeItem {
     private final ReadOnlyObjectProperty<Account> accountProperty;
     private final ReadOnlyObjectProperty<Category> categoryProperty;
     private final ReadOnlyStringProperty nameProperty;
     private final ReadOnlyStringProperty commentProperty;
-    private final int id;
+    private final int accountId;
+    private final int categoryId;
 
     AccountTreeItem(String name, String comment) {
-        id = 0;
+        accountId = 0;
+        categoryId = 0;
         nameProperty = new SimpleStringProperty(this, "name", name);
         commentProperty = new SimpleStringProperty(this, "comment", comment);
         accountProperty = new SimpleObjectProperty<>(this, "account", null);
@@ -49,7 +52,8 @@ public class AccountTreeItem {
     }
 
     AccountTreeItem(Account account) {
-        id = account.getId();
+        accountId = account.getId();
+        categoryId = 0;
         nameProperty = new SimpleStringProperty(this, "name", account.getName());
         commentProperty = new SimpleStringProperty(this, "comment", account.getComment());
         accountProperty = new SimpleObjectProperty<>(this, "account", account);
@@ -57,15 +61,20 @@ public class AccountTreeItem {
     }
 
     AccountTreeItem(Category category) {
-        id = category.getId();
+        accountId = 0;
+        categoryId = category.getId();
         nameProperty = new SimpleStringProperty(this, "name", category.getName());
         commentProperty = new SimpleStringProperty(this, "comment", category.getComment());
         accountProperty = new SimpleObjectProperty<>(this, "account", null);
         categoryProperty = new SimpleObjectProperty<>(this, "category", category);
     }
 
-    int getId() {
-        return id;
+    int getAccountId() {
+        return accountId;
+    }
+
+    int getCategoryId() {
+        return categoryId;
     }
 
     public ReadOnlyStringProperty nameProperty() {

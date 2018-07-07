@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,11 +35,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import org.panteleyev.money.Images;
 import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.Styles;
 import java.util.Collections;
@@ -54,6 +56,7 @@ class TCPEditor extends VBox {
     private final TextField dataBasePortEdit = new TextField();
     private final TextField dataBaseUserEdit = new TextField();
     private final PasswordField dataBasePasswordEdit = new PasswordField();
+    private final Button createSchemaButton = new Button(RB.getString("button.Init"));
 
     // SSH parameters
     private final TextField sshHostEdit = new TextField();
@@ -80,6 +83,9 @@ class TCPEditor extends VBox {
         mySqlGrid.addRow(1, new Label(RB.getString("label.User")), dataBaseUserEdit);
         mySqlGrid.addRow(2, new Label(RB.getString("label.Password")), dataBasePasswordEdit);
         mySqlGrid.addRow(3, new Label(RB.getString("label.Schema")), schemaEdit);
+        mySqlGrid.add(createSchemaButton, 3, 3);
+
+        createSchemaButton.setGraphic(new ImageView(Images.WARNING));
 
         mySqlGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
                 newColumnConstraints(Priority.ALWAYS));
@@ -111,10 +117,14 @@ class TCPEditor extends VBox {
 
         GridPane.setColumnSpan(dataBaseUserEdit, 3);
         GridPane.setColumnSpan(dataBasePasswordEdit, 3);
-        GridPane.setColumnSpan(schemaEdit, 3);
+        GridPane.setColumnSpan(schemaEdit, 2);
         GridPane.setColumnSpan(sshUserEdit, 3);
         GridPane.setColumnSpan(sshPasswordEdit, 3);
         GridPane.setColumnSpan(keyFilePane, 3);
+    }
+
+    Button getCreateSchemaButton() {
+        return createSchemaButton;
     }
 
     TextField getSchemaEdit() {

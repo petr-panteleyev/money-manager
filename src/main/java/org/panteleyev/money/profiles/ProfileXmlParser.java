@@ -102,6 +102,9 @@ class ProfileXmlParser extends DefaultHandler {
     public void characters(char[] ch, int start, int length) throws SAXException {
         super.characters(ch, start, length);
         value = new String(ch, start, length);
+        if (value.trim().isEmpty()) {
+            value = "";
+        }
     }
 
     private static ConnectionProfile parseProfile(Map<String, String> tags) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.ReferenceOption;
@@ -40,34 +40,47 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 @Table("account")
 public final class Account implements MoneyRecord, Named, Comparable<Account> {
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("name")
     private final String name;
+    @Column("comment")
     private final String comment;
+    @Column("opening")
     private final BigDecimal openingBalance;
+    @Column("acc_limit")
     private final BigDecimal accountLimit;
+    @Column("currency_rate")
     private final BigDecimal currencyRate;
+    @Column(value = "type_id", nullable = false)
     private final int typeId;
+    @Column("category_id")
+    @ForeignKey(table = Category.class, onDelete = ReferenceOption.CASCADE)
     private final int categoryId;
+    @Column("currency_id")
     private final int currencyId;
+    @Column("enabled")
     private final boolean enabled;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     private final CategoryType type;
 
     @RecordBuilder
-    public Account(@Field("id") int id,
-                   @Field("name") String name,
-                   @Field("comment") String comment,
-                   @Field("opening") BigDecimal openingBalance,
-                   @Field("acc_limit") BigDecimal accountLimit,
-                   @Field("currency_rate") BigDecimal currencyRate,
-                   @Field("type_id") int typeId,
-                   @Field("category_id") int categoryId,
-                   @Field("currency_id") int currencyId,
-                   @Field("enabled") boolean enabled,
-                   @Field("guid") String guid,
-                   @Field("modified") long modified) {
+    public Account(@Column("id") int id,
+                   @Column("name") String name,
+                   @Column("comment") String comment,
+                   @Column("opening") BigDecimal openingBalance,
+                   @Column("acc_limit") BigDecimal accountLimit,
+                   @Column("currency_rate") BigDecimal currencyRate,
+                   @Column("type_id") int typeId,
+                   @Column("category_id") int categoryId,
+                   @Column("currency_id") int currencyId,
+                   @Column("enabled") boolean enabled,
+                   @Column("guid") String guid,
+                   @Column("modified") long modified) {
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -109,66 +122,53 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     }
 
     @Override
-    @Field(value = "id", primaryKey = true)
     public int getId() {
         return id;
     }
 
     @Override
-    @Field("name")
     public String getName() {
         return name;
     }
 
-    @Field("comment")
     public String getComment() {
         return comment;
     }
 
-    @Field("opening")
     public BigDecimal getOpeningBalance() {
         return openingBalance;
     }
 
-    @Field("acc_limit")
     public BigDecimal getAccountLimit() {
         return accountLimit;
     }
 
-    @Field("currency_rate")
     public BigDecimal getCurrencyRate() {
         return currencyRate;
     }
 
-    @Field(value = "type_id", nullable = false)
     public int getTypeId() {
         return typeId;
     }
 
-    @Field("category_id")
-    @ForeignKey(table = Category.class, onDelete = ReferenceOption.CASCADE)
     public int getCategoryId() {
         return categoryId;
     }
 
-    @Field("currency_id")
     public int getCurrencyId() {
         return currencyId;
     }
 
-    @Field("enabled")
     public boolean getEnabled() {
         return enabled;
     }
 
     @Override
-    @Field("guid")
     public String getGuid() {
         return guid;
     }
 
     @Override
-    @Field("modified")
     public long getModified() {
         return modified;
     }

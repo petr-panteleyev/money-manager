@@ -33,20 +33,18 @@ import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.RecordSource;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
-import java.io.IOException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.UncheckedIOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.XMLUtils.closeTag;
-import static org.panteleyev.money.XMLUtils.openTag;
-import static org.panteleyev.money.XMLUtils.writeTag;
-import static org.panteleyev.money.XMLUtils.writeXmlHeader;
+import static org.panteleyev.money.XMLUtils.appendElement;
+import static org.panteleyev.money.XMLUtils.appendTextNode;
+import static org.panteleyev.money.XMLUtils.createDocument;
+import static org.panteleyev.money.XMLUtils.writeDocument;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class Export {
@@ -148,168 +146,158 @@ public class Export {
     }
 
     public void doExport(OutputStream out) {
-        try (var w = new PrintWriter(out)) {
-            writeXmlHeader(w);
+        try {
+            var rootElement = createDocument("Money");
+            var doc = rootElement.getOwnerDocument();
 
-            openTag(w, "Money");
-
-            openTag(w, "Accounts");
+            var accountRoot = appendElement(rootElement, "Accounts");
             for (var account : accounts) {
-                exportAccount(w, account);
+                accountRoot.appendChild(exportAccount(doc, account));
             }
-            closeTag(w, "Accounts");
-            w.flush();
 
-            openTag(w, "Categories");
+            var categoryRoot = appendElement(rootElement, "Categories");
             for (var category : categories) {
-                exportCategory(w, category);
+                categoryRoot.appendChild(exportCategory(doc, category));
             }
-            closeTag(w, "Categories");
-            w.flush();
 
-            openTag(w, "Contacts");
+            var contactRoot = appendElement(rootElement, "Contacts");
             for (var contact : contacts) {
-                exportContact(w, contact);
+                contactRoot.appendChild(exportContact(doc, contact));
             }
-            closeTag(w, "Contacts");
-            w.flush();
 
-            openTag(w, "Currencies");
+            var currencyRoot = appendElement(rootElement, "Currencies");
             for (var currency : currencies) {
-                exportCurrency(w, currency);
+                currencyRoot.appendChild(exportCurrency(doc, currency));
             }
-            closeTag(w, "Currencies");
-            w.flush();
 
-            openTag(w, "TransactionGroups");
+            var transactionGroupRoot = appendElement(rootElement, "TransactionGroups");
             for (var transactionGroup : transactionGroups) {
-                exportTransactionGroup(w, transactionGroup);
+                transactionGroupRoot.appendChild(exportTransactionGroup(doc, transactionGroup));
             }
-            closeTag(w, "TransactionGroups");
-            w.flush();
 
-            openTag(w, "Transactions");
+            var transactionRoot = appendElement(rootElement, "Transactions");
             for (var transaction : transactions) {
-                exportTransaction(w, transaction);
+                transactionRoot.appendChild(exportTransaction(doc, transaction));
             }
-            closeTag(w, "Transactions");
-            w.flush();
 
-            closeTag(w, "Money");
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+            writeDocument(doc, out);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    private void exportCategory(Writer w, Category category) throws IOException {
-        openTag(w, "Category", category.getId());
+    private static Element exportCategory(Document doc, Category category) {
+        var e = doc.createElement("Category");
+        e.setAttribute("id", Integer.toString(category.getId()));
 
-        writeTag(w, "name", category.getName());
-        writeTag(w, "comment", category.getComment());
-        writeTag(w, "catTypeId", category.getCatTypeId());
-        writeTag(w, "expanded", category.getExpanded());
-        writeTag(w, "guid", category.getGuid());
-        writeTag(w, "modified", category.getModified());
+        appendTextNode(e, "name", category.getName());
+        appendTextNode(e, "comment", category.getComment());
+        appendTextNode(e, "catTypeId", category.getCatTypeId());
+        appendTextNode(e, "expanded", category.getExpanded());
+        appendTextNode(e, "guid", category.getGuid());
+        appendTextNode(e, "modified", category.getModified());
 
-        closeTag(w, "Category");
+        return e;
     }
 
-    private void exportAccount(Writer w, Account account) throws IOException {
-        openTag(w, "Account", account.getId());
+    private static Element exportAccount(Document doc, Account account) {
+        var e = doc.createElement("Account");
+        e.setAttribute("id", Integer.toString(account.getId()));
 
-        writeTag(w, "name", account.getName());
-        writeTag(w, "comment", account.getComment());
-        writeTag(w, "openingBalance", account.getOpeningBalance());
-        writeTag(w, "accountLimit", account.getAccountLimit());
-        writeTag(w, "currencyRate", account.getCurrencyRate());
-        writeTag(w, "typeId", account.getTypeId());
-        writeTag(w, "categoryId", account.getCategoryId());
-        writeTag(w, "currencyId", account.getCurrencyId());
-        writeTag(w, "enabled", account.getEnabled());
-        writeTag(w, "guid", account.getGuid());
-        writeTag(w, "modified", account.getModified());
+        appendTextNode(e, "name", account.getName());
+        appendTextNode(e, "comment", account.getComment());
+        appendTextNode(e, "openingBalance", account.getOpeningBalance());
+        appendTextNode(e, "accountLimit", account.getAccountLimit());
+        appendTextNode(e, "currencyRate", account.getCurrencyRate());
+        appendTextNode(e, "typeId", account.getTypeId());
+        appendTextNode(e, "categoryId", account.getCategoryId());
+        appendTextNode(e, "currencyId", account.getCurrencyId());
+        appendTextNode(e, "enabled", account.getEnabled());
+        appendTextNode(e, "guid", account.getGuid());
+        appendTextNode(e, "modified", account.getModified());
 
-        closeTag(w, "Account");
+        return e;
     }
 
-    private void exportContact(Writer w, Contact contact) throws IOException {
-        openTag(w, "Contact", contact.getId());
+    private static Element exportContact(Document doc, Contact contact) {
+        var e = doc.createElement("Contact");
+        e.setAttribute("id", Integer.toString(contact.getId()));
 
-        writeTag(w, "name", contact.getName());
-        writeTag(w, "typeId", contact.getTypeId());
-        writeTag(w, "phone", contact.getPhone());
-        writeTag(w, "mobile", contact.getMobile());
-        writeTag(w, "email", contact.getEmail());
-        writeTag(w, "web", contact.getWeb());
-        writeTag(w, "comment", contact.getComment());
-        writeTag(w, "street", contact.getStreet());
-        writeTag(w, "city", contact.getCity());
-        writeTag(w, "country", contact.getCountry());
-        writeTag(w, "zip", contact.getZip());
-        writeTag(w, "guid", contact.getGuid());
-        writeTag(w, "modified", contact.getModified());
+        appendTextNode(e, "name", contact.getName());
+        appendTextNode(e, "typeId", contact.getTypeId());
+        appendTextNode(e, "phone", contact.getPhone());
+        appendTextNode(e, "mobile", contact.getMobile());
+        appendTextNode(e, "email", contact.getEmail());
+        appendTextNode(e, "web", contact.getWeb());
+        appendTextNode(e, "comment", contact.getComment());
+        appendTextNode(e, "street", contact.getStreet());
+        appendTextNode(e, "city", contact.getCity());
+        appendTextNode(e, "country", contact.getCountry());
+        appendTextNode(e, "zip", contact.getZip());
+        appendTextNode(e, "guid", contact.getGuid());
+        appendTextNode(e, "modified", contact.getModified());
 
-        closeTag(w, "Contact");
+        return e;
     }
 
-    private void exportCurrency(Writer w, Currency currency) throws IOException {
-        openTag(w, "Currency", currency.getId());
+    private static Element exportCurrency(Document doc, Currency currency) {
+        var e = doc.createElement("Currency");
+        e.setAttribute("id", Integer.toString(currency.getId()));
 
-        writeTag(w, "symbol", currency.getSymbol());
-        writeTag(w, "description", currency.getDescription());
-        writeTag(w, "formatSymbol", currency.getFormatSymbol());
-        writeTag(w, "formatSymbolPosition", currency.getFormatSymbolPosition());
-        writeTag(w, "showFormatSymbol", currency.getShowFormatSymbol());
-        writeTag(w, "default", currency.getDef());
-        writeTag(w, "rate", currency.getRate());
-        writeTag(w, "direction", currency.getDirection());
-        writeTag(w, "useThousandSeparator", currency.getUseThousandSeparator());
-        writeTag(w, "guid", currency.getGuid());
-        writeTag(w, "modified", currency.getModified());
+        appendTextNode(e, "symbol", currency.getSymbol());
+        appendTextNode(e, "description", currency.getDescription());
+        appendTextNode(e, "formatSymbol", currency.getFormatSymbol());
+        appendTextNode(e, "formatSymbolPosition", currency.getFormatSymbolPosition());
+        appendTextNode(e, "showFormatSymbol", currency.getShowFormatSymbol());
+        appendTextNode(e, "default", currency.getDef());
+        appendTextNode(e, "rate", currency.getRate().toString());
+        appendTextNode(e, "direction", currency.getDirection());
+        appendTextNode(e, "useThousandSeparator", currency.getUseThousandSeparator());
+        appendTextNode(e, "guid", currency.getGuid());
+        appendTextNode(e, "modified", currency.getModified());
 
-        closeTag(w, "Currency");
+        return e;
     }
 
-    private void exportTransactionGroup(Writer w, TransactionGroup tg) throws IOException {
-        openTag(w, "TransactionGroup", tg.getId());
+    private static Element exportTransactionGroup(Document doc, TransactionGroup tg) {
+        var e = doc.createElement("TransactionGroup");
+        e.setAttribute("id", Integer.toString(tg.getId()));
 
-        writeTag(w, "day", tg.getDay());
-        writeTag(w, "month", tg.getMonth());
-        writeTag(w, "year", tg.getYear());
-        writeTag(w, "expanded", tg.getExpanded());
-        writeTag(w, "guid", tg.getGuid());
-        writeTag(w, "modified", tg.getModified());
+        appendTextNode(e, "day", tg.getDay());
+        appendTextNode(e, "month", tg.getMonth());
+        appendTextNode(e, "year", tg.getYear());
+        appendTextNode(e, "expanded", tg.getExpanded());
+        appendTextNode(e, "guid", tg.getGuid());
+        appendTextNode(e, "modified", tg.getModified());
 
-        closeTag(w, "TransactionGroup");
+        return e;
     }
 
-    private void exportTransaction(Writer w, Transaction t) throws IOException {
-        openTag(w, "Transaction", t.getId());
+    private static Element exportTransaction(Document doc, Transaction t) {
+        var e = doc.createElement("Transaction");
+        e.setAttribute("id", Integer.toString(t.getId()));
 
-        writeTag(w, "amount", t.getAmount());
-        writeTag(w, "day", t.getDay());
-        writeTag(w, "month", t.getMonth());
-        writeTag(w, "year", t.getYear());
-        writeTag(w, "transactionTypeId", t.getTransactionTypeId());
-        writeTag(w, "comment", t.getComment());
-        writeTag(w, "checked", t.getChecked());
-        writeTag(w, "accountDebitedId", t.getAccountDebitedId());
-        writeTag(w, "accountCreditedId", t.getAccountCreditedId());
-        writeTag(w, "accountDebitedTypeId", t.getAccountDebitedTypeId());
-        writeTag(w, "accountCreditedTypeId", t.getAccountCreditedTypeId());
-        writeTag(w, "accountDebitedCategoryId", t.getAccountDebitedCategoryId());
-        writeTag(w, "accountCreditedCategoryId", t.getAccountCreditedCategoryId());
-        writeTag(w, "groupId", t.getGroupId());
-        writeTag(w, "contactId", t.getContactId());
-        writeTag(w, "rate", t.getRate());
-        writeTag(w, "rateDirection", t.getRateDirection());
-        writeTag(w, "invoiceNumber", t.getInvoiceNumber());
-        writeTag(w, "guid", t.getGuid());
-        writeTag(w, "modified", t.getModified());
+        appendTextNode(e, "amount", t.getAmount());
+        appendTextNode(e, "day", t.getDay());
+        appendTextNode(e, "month", t.getMonth());
+        appendTextNode(e, "year", t.getYear());
+        appendTextNode(e, "transactionTypeId", t.getTransactionTypeId());
+        appendTextNode(e, "comment", t.getComment());
+        appendTextNode(e, "checked", t.getChecked());
+        appendTextNode(e, "accountDebitedId", t.getAccountDebitedId());
+        appendTextNode(e, "accountCreditedId", t.getAccountCreditedId());
+        appendTextNode(e, "accountDebitedTypeId", t.getAccountDebitedTypeId());
+        appendTextNode(e, "accountCreditedTypeId", t.getAccountCreditedTypeId());
+        appendTextNode(e, "accountDebitedCategoryId", t.getAccountDebitedCategoryId());
+        appendTextNode(e, "accountCreditedCategoryId", t.getAccountCreditedCategoryId());
+        appendTextNode(e, "groupId", t.getGroupId());
+        appendTextNode(e, "contactId", t.getContactId());
+        appendTextNode(e, "rate", t.getRate());
+        appendTextNode(e, "rateDirection", t.getRateDirection());
+        appendTextNode(e, "invoiceNumber", t.getInvoiceNumber());
+        appendTextNode(e, "guid", t.getGuid());
+        appendTextNode(e, "modified", t.getModified());
 
-        closeTag(w, "Transaction");
+        return e;
     }
-
-
-
 }

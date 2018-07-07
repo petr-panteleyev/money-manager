@@ -33,7 +33,6 @@ import org.panteleyev.money.persistence.Currency;
 import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionGroup;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;

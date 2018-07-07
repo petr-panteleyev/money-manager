@@ -26,6 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
+import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
@@ -37,6 +38,7 @@ import org.panteleyev.persistence.Record;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -597,6 +599,24 @@ public class MoneyDAO extends DAO implements RecordSource {
             }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public static Exception initDatabase(MysqlDataSource dataSource, String schema) {
+        dataSource.setDatabaseName(null);
+        dataSource.setCharacterEncoding("utf8");
+
+        try (Connection conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
+            st.execute("CREATE DATABASE " + schema + " CHARACTER SET = utf8");
+
+            dataSource.setDatabaseName(schema);
+
+            DAO dao = new DAO(dataSource);
+            dao.createTables(TABLE_CLASSES);
+
+            return null;
+        } catch (SQLException ex) {
+            return ex;
         }
     }
 }

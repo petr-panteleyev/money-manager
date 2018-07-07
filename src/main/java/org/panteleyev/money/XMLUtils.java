@@ -26,46 +26,73 @@
 
 package org.panteleyev.money;
 
-import java.io.IOException;
-import java.io.Writer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 
 public interface XMLUtils {
-    static void writeXmlHeader(Writer w) throws IOException {
-        w.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+    static void appendTextNode(Element e, String name, String value) {
+        Document document = e.getOwnerDocument();
+        Element child = document.createElement(name);
+        e.appendChild(child);
+        Node text = document.createTextNode(value);
+        child.appendChild(text);
     }
 
-    static void writeTag(Writer w, String tag, String value) throws IOException {
-        w.write("<" + tag + ">"
-                + (value == null ? "" : value)
-                + "</" + tag + ">");
+    static void appendTextNode(Element e, String name, int value) {
+        appendTextNode(e, name, Integer.toString(value));
     }
 
-    static void writeTag(Writer w, String tag, int value) throws IOException {
-        writeTag(w, tag, Integer.toString(value));
+    static void appendTextNode(Element e, String name, boolean value) {
+        appendTextNode(e, name, Boolean.toString(value));
     }
 
-    static void writeTag(Writer w, String tag, long value) throws IOException {
-        writeTag(w, tag, Long.toString(value));
+    static void appendTextNode(Element e, String name, long value) {
+        appendTextNode(e, name, Long.toString(value));
     }
 
-    static void writeTag(Writer w, String tag, boolean value) throws IOException {
-        writeTag(w, tag, Boolean.toString(value));
+    static void appendTextNode(Element e, String name, BigDecimal value) {
+        appendTextNode(e, name, value.toString());
     }
 
-    static void writeTag(Writer w, String tag, BigDecimal value) throws IOException {
-        writeTag(w, tag, value.toString());
+    static Element appendElement(Element parent, String name) {
+        Element element = parent.getOwnerDocument().createElement(name);
+        parent.appendChild(element);
+        return element;
     }
 
-    static void openTag(Writer w, String tag) throws IOException {
-        w.write("<" + tag + ">");
+    static Element createDocument(String rootElementName) {
+        try {
+            var docFactory = DocumentBuilderFactory.newInstance();
+            var docBuilder = docFactory.newDocumentBuilder();
+
+            var doc = docBuilder.newDocument();
+            var rootElement = doc.createElement(rootElementName);
+            doc.appendChild(rootElement);
+
+            return rootElement;
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    static void openTag(Writer w, String tag, int id) throws IOException {
-        w.write("<" + tag + " id=\"" + Integer.toString(id) + "\">");
-    }
-
-    static void closeTag(Writer w, String tag) throws IOException {
-        w.write("</" + tag + ">");
+    static void writeDocument(Document document, OutputStream outputStream) {
+        try {
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(new DOMSource(document), new StreamResult(outputStream));
+        } catch (TransformerException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

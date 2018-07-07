@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.persistence.annotations.Field;
+import org.panteleyev.persistence.annotations.Column;
 import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
 import org.panteleyev.persistence.annotations.Table;
@@ -52,26 +52,49 @@ public class Transaction implements MoneyRecord {
         return res;
     };
 
+    @Column(value = "id", primaryKey = true)
     private final int id;
+    @Column("amount")
     private final BigDecimal amount;
+    @Column("date_day")
     private final int day;
+    @Column("date_month")
     private final int month;
+    @Column("date_year")
     private final int year;
+    @Column("transaction_type_id")
     private final int transactionTypeId;
+    @Column("comment")
     private final String comment;
+    @Column("checked")
     private final boolean checked;
+    @Column("account_debited_id")
+    @ForeignKey(table = Account.class)
     private final int accountDebitedId;
+    @Column("account_credited_id")
+    @ForeignKey(table = Account.class)
     private final int accountCreditedId;
+    @Column(value = "account_debited_type_id", nullable = false)
     private final int accountDebitedTypeId;
+    @Column(value = "account_credited_type_id", nullable = false)
     private final int accountCreditedTypeId;
+    @Column(value = "account_debited_category_id", nullable = false)
     private final int accountDebitedCategoryId;
+    @Column(value = "account_credited_category_id", nullable = false)
     private final int accountCreditedCategoryId;
+    @Column(value = "group_id", nullable = false)
     private final int groupId;
+    @Column("contact_id")
     private final int contactId;
+    @Column("currency_rate")
     private final BigDecimal rate;
+    @Column("rate_direction")
     private final int rateDirection;
+    @Column("invoice_number")
     private final String invoiceNumber;
+    @Column("guid")
     private final String guid;
+    @Column("modified")
     private final long modified;
 
     private final TransactionType transactionType;
@@ -79,27 +102,27 @@ public class Transaction implements MoneyRecord {
     private final CategoryType accountCreditedType;
 
     @RecordBuilder
-    public Transaction(@Field("id") int id,
-                       @Field("amount") BigDecimal amount,
-                       @Field("date_day") int day,
-                       @Field("date_month") int month,
-                       @Field("date_year") int year,
-                       @Field("transaction_type_id") int transactionTypeId,
-                       @Field("comment") String comment,
-                       @Field("checked") boolean checked,
-                       @Field("account_debited_id") int accountDebitedId,
-                       @Field("account_credited_id") int accountCreditedId,
-                       @Field("account_debited_type_id") int accountDebitedTypeId,
-                       @Field("account_credited_type_id") int accountCreditedTypeId,
-                       @Field("account_debited_category_id") int accountDebitedCategoryId,
-                       @Field("account_credited_category_id") int accountCreditedCategoryId,
-                       @Field("group_id") int groupId,
-                       @Field("contact_id") int contactId,
-                       @Field("currency_rate") BigDecimal rate,
-                       @Field("rate_direction") int rateDirection,
-                       @Field("invoice_number") String invoiceNumber,
-                       @Field("guid") String guid,
-                       @Field("modified") long modified) {
+    public Transaction(@Column("id") int id,
+                       @Column("amount") BigDecimal amount,
+                       @Column("date_day") int day,
+                       @Column("date_month") int month,
+                       @Column("date_year") int year,
+                       @Column("transaction_type_id") int transactionTypeId,
+                       @Column("comment") String comment,
+                       @Column("checked") boolean checked,
+                       @Column("account_debited_id") int accountDebitedId,
+                       @Column("account_credited_id") int accountCreditedId,
+                       @Column("account_debited_type_id") int accountDebitedTypeId,
+                       @Column("account_credited_type_id") int accountCreditedTypeId,
+                       @Column("account_debited_category_id") int accountDebitedCategoryId,
+                       @Column("account_credited_category_id") int accountCreditedCategoryId,
+                       @Column("group_id") int groupId,
+                       @Column("contact_id") int contactId,
+                       @Column("currency_rate") BigDecimal rate,
+                       @Column("rate_direction") int rateDirection,
+                       @Column("invoice_number") String invoiceNumber,
+                       @Column("guid") String guid,
+                       @Column("modified") long modified) {
         this.id = id;
         this.amount = amount;
         this.day = day;
@@ -218,111 +241,88 @@ public class Transaction implements MoneyRecord {
                 + "]";
     }
 
-    @Field(value = "id", primaryKey = true)
     public int getId() {
-        return this.id;
+        return id;
     }
 
-    @Field("amount")
     public final BigDecimal getAmount() {
-        return this.amount;
+        return amount;
     }
 
-    @Field("date_day")
     public final int getDay() {
-        return this.day;
+        return day;
     }
 
-    @Field("date_month")
     public final int getMonth() {
-        return this.month;
+        return month;
     }
 
-    @Field("date_year")
     public final int getYear() {
-        return this.year;
+        return year;
     }
 
-    @Field("transaction_type_id")
     public final int getTransactionTypeId() {
-        return this.transactionTypeId;
+        return transactionTypeId;
     }
 
-    @Field("comment")
     public final String getComment() {
-        return this.comment;
+        return comment;
     }
 
-    @Field("checked")
     public final boolean getChecked() {
-        return this.checked;
+        return checked;
     }
 
-    @Field("account_debited_id")
-    @ForeignKey(table = Account.class)
     public final int getAccountDebitedId() {
-        return this.accountDebitedId;
+        return accountDebitedId;
     }
 
-    @Field("account_credited_id")
-    @ForeignKey(table = Account.class)
     public final int getAccountCreditedId() {
-        return this.accountCreditedId;
+        return accountCreditedId;
     }
 
-    @Field(value = "account_debited_type_id", nullable = false)
     public final int getAccountDebitedTypeId() {
-        return this.accountDebitedTypeId;
+        return accountDebitedTypeId;
     }
 
-    @Field(value = "account_credited_type_id", nullable = false)
     public final int getAccountCreditedTypeId() {
-        return this.accountCreditedTypeId;
+        return accountCreditedTypeId;
     }
 
-    @Field(value = "account_debited_category_id", nullable = false)
     public final int getAccountDebitedCategoryId() {
-        return this.accountDebitedCategoryId;
+        return accountDebitedCategoryId;
     }
 
-    @Field(value = "account_credited_category_id", nullable = false)
     public final int getAccountCreditedCategoryId() {
-        return this.accountCreditedCategoryId;
+        return accountCreditedCategoryId;
     }
 
-    @Field(value = "group_id", nullable = false)
     public final int getGroupId() {
-        return this.groupId;
+        return groupId;
     }
 
-    @Field("contact_id")
     public final int getContactId() {
-        return this.contactId;
+        return contactId;
     }
 
-    @Field("currency_rate")
     public final BigDecimal getRate() {
-        return this.rate;
+        return rate;
     }
 
-    @Field("rate_direction")
     public final int getRateDirection() {
-        return this.rateDirection;
+        return rateDirection;
     }
 
-    @Field("invoice_number")
     public final String getInvoiceNumber() {
-        return this.invoiceNumber;
+        return invoiceNumber;
     }
 
-    @Field("guid")
     public String getGuid() {
-        return this.guid;
+        return guid;
     }
 
-    @Field("modified")
     public long getModified() {
-        return this.modified;
+        return modified;
     }
 
     public static final class Builder {
@@ -547,12 +547,10 @@ public class Transaction implements MoneyRecord {
             this.modified = var1;
         }
 
-
         public final Builder id(int id) {
             this.id = id;
             return this;
         }
-
 
         public final Builder amount(BigDecimal amount) {
             Objects.requireNonNull(amount);
@@ -564,7 +562,6 @@ public class Transaction implements MoneyRecord {
             this.day = day;
             return this;
         }
-
 
         public final Builder month(int month) {
             this.month = month;
@@ -583,13 +580,11 @@ public class Transaction implements MoneyRecord {
             return this;
         }
 
-
         public final Builder transactionType(TransactionType type) {
             Objects.requireNonNull(type);
             this.transactionTypeId = type.getId();
             return this;
         }
-
 
         public final Builder comment(String comment) {
             Objects.requireNonNull(comment);
@@ -597,30 +592,25 @@ public class Transaction implements MoneyRecord {
             return this;
         }
 
-
         public final Builder checked(boolean checked) {
             this.checked = checked;
             return this;
         }
-
 
         public final Builder accountDebitedId(int id) {
             this.accountDebitedId = id;
             return this;
         }
 
-
         public final Builder accountCreditedId(int id) {
             this.accountCreditedId = id;
             return this;
         }
 
-
         public final Builder accountDebitedTypeId(int id) {
             this.accountCreditedTypeId = id;
             return this;
         }
-
 
         public final Builder accountDebitedType(CategoryType type) {
             this.accountDebitedTypeId = type.getId();
