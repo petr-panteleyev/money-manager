@@ -28,11 +28,9 @@ package org.panteleyev.money;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -42,10 +40,10 @@ import java.math.BigDecimal;
 
 public interface XMLUtils {
     static void appendTextNode(Element e, String name, String value) {
-        Document document = e.getOwnerDocument();
-        Element child = document.createElement(name);
+        var document = e.getOwnerDocument();
+        var child = document.createElement(name);
         e.appendChild(child);
-        Node text = document.createTextNode(value);
+        var text = document.createTextNode(value);
         child.appendChild(text);
     }
 
@@ -66,7 +64,7 @@ public interface XMLUtils {
     }
 
     static Element appendElement(Element parent, String name) {
-        Element element = parent.getOwnerDocument().createElement(name);
+        var element = parent.getOwnerDocument().createElement(name);
         parent.appendChild(element);
         return element;
     }
@@ -88,7 +86,7 @@ public interface XMLUtils {
 
     static void writeDocument(Document document, OutputStream outputStream) {
         try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            var transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(new DOMSource(document), new StreamResult(outputStream));
         } catch (TransformerException ex) {

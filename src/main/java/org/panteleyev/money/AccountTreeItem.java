@@ -30,8 +30,8 @@ import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class AccountTreeItem {

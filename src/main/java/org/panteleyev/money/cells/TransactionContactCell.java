@@ -27,9 +27,9 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.Contact;
-import org.panteleyev.money.persistence.SplitTransaction;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.SplitTransaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionContactCell extends TableCell<Transaction, Transaction> {

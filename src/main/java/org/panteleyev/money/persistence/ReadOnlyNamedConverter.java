@@ -27,6 +27,7 @@
 package org.panteleyev.money.persistence;
 
 import javafx.util.StringConverter;
+import org.panteleyev.money.persistence.model.Named;
 
 public class ReadOnlyNamedConverter<T extends Named> extends StringConverter<T> {
     @Override

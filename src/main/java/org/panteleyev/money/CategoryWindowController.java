@@ -41,12 +41,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.money.persistence.Category;
+import org.panteleyev.money.persistence.model.Category;
 import java.util.Optional;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class CategoryWindowController extends BaseController {
     private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
@@ -147,7 +148,7 @@ final class CategoryWindowController extends BaseController {
             if (c.getId() != 0) {
                 getDao().updateCategory(c);
             } else {
-                getDao().insertCategory(c.copy(getDao().generatePrimaryKey(Category.class)));
+                getDao().insertCategory(c.copy(getDao().generatePrimaryKey(dtoClass(Category.class))));
             }
         });
     }

@@ -58,7 +58,7 @@ public final class ConnectionProfileManager {
         return autoConnect;
     }
 
-    public static void setAutoConnect(boolean b) {
+    static void setAutoConnect(boolean b) {
         autoConnect = b;
     }
 
@@ -66,7 +66,7 @@ public final class ConnectionProfileManager {
         return defaultProfile;
     }
 
-    public static void setDefaultProfile(ConnectionProfile profile) {
+    static void setDefaultProfile(ConnectionProfile profile) {
         defaultProfile = profile;
     }
 
@@ -75,7 +75,7 @@ public final class ConnectionProfileManager {
         profList.forEach(p -> profiles.put(p.getName(), p));
     }
 
-    public static void saveProfiles(OutputStream out) {
+    static void saveProfiles(OutputStream out) {
         var rootElement = createDocument("MoneyManager");
         var doc = rootElement.getOwnerDocument();
 
@@ -99,7 +99,7 @@ public final class ConnectionProfileManager {
         }
     }
 
-    public static void loadProfiles(InputStream inputStream) throws Exception {
+    static void loadProfiles(InputStream inputStream) throws Exception {
         var factory = SAXParserFactory.newInstance();
         var parser = factory.newSAXParser();
 
@@ -157,14 +157,13 @@ public final class ConnectionProfileManager {
         var e = doc.createElement("profile");
 
         appendTextNode(e, "name", profile.getName());
-        appendTextNode(e, "type", profile.getType().name());
         appendTextNode(e, "dataBaseHost", profile.getDataBaseHost());
         appendTextNode(e, "dataBasePort", Integer.toString(profile.getDataBasePort()));
         appendTextNode(e, "dataBaseUser", profile.getDataBaseUser());
         appendTextNode(e, "dataBasePassword", profile.getDataBasePassword());
         appendTextNode(e, "schema", profile.getSchema());
-        appendTextNode(e, "remoteHost", profile.getRemoteHost());
-        appendTextNode(e, "remotePort", profile.getRemotePort());
+        appendTextNode(e, "encryptionKey", profile.getEncryptionKey());
+        appendTextNode(e, "sshSession", profile.getSshSession());
 
         return e;
     }

@@ -26,13 +26,13 @@
 
 package org.panteleyev.money.xml;
 
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.Contact;
-import org.panteleyev.money.persistence.Currency;
-import org.panteleyev.money.persistence.MoneyRecord;
-import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.MoneyRecord;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -96,7 +96,7 @@ class ImportParser extends DefaultHandler {
 
     private Map<String, String> tags = null;
     private int currentId = 0;
-    private String currentCharacters = "";
+    private final StringBuilder currentCharacters = new StringBuilder();
 
     public List<Category> getCategories() {
         return categories;
@@ -143,8 +143,8 @@ class ImportParser extends DefaultHandler {
             tags = null;
         }, () -> {
             if (tags != null) {
-                tags.put(qName, currentCharacters);
-                currentCharacters = "";
+                tags.put(qName, currentCharacters.toString());
+                currentCharacters.setLength(0);
             }
         });
     }
@@ -152,7 +152,7 @@ class ImportParser extends DefaultHandler {
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         super.characters(ch, start, length);
-        currentCharacters = new String(ch, start, length);
+        currentCharacters.append(new String(ch, start, length));
     }
 
     private static Category parseCategory(int id, Map<String, String> tags) {

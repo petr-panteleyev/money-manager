@@ -39,7 +39,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.money.persistence.Currency;
+import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.math.BigDecimal;
 import java.util.UUID;

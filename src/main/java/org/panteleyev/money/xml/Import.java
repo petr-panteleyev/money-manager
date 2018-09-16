@@ -26,12 +26,12 @@
 
 package org.panteleyev.money.xml;
 
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.Contact;
-import org.panteleyev.money.persistence.Currency;
-import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;

@@ -26,40 +26,23 @@
 
 package org.panteleyev.money.profiles;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
-
-import javax.sql.DataSource;
+import com.mysql.cj.jdbc.MysqlDataSource;
+import java.sql.SQLException;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class ConnectionProfile {
     private static final String DEFAULT_HOST = "localhost";
     private static final int DEFAULT_PORT = 3306;
-    private static final String DEFAULT_SCHEMA = "money";
-    private static final int DEFAULT_SSH_PORT = 22;
 
     private final String name;
-    private final ConnectionType type;
     private final String dataBaseHost;
     private final int dataBasePort;
     private final String dataBaseUser;
     private final String dataBasePassword;
     private final String schema;
-    private final String remoteHost;
-    private final int remotePort;
-
-    public ConnectionProfile(String name, ConnectionType type, String dataBaseHost, int dataBasePort,
-                             String dataBaseUser, String dataBasePassword, String schema, String remoteHost,
-                             int remotePort) {
-        this.name = name;
-        this.type = type;
-        this.dataBaseHost = dataBaseHost;
-        this.dataBasePort = dataBasePort;
-        this.dataBaseUser = dataBaseUser;
-        this.dataBasePassword = dataBasePassword;
-        this.schema = schema;
-        this.remoteHost = remoteHost;
-        this.remotePort = remotePort;
-    }
+    private final String encryptionKey;
+    private final String sshSession;
 
     /**
      * Profile for a typical MySQL connection.
@@ -71,43 +54,41 @@ public class ConnectionProfile {
      * @param dataBasePassword database password
      * @param schema           schema
      */
-    public ConnectionProfile(String name, String dataBaseHost, int dataBasePort, String dataBaseUser,
-                             String dataBasePassword, String schema) {
-        this(name, ConnectionType.TCP_IP, dataBaseHost, dataBasePort, dataBaseUser, dataBasePassword, schema,
-                DEFAULT_HOST, DEFAULT_SSH_PORT);
+    ConnectionProfile(String name, String dataBaseHost, int dataBasePort,
+                      String dataBaseUser, String dataBasePassword, String schema,
+                      String encryptionKey, String sshSession) {
+        this.name = name;
+        this.dataBaseHost = dataBaseHost;
+        this.dataBasePort = dataBasePort;
+        this.dataBaseUser = dataBaseUser;
+        this.dataBasePassword = dataBasePassword;
+        this.schema = schema;
+        this.encryptionKey = encryptionKey;
+        this.sshSession = sshSession == null ? "" : sshSession;
     }
 
-    public ConnectionProfile(String name, String dataBaseUser, String dataBasePassword) {
-        this(name, ConnectionType.TCP_IP, DEFAULT_HOST, DEFAULT_PORT, dataBaseUser, dataBasePassword,
-                DEFAULT_SCHEMA, DEFAULT_HOST, DEFAULT_SSH_PORT);
-    }
-
-    public ConnectionProfile(String name, String schema) {
-        this(name, ConnectionType.TCP_IP, DEFAULT_HOST, DEFAULT_PORT, "", "",
-                schema, DEFAULT_HOST, DEFAULT_SSH_PORT);
+    ConnectionProfile(String name, String schema) {
+        this(name, DEFAULT_HOST, DEFAULT_PORT, "", "",
+                schema, "", "");
     }
 
     public String getName() {
         return name;
     }
 
-    public ConnectionType getType() {
-        return type;
-    }
-
-    public String getDataBaseHost() {
+    String getDataBaseHost() {
         return dataBaseHost;
     }
 
-    public int getDataBasePort() {
+    int getDataBasePort() {
         return dataBasePort;
     }
 
-    public String getDataBaseUser() {
+    String getDataBaseUser() {
         return dataBaseUser;
     }
 
-    public String getDataBasePassword() {
+    String getDataBasePassword() {
         return dataBasePassword;
     }
 
@@ -115,29 +96,35 @@ public class ConnectionProfile {
         return schema;
     }
 
-    public String getRemoteHost() {
-        return remoteHost;
+    String getEncryptionKey() {
+        return encryptionKey;
     }
 
-    public int getRemotePort() {
-        return remotePort;
+    public String getSshSession() {
+        return sshSession;
     }
 
     public String getConnectionString() {
         return "mysql://" + dataBaseHost + ":" + dataBasePort + "/" + schema;
     }
 
-    public DataSource build() {
-        var ds = new MysqlDataSource();
+    public MysqlDataSource buildDataSource() {
+        try {
+            var ds = new MysqlDataSource();
 
-        ds.setEncoding("utf8");
-        ds.setPort(dataBasePort);
-        ds.setServerName(dataBaseHost);
-        ds.setUser(dataBaseUser);
-        ds.setPassword(dataBasePassword);
-        ds.setDatabaseName(schema);
+            ds.setCharacterEncoding("utf8");
+            ds.setUseSSL(false);
+            ds.setServerTimezone(TimeZone.getDefault().getID());
+            ds.setPort(dataBasePort);
+            ds.setServerName(dataBaseHost);
+            ds.setUser(dataBaseUser);
+            ds.setPassword(dataBasePassword);
+            ds.setDatabaseName(schema);
 
-        return ds;
+            return ds;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override
@@ -153,33 +140,30 @@ public class ConnectionProfile {
         var that = (ConnectionProfile) o;
 
         return Objects.equals(this.name, that.name)
-                && Objects.equals(this.type, that.type)
                 && Objects.equals(this.dataBaseHost, that.dataBaseHost)
                 && this.dataBasePort == that.dataBasePort
                 && Objects.equals(this.dataBaseUser, that.dataBaseUser)
                 && Objects.equals(this.dataBasePassword, that.dataBasePassword)
                 && Objects.equals(this.schema, that.schema)
-                && Objects.equals(this.remoteHost, that.remoteHost)
-                && this.remotePort == that.remotePort;
+                && Objects.equals(this.encryptionKey, that.encryptionKey)
+                && Objects.equals(this.sshSession, that.sshSession);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, dataBaseHost, dataBasePort, dataBaseUser, dataBasePassword, schema,
-                remoteHost, remotePort);
+        return Objects.hash(name, dataBaseHost, dataBasePort, dataBaseUser, dataBasePassword, schema,
+                encryptionKey, sshSession);
     }
 
     @Override
     public String toString() {
         return super.toString()
                 + " name=" + name
-                + " type=" + type
                 + " dataBaseHost=" + dataBaseHost
                 + " dataBasePort=" + dataBasePort
                 + " dataBaseUser=" + dataBaseUser
                 + " dataBasePassword=" + dataBasePassword
                 + " schema=" + schema
-                + " remoteHost=" + remoteHost
-                + " remotePort=" + remotePort;
+                + " sshSession=" + sshSession;
     }
 }

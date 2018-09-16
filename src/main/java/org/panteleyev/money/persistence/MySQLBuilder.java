@@ -26,8 +26,10 @@
 
 package org.panteleyev.money.persistence;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import javax.sql.DataSource;
+import java.sql.SQLException;
+import java.util.TimeZone;
 
 public class MySQLBuilder {
     private int port = 3306;
@@ -37,14 +39,20 @@ public class MySQLBuilder {
     private String password = "";
 
     public DataSource build() {
-        var ds = new MysqlDataSource();
-        ds.setEncoding("utf8");
-        ds.setPort(port);
-        ds.setServerName(host);
-        ds.setUser(user);
-        ds.setPassword(password);
-        ds.setDatabaseName(dbName);
-        return ds;
+        try {
+            var ds = new MysqlDataSource();
+            ds.setCharacterEncoding("utf8");
+            ds.setUseSSL(false);
+            ds.setServerTimezone(TimeZone.getDefault().getID());
+            ds.setPort(port);
+            ds.setServerName(host);
+            ds.setUser(user);
+            ds.setPassword(password);
+            ds.setDatabaseName(dbName);
+            return ds;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public MySQLBuilder host(String host) {

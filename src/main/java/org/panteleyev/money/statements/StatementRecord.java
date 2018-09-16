@@ -26,7 +26,7 @@
 
 package org.panteleyev.money.statements;
 
-import org.panteleyev.money.persistence.Currency;
+import org.panteleyev.money.persistence.model.Currency;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;

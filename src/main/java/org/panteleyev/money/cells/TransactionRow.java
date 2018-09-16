@@ -27,8 +27,8 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableRow;
-import org.panteleyev.money.persistence.SplitTransaction;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.SplitTransaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.Styles.GROUP_CELL;
 import static org.panteleyev.money.Styles.GROUP_MEMBER_CELL;
 import static org.panteleyev.money.Styles.TRANSACTION_CELL;

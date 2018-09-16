@@ -1,5 +1,11 @@
 # Change Log
 
+## [18.5.0] - 2018-09-17
+
+- Updated database schema with encryption
+- SSH tunnel
+- Usability improvements
+
 ## [18.4.0] - 2018-07-07
 
 - Performance optimizations

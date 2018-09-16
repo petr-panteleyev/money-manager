@@ -47,21 +47,20 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.cells.AccountBalanceCell;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.CategoryType;
+import org.panteleyev.money.persistence.model.Transaction;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 class AccountTree extends BorderPane {
     private final TreeTableView<AccountTreeItem> tableView = new TreeTableView<>();
@@ -344,7 +343,7 @@ class AccountTree extends BorderPane {
         }
 
         new AccountDialog(initialCategory).showAndWait().ifPresent(it -> {
-            getDao().insertAccount(it.copy(getDao().generatePrimaryKey(Account.class)));
+            getDao().insertAccount(it.copy(getDao().generatePrimaryKey(dtoClass(Account.class))));
         });
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.panteleyev.money.persistence.Contact;
-import org.panteleyev.money.persistence.ContactType;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.ContactType;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +54,7 @@ import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 class ContactListWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
@@ -165,7 +166,7 @@ class ContactListWindowController extends BaseController {
                     if (c.getId() != 0) {
                         getDao().updateContact(c);
                     } else {
-                        getDao().insertContact(c.copy(getDao().generatePrimaryKey(Contact.class)));
+                        getDao().insertContact(c.copy(getDao().generatePrimaryKey(dtoClass(Contact.class))));
                     }
                 });
     }

@@ -26,8 +26,8 @@
 
 package org.panteleyev.money.statements;
 
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;

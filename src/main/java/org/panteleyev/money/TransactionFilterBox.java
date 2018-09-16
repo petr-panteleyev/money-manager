@@ -35,7 +35,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
 import java.time.LocalDate;
 import java.util.function.Predicate;

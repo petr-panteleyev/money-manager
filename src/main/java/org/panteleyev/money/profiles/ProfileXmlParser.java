@@ -74,7 +74,7 @@ class ProfileXmlParser extends DefaultHandler {
         super.endElement(uri, localName, qName);
 
         switch (qName) {
-            case "autoConnect" :
+            case "autoConnect":
                 autoConnect = Boolean.parseBoolean(value);
                 break;
 
@@ -110,13 +110,12 @@ class ProfileXmlParser extends DefaultHandler {
     private static ConnectionProfile parseProfile(Map<String, String> tags) {
         return new ConnectionProfile(
                 tags.get("name"),
-                ConnectionType.valueOf(tags.get("type")),
                 tags.get("dataBaseHost"),
                 Integer.parseInt(tags.get("dataBasePort")),
                 tags.get("dataBaseUser"),
                 tags.get("dataBasePassword"),
                 tags.get("schema"),
-                tags.get("remoteHost"),
-                Integer.parseInt(tags.get("remotePort")));
+                tags.get("encryptionKey"),
+                tags.get("sshSession"));
     }
 }

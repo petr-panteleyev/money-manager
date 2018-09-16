@@ -51,6 +51,7 @@ import org.panteleyev.money.profiles.ConnectDialog;
 import org.panteleyev.money.profiles.ConnectionProfile;
 import org.panteleyev.money.profiles.ConnectionProfileManager;
 import org.panteleyev.money.profiles.ConnectionProfilesEditor;
+import org.panteleyev.money.ssh.SshManager;
 import org.panteleyev.money.statements.StatementTab;
 import org.panteleyev.money.xml.Export;
 import org.panteleyev.utilities.fx.Controller;
@@ -66,6 +67,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController {
@@ -109,7 +111,6 @@ public class MainWindowController extends BaseController {
             CategoryWindowController.class,
             CurrencyWindowController.class
     );
-
 
     public MainWindowController(Stage stage) {
         super(stage, CSS_PATH);
@@ -245,13 +246,7 @@ public class MainWindowController extends BaseController {
 
         /*
          * Application parameters:
-         * --profile="<profile>"
-         *     or
-         * --host=<host>
-         * --port=<port>
-         * --user=<user>
-         * --password=<password>
-         * --name=<name>
+         * --profile=<profile>
          */
         Application.Parameters params = MoneyApplication.application.getParameters();
 
@@ -259,31 +254,15 @@ public class MainWindowController extends BaseController {
         if (profileName != null) {
             var profile = ConnectionProfileManager.get(profileName);
             if (profile == null) {
-                LOGGER.warning("Profile $profileName not found");
+                LOGGER.warning("Profile " + profileName + " not found");
             } else {
                 open(profile);
             }
         } else {
-            var name = params.getNamed().get("name");
-            if (name != null) {
-                // check mandatory parameters
-                var host = params.getNamed().getOrDefault("host", "localhost");
-                var port = Integer.parseInt(params.getNamed().getOrDefault("port", "3306"));
-                var user = params.getNamed().get("user");
-                var password = params.getNamed().getOrDefault("password", "");
-
-                if (user == null) {
-                    throw new IllegalArgumentException("User name cannot be empty");
-                }
-
-                var profile = new ConnectionProfile("", host, port, user, password, name);
-                open(profile);
-            } else {
-                if (ConnectionProfileManager.getAutoConnect()) {
-                    var profile = ConnectionProfileManager.getDefaultProfile();
-                    if (profile != null) {
-                        open(profile);
-                    }
+            if (ConnectionProfileManager.getAutoConnect()) {
+                var profile = ConnectionProfileManager.getDefaultProfile();
+                if (profile != null) {
+                    open(profile);
                 }
             }
         }
@@ -351,15 +330,17 @@ public class MainWindowController extends BaseController {
                 .ifPresent(this::open);
     }
 
-    private void open(ConnectionProfile builder) {
-        DataSource ds = builder.build();
+    private void open(ConnectionProfile profile) {
+        SshManager.setupTunnel(profile);
+        DataSource ds = profile.buildDataSource();
 
+        getDao().setEncryptionKey("");
         getDao().initialize(ds);
 
         Future loadResult = CompletableFuture
                 .runAsync(() -> getDao().preload())
                 .thenRun(() -> Platform.runLater(() -> {
-                    setTitle(AboutDialog.APP_TITLE + " - " + builder.getConnectionString());
+                    setTitle(AboutDialog.APP_TITLE + " - " + profile.getName() + " - " + profile.getConnectionString());
                     dbOpenProperty.set(true);
                 }));
 
@@ -392,6 +373,8 @@ public class MainWindowController extends BaseController {
     private void xmlDump() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
+        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML Files", "*.xml"),
                 new FileChooser.ExtensionFilter("All Files", "*.*"));
 
@@ -408,7 +391,7 @@ public class MainWindowController extends BaseController {
                             .withTransactionGroups(getDao().getTransactionGroups())
                             .withTransactions(getDao().getTransactions(), false)
                             .doExport(outputStream);
-
+                    Options.setLastExportDir(selected.getParent());
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }

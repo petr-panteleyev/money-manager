@@ -14,11 +14,13 @@ open module org.panteleyev.money {
 
     requires org.panteleyev.persistence;
     requires org.panteleyev.utilities;
+    requires org.panteleyev.crypto;
 
-    // Patched modules
+    // Automatic modules
     requires mysql.connector.java;
     requires commons.csv;
     requires controlsfx;
     requires jsoup;
     requires gson;
+    requires jsch;
 }

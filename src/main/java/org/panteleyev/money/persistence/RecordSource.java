@@ -26,6 +26,12 @@
 
 package org.panteleyev.money.persistence;
 
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import java.util.Optional;
 
 /**

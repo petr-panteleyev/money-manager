@@ -26,7 +26,6 @@
 
 package org.panteleyev.money.profiles;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -46,6 +45,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -53,14 +53,13 @@ import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.Styles;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import org.panteleyev.money.ssh.SshManager;
 import org.panteleyev.utilities.fx.BaseDialog;
 import java.sql.SQLException;
 import java.util.Optional;
-import java.util.ResourceBundle;
+import static org.panteleyev.money.MainWindowController.RB;
 
 public class ConnectionProfilesEditor extends BaseDialog {
-    private static final ResourceBundle RB = MainWindowController.RB;
-
     private static int counter = 0;
 
     private final ValidationSupport profileNameValidation = new ValidationSupport();
@@ -68,6 +67,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
     private final ListView<ConnectionProfile> profileListView = initProfileListView();
     private TextField profileNameEdit = new TextField();
     private TCPEditor tcpEditor = new TCPEditor();
+    private EncryptionKeyEditor encryptionKeyEditor = new EncryptionKeyEditor();
     private Label testStatusLabel = new Label();
 
     private static final Validator<String> INTEGER_VALIDATOR = (Control control, String text) -> {
@@ -102,7 +102,8 @@ public class ConnectionProfilesEditor extends BaseDialog {
         deleteButton.addEventFilter(ActionEvent.ACTION, this::newDeleteButton);
 
         var saveButton = (Button) getDialogPane().lookupButton(saveButtonType);
-        saveButton.disableProperty().bind(profileNameValidation.invalidProperty());
+        saveButton.disableProperty().bind(profileNameValidation.invalidProperty()
+                .or(encryptionKeyEditor.getValidation().invalidProperty()));
         saveButton.addEventFilter(ActionEvent.ACTION, this::onSaveButton);
 
         var initButton = tcpEditor.getCreateSchemaButton();
@@ -173,8 +174,9 @@ public class ConnectionProfilesEditor extends BaseDialog {
     private void onSaveButton(ActionEvent event) {
         event.consume();
 
-        var prof = buildConnectionProfile();
         int index = profileListView.getSelectionModel().getSelectedIndex();
+
+        var prof = buildConnectionProfile();
 
         profileListView.getItems().set(index, prof);
         profileListView.getSelectionModel().select(prof);
@@ -190,7 +192,9 @@ public class ConnectionProfilesEditor extends BaseDialog {
                 tcpEditor.getDataBasePort(),
                 tcpEditor.getDataBaseUser(),
                 tcpEditor.getDataBasePassword(),
-                tcpEditor.getSchema()
+                tcpEditor.getSchema(),
+                encryptionKeyEditor.getEncryptionKey(),
+                tcpEditor.getSshSession()
         );
     }
 
@@ -202,7 +206,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
                 .filter(response -> response == ButtonType.OK)
                 .ifPresent(b -> {
                     var profile = buildConnectionProfile();
-                    var ds = (MysqlDataSource) profile.build();
+                    var ds = profile.buildDataSource();
 
                     Exception ex = MoneyDAO.initDatabase(ds, profile.getSchema());
                     if (ex != null) {
@@ -217,10 +221,11 @@ public class ConnectionProfilesEditor extends BaseDialog {
         event.consume();
 
         var profile = buildConnectionProfile();
+        SshManager.setupTunnel(profile);
 
         var TEST_QUERY = "SHOW TABLES FROM " + profile.getSchema();
 
-        var ds = profile.build();
+        var ds = profile.buildDataSource();
 
         try (var conn = ds.getConnection(); var st = conn.createStatement()) {
             st.execute(TEST_QUERY);
@@ -250,12 +255,13 @@ public class ConnectionProfilesEditor extends BaseDialog {
         if (profile != null) {
             profileNameEdit.setText("");               // enforce validation
             profileNameEdit.setText(profile.getName());
-            tcpEditor.setType(profile.getType());
             tcpEditor.setDataBaseHost(profile.getDataBaseHost());
             tcpEditor.setDataBasePort(profile.getDataBasePort());
             tcpEditor.setDataBaseUser(profile.getDataBaseUser());
             tcpEditor.setDataBasePassword(profile.getDataBasePassword());
             tcpEditor.setSchema(profile.getSchema());
+            tcpEditor.setSshSession(profile.getSshSession());
+            encryptionKeyEditor.setEncryptionKey(profile.getEncryptionKey());
         } else {
             profileNameEdit.setText("");
             tcpEditor.setDataBaseHost("");
@@ -263,6 +269,7 @@ public class ConnectionProfilesEditor extends BaseDialog {
             tcpEditor.setDataBaseUser("");
             tcpEditor.setDataBasePassword("");
             tcpEditor.setSchema("");
+            tcpEditor.setSshSession(null);
         }
     }
 
@@ -308,22 +315,25 @@ public class ConnectionProfilesEditor extends BaseDialog {
         return pane;
     }
 
-    private BorderPane initCenterPane() {
-        var pane = new BorderPane();
+    private VBox initCenterPane() {
+        var pane = new VBox();
 
         var hBox = new HBox(new Label(RB.getString("label.ProfileName")), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
-        pane.setTop(hBox);
-
-        pane.setBottom(testStatusLabel);
 
         var titled = new TitledPane(RB.getString("text.Connection"), tcpEditor);
         titled.setCollapsible(false);
-        pane.setCenter(titled);
+
+        var encryptionPane = new TitledPane(RB.getString("label.Encryption.Key"), encryptionKeyEditor);
+        encryptionPane.setCollapsible(false);
+
+        pane.getChildren().addAll(hBox, titled, encryptionPane, testStatusLabel);
 
         HBox.setHgrow(profileNameEdit, Priority.ALWAYS);
-        HBox.setMargin(profileNameEdit, new Insets(0.0, 0.0, 0.0, 5.0));
-        BorderPane.setMargin(titled, new Insets(10.0, 0.0, 0.0, 0.0));
+        HBox.setMargin(profileNameEdit, new Insets(0.0, 0.0, 10.0, 5.0));
+        VBox.setMargin(titled, new Insets(0.0, 0.0, 10.0, 0.0));
+        VBox.setMargin(encryptionPane, new Insets(0.0, 0.0, 10.0, 0.0));
+
         return pane;
     }
 }

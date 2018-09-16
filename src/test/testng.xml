@@ -33,39 +33,50 @@
             <class name="org.panteleyev.money.ymoney.TestClientId"/>
         </classes>
     </test>
-    <test name="DAO Classes">
+    <test name="DTO">
         <classes>
-            <class name="org.panteleyev.money.test.TestAccount"/>
-            <class name="org.panteleyev.money.test.TestCategory"/>
-            <class name="org.panteleyev.money.test.TestContact"/>
-            <class name="org.panteleyev.money.test.TestCurrency"/>
-            <class name="org.panteleyev.money.test.TestTransaction"/>
-            <class name="org.panteleyev.money.test.TestTransactionGroup"/>
+            <class name="org.panteleyev.money.persistence.dto.TestDto"/>
+        </classes>
+    </test>
+    <test name="Model">
+        <classes>
+            <class name="org.panteleyev.money.persistence.model.TestAccount"/>
+            <class name="org.panteleyev.money.persistence.model.TestCategory"/>
+            <class name="org.panteleyev.money.persistence.model.TestContact"/>
+            <class name="org.panteleyev.money.persistence.model.TestCurrency"/>
+            <class name="org.panteleyev.money.persistence.model.TestTransaction"/>
+            <class name="org.panteleyev.money.persistence.model.TestTransactionGroup"/>
         </classes>
     </test>
     <test name="DAO">
         <classes>
-            <class name="org.panteleyev.money.test.TestMoneyDAO"/>
-            <class name="org.panteleyev.money.test.TestFreshFile"/>
+            <class name="org.panteleyev.money.persistence.TestMoneyDAO"/>
+            <class name="org.panteleyev.money.persistence.TestFreshFile"/>
         </classes>
     </test>
     <test name="Import/Export">
         <classes>
-            <class name="org.panteleyev.money.test.TestImportExport"/>
-            <class name="org.panteleyev.money.test.TestImportRecords"/>
-            <class name="org.panteleyev.money.test.TestXsdNegative"/>
+            <class name="org.panteleyev.money.TestImportExport"/>
+            <class name="org.panteleyev.money.TestImportRecords"/>
+            <class name="org.panteleyev.money.TestXsdNegative"/>
         </classes>
     </test>
     <test name="Profiles">
         <classes>
-            <class name="org.panteleyev.money.test.profiles.TestConnectionProfile"/>
-            <class name="org.panteleyev.money.test.profiles.TestConnectionProfileManager"/>
+            <class name="org.panteleyev.money.profiles.TestConnectionProfile"/>
+            <class name="org.panteleyev.money.profiles.TestConnectionProfileManager"/>
+        </classes>
+    </test>
+    <test name="Ssh">
+        <classes>
+            <class name="org.panteleyev.money.ssh.TestSession"/>
+            <class name="org.panteleyev.money.ssh.TestSshManager"/>
         </classes>
     </test>
     <test name="Misc">
         <classes>
-            <class name="org.panteleyev.money.test.TestEditorPane"/>
-            <class name="org.panteleyev.money.test.TestStatements"/>
+            <class name="org.panteleyev.money.TestEditorPane"/>
+            <class name="org.panteleyev.money.TestStatements"/>
         </classes>
     </test>
 </suite>

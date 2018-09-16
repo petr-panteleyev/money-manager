@@ -31,7 +31,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.ResourceBundle;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;

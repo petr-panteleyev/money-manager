@@ -26,6 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
+import org.panteleyev.money.persistence.model.Transaction;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;

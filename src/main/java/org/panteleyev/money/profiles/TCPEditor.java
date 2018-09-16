@@ -26,55 +26,35 @@
 
 package org.panteleyev.money.profiles;
 
-import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TitledPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.panteleyev.money.Images;
-import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.Styles;
-import java.util.Collections;
-import java.util.ResourceBundle;
+import org.panteleyev.money.ToStringConverter;
+import org.panteleyev.money.ssh.SshManager;
+import org.panteleyev.money.ssh.SshSession;
+import static org.panteleyev.money.MainWindowController.RB;
 
-class TCPEditor extends VBox {
-    private static final ResourceBundle RB = MainWindowController.RB;
-
-    private final ComboBox<ConnectionType> typeList = initTypeList();
+final class TCPEditor extends VBox {
     private final TextField schemaEdit = initSchemaEdit();
     private final TextField dataBaseHostEdit = new TextField();
     private final TextField dataBasePortEdit = new TextField();
     private final TextField dataBaseUserEdit = new TextField();
     private final PasswordField dataBasePasswordEdit = new PasswordField();
     private final Button createSchemaButton = new Button(RB.getString("button.Init"));
-
-    // SSH parameters
-    private final TextField sshHostEdit = new TextField();
-    private final TextField sshPortEdit = new TextField();
-    private final TextField sshUserEdit = new TextField();
-    private final PasswordField sshPasswordEdit = new PasswordField();
-    private final Label sshKeyFileLabel = new Label("SSH Key File:");
-    private final TextField sshKeyFileEdit = new TextField();
-    private final Button sshKeyFileButton = new Button("...");
+    private final ChoiceBox<Object> sessionBox = populateSshSessionBox();
 
     TCPEditor() {
-        var typePane = new HBox(new Label(RB.getString("label.ConnectionMethod")), typeList);
-        typePane.setAlignment(Pos.CENTER_LEFT);
-
-        var keyFilePane = new HBox(sshKeyFileEdit, sshKeyFileButton);
-
-        HBox.setMargin(typeList, new Insets(0.0, 0.0, 0.0, 5.0));
-
         var mySqlGrid = new GridPane();
         mySqlGrid.getStyleClass().add(Styles.GRID_PANE);
 
@@ -83,44 +63,22 @@ class TCPEditor extends VBox {
         mySqlGrid.addRow(1, new Label(RB.getString("label.User")), dataBaseUserEdit);
         mySqlGrid.addRow(2, new Label(RB.getString("label.Password")), dataBasePasswordEdit);
         mySqlGrid.addRow(3, new Label(RB.getString("label.Schema")), schemaEdit);
+        mySqlGrid.addRow(4, new Label(RB.getString("label.Ssh.Tunnel")), sessionBox);
         mySqlGrid.add(createSchemaButton, 3, 3);
+
+        sessionBox.setOnAction(event -> onSessionChange());
 
         createSchemaButton.setGraphic(new ImageView(Images.WARNING));
 
         mySqlGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
                 newColumnConstraints(Priority.ALWAYS));
 
-        var mySqlPane = new TitledPane("MySQL", mySqlGrid);
-        mySqlPane.setCollapsible(false);
-
-        var sshGrid = new GridPane();
-        sshGrid.getStyleClass().add(Styles.GRID_PANE);
-
-        sshGrid.addRow(0, new Label(RB.getString("label.Host")), sshHostEdit,
-                new Label(RB.getString("label.Port")), sshPortEdit);
-        sshGrid.addRow(1, new Label(RB.getString("label.User")), sshUserEdit);
-        sshGrid.addRow(2, new Label(RB.getString("label.Password")), sshPasswordEdit);
-        sshGrid.addRow(3, sshKeyFileLabel, keyFilePane);
-
-        sshGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
-                newColumnConstraints(Priority.ALWAYS));
-
-        var sshPane = new TitledPane("SSH", sshGrid);
-        sshPane.setCollapsible(false);
-        sshPane.visibleProperty().bind(typeList.getSelectionModel().selectedItemProperty()
-                .isEqualTo(ConnectionType.TCP_OVER_SSH));
-
-        getChildren().addAll(typePane, mySqlPane, sshPane);
-        VBox.setMargin(typePane, new Insets(10.0, 10.0, 5.0, 10.0));
-        VBox.setMargin(mySqlPane, new Insets(5.0, 10.0, 5.0, 10.0));
-        VBox.setMargin(sshPane, new Insets(5.0, 10.0, 10.0, 10.0));
+        getChildren().addAll(mySqlGrid);
+        VBox.setMargin(mySqlGrid, new Insets(10.0, 10.0, 10.0, 10.0));
 
         GridPane.setColumnSpan(dataBaseUserEdit, 3);
         GridPane.setColumnSpan(dataBasePasswordEdit, 3);
         GridPane.setColumnSpan(schemaEdit, 2);
-        GridPane.setColumnSpan(sshUserEdit, 3);
-        GridPane.setColumnSpan(sshPasswordEdit, 3);
-        GridPane.setColumnSpan(keyFilePane, 3);
     }
 
     Button getCreateSchemaButton() {
@@ -141,14 +99,6 @@ class TCPEditor extends VBox {
 
     TextField getDataBaseUserEdit() {
         return dataBaseUserEdit;
-    }
-
-    ConnectionType getType() {
-        return typeList.getSelectionModel().getSelectedItem();
-    }
-
-    void setType(ConnectionType type) {
-        typeList.getSelectionModel().select(type);
     }
 
     String getSchema() {
@@ -191,12 +141,23 @@ class TCPEditor extends VBox {
         dataBasePasswordEdit.setText(password);
     }
 
-    private static ComboBox<ConnectionType> initTypeList() {
-        var typeList = new ComboBox<ConnectionType>();
-        //typeList.setItems(FXCollections.observableArrayList(ConnectionType.values()));
-        typeList.setItems(FXCollections.observableArrayList(Collections.singletonList(ConnectionType.TCP_IP)));
-        typeList.getSelectionModel().select(0);
-        return typeList;
+    String getSshSession() {
+        Object selected = sessionBox.getSelectionModel().getSelectedItem();
+        if (selected instanceof SshSession) {
+            return ((SshSession) selected).getName();
+        } else {
+            return "";
+        }
+    }
+
+    void setSshSession(String name) {
+        if (name == null || name.isEmpty()) {
+            sessionBox.getSelectionModel().selectFirst();
+        } else {
+            sessionBox.getSelectionModel()
+                    .select(SshManager.getSessions().stream()
+                            .filter(s -> s.getName().equals(name)).findFirst().orElseThrow());
+        }
     }
 
     private TextField initSchemaEdit() {
@@ -209,5 +170,38 @@ class TCPEditor extends VBox {
         var constraints = new ColumnConstraints();
         constraints.setHgrow(hGrow);
         return constraints;
+    }
+
+    private ChoiceBox<Object> populateSshSessionBox() {
+        var comboBox = new ChoiceBox<>();
+
+        comboBox.setConverter(new ToStringConverter<>() {
+            @Override
+            public String toString(Object object) {
+                if (object instanceof SshSession) {
+                    return ((SshSession) object).getName();
+                } else {
+                    return object.toString();
+                }
+            }
+        });
+
+        comboBox.getItems().add(RB.getString("label.Direct.Connection"));
+
+        var sessions = SshManager.getSessions();
+        if (!sessions.isEmpty()) {
+            comboBox.getItems().add(new Separator());
+            comboBox.getItems().addAll(sessions);
+        }
+        return comboBox;
+    }
+
+    private void onSessionChange() {
+        Object selected = sessionBox.getSelectionModel().getSelectedItem();
+        if (selected instanceof SshSession) {
+            dataBasePortEdit.setText(Integer.toString(((SshSession) selected).getLocalPort()));
+        } else {
+            dataBasePortEdit.setText("3306");
+        }
     }
 }

@@ -47,9 +47,9 @@ import org.panteleyev.money.cells.TransactionDebitedAccountCell;
 import org.panteleyev.money.cells.TransactionRow;
 import org.panteleyev.money.cells.TransactionSumCell;
 import org.panteleyev.money.cells.TransactionTypeCell;
-import org.panteleyev.money.persistence.SplitTransaction;
-import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.persistence.model.SplitTransaction;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.money.xml.Export;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -382,6 +382,7 @@ public class TransactionTableView extends TableView<Transaction> {
         if (!toExport.isEmpty()) {
             var fileChooser = new FileChooser();
             fileChooser.setTitle("Export to file");
+            Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
             fileChooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("XML Files", "*.xml"),
                     new FileChooser.ExtensionFilter("All Files", "*.*")
@@ -392,6 +393,7 @@ public class TransactionTableView extends TableView<Transaction> {
                     try (var out = new FileOutputStream(selected)) {
                         new Export().withTransactions(toExport, true)
                                 .doExport(out);
+                        Options.setLastExportDir(selected.getParent());
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }

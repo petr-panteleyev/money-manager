@@ -27,7 +27,7 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Transaction;
 
 public class TransactionTypeCell extends TableCell<Transaction, Transaction> {
     @Override

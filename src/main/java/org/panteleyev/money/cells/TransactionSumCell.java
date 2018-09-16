@@ -28,9 +28,9 @@ package org.panteleyev.money.cells;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.SplitTransaction;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.CategoryType;
+import org.panteleyev.money.persistence.model.SplitTransaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import java.math.RoundingMode;
 import static org.panteleyev.money.Styles.BLACK_TEXT;
 import static org.panteleyev.money.Styles.BLUE_TEXT;

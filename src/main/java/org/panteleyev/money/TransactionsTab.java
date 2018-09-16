@@ -43,12 +43,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.Contact;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.CategoryType;
+import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import org.panteleyev.money.persistence.Transaction;
-import org.panteleyev.money.persistence.TransactionGroup;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.money.statements.StatementRecord;
 import java.time.LocalDate;
 import java.time.Month;
@@ -61,6 +61,7 @@ import java.util.function.Predicate;
 import java.util.logging.Logger;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class TransactionsTab extends BorderPane {
     private final static Logger LOGGER = Logger.getLogger(TransactionsTab.class.getName());
@@ -280,7 +281,9 @@ final class TransactionsTab extends BorderPane {
     }
 
     private Contact createContact(String name) {
-        return getDao().insertContact(new Contact(getDao().generatePrimaryKey(Contact.class), name));
+        Contact contact = new Contact(getDao().generatePrimaryKey(dtoClass(Contact.class)), name);
+        getDao().insertContact(contact);
+        return contact;
     }
 
     private void onAddTransaction(Transaction.Builder builder, String c) {
@@ -293,7 +296,7 @@ final class TransactionsTab extends BorderPane {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        builder.id(getDao().generatePrimaryKey(Transaction.class))
+        builder.id(getDao().generatePrimaryKey(dtoClass(Transaction.class)))
                 .month(month)
                 .year(year)
                 .groupId(0);
@@ -319,7 +322,7 @@ final class TransactionsTab extends BorderPane {
     }
 
     private void onAddGroup(TransactionGroup group, List<Transaction> transactions) {
-        int groupId = getDao().generatePrimaryKey(TransactionGroup.class);
+        int groupId = getDao().generatePrimaryKey(dtoClass(TransactionGroup.class));
 
         TransactionGroup grp = group.copy(groupId);
 

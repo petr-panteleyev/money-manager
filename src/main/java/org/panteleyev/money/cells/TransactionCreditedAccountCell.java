@@ -27,9 +27,9 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.SplitTransaction;
-import org.panteleyev.money.persistence.Transaction;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.SplitTransaction;
+import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionCreditedAccountCell extends TableCell<Transaction, Transaction> {

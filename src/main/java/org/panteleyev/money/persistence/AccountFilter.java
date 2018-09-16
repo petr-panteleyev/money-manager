@@ -26,6 +26,7 @@
 
 package org.panteleyev.money.persistence;
 
+import org.panteleyev.money.persistence.model.Account;
 import java.util.function.Predicate;
 
 public enum AccountFilter {

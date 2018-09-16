@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,12 +39,13 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.money.persistence.Currency;
+import org.panteleyev.money.persistence.model.Currency;
 import java.util.Optional;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class CurrencyWindowController extends BaseController {
     private final ObservableList<Currency> currencyList = FXCollections.observableArrayList();
@@ -109,7 +110,7 @@ final class CurrencyWindowController extends BaseController {
             if (c.getId() != 0) {
                 getDao().updateCurrency(c);
             } else {
-                getDao().insertCurrency(c.copy(getDao().generatePrimaryKey(Currency.class)));
+                getDao().insertCurrency(c.copy(getDao().generatePrimaryKey(dtoClass(Currency.class))));
             }
         });
     }

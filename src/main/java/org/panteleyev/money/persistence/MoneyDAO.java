@@ -26,12 +26,27 @@
 
 package org.panteleyev.money.persistence;
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.util.Pair;
+import org.panteleyev.money.persistence.dto.AccountDto;
+import org.panteleyev.money.persistence.dto.CategoryDto;
+import org.panteleyev.money.persistence.dto.ContactDto;
+import org.panteleyev.money.persistence.dto.CurrencyDto;
+import org.panteleyev.money.persistence.dto.Dto;
+import org.panteleyev.money.persistence.dto.TransactionDto;
+import org.panteleyev.money.persistence.dto.TransactionGroupDto;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.CategoryType;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.MoneyRecord;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.money.xml.Import;
 import org.panteleyev.persistence.DAO;
 import org.panteleyev.persistence.Record;
@@ -43,6 +58,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,6 +66,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
+import static org.panteleyev.money.persistence.dto.Dto.newDto;
 
 public class MoneyDAO extends DAO implements RecordSource {
     private static final MoneyDAO MONEY_DAO = new MoneyDAO();
@@ -66,21 +84,21 @@ public class MoneyDAO extends DAO implements RecordSource {
     };
 
     private static final List<Class<? extends Record>> TABLE_CLASSES = List.of(
-            Category.class,
-            Contact.class,
-            Currency.class,
-            Account.class,
-            TransactionGroup.class,
-            Transaction.class
+            CategoryDto.class,
+            ContactDto.class,
+            CurrencyDto.class,
+            AccountDto.class,
+            TransactionGroupDto.class,
+            TransactionDto.class
     );
 
     private static final List<Class<? extends Record>> TABLE_CLASSES_REVERSED = List.of(
-            Transaction.class,
-            TransactionGroup.class,
-            Account.class,
-            Currency.class,
-            Contact.class,
-            Category.class
+            TransactionDto.class,
+            TransactionGroupDto.class,
+            AccountDto.class,
+            CurrencyDto.class,
+            ContactDto.class,
+            CategoryDto.class
     );
 
     private final Map<Integer, Category> categoriesMap = new ConcurrentHashMap<>();
@@ -109,8 +127,15 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     private final BooleanProperty preloadingProperty = new SimpleBooleanProperty(false);
 
+    private String encryptionKey;
+
     public BooleanProperty preloadingProperty() {
         return preloadingProperty;
+    }
+
+    public void setEncryptionKey(String encryptionKey) {
+        Objects.requireNonNull(encryptionKey, "Encryption key cannot be null");
+        this.encryptionKey = encryptionKey;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -125,16 +150,14 @@ public class MoneyDAO extends DAO implements RecordSource {
         return Optional.ofNullable(categoriesMap.get(id));
     }
 
-    public Category insertCategory(Category category) {
-        var result = insert(category);
-        categories.put(result.getId(), result);
-        return result;
+    public void insertCategory(Category category) {
+        insert(newDto(category, encryptionKey));
+        categories.put(category.getId(), category);
     }
 
-    public Category updateCategory(Category category) {
-        var result = update(category);
-        categories.put(result.getId(), result);
-        return result;
+    public void updateCategory(Category category) {
+        update(newDto(category, encryptionKey));
+        categories.put(category.getId(), category);
     }
 
     public Collection<Category> getCategories() {
@@ -161,16 +184,14 @@ public class MoneyDAO extends DAO implements RecordSource {
         return Optional.ofNullable(currencyMap.get(id));
     }
 
-    public Currency insertCurrency(Currency currency) {
-        var result = insert(currency);
-        currencies.put(result.getId(), result);
-        return result;
+    public void insertCurrency(Currency currency) {
+        insert(newDto(currency, encryptionKey));
+        currencies.put(currency.getId(), currency);
     }
 
-    public Currency updateCurrency(Currency currency) {
-        var result = update(currency);
-        currencies.put(result.getId(), result);
-        return result;
+    public void updateCurrency(Currency currency) {
+        update(newDto(currency, encryptionKey));
+        currencies.put(currency.getId(), currency);
     }
 
     public Collection<Currency> getCurrencies() {
@@ -193,16 +214,14 @@ public class MoneyDAO extends DAO implements RecordSource {
         return Optional.ofNullable(contactsMap.get(id));
     }
 
-    public Contact insertContact(Contact contact) {
-        var result = insert(contact);
-        contacts.put(result.getId(), result);
-        return result;
+    public void insertContact(Contact contact) {
+        insert(newDto(contact, encryptionKey));
+        contacts.put(contact.getId(), contact);
     }
 
-    public Contact updateContact(Contact contact) {
-        var result = update(contact);
-        contacts.put(result.getId(), result);
-        return result;
+    public void updateContact(Contact contact) {
+        update(newDto(contact, encryptionKey));
+        contacts.put(contact.getId(), contact);
     }
 
     public Collection<Contact> getContacts() {
@@ -221,21 +240,19 @@ public class MoneyDAO extends DAO implements RecordSource {
         return Optional.ofNullable(accountsMap.get(id));
     }
 
-    public Account insertAccount(Account account) {
-        var result = insert(account);
-        accounts.put(result.getId(), result);
-        return result;
+    public void insertAccount(Account account) {
+        insert(newDto(account, encryptionKey));
+        accounts.put(account.getId(), account);
     }
 
-    public Account updateAccount(Account account) {
-        var result = update(account);
-        accounts.put(result.getId(), result);
-        return result;
+    public void updateAccount(Account account) {
+        update(newDto(account, encryptionKey));
+        accounts.put(account.getId(), account);
     }
 
     public void deleteAccount(Account account) {
         accounts.remove(account.getId());
-        delete(account);
+        delete(account.getId(), dtoClass(Account.class));
     }
 
     public Collection<Account> getAccounts() {
@@ -278,21 +295,19 @@ public class MoneyDAO extends DAO implements RecordSource {
         return id == 0 ? Optional.empty() : Optional.ofNullable(transactionGroupsMap.get(id));
     }
 
-    public TransactionGroup insertTransactionGroup(TransactionGroup tg) {
-        var result = insert(tg);
-        transactionGroups.put(result.getId(), result);
-        return result;
+    public void insertTransactionGroup(TransactionGroup tg) {
+        insert(newDto(tg, encryptionKey));
+        transactionGroups.put(tg.getId(), tg);
     }
 
-    public TransactionGroup updateTransactionGroup(TransactionGroup tg) {
-        var result = update(tg);
-        transactionGroups.put(result.getId(), result);
-        return result;
+    public void updateTransactionGroup(TransactionGroup tg) {
+        update(newDto(tg, encryptionKey));
+        transactionGroups.put(tg.getId(), tg);
     }
 
     public void deleteTransactionGroup(int id) {
         transactionGroups.remove(id);
-        delete(id, TransactionGroup.class);
+        delete(id, dtoClass(TransactionGroup.class));
     }
 
     public Collection<TransactionGroup> getTransactionGroups() {
@@ -311,21 +326,19 @@ public class MoneyDAO extends DAO implements RecordSource {
         return id == 0 ? Optional.empty() : Optional.ofNullable(transactionsMap.get(id));
     }
 
-    public Transaction insertTransaction(Transaction transaction) {
-        var result = insert(transaction);
-        transactions.put(result.getId(), result);
-        return result;
+    public void insertTransaction(Transaction transaction) {
+        insert(newDto(transaction, encryptionKey));
+        transactions.put(transaction.getId(), transaction);
     }
 
-    public Transaction updateTransaction(Transaction transaction) {
-        var result = update(transaction);
-        transactions.put(result.getId(), result);
-        return result;
+    public void updateTransaction(Transaction transaction) {
+        update(newDto(transaction, encryptionKey));
+        transactions.put(transaction.getId(), transaction);
     }
 
     public void deleteTransaction(int id) {
         transactions.remove(id);
-        delete(id, Transaction.class);
+        delete(id, dtoClass(Transaction.class));
     }
 
     public Collection<Transaction> getTransactions() {
@@ -393,6 +406,16 @@ public class MoneyDAO extends DAO implements RecordSource {
         preload(IGNORE_PROGRESS);
     }
 
+    private <T extends Record> void loadDto(Class<? extends Dto<T>> dtoClass, Map<Integer, T> result) {
+        List<? extends Dto<T>> dtoList = getAll(dtoClass);
+        result.clear();
+        for (Dto<T> dto : dtoList) {
+            T model = dto.decrypt(encryptionKey);
+            result.put(model.getId(), model);
+        }
+    }
+
+
     public void preload(Consumer<String> progress) {
         synchronized (preloadingProperty) {
             preloadingProperty.set(true);
@@ -404,33 +427,27 @@ public class MoneyDAO extends DAO implements RecordSource {
             progress.accept("Preloading data...\n");
 
             progress.accept("    categories... ");
-            categoriesMap.clear();
-            getAll(Category.class, categoriesMap);
+            loadDto(CategoryDto.class, categoriesMap);
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
-            contactsMap.clear();
-            getAll(Contact.class, contactsMap);
+            loadDto(ContactDto.class, contactsMap);
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
-            currencyMap.clear();
-            getAll(Currency.class, currencyMap);
+            loadDto(CurrencyDto.class, currencyMap);
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
-            accountsMap.clear();
-            getAll(Account.class, accountsMap);
+            loadDto(AccountDto.class, accountsMap);
             progress.accept("done\n");
 
             progress.accept("    transaction groups... ");
-            transactionGroupsMap.clear();
-            getAll(TransactionGroup.class, transactionGroupsMap);
+            loadDto(TransactionGroupDto.class, transactionGroupsMap);
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
-            transactionsMap.clear();
-            getAll(Transaction.class, transactionsMap);
+            loadDto(TransactionDto.class, transactionsMap);
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -473,27 +490,33 @@ public class MoneyDAO extends DAO implements RecordSource {
             progress.accept("Importing data...\n");
 
             progress.accept("    categories... ");
-            insert(conn, BATCH_SIZE, imp.getCategories());
+            insert(conn, BATCH_SIZE, imp.getCategories().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
-            insert(conn, BATCH_SIZE, imp.getCurrencies());
+            insert(conn, BATCH_SIZE, imp.getCurrencies().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
-            insert(conn, BATCH_SIZE, imp.getAccounts());
+            insert(conn, BATCH_SIZE, imp.getAccounts().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
-            insert(conn, BATCH_SIZE, imp.getContacts());
+            insert(conn, BATCH_SIZE, imp.getContacts().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    transaction groups... ");
-            insert(conn, BATCH_SIZE, imp.getTransactionGroups());
+            insert(conn, BATCH_SIZE, imp.getTransactionGroups().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
-            insert(conn, BATCH_SIZE, imp.getTransactions());
+            insert(conn, BATCH_SIZE, imp.getTransactions().stream()
+                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -519,7 +542,7 @@ public class MoneyDAO extends DAO implements RecordSource {
                     idMap.put(it.getId(), new Pair<>(found.getId(), ImportAction.IGNORE));
                 }
             } else {
-                idMap.put(it.getId(), new Pair<>(generatePrimaryKey(it.getClass()), ImportAction.INSERT));
+                idMap.put(it.getId(), new Pair<>(generatePrimaryKey(dtoClass(it)), ImportAction.INSERT));
             }
         });
     }
@@ -535,9 +558,9 @@ public class MoneyDAO extends DAO implements RecordSource {
                 var replaced = replacement.apply(it);
 
                 if (action == ImportAction.INSERT) {
-                    insert(conn, replaced);
+                    insert(conn, newDto(replaced, encryptionKey));
                 } else {
-                    update(conn, replaced);
+                    update(conn, newDto(replaced, encryptionKey));
                 }
             }
         });
@@ -577,8 +600,8 @@ public class MoneyDAO extends DAO implements RecordSource {
                         it -> it.copy(getMappedId(contactIdMap, it.getId())));
 
                 importTable(conn, imp.getAccounts(), accountIdMap,
-                        it -> it.copy(getMappedId(accountIdMap, it.getId()), getMappedId(categoryIdMap, it.getCategoryId
-                                ())));
+                        it -> it.copy(getMappedId(accountIdMap, it.getId()),
+                                getMappedId(categoryIdMap, it.getCategoryId())));
 
                 importTable(conn, imp.getTransactionGroups(), transactionGroupIdMap,
                         it -> it.copy(getMappedId(transactionGroupIdMap, it.getId())));
@@ -604,7 +627,6 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public static Exception initDatabase(MysqlDataSource dataSource, String schema) {
         dataSource.setDatabaseName(null);
-        dataSource.setCharacterEncoding("utf8");
 
         try (Connection conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
             st.execute("CREATE DATABASE " + schema + " CHARACTER SET = utf8");

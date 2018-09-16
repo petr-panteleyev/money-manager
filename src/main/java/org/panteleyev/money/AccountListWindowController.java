@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,10 +46,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.panteleyev.money.persistence.Account;
-import org.panteleyev.money.persistence.Category;
-import org.panteleyev.money.persistence.CategoryType;
-import org.panteleyev.money.persistence.Currency;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.CategoryType;
+import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -61,6 +61,7 @@ import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 class AccountListWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
@@ -246,7 +247,7 @@ class AccountListWindowController extends BaseController {
 
     private void onAddAccount() {
         new AccountDialog(null, null).showAndWait()
-                .ifPresent(a -> getDao().insertAccount(a.copy(getDao().generatePrimaryKey(Account.class))));
+                .ifPresent(a -> getDao().insertAccount(a.copy(getDao().generatePrimaryKey(dtoClass(Account.class)))));
     }
 
     private Optional<Account> getSelectedAccount() {

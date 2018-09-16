@@ -31,8 +31,10 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.profiles.ConnectionProfileManager;
+import org.panteleyev.money.ssh.SshManager;
 import java.io.File;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -65,9 +67,16 @@ public class MoneyApplication extends Application {
             LOGGER.log(Level.WARNING, "Unable to load profiles", ex);
         }
 
+        try {
+            SshManager.loadSessions();
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Unable to load ssh sessions", ex);
+        }
+
         new MainWindowController(primaryStage);
 
         primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> SshManager.closeAllSessions());
     }
 
     public static void uncaughtException(Throwable e) {
@@ -87,5 +96,9 @@ public class MoneyApplication extends Application {
 
     public static void main(String[] args) {
         Application.launch(MoneyApplication.class, args);
+    }
+
+    static String generateFileName() {
+        return "Money-" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

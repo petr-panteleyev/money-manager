@@ -125,6 +125,7 @@ final class ImportWizard extends BaseDialog {
         private void onBrowse() {
             FileChooser chooser = new FileChooser();
             chooser.setTitle(RB.getString("word.Import"));
+            Options.getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(
                     new FileChooser.ExtensionFilter("XML Files", "*.xml"),
                     new FileChooser.ExtensionFilter("All Files", "*.*")

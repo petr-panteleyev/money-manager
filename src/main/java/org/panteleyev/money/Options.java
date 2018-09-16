@@ -46,7 +46,8 @@ public class Options {
         MAIN_WINDOW_HEIGHT("mainWindowHeight"),
         AUTO_COMPLETE_LENGTH("autoCompleteLength"),
         YM_TOKEN("ym_token"),
-        LAST_STATEMENT_DIR("lastStatementDir");
+        LAST_STATEMENT_DIR("lastStatementDir"),
+        LAST_EXPORT_DIR("lastExportDir");
 
         private final String s;
 
@@ -65,35 +66,35 @@ public class Options {
     // Cached values
     private static int autoCompleteLength = AUTO_COMPLETE_LENGTH;
 
-    public static boolean getShowDeactivatedAccounts() {
+    static boolean getShowDeactivatedAccounts() {
         return PREFS.getBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), false);
     }
 
-    public static void setShowDeactivatedAccounts(boolean show) {
+    static void setShowDeactivatedAccounts(boolean show) {
         PREFS.putBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), show);
     }
 
-    public static double getMainWindowWidth() {
+    static double getMainWindowWidth() {
         return PREFS.getDouble(Option.MAIN_WINDOW_WIDTH.toString(), DEFAULT_WIDTH);
     }
 
-    public static void setMainWindowWidth(double x) {
+    static void setMainWindowWidth(double x) {
         PREFS.putDouble(Option.MAIN_WINDOW_WIDTH.toString(), x);
     }
 
-    public static double getMainWindowHeight() {
+    static double getMainWindowHeight() {
         return PREFS.getDouble(Option.MAIN_WINDOW_HEIGHT.toString(), DEFAULT_HEIGHT);
     }
 
-    public static void setMainWindowHeight(double x) {
+    static void setMainWindowHeight(double x) {
         PREFS.putDouble(Option.MAIN_WINDOW_HEIGHT.toString(), x);
     }
 
-    public static int getAutoCompleteLength() {
+    static int getAutoCompleteLength() {
         return autoCompleteLength;
     }
 
-    public static void setAutoCompleteLength(int x) {
+    static void setAutoCompleteLength(int x) {
         autoCompleteLength = x;
         PREFS.putInt(Option.AUTO_COMPLETE_LENGTH.toString(), x);
     }
@@ -114,8 +115,16 @@ public class Options {
         return PREFS.get(Option.YM_TOKEN.toString(), null);
     }
 
-    static {
+    static Optional<File> getLastExportDir() {
+        String dir = PREFS.get(Option.LAST_EXPORT_DIR.toString(), null);
+        return dir == null || dir.isEmpty() ? Optional.empty() : Optional.of(new File(dir));
+    }
 
+    static void setLastExportDir(String dir) {
+        PREFS.put(Option.LAST_EXPORT_DIR.toString(), dir);
+    }
+
+    static {
         // Load values into cache
         autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
     }
