@@ -166,9 +166,11 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Account parseAccount(int id, Map<String, String> tags) {
+        var accountNumber = tags.get("accountNumber");
         return new Account(id,
                 tags.get("name"),
                 tags.get("comment"),
+                accountNumber == null ? "" : accountNumber,
                 new BigDecimal(tags.get("openingBalance")),
                 new BigDecimal(tags.get("accountLimit")),
                 new BigDecimal(tags.get("currencyRate")),

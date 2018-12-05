@@ -410,17 +410,19 @@ class AccountTree extends BorderPane {
         }
 
         if (removedAccount == null) {
-            // Add account
-            var categoryNode = findCategoryTreeItem(root, addedAccount.getCategoryId());
-            if (categoryNode == null) {
-                throw new IllegalStateException("Cannot find node for category id: " + addedAccount.getCategoryId());
-            }
+            if (Options.getShowDeactivatedAccounts() || addedAccount.getEnabled()) {
+                // Add account
+                var categoryNode = findCategoryTreeItem(root, addedAccount.getCategoryId());
+                if (categoryNode == null) {
+                    throw new IllegalStateException("Cannot find node for category id: " + addedAccount.getCategoryId());
+                }
 
-            categoryNode.getChildren().add(new TreeItem<>(new AccountTreeItem(addedAccount)));
+                categoryNode.getChildren().add(new TreeItem<>(new AccountTreeItem(addedAccount)));
+            }
         } else {
             var node = findAccountTreeItem(root, change.getKey());
             if (node == null) {
-                throw new IllegalStateException("Cannot find node for changed account id: " + change.getKey());
+                return;
             }
 
             if (addedAccount == null) {

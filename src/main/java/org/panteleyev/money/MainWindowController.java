@@ -334,7 +334,7 @@ public class MainWindowController extends BaseController {
         SshManager.setupTunnel(profile);
         DataSource ds = profile.buildDataSource();
 
-        getDao().setEncryptionKey("");
+        getDao().setEncryptionKey(profile.getEncryptionKey());
         getDao().initialize(ds);
 
         Future loadResult = CompletableFuture

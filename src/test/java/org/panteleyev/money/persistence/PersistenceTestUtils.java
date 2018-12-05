@@ -82,6 +82,7 @@ public class PersistenceTestUtils {
                 id,
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 randomBigDecimal(),
                 randomBigDecimal(),
                 randomBigDecimal(),

@@ -28,13 +28,16 @@ package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
 import org.testng.Assert;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.BaseTestUtils.randomId;
+import static org.panteleyev.money.BaseTestUtils.randomString;
 import static org.panteleyev.money.persistence.PersistenceTestUtils.randomCategoryType;
+import static org.testng.Assert.assertEquals;
 
 public class TestAccount extends BaseTest {
     @Test
@@ -42,6 +45,7 @@ public class TestAccount extends BaseTest {
         int id = randomId();
         String name = UUID.randomUUID().toString();
         String comment = UUID.randomUUID().toString();
+        String accountNumber = UUID.randomUUID().toString();
         BigDecimal opening = randomBigDecimal();
         BigDecimal limit = randomBigDecimal();
         BigDecimal rate = randomBigDecimal();
@@ -52,12 +56,30 @@ public class TestAccount extends BaseTest {
         String uuid = UUID.randomUUID().toString();
         long modified = System.currentTimeMillis();
 
-        Account a1 = new Account(id, name, comment, opening, limit, rate, type.getId(), categoryId, currencyId,
-                enabled, uuid, modified);
-        Account a2 = new Account(id, name, comment, opening, limit, rate, type.getId(), categoryId, currencyId,
-                enabled, uuid, modified);
+        Account a1 = new Account(id, name, comment, accountNumber, opening, limit, rate, type.getId(), categoryId,
+                currencyId, enabled, uuid, modified);
+        Account a2 = new Account(id, name, comment, accountNumber, opening, limit, rate, type.getId(), categoryId,
+                currencyId, enabled, uuid, modified);
 
-        Assert.assertEquals(a1, a2);
-        Assert.assertEquals(a1.hashCode(), a2.hashCode());
+        assertEquals(a1, a2);
+        assertEquals(a1.hashCode(), a2.hashCode());
+    }
+
+    @DataProvider(name = "testAccountNumberDataProvider")
+    public Object[][] testAccountNumberDataProvider() {
+        return new Object[][] {
+                {"   1234  5 6   78 ", "12345678"},
+                {"12345678", "12345678"},
+                {"123456 78    ", "12345678"},
+                {" 12345678", "12345678"},
+        };
+    }
+    @Test(dataProvider = "testAccountNumberDataProvider")
+    public void testAccountNumber(String accountNumber, String accountNumberNoSpaces) {
+        Account a = new Account(0, "", "", accountNumber, BigDecimal.ZERO, BigDecimal.ZERO,
+                BigDecimal.ZERO, CategoryType.DEBTS.getId(), 0, 0, true, "", 0L);
+
+        assertEquals(a.getAccountNumber(), accountNumber);
+        assertEquals(a.getAccountNumberNoSpaces(), accountNumberNoSpaces);
     }
 }

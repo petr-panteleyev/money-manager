@@ -68,6 +68,7 @@ public final class AccountDto implements Record, Dto<Account> {
         json.addProperty("id", account.getId());
         json.addProperty("name", account.getName());
         json.addProperty("comment", account.getComment());
+        json.addProperty("accountNumber", account.getAccountNumber());
         json.addProperty("openingBalance", account.getOpeningBalance());
         json.addProperty("accountLimit", account.getAccountLimit());
         json.addProperty("currencyRate", account.getCurrencyRate());
@@ -86,9 +87,13 @@ public final class AccountDto implements Record, Dto<Account> {
                 aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
+
+        var accountNumber = obj.get("accountNumber");
+
         return new Account(obj.get("id").getAsInt(),
                 obj.get("name").getAsString(),
                 obj.get("comment").getAsString(),
+                accountNumber == null || accountNumber.isJsonNull() ? "" : accountNumber.getAsString(),
                 obj.get("openingBalance").getAsBigDecimal(),
                 obj.get("accountLimit").getAsBigDecimal(),
                 obj.get("currencyRate").getAsBigDecimal(),

@@ -124,6 +124,7 @@ public class TestEditorPane extends BaseDaoTest {
         acc_1 = new Account(newAccountId(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,
                 BigDecimal.ONE,
@@ -139,6 +140,7 @@ public class TestEditorPane extends BaseDaoTest {
         acc_2 = new Account(newAccountId(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
                 BigDecimal.ZERO,
                 BigDecimal.ZERO,
                 BigDecimal.ONE,
@@ -152,6 +154,7 @@ public class TestEditorPane extends BaseDaoTest {
 
         // same currency as (1)
         acc_3 = new Account(newAccountId(),
+                UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 UUID.randomUUID().toString(),
                 BigDecimal.ZERO,

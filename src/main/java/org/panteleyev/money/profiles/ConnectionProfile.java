@@ -96,7 +96,7 @@ public class ConnectionProfile {
         return schema;
     }
 
-    String getEncryptionKey() {
+    public String getEncryptionKey() {
         return encryptionKey;
     }
 

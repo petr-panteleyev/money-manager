@@ -37,6 +37,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     private final int id;
     private final String name;
     private final String comment;
+    private final String accountNumber;
     private final BigDecimal openingBalance;
     private final BigDecimal accountLimit;
     private final BigDecimal currencyRate;
@@ -49,12 +50,13 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
     private final CategoryType type;
 
-    public Account(int id, String name, String comment, BigDecimal openingBalance,
+    public Account(int id, String name, String comment, String accountNumber, BigDecimal openingBalance,
                    BigDecimal accountLimit, BigDecimal currencyRate, int typeId, int categoryId,
                    int currencyId, boolean enabled, String guid, long modified) {
         this.id = id;
         this.name = name;
         this.comment = comment;
+        this.accountNumber = accountNumber;
         this.openingBalance = openingBalance;
         this.accountLimit = accountLimit;
         this.currencyRate = currencyRate;
@@ -69,13 +71,13 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     }
 
     public Account copy(int newId) {
-        return new Account(newId, name, comment, openingBalance, accountLimit, currencyRate, typeId, categoryId,
-                currencyId, enabled, guid, modified);
+        return new Account(newId, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
+                categoryId, currencyId, enabled, guid, modified);
     }
 
     public Account copy(int newId, int newCategoryId) {
-        return new Account(newId, name, comment, openingBalance, accountLimit, currencyRate, typeId, newCategoryId,
-                currencyId, enabled, guid, modified);
+        return new Account(newId, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
+                newCategoryId, currencyId, enabled, guid, modified);
     }
 
     public CategoryType getType() {
@@ -88,8 +90,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     }
 
     public Account enable(boolean e) {
-        return new Account(id, name, comment, openingBalance, accountLimit, currencyRate, typeId, categoryId,
-                currencyId, e, guid, modified);
+        return new Account(id, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
+                categoryId, currencyId, e, guid, modified);
     }
 
     @Override
@@ -104,6 +106,10 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
     public String getComment() {
         return comment;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
     public BigDecimal getOpeningBalance() {
@@ -159,6 +165,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         return id == that.id
                 && Objects.equals(name, that.name)
                 && Objects.equals(comment, that.comment)
+                && Objects.equals(accountNumber, that.accountNumber)
                 && openingBalance.compareTo(that.openingBalance) == 0
                 && accountLimit.compareTo(that.accountLimit) == 0
                 && currencyRate.compareTo(that.currencyRate) == 0
@@ -172,7 +179,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, openingBalance.stripTrailingZeros(), accountLimit.stripTrailingZeros(),
+        return Objects.hash(id, name, comment, accountNumber, openingBalance.stripTrailingZeros(), accountLimit.stripTrailingZeros(),
                 currencyRate.stripTrailingZeros(), typeId, categoryId, currencyId, enabled,
                 guid, modified);
     }
@@ -183,6 +190,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
                 + " id:" + id
                 + " name:" + name
                 + " comment:" + comment
+                + " accountNumber:" + accountNumber
                 + " categoryId:" + categoryId
                 + "]";
 
@@ -221,5 +229,9 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
                     return amount;
                 })
                 .reduce(total ? this.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public String getAccountNumberNoSpaces() {
+        return getAccountNumber().replaceAll(" ", "");
     }
 }

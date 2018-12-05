@@ -18,6 +18,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>9</categoryId>
             <comment></comment>
+            <accountNumber>12345 678 9 11112222</accountNumber>
             <currencyId>0</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -31,6 +32,7 @@
             <accountLimit>207000.000000</accountLimit>
             <categoryId>5</categoryId>
             <comment>Super Bank</comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -44,6 +46,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>8</categoryId>
             <comment></comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -57,6 +60,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>8</categoryId>
             <comment></comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -70,6 +74,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>2</categoryId>
             <comment>Account number</comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -83,6 +88,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>29</categoryId>
             <comment>1234456789</comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -96,6 +102,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>9</categoryId>
             <comment></comment>
+            <accountNumber></accountNumber>
             <currencyId>0</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -109,6 +116,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>8</categoryId>
             <comment></comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -122,6 +130,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>1</categoryId>
             <comment>VISA</comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
@@ -135,6 +144,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>4</categoryId>
             <comment></comment>
+            <accountNumber></accountNumber>
             <currencyId>2</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>

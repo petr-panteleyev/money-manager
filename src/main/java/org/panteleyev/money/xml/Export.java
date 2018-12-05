@@ -206,6 +206,7 @@ public class Export {
 
         appendTextNode(e, "name", account.getName());
         appendTextNode(e, "comment", account.getComment());
+        appendTextNode(e, "accountNumber", account.getAccountNumber());
         appendTextNode(e, "openingBalance", account.getOpeningBalance());
         appendTextNode(e, "accountLimit", account.getAccountLimit());
         appendTextNode(e, "currencyRate", account.getCurrencyRate());

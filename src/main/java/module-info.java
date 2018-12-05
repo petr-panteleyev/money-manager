@@ -3,6 +3,7 @@ open module org.panteleyev.money {
     requires java.prefs;
     requires java.sql;
     requires java.naming;
+    requires java.net.http;
 
     requires jdk.crypto.cryptoki;
 
@@ -10,7 +11,6 @@ open module org.panteleyev.money {
     requires javafx.controls;
     requires javafx.web;
     requires javafx.swing;          // for tests
-    requires jdk.incubator.httpclient;
 
     requires org.panteleyev.persistence;
     requires org.panteleyev.utilities;

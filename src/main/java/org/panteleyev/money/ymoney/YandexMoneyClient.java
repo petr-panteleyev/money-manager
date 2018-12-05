@@ -28,15 +28,15 @@ package org.panteleyev.money.ymoney;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import jdk.incubator.http.HttpClient;
-import jdk.incubator.http.HttpRequest;
-import jdk.incubator.http.HttpResponse;
 import org.panteleyev.money.Options;
 import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementRecord;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -106,10 +106,10 @@ public class YandexMoneyClient {
             var httpRequest = historyRequestBuilder
                     .header("Authorization", "Bearer " + token)
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublisher.fromString(body))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
-            var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandler.asString());
+            var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             int status = httpResponse.statusCode();
             if (status != 200) {
                 throw new RuntimeException("Invalid history");
@@ -156,9 +156,9 @@ public class YandexMoneyClient {
 
                 var httpRequest = tokenRequestBuilder
                         .header("Content-Type", "application/x-www-form-urlencoded")
-                        .POST(HttpRequest.BodyPublisher.fromString(body))
+                        .POST(HttpRequest.BodyPublishers.ofString(body))
                         .build();
-                var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandler.asString());
+                var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
                 int status = httpResponse.statusCode();
                 if (status != 200) {
                     throw new RuntimeException("Invalid response");
@@ -192,9 +192,9 @@ public class YandexMoneyClient {
             var request = accountInfoRequestBuilder
                     .header("Authorization", "Bearer " + token)
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublisher.noBody())
+                    .POST(HttpRequest.BodyPublishers.noBody())
                     .build();
-            var httpResponse = httpClient.send(request, HttpResponse.BodyHandler.asString());
+            var httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             int status = httpResponse.statusCode();
             if (status != 200) {
                 return Optional.empty();

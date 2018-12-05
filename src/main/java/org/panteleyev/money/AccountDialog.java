@@ -55,6 +55,7 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField nameEdit = new TextField();
     private final TextField initialEdit = new TextField();
     private final TextField commentEdit = new TextField();
+    private final TextField accountNumberEdit = new TextField();
     private final ComboBox<CategoryType> typeComboBox = new ComboBox<>();
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
@@ -80,6 +81,7 @@ class AccountDialog extends BaseDialog<Account> {
         gridPane.addRow(index++, new Label(RB.getString("label.Type")), typeComboBox);
         gridPane.addRow(index++, new Label(RB.getString("label.Category")), categoryComboBox);
         gridPane.addRow(index++, new Label(RB.getString("account.Dialog.InitialBalance")), initialEdit);
+        gridPane.addRow(index++, new Label(RB.getString("label.Account.Number")), accountNumberEdit);
         gridPane.addRow(index++, new Label(RB.getString("label.Comment")), commentEdit);
         gridPane.addRow(index++, new Label(RB.getString("account.Dialog.Currency")), currencyComboBox);
         gridPane.add(activeCheckBox, 1, index);
@@ -130,6 +132,7 @@ class AccountDialog extends BaseDialog<Account> {
         } else {
             nameEdit.setText(account.getName());
             commentEdit.setText(account.getComment());
+            accountNumberEdit.setText(account.getAccountNumber());
             initialEdit.setText(account.getOpeningBalance().toString());
             activeCheckBox.setSelected(account.getEnabled());
 
@@ -148,6 +151,7 @@ class AccountDialog extends BaseDialog<Account> {
                 return new Account(account != null ? account.getId() : 0,
                         nameEdit.getText(),
                         commentEdit.getText(),
+                        accountNumberEdit.getText(),
                         new BigDecimal(initialEdit.getText()),
                         BigDecimal.ZERO,
                         BigDecimal.ONE,

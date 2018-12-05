@@ -126,6 +126,7 @@
             <xsd:element name="accountLimit" type="xsd:decimal"/>
             <xsd:element name="categoryId" type="Id"/>
             <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="accountNumber" type="xsd:string"/>
             <xsd:element name="currencyId" type="OptionalId"/>
             <xsd:element name="currencyRate" type="xsd:decimal"/>
             <xsd:element name="enabled" type="xsd:boolean"/>

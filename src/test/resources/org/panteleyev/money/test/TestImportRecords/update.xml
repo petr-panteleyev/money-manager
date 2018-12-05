@@ -18,6 +18,7 @@
             <accountLimit>0.000000</accountLimit>
             <categoryId>9</categoryId>
             <comment>Updated account</comment>
+            <accountNumber>12345 678 9 33334444</accountNumber>
             <currencyId>0</currencyId>
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
