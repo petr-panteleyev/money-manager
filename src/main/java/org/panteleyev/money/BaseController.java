@@ -29,7 +29,7 @@ package org.panteleyev.money;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
-import org.panteleyev.utilities.fx.Controller;
+import org.panteleyev.commons.fx.Controller;
 import java.util.ResourceBundle;
 
 public class BaseController extends Controller {

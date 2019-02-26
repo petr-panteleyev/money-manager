@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,57 @@ package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
 import org.testng.annotations.Test;
-import java.math.BigDecimal;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.BaseTestUtils.randomId;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newCurrency;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 
 public class TestCurrency extends BaseTest {
     @Test
     public void testEquals() {
-        int id = randomId();
-        String symbol = UUID.randomUUID().toString();
-        String description = UUID.randomUUID().toString();
-        String formatSymbol = UUID.randomUUID().toString();
-        int formatSymbolPosition = RANDOM.nextInt();
-        boolean showFormatSymbol = RANDOM.nextBoolean();
-        boolean def = RANDOM.nextBoolean();
-        BigDecimal rate = randomBigDecimal();
-        int direction = RANDOM.nextInt();
-        boolean useSeparator = RANDOM.nextBoolean();
-        String uuid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var id = randomId();
+        var symbol = UUID.randomUUID().toString();
+        var description = UUID.randomUUID().toString();
+        var formatSymbol = UUID.randomUUID().toString();
+        var formatSymbolPosition = RANDOM.nextInt();
+        var showFormatSymbol = RANDOM.nextBoolean();
+        var def = RANDOM.nextBoolean();
+        var rate = randomBigDecimal();
+        var direction = RANDOM.nextInt();
+        var useSeparator = RANDOM.nextBoolean();
+        var uuid = UUID.randomUUID().toString();
+        var modified = System.currentTimeMillis();
 
-        Currency c1 = new Currency(id, symbol, description, formatSymbol,
-                formatSymbolPosition, showFormatSymbol,
-                def, rate, direction, useSeparator,
-                uuid, modified
-        );
+        var c1 = new Currency.Builder(id)
+            .symbol(symbol)
+            .description(description)
+            .formatSymbol(formatSymbol)
+            .formatSymbolPosition(formatSymbolPosition)
+            .showFormatSymbol(showFormatSymbol)
+            .def(def)
+            .rate(rate)
+            .direction(direction)
+            .useThousandSeparator(useSeparator)
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
-        Currency c2 = new Currency(id, symbol, description, formatSymbol,
-                formatSymbolPosition, showFormatSymbol,
-                def, rate, direction, useSeparator,
-                uuid, modified
-        );
+        var c2 = new Currency.Builder(id)
+            .symbol(symbol)
+            .description(description)
+            .formatSymbol(formatSymbol)
+            .formatSymbolPosition(formatSymbolPosition)
+            .showFormatSymbol(showFormatSymbol)
+            .def(def)
+            .rate(rate)
+            .direction(direction)
+            .useThousandSeparator(useSeparator)
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
         assertEquals(c1, c2);
         assertEquals(c1.hashCode(), c2.hashCode());
@@ -71,10 +86,10 @@ public class TestCurrency extends BaseTest {
 
     @Test
     public void testCopy() {
-        Currency currency = newCurrency();
+        var currency = newCurrency();
 
-        int newId = randomId();
-        Currency copy = currency.copy(newId);
+        var newId = randomId();
+        var copy = currency.copy(newId);
 
         assertNotEquals(currency, copy);
 
@@ -88,5 +103,29 @@ public class TestCurrency extends BaseTest {
         assertEquals(currency.getGuid(), copy.getGuid());
         assertEquals(currency.getModified(), copy.getModified());
         assertEquals(currency.getRate(), copy.getRate());
+    }
+
+    @Test
+    public void testBuilder() {
+        var original = newCurrency();
+
+        var copy = new Currency.Builder(original).build();
+        assertEquals(copy, original);
+
+        var manualCopy = new Currency.Builder()
+            .id(original.getId())
+            .symbol(original.getSymbol())
+            .description(original.getDescription())
+            .formatSymbol(original.getFormatSymbol())
+            .formatSymbolPosition(original.getFormatSymbolPosition())
+            .showFormatSymbol(original.getShowFormatSymbol())
+            .def(original.getDef())
+            .rate(original.getRate())
+            .direction(original.getDirection())
+            .useThousandSeparator(original.getUseThousandSeparator())
+            .guid(original.getGuid())
+            .modified(original.getModified())
+            .build();
+        assertEquals(manualCopy, original);
     }
 }

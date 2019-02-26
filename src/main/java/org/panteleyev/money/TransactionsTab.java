@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,27 +43,27 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import org.panteleyev.money.details.TransactionDetail;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Contact;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.money.statements.StatementRecord;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
-final class TransactionsTab extends BorderPane {
+final class TransactionsTab extends BorderPane implements TransactionTableView.TransactionDetailsCallback {
     private final static Logger LOGGER = Logger.getLogger(TransactionsTab.class.getName());
 
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
@@ -71,7 +71,8 @@ final class TransactionsTab extends BorderPane {
     private final Spinner<Integer> yearSpinner = new Spinner<>();
     private final Label transactionCountLabel = new Label();
 
-    private final TransactionTableView transactionTable = new TransactionTableView(false);
+    private final TransactionTableView transactionTable =
+        new TransactionTableView(TransactionTableView.Mode.ACCOUNT, this);
     private final TransactionEditorPane transactionEditor = new TransactionEditorPane();
 
     private final MapChangeListener<Integer, Account> accountListener = change -> {
@@ -80,26 +81,26 @@ final class TransactionsTab extends BorderPane {
     };
 
     TransactionsTab() {
-        Button prevButton = new Button("", getButtonImage("arrow-left-16.png"));
+        var prevButton = new Button("", getButtonImage("arrow-left-16.png"));
         prevButton.setOnAction(event -> onPrevMonth());
 
-        Button todayButton = new Button("", getButtonImage("bullet-black-16.png"));
+        var todayButton = new Button("", getButtonImage("bullet-black-16.png"));
         todayButton.setOnAction(event -> onCurrentMonth());
 
-        Button nextButton = new Button("", getButtonImage("arrow-right-16.png"));
+        var nextButton = new Button("", getButtonImage("arrow-right-16.png"));
         nextButton.setOnAction(event -> onNextMonth());
 
         monthFilterBox.setOnAction(event -> onMonthChanged());
 
-        HBox hBox = new HBox(5.0,
-                accountFilterBox,
-                monthFilterBox,
-                yearSpinner,
-                prevButton,
-                todayButton,
-                nextButton,
-                new Label("Transactions:"),
-                transactionCountLabel
+        var hBox = new HBox(5.0,
+            accountFilterBox,
+            monthFilterBox,
+            yearSpinner,
+            prevButton,
+            todayButton,
+            nextButton,
+            new Label("Transactions:"),
+            transactionCountLabel
         );
         hBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -115,11 +116,11 @@ final class TransactionsTab extends BorderPane {
 
         for (int i = 1; i <= 12; i++) {
             monthFilterBox.getItems()
-                    .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
+                .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
         }
 
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
-                .IntegerSpinnerValueFactory(1970, 2050);
+            .IntegerSpinnerValueFactory(1970, 2050);
         yearSpinner.setValueFactory(valueFactory);
         yearSpinner.valueProperty().addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
 
@@ -127,8 +128,6 @@ final class TransactionsTab extends BorderPane {
         transactionEditor.setOnUpdateTransaction(this::onUpdateTransaction);
         transactionEditor.setOnDeleteTransaction(this::onDeleteTransaction);
 
-        transactionTable.setOnAddGroup(this::onAddGroup);
-        transactionTable.setOnDeleteGroup(this::onDeleteGroup);
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
         setCurrentDate();
@@ -162,17 +161,17 @@ final class TransactionsTab extends BorderPane {
         });
 
         accountFilterBox.getSelectionModel().selectedIndexProperty()
-                .addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
+            .addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
 
         getDao().accounts().addListener(accountListener);
 
         getDao().preloadingProperty().addListener(
-                (x, y, newValue) -> {
-                    if (!newValue) {
-                        Platform.runLater(this::initAccountFilterBox);
-                        Platform.runLater(this::reloadTransactions);
-                    }
-                });
+            (x, y, newValue) -> {
+                if (!newValue) {
+                    Platform.runLater(this::initAccountFilterBox);
+                    Platform.runLater(this::reloadTransactions);
+                }
+            });
     }
 
     TransactionEditorPane getTransactionEditor() {
@@ -180,7 +179,7 @@ final class TransactionsTab extends BorderPane {
     }
 
     private ImageView getButtonImage(String name) {
-        ImageView image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
+        var image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
         image.setFitHeight(16.0);
         image.setFitWidth(16.0);
         return image;
@@ -191,9 +190,9 @@ final class TransactionsTab extends BorderPane {
             accountFilterBox.getItems().add(new Separator());
 
             aList.stream()
-                    .filter(Account::getEnabled)
-                    .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
-                    .forEach(account -> accountFilterBox.getItems().add(account));
+                .filter(Account::getEnabled)
+                .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
+                .forEach(account -> accountFilterBox.getItems().add(account));
         }
     }
 
@@ -208,9 +207,9 @@ final class TransactionsTab extends BorderPane {
     }
 
     private void setCurrentDate() {
-        Calendar cal = Calendar.getInstance();
-        monthFilterBox.getSelectionModel().select(cal.get(Calendar.MONTH));
-        yearSpinner.getValueFactory().setValue(cal.get(Calendar.YEAR));
+        var now = LocalDate.now();
+        monthFilterBox.getSelectionModel().select(now.getMonth().getValue() - 1);
+        yearSpinner.getValueFactory().setValue(now.getYear());
     }
 
     private void setDate(LocalDate date) {
@@ -257,9 +256,11 @@ final class TransactionsTab extends BorderPane {
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        Predicate<Transaction> filter = t -> t.getMonth() == month && t.getYear() == year;
+        Predicate<Transaction> filter = t -> t.getMonth() == month
+            && t.getYear() == year;
+//            && t.getParentId() == 0;
 
-        Object selected = accountFilterBox.getSelectionModel().getSelectedItem();
+        var selected = accountFilterBox.getSelectionModel().getSelectedItem();
         if (selected instanceof Account) {
             int id = ((Account) selected).getId();
             filter = filter.and(t -> t.getAccountCreditedId() == id || t.getAccountDebitedId() == id);
@@ -281,7 +282,11 @@ final class TransactionsTab extends BorderPane {
     }
 
     private Contact createContact(String name) {
-        Contact contact = new Contact(getDao().generatePrimaryKey(dtoClass(Contact.class)), name);
+        var contact = new Contact.Builder()
+            .id(getDao().generatePrimaryKey(dtoClass(Contact.class)))
+            .name(name)
+            .build();
+
         getDao().insertContact(contact);
         return contact;
     }
@@ -297,9 +302,8 @@ final class TransactionsTab extends BorderPane {
         int year = yearSpinner.getValue();
 
         builder.id(getDao().generatePrimaryKey(dtoClass(Transaction.class)))
-                .month(month)
-                .year(year)
-                .groupId(0);
+            .month(month)
+            .year(year);
 
         transactionEditor.clear();
         getDao().insertTransaction(builder.build());
@@ -321,46 +325,19 @@ final class TransactionsTab extends BorderPane {
         getDao().updateTransaction(builder.build());
     }
 
-    private void onAddGroup(TransactionGroup group, List<Transaction> transactions) {
-        int groupId = getDao().generatePrimaryKey(dtoClass(TransactionGroup.class));
-
-        TransactionGroup grp = group.copy(groupId);
-
-        for (Transaction t : transactions) {
-            getDao().updateTransaction(t.setGroupId(groupId));
-        }
-
-        getDao().insertTransactionGroup(grp);
-    }
-
-    private void onDeleteGroup(List<Transaction> transactions) {
-        if (transactions.isEmpty()) {
-            LOGGER.warning("Attempt to delete empty transaction group");
-            return;
-        }
-
-        int groupId = transactions.get(0).getGroupId();
-
-        for (Transaction t : transactions) {
-            getDao().updateTransaction(t.setGroupId(0));
-        }
-
-        getDao().deleteTransactionGroup(groupId);
-    }
-
     private void onDeleteTransaction(int id) {
         new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
-                .showAndWait()
-                .ifPresent(r -> {
-                    if (r == ButtonType.OK) {
-                        transactionEditor.clear();
-                        getDao().deleteTransaction(id);
-                    }
-                });
+            .showAndWait()
+            .ifPresent(r -> {
+                if (r == ButtonType.OK) {
+                    transactionEditor.clear();
+                    getDao().deleteTransaction(id);
+                }
+            });
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
-        for (Transaction t : transactions) {
+        for (var t : transactions) {
             getDao().updateTransaction(t.check(check));
         }
     }
@@ -378,5 +355,46 @@ final class TransactionsTab extends BorderPane {
             setDate(record.getActual());
             transactionEditor.setTransactionFromStatement(record, account);
         });
+    }
+
+    @Override
+    public void handleTransactionDetails(Transaction transaction, List<TransactionDetail> details) {
+        var childTransactions = getDao().getTransactionDetails(transaction);
+
+        if (details.isEmpty()) {
+            if (!childTransactions.isEmpty()) {
+                for (Transaction child : childTransactions) {
+                    getDao().deleteTransaction(child.getId());
+                }
+                var noChildren = new Transaction.Builder(transaction)
+                    .detailed(false)
+                    .timestamp()
+                    .build();
+                getDao().updateTransaction(noChildren);
+            }
+        } else {
+            getDao().updateTransaction(new Transaction.Builder(transaction)
+                .detailed(true)
+                .timestamp()
+                .build());
+
+            for (Transaction ch : childTransactions) {
+                getDao().deleteTransaction(ch.getId());
+            }
+
+            for (var transactionDetail : details) {
+                var newDetail = new Transaction.Builder(transaction)
+                    .id(getDao().generatePrimaryKey(dtoClass(Transaction.class)))
+                    .accountCreditedId(transactionDetail.getAccountCreditedId())
+                    .amount(transactionDetail.getAmount())
+                    .comment(transactionDetail.getComment())
+                    .guid(UUID.randomUUID().toString())
+                    .parentId(transaction.getId())
+                    .detailed(false)
+                    .timestamp()
+                    .build();
+                getDao().insertTransaction(newDetail);
+            }
+        }
     }
 }

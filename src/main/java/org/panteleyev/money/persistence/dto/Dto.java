@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.persistence.Record;
 
 public interface Dto<T> extends Record {
@@ -52,8 +51,6 @@ public interface Dto<T> extends Record {
             return new CurrencyDto((Currency) model, password);
         } else if (model instanceof Transaction) {
             return new TransactionDto((Transaction) model, password);
-        } else if (model instanceof TransactionGroup) {
-            return new TransactionGroupDto((TransactionGroup) model, password);
         } else {
             throw new IllegalArgumentException("Unknown record type");
         }
@@ -70,8 +67,6 @@ public interface Dto<T> extends Record {
             return CurrencyDto.class;
         } else if (model instanceof Transaction) {
             return TransactionDto.class;
-        } else if (model instanceof TransactionGroup) {
-            return TransactionGroupDto.class;
         } else {
             throw new IllegalArgumentException("Unknown record type");
         }
@@ -88,8 +83,6 @@ public interface Dto<T> extends Record {
             return CurrencyDto.class;
         } else if (Transaction.class.equals(modelClass)) {
             return TransactionDto.class;
-        } else if (TransactionGroup.class.equals(modelClass)) {
-            return TransactionGroupDto.class;
         } else {
             throw new IllegalArgumentException("Unknown record class");
         }

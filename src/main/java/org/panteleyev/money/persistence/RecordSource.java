@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,6 +43,6 @@ public interface RecordSource {
     Optional<Currency> getCurrency(int id);
     Optional<Contact> getContact(int id);
     Optional<Account> getAccount(int id);
-    Optional<TransactionGroup> getTransactionGroup(int id);
     Optional<Transaction> getTransaction(int id);
+    List<Transaction> getTransactionDetails(Transaction parent);
 }

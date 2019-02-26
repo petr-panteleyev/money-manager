@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,39 +27,62 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import java.math.BigDecimal;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
 import static org.panteleyev.money.BaseTestUtils.randomId;
 import static org.panteleyev.money.BaseTestUtils.randomString;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.randomCategoryType;
 import static org.testng.Assert.assertEquals;
 
 public class TestAccount extends BaseTest {
     @Test
     public void testEquals() {
         int id = randomId();
-        String name = UUID.randomUUID().toString();
-        String comment = UUID.randomUUID().toString();
-        String accountNumber = UUID.randomUUID().toString();
-        BigDecimal opening = randomBigDecimal();
-        BigDecimal limit = randomBigDecimal();
-        BigDecimal rate = randomBigDecimal();
-        CategoryType type = randomCategoryType();
-        int categoryId = randomId();
-        int currencyId = randomId();
-        boolean enabled = RANDOM.nextBoolean();
-        String uuid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var name = UUID.randomUUID().toString();
+        var comment = UUID.randomUUID().toString();
+        var accountNumber = UUID.randomUUID().toString();
+        var opening = randomBigDecimal();
+        var limit = randomBigDecimal();
+        var rate = randomBigDecimal();
+        var type = randomCategoryType();
+        var categoryId = randomId();
+        var currencyId = randomId();
+        var enabled = RANDOM.nextBoolean();
+        var uuid = randomString();
+        var modified = System.currentTimeMillis();
 
-        Account a1 = new Account(id, name, comment, accountNumber, opening, limit, rate, type.getId(), categoryId,
-                currencyId, enabled, uuid, modified);
-        Account a2 = new Account(id, name, comment, accountNumber, opening, limit, rate, type.getId(), categoryId,
-                currencyId, enabled, uuid, modified);
+        var a1 = new Account.Builder()
+            .id(id).name(name)
+            .comment(comment)
+            .accountNumber(accountNumber)
+            .openingBalance(opening)
+            .accountLimit(limit)
+            .currencyRate(rate)
+            .typeId(type.getId())
+            .categoryId(categoryId)
+            .currencyId(currencyId)
+            .enabled(enabled)
+            .guid(uuid)
+            .modified(modified)
+            .build();
+
+        var a2 = new Account.Builder()
+            .id(id).name(name)
+            .comment(comment)
+            .accountNumber(accountNumber)
+            .openingBalance(opening)
+            .accountLimit(limit)
+            .currencyRate(rate)
+            .typeId(type.getId())
+            .categoryId(categoryId)
+            .currencyId(currencyId)
+            .enabled(enabled)
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
         assertEquals(a1, a2);
         assertEquals(a1.hashCode(), a2.hashCode());
@@ -67,19 +90,65 @@ public class TestAccount extends BaseTest {
 
     @DataProvider(name = "testAccountNumberDataProvider")
     public Object[][] testAccountNumberDataProvider() {
-        return new Object[][] {
-                {"   1234  5 6   78 ", "12345678"},
-                {"12345678", "12345678"},
-                {"123456 78    ", "12345678"},
-                {" 12345678", "12345678"},
+        return new Object[][]{
+            {"   1234  5 6   78 ", "12345678"},
+            {"12345678", "12345678"},
+            {"123456 78    ", "12345678"},
+            {" 12345678", "12345678"},
         };
     }
+
     @Test(dataProvider = "testAccountNumberDataProvider")
     public void testAccountNumber(String accountNumber, String accountNumberNoSpaces) {
-        Account a = new Account(0, "", "", accountNumber, BigDecimal.ZERO, BigDecimal.ZERO,
-                BigDecimal.ZERO, CategoryType.DEBTS.getId(), 0, 0, true, "", 0L);
+        var a = new Account.Builder()
+            .accountNumber(accountNumber)
+            .typeId(CategoryType.DEBTS.getId())
+            .categoryId(0)
+            .currencyId(0)
+            .guid("")
+            .modified(0)
+            .build();
 
         assertEquals(a.getAccountNumber(), accountNumber);
         assertEquals(a.getAccountNumberNoSpaces(), accountNumberNoSpaces);
+    }
+
+    @Test
+    public void testBuilder() {
+        var original = new Account.Builder()
+            .id(randomId())
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .openingBalance(randomBigDecimal())
+            .accountLimit(randomBigDecimal())
+            .currencyRate(randomBigDecimal())
+            .typeId(randomCategoryType().getId())
+            .categoryId(randomId())
+            .currencyId(randomId())
+            .enabled(RANDOM.nextBoolean())
+            .guid(randomString())
+            .modified(System.currentTimeMillis())
+            .build();
+
+        var copy = new Account.Builder(original).build();
+        assertEquals(copy, original);
+
+        var manualCopy = new Account.Builder()
+            .id(original.getId())
+            .name(original.getName())
+            .comment(original.getComment())
+            .accountNumber(original.getAccountNumber())
+            .openingBalance(original.getOpeningBalance())
+            .accountLimit(original.getAccountLimit())
+            .currencyRate(original.getCurrencyRate())
+            .typeId(original.getTypeId())
+            .categoryId(original.getCategoryId())
+            .currencyId(original.getCurrencyId())
+            .enabled(original.getEnabled())
+            .guid(original.getGuid())
+            .modified(original.getModified())
+            .build();
+        assertEquals(manualCopy, original);
     }
 }

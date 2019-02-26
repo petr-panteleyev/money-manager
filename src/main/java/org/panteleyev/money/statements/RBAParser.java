@@ -28,11 +28,9 @@ package org.panteleyev.money.statements;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import org.panteleyev.ofx.BankTransactionList;
+import org.panteleyev.ofx.OFXParser;
+import org.panteleyev.ofx.StatementTransaction;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -44,7 +42,6 @@ import java.util.ArrayList;
 
 class RBAParser {
     private static final DateTimeFormatter CSV_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    private static final DateTimeFormatter OFX_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final char CSV_DELIMITER = ';';
     private static final int CSV_CARD_RECORD_SIZE = 10;
     private static final int CSV_ACCOUNT_RECORD_SIZE = 6;
@@ -54,7 +51,7 @@ class RBAParser {
         try {
             var records = new ArrayList<StatementRecord>();
             var parser = CSVParser.parse(inStream, Charset.forName(CSV_ENCODING),
-                    CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
+                CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
 
             for (var r : parser.getRecords()) {
                 if (r.getRecordNumber() == 1L || r.size() < CSV_ACCOUNT_RECORD_SIZE) {
@@ -64,20 +61,20 @@ class RBAParser {
                 var date = LocalDate.parse(r.get(0), CSV_DATE_FORMAT);
 
                 records.add(new StatementRecord(
-                        date,
-                        date,
-                        r.get(1),
-                        "",
-                        "",
-                        "",
-                        r.get(2),
-                        r.get(3).replaceAll(" ", ""),
-                        r.get(4),
-                        r.get(5).replaceAll(" ", "")
+                    date,
+                    date,
+                    r.get(1),
+                    "",
+                    "",
+                    "",
+                    r.get(2),
+                    r.get(3).replaceAll(" ", ""),
+                    r.get(4),
+                    r.get(5).replaceAll(" ", "")
                 ));
             }
 
-            return new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV, records);
+            return new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV, null, records);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         } catch (DateTimeParseException ex) {
@@ -89,7 +86,7 @@ class RBAParser {
         try {
             var records = new ArrayList<StatementRecord>();
             var parser = CSVParser.parse(inStream, Charset.forName(CSV_ENCODING),
-                    CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
+                CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
 
             for (var r : parser.getRecords()) {
                 if (r.getRecordNumber() == 1L || r.size() < CSV_CARD_RECORD_SIZE) {
@@ -97,20 +94,20 @@ class RBAParser {
                 }
 
                 records.add(new StatementRecord(
-                        LocalDate.parse(r.get(0), CSV_DATE_FORMAT),
-                        LocalDate.parse(r.get(1), CSV_DATE_FORMAT),
-                        r.get(2),
-                        r.get(3),
-                        r.get(4),
-                        r.get(5),
-                        r.get(6),
-                        r.get(7).replaceAll(" ", ""),
-                        r.get(8),
-                        r.get(9).replaceAll(" ", "")
+                    LocalDate.parse(r.get(0), CSV_DATE_FORMAT),
+                    LocalDate.parse(r.get(1), CSV_DATE_FORMAT),
+                    r.get(2),
+                    r.get(3),
+                    r.get(4),
+                    r.get(5),
+                    r.get(6),
+                    r.get(7).replaceAll(" ", ""),
+                    r.get(8),
+                    r.get(9).replaceAll(" ", "")
                 ));
             }
 
-            return new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV, records);
+            return new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV, null, records);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         } catch (DateTimeParseException ex) {
@@ -119,53 +116,34 @@ class RBAParser {
     }
 
     static Statement parseOfx(InputStream inStream) {
-        try {
-            var records = new ArrayList<StatementRecord>();
-            var factory = DocumentBuilderFactory.newInstance();
-            var documentBuilder = factory.newDocumentBuilder();
-            var doc = documentBuilder.parse(inStream);
+        var records = new ArrayList<StatementRecord>();
 
-            var xPathFactory = XPathFactory.newInstance();
-            var xPath = xPathFactory.newXPath();
-            var expression = xPath.compile("/OFX/BANKMSGSRSV1/STMTTRNRS/STMTRS");
+        var parser = new OFXParser();
+        var ofxStatement = parser.parse(inStream);
 
-            var nl = (NodeList) expression.evaluate(doc, XPathConstants.NODESET);
+        var transactionList = new BankTransactionList();
+        var accountNumber = "";
 
-            for (int i = 0; i < nl.getLength(); i++) {
-                var stmtrs = (Element) nl.item(i);
-                var transactions = stmtrs.getElementsByTagName("STMTTRN");
-
-                var builder = new StatementRecord.Builder();
-                for (int j = 0; j < transactions.getLength(); j++) {
-                    var transaction = (Element) transactions.item(j);
-                    var children = transaction.getChildNodes();
-
-                    for (int k = 0; k < children.getLength(); k++) {
-                        var field = (Element) children.item(k);
-
-                        switch (field.getTagName()) {
-                            case "NAME":
-                                builder.counterParty(field.getTextContent());
-                                break;
-                            case "DTPOSTED":
-                                builder.actual(LocalDate.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                                break;
-                            case "DTAVAIL":
-                                builder.execution(LocalDate.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                                break;
-                            case "TRNAMT":
-                                builder.amount(field.getTextContent());
-                                break;
-                        }
-                    }
-
-                    records.add(builder.build());
-                }
-            }
-
-            return new Statement(Statement.StatementType.RAIFFEISEN_CARD_OFX, records);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        if (!ofxStatement.getAccountStatements().isEmpty()) {
+            var statement = ofxStatement.getAccountStatements().get(0);
+            transactionList = statement.getBankTransactionList();
+            accountNumber = statement.getAccountInfo().getAccountNumber();
+        } else if (!ofxStatement.getCreditCardStatements().isEmpty()) {
+            var statement = ofxStatement.getCreditCardStatements().get(0);
+            transactionList = ofxStatement.getCreditCardStatements().get(0).getBankTransactionList();
+            accountNumber = statement.getAccountInfo().getAccountNumber();
         }
+
+        for (StatementTransaction tr : transactionList.getTransactions()) {
+            var builder = new StatementRecord.Builder()
+                .amount(tr.getAmount().toString())
+                .counterParty(tr.getName())
+                .description(tr.getMemo())
+                .actual(tr.getDatePosted().toLocalDate())
+                .execution(tr.getDateAvailable().toLocalDate());
+            records.add(builder.build());
+        }
+
+        return new Statement(Statement.StatementType.RAIFFEISEN_OFX, accountNumber, records);
     }
 }

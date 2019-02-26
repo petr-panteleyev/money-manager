@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -39,20 +40,21 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 class RequestTab extends BorderPane {
     private static final ResourceBundle rb = MainWindowController.RB;
 
-    private final TransactionTableView table = new TransactionTableView(true);
+    private final TransactionTableView table = new TransactionTableView(TransactionTableView.Mode.QUERY);
 
     private final AccountFilterSelectionBox accBox = new AccountFilterSelectionBox();
+    private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
 
     RequestTab() {
-        Button clearButton = new Button(rb.getString("button.Clear"));
+        var clearButton = new Button(rb.getString("button.Clear"));
         clearButton.setOnAction(event -> onClearButton());
 
-        Button findButton = new Button(rb.getString("button.Find"));
+        var findButton = new Button(rb.getString("button.Find"));
         findButton.setOnAction(event -> onFindButton());
 
-        HBox row1 = new HBox(5.0, clearButton, findButton);
-
-        VBox vBox = new VBox(5.0, row1, accBox);
+        var vBox = new VBox(5.0,
+            new HBox(5.0, clearButton, findButton),
+            new HBox(5.0, accBox, transactionFilterBox));
 
         setTop(vBox);
         setCenter(table);
@@ -63,7 +65,8 @@ class RequestTab extends BorderPane {
     }
 
     private void onFindButton() {
-        table.setTransactionFilter(accBox.getTransactionFilter());
+        table.setTransactionFilter(accBox.getTransactionFilter()
+            .and(transactionFilterBox.getTransactionFilter()));
     }
 
     private void onClearButton() {
@@ -75,5 +78,10 @@ class RequestTab extends BorderPane {
         for (Transaction t : transactions) {
             getDao().updateTransaction(t.check(check));
         }
+    }
+
+    void showTransactionsForAccount(Account account) {
+        accBox.setAccount(account);
+        onFindButton();
     }
 }

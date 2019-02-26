@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,7 +41,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.ContactType;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.util.UUID;
 import static org.panteleyev.money.MainWindowController.RB;
 
@@ -63,7 +63,7 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         setTitle(RB.getString("contact.Dialog.Title"));
 
-        GridPane gridPane = new GridPane();
+        var gridPane = new GridPane();
 
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
@@ -80,7 +80,7 @@ final class ContactDialog extends BaseDialog<Contact> {
         gridPane.addRow(index++, new Label(RB.getString("label.ZIP")), zipField);
         gridPane.addRow(index, new Label(RB.getString("label.Comment")), commentEdit);
 
-        RowConstraints topAlignmentConstraints = new RowConstraints();
+        var topAlignmentConstraints = new RowConstraints();
         topAlignmentConstraints.setValignment(VPos.TOP);
         for (int i = 0; i < index; i++) {
             gridPane.getRowConstraints().add(new RowConstraints());
@@ -117,21 +117,21 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Contact(contact != null ? contact.getId() :0,
-                        nameField.getText(),
-                        typeChoiceBox.getSelectionModel().getSelectedItem().getId(),
-                        phoneField.getText(),
-                        mobileField.getText(),
-                        emailField.getText(),
-                        webField.getText(),
-                        commentEdit.getText(),
-                        streetField.getText(),
-                        cityField.getText(),
-                        countryField.getText(),
-                        zipField.getText(),
-                        contact != null? contact.getGuid() :UUID.randomUUID().toString(),
-                        System.currentTimeMillis()
-                );
+                return new Contact.Builder(contact != null ? contact.getId() : 0)
+                    .name(nameField.getText())
+                    .typeId(typeChoiceBox.getSelectionModel().getSelectedItem().getId())
+                    .phone(phoneField.getText())
+                    .mobile(mobileField.getText())
+                    .email(emailField.getText())
+                    .web(webField.getText())
+                    .comment(commentEdit.getText())
+                    .street(streetField.getText())
+                    .city(cityField.getText())
+                    .country(countryField.getText())
+                    .zip(zipField.getText())
+                    .guid(contact != null ? contact.getGuid() : UUID.randomUUID().toString())
+                    .modified(System.currentTimeMillis())
+                    .build();
             } else {
                 return null;
             }
@@ -143,7 +143,7 @@ final class ContactDialog extends BaseDialog<Contact> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameField, (Control control, String value) ->
-                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
         validation.initInitialDecoration();
     }

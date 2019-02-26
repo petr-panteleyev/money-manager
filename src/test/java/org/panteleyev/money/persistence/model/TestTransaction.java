@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,172 +27,126 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import java.math.BigDecimal;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.BaseTestUtils.newTransaction;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
 import static org.panteleyev.money.BaseTestUtils.randomDay;
 import static org.panteleyev.money.BaseTestUtils.randomId;
 import static org.panteleyev.money.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.BaseTestUtils.randomTransactionType;
 import static org.panteleyev.money.BaseTestUtils.randomYear;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.randomCategoryType;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.randomTransactionType;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class TestTransaction extends BaseTest {
     @Test
     public void testEquals() {
-        int id = randomId();
-        BigDecimal amount = randomBigDecimal();
-        int day = randomDay();
-        int month = randomMonth();
-        int year = randomYear();
-        int transactionTypeId = randomTransactionType().getId();
-        String comment = UUID.randomUUID().toString();
-        boolean checked = RANDOM.nextBoolean();
-        int accountDebitedId = randomId();
-        int accountCreditedId = randomId();
-        int accountDebitedTypeId = randomCategoryType().getId();
-        int accountCreditedTypeId = randomCategoryType().getId();
-        int accountDebitedCategoryId = randomId();
-        int accountCreditedCategoryId = randomId();
-        int groupId = randomId();
-        int contactId = randomId();
-        BigDecimal rate = randomBigDecimal();
-        int rateDirection = RANDOM.nextInt();
-        String invoiceNumber = UUID.randomUUID().toString();
-        String guid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var id = randomId();
+        var amount = randomBigDecimal();
+        var day = randomDay();
+        var month = randomMonth();
+        var year = randomYear();
+        var transactionTypeId = randomTransactionType().getId();
+        var comment = UUID.randomUUID().toString();
+        var checked = RANDOM.nextBoolean();
+        var accountDebitedId = randomId();
+        var accountCreditedId = randomId();
+        var accountDebitedTypeId = randomCategoryType().getId();
+        var accountCreditedTypeId = randomCategoryType().getId();
+        var accountDebitedCategoryId = randomId();
+        var accountCreditedCategoryId = randomId();
+        var contactId = randomId();
+        var rate = randomBigDecimal();
+        var rateDirection = RANDOM.nextInt();
+        var invoiceNumber = UUID.randomUUID().toString();
+        var guid = UUID.randomUUID().toString();
+        var modified = System.currentTimeMillis();
+        var parentId = randomId();
+        var detailed = RANDOM.nextBoolean();
 
-        Transaction t1 = new Transaction(id, amount, day, month, year,
+        var t1 = new Transaction(id, amount, day, month, year,
                 transactionTypeId, comment, checked,
                 accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
                 accountDebitedCategoryId, accountCreditedCategoryId,
-                groupId, contactId, rate, rateDirection, invoiceNumber,
-                guid, modified);
+                contactId, rate, rateDirection, invoiceNumber,
+                guid, modified, parentId, detailed);
 
-        Transaction t2 = new Transaction(id, amount, day, month, year,
+        var t2 = new Transaction(id, amount, day, month, year,
                 transactionTypeId, comment, checked,
                 accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
                 accountDebitedCategoryId, accountCreditedCategoryId,
-                groupId, contactId, rate, rateDirection, invoiceNumber,
-                guid, modified);
+                contactId, rate, rateDirection, invoiceNumber,
+                guid, modified, parentId, detailed);
 
-        Assert.assertEquals(t2, t1);
-        Assert.assertEquals(t2.hashCode(), t1.hashCode());
+        assertEquals(t2, t1);
+        assertEquals(t2.hashCode(), t1.hashCode());
     }
 
     @Test
     public void testCheck() {
-        int id = randomId();
-        BigDecimal amount = randomBigDecimal();
-        int day = randomDay();
-        int month = randomMonth();
-        int year = randomYear();
-        int transactionTypeId = randomTransactionType().getId();
-        String comment = UUID.randomUUID().toString();
-        boolean checked = RANDOM.nextBoolean();
-        int accountDebitedId = randomId();
-        int accountCreditedId = randomId();
-        int accountDebitedTypeId = randomCategoryType().getId();
-        int accountCreditedTypeId = randomCategoryType().getId();
-        int accountDebitedCategoryId = randomId();
-        int accountCreditedCategoryId = randomId();
-        int groupId = randomId();
-        int contactId = randomId();
-        BigDecimal rate = randomBigDecimal();
-        int rateDirection = RANDOM.nextInt();
-        String invoiceNumber = UUID.randomUUID().toString();
-        String guid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var id = randomId();
+        var amount = randomBigDecimal();
+        var day = randomDay();
+        var month = randomMonth();
+        var year = randomYear();
+        var transactionTypeId = randomTransactionType().getId();
+        var comment = UUID.randomUUID().toString();
+        var checked = RANDOM.nextBoolean();
+        var accountDebitedId = randomId();
+        var accountCreditedId = randomId();
+        var accountDebitedTypeId = randomCategoryType().getId();
+        var accountCreditedTypeId = randomCategoryType().getId();
+        var accountDebitedCategoryId = randomId();
+        var accountCreditedCategoryId = randomId();
+        var contactId = randomId();
+        var rate = randomBigDecimal();
+        var rateDirection = RANDOM.nextInt();
+        var invoiceNumber = UUID.randomUUID().toString();
+        var guid = UUID.randomUUID().toString();
+        var modified = System.currentTimeMillis();
+        int parentId = randomId();
+        boolean detailed = RANDOM.nextBoolean();
 
         Transaction t1 = new Transaction(id, amount, day, month, year,
                 transactionTypeId, comment, checked,
                 accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
                 accountDebitedCategoryId, accountCreditedCategoryId,
-                groupId, contactId, rate, rateDirection, invoiceNumber,
-                guid, modified);
+                contactId, rate, rateDirection, invoiceNumber,
+                guid, modified, parentId, detailed);
 
-        Transaction t2 = t1.check(!t1.getChecked());
+        var t2 = t1.check(!t1.getChecked());
 
-        Assert.assertEquals(t2.getId(), t1.getId());
-        Assert.assertEquals(t2.getAmount(), t1.getAmount());
-        Assert.assertEquals(t2.getDay(), t1.getDay());
-        Assert.assertEquals(t2.getMonth(), t1.getMonth());
-        Assert.assertEquals(t2.getYear(), t1.getYear());
-        Assert.assertEquals(t2.getTransactionTypeId(), t1.getTransactionTypeId());
-        Assert.assertEquals(t2.getComment(), t1.getComment());
-        Assert.assertEquals(t2.getChecked(), !t1.getChecked());
-        Assert.assertEquals(t2.getAccountDebitedId(), t1.getAccountDebitedId());
-        Assert.assertEquals(t2.getAccountCreditedId(), t1.getAccountCreditedId());
-        Assert.assertEquals(t2.getAccountDebitedType(), t1.getAccountDebitedType());
-        Assert.assertEquals(t2.getAccountCreditedType(), t1.getAccountCreditedType());
-        Assert.assertEquals(t2.getAccountDebitedCategoryId(), t1.getAccountDebitedCategoryId());
-        Assert.assertEquals(t2.getAccountCreditedCategoryId(), t1.getAccountCreditedCategoryId());
-        Assert.assertEquals(t2.getGroupId(), t1.getGroupId());
-        Assert.assertEquals(t2.getContactId(), t1.getContactId());
-        Assert.assertEquals(t2.getRate(), t1.getRate());
-        Assert.assertEquals(t2.getRateDirection(), t1.getRateDirection());
-        Assert.assertEquals(t2.getInvoiceNumber(), t1.getInvoiceNumber());
-        Assert.assertEquals(t2.getGuid(), t1.getGuid());
-        Assert.assertTrue(t2.getModified() >= t1.getModified());
+        assertEquals(t2.getId(), t1.getId());
+        assertEquals(t2.getAmount(), t1.getAmount());
+        assertEquals(t2.getDay(), t1.getDay());
+        assertEquals(t2.getMonth(), t1.getMonth());
+        assertEquals(t2.getYear(), t1.getYear());
+        assertEquals(t2.getTransactionTypeId(), t1.getTransactionTypeId());
+        assertEquals(t2.getComment(), t1.getComment());
+        assertEquals(t2.getChecked(), !t1.getChecked());
+        assertEquals(t2.getAccountDebitedId(), t1.getAccountDebitedId());
+        assertEquals(t2.getAccountCreditedId(), t1.getAccountCreditedId());
+        assertEquals(t2.getAccountDebitedType(), t1.getAccountDebitedType());
+        assertEquals(t2.getAccountCreditedType(), t1.getAccountCreditedType());
+        assertEquals(t2.getAccountDebitedCategoryId(), t1.getAccountDebitedCategoryId());
+        assertEquals(t2.getAccountCreditedCategoryId(), t1.getAccountCreditedCategoryId());
+        assertEquals(t2.getContactId(), t1.getContactId());
+        assertEquals(t2.getRate(), t1.getRate());
+        assertEquals(t2.getRateDirection(), t1.getRateDirection());
+        assertEquals(t2.getInvoiceNumber(), t1.getInvoiceNumber());
+        assertEquals(t2.getGuid(), t1.getGuid());
+        assertTrue(t2.getModified() >= t1.getModified());
     }
 
     @Test
-    public void testSetGroupId() {
-        int id = randomId();
-        BigDecimal amount = randomBigDecimal();
-        int day = randomDay();
-        int month = randomMonth();
-        int year = randomYear();
-        int transactionTypeId = randomTransactionType().getId();
-        String comment = UUID.randomUUID().toString();
-        boolean checked = RANDOM.nextBoolean();
-        int accountDebitedId = randomId();
-        int accountCreditedId = randomId();
-        int accountDebitedTypeId = randomCategoryType().getId();
-        int accountCreditedTypeId = randomCategoryType().getId();
-        int accountDebitedCategoryId = randomId();
-        int accountCreditedCategoryId = randomId();
-        int groupId = randomId();
-        int contactId = randomId();
-        BigDecimal rate = randomBigDecimal();
-        int rateDirection = RANDOM.nextInt();
-        String invoiceNumber = UUID.randomUUID().toString();
-        String guid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+    public void testBuilder() {
+        var original = newTransaction(randomId());
 
-        Transaction t1 = new Transaction(id, amount, day, month, year,
-                transactionTypeId, comment, checked,
-                accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                accountDebitedCategoryId, accountCreditedCategoryId,
-                groupId, contactId, rate, rateDirection, invoiceNumber,
-                guid, modified);
-
-        int newGroupId = RANDOM.nextInt();
-        Transaction t2 = t1.setGroupId(newGroupId);
-
-        Assert.assertEquals(t2.getId(), t2.getId());
-        Assert.assertEquals(t2.getAmount(), t2.getAmount());
-        Assert.assertEquals(t2.getDay(), t2.getDay());
-        Assert.assertEquals(t2.getMonth(), t2.getMonth());
-        Assert.assertEquals(t2.getYear(), t2.getYear());
-        Assert.assertEquals(t2.getTransactionTypeId(), t2.getTransactionTypeId());
-        Assert.assertEquals(t2.getComment(), t2.getComment());
-        Assert.assertEquals(t2.getChecked(), t2.getChecked());
-        Assert.assertEquals(t2.getAccountDebitedId(), t2.getAccountDebitedId());
-        Assert.assertEquals(t2.getAccountCreditedId(), t2.getAccountCreditedId());
-        Assert.assertEquals(t2.getAccountDebitedType(), t2.getAccountDebitedType());
-        Assert.assertEquals(t2.getAccountCreditedType(), t2.getAccountCreditedType());
-        Assert.assertEquals(t2.getAccountDebitedCategoryId(), t2.getAccountDebitedCategoryId());
-        Assert.assertEquals(t2.getAccountCreditedCategoryId(), t2.getAccountCreditedCategoryId());
-        Assert.assertEquals(t2.getGroupId(), newGroupId);
-        Assert.assertEquals(t2.getContactId(), t2.getContactId());
-        Assert.assertEquals(t2.getRate(), t2.getRate());
-        Assert.assertEquals(t2.getRateDirection(), t2.getRateDirection());
-        Assert.assertEquals(t2.getInvoiceNumber(), t2.getInvoiceNumber());
-        Assert.assertEquals(t2.getGuid(), t2.getGuid());
-        Assert.assertTrue(t2.getModified() >= t2.getModified());
+        // Builder copy
+        var builderCopy = new Transaction.Builder(original).build();
+        assertEquals(builderCopy, original);
     }
 }

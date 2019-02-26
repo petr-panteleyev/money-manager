@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.util.List;
 import java.util.UUID;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -54,7 +54,7 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         setTitle(RB.getString("category.Dialog.Title"));
 
-        GridPane pane = new GridPane();
+        var pane = new GridPane();
 
         int index = 0;
         pane.getStyleClass().add(Styles.GRID_PANE);
@@ -64,7 +64,7 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         nameEdit.setPrefColumnCount(20);
 
-        List<CategoryType> list = List.of(CategoryType.values());
+        var list = List.of(CategoryType.values());
         typeComboBox.setItems(FXCollections.observableArrayList(list));
         if (!list.isEmpty()) {
             typeComboBox.getSelectionModel().select(0);
@@ -72,9 +72,9 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         if (category != null) {
             list.stream()
-                    .filter(t -> t == category.getType())
-                    .findFirst()
-                    .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
+                .filter(t -> t == category.getType())
+                .findFirst()
+                .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
 
             nameEdit.setText(category.getName());
             commentEdit.setText(category.getComment());
@@ -95,15 +95,15 @@ final class CategoryDialog extends BaseDialog<Category> {
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
                 return category != null ?
-                        category.copy(nameEdit.getText(), commentEdit.getText(), typeComboBox.getSelectionModel().getSelectedItem().getId()) :
-                        new Category(0,
-                                nameEdit.getText(),
-                                commentEdit.getText(),
-                                typeComboBox.getSelectionModel().getSelectedItem().getId(),
-                                false,
-                                UUID.randomUUID().toString(),
-                                System.currentTimeMillis()
-                        );
+                    category.copy(nameEdit.getText(), commentEdit.getText(),
+                        typeComboBox.getSelectionModel().getSelectedItem().getId()) :
+                    new Category.Builder()
+                        .name(nameEdit.getText())
+                        .comment(commentEdit.getText())
+                        .catTypeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
+                        .guid(UUID.randomUUID().toString())
+                        .modified(System.currentTimeMillis())
+                        .build();
             } else {
                 return null;
             }
@@ -117,7 +117,7 @@ final class CategoryDialog extends BaseDialog<Category> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameEdit, (Control control, String value) ->
-                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
         validation.initInitialDecoration();
     }
 }

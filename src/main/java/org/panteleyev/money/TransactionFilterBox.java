@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -66,8 +66,8 @@ public class TransactionFilterBox extends HBox {
         getChildren().add(filterChoice);
 
         if (showRange) {
-            RadioButton rangeRadio = new RadioButton();
-            ToggleGroup toggleGroup = new ToggleGroup();
+            var rangeRadio = new RadioButton();
+            var toggleGroup = new ToggleGroup();
             periodRadio.setToggleGroup(toggleGroup);
             rangeRadio.setToggleGroup(toggleGroup);
 
@@ -126,7 +126,7 @@ public class TransactionFilterBox extends HBox {
 
     public Predicate<Transaction> getTransactionFilter() {
         if (periodRadio.isSelected()) {
-            Object selected = filterChoice.getSelectionModel().getSelectedItem();
+            var selected = filterChoice.getSelectionModel().getSelectedItem();
             if (selected instanceof TransactionFilter) {
                 return ((TransactionFilter) selected).predicate();
             } else if (selected instanceof Integer) {

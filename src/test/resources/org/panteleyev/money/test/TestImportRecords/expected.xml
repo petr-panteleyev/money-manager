@@ -714,6 +714,31 @@
             <rateDirection>1</rateDirection>
             <transactionTypeId>1</transactionTypeId>
             <year>2017</year>
+            <detailed>true</detailed>
+        </Transaction>
+        <Transaction id="7144">
+            <accountCreditedCategoryId>4</accountCreditedCategoryId>
+            <accountCreditedId>254</accountCreditedId>
+            <accountCreditedTypeId>3</accountCreditedTypeId>
+            <accountDebitedCategoryId>29</accountDebitedCategoryId>
+            <accountDebitedId>255</accountDebitedId>
+            <accountDebitedTypeId>1</accountDebitedTypeId>
+            <amount>505.980000</amount>
+            <checked>false</checked>
+            <comment></comment>
+            <contactId>10</contactId>
+            <day>29</day>
+            <groupId>0</groupId>
+            <guid>251e8da2-748e-11e7-8cf7-a6006ad3dba1</guid>
+            <invoiceNumber></invoiceNumber>
+            <modified>1000</modified>
+            <month>7</month>
+            <rate>1.000000</rate>
+            <rateDirection>1</rateDirection>
+            <transactionTypeId>1</transactionTypeId>
+            <year>2017</year>
+            <detailed>false</detailed>
+            <parentId>7143</parentId>
         </Transaction>
     </Transactions>
 </Money>

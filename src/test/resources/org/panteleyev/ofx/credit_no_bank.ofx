@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><?OFX OFXHEADER="200" VERSION="200" SECURITY="NONE"?>
+<!--
+  ~ Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without
+  ~ modification, are permitted provided that the following conditions are met:
+  ~
+  ~ 1. Redistributions of source code must retain the above copyright notice, this
+  ~    list of conditions and the following disclaimer.
+  ~ 2. Redistributions in binary form must reproduce the above copyright notice,
+  ~    this list of conditions and the following disclaimer in the documentation
+  ~    and/or other materials provided with the distribution.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  ~ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  ~ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ~ ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+  ~ LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  ~ CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  ~ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  ~ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  ~ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ~ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  ~ POSSIBILITY OF SUCH DAMAGE.
+  -->
+
+<OFX>
+    <SIGNONMSGSRSV1>
+        <SONRS>
+            <STATUS>
+                <CODE>0</CODE>
+                <SEVERITY>INFO</SEVERITY>
+            </STATUS>
+            <DTSERVER>20181208120000</DTSERVER>
+            <LANGUAGE>ENG</LANGUAGE>
+        </SONRS>
+    </SIGNONMSGSRSV1>
+    <CREDITCARDMSGSRSV1>
+        <CCSTMTTRNRS>
+            <TRNUID>0</TRNUID>
+            <STATUS>
+                <CODE>0</CODE>
+                <SEVERITY>INFO</SEVERITY>
+            </STATUS>
+            <CCSTMTRS>
+                <CURDEF>EUR</CURDEF>
+                <CCACCTFROM>
+                    <ACCTID>12345678901234567890</ACCTID>
+                </CCACCTFROM>
+                <BANKTRANLISTP>
+                    <DTASOF>20181208120000</DTASOF>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181207120000</DTTRAN>
+                        <TRNAMT>-349.120</TRNAMT>
+                        <NAME>GROCERY STORE</NAME>
+                        <MEMO>GROCERY STORE MEMO</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181207120000</DTTRAN>
+                        <TRNAMT>-257.000</TRNAMT>
+                        <NAME>TAXI</NAME>
+                        <MEMO>TAXI</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181207120000</DTTRAN>
+                        <TRNAMT>-97.500</TRNAMT>
+                        <NAME>HOME DEPOT</NAME>
+                        <MEMO>HOME DEPOT</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181207120000</DTTRAN>
+                        <TRNAMT>-220.000</TRNAMT>
+                        <NAME>CANTINA</NAME>
+                        <MEMO>CANTINA</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181207120000</DTTRAN>
+                        <TRNAMT>-235.000</TRNAMT>
+                        <NAME>STARBUCKS</NAME>
+                        <MEMO>STARBUCKS</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181206120000</DTTRAN>
+                        <TRNAMT>-182.070</TRNAMT>
+                        <NAME>ANOTHER STORE</NAME>
+                        <MEMO>ANOTHER STORE</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181206120000</DTTRAN>
+                        <TRNAMT>-220.000</TRNAMT>
+                        <NAME>CANTINA</NAME>
+                        <MEMO>CANTINA</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                    <STMTTRNP>
+                        <TRNTYPE>HOLD</TRNTYPE>
+                        <DTTRAN>20181206120000</DTTRAN>
+                        <TRNAMT>-179.100</TRNAMT>
+                        <NAME>BAKERY</NAME>
+                        <MEMO>BAKERY</MEMO>
+                        <CURRENCY>
+                            <CURRATE>1</CURRATE>
+                            <CURSYM>EUR</CURSYM>
+                        </CURRENCY>
+                    </STMTTRNP>
+                </BANKTRANLISTP>
+                <LEDGERBAL>
+                    <BALAMT>12345.67</BALAMT>
+                    <DTASOF>20181208120000</DTASOF>
+                </LEDGERBAL>
+                <INTRATEPURCH>19.50</INTRATEPURCH>
+            </CCSTMTRS>
+        </CCSTMTTRNRS>
+    </CREDITCARDMSGSRSV1>
+</OFX>

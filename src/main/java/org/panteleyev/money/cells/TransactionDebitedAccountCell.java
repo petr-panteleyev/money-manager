@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,8 @@ public class TransactionDebitedAccountCell extends TableCell<Transaction, Transa
             setText("");
         } else {
             setText(getDao().getAccount(transaction.getAccountDebitedId())
-                    .map(Account::getName)
-                    .orElse(""));
+                .map(Account::getName)
+                .orElse(""));
         }
     }
 }

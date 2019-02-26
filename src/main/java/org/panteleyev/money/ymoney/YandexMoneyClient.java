@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,31 +59,20 @@ public class YandexMoneyClient {
     private String token;
 
     private final HttpClient httpClient = HttpClient.newHttpClient();
-    private final HttpRequest.Builder tokenRequestBuilder;
-    private final HttpRequest.Builder accountInfoRequestBuilder;
-    private final HttpRequest.Builder historyRequestBuilder;
 
     public YandexMoneyClient() {
         clientId = ClientId.load(YM_PROPS);
         token = Options.getYandexMoneyToken();
-
-        try {
-            tokenRequestBuilder = HttpRequest.newBuilder(new URI(TOKEN_ENDPOINT));
-            historyRequestBuilder = HttpRequest.newBuilder(new URI(API_ENDPOINT + "/operation-history"));
-            accountInfoRequestBuilder = HttpRequest.newBuilder(new URI(API_ENDPOINT + "/account-info"));
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     public void authorize() {
         var scope = URLEncoder.encode("operation-details account-info operation-history", StandardCharsets.UTF_8);
 
         var authUrl = OAUTH_ENDPOINT
-                + "?client_id=" + clientId.getClientId()
-                + "&scope=" + scope
-                + "&response_type=code"
-                + "&redirect_uri=" + clientId.getEncodedRedirectUri();
+            + "?client_id=" + clientId.getClientId()
+            + "&scope=" + scope
+            + "&response_type=code"
+            + "&redirect_uri=" + clientId.getEncodedRedirectUri();
 
         var authDialog = new WebAuthDialog(authUrl, clientId.getRedirectUri());
         authDialog.responseUriProperty().addListener((x, y, redirectUri) -> onAuthComplete(redirectUri));
@@ -94,20 +83,23 @@ public class YandexMoneyClient {
     }
 
     public Statement load(int limit, LocalDate from, LocalDate to) {
-        BigDecimal balance = accountInfoRequest().map(AccountInfo::getBalance).orElse(BigDecimal.ZERO);
+        var accountInfo = accountInfoRequest();
+        var balance = accountInfo.map(AccountInfo::getBalance).orElse(BigDecimal.ZERO);
+        var accountNumber = accountInfo.map(AccountInfo::getId).orElse("");
 
         try {
             var body = "records=" +
-                    Integer.toString(limit) +
-                    "&details=true" +
-                    "&from=" + DateTimeFormatter.ISO_DATE.format(from) +
-                    "&till=" + DateTimeFormatter.ISO_DATE.format(to);
+                limit +
+                "&details=true" +
+                "&from=" + DateTimeFormatter.ISO_DATE.format(from) +
+                "&till=" + DateTimeFormatter.ISO_DATE.format(to);
 
-            var httpRequest = historyRequestBuilder
-                    .header("Authorization", "Bearer " + token)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .build();
+            var builder = HttpRequest.newBuilder(new URI(API_ENDPOINT + "/operation-history"));
+            var httpRequest = builder
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
 
             var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             int status = httpResponse.statusCode();
@@ -124,22 +116,22 @@ public class YandexMoneyClient {
                 var operation = new Operation((JsonObject) opn);
 
                 var title = operation.getDetails() == null ?
-                        operation.getTitle() : operation.getDetails();
+                    operation.getTitle() : operation.getDetails();
 
                 var record = new StatementRecord(
-                        operation.getDate(), operation.getDate(),
-                        title,
-                        "", "", "",
-                        "RUB",
-                        operation.getAmount().toString(),
-                        "RUB",
-                        operation.getAmount().toString()
+                    operation.getDate(), operation.getDate(),
+                    title,
+                    "", "", "",
+                    "RUB",
+                    operation.getAmount().toString(),
+                    "RUB",
+                    operation.getAmount().toString()
                 );
 
                 statementRecords.add(record);
             }
 
-            return new Statement(Statement.StatementType.YANDEX_MONEY, statementRecords, balance);
+            return new Statement(Statement.StatementType.YANDEX_MONEY, accountNumber, statementRecords, balance);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -150,14 +142,15 @@ public class YandexMoneyClient {
         if (response.getError() == null) {
             try {
                 var body = "code=" + response.getCode()
-                        + "&client_id=" + clientId.getClientId()
-                        + "&grant_type=authorization_code"
-                        + "&redirect_uri=" + clientId.getEncodedRedirectUri();
+                    + "&client_id=" + clientId.getClientId()
+                    + "&grant_type=authorization_code"
+                    + "&redirect_uri=" + clientId.getEncodedRedirectUri();
 
-                var httpRequest = tokenRequestBuilder
-                        .header("Content-Type", "application/x-www-form-urlencoded")
-                        .POST(HttpRequest.BodyPublishers.ofString(body))
-                        .build();
+                var builder = HttpRequest.newBuilder(new URI(TOKEN_ENDPOINT));
+                var httpRequest = builder
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
                 var httpResponse = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
                 int status = httpResponse.statusCode();
                 if (status != 200) {
@@ -189,11 +182,12 @@ public class YandexMoneyClient {
         }
 
         try {
-            var request = accountInfoRequestBuilder
-                    .header("Authorization", "Bearer " + token)
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .POST(HttpRequest.BodyPublishers.noBody())
-                    .build();
+            var builder = HttpRequest.newBuilder(new URI(API_ENDPOINT + "/account-info"));
+            var request = builder
+                .header("Authorization", "Bearer " + token)
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
             var httpResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             int status = httpResponse.statusCode();
             if (status != 200) {

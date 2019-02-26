@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@ package org.panteleyev.money.cells;
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.persistence.model.CategoryType;
-import org.panteleyev.money.persistence.model.SplitTransaction;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.math.RoundingMode;
 import static org.panteleyev.money.Styles.BLACK_TEXT;
@@ -46,26 +45,19 @@ public class TransactionSumCell extends TableCell<Transaction, Transaction> {
         if (empty || item == null) {
             setText("");
         } else {
-            var amount = item.getSignedAmount();
-
             getStyleClass().removeAll(RED_TEXT, BLUE_TEXT, BLACK_TEXT);
 
-            if (item instanceof SplitTransaction) {
-                getStyleClass().add(amount.signum() < 0 ? RED_TEXT : BLACK_TEXT);
-            } else {
-                var s = BLACK_TEXT;
-                if (item.getAccountCreditedType() != item.getAccountDebitedType()) {
-                    if (item.getAccountDebitedType() == CategoryType.INCOMES) {
-                        s = BLUE_TEXT;
-                    } else {
-                        s = RED_TEXT;
-                    }
+            var s = BLACK_TEXT;
+            if (item.getAccountCreditedType() != item.getAccountDebitedType()) {
+                if (item.getAccountDebitedType() == CategoryType.INCOMES) {
+                    s = BLUE_TEXT;
+                } else {
+                    s = RED_TEXT;
                 }
-                getStyleClass().add(s);
             }
+            getStyleClass().add(s);
 
-            var format = item instanceof SplitTransaction || item.getGroupId() == 0 ? "%s" : "(%s)";
-            setText(String.format(format, amount.setScale(2, RoundingMode.HALF_UP).toString()));
+            setText(item.getSignedAmount().setScale(2, RoundingMode.HALF_UP).toString());
         }
     }
 }

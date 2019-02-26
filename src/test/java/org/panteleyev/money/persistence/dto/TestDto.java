@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,13 +34,12 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.UUID;
+import static org.panteleyev.money.BaseTestUtils.newAccount;
+import static org.panteleyev.money.BaseTestUtils.newCategory;
+import static org.panteleyev.money.BaseTestUtils.newContact;
+import static org.panteleyev.money.BaseTestUtils.newCurrency;
+import static org.panteleyev.money.BaseTestUtils.newTransaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newAccount;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newCategory;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newContact;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newCurrency;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newTransaction;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.newTransactionGroup;
 import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 import static org.panteleyev.money.persistence.dto.Dto.newDto;
 import static org.testng.Assert.assertEquals;
@@ -70,24 +69,21 @@ public class TestDto extends BaseDaoTest {
     @DataProvider(name = "dto")
     public Object[][] testEncryptDecryptDataProvider() {
         return new Object[][]{
-                {newCategory(newCategoryId()), null},
-                {newCategory(newCategoryId()), ""},
-                {newCategory(newCategoryId()), UUID.randomUUID().toString()},
-                {newCurrency(newCurrencyId()), null},
-                {newCurrency(newCurrencyId()), ""},
-                {newCurrency(newCurrencyId()), UUID.randomUUID().toString()},
-                {newAccount(newAccountId()), null},
-                {newAccount(newAccountId()), ""},
-                {newAccount(newAccountId()), UUID.randomUUID().toString()},
-                {newContact(newContactId()), null},
-                {newContact(newContactId()), ""},
-                {newContact(newContactId()), UUID.randomUUID().toString()},
-                {newTransactionGroup(newTransactionGroupId()), null},
-                {newTransactionGroup(newTransactionGroupId()), ""},
-                {newTransactionGroup(newTransactionGroupId()), UUID.randomUUID().toString()},
-                {newTransaction(newTransactionId()), null},
-                {newTransaction(newTransactionId()), ""},
-                {newTransaction(newTransactionId()), UUID.randomUUID().toString()},
+            {newCategory(newCategoryId()), null},
+            {newCategory(newCategoryId()), ""},
+            {newCategory(newCategoryId()), UUID.randomUUID().toString()},
+            {newCurrency(newCurrencyId()), null},
+            {newCurrency(newCurrencyId()), ""},
+            {newCurrency(newCurrencyId()), UUID.randomUUID().toString()},
+            {newAccount(newAccountId()), null},
+            {newAccount(newAccountId()), ""},
+            {newAccount(newAccountId()), UUID.randomUUID().toString()},
+            {newContact(newContactId()), null},
+            {newContact(newContactId()), ""},
+            {newContact(newContactId()), UUID.randomUUID().toString()},
+            {newTransaction(newTransactionId()), null},
+            {newTransaction(newTransactionId()), ""},
+            {newTransaction(newTransactionId()), UUID.randomUUID().toString()},
         };
     }
 
@@ -114,12 +110,11 @@ public class TestDto extends BaseDaoTest {
     @DataProvider(name = "dtoClassTestDataProvider")
     public Object[][] dtoClassTestDataProvider() {
         return new Object[][]{
-                {newCategory(newCategoryId()), CategoryDto.class},
-                {newCurrency(newCurrencyId()), CurrencyDto.class},
-                {newContact(newContactId()), ContactDto.class},
-                {newAccount(newAccountId()), AccountDto.class},
-                {newTransactionGroup(newTransactionGroupId()), TransactionGroupDto.class},
-                {newTransaction(newTransactionId()), TransactionDto.class},
+            {newCategory(newCategoryId()), CategoryDto.class},
+            {newCurrency(newCurrencyId()), CurrencyDto.class},
+            {newContact(newContactId()), ContactDto.class},
+            {newAccount(newAccountId()), AccountDto.class},
+            {newTransaction(newTransactionId()), TransactionDto.class},
         };
     }
 

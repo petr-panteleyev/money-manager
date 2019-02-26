@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import org.panteleyev.money.profiles.ConnectionProfileManager;
-import org.panteleyev.money.ssh.SshManager;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,32 +49,19 @@ public class MoneyApplication extends Application {
         application = this;
 
         if (initLogDirectory()) {
-            String formatProperty = System.getProperty(FORMAT_PROP);
+            var formatProperty = System.getProperty(FORMAT_PROP);
             if (formatProperty == null) {
                 System.setProperty(FORMAT_PROP, FORMAT);
             }
             LogManager.getLogManager()
-                    .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
+                .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
         }
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
-        try {
-            ConnectionProfileManager.loadProfiles();
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Unable to load profiles", ex);
-        }
-
-        try {
-            SshManager.loadSessions();
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING, "Unable to load ssh sessions", ex);
-        }
-
         new MainWindowController(primaryStage);
 
         primaryStage.show();
-        primaryStage.setOnCloseRequest(event -> SshManager.closeAllSessions());
     }
 
     public static void uncaughtException(Throwable e) {
@@ -88,8 +73,8 @@ public class MoneyApplication extends Application {
     }
 
     private static boolean initLogDirectory() {
-        File optionsDir = Options.getSettingsDirectory();
-        File logDir = new File(optionsDir, "logs");
+        var optionsDir = Options.getSettingsDirectory();
+        var logDir = new File(optionsDir, "logs");
 
         return logDir.exists() ? logDir.isDirectory() : logDir.mkdir();
     }

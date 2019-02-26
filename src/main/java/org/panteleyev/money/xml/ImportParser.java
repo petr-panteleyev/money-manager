@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.MoneyRecord;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -45,6 +44,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
 
 class ImportParser extends DefaultHandler {
     enum Tag {
@@ -52,7 +53,6 @@ class ImportParser extends DefaultHandler {
         Account(ImportParser::parseAccount),
         Currency(ImportParser::parseCurrency),
         Contact(ImportParser::parseContact),
-        TransactionGroup(ImportParser::parseTransactionGroup),
         Transaction(ImportParser::parseTransaction);
 
         Tag(BiFunction<Integer, Map<String, String>, MoneyRecord> parseMethod) {
@@ -75,23 +75,21 @@ class ImportParser extends DefaultHandler {
     }
 
     private static final List<String> NAMES = Arrays.stream(Tag.values())
-            .map(Tag::name)
-            .collect(Collectors.toList());
+        .map(Tag::name)
+        .collect(Collectors.toList());
 
     private final List<Category> categories = new ArrayList<>();
     private final List<Account> accounts = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
     private final List<Currency> currencies = new ArrayList<>();
-    private final List<TransactionGroup> transactionGroups = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
-            Map.entry(Tag.Category, categories),
-            Map.entry(Tag.Account, accounts),
-            Map.entry(Tag.Currency, currencies),
-            Map.entry(Tag.Contact, contacts),
-            Map.entry(Tag.TransactionGroup, transactionGroups),
-            Map.entry(Tag.Transaction, transactions)
+        Map.entry(Tag.Category, categories),
+        Map.entry(Tag.Account, accounts),
+        Map.entry(Tag.Currency, currencies),
+        Map.entry(Tag.Contact, contacts),
+        Map.entry(Tag.Transaction, transactions)
     );
 
     private Map<String, String> tags = null;
@@ -114,10 +112,6 @@ class ImportParser extends DefaultHandler {
         return currencies;
     }
 
-    public List<TransactionGroup> getTransactionGroups() {
-        return transactionGroups;
-    }
-
     public List<Transaction> getTransactions() {
         return transactions;
     }
@@ -127,7 +121,7 @@ class ImportParser extends DefaultHandler {
         super.startElement(uri, localName, qName, attributes);
 
         if (NAMES.contains(qName)) {
-            currentId = Integer.parseInt(attributes.getValue("id"));
+            currentId = parseInt(attributes.getValue("id"));
             tags = new HashMap<>();
         }
     }
@@ -156,95 +150,92 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Category parseCategory(int id, Map<String, String> tags) {
-        return new Category(id,
-                tags.get("name"),
-                tags.get("comment"),
-                Integer.parseInt(tags.get("catTypeId")),
-                Boolean.parseBoolean(tags.get("expanded")),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
+        return new Category.Builder(id)
+            .name(tags.get("name"))
+            .comment(tags.get("comment"))
+            .catTypeId(parseInt(tags.get("catTypeId")))
+            .guid(tags.get("guid"))
+            .modified(Long.parseLong(tags.get("modified")))
+            .build();
     }
 
     private static Account parseAccount(int id, Map<String, String> tags) {
-        var accountNumber = tags.get("accountNumber");
-        return new Account(id,
-                tags.get("name"),
-                tags.get("comment"),
-                accountNumber == null ? "" : accountNumber,
-                new BigDecimal(tags.get("openingBalance")),
-                new BigDecimal(tags.get("accountLimit")),
-                new BigDecimal(tags.get("currencyRate")),
-                Integer.parseInt(tags.get("typeId")),
-                Integer.parseInt(tags.get("categoryId")),
-                Integer.parseInt(tags.get("currencyId")),
-                Boolean.parseBoolean(tags.get("enabled")),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
+        return new Account.Builder(id)
+            .name(tags.get("name"))
+            .comment(tags.get("comment"))
+            .accountNumber(tags.get("accountNumber"))
+            .openingBalance(new BigDecimal(tags.get("openingBalance")))
+            .accountLimit(new BigDecimal(tags.get("accountLimit")))
+            .currencyRate(new BigDecimal(tags.get("currencyRate")))
+            .typeId(parseInt(tags.get("typeId")))
+            .categoryId(parseInt(tags.get("categoryId")))
+            .currencyId(parseInt(tags.get("currencyId")))
+            .enabled(parseBoolean(tags.get("enabled")))
+            .guid(tags.get("guid"))
+            .modified(Long.parseLong(tags.get("modified")))
+            .build();
     }
 
     private static Currency parseCurrency(int id, Map<String, String> tags) {
-        return new Currency(id,
-                tags.get("symbol"),
-                tags.get("description"),
-                tags.get("formatSymbol"),
-                Integer.parseInt(tags.get("formatSymbolPosition")),
-                Boolean.parseBoolean(tags.get("showFormatSymbol")),
-                Boolean.parseBoolean(tags.get("default")),
-                new BigDecimal(tags.get("rate")),
-                Integer.parseInt(tags.get("direction")),
-                Boolean.parseBoolean(tags.get("useThousandSeparator")),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
+        return new Currency.Builder(id)
+            .symbol(tags.get("symbol"))
+            .description(tags.get("description"))
+            .formatSymbol(tags.get("formatSymbol"))
+            .formatSymbolPosition(parseInt(tags.get("formatSymbolPosition")))
+            .showFormatSymbol(parseBoolean(tags.get("showFormatSymbol")))
+            .def(parseBoolean(tags.get("default")))
+            .rate(new BigDecimal(tags.get("rate")))
+            .direction(parseInt(tags.get("direction")))
+            .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator")))
+            .guid(tags.get("guid"))
+            .modified(Long.parseLong(tags.get("modified")))
+            .build();
     }
 
     private static Contact parseContact(int id, Map<String, String> tags) {
-        return new Contact(id,
-                tags.get("name"),
-                Integer.parseInt(tags.get("typeId")),
-                tags.get("phone"),
-                tags.get("mobile"),
-                tags.get("email"),
-                tags.get("web"),
-                tags.get("comment"),
-                tags.get("street"),
-                tags.get("city"),
-                tags.get("country"),
-                tags.get("zip"),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
-    }
-
-    private static TransactionGroup parseTransactionGroup(int id, Map<String, String> tags) {
-        return new TransactionGroup(id,
-                Integer.parseInt(tags.get("day")),
-                Integer.parseInt(tags.get("month")),
-                Integer.parseInt(tags.get("year")),
-                Boolean.parseBoolean(tags.get("expanded")),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
+        return new Contact.Builder(id)
+            .name(tags.get("name"))
+            .typeId(parseInt(tags.get("typeId")))
+            .phone(tags.get("phone"))
+            .mobile(tags.get("mobile"))
+            .email(tags.get("email"))
+            .web(tags.get("web"))
+            .comment(tags.get("comment"))
+            .street(tags.get("street"))
+            .city(tags.get("city"))
+            .country(tags.get("country"))
+            .zip(tags.get("zip"))
+            .guid(tags.get("guid"))
+            .modified(Long.parseLong(tags.get("modified")))
+            .build();
     }
 
     private static Transaction parseTransaction(int id, Map<String, String> tags) {
-        return new Transaction(id,
-                new BigDecimal(tags.get("amount")),
-                Integer.parseInt(tags.get("day")),
-                Integer.parseInt(tags.get("month")),
-                Integer.parseInt(tags.get("year")),
-                Integer.parseInt(tags.get("transactionTypeId")),
-                tags.get("comment"),
-                Boolean.parseBoolean(tags.get("checked")),
-                Integer.parseInt(tags.get("accountDebitedId")),
-                Integer.parseInt(tags.get("accountCreditedId")),
-                Integer.parseInt(tags.get("accountDebitedTypeId")),
-                Integer.parseInt(tags.get("accountCreditedTypeId")),
-                Integer.parseInt(tags.get("accountDebitedCategoryId")),
-                Integer.parseInt(tags.get("accountCreditedCategoryId")),
-                Integer.parseInt(tags.get("groupId")),
-                Integer.parseInt(tags.get("contactId")),
-                new BigDecimal(tags.get("rate")),
-                Integer.parseInt(tags.get("rateDirection")),
-                tags.get("invoiceNumber"),
-                tags.get("guid"),
-                Long.parseLong(tags.get("modified")));
+        var parentIdObj = tags.get("parentId");
+        var detailedObj = tags.get("detailed");
+        return new Transaction.Builder()
+            .id(id)
+            .amount(new BigDecimal(tags.get("amount")))
+            .day(parseInt(tags.get("day")))
+            .month(parseInt(tags.get("month")))
+            .year(parseInt(tags.get("year")))
+            .transactionTypeId(parseInt(tags.get("transactionTypeId")))
+            .comment(tags.get("comment"))
+            .checked(parseBoolean(tags.get("checked")))
+            .accountDebitedId(parseInt(tags.get("accountDebitedId")))
+            .accountCreditedId(parseInt(tags.get("accountCreditedId")))
+            .accountDebitedTypeId(parseInt(tags.get("accountDebitedTypeId")))
+            .accountCreditedTypeId(parseInt(tags.get("accountCreditedTypeId")))
+            .accountDebitedCategoryId(parseInt(tags.get("accountDebitedCategoryId")))
+            .accountCreditedCategoryId(parseInt(tags.get("accountCreditedCategoryId")))
+            .contactId(parseInt(tags.get("contactId")))
+            .rate(new BigDecimal(tags.get("rate")))
+            .rateDirection(parseInt(tags.get("rateDirection")))
+            .invoiceNumber(tags.get("invoiceNumber"))
+            .parentId(parentIdObj == null ? 0 : parseInt(tags.get("parentId")))
+            .detailed(detailedObj != null && parseBoolean(tags.get("detailed")))
+            .guid(tags.get("guid"))
+            .modified(Long.parseLong(tags.get("modified")))
+            .build();
     }
 }

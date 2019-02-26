@@ -3,47 +3,8 @@
     -fx-font-size: 12;
 }
 
-.transactionCell:odd {
-    -fx-background-color: Azure;
-}
-
-.transactionCell {
-    -fx-background-color: Ivory;
-}
-
-.transactionCell:focused {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
-}
-
-.transactionCell:selected {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
-}
-
 .groupCell {
-    -fx-background-color: Khaki;
     -fx-font-weight: bold;
-}
-
-.groupCell:focused {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
-    -fx-font-weight: bold;
-}
-
-.groupCell:selected {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
-    -fx-font-weight: bold;
-}
-
-.groupMemberCell  {
-    -fx-background-color: LemonChiffon;
-}
-
-.groupMemberCell:focused {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
-}
-
-.groupMemberCell:selected {
-    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
 }
 
 .blueText {

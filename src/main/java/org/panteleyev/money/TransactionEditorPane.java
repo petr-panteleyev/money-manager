@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -46,9 +46,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
@@ -78,11 +76,11 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionEditorPane extends TitledPane {
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
-            new ToStringConverter<>() {
-                public String toString(TransactionType obj) {
-                    return obj.getTypeName();
-                }
-            };
+        new ToStringConverter<>() {
+            public String toString(TransactionType obj) {
+                return obj.getTypeName();
+            }
+        };
 
     private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
         public String toString(Contact obj) {
@@ -95,37 +93,6 @@ public class TransactionEditorPane extends TitledPane {
             return obj.getName();
         }
     };
-
-    private abstract static class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding
-            .ISuggestionRequest, Collection<T>> {
-        private final Set<T> set;
-
-        BaseCompletionProvider(Set<T> set) {
-            this.set = set;
-        }
-
-        abstract String getElementString(T element);
-
-        @Override
-        public Collection<T> call(AutoCompletionBinding.ISuggestionRequest req) {
-            if (req.getUserText().length() >= Options.getAutoCompleteLength()) {
-                String userText = req.getUserText();
-
-                List<T> result = set.stream()
-                        .filter(it -> getElementString(it).toLowerCase().contains(userText.toLowerCase()))
-                        .collect(Collectors.toList());
-
-                if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
-                    /* If there is a single case sensitive match then no suggestions must be shown. */
-                    return List.of();
-                } else {
-                    return result;
-                }
-            } else {
-                return List.of();
-            }
-        }
-    }
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
@@ -186,12 +153,9 @@ public class TransactionEditorPane extends TitledPane {
     private final Button deleteButton = new Button(rb.getString("deleteButton"));
     private final Button clearButton = new Button(rb.getString("clearButton"));
 
-    private BiConsumer<Transaction.Builder, String> addTransactionConsumer = (x, y) -> {
-    };
-    private BiConsumer<Transaction.Builder, String> updateTransactionConsumer = (x, y) -> {
-    };
-    private Consumer<Integer> deleteTransactionConsumer = (x) -> {
-    };
+    private BiConsumer<Transaction.Builder, String> addTransactionConsumer = (x, y) -> { };
+    private BiConsumer<Transaction.Builder, String> updateTransactionConsumer = (x, y) -> { };
+    private Consumer<Integer> deleteTransactionConsumer = (x) -> { };
 
     private Transaction.Builder builder = new Transaction.Builder();
 
@@ -221,27 +185,27 @@ public class TransactionEditorPane extends TitledPane {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Contact> contactListener =
-            change -> Platform.runLater(this::setupContactMenu);
+        change -> Platform.runLater(this::setupContactMenu);
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Account> accountListener =
-            change -> Platform.runLater(this::setupAccountMenus);
+        change -> Platform.runLater(this::setupAccountMenus);
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<Integer, Transaction> transactionListener =
-            this::transactionChangeListener;
+        this::transactionChangeListener;
 
     public TransactionEditorPane() {
         var debitedBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("debitedAccountLabel")),
-                new HBox(debitedAccountEdit, debitedMenuButton),
-                debitedCategoryLabel);
+            new HBox(debitedAccountEdit, debitedMenuButton),
+            debitedCategoryLabel);
         HBox.setHgrow(debitedAccountEdit, Priority.ALWAYS);
 
         var creditedBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("creditedAccountLabel")),
-                new HBox(creditedAccountEdit, creditedMenuButton),
-                creditedCategoryLabel);
+            new HBox(creditedAccountEdit, creditedMenuButton),
+            creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var contactBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("contactLabel")),
-                new HBox(contactEdit, contactMenuButton));
+            new HBox(contactEdit, contactMenuButton));
         HBox.setHgrow(contactEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit, checkedCheckBox);
@@ -251,8 +215,8 @@ public class TransactionEditorPane extends TitledPane {
         var commentBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("commentLabel")), commentEdit);
 
         var rateBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("rateLabel")),
-                new HBox(rate1Edit, rateDir1Combo),
-                rateAmoutLabel);
+            new HBox(rate1Edit, rateDir1Combo),
+            rateAmoutLabel);
 
         var filler = new Region();
 
@@ -267,18 +231,18 @@ public class TransactionEditorPane extends TitledPane {
         deleteButton.setOnAction(event -> onDeleteButton());
 
         var row3 = new HBox(Styles.BIG_SPACING,
-                new VBox(2.0, new Label(rb.getString("invoiceLabel")), invoiceNumberEdit),
-                filler, clearButton, deleteButton, updateButton, addButton);
+            new VBox(2.0, new Label(rb.getString("invoiceLabel")), invoiceNumberEdit),
+            filler, clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
         setContent(new VBox(Styles.BIG_SPACING,
-                new HBox(Styles.BIG_SPACING,
-                        new VBox(2.0, new Label(rb.getString("dayLabel")), daySpinner),
-                        new VBox(2.0, new Label(rb.getString("typeLabel")),
-                                new HBox(typeEdit, typeMenuButton)),
-                        debitedBox, creditedBox, contactBox, sumBox),
-                new HBox(Styles.BIG_SPACING, commentBox, rateBox),
-                row3));
+            new HBox(Styles.BIG_SPACING,
+                new VBox(Styles.SMALL_SPACING, new Label(rb.getString("dayLabel")), daySpinner),
+                new VBox(Styles.SMALL_SPACING, new Label(rb.getString("typeLabel")),
+                    new HBox(typeEdit, typeMenuButton)),
+                debitedBox, creditedBox, contactBox, sumBox),
+            new HBox(Styles.BIG_SPACING, commentBox, rateBox),
+            row3));
 
         HBox.setHgrow(debitedBox, Priority.ALWAYS);
         HBox.setHgrow(creditedBox, Priority.ALWAYS);
@@ -308,7 +272,7 @@ public class TransactionEditorPane extends TitledPane {
         daySpinner.setEditable(true);
         daySpinner.getEditor().prefColumnCountProperty().set(4);
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 31, 1, 1);
+            new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 31, 1, 1);
         valueFactory.setValue(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
         daySpinner.setValueFactory(valueFactory);
 
@@ -319,11 +283,11 @@ public class TransactionEditorPane extends TitledPane {
         rateDir1Combo.getItems().setAll("/", "*");
 
         TextFields.bindAutoCompletion(typeEdit,
-                new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
+            new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
         TextFields.bindAutoCompletion(debitedAccountEdit,
-                new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
+            new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
-                new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+            new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
@@ -374,26 +338,26 @@ public class TransactionEditorPane extends TitledPane {
 
     private void setupBanksAndCashMenuItems(Set<Account> debitedSuggestions, Set<Account> creditedSuggestions) {
         var banksAndCash = getDao().getAccountsByType(CategoryType.BANKS_AND_CASH).stream()
-                .filter(Account::getEnabled)
-                .collect(Collectors.toList());
+            .filter(Account::getEnabled)
+            .collect(Collectors.toList());
 
         banksAndCash.stream()
-                .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
-                .forEach(acc -> {
-                    var title = "[" + acc.getName() + "]";
+            .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
+            .forEach(acc -> {
+                var title = "[" + acc.getName() + "]";
 
-                    var m1 = new MenuItem(title);
-                    m1.setOnAction(event -> onDebitedAccountSelected(acc));
+                var m1 = new MenuItem(title);
+                m1.setOnAction(event -> onDebitedAccountSelected(acc));
 
-                    var m2 = new MenuItem(title);
-                    m2.setOnAction(event -> onCreditedAccountSelected(acc));
+                var m2 = new MenuItem(title);
+                m2.setOnAction(event -> onCreditedAccountSelected(acc));
 
-                    debitedMenuButton.getItems().add(m1);
-                    creditedMenuButton.getItems().add(m2);
+                debitedMenuButton.getItems().add(m1);
+                creditedMenuButton.getItems().add(m2);
 
-                    debitedSuggestions.add(acc);
-                    creditedSuggestions.add(acc);
-                });
+                debitedSuggestions.add(acc);
+                creditedSuggestions.add(acc);
+            });
 
         if (!banksAndCash.isEmpty()) {
             debitedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -411,36 +375,37 @@ public class TransactionEditorPane extends TitledPane {
 
     private void setAccountMenuItemsByCategory(CategoryType categoryType, String prefix,
                                                Set<Account> debitedSuggestions,
-                                               Set<Account> creditedSuggestions) {
+                                               Set<Account> creditedSuggestions)
+    {
         var categories = getDao().getCategoriesByType(categoryType);
 
         categories.stream()
-                .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-                .forEach(x -> {
-                    List<Account> accounts = getDao().getAccountsByCategory(x.getId());
+            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .forEach(x -> {
+                List<Account> accounts = getDao().getAccountsByCategory(x.getId());
 
-                    if (!accounts.isEmpty()) {
-                        debitedMenuButton.getItems().add(new MenuItem(x.getName()));
-                        creditedMenuButton.getItems().add(new MenuItem(x.getName()));
+                if (!accounts.isEmpty()) {
+                    debitedMenuButton.getItems().add(new MenuItem(x.getName()));
+                    creditedMenuButton.getItems().add(new MenuItem(x.getName()));
 
-                        accounts.stream()
-                                .filter(Account::getEnabled)
-                                .forEach(acc -> {
-                                    var title = "  " + prefix + " " + acc.getName();
-                                    var m1 = new MenuItem(title);
-                                    m1.setOnAction(event -> onDebitedAccountSelected(acc));
+                    accounts.stream()
+                        .filter(Account::getEnabled)
+                        .forEach(acc -> {
+                            var title = "  " + prefix + " " + acc.getName();
+                            var m1 = new MenuItem(title);
+                            m1.setOnAction(event -> onDebitedAccountSelected(acc));
 
-                                    var m2 = new MenuItem(title);
-                                    m2.setOnAction(event -> onCreditedAccountSelected(acc));
+                            var m2 = new MenuItem(title);
+                            m2.setOnAction(event -> onCreditedAccountSelected(acc));
 
-                                    debitedMenuButton.getItems().add(m1);
-                                    creditedMenuButton.getItems().add(m2);
+                            debitedMenuButton.getItems().add(m1);
+                            creditedMenuButton.getItems().add(m2);
 
-                                    debitedSuggestions.add(acc);
-                                    creditedSuggestions.add(acc);
-                                });
-                    }
-                });
+                            debitedSuggestions.add(acc);
+                            creditedSuggestions.add(acc);
+                        });
+                }
+            });
 
 
         if (!categories.isEmpty()) {
@@ -464,6 +429,8 @@ public class TransactionEditorPane extends TitledPane {
         checkedCheckBox.setSelected(false);
         invoiceNumberEdit.setText("");
         sumEdit.setText("");
+        rate1Edit.setText("1.0");
+        rateDir1Combo.getSelectionModel().clearAndSelect(0);
         rateAmoutLabel.setText("");
 
         daySpinner.getEditor().setText(Integer.toString(Calendar.getInstance().get(Calendar.DAY_OF_MONTH)));
@@ -601,7 +568,7 @@ public class TransactionEditorPane extends TitledPane {
         // Check type id
         handleTypeFocusLoss();
         Optional<TransactionType> type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions,
-                TRANSACTION_TYPE_TO_STRING);
+            TRANSACTION_TYPE_TO_STRING);
         type.ifPresent(it -> builder.transactionType(it));
 
         var debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
@@ -667,11 +634,11 @@ public class TransactionEditorPane extends TitledPane {
             disable = true;
         } else {
             int c1 = getDao().getAccount(builder.getAccountDebitedId())
-                    .map(Account::getCurrencyId)
-                    .orElse(0);
+                .map(Account::getCurrencyId)
+                .orElse(0);
             int c2 = getDao().getAccount(builder.getAccountCreditedId())
-                    .map(Account::getCurrencyId)
-                    .orElse(0);
+                .map(Account::getCurrencyId)
+                .orElse(0);
 
             disable = c1 == c2;
         }
@@ -687,25 +654,29 @@ public class TransactionEditorPane extends TitledPane {
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter) {
+                                                              StringConverter<T> converter)
+    {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(String value, Collection<TransactionType> items,
-                                                                     StringConverter<TransactionType> converter) {
+                                                                     StringConverter<TransactionType> converter)
+    {
         return items.stream()
-                .filter(it -> converter.toString(it).equals(value)).findFirst();
+            .filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(TextField field,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter) {
+                                                              StringConverter<T> converter)
+    {
         return checkTextFieldValue(field.getText(), items, converter);
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(TextField field,
                                                                      Collection<TransactionType> items,
-                                                                     StringConverter<TransactionType> converter) {
+                                                                     StringConverter<TransactionType> converter)
+    {
         return checkTransactionTypeFieldValue(field.getText(), items, converter);
     }
 
@@ -753,14 +724,14 @@ public class TransactionEditorPane extends TitledPane {
         contactSuggestions.clear();
 
         getDao().getContacts().stream()
-                .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-                .forEach(x -> {
-                    var m = new MenuItem(x.getName());
-                    m.setOnAction(event -> onContactSelected(x));
+            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .forEach(x -> {
+                var m = new MenuItem(x.getName());
+                m.setOnAction(event -> onContactSelected(x));
 
-                    contactMenuButton.getItems().add(m);
-                    contactSuggestions.add(x);
-                });
+                contactMenuButton.getItems().add(m);
+                contactSuggestions.add(x);
+            });
 
         contactMenuButton.setDisable(contactMenuButton.getItems().isEmpty());
     }
@@ -793,21 +764,21 @@ public class TransactionEditorPane extends TitledPane {
         // Incomes to debitable accounts
         List<Category> incomeCategories = getDao().getCategoriesByType(CategoryType.INCOMES);
         incomeCategories.stream()
-                .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-                .forEach(x -> {
-                    var accounts = getDao().getAccountsByCategory(x.getId());
+            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .forEach(x -> {
+                var accounts = getDao().getAccountsByCategory(x.getId());
 
-                    if (!accounts.isEmpty()) {
-                        debitedMenuButton.getItems().add(new MenuItem(x.getName()));
+                if (!accounts.isEmpty()) {
+                    debitedMenuButton.getItems().add(new MenuItem(x.getName()));
 
-                        accounts.forEach(acc -> {
-                            var accMenuItem = new MenuItem("  + " + acc.getName());
-                            accMenuItem.setOnAction(event -> onDebitedAccountSelected(acc));
-                            debitedMenuButton.getItems().add(accMenuItem);
-                            debitedSuggestions.add(acc);
-                        });
-                    }
-                });
+                    accounts.forEach(acc -> {
+                        var accMenuItem = new MenuItem("  + " + acc.getName());
+                        accMenuItem.setOnAction(event -> onDebitedAccountSelected(acc));
+                        debitedMenuButton.getItems().add(accMenuItem);
+                        debitedSuggestions.add(acc);
+                    });
+                }
+            });
 
         if (!incomeCategories.isEmpty()) {
             debitedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -816,21 +787,21 @@ public class TransactionEditorPane extends TitledPane {
         // Expenses to creditable accounts
         List<Category> expenseCategories = getDao().getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
-                .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-                .forEach(x -> {
-                    var accounts = getDao().getAccountsByCategory(x.getId());
+            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .forEach(x -> {
+                var accounts = getDao().getAccountsByCategory(x.getId());
 
-                    if (!accounts.isEmpty()) {
-                        creditedMenuButton.getItems().add(new MenuItem(x.getName()));
+                if (!accounts.isEmpty()) {
+                    creditedMenuButton.getItems().add(new MenuItem(x.getName()));
 
-                        accounts.forEach(acc -> {
-                            creditedSuggestions.add(acc);
-                            var accMenuItem = new MenuItem("  - " + acc.getName());
-                            accMenuItem.setOnAction(event -> onCreditedAccountSelected(acc));
-                            creditedMenuButton.getItems().add(accMenuItem);
-                        });
-                    }
-                });
+                    accounts.forEach(acc -> {
+                        creditedSuggestions.add(acc);
+                        var accMenuItem = new MenuItem("  - " + acc.getName());
+                        accMenuItem.setOnAction(event -> onCreditedAccountSelected(acc));
+                        creditedMenuButton.getItems().add(accMenuItem);
+                    });
+                }
+            });
 
         if (!expenseCategories.isEmpty()) {
             creditedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -878,7 +849,7 @@ public class TransactionEditorPane extends TitledPane {
         }
 
         Platform.runLater(() ->
-                rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP).toString()));
+            rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP).toString()));
     }
 
     private void updateCategoryLabel(Label label, Account account) {
@@ -896,23 +867,23 @@ public class TransactionEditorPane extends TitledPane {
 
         if (accDebitedId != 0 && accCreditedId != 0) {
             getDao().getTransactions().stream()
-                    .filter(it -> it.getAccountCreditedId() == accCreditedId && it.getAccountDebitedId() == accDebitedId)
-                    .sorted(Transaction.BY_DATE.reversed())
-                    .findFirst()
-                    .ifPresent(it -> {
-                        if (commentEdit.getText().isEmpty()) {
-                            commentEdit.setText(it.getComment());
-                        }
-                        if (sumEdit.getText().isEmpty()) {
-                            sumEdit.setText(it.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
-                        }
+                .filter(it -> it.getAccountCreditedId() == accCreditedId && it.getAccountDebitedId() == accDebitedId)
+                .sorted(Transaction.BY_DATE.reversed())
+                .findFirst()
+                .ifPresent(it -> {
+                    if (commentEdit.getText().isEmpty()) {
+                        commentEdit.setText(it.getComment());
+                    }
+                    if (sumEdit.getText().isEmpty()) {
+                        sumEdit.setText(it.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
+                    }
 
-                        getDao().getContact(it.getContactId()).ifPresent(contact -> {
-                            if (contactEdit.getText().isEmpty()) {
-                                contactEdit.setText(contact.getName());
-                            }
-                        });
+                    getDao().getContact(it.getContactId()).ifPresent(contact -> {
+                        if (contactEdit.getText().isEmpty()) {
+                            contactEdit.setText(contact.getName());
+                        }
                     });
+                });
         }
     }
 

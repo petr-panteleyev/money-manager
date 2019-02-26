@@ -13,14 +13,16 @@ open module org.panteleyev.money {
     requires javafx.swing;          // for tests
 
     requires org.panteleyev.persistence;
-    requires org.panteleyev.utilities;
+    requires org.panteleyev.commons.ssh;
+    requires org.panteleyev.commons.database;
+    requires org.panteleyev.commons.fx;
     requires org.panteleyev.crypto;
 
     // Automatic modules
     requires mysql.connector.java;
     requires commons.csv;
     requires controlsfx;
-    requires jsoup;
+    requires org.jsoup;
     requires gson;
     requires jsch;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public final class ContactDto implements Record, Dto<Contact> {
 
         var rawBytes = toJson(contact);
         bytes = password != null && !password.isEmpty() ?
-                aes256().encrypt(rawBytes, password) : rawBytes;
+            aes256().encrypt(rawBytes, password) : rawBytes;
     }
 
     @Override
@@ -85,22 +85,23 @@ public final class ContactDto implements Record, Dto<Contact> {
     @Override
     public Contact decrypt(String password) {
         var rawBytes = password != null && !password.isEmpty() ?
-                aes256().decrypt(bytes, password) : bytes;
+            aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
-        return new Contact(obj.get("id").getAsInt(),
-                obj.get("name").getAsString(),
-                obj.get("typeId").getAsInt(),
-                obj.get("phone").getAsString(),
-                obj.get("mobile").getAsString(),
-                obj.get("email").getAsString(),
-                obj.get("web").getAsString(),
-                obj.get("comment").getAsString(),
-                obj.get("street").getAsString(),
-                obj.get("city").getAsString(),
-                obj.get("country").getAsString(),
-                obj.get("zip").getAsString(),
-                obj.get("guid").getAsString(),
-                obj.get("modified").getAsLong());
+        return new Contact.Builder(obj.get("id").getAsInt())
+            .name(obj.get("name").getAsString())
+            .typeId(obj.get("typeId").getAsInt())
+            .phone(obj.get("phone").getAsString())
+            .mobile(obj.get("mobile").getAsString())
+            .email(obj.get("email").getAsString())
+            .web(obj.get("web").getAsString())
+            .comment(obj.get("comment").getAsString())
+            .street(obj.get("street").getAsString())
+            .city(obj.get("city").getAsString())
+            .country(obj.get("country").getAsString())
+            .zip(obj.get("zip").getAsString())
+            .guid(obj.get("guid").getAsString())
+            .modified(obj.get("modified").getAsLong())
+            .build();
     }
 }

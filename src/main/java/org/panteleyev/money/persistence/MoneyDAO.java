@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,6 @@ import org.panteleyev.money.persistence.dto.ContactDto;
 import org.panteleyev.money.persistence.dto.CurrencyDto;
 import org.panteleyev.money.persistence.dto.Dto;
 import org.panteleyev.money.persistence.dto.TransactionDto;
-import org.panteleyev.money.persistence.dto.TransactionGroupDto;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
@@ -46,7 +45,6 @@ import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.MoneyRecord;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.panteleyev.money.xml.Import;
 import org.panteleyev.persistence.DAO;
 import org.panteleyev.persistence.Record;
@@ -55,6 +53,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,46 +83,40 @@ public class MoneyDAO extends DAO implements RecordSource {
     };
 
     private static final List<Class<? extends Record>> TABLE_CLASSES = List.of(
-            CategoryDto.class,
-            ContactDto.class,
-            CurrencyDto.class,
-            AccountDto.class,
-            TransactionGroupDto.class,
-            TransactionDto.class
+        CategoryDto.class,
+        ContactDto.class,
+        CurrencyDto.class,
+        AccountDto.class,
+        TransactionDto.class
     );
 
     private static final List<Class<? extends Record>> TABLE_CLASSES_REVERSED = List.of(
-            TransactionDto.class,
-            TransactionGroupDto.class,
-            AccountDto.class,
-            CurrencyDto.class,
-            ContactDto.class,
-            CategoryDto.class
+        TransactionDto.class,
+        AccountDto.class,
+        CurrencyDto.class,
+        ContactDto.class,
+        CategoryDto.class
     );
 
     private final Map<Integer, Category> categoriesMap = new ConcurrentHashMap<>();
     private final ObservableMap<Integer, Category> categories
-            = FXCollections.observableMap(categoriesMap);
+        = FXCollections.observableMap(categoriesMap);
 
     private final Map<Integer, Contact> contactsMap = new ConcurrentHashMap<>();
     private final ObservableMap<Integer, Contact> contacts
-            = FXCollections.observableMap(contactsMap);
+        = FXCollections.observableMap(contactsMap);
 
     private final Map<Integer, Currency> currencyMap = new ConcurrentHashMap<>();
     private final ObservableMap<Integer, Currency> currencies
-            = FXCollections.observableMap(currencyMap);
+        = FXCollections.observableMap(currencyMap);
 
     private final Map<Integer, Account> accountsMap = new ConcurrentHashMap<>();
     private final ObservableMap<Integer, Account> accounts
-            = FXCollections.observableMap(accountsMap);
-
-    private final Map<Integer, TransactionGroup> transactionGroupsMap = new ConcurrentHashMap<>();
-    private final ObservableMap<Integer, TransactionGroup> transactionGroups
-            = FXCollections.observableMap(transactionGroupsMap);
+        = FXCollections.observableMap(accountsMap);
 
     private final Map<Integer, Transaction> transactionsMap = new ConcurrentHashMap<>();
     private final ObservableMap<Integer, Transaction> transactions
-            = FXCollections.observableMap(transactionsMap);
+        = FXCollections.observableMap(transactionsMap);
 
     private final BooleanProperty preloadingProperty = new SimpleBooleanProperty(false);
 
@@ -168,8 +161,14 @@ public class MoneyDAO extends DAO implements RecordSource {
         var typeList = List.of(types);
 
         return getCategories().stream()
-                .filter(category -> typeList.contains(category.getType()))
-                .collect(Collectors.toList());
+            .filter(category -> typeList.contains(category.getType()))
+            .collect(Collectors.toList());
+    }
+
+    public List<Category> getCategoriesByType(EnumSet<CategoryType> types) {
+        return getCategories().stream()
+            .filter(category -> types.contains(category.getType()))
+            .collect(Collectors.toList());
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -265,53 +264,28 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public List<Account> getAccountsByType(CategoryType type) {
         return accountsMap.values().stream()
-                .filter(account -> account.getType() == type)
-                .collect(Collectors.toList());
+            .filter(account -> account.getType() == type)
+            .collect(Collectors.toList());
     }
 
     public List<Account> getAccountsByCategory(int id) {
         return accountsMap.values().stream()
-                .filter(account -> account.getCategoryId() == id)
-                .collect(Collectors.toList());
+            .filter(account -> account.getCategoryId() == id)
+            .collect(Collectors.toList());
     }
 
     public List<Account> getAccountsByCategoryId(Integer... ids) {
         var catIDs = List.of(ids);
 
         return accountsMap.values().stream()
-                .filter(account -> catIDs.contains(account.getCategoryId()))
-                .collect(Collectors.toList());
+            .filter(account -> catIDs.contains(account.getCategoryId()))
+            .collect(Collectors.toList());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Transaction Groups
-    ////////////////////////////////////////////////////////////////////////////
-
-    public ObservableMap<Integer, TransactionGroup> transactionGroups() {
-        return transactionGroups;
-    }
-
-    public Optional<TransactionGroup> getTransactionGroup(int id) {
-        return id == 0 ? Optional.empty() : Optional.ofNullable(transactionGroupsMap.get(id));
-    }
-
-    public void insertTransactionGroup(TransactionGroup tg) {
-        insert(newDto(tg, encryptionKey));
-        transactionGroups.put(tg.getId(), tg);
-    }
-
-    public void updateTransactionGroup(TransactionGroup tg) {
-        update(newDto(tg, encryptionKey));
-        transactionGroups.put(tg.getId(), tg);
-    }
-
-    public void deleteTransactionGroup(int id) {
-        transactionGroups.remove(id);
-        delete(id, dtoClass(TransactionGroup.class));
-    }
-
-    public Collection<TransactionGroup> getTransactionGroups() {
-        return transactionGroupsMap.values();
+    public Optional<Account> getAccountByNumber(String accountNumber) {
+        return accountsMap.values().stream()
+            .filter(a -> Objects.equals(a.getAccountNumberNoSpaces(), accountNumber))
+            .findFirst();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -347,51 +321,58 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public List<Transaction> getTransactions(Collection<Account> accounts) {
         var ids = accounts.stream()
-                .map(Account::getId)
-                .collect(Collectors.toList());
+            .map(Account::getId)
+            .collect(Collectors.toList());
 
         return getTransactions().stream()
-                .filter(tr -> ids.contains(tr.getAccountDebitedId()) || ids.contains(tr.getAccountCreditedId()))
-                .collect(Collectors.toList());
+            .filter(tr -> ids.contains(tr.getAccountDebitedId()) || ids.contains(tr.getAccountCreditedId()))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Transaction> getTransactionDetails(Transaction parent) {
+        return getTransactions().stream()
+            .filter(t -> t.getParentId() == parent.getId())
+            .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactions(int month, int year) {
         return getTransactions().stream()
-                .filter(tr -> tr.getMonth() == month && tr.getYear() == year)
-                .collect(Collectors.toList());
+            .filter(tr -> tr.getMonth() == month && tr.getYear() == year)
+            .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactions(Account account) {
         int id = account.getId();
         return getTransactions().stream()
-                .filter(tr -> tr.getAccountDebitedId() == id || tr.getAccountCreditedId() == id)
-                .collect(Collectors.toList());
+            .filter(tr -> tr.getAccountDebitedId() == id || tr.getAccountCreditedId() == id)
+            .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
         var ids = categories.stream()
-                .map(Category::getId)
-                .collect(Collectors.toList());
+            .map(Category::getId)
+            .collect(Collectors.toList());
 
         return getTransactions().stream()
-                .filter(tr -> ids.contains(tr.getAccountDebitedCategoryId())
-                        || ids.contains(tr.getAccountCreditedCategoryId()))
-                .collect(Collectors.toList());
+            .filter(tr -> ids.contains(tr.getAccountDebitedCategoryId())
+                || ids.contains(tr.getAccountCreditedCategoryId()))
+            .collect(Collectors.toList());
     }
 
     public Set<String> getUniqueTransactionComments() {
         return getTransactions().stream()
-                .map(Transaction::getComment)
-                .filter(c -> !c.isEmpty())
-                .collect(Collectors.toSet());
+            .map(Transaction::getComment)
+            .filter(c -> !c.isEmpty())
+            .collect(Collectors.toSet());
     }
 
     public long getTransactionCount(Account account) {
         int id = account.getId();
 
         return getTransactions().stream()
-                .filter(tr -> tr.getAccountDebitedId() == id || tr.getAccountCreditedId() == id)
-                .count();
+            .filter(tr -> tr.getAccountDebitedId() == id || tr.getAccountCreditedId() == id)
+            .count();
     }
 
     public void createTables() {
@@ -442,10 +423,6 @@ public class MoneyDAO extends DAO implements RecordSource {
             loadDto(AccountDto.class, accountsMap);
             progress.accept("done\n");
 
-            progress.accept("    transaction groups... ");
-            loadDto(TransactionGroupDto.class, transactionGroupsMap);
-            progress.accept("done\n");
-
             progress.accept("    transactions... ");
             loadDto(TransactionDto.class, transactionsMap);
             progress.accept("done\n");
@@ -471,7 +448,6 @@ public class MoneyDAO extends DAO implements RecordSource {
             contactsMap.clear();
             currencyMap.clear();
             accountsMap.clear();
-            transactionGroupsMap.clear();
             transactionsMap.clear();
             preloadingProperty.set(false);
         }
@@ -491,32 +467,27 @@ public class MoneyDAO extends DAO implements RecordSource {
 
             progress.accept("    categories... ");
             insert(conn, BATCH_SIZE, imp.getCategories().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
+                .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
             insert(conn, BATCH_SIZE, imp.getCurrencies().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
+                .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
             insert(conn, BATCH_SIZE, imp.getAccounts().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
+                .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
             insert(conn, BATCH_SIZE, imp.getContacts().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
-            progress.accept("done\n");
-
-            progress.accept("    transaction groups... ");
-            insert(conn, BATCH_SIZE, imp.getTransactionGroups().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
+                .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
             insert(conn, BATCH_SIZE, imp.getTransactions().stream()
-                    .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
+                .map(c -> newDto(c, encryptionKey)).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -532,7 +503,8 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     private void mapImportedIds(Map<Integer, Pair<Integer, ImportAction>> idMap,
                                 Collection<? extends MoneyRecord> existing,
-                                List<? extends MoneyRecord> toImport) {
+                                List<? extends MoneyRecord> toImport)
+    {
         toImport.forEach(it -> {
             var found = findByGuid(existing, it.getGuid()).orElse(null);
             if (found != null) {
@@ -550,7 +522,8 @@ public class MoneyDAO extends DAO implements RecordSource {
     private <T extends MoneyRecord> void importTable(Connection conn,
                                                      List<? extends T> toImport,
                                                      Map<Integer, Pair<Integer, ImportAction>> idMap,
-                                                     Function<T, T> replacement) {
+                                                     Function<T, T> replacement)
+    {
         toImport.forEach(it -> {
             var action = idMap.get(it.getId()).getValue();
 
@@ -576,44 +549,40 @@ public class MoneyDAO extends DAO implements RecordSource {
         var currencyIdMap = new HashMap<Integer, Pair<Integer, ImportAction>>();
         var contactIdMap = new HashMap<Integer, Pair<Integer, ImportAction>>();
         var accountIdMap = new HashMap<Integer, Pair<Integer, ImportAction>>();
-        var transactionGroupIdMap = new HashMap<Integer, Pair<Integer, ImportAction>>();
         var transactionIdMap = new HashMap<Integer, Pair<Integer, ImportAction>>();
 
         mapImportedIds(currencyIdMap, currencyMap.values(), imp.getCurrencies());
         mapImportedIds(categoryIdMap, categoriesMap.values(), imp.getCategories());
         mapImportedIds(contactIdMap, contactsMap.values(), imp.getContacts());
         mapImportedIds(accountIdMap, accountsMap.values(), imp.getAccounts());
-        mapImportedIds(transactionGroupIdMap, transactionGroupsMap.values(), imp.getTransactionGroups());
         mapImportedIds(transactionIdMap, transactionsMap.values(), imp.getTransactions());
 
-        try (Connection conn = getDataSource().getConnection()) {
+        try (var conn = getDataSource().getConnection()) {
             try {
                 conn.setAutoCommit(false);
 
                 importTable(conn, imp.getCategories(), categoryIdMap,
-                        it -> it.copy(getMappedId(categoryIdMap, it.getId())));
+                    it -> it.copy(getMappedId(categoryIdMap, it.getId())));
 
                 importTable(conn, imp.getCurrencies(), currencyIdMap,
-                        it -> it.copy(getMappedId(currencyIdMap, it.getId())));
+                    it -> it.copy(getMappedId(currencyIdMap, it.getId())));
 
                 importTable(conn, imp.getContacts(), contactIdMap,
-                        it -> it.copy(getMappedId(contactIdMap, it.getId())));
+                    it -> it.copy(getMappedId(contactIdMap, it.getId())));
 
                 importTable(conn, imp.getAccounts(), accountIdMap,
-                        it -> it.copy(getMappedId(accountIdMap, it.getId()),
-                                getMappedId(categoryIdMap, it.getCategoryId())));
-
-                importTable(conn, imp.getTransactionGroups(), transactionGroupIdMap,
-                        it -> it.copy(getMappedId(transactionGroupIdMap, it.getId())));
+                    it -> it.copy(getMappedId(accountIdMap, it.getId()),
+                        getMappedId(categoryIdMap, it.getCategoryId())));
 
                 importTable(conn, imp.getTransactions(), transactionIdMap,
-                        it -> it.copy(getMappedId(transactionIdMap, it.getId()),
-                                getMappedId(accountIdMap, it.getAccountDebitedId()),
-                                getMappedId(accountIdMap, it.getAccountCreditedId()),
-                                getMappedId(categoryIdMap, it.getAccountDebitedCategoryId()),
-                                getMappedId(categoryIdMap, it.getAccountCreditedCategoryId()),
-                                getMappedId(contactIdMap, it.getContactId()),
-                                getMappedId(transactionGroupIdMap, it.getGroupId())));
+                    it -> it.copy(getMappedId(transactionIdMap, it.getId()),
+                        getMappedId(accountIdMap, it.getAccountDebitedId()),
+                        getMappedId(accountIdMap, it.getAccountCreditedId()),
+                        getMappedId(categoryIdMap, it.getAccountDebitedCategoryId()),
+                        getMappedId(categoryIdMap, it.getAccountCreditedCategoryId()),
+                        getMappedId(contactIdMap, it.getContactId()),
+                        getMappedId(transactionIdMap, it.getParentId())
+                    ));
 
                 conn.commit();
             } catch (Exception ex) {
@@ -628,12 +597,12 @@ public class MoneyDAO extends DAO implements RecordSource {
     public static Exception initDatabase(MysqlDataSource dataSource, String schema) {
         dataSource.setDatabaseName(null);
 
-        try (Connection conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
+        try (var conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
             st.execute("CREATE DATABASE " + schema + " CHARACTER SET = utf8");
 
             dataSource.setDatabaseName(schema);
 
-            DAO dao = new DAO(dataSource);
+            var dao = new DAO(dataSource);
             dao.createTables(TABLE_CLASSES);
 
             return null;

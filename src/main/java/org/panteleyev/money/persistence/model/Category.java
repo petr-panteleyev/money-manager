@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,24 +27,23 @@
 package org.panteleyev.money.persistence.model;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public final class Category implements MoneyRecord, Named {
     private final int id;
     private final String name;
     private final String comment;
     private final int catTypeId;
-    private final boolean expanded;
     private final String guid;
     private final long modified;
 
     private final CategoryType type;
 
-    public Category(int id, String name, String comment, int catTypeId, boolean expanded, String guid, long modified) {
+    private Category(int id, String name, String comment, int catTypeId, String guid, long modified) {
         this.id = id;
         this.name = name;
         this.comment = comment;
         this.catTypeId = catTypeId;
-        this.expanded = expanded;
         this.guid = guid;
         this.modified = modified;
 
@@ -52,19 +51,20 @@ public final class Category implements MoneyRecord, Named {
     }
 
     public Category copy(String newName, String newComment, int newCatTypeId) {
-        return new Category(id, newName, newComment, newCatTypeId, expanded, guid, System.currentTimeMillis());
+        return new Builder(this)
+            .name(newName)
+            .comment(newComment)
+            .catTypeId(newCatTypeId)
+            .modified(System.currentTimeMillis())
+            .build();
     }
 
     public CategoryType getType() {
         return type;
     }
 
-    public Category expand(boolean exp) {
-        return new Category(id, name, comment, catTypeId, exp, guid, modified);
-    }
-
     public Category copy(int newId) {
-        return new Category(newId, name, comment, catTypeId, expanded, guid, modified);
+        return new Builder(this).id(newId).build();
     }
 
     @Override
@@ -85,10 +85,6 @@ public final class Category implements MoneyRecord, Named {
         return catTypeId;
     }
 
-    public boolean getExpanded() {
-        return expanded;
-    }
-
     @Override
     public String getGuid() {
         return guid;
@@ -101,7 +97,7 @@ public final class Category implements MoneyRecord, Named {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, catTypeId, expanded, guid, modified);
+        return Objects.hash(id, name, comment, catTypeId, guid, modified);
     }
 
     @Override
@@ -117,11 +113,84 @@ public final class Category implements MoneyRecord, Named {
         Category that = (Category) other;
 
         return this.id == that.id
-                && Objects.equals(this.name, that.name)
-                && Objects.equals(this.comment, that.comment)
-                && this.catTypeId == that.catTypeId
-                && this.expanded == that.expanded
-                && Objects.equals(this.guid, that.guid)
-                && this.modified == that.modified;
+            && Objects.equals(this.name, that.name)
+            && Objects.equals(this.comment, that.comment)
+            && this.catTypeId == that.catTypeId
+            && Objects.equals(this.guid, that.guid)
+            && this.modified == that.modified;
+    }
+
+    public static class Builder {
+        private int id = 0;
+        private String name = "";
+        private String comment = "";
+        private int catTypeId = 0;
+        private String guid = null;
+        private long modified = 0L;
+
+        public Builder() {
+        }
+
+        public Builder(int id) {
+            this.id = id;
+        }
+
+        public Builder(Category c) {
+            if (c == null) {
+                return;
+            }
+
+            id = c.getId();
+            name = c.getName();
+            comment = c.getComment();
+            catTypeId = c.getCatTypeId();
+            guid = c.getGuid();
+            modified = c.getModified();
+        }
+
+        public Category build() {
+            if (guid == null) {
+                guid = UUID.randomUUID().toString();
+            }
+
+            if (modified == 0) {
+                modified = System.currentTimeMillis();
+            }
+
+            return new Category(id, name, comment, catTypeId, guid, modified);
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Category name must not be empty");
+            }
+            this.name = name;
+            return this;
+        }
+
+        public Builder comment(String comment) {
+            this.comment = comment == null ? "" : comment;
+            return this;
+        }
+
+        public Builder catTypeId(int catTypeId) {
+            this.catTypeId = catTypeId;
+            return this;
+        }
+
+        public Builder guid(String guid) {
+            this.guid = guid;
+            return this;
+        }
+
+        public Builder modified(long modified) {
+            this.modified = modified;
+            return this;
+        }
     }
 }

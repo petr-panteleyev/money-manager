@@ -167,4 +167,13 @@ public class AccountFilterSelectionBox extends HBox {
                         .orElseGet(() -> getSelectedCategoryType().map(t -> AccountFilter.byCategoryType(t.getId()))
                                 .orElse(x -> true)));
     }
+
+    public void setAccount(Account account) {
+        var type = account.getType();
+        var category = getDao().getCategory(account.getCategoryId()).orElseThrow();
+
+        categoryTypeChoiceBox.getSelectionModel().select(type);
+        categoryChoiceBox.getSelectionModel().select(category);
+        accountChoiceBox.getSelectionModel().select(account);
+    }
 }

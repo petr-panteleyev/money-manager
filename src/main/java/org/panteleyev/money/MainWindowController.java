@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 
 package org.panteleyev.money;
 
-import javafx.application.Application;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
@@ -46,53 +46,67 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
+import org.panteleyev.commons.database.ConnectDialog;
+import org.panteleyev.commons.database.ConnectionProfile;
+import org.panteleyev.commons.database.ConnectionProfileManager;
+import org.panteleyev.commons.fx.Controller;
+import org.panteleyev.commons.fx.WindowManager;
+import org.panteleyev.commons.ssh.SshManager;
 import org.panteleyev.money.charts.ChartsTab;
-import org.panteleyev.money.profiles.ConnectDialog;
-import org.panteleyev.money.profiles.ConnectionProfile;
-import org.panteleyev.money.profiles.ConnectionProfileManager;
-import org.panteleyev.money.profiles.ConnectionProfilesEditor;
-import org.panteleyev.money.ssh.SshManager;
+import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.statements.StatementTab;
 import org.panteleyev.money.xml.Export;
-import org.panteleyev.utilities.fx.Controller;
-import org.panteleyev.utilities.fx.WindowManager;
-import javax.sql.DataSource;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController {
-    private static final Logger LOGGER = Logger.getLogger(MainWindowController.class.getName());
+    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.money.res.ui";
-    public static final String CSS_PATH = "/org/panteleyev/money/res/main.css";
+    static final URL CSS_PATH = MainWindowController.class.getResource("/org/panteleyev/money/res/main.css");
 
     public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
     private final BorderPane self = new BorderPane();
     private final TabPane tabPane = new TabPane();
 
-    private Label progressLabel = new Label();
-    private ProgressBar progressBar = new ProgressBar();
+    private final Label progressLabel = new Label();
+    private final ProgressBar progressBar = new ProgressBar();
 
-    private Menu windowMenu = new Menu(RB.getString("menu.Window"));
+    private final Menu windowMenu = new Menu(RB.getString("menu.Window"));
 
     private final AccountsTab accountsTab = new AccountsTab();
-    private TransactionsTab transactionTab = new TransactionsTab();
-    private RequestTab requestTab = new RequestTab();
+    private final TransactionsTab transactionTab = new TransactionsTab();
+    private final RequestTab requestTab = new RequestTab();
     private final StatementTab statementsTab = new StatementTab();
     private final ChartsTab chartsTab = new ChartsTab();
 
-    private SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
+    private final Tab tabAccounts = new Tab(RB.getString("tab.Accouts"), accountsTab);
+    private final Tab tabTransactions = new Tab(RB.getString("tab.Transactions"), transactionTab);
+    private final Tab tabRequests = new Tab(RB.getString("tab.Requests"), requestTab);
+    private final Tab tabStatements = new Tab(RB.getString("Statement"), statementsTab);
+    private final Tab tabCharts = new Tab(RB.getString("tab.Charts"), chartsTab);
+
+    private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
+
+    private final SshManager sshManager = new SshManager(PREFERENCES);
+    private final ConnectionProfileManager profileManager =
+        new ConnectionProfileManager(this::onInitDatabase, this::onBuildDatasource,
+            PREFERENCES, sshManager);
 
     static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -106,14 +120,18 @@ public class MainWindowController extends BaseController {
     };
 
     private static final List<Class<? extends Controller>> WINDOW_CLASSES = List.of(
-            ContactListWindowController.class,
-            AccountListWindowController.class,
-            CategoryWindowController.class,
-            CurrencyWindowController.class
+        ContactListWindowController.class,
+        CategoryWindowController.class,
+        CurrencyWindowController.class
     );
 
     public MainWindowController(Stage stage) {
-        super(stage, CSS_PATH);
+        super(stage, CSS_PATH.toString());
+
+        sshManager.loadSessions();
+        profileManager.loadProfiles();
+
+        stage.setOnCloseRequest(event -> sshManager.closeAllSessions());
 
         stage.getIcons().add(Images.APP_ICON);
         initialize();
@@ -127,66 +145,77 @@ public class MainWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         // Main menu
-        var m2 = new MenuItem(RB.getString("menu.File.Connect"));
-        m2.setOnAction(event -> onOpenConnection());
-        var m3 = new MenuItem(RB.getString("menu.File.Close"));
-        m3.setOnAction(event -> onClose());
-        var m4 = new MenuItem(RB.getString("menu.File.Exit"));
-        m4.setOnAction(event -> onExit());
+        var fileConnectMenuItem = new MenuItem(RB.getString("menu.File.Connect"));
+        fileConnectMenuItem.setOnAction(event -> onOpenConnection());
+        var fileCloseMenuItem = new MenuItem(RB.getString("menu.File.Close"));
+        fileCloseMenuItem.setOnAction(event -> onClose());
+        var fileExitMenuItem = new MenuItem(RB.getString("menu.File.Exit"));
+        fileExitMenuItem.setOnAction(event -> onExit());
+        var exportMenuItem = new MenuItem(RB.getString("menu.Tools.Export"));
+        exportMenuItem.setOnAction(event -> xmlDump());
+        var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
+        importMenuItem.setOnAction(event -> onImport());
 
         var fileMenu = new Menu(RB.getString("menu.File"), null,
-                m2, new SeparatorMenuItem(), m3, new SeparatorMenuItem(), m4);
+            fileConnectMenuItem,
+            new SeparatorMenuItem(),
+            importMenuItem,
+            exportMenuItem,
+            new SeparatorMenuItem(),
+            fileCloseMenuItem,
+            new SeparatorMenuItem(),
+            fileExitMenuItem);
 
-        var m5 = new MenuItem(RB.getString("menu.Edit.Delete"));
+        var editDeleteMenuItem = new MenuItem(RB.getString("menu.Edit.Delete"));
 
         var currenciesMenuItem = new MenuItem(RB.getString("menu.Edit.Currencies"));
         currenciesMenuItem.setOnAction(event -> onManageCurrencies());
         var categoriesMenuItem = new MenuItem(RB.getString("menu.Edit.Categories"));
         categoriesMenuItem.setOnAction(event -> onManageCategories());
-        var accountsMenuItem = new MenuItem(RB.getString("menu.Edit.Accounts"));
-        accountsMenuItem.setOnAction(event -> onManageAccounts());
         var contactsMenuItem = new MenuItem(RB.getString("menu.Edit.Contacts"));
         contactsMenuItem.setOnAction(event -> onManageContacts());
 
         var editMenu = new Menu(RB.getString("menu.Edit"), null,
-                m5, new SeparatorMenuItem(),
-                currenciesMenuItem, categoriesMenuItem, accountsMenuItem, contactsMenuItem);
+            editDeleteMenuItem,
+            new SeparatorMenuItem(),
+            currenciesMenuItem,
+            categoriesMenuItem,
+            contactsMenuItem);
 
-        var dumpXmlMenuItem = new MenuItem(RB.getString("menu.Tools.Export"));
-        dumpXmlMenuItem.setOnAction(event -> xmlDump());
-
-        var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
-        importMenuItem.setOnAction(event -> onImport());
-
+        var sshMenuItem = new MenuItem("SSH...");
+        sshMenuItem.setOnAction(a -> sshManager.getEditor().showAndWait());
         var profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
-        profilesMenuItem.setOnAction(event -> onProfiles());
+        profilesMenuItem.setOnAction(a -> profileManager.getEditor().showAndWait());
 
-        var m7 = new MenuItem(RB.getString("menu.Tools.Options"));
-        m7.setOnAction(event -> onOptions());
+        var optionsMenuItem = new MenuItem(RB.getString("menu.Tools.Options"));
+        optionsMenuItem.setOnAction(event -> onOptions());
+        var importSettingsMenuItem = new MenuItem(RB.getString("menu.tools.import.settings"));
+        importSettingsMenuItem.setOnAction(a -> onImportSettings());
+        var exportSettingsMenuItem = new MenuItem(RB.getString("menu.tool.export.settings"));
+        exportSettingsMenuItem.setOnAction(a -> onExportSettings());
 
         var toolsMenu = new Menu(RB.getString("menu.Tools"), null,
-                dumpXmlMenuItem,
-                importMenuItem,
-                new SeparatorMenuItem(),
-                profilesMenuItem,
-                new SeparatorMenuItem(),
-                m7
+            sshMenuItem,
+            profilesMenuItem,
+            new SeparatorMenuItem(),
+            optionsMenuItem,
+            importSettingsMenuItem,
+            exportSettingsMenuItem
         );
 
         /* Dummy menu item is required in order to let onShowing() fire up first time */
         windowMenu.getItems().setAll(new MenuItem("dummy"));
 
         var menuBar = new MenuBar(fileMenu, editMenu, toolsMenu,
-                windowMenu, createHelpMenu(RB));
+            windowMenu, createHelpMenu(RB));
 
         menuBar.setUseSystemMenuBar(true);
 
         currenciesMenuItem.disableProperty().bind(dbOpenProperty.not());
         categoriesMenuItem.disableProperty().bind(dbOpenProperty.not());
-        accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
         contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
 
-        dumpXmlMenuItem.disableProperty().bind(dbOpenProperty.not());
+        exportMenuItem.disableProperty().bind(dbOpenProperty.not());
         importMenuItem.disableProperty().bind(dbOpenProperty.not());
 
         return menuBar;
@@ -205,22 +234,27 @@ public class MainWindowController extends BaseController {
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
 
-        var t2 = new Tab(RB.getString("tab.Transactions"), transactionTab);
-        t2.selectedProperty().addListener((x, y, newValue) -> {
+        tabTransactions.selectedProperty().addListener((x, y, newValue) -> {
             if (newValue) {
-                Platform.runLater(() -> transactionTab.scrollToEnd());
+                Platform.runLater(transactionTab::scrollToEnd);
             }
         });
 
         tabPane.getTabs().addAll(
-                new Tab(RB.getString("tab.Accouts"), accountsTab),
-                t2, new Tab(RB.getString("tab.Requests"), requestTab),
-                new Tab(RB.getString("Statement"), statementsTab),
-                new Tab(RB.getString("tab.Charts"), chartsTab)
+            tabTransactions,
+            tabAccounts,
+            tabRequests,
+            tabStatements,
+            tabCharts
         );
 
+        accountsTab.setAccountTransactionsConsumer(account -> {
+            requestTab.showTransactionsForAccount(account);
+            tabPane.getSelectionModel().select(tabRequests);
+        });
+
         statementsTab.setNewTransactionCallback((record, account) -> {
-            tabPane.getSelectionModel().select(t2);
+            tabPane.getSelectionModel().select(tabTransactions);
             transactionTab.handleStatementRecord(record, account);
         });
 
@@ -244,37 +278,12 @@ public class MainWindowController extends BaseController {
         getStage().setWidth(Options.getMainWindowWidth());
         getStage().setHeight(Options.getMainWindowHeight());
 
-        /*
-         * Application parameters:
-         * --profile=<profile>
-         */
-        Application.Parameters params = MoneyApplication.application.getParameters();
-
-        var profileName = params.getNamed().get("profile");
-        if (profileName != null) {
-            var profile = ConnectionProfileManager.get(profileName);
-            if (profile == null) {
-                LOGGER.warning("Profile " + profileName + " not found");
-            } else {
-                open(profile);
-            }
-        } else {
-            if (ConnectionProfileManager.getAutoConnect()) {
-                var profile = ConnectionProfileManager.getDefaultProfile();
-                if (profile != null) {
-                    open(profile);
-                }
-            }
-        }
-    }
-
-    private void onProfiles() {
-        new ConnectionProfilesEditor().showAndWait();
+        profileManager.getProfileToOpen(MoneyApplication.application).ifPresent(this::open);
     }
 
     private void onManageCategories() {
         var controller = WindowManager.find(CategoryWindowController.class)
-                .orElseGet(CategoryWindowController::new);
+            .orElseGet(CategoryWindowController::new);
 
         var stage = controller.getStage();
         stage.show();
@@ -287,16 +296,7 @@ public class MainWindowController extends BaseController {
 
     private void onManageCurrencies() {
         var controller = WindowManager.find(CurrencyWindowController.class)
-                .orElseGet(CurrencyWindowController::new);
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
-    }
-
-    private void onManageAccounts() {
-        var controller = WindowManager.find(AccountListWindowController.class)
-                .orElseGet(AccountListWindowController::new);
+            .orElseGet(CurrencyWindowController::new);
 
         var stage = controller.getStage();
         stage.show();
@@ -305,7 +305,7 @@ public class MainWindowController extends BaseController {
 
     private void onManageContacts() {
         var controller = WindowManager.find(ContactListWindowController.class)
-                .orElseGet(ContactListWindowController::new);
+            .orElseGet(ContactListWindowController::new);
 
         var stage = controller.getStage();
         stage.show();
@@ -326,23 +326,23 @@ public class MainWindowController extends BaseController {
     }
 
     private void onOpenConnection() {
-        new ConnectDialog().showAndWait()
-                .ifPresent(this::open);
+        new ConnectDialog(profileManager).showAndWait()
+            .ifPresent(this::open);
     }
 
     private void open(ConnectionProfile profile) {
-        SshManager.setupTunnel(profile);
-        DataSource ds = profile.buildDataSource();
+        sshManager.setupTunnel(profile.getSshSession());
+        var ds = onBuildDatasource(profile);
 
         getDao().setEncryptionKey(profile.getEncryptionKey());
         getDao().initialize(ds);
 
         Future loadResult = CompletableFuture
-                .runAsync(() -> getDao().preload())
-                .thenRun(() -> Platform.runLater(() -> {
-                    setTitle(AboutDialog.APP_TITLE + " - " + profile.getName() + " - " + profile.getConnectionString());
-                    dbOpenProperty.set(true);
-                }));
+            .runAsync(() -> getDao().preload())
+            .thenRun(() -> Platform.runLater(() -> {
+                setTitle(AboutDialog.APP_TITLE + " - " + profile.getName() + " - " + profile.getConnectionString());
+                dbOpenProperty.set(true);
+            }));
 
         checkFutureException(loadResult);
     }
@@ -376,7 +376,7 @@ public class MainWindowController extends BaseController {
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
+            new FileChooser.ExtensionFilter("All Files", "*.*"));
 
         var selected = fileChooser.showSaveDialog(null);
 
@@ -384,13 +384,12 @@ public class MainWindowController extends BaseController {
             CompletableFuture.runAsync(() -> {
                 try (var outputStream = new FileOutputStream(selected)) {
                     new Export()
-                            .withCategories(getDao().getCategories())
-                            .withAccounts(getDao().getAccounts(), false)
-                            .withCurrencies(getDao().getCurrencies())
-                            .withContacts(getDao().getContacts())
-                            .withTransactionGroups(getDao().getTransactionGroups())
-                            .withTransactions(getDao().getTransactions(), false)
-                            .doExport(outputStream);
+                        .withCategories(getDao().getCategories())
+                        .withAccounts(getDao().getAccounts(), false)
+                        .withCurrencies(getDao().getCurrencies())
+                        .withContacts(getDao().getContacts())
+                        .withTransactions(getDao().getTransactions(), false)
+                        .doExport(outputStream);
                     Options.setLastExportDir(selected.getParent());
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
@@ -401,5 +400,64 @@ public class MainWindowController extends BaseController {
 
     private void onImport() {
         new ImportWizard().showAndWait();
+    }
+
+
+    private Exception onInitDatabase(org.panteleyev.commons.database.ConnectionProfile profile) {
+        var ds = onBuildDatasource(profile);
+        return MoneyDAO.initDatabase(ds, profile.getSchema());
+    }
+
+    private MysqlDataSource onBuildDatasource(org.panteleyev.commons.database.ConnectionProfile profile) {
+        try {
+            var ds = new MysqlDataSource();
+
+            ds.setCharacterEncoding("utf8");
+            ds.setUseSSL(false);
+            ds.setServerTimezone(TimeZone.getDefault().getID());
+            ds.setPort(profileManager.getDatabasePort(profile));
+            ds.setServerName(profileManager.getDatabaseHost(profile));
+            ds.setUser(profile.getDataBaseUser());
+            ds.setPassword(profile.getDataBasePassword());
+            ds.setDatabaseName(profile.getSchema());
+
+            return ds;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void onImportSettings() {
+        var d = new FileChooser();
+        d.setTitle("Import Settings");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Settings", "*.xml")
+        );
+        var file = d.showOpenDialog(null);
+        if (file != null) {
+            try (var in = new FileInputStream(file)) {
+                Preferences.importPreferences(in);
+                sshManager.loadSessions();
+                profileManager.loadProfiles();
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private void onExportSettings() {
+        var d = new FileChooser();
+        d.setTitle("Export Settings");
+        d.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Settings", "*.xml")
+        );
+        var file = d.showSaveDialog(null);
+        if (file != null) {
+            try (var out = new FileOutputStream(file)) {
+                PREFERENCES.exportSubtree(out);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 }

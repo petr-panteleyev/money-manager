@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+  ~ Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
   ~ All rights reserved.
   ~
   ~ Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,6 @@
             <class name="org.panteleyev.money.persistence.model.TestContact"/>
             <class name="org.panteleyev.money.persistence.model.TestCurrency"/>
             <class name="org.panteleyev.money.persistence.model.TestTransaction"/>
-            <class name="org.panteleyev.money.persistence.model.TestTransactionGroup"/>
         </classes>
     </test>
     <test name="DAO">
@@ -59,18 +58,6 @@
             <class name="org.panteleyev.money.TestImportExport"/>
             <class name="org.panteleyev.money.TestImportRecords"/>
             <class name="org.panteleyev.money.TestXsdNegative"/>
-        </classes>
-    </test>
-    <test name="Profiles">
-        <classes>
-            <class name="org.panteleyev.money.profiles.TestConnectionProfile"/>
-            <class name="org.panteleyev.money.profiles.TestConnectionProfileManager"/>
-        </classes>
-    </test>
-    <test name="Ssh">
-        <classes>
-            <class name="org.panteleyev.money.ssh.TestSession"/>
-            <class name="org.panteleyev.money.ssh.TestSshManager"/>
         </classes>
     </test>
     <test name="Misc">

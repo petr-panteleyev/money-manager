@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,31 +27,20 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableRow;
-import org.panteleyev.money.persistence.model.SplitTransaction;
 import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.Styles.GROUP_CELL;
-import static org.panteleyev.money.Styles.GROUP_MEMBER_CELL;
-import static org.panteleyev.money.Styles.TRANSACTION_CELL;
 
 public class TransactionRow extends TableRow<Transaction> {
     @Override
     public void updateItem(Transaction item, boolean empty) {
         super.updateItem(item, empty);
 
-        getStyleClass().removeAll(GROUP_CELL, GROUP_MEMBER_CELL, TRANSACTION_CELL);
+        getStyleClass().removeAll(GROUP_CELL);
 
         if (item != null && !empty) {
-            if (item instanceof SplitTransaction) {
+            if (item.isDetailed()) {
                 getStyleClass().add(GROUP_CELL);
-            } else {
-                if (item.getGroupId() != 0) {
-                    getStyleClass().add(GROUP_MEMBER_CELL);
-                } else {
-                    getStyleClass().add(TRANSACTION_CELL);
-                }
             }
-        } else {
-            getStyleClass().add(TRANSACTION_CELL);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 Personal finance manager. Work in progress.
 
-## Running with Java 10
+## Running with Java 11
 
 The following options must be added to java command line:
 

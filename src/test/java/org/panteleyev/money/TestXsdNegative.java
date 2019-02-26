@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ import org.testng.annotations.Test;
 import org.xml.sax.SAXParseException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 
 /**
  * This test covers various validation violations.
@@ -47,7 +46,6 @@ public class TestXsdNegative extends BaseTest {
                 {"noCategories.xml"},
                 {"noContacts.xml"},
                 {"noCurrencies.xml"},
-                {"noTransactionGroups.xml"},
                 {"noTransactions.xml"},
 
                 // account
@@ -67,10 +65,6 @@ public class TestXsdNegative extends BaseTest {
                 {"currency/notUniqueId.xml"},
                 {"currency/notUniqueUUID.xml"},
 
-                // transaction group
-                {"transactionGroup/notUniqueId.xml"},
-                {"transactionGroup/notUniqueUUID.xml"},
-
                 // transaction
                 {"transaction/notUniqueId.xml"},
                 {"transaction/notUniqueUUID.xml"}
@@ -79,7 +73,7 @@ public class TestXsdNegative extends BaseTest {
 
     @Test(dataProvider = "dataProvider")
     public void negativeXsdTest(String fileName) throws Exception {
-        try (InputStream input = new FileInputStream(new File(RESOURCES + fileName))) {
+        try (var input = new FileInputStream(new File(RESOURCES + fileName))) {
             boolean caught = false;
 
             try {

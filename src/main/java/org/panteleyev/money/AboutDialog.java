@@ -33,7 +33,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.util.ResourceBundle;
 
 final class AboutDialog extends BaseDialog {

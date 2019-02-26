@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -50,9 +51,10 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
     private final CategoryType type;
 
-    public Account(int id, String name, String comment, String accountNumber, BigDecimal openingBalance,
-                   BigDecimal accountLimit, BigDecimal currencyRate, int typeId, int categoryId,
-                   int currencyId, boolean enabled, String guid, long modified) {
+    private Account(int id, String name, String comment, String accountNumber, BigDecimal openingBalance,
+                    BigDecimal accountLimit, BigDecimal currencyRate, int typeId, int categoryId,
+                    int currencyId, boolean enabled, String guid, long modified)
+    {
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -71,13 +73,16 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     }
 
     public Account copy(int newId) {
-        return new Account(newId, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
-                categoryId, currencyId, enabled, guid, modified);
+        return new Builder(this)
+            .id(newId)
+            .build();
     }
 
     public Account copy(int newId, int newCategoryId) {
-        return new Account(newId, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
-                newCategoryId, currencyId, enabled, guid, modified);
+        return new Builder(this)
+            .id(newId)
+            .categoryId(newCategoryId)
+            .build();
     }
 
     public CategoryType getType() {
@@ -91,7 +96,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
     public Account enable(boolean e) {
         return new Account(id, name, comment, accountNumber, openingBalance, accountLimit, currencyRate, typeId,
-                categoryId, currencyId, e, guid, modified);
+            categoryId, currencyId, e, guid, modified);
     }
 
     @Override
@@ -163,36 +168,37 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         Account that = (Account) other;
 
         return id == that.id
-                && Objects.equals(name, that.name)
-                && Objects.equals(comment, that.comment)
-                && Objects.equals(accountNumber, that.accountNumber)
-                && openingBalance.compareTo(that.openingBalance) == 0
-                && accountLimit.compareTo(that.accountLimit) == 0
-                && currencyRate.compareTo(that.currencyRate) == 0
-                && typeId == that.typeId
-                && categoryId == that.categoryId
-                && currencyId == that.currencyId
-                && enabled == that.enabled
-                && Objects.equals(guid, that.guid)
-                && modified == that.modified;
+            && Objects.equals(name, that.name)
+            && Objects.equals(comment, that.comment)
+            && Objects.equals(accountNumber, that.accountNumber)
+            && openingBalance.compareTo(that.openingBalance) == 0
+            && accountLimit.compareTo(that.accountLimit) == 0
+            && currencyRate.compareTo(that.currencyRate) == 0
+            && typeId == that.typeId
+            && categoryId == that.categoryId
+            && currencyId == that.currencyId
+            && enabled == that.enabled
+            && Objects.equals(guid, that.guid)
+            && modified == that.modified;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, accountNumber, openingBalance.stripTrailingZeros(), accountLimit.stripTrailingZeros(),
-                currencyRate.stripTrailingZeros(), typeId, categoryId, currencyId, enabled,
-                guid, modified);
+        return Objects.hash(id, name, comment, accountNumber, openingBalance.stripTrailingZeros(),
+            accountLimit.stripTrailingZeros(),
+            currencyRate.stripTrailingZeros(), typeId, categoryId, currencyId, enabled,
+            guid, modified);
     }
 
     @Override
     public String toString() {
         return "Account ["
-                + " id:" + id
-                + " name:" + name
-                + " comment:" + comment
-                + " accountNumber:" + accountNumber
-                + " categoryId:" + categoryId
-                + "]";
+            + " id:" + id
+            + " name:" + name
+            + " comment:" + comment
+            + " accountNumber:" + accountNumber
+            + " categoryId:" + categoryId
+            + "]";
 
     }
 
@@ -213,25 +219,151 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
      */
     public BigDecimal calculateBalance(boolean total, Predicate<Transaction> filter) {
         return getDao().getTransactions(this).stream()
-                .filter(filter)
-                .map(t -> {
-                    BigDecimal amount = t.getAmount();
-                    if (this.getId() == t.getAccountCreditedId()) {
-                        // handle conversion rate
-                        BigDecimal rate = t.getRate();
-                        if (rate.compareTo(BigDecimal.ZERO) != 0) {
-                            amount = t.getRateDirection() == 0 ?
-                                    amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
-                        }
-                    } else {
-                        amount = amount.negate();
+            .filter(filter)
+            .map(t -> {
+                BigDecimal amount = t.getAmount();
+                if (this.getId() == t.getAccountCreditedId()) {
+                    // handle conversion rate
+                    var rate = t.getRate();
+                    if (rate.compareTo(BigDecimal.ZERO) != 0) {
+                        amount = t.getRateDirection() == 0 ?
+                            amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
                     }
-                    return amount;
-                })
-                .reduce(total ? this.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
+                } else {
+                    amount = amount.negate();
+                }
+                return amount;
+            })
+            .reduce(total ? this.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
     }
 
     public String getAccountNumberNoSpaces() {
         return getAccountNumber().replaceAll(" ", "");
+    }
+
+    public static final class Builder {
+        private int id = 0;
+        private String name = "";
+        private String comment = "";
+        private String accountNumber = "";
+        private BigDecimal openingBalance = BigDecimal.ZERO;
+        private BigDecimal accountLimit = BigDecimal.ZERO;
+        private BigDecimal currencyRate = BigDecimal.ONE;
+        private int typeId;
+        private int categoryId;
+        private int currencyId;
+        private boolean enabled = true;
+        private String guid = null;
+        private long modified = 0;
+
+        public Builder() {
+        }
+
+        public Builder(int id) {
+            this.id = id;
+        }
+
+        public Builder(Account account) {
+            if (account == null) {
+                return;
+            }
+
+            id = account.getId();
+            name = account.getName();
+            comment = account.getComment();
+            accountNumber = account.getAccountNumber();
+            openingBalance = account.getOpeningBalance();
+            accountLimit = account.getAccountLimit();
+            currencyRate = account.getCurrencyRate();
+            typeId = account.getTypeId();
+            categoryId = account.getCategoryId();
+            currencyId = account.getCurrencyId();
+            enabled = account.getEnabled();
+            guid = account.getGuid();
+            modified = account.getModified();
+        }
+
+        public Account build() {
+            if (guid == null) {
+                guid = UUID.randomUUID().toString();
+            }
+
+            if (modified == 0) {
+                modified = System.currentTimeMillis();
+            }
+
+            return new Account(id, name, comment, accountNumber, openingBalance,
+                accountLimit, currencyRate, typeId, categoryId,
+                currencyId, enabled, guid, modified);
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Account name must not be empty");
+            }
+            this.name = name;
+            return this;
+        }
+
+        public Builder comment(String comment) {
+            this.comment = comment == null ? "" : comment;
+            return this;
+        }
+
+        public Builder accountNumber(String accountNumber) {
+            this.accountNumber = accountNumber == null ? "" : accountNumber;
+            return this;
+        }
+
+        public Builder openingBalance(BigDecimal openingBalance) {
+            this.openingBalance = openingBalance;
+            return this;
+        }
+
+        public Builder accountLimit(BigDecimal accountLimit) {
+            this.accountLimit = accountLimit;
+            return this;
+        }
+
+        public Builder currencyRate(BigDecimal currencyRate) {
+            this.currencyRate = currencyRate;
+            return this;
+        }
+
+        public Builder typeId(int typeId) {
+            this.typeId = typeId;
+            return this;
+        }
+
+        public Builder categoryId(int categoryId) {
+            this.categoryId = categoryId;
+            return this;
+        }
+
+        public Builder currencyId(int currencyId) {
+            this.currencyId = currencyId;
+            return this;
+        }
+
+        public Builder enabled(boolean enabled) {
+            this.enabled = enabled;
+            return this;
+        }
+
+        public Builder guid(String guid) {
+            Objects.requireNonNull(guid);
+            this.guid = guid;
+            return this;
+        }
+
+        public Builder modified(long modified) {
+            this.modified = modified;
+            return this;
+        }
     }
 }

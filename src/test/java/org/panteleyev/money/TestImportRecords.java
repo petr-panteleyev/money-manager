@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,7 @@
 package org.panteleyev.money;
 
 import org.panteleyev.money.persistence.BaseDaoTest;
-import org.panteleyev.money.persistence.model.MoneyRecord;
 import org.panteleyev.money.xml.Import;
-import org.panteleyev.persistence.Record;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
@@ -37,8 +35,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Comparator;
 import static org.panteleyev.money.persistence.MoneyDAO.IGNORE_PROGRESS;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -49,16 +45,13 @@ public class TestImportRecords extends BaseDaoTest {
     private static String UPDATE = RESOURCE_DIR + "/update.xml";
     private static String EXPECTED = RESOURCE_DIR + "/expected.xml";
 
-    private static final Comparator<MoneyRecord> BY_ID = Comparator.comparingInt(Record::getId);
-
     @BeforeClass
     @Override
     public void setupAndSkip() throws Exception {
         try {
             super.setupAndSkip();
             getDao().createTables();
-            getDao().preload(t -> {
-            });
+            getDao().preload(t -> { });
         } catch (Exception ex) {
             throw new SkipException("Database not configured");
         }
@@ -73,20 +66,20 @@ public class TestImportRecords extends BaseDaoTest {
 
     @Test
     public void testImportRecords() throws Exception {
-        File initial = new File(INITIAL);
+        var initial = new File(INITIAL);
         Assert.assertTrue(initial.exists());
 
-        try (InputStream inputStream = new FileInputStream(initial)) {
+        try (var inputStream = new FileInputStream(initial)) {
             getDao().importFullDump(Import.doImport(inputStream), IGNORE_PROGRESS);
         }
 
         getDao().preload();
         compareDatabase(INITIAL);
 
-        File update = new File(UPDATE);
+        var update = new File(UPDATE);
         Assert.assertTrue(update.exists());
 
-        try (InputStream inputStream = new FileInputStream(update)) {
+        try (var inputStream = new FileInputStream(update)) {
             getDao().importRecords(Import.doImport(inputStream), IGNORE_PROGRESS);
         }
 
@@ -95,17 +88,16 @@ public class TestImportRecords extends BaseDaoTest {
     }
 
     private void compareDatabase(String expected) throws Exception {
-        File file = new File(expected);
+        var file = new File(expected);
         Assert.assertTrue(file.exists());
 
-        try (InputStream inputStream = new FileInputStream(file)) {
-            Import imp = Import.doImport(inputStream);
+        try (var inputStream = new FileInputStream(file)) {
+            var imp = Import.doImport(inputStream);
 
             Assert.assertEquals(sortedById(getDao().getCategories()), sortedById(imp.getCategories()));
             Assert.assertEquals(sortedById(getDao().getAccounts()), sortedById(imp.getAccounts()));
             Assert.assertEquals(sortedById(getDao().getCurrencies()), sortedById(imp.getCurrencies()));
             Assert.assertEquals(sortedById(getDao().getContacts()), sortedById(imp.getContacts()));
-            Assert.assertEquals(sortedById(getDao().getTransactionGroups()), sortedById(imp.getTransactionGroups()));
             Assert.assertEquals(sortedById(getDao().getTransactions()), sortedById(imp.getTransactions()));
         }
     }

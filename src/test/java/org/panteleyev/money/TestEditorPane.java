@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -90,83 +90,83 @@ public class TestEditorPane extends BaseDaoTest {
     }
 
     private void createData() {
-        curr_1 = new Currency(newCurrencyId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                1, false, false,
-                new BigDecimal(RANDOM.nextDouble()), 1, false,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        curr_1 = new Currency.Builder(newCurrencyId())
+            .symbol(UUID.randomUUID().toString())
+            .description(UUID.randomUUID().toString())
+            .formatSymbol(UUID.randomUUID().toString())
+            .formatSymbolPosition(1)
+            .showFormatSymbol(false)
+            .def(false)
+            .rate(new BigDecimal(RANDOM.nextDouble()))
+            .direction(1)
+            .useThousandSeparator(false)
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        curr_2 = new Currency(newCurrencyId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                1, false, false,
-                new BigDecimal(RANDOM.nextDouble()), 1, false,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        curr_2 = new Currency.Builder(newCurrencyId())
+            .symbol(UUID.randomUUID().toString())
+            .description(UUID.randomUUID().toString())
+            .formatSymbol(UUID.randomUUID().toString())
+            .formatSymbolPosition(1)
+            .showFormatSymbol(false)
+            .def(false)
+            .rate(new BigDecimal(RANDOM.nextDouble()))
+            .direction(1)
+            .useThousandSeparator(false)
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        category = new Category(newCategoryId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                CategoryType.BANKS_AND_CASH.getId(),
-                false,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        category = new Category.Builder(newCategoryId())
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .catTypeId(CategoryType.BANKS_AND_CASH.getId())
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        contact = new Contact(newContactId(), UUID.randomUUID().toString());
+        contact = new Contact.Builder(newContactId())
+            .name(UUID.randomUUID().toString())
+            .build();
 
-        acc_1 = new Account(newAccountId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                BigDecimal.ZERO,
-                BigDecimal.ZERO,
-                BigDecimal.ONE,
-                CategoryType.BANKS_AND_CASH.getId(),
-                category.getId(),
-                curr_1.getId(),
-                true,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        acc_1 = new Account.Builder(newAccountId())
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .typeId(CategoryType.BANKS_AND_CASH.getId())
+            .categoryId(category.getId())
+            .currencyId(curr_1.getId())
+            .enabled(true)
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
         // different currency
-        acc_2 = new Account(newAccountId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                BigDecimal.ZERO,
-                BigDecimal.ZERO,
-                BigDecimal.ONE,
-                CategoryType.BANKS_AND_CASH.getId(),
-                category.getId(),
-                curr_2.getId(),
-                true,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        acc_2 = new Account.Builder(newAccountId())
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .typeId(CategoryType.BANKS_AND_CASH.getId())
+            .categoryId(category.getId())
+            .currencyId(curr_2.getId())
+            .enabled(true)
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
         // same currency as (1)
-        acc_3 = new Account(newAccountId(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                UUID.randomUUID().toString(),
-                BigDecimal.ZERO,
-                BigDecimal.ZERO,
-                BigDecimal.ONE,
-                CategoryType.BANKS_AND_CASH.getId(),
-                category.getId(),
-                curr_1.getId(),
-                true,
-                UUID.randomUUID().toString(),
-                System.currentTimeMillis()
-        );
+        acc_3 = new Account.Builder(newAccountId())
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .typeId(CategoryType.BANKS_AND_CASH.getId())
+            .categoryId(category.getId())
+            .currencyId(curr_1.getId())
+            .enabled(true)
+            .guid(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
 
         getDao().insertCurrency(curr_1);
         getDao().insertCurrency(curr_2);
@@ -211,13 +211,13 @@ public class TestEditorPane extends BaseDaoTest {
 
         // Debited account
         getTextField(pane, "debitedAccountEdit").setText(getDao().getAccount(t.getAccountDebitedId())
-                .map(Account::getName)
-                .orElse(""));
+            .map(Account::getName)
+            .orElse(""));
 
         // Credited account
         getTextField(pane, "creditedAccountEdit").setText(getDao().getAccount(t.getAccountCreditedId())
-                .map(Account::getName)
-                .orElse(""));
+            .map(Account::getName)
+            .orElse(""));
 
         getTextField(pane, "commentEdit").setText(t.getComment());
         getTextField(pane, "sumEdit").setText(t.getAmount().toString());
@@ -267,18 +267,18 @@ public class TestEditorPane extends BaseDaoTest {
 
     private Transaction createTestTransaction(Account debit, Account credit, Contact contact) {
         Transaction.Builder builder = new Transaction.Builder()
-                .id(RANDOM.nextInt())
-                .transactionType(TransactionType.CARD_PAYMENT)
-                .accountCreditedType(category.getType())
-                .accountDebitedType(category.getType())
-                .accountCreditedCategoryId(category.getId())
-                .accountDebitedCategoryId(category.getId())
-                .accountDebitedId(debit.getId())
-                .accountCreditedId(credit.getId())
-                .day(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
-                .comment(UUID.randomUUID().toString())
-                .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
-                .checked(RANDOM.nextBoolean());
+            .id(RANDOM.nextInt())
+            .transactionType(TransactionType.CARD_PAYMENT)
+            .accountCreditedType(category.getType())
+            .accountDebitedType(category.getType())
+            .accountCreditedCategoryId(category.getId())
+            .accountDebitedCategoryId(category.getId())
+            .accountDebitedId(debit.getId())
+            .accountCreditedId(credit.getId())
+            .day(Calendar.getInstance().get(Calendar.DAY_OF_MONTH))
+            .comment(UUID.randomUUID().toString())
+            .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
+            .checked(RANDOM.nextBoolean());
 
         if (debit.getCurrencyId() == credit.getCurrencyId()) {
             builder.rate(BigDecimal.ONE);
@@ -295,30 +295,30 @@ public class TestEditorPane extends BaseDaoTest {
 
     private StatementRecord createTestStatementRecord() {
         StatementRecord.Builder builder = new StatementRecord.Builder()
-                .actual(LocalDate.now())
-                .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
+            .actual(LocalDate.now())
+            .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
         return builder.build();
     }
 
     private void assertMainFields(Transaction r, Transaction t) {
         Assert.assertEquals(r.getTransactionType(), t.getTransactionType(),
-                "Transaction type ID is invalid");
+            "Transaction type ID is invalid");
 
         // Debited account
         Assert.assertEquals(r.getAccountDebitedId(), t.getAccountDebitedId(),
-                "Debited account ID is invalid");
+            "Debited account ID is invalid");
         Assert.assertEquals(r.getAccountDebitedCategoryId(), t.getAccountDebitedCategoryId(),
-                "Debited account category ID is invalid");
+            "Debited account category ID is invalid");
         Assert.assertEquals(r.getAccountDebitedType(), t.getAccountDebitedType(),
-                "Debited account category type ID is invalid");
+            "Debited account category type ID is invalid");
 
         // Credited account
         Assert.assertEquals(r.getAccountCreditedId(), t.getAccountCreditedId(),
-                "Credited account ID is invalid");
+            "Credited account ID is invalid");
         Assert.assertEquals(r.getAccountCreditedCategoryId(), t.getAccountCreditedCategoryId(),
-                "Credited account category ID is invalid");
+            "Credited account category ID is invalid");
         Assert.assertEquals(r.getAccountCreditedType(), t.getAccountCreditedType(),
-                "Credited account category type ID is invalid");
+            "Credited account category type ID is invalid");
 
         Assert.assertEquals(r.getDay(), t.getDay(), "Day is invalid");
         Assert.assertEquals(r.getComment(), t.getComment(), "Comment is invalid");
@@ -361,10 +361,10 @@ public class TestEditorPane extends BaseDaoTest {
             Transaction resultedTransaction = builder.id(1).build();
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
-                    "Contact ID is invalid");
+                "Contact ID is invalid");
             Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
             Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
-                    "Amount is invalid");
+                "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -392,7 +392,7 @@ public class TestEditorPane extends BaseDaoTest {
             Transaction resultedTransaction = builder.id(1).build();
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
-                    "Contact ID is invalid");
+                "Contact ID is invalid");
             Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
             Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
@@ -455,7 +455,7 @@ public class TestEditorPane extends BaseDaoTest {
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
-                    "Contact ID is invalid");
+                "Contact ID is invalid");
             Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(), "Rate is invalid");
             Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
 
@@ -488,11 +488,11 @@ public class TestEditorPane extends BaseDaoTest {
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(),
-                    "Contact ID is invalid");
+                "Contact ID is invalid");
             Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(),
-                    "Rate is invalid");
+                "Rate is invalid");
             Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
-                    "Amount is invalid");
+                "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -521,7 +521,8 @@ public class TestEditorPane extends BaseDaoTest {
             Assert.assertEquals(resultedTransaction.getId(), transaction.getId());
 
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is invalid");
+            Assert.assertEquals(resultedTransaction.getContactId(), transaction.getContactId(), "Contact ID is " +
+                "invalid");
             Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
             Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);

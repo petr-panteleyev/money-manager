@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.model.SplitTransaction;
 import org.panteleyev.money.persistence.model.Transaction;
 
 public class TransactionDayCell extends TableCell<Transaction, Transaction> {
@@ -44,15 +43,11 @@ public class TransactionDayCell extends TableCell<Transaction, Transaction> {
         if (empty || transaction == null) {
             setText("");
         } else {
-            if (transaction instanceof SplitTransaction || transaction.getGroupId() == 0) {
-                if (fullDate) {
-                    setText(String.format("%02d.%02d.%04d",
-                            transaction.getDay(), transaction.getMonth(), transaction.getYear()));
-                } else {
-                    setText(Integer.toString(transaction.getDay()));
-                }
+            if (fullDate) {
+                setText(String.format("%02d.%02d.%04d",
+                    transaction.getDay(), transaction.getMonth(), transaction.getYear()));
             } else {
-                setText("");
+                setText(Integer.toString(transaction.getDay()));
             }
         }
     }

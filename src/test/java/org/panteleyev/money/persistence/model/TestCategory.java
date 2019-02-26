@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,28 +27,63 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import java.util.UUID;
-import static org.panteleyev.money.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
 import static org.panteleyev.money.BaseTestUtils.randomId;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.randomCategoryType;
+import static org.panteleyev.money.BaseTestUtils.randomString;
+import static org.testng.Assert.assertEquals;
 
 public class TestCategory extends BaseTest {
     @Test
     public void testEquals() {
-        int id = randomId();
-        String name = UUID.randomUUID().toString();
-        String comment = UUID.randomUUID().toString();
-        CategoryType type = randomCategoryType();
-        boolean expanded = RANDOM.nextBoolean();
-        String uuid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var id = randomId();
+        var name = UUID.randomUUID().toString();
+        var comment = UUID.randomUUID().toString();
+        var type = randomCategoryType();
+        var uuid = UUID.randomUUID().toString();
+        var modified = System.currentTimeMillis();
 
-        Category c1 = new Category(id, name, comment, type.getId(), expanded, uuid, modified);
-        Category c2 = new Category(id, name, comment, type.getId(), expanded, uuid, modified);
+        var c1 = new Category.Builder(id)
+            .name(name)
+            .comment(comment)
+            .catTypeId(type.getId())
+            .guid(uuid)
+            .modified(modified)
+            .build();
+        var c2 = new Category.Builder(id)
+            .name(name)
+            .comment(comment)
+            .catTypeId(type.getId())
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
-        Assert.assertEquals(c1, c2);
-        Assert.assertEquals(c1.hashCode(), c2.hashCode());
+        assertEquals(c1, c2);
+        assertEquals(c1.hashCode(), c2.hashCode());
+    }
+
+    @Test
+    public void testBuilder() {
+        var original = new Category.Builder(randomId())
+            .name(randomString())
+            .comment(randomString())
+            .catTypeId(randomCategoryType().getId())
+            .guid(randomString())
+            .modified(System.currentTimeMillis())
+            .build();
+
+        var copy = new Category.Builder(original).build();
+        assertEquals(copy, original);
+
+        var manualCopy = new Category.Builder()
+            .id(original.getId())
+            .name(original.getName())
+            .comment(original.getComment())
+            .catTypeId(original.getCatTypeId())
+            .guid(original.getGuid())
+            .modified(original.getModified())
+            .build();
+        assertEquals(manualCopy, original);
     }
 }

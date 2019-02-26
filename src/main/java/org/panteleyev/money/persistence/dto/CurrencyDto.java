@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public final class CurrencyDto implements Record, Dto<Currency> {
 
         var rawBytes = toJson(currency);
         bytes = password != null && !password.isEmpty() ?
-                aes256().encrypt(rawBytes, password) : rawBytes;
+            aes256().encrypt(rawBytes, password) : rawBytes;
     }
 
     @Override
@@ -83,20 +83,21 @@ public final class CurrencyDto implements Record, Dto<Currency> {
     @Override
     public Currency decrypt(String password) {
         var rawBytes = password != null && !password.isEmpty() ?
-                aes256().decrypt(bytes, password) : bytes;
+            aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
-        return new Currency(obj.get("id").getAsInt(),
-                obj.get("symbol").getAsString(),
-                obj.get("description").getAsString(),
-                obj.get("formatSymbol").getAsString(),
-                obj.get("formatSymbolPosition").getAsInt(),
-                obj.get("showFormatSymbol").getAsBoolean(),
-                obj.get("def").getAsBoolean(),
-                obj.get("rate").getAsBigDecimal(),
-                obj.get("direction").getAsInt(),
-                obj.get("useThousandSeparator").getAsBoolean(),
-                obj.get("guid").getAsString(),
-                obj.get("modified").getAsLong());
+        return new Currency.Builder(obj.get("id").getAsInt())
+            .symbol(obj.get("symbol").getAsString())
+            .description(obj.get("description").getAsString())
+            .formatSymbol(obj.get("formatSymbol").getAsString())
+            .formatSymbolPosition(obj.get("formatSymbolPosition").getAsInt())
+            .showFormatSymbol(obj.get("showFormatSymbol").getAsBoolean())
+            .def(obj.get("def").getAsBoolean())
+            .rate(obj.get("rate").getAsBigDecimal())
+            .direction(obj.get("direction").getAsInt())
+            .useThousandSeparator(obj.get("useThousandSeparator").getAsBoolean())
+            .guid(obj.get("guid").getAsString())
+            .modified(obj.get("modified").getAsLong())
+            .build();
     }
 }

@@ -37,7 +37,7 @@ public final class StatementParser {
             case RAIFFEISEN_ACCOUNT_CSV:
                 return RBAParser.parseAccountCSV(inStream);
 
-            case RAIFFEISEN_CARD_OFX:
+            case RAIFFEISEN_OFX:
                 return RBAParser.parseOfx(inStream);
 
             case SBERBANK_HTML:

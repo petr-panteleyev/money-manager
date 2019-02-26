@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public final class AccountDto implements Record, Dto<Account> {
 
         var rawBytes = toJson(account);
         bytes = password != null && !password.isEmpty() ?
-                aes256().encrypt(rawBytes, password) : rawBytes;
+            aes256().encrypt(rawBytes, password) : rawBytes;
     }
 
     @Override
@@ -84,24 +84,25 @@ public final class AccountDto implements Record, Dto<Account> {
     @Override
     public Account decrypt(String password) {
         var rawBytes = password != null && !password.isEmpty() ?
-                aes256().decrypt(bytes, password) : bytes;
+            aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
 
         var accountNumber = obj.get("accountNumber");
 
-        return new Account(obj.get("id").getAsInt(),
-                obj.get("name").getAsString(),
-                obj.get("comment").getAsString(),
-                accountNumber == null || accountNumber.isJsonNull() ? "" : accountNumber.getAsString(),
-                obj.get("openingBalance").getAsBigDecimal(),
-                obj.get("accountLimit").getAsBigDecimal(),
-                obj.get("currencyRate").getAsBigDecimal(),
-                obj.get("typeId").getAsInt(),
-                obj.get("categoryId").getAsInt(),
-                obj.get("currencyId").getAsInt(),
-                obj.get("enabled").getAsBoolean(),
-                obj.get("guid").getAsString(),
-                obj.get("modified").getAsLong());
+        return new Account.Builder(obj.get("id").getAsInt())
+            .name(obj.get("name").getAsString())
+            .comment(obj.get("comment").getAsString())
+            .accountNumber(accountNumber == null || accountNumber.isJsonNull() ? "" : accountNumber.getAsString())
+            .openingBalance(obj.get("openingBalance").getAsBigDecimal())
+            .accountLimit(obj.get("accountLimit").getAsBigDecimal())
+            .currencyRate(obj.get("currencyRate").getAsBigDecimal())
+            .typeId(obj.get("typeId").getAsInt())
+            .categoryId(obj.get("categoryId").getAsInt())
+            .currencyId(obj.get("currencyId").getAsInt())
+            .enabled(obj.get("enabled").getAsBoolean())
+            .guid(obj.get("guid").getAsString())
+            .modified(obj.get("modified").getAsLong())
+            .build();
     }
 }

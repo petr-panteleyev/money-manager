@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,6 @@ package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.persistence.model.Contact;
-import org.panteleyev.money.persistence.model.SplitTransaction;
 import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -40,13 +39,9 @@ public class TransactionContactCell extends TableCell<Transaction, Transaction> 
         if (empty || transaction == null) {
             setText("");
         } else {
-            if (transaction instanceof SplitTransaction) {
-                setText(((SplitTransaction) transaction).getContactString());
-            } else {
-                setText(getDao().getContact(transaction.getContactId())
-                        .map(Contact::getName)
-                        .orElse(""));
-            }
+            setText(getDao().getContact(transaction.getContactId())
+                .map(Contact::getName)
+                .orElse(""));
         }
     }
 }

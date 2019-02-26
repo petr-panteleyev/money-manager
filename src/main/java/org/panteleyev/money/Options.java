@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -90,7 +90,7 @@ public class Options {
         PREFS.putDouble(Option.MAIN_WINDOW_HEIGHT.toString(), x);
     }
 
-    static int getAutoCompleteLength() {
+    public static int getAutoCompleteLength() {
         return autoCompleteLength;
     }
 
@@ -116,7 +116,7 @@ public class Options {
     }
 
     static Optional<File> getLastExportDir() {
-        String dir = PREFS.get(Option.LAST_EXPORT_DIR.toString(), null);
+        var dir = PREFS.get(Option.LAST_EXPORT_DIR.toString(), null);
         return dir == null || dir.isEmpty() ? Optional.empty() : Optional.of(new File(dir));
     }
 

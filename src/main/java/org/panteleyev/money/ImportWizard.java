@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -44,7 +44,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.xml.Import;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -96,42 +96,42 @@ final class ImportWizard extends BaseDialog {
         }
 
         private TextField createFileNameEdit() {
-            TextField field = new TextField();
+            var field = new TextField();
             field.setPromptText(RB.getString("prompt.ImportFileName"));
             field.setPrefColumnCount(40);
             return field;
         }
 
         private Button createBrowseButton() {
-            Button btn = new Button("...");
+            var btn = new Button("...");
             btn.setOnAction(event -> onBrowse());
             return btn;
         }
 
         private Label createWarningLabel() {
-            Label label = new Label(RB.getString("label.FullDumpImportWarning"));
+            var label = new Label(RB.getString("label.FullDumpImportWarning"));
             label.setWrapText(true);
             label.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return label;
         }
 
         private CheckBox createWarningCheckBox() {
-            CheckBox checkBox = new CheckBox(RB.getString("check.FullDumpImport"));
+            var checkBox = new CheckBox(RB.getString("check.FullDumpImport"));
             checkBox.getStyleClass().add(Styles.BOLD_TEXT);
             checkBox.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return checkBox;
         }
 
         private void onBrowse() {
-            FileChooser chooser = new FileChooser();
+            var chooser = new FileChooser();
             chooser.setTitle(RB.getString("word.Import"));
             Options.getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-                    new FileChooser.ExtensionFilter("All Files", "*.*")
+                new FileChooser.ExtensionFilter("XML Files", "*.xml"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
             );
 
-            File selected = chooser.showOpenDialog(null);
+            var selected = chooser.showOpenDialog(null);
 
             fileNameEdit.setText(selected != null ? selected.getAbsolutePath() : "");
         }
@@ -150,7 +150,7 @@ final class ImportWizard extends BaseDialog {
         }
 
         private TextArea createTextArea() {
-            TextArea textArea = new TextArea();
+            var textArea = new TextArea();
             textArea.setEditable(false);
             textArea.setPrefColumnCount(40);
             textArea.setPrefRowCount(21);
@@ -159,14 +159,14 @@ final class ImportWizard extends BaseDialog {
 
         void start(String fileName, boolean fullDump) {
             CompletableFuture.runAsync(() -> {
-                File file = new File(fileName);
+                var file = new File(fileName);
                 if (!file.exists()) {
                     throw new RuntimeException("File not found");
                 }
 
                 progress.accept("Reading file... ");
-                try (InputStream input = new FileInputStream(file)) {
-                    Import imp = Import.doImport(input);
+                try (var input = new FileInputStream(file)) {
+                    var imp = Import.doImport(input);
                     progress.accept("done\n\n");
 
                     if (fullDump) {
@@ -198,7 +198,7 @@ final class ImportWizard extends BaseDialog {
 
         getDialogPane().getButtonTypes().addAll(ButtonType.NEXT, ButtonType.CANCEL);
 
-        Button nextButton = (Button) getDialogPane().lookupButton(ButtonType.NEXT);
+        var nextButton = (Button) getDialogPane().lookupButton(ButtonType.NEXT);
         nextButton.setText(RB.getString("word.Import"));
 
         getDialogPane().setContent(new StackPane(progressPage, startPage));
@@ -226,11 +226,11 @@ final class ImportWizard extends BaseDialog {
 
     private void createValidationSupport() {
         validation.registerValidator(startPage.fileNameEdit, (Control control, String value) -> {
-            boolean invalid = value.isEmpty() || !new File(value).exists();
+            var invalid = value.isEmpty() || !new File(value).exists();
             return ValidationResult.fromErrorIf(control, null, invalid);
         });
         validation.registerValidator(startPage.warningCheck, (Control control, Boolean value) ->
-                ValidationResult.fromErrorIf(control, null, startPage.getFullDump() && !value));
+            ValidationResult.fromErrorIf(control, null, startPage.getFullDump() && !value));
         validation.initInitialDecoration();
     }
 }

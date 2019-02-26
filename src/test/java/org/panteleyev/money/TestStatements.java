@@ -42,7 +42,7 @@ public class TestStatements {
 
     @Test
     public void testRaiffeisenCardStatement() throws Exception {
-        Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV,
+        Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV, "",
                 List.of(
                         new StatementRecord(
                                 LocalDate.of(2017, 9, 7),
@@ -116,7 +116,7 @@ public class TestStatements {
 
     @Test
     public void testRaiffeisenAccountStatement() throws Exception {
-        Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV,
+        Statement expected = new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV, "",
                 List.of(
                         new StatementRecord(
                                 LocalDate.of(1998, 1, 1),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -122,7 +122,7 @@ class AccountDialog extends BaseDialog<Account> {
                 typeComboBox.getSelectionModel().select(initialCategory.getType());
                 onCategoryTypeSelected();
                 categoryComboBox.getSelectionModel()
-                        .select(getDao().getCategory(initialCategory.getId()).orElse(null));
+                    .select(getDao().getCategory(initialCategory.getId()).orElse(null));
             } else {
                 typeComboBox.getSelectionModel().select(0);
                 onCategoryTypeSelected();
@@ -138,9 +138,9 @@ class AccountDialog extends BaseDialog<Account> {
 
             typeComboBox.getSelectionModel().select(account.getType());
             categoryComboBox.getSelectionModel()
-                    .select(getDao().getCategory(account.getCategoryId()).orElse(null));
+                .select(getDao().getCategory(account.getCategoryId()).orElse(null));
             currencyComboBox.getSelectionModel()
-                    .select(getDao().getCurrency(account.getCurrencyId()).orElse(null));
+                .select(getDao().getCurrency(account.getCurrencyId()).orElse(null));
         }
 
         setResultConverter((ButtonType b) -> {
@@ -148,20 +148,18 @@ class AccountDialog extends BaseDialog<Account> {
                 // TODO: reconsider using null currency value
                 var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
 
-                return new Account(account != null ? account.getId() : 0,
-                        nameEdit.getText(),
-                        commentEdit.getText(),
-                        accountNumberEdit.getText(),
-                        new BigDecimal(initialEdit.getText()),
-                        BigDecimal.ZERO,
-                        BigDecimal.ONE,
-                        typeComboBox.getSelectionModel().getSelectedItem().getId(),
-                        categoryComboBox.getSelectionModel().getSelectedItem().getId(),
-                        selectedCurrency != null ? selectedCurrency.getId() : 0,
-                        activeCheckBox.isSelected(),
-                        account != null ? account.getGuid() : UUID.randomUUID().toString(),
-                        System.currentTimeMillis()
-                );
+                return new Account.Builder(account != null ? account.getId() : 0)
+                    .name(nameEdit.getText())
+                    .comment(commentEdit.getText())
+                    .accountNumber(accountNumberEdit.getText())
+                    .openingBalance(new BigDecimal(initialEdit.getText()))
+                    .typeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
+                    .categoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId())
+                    .currencyId(selectedCurrency != null ? selectedCurrency.getId() : 0)
+                    .enabled(activeCheckBox.isSelected())
+                    .guid(account != null ? account.getGuid() : UUID.randomUUID().toString())
+                    .modified(System.currentTimeMillis())
+                    .build();
             } else {
                 return null;
             }
@@ -176,8 +174,8 @@ class AccountDialog extends BaseDialog<Account> {
         var type = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<Category> filtered = categories.stream()
-                .filter(c -> c.getType().equals(type))
-                .collect(Collectors.toList());
+            .filter(c -> c.getType().equals(type))
+            .collect(Collectors.toList());
 
         categoryComboBox.setItems(FXCollections.observableArrayList(filtered));
 
@@ -188,9 +186,9 @@ class AccountDialog extends BaseDialog<Account> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameEdit,
-                (Control control, String value) -> ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+            (Control control, String value) -> ValidationResult.fromErrorIf(control, null, value.isEmpty()));
         validation.registerValidator(categoryComboBox,
-                (Control control, Category value) -> ValidationResult.fromErrorIf(control, null, value == null));
+            (Control control, Category value) -> ValidationResult.fromErrorIf(control, null, value == null));
         validation.registerValidator(initialEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.initInitialDecoration();
     }

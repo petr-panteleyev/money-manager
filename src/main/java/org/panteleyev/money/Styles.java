@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,6 @@ public interface Styles {
     String BLUE_TEXT = "blueText";
     String GREEN_TEXT = "greenText";
     String GROUP_CELL = "groupCell";
-    String GROUP_MEMBER_CELL = "groupMemberCell";
-    String TRANSACTION_CELL = "transactionCell";
 
     String BOLD_TEXT = "boldText";
 

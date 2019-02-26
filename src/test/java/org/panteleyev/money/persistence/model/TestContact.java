@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,37 +27,105 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
-import org.testng.Assert;
 import org.testng.annotations.Test;
-import java.util.UUID;
+import static org.panteleyev.money.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.BaseTestUtils.randomId;
-import static org.panteleyev.money.persistence.PersistenceTestUtils.randomContactType;
+import static org.panteleyev.money.BaseTestUtils.randomString;
+import static org.testng.Assert.assertEquals;
 
 public class TestContact extends BaseTest {
     @Test
     public void testEquals() {
-        int id = randomId();
-        String name = UUID.randomUUID().toString();
-        ContactType type = randomContactType();
-        String phone = UUID.randomUUID().toString();
-        String mobile = UUID.randomUUID().toString();
-        String email = UUID.randomUUID().toString();
-        String web = UUID.randomUUID().toString();
-        String comment = UUID.randomUUID().toString();
-        String street = UUID.randomUUID().toString();
-        String city = UUID.randomUUID().toString();
-        String country = UUID.randomUUID().toString();
-        String zip = UUID.randomUUID().toString();
-        String uuid = UUID.randomUUID().toString();
-        long modified = System.currentTimeMillis();
+        var id = randomId();
+        var name = randomString();
+        var type = randomContactType();
+        var phone = randomString();
+        var mobile = randomString();
+        var email = randomString();
+        var web = randomString();
+        var comment = randomString();
+        var street = randomString();
+        var city = randomString();
+        var country = randomString();
+        var zip = randomString();
+        var uuid = randomString();
+        var modified = System.currentTimeMillis();
 
-        Contact c1 = new Contact(id, name, type.getId(), phone, mobile, email, web,
-                comment, street, city, country, zip, uuid, modified);
+        var c1 = new Contact.Builder(id)
+            .name(name)
+            .typeId(type.getId())
+            .phone(phone)
+            .mobile(mobile)
+            .email(email)
+            .web(web)
+            .comment(comment)
+            .street(street)
+            .city(city)
+            .country(country)
+            .zip(zip)
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
-        Contact c2 = new Contact(id, name, type.getId(), phone, mobile, email, web,
-                comment, street, city, country, zip, uuid, modified);
+        var c2 = new Contact.Builder(id)
+            .name(name)
+            .typeId(type.getId())
+            .phone(phone)
+            .mobile(mobile)
+            .email(email)
+            .web(web)
+            .comment(comment)
+            .street(street)
+            .city(city)
+            .country(country)
+            .zip(zip)
+            .guid(uuid)
+            .modified(modified)
+            .build();
 
-        Assert.assertEquals(c1, c2);
-        Assert.assertEquals(c1.hashCode(), c2.hashCode());
+        assertEquals(c1, c2);
+        assertEquals(c1.hashCode(), c2.hashCode());
+    }
+
+    @Test
+    public void testBuilder() {
+        var original = new Contact.Builder(randomId())
+            .name(randomString())
+            .typeId(randomContactType().getId())
+            .phone(randomString())
+            .mobile(randomString())
+            .email(randomString())
+            .web(randomString())
+            .comment(randomString())
+            .street(randomString())
+            .city(randomString())
+            .country(randomString())
+            .zip(randomString())
+            .guid(randomString())
+            .modified(RANDOM.nextLong())
+            .build();
+
+        var copy = new Contact.Builder(original).build();
+        assertEquals(copy, original);
+        assertEquals(copy.hashCode(), original.hashCode());
+
+        var manualCopy = new Contact.Builder(original.getId())
+            .name(original.getName())
+            .typeId(original.getTypeId())
+            .phone(original.getPhone())
+            .mobile(original.getMobile())
+            .email(original.getEmail())
+            .web(original.getWeb())
+            .comment(original.getComment())
+            .street(original.getStreet())
+            .city(original.getCity())
+            .country(original.getCountry())
+            .zip(original.getZip())
+            .guid(original.getGuid())
+            .modified(original.getModified())
+            .build();
+        assertEquals(manualCopy, original);
+        assertEquals(manualCopy.hashCode(), original.hashCode());
     }
 }

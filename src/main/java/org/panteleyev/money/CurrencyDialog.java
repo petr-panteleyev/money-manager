@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.money.persistence.model.Currency;
-import org.panteleyev.utilities.fx.BaseDialog;
+import org.panteleyev.commons.fx.BaseDialog;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setTitle(RB.getString("currency.Dialog.Title"));
 
-        GridPane gridPane = new GridPane();
+        var gridPane = new GridPane();
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
         int index = 0;
@@ -71,7 +71,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         gridPane.addRow(index++, new Label(RB.getString("label.Description")), descrEdit);
         gridPane.addRow(index++, new Label(RB.getString("label.Rate")), rateEdit, rateDirectionChoice);
 
-        HBox hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
+        var hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
         hBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
         gridPane.add(hBox, 1, index++);
@@ -86,13 +86,13 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         rateDirectionChoice.getItems().setAll("/", "*");
 
         formatSymbolPositionChoice.getItems().setAll(
-                RB.getString("currency.Dialog.Before"),
-                RB.getString("currency.Dialog.After"));
+            RB.getString("currency.Dialog.Before"),
+            RB.getString("currency.Dialog.After"));
 
         formatSymbolCombo.getItems().setAll(getDao().getCurrencies().stream()
-                .map(Currency::getFormatSymbol)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet()));
+            .map(Currency::getFormatSymbol)
+            .filter(s -> !s.isEmpty())
+            .collect(Collectors.toSet()));
 
         if (currency == null) {
             rateDirectionChoice.getSelectionModel().select(0);
@@ -112,19 +112,19 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Currency(currency != null ? currency.getId() : 0,
-                        nameEdit.getText(),
-                        descrEdit.getText(),
-                        formatSymbolCombo.getSelectionModel().getSelectedItem(),
-                        formatSymbolPositionChoice.getSelectionModel().getSelectedIndex(),
-                        showSymbolCheck.isSelected(),
-                        defaultCheck.isSelected(),
-                        new BigDecimal(rateEdit.getText()),
-                        rateDirectionChoice.getSelectionModel().getSelectedIndex(),
-                        thousandSeparatorCheck.isSelected(),
-                        currency != null ? currency.getGuid() : UUID.randomUUID().toString(),
-                        System.currentTimeMillis()
-                );
+                return new Currency.Builder(currency != null ? currency.getId() : 0)
+                    .symbol(nameEdit.getText())
+                    .description(descrEdit.getText())
+                    .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
+                    .formatSymbolPosition(formatSymbolPositionChoice.getSelectionModel().getSelectedIndex())
+                    .showFormatSymbol(showSymbolCheck.isSelected())
+                    .def(defaultCheck.isSelected())
+                    .rate(new BigDecimal(rateEdit.getText()))
+                    .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
+                    .useThousandSeparator(thousandSeparatorCheck.isSelected())
+                    .guid(currency != null ? currency.getGuid() : UUID.randomUUID().toString())
+                    .modified(System.currentTimeMillis())
+                    .build();
             } else {
                 return null;
             }
@@ -137,7 +137,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameEdit, (Control control, String value) ->
-                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
         validation.registerValidator(rateEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.initInitialDecoration();

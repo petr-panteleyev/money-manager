@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import java.io.OutputStream;
@@ -54,7 +53,6 @@ public class Export {
     private Collection<Account> accounts = new ArrayList<>();
     private Collection<Contact> contacts = new ArrayList<>();
     private Collection<Currency> currencies = new ArrayList<>();
-    private Collection<TransactionGroup> transactionGroups = new ArrayList<>();
     private Collection<Transaction> transactions = new ArrayList<>();
 
     public Export() {
@@ -106,24 +104,20 @@ public class Export {
         return this;
     }
 
-    public Export withTransactionGroups(Collection<TransactionGroup> transactionGroups) {
-        this.transactionGroups = transactionGroups;
-        return this;
-    }
-
-    public Export withTransactions(Collection<Transaction> transactions, boolean withDeps) {
-        this.transactions = transactions;
-
+    public Export withTransactions(Collection<Transaction> toExport, boolean withDeps) {
         if (withDeps) {
-            transactionGroups = transactions.stream()
-                    .filter(t -> t.getGroupId() != 0)
-                    .map(Transaction::getGroupId)
-                    .distinct()
-                    .map(source::getTransactionGroup)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
+            transactions = toExport.stream()
+                .filter(t -> t.getParentId() == 0)
+                .collect(Collectors.toCollection(ArrayList::new));
 
-            contacts = transactions.stream()
+            var details = toExport.stream()
+                .filter(Transaction::isDetailed)
+                .map(source::getTransactionDetails)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+            transactions.addAll(details);
+
+            contacts = toExport.stream()
                     .filter(t -> t.getContactId() != 0)
                     .map(Transaction::getContactId)
                     .distinct()
@@ -140,6 +134,8 @@ public class Export {
                     .map(source::getAccount)
                     .flatMap(Optional::stream)
                     .collect(Collectors.toList()), true);
+        } else {
+            transactions = toExport;
         }
 
         return this;
@@ -170,11 +166,6 @@ public class Export {
                 currencyRoot.appendChild(exportCurrency(doc, currency));
             }
 
-            var transactionGroupRoot = appendElement(rootElement, "TransactionGroups");
-            for (var transactionGroup : transactionGroups) {
-                transactionGroupRoot.appendChild(exportTransactionGroup(doc, transactionGroup));
-            }
-
             var transactionRoot = appendElement(rootElement, "Transactions");
             for (var transaction : transactions) {
                 transactionRoot.appendChild(exportTransaction(doc, transaction));
@@ -193,7 +184,6 @@ public class Export {
         appendTextNode(e, "name", category.getName());
         appendTextNode(e, "comment", category.getComment());
         appendTextNode(e, "catTypeId", category.getCatTypeId());
-        appendTextNode(e, "expanded", category.getExpanded());
         appendTextNode(e, "guid", category.getGuid());
         appendTextNode(e, "modified", category.getModified());
 
@@ -260,20 +250,6 @@ public class Export {
         return e;
     }
 
-    private static Element exportTransactionGroup(Document doc, TransactionGroup tg) {
-        var e = doc.createElement("TransactionGroup");
-        e.setAttribute("id", Integer.toString(tg.getId()));
-
-        appendTextNode(e, "day", tg.getDay());
-        appendTextNode(e, "month", tg.getMonth());
-        appendTextNode(e, "year", tg.getYear());
-        appendTextNode(e, "expanded", tg.getExpanded());
-        appendTextNode(e, "guid", tg.getGuid());
-        appendTextNode(e, "modified", tg.getModified());
-
-        return e;
-    }
-
     private static Element exportTransaction(Document doc, Transaction t) {
         var e = doc.createElement("Transaction");
         e.setAttribute("id", Integer.toString(t.getId()));
@@ -291,13 +267,14 @@ public class Export {
         appendTextNode(e, "accountCreditedTypeId", t.getAccountCreditedTypeId());
         appendTextNode(e, "accountDebitedCategoryId", t.getAccountDebitedCategoryId());
         appendTextNode(e, "accountCreditedCategoryId", t.getAccountCreditedCategoryId());
-        appendTextNode(e, "groupId", t.getGroupId());
         appendTextNode(e, "contactId", t.getContactId());
         appendTextNode(e, "rate", t.getRate());
         appendTextNode(e, "rateDirection", t.getRateDirection());
         appendTextNode(e, "invoiceNumber", t.getInvoiceNumber());
         appendTextNode(e, "guid", t.getGuid());
         appendTextNode(e, "modified", t.getModified());
+        appendTextNode(e, "parentId", t.getParentId());
+        appendTextNode(e, "detailed", t.isDetailed());
 
         return e;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,7 @@
 package org.panteleyev.money.cells;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.TreeTableCell;
-import org.panteleyev.money.AccountTreeItem;
+import javafx.scene.control.TableCell;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
@@ -36,7 +35,7 @@ import java.util.function.Predicate;
 import static org.panteleyev.money.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> {
+public class AccountBalanceCell extends TableCell<Account, Account> {
     private final boolean total;
     private final Predicate<Transaction> filter;
 
@@ -46,7 +45,7 @@ public class AccountBalanceCell extends TreeTableCell<AccountTreeItem, Account> 
 
     public AccountBalanceCell(boolean total, Predicate<Transaction> filter) {
         this.total = total;
-        this.filter = filter;
+        this.filter = filter.and(t -> t.getParentId() == 0);
     }
 
     @Override

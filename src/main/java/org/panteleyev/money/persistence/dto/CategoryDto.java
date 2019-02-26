@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public final class CategoryDto implements Record, Dto<Category> {
 
         var rawBytes = toJson(category);
         bytes = password != null && !password.isEmpty() ?
-                aes256().encrypt(rawBytes, password) : rawBytes;
+            aes256().encrypt(rawBytes, password) : rawBytes;
     }
 
     @Override
@@ -69,7 +69,6 @@ public final class CategoryDto implements Record, Dto<Category> {
         json.addProperty("name", category.getName());
         json.addProperty("comment", category.getComment());
         json.addProperty("catTypeId", category.getCatTypeId());
-        json.addProperty("expanded", category.getExpanded());
         json.addProperty("guid", category.getGuid());
         json.addProperty("modified", category.getModified());
         return json.toString().getBytes(StandardCharsets.UTF_8);
@@ -78,15 +77,15 @@ public final class CategoryDto implements Record, Dto<Category> {
     @Override
     public Category decrypt(String password) {
         var rawBytes = password != null && !password.isEmpty() ?
-                aes256().decrypt(bytes, password) : bytes;
+            aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
-        return new Category(obj.get("id").getAsInt(),
-                obj.get("name").getAsString(),
-                obj.get("comment").getAsString(),
-                obj.get("catTypeId").getAsInt(),
-                obj.get("expanded").getAsBoolean(),
-                obj.get("guid").getAsString(),
-                obj.get("modified").getAsLong());
+        return new Category.Builder(obj.get("id").getAsInt())
+            .name(obj.get("name").getAsString())
+            .comment(obj.get("comment").getAsString())
+            .catTypeId(obj.get("catTypeId").getAsInt())
+            .guid(obj.get("guid").getAsString())
+            .modified(obj.get("modified").getAsLong())
+            .build();
     }
 }

@@ -2,7 +2,7 @@
     <xsd:annotation>
         <xsd:documentation xml:lang="en">
             Money Database export file schema.
-            Copyright (c) 2017, Petr Panteleyev
+            Copyright (c) 2017, 2019, Petr Panteleyev
         </xsd:documentation>
     </xsd:annotation>
 
@@ -81,24 +81,6 @@
                         <xsd:field xpath="./guid"/>
                     </xsd:unique>
                 </xsd:element>
-                <xsd:element name="TransactionGroups">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:element name="TransactionGroup"
-                                         type="TransactionGroup"
-                                         minOccurs="0"
-                                         maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                    <xsd:unique name="TransactionGroupUniqueId">
-                        <xsd:selector xpath="TransactionGroup"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
-                    <xsd:unique name="TransactionGroupUniqueUUID">
-                        <xsd:selector xpath="TransactionGroup"/>
-                        <xsd:field xpath="./guid"/>
-                    </xsd:unique>
-                </xsd:element>
                 <xsd:element name="Transactions">
                     <xsd:complexType>
                         <xsd:sequence>
@@ -144,7 +126,6 @@
             <xsd:element name="name" type="xsd:string"/>
             <xsd:element name="catTypeId" type="CategoryType"/>
             <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="expanded" type="xsd:boolean"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="modified" type="Timestamp"/>
         </xsd:all>
@@ -187,18 +168,6 @@
         <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
-    <xsd:complexType name="TransactionGroup">
-        <xsd:all>
-            <xsd:element name="day" type="Day"/>
-            <xsd:element name="expanded" type="xsd:boolean"/>
-            <xsd:element name="month" type="Month"/>
-            <xsd:element name="year" type="Year"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
-    </xsd:complexType>
-
     <xsd:complexType name="Transaction">
         <xsd:all>
             <xsd:element name="accountCreditedCategoryId" type="Id"/>
@@ -212,7 +181,6 @@
             <xsd:element name="comment" type="xsd:string"/>
             <xsd:element name="contactId" type="OptionalId"/>
             <xsd:element name="day" type="Day"/>
-            <xsd:element name="groupId" type="OptionalId"/>
             <xsd:element name="invoiceNumber" type="xsd:string"/>
             <xsd:element name="month" type="Month"/>
             <xsd:element name="rate" type="xsd:decimal"/>
@@ -221,6 +189,8 @@
             <xsd:element name="year" type="Year"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="modified" type="Timestamp"/>
+            <xsd:element name="parentId" type="OptionalId"/>
+            <xsd:element name="detailed" type="xsd:boolean"/>
         </xsd:all>
         <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>

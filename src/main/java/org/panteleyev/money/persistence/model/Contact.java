@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -47,9 +47,10 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
 
     private final ContactType type;
 
-    public Contact(int id, String name, int typeId, String phone, String mobile, String email, String web,
-                   String comment, String street, String city, String country, String zip,
-                   String guid, long modified) {
+    private Contact(int id, String name, int typeId, String phone, String mobile, String email, String web,
+                    String comment, String street, String city, String country, String zip,
+                    String guid, long modified)
+    {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
@@ -67,15 +68,8 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         this.type = ContactType.get(this.typeId);
     }
 
-    public Contact(int id, String name) {
-        this(id, name, ContactType.PERSONAL.getId(),
-                "", "", "", "", "", "", "", "", "",
-                UUID.randomUUID().toString(), System.currentTimeMillis());
-    }
-
     public Contact copy(int newId) {
-        return new Contact(newId, name, typeId, phone, mobile, email, web, comment, street, city, country, zip,
-                guid, modified);
+        return new Builder(newId).build();
     }
 
     public final ContactType getType() {
@@ -147,11 +141,10 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         return modified;
     }
 
-
     @Override
     public int hashCode() {
         return Objects.hash(id, name, typeId, phone, mobile, email, web, comment, street, city, country, zip, guid,
-                modified);
+            modified);
     }
 
     public boolean equals(Object other) {
@@ -164,20 +157,154 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         }
 
         Contact that = (Contact) other;
-
         return id == that.id
-                && Objects.equals(name, that.name)
-                && typeId == that.typeId
-                && Objects.equals(phone, that.phone)
-                && Objects.equals(mobile, that.mobile)
-                && Objects.equals(email, that.email)
-                && Objects.equals(web, that.web)
-                && Objects.equals(comment, that.comment)
-                && Objects.equals(street, that.street)
-                && Objects.equals(city, that.city)
-                && Objects.equals(country, that.country)
-                && Objects.equals(zip, that.zip)
-                && Objects.equals(guid, that.guid)
-                && modified == that.modified;
+            && Objects.equals(name, that.name)
+            && typeId == that.typeId
+            && Objects.equals(phone, that.phone)
+            && Objects.equals(mobile, that.mobile)
+            && Objects.equals(email, that.email)
+            && Objects.equals(web, that.web)
+            && Objects.equals(comment, that.comment)
+            && Objects.equals(street, that.street)
+            && Objects.equals(city, that.city)
+            && Objects.equals(country, that.country)
+            && Objects.equals(zip, that.zip)
+            && Objects.equals(guid, that.guid)
+            && modified == that.modified;
+    }
+
+    public static final class Builder {
+        private int id;
+        private String name = "";
+        private int typeId = ContactType.PERSONAL.getId();
+        private String phone = "";
+        private String mobile = "";
+        private String email = "";
+        private String web = "";
+        private String comment = "";
+        private String street = "";
+        private String city = "";
+        private String country = "";
+        private String zip = "";
+        private String guid = null;
+        private long modified = 0L;
+
+        public Builder() {
+        }
+
+        public Builder(int id) {
+            this.id = id;
+        }
+
+        public Builder(Contact c) {
+            if (c == null) {
+                return;
+            }
+
+            id = c.getId();
+            name = c.getName();
+            typeId = c.getTypeId();
+            phone = c.getPhone();
+            mobile = c.getMobile();
+            email = c.getEmail();
+            web = c.getWeb();
+            comment = c.getComment();
+            street = c.getStreet();
+            city = c.getCity();
+            country = c.getCountry();
+            zip = c.getZip();
+            guid = c.getGuid();
+            modified = c.getModified();
+        }
+
+        public Contact build() {
+            if (name.isBlank()) {
+                throw new IllegalStateException("Name must not be empty");
+            }
+
+            if (guid == null) {
+                guid = UUID.randomUUID().toString();
+            }
+
+            if (modified == 0) {
+                modified = System.currentTimeMillis();
+            }
+
+            return new Contact(id, name, typeId, phone, mobile, email, web, comment, street, city, country, zip,
+                guid, modified);
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Contact name must not be empty");
+            }
+            this.name = name;
+            return this;
+        }
+
+        public Builder typeId(int typeId) {
+            this.typeId = typeId;
+            return this;
+        }
+
+        public Builder phone(String phone) {
+            this.phone = phone == null ? "" : phone;
+            return this;
+        }
+
+        public Builder mobile(String mobile) {
+            this.mobile = mobile == null ? "" : mobile;
+            return this;
+        }
+
+        public Builder email(String email) {
+            this.email = email == null ? "" : email;
+            return this;
+        }
+
+        public Builder web(String web) {
+            this.web = web == null ? "" : web;
+            return this;
+        }
+
+        public Builder comment(String comment) {
+            this.comment = comment == null ? "" : comment;
+            return this;
+        }
+
+        public Builder street(String street) {
+            this.street = street == null ? "" : street;
+            return this;
+        }
+
+        public Builder city(String city) {
+            this.city = city == null ? "" : city;
+            return this;
+        }
+
+        public Builder country(String country) {
+            this.country = country == null ? "" : country;
+            return this;
+        }
+
+        public Builder zip(String zip) {
+            this.zip = zip == null ? "" : zip;
+            return this;
+        }
+
+        public Builder guid(String guid) {
+            this.guid = guid;
+            return this;
+        }
+
+        public Builder modified(long modified) {
+            this.modified = modified;
+            return this;
+        }
     }
 }

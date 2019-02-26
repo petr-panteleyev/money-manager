@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,8 @@ public final class TransactionDto implements Record, Dto<Transaction> {
     @RecordBuilder
     public TransactionDto(@Column("id") int id,
                           @Column("date") LocalDate date,
-                          @Column("bytes") byte[] bytes) {
+                          @Column("bytes") byte[] bytes)
+    {
         this.id = id;
         this.date = date;
         this.bytes = bytes;
@@ -62,7 +63,7 @@ public final class TransactionDto implements Record, Dto<Transaction> {
 
         var rawBytes = toJson(transaction);
         bytes = password != null && !password.isEmpty() ?
-                aes256().encrypt(rawBytes, password) : rawBytes;
+            aes256().encrypt(rawBytes, password) : rawBytes;
     }
 
     @Override
@@ -87,42 +88,48 @@ public final class TransactionDto implements Record, Dto<Transaction> {
         json.addProperty("accountCreditedTypeId", transaction.getAccountCreditedTypeId());
         json.addProperty("accountDebitedCategoryId", transaction.getAccountDebitedCategoryId());
         json.addProperty("accountCreditedCategoryId", transaction.getAccountCreditedCategoryId());
-        json.addProperty("groupId", transaction.getGroupId());
         json.addProperty("contactId", transaction.getContactId());
         json.addProperty("rate", transaction.getRate());
         json.addProperty("rateDirection", transaction.getRateDirection());
         json.addProperty("invoiceNumber", transaction.getInvoiceNumber());
         json.addProperty("guid", transaction.getGuid());
         json.addProperty("modified", transaction.getModified());
+        json.addProperty("parentId", transaction.getParentId());
+        json.addProperty("detailed", transaction.isDetailed());
         return json.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     public Transaction decrypt(String password) {
         var rawBytes = password != null && !password.isEmpty() ?
-                aes256().decrypt(bytes, password) : bytes;
+            aes256().decrypt(bytes, password) : bytes;
         var jsonString = new String(rawBytes, StandardCharsets.UTF_8);
         var obj = (JsonObject) new JsonParser().parse(jsonString);
-        return new Transaction(obj.get("id").getAsInt(),
-                obj.get("amount").getAsBigDecimal(),
-                obj.get("day").getAsInt(),
-                obj.get("month").getAsInt(),
-                obj.get("year").getAsInt(),
-                obj.get("transactionTypeId").getAsInt(),
-                obj.get("comment").getAsString(),
-                obj.get("checked").getAsBoolean(),
-                obj.get("accountDebitedId").getAsInt(),
-                obj.get("accountCreditedId").getAsInt(),
-                obj.get("accountDebitedTypeId").getAsInt(),
-                obj.get("accountCreditedTypeId").getAsInt(),
-                obj.get("accountDebitedCategoryId").getAsInt(),
-                obj.get("accountCreditedCategoryId").getAsInt(),
-                obj.get("groupId").getAsInt(),
-                obj.get("contactId").getAsInt(),
-                obj.get("rate").getAsBigDecimal(),
-                obj.get("rateDirection").getAsInt(),
-                obj.get("invoiceNumber").getAsString(),
-                obj.get("guid").getAsString(),
-                obj.get("modified").getAsLong());
+        var parentIdObj = obj.get("parentId");
+        var detailedObj = obj.get("detailed");
+        return new Transaction.Builder()
+            .id(obj.get("id").getAsInt())
+            .amount(obj.get("amount").getAsBigDecimal())
+            .day(obj.get("day").getAsInt())
+            .month(obj.get("month").getAsInt())
+            .year(obj.get("year").getAsInt())
+            .transactionTypeId(obj.get("transactionTypeId").getAsInt())
+            .comment(obj.get("comment").getAsString())
+            .checked(obj.get("checked").getAsBoolean())
+            .accountDebitedId(obj.get("accountDebitedId").getAsInt())
+            .accountCreditedId(obj.get("accountCreditedId").getAsInt())
+            .accountDebitedTypeId(obj.get("accountDebitedTypeId").getAsInt())
+            .accountCreditedTypeId(obj.get("accountCreditedTypeId").getAsInt())
+            .accountDebitedCategoryId(obj.get("accountDebitedCategoryId").getAsInt())
+            .accountCreditedCategoryId(obj.get("accountCreditedCategoryId").getAsInt())
+            .contactId(obj.get("contactId").getAsInt())
+            .rate(obj.get("rate").getAsBigDecimal())
+            .rateDirection(obj.get("rateDirection").getAsInt())
+            .invoiceNumber(obj.get("invoiceNumber").getAsString())
+            .guid(obj.get("guid").getAsString())
+            .modified(obj.get("modified").getAsLong())
+            .parentId(parentIdObj == null ? 0 : parentIdObj.getAsInt())
+            .detailed(detailedObj != null && detailedObj.getAsBoolean())
+            .build();
     }
 }

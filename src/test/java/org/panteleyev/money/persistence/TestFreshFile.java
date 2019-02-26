@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import java.util.Collection;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TestFreshFile extends BaseDaoTest {
@@ -55,19 +54,16 @@ public class TestFreshFile extends BaseDaoTest {
     public void testNewFileCreation() {
         initializeEmptyMoneyFile();
 
-        Collection currencies = getDao().getCurrencies();
+        var currencies = getDao().getCurrencies();
         Assert.assertTrue(currencies.isEmpty());
 
-        Collection accounts = getDao().getAccounts();
+        var accounts = getDao().getAccounts();
         Assert.assertTrue(accounts.isEmpty());
 
-        Collection transactions = getDao().getTransactions();
+        var transactions = getDao().getTransactions();
         Assert.assertTrue(transactions.isEmpty());
 
-        Collection groups = getDao().getTransactionGroups();
-        Assert.assertTrue(groups.isEmpty());
-
-        Collection contacts = getDao().getContacts();
+        var contacts = getDao().getContacts();
         Assert.assertTrue(contacts.isEmpty());
     }
 }

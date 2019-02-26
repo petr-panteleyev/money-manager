@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,25 +61,27 @@ public class Transaction implements MoneyRecord {
     private final int accountCreditedTypeId;
     private final int accountDebitedCategoryId;
     private final int accountCreditedCategoryId;
-    private final int groupId;
     private final int contactId;
     private final BigDecimal rate;
     private final int rateDirection;
     private final String invoiceNumber;
     private final String guid;
     private final long modified;
+    private final int parentId;
+    private final boolean detailed;
 
     private final TransactionType transactionType;
     private final CategoryType accountDebitedType;
     private final CategoryType accountCreditedType;
 
-    public Transaction(int id, BigDecimal amount, int day, int month, int year, int transactionTypeId,
-                       String comment, boolean checked,
-                       int accountDebitedId, int accountCreditedId,
-                       int accountDebitedTypeId, int accountCreditedTypeId,
-                       int accountDebitedCategoryId, int accountCreditedCategoryId,
-                       int groupId, int contactId, BigDecimal rate, int rateDirection,
-                       String invoiceNumber, String guid, long modified) {
+    protected Transaction(int id, BigDecimal amount, int day, int month, int year, int transactionTypeId,
+                          String comment, boolean checked,
+                          int accountDebitedId, int accountCreditedId,
+                          int accountDebitedTypeId, int accountCreditedTypeId,
+                          int accountDebitedCategoryId, int accountCreditedCategoryId,
+                          int contactId, BigDecimal rate, int rateDirection,
+                          String invoiceNumber, String guid, long modified, int parentId, boolean detailed)
+    {
         this.id = id;
         this.amount = amount;
         this.day = day;
@@ -94,13 +96,14 @@ public class Transaction implements MoneyRecord {
         this.accountCreditedTypeId = accountCreditedTypeId;
         this.accountDebitedCategoryId = accountDebitedCategoryId;
         this.accountCreditedCategoryId = accountCreditedCategoryId;
-        this.groupId = groupId;
         this.contactId = contactId;
         this.rate = rate;
         this.rateDirection = rateDirection;
         this.invoiceNumber = invoiceNumber;
         this.guid = guid;
         this.modified = modified;
+        this.parentId = parentId;
+        this.detailed = detailed;
 
         this.transactionType = TransactionType.get(this.transactionTypeId);
         this.accountDebitedType = CategoryType.get(this.accountDebitedTypeId);
@@ -109,16 +112,22 @@ public class Transaction implements MoneyRecord {
 
     public Transaction copy(int newId, int newAccountDebitedId, int newAccountCreditedId,
                             int newAccountDebitedCategoryId, int newAccountCreditedCategoryId,
-                            int newContactId, int newGroupId) {
-        return new Transaction(newId, amount, day, month, year, transactionTypeId, comment, checked,
-                newAccountDebitedId, newAccountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                newAccountDebitedCategoryId, newAccountCreditedCategoryId, newGroupId, newContactId,
-                rate, rateDirection, invoiceNumber, guid, modified);
+                            int newContactId, int newParentId)
+    {
+        return new Builder(this)
+            .id(newId)
+            .accountDebitedId(newAccountDebitedId)
+            .accountCreditedId(newAccountCreditedId)
+            .accountDebitedCategoryId(newAccountDebitedCategoryId)
+            .accountCreditedCategoryId(newAccountCreditedCategoryId)
+            .contactId(newContactId)
+            .parentId(newParentId)
+            .build();
     }
 
     public BigDecimal getSignedAmount() {
         return accountCreditedType != accountDebitedType && accountDebitedType != CategoryType.INCOMES ?
-                amount.negate() : amount;
+            amount.negate() : amount;
     }
 
     public final TransactionType getTransactionType() {
@@ -134,25 +143,25 @@ public class Transaction implements MoneyRecord {
     }
 
     public Transaction check(boolean check) {
-        return new Transaction(id, amount, day, month, year, transactionTypeId, comment, check,
-                accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                accountDebitedCategoryId, accountCreditedCategoryId, groupId, contactId,
-                rate, rateDirection, invoiceNumber, guid, System.currentTimeMillis());
+        return new Builder(this)
+            .checked(check)
+            .modified(System.currentTimeMillis())
+            .build();
     }
 
-    public Transaction setGroupId(int newGroupId) {
-        return new Transaction(id, amount, day, month, year, transactionTypeId, comment, checked,
-                accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                accountDebitedCategoryId, accountCreditedCategoryId, newGroupId, contactId,
-                rate, rateDirection, invoiceNumber, guid, System.currentTimeMillis());
+    public Transaction setParentId(int newParentId) {
+        return new Builder(this)
+            .parentId(newParentId)
+            .modified(System.currentTimeMillis())
+            .build();
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, amount.stripTrailingZeros(), day, month, year, transactionTypeId, comment,
-                checked, accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                accountDebitedCategoryId, accountCreditedCategoryId, groupId, contactId, rate.stripTrailingZeros(),
-                rateDirection, invoiceNumber, guid, modified);
+            checked, accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
+            accountDebitedCategoryId, accountCreditedCategoryId, contactId, rate.stripTrailingZeros(),
+            rateDirection, invoiceNumber, guid, modified, parentId, detailed);
     }
 
     @Override
@@ -167,35 +176,38 @@ public class Transaction implements MoneyRecord {
 
         Transaction that = (Transaction) other;
         return id == that.id
-                && day == that.day
-                && month == that.month
-                && year == that.year
-                && transactionTypeId == that.transactionTypeId
-                && checked == that.checked
-                && accountDebitedId == that.accountDebitedId
-                && accountCreditedId == that.accountCreditedId
-                && accountDebitedTypeId == that.accountDebitedTypeId
-                && accountCreditedTypeId == that.accountCreditedTypeId
-                && accountDebitedCategoryId == that.accountDebitedCategoryId
-                && accountCreditedCategoryId == that.accountCreditedCategoryId
-                && groupId == that.groupId
-                && contactId == that.contactId
-                && rateDirection == that.rateDirection
-                && amount.compareTo(that.amount) == 0
-                && Objects.equals(comment, that.comment)
-                && rate.compareTo(that.rate) == 0
-                && Objects.equals(invoiceNumber, that.invoiceNumber)
-                && Objects.equals(guid, that.guid)
-                && modified == that.modified;
+            && day == that.day
+            && month == that.month
+            && year == that.year
+            && transactionTypeId == that.transactionTypeId
+            && checked == that.checked
+            && accountDebitedId == that.accountDebitedId
+            && accountCreditedId == that.accountCreditedId
+            && accountDebitedTypeId == that.accountDebitedTypeId
+            && accountCreditedTypeId == that.accountCreditedTypeId
+            && accountDebitedCategoryId == that.accountDebitedCategoryId
+            && accountCreditedCategoryId == that.accountCreditedCategoryId
+            && contactId == that.contactId
+            && rateDirection == that.rateDirection
+            && amount.compareTo(that.amount) == 0
+            && Objects.equals(comment, that.comment)
+            && rate.compareTo(that.rate) == 0
+            && Objects.equals(invoiceNumber, that.invoiceNumber)
+            && Objects.equals(guid, that.guid)
+            && modified == that.modified
+            && parentId == that.parentId
+            && detailed == that.detailed;
     }
 
     public String toString() {
-        return "[Transaction id=" + this.getId()
-                + " amount=" + this.amount
-                + " accountDebitedId=" + this.accountDebitedId
-                + " accountCreditedId=" + this.accountCreditedId
-                + " comment=" + this.comment
-                + "]";
+        return "[Transaction id=" + id
+            + " guid=" + guid
+            + " amount=" + amount
+            + " accountDebitedId=" + accountDebitedId
+            + " accountCreditedId=" + accountCreditedId
+            + " comment=" + comment
+            + " parentId=" + parentId
+            + "]";
     }
 
     public int getId() {
@@ -254,10 +266,6 @@ public class Transaction implements MoneyRecord {
         return accountCreditedCategoryId;
     }
 
-    public final int getGroupId() {
-        return groupId;
-    }
-
     public final int getContactId() {
         return contactId;
     }
@@ -282,6 +290,14 @@ public class Transaction implements MoneyRecord {
         return modified;
     }
 
+    public int getParentId() {
+        return parentId;
+    }
+
+    public boolean isDetailed() {
+        return detailed;
+    }
+
     public static final class Builder {
         private int id;
         private BigDecimal amount = BigDecimal.ZERO;
@@ -302,7 +318,10 @@ public class Transaction implements MoneyRecord {
         private BigDecimal rate = BigDecimal.ONE;
         private int rateDirection;
         private String invoiceNumber = "";
-        private long modified;
+        private long modified = 0;
+        private String guid;
+        private int parentId = 0;
+        private boolean detailed = false;
 
         public Builder() {
         }
@@ -323,308 +342,189 @@ public class Transaction implements MoneyRecord {
                 this.accountCreditedTypeId = t.getAccountCreditedTypeId();
                 this.accountDebitedCategoryId = t.getAccountDebitedCategoryId();
                 this.accountCreditedCategoryId = t.getAccountCreditedCategoryId();
-                this.groupId = t.getGroupId();
                 this.contactId = t.getContactId();
                 this.rate = t.getRate();
                 this.rateDirection = t.getRateDirection();
                 this.invoiceNumber = t.getInvoiceNumber();
                 this.modified = t.getModified();
+                this.parentId = t.getParentId();
+                this.detailed = t.isDetailed();
+                this.guid = t.getGuid();
             }
         }
 
-        public final int getId() {
+        public int getId() {
             return this.id;
         }
 
-        public final void setId(int id) {
-            this.id = id;
-        }
-
-
-        public final BigDecimal getAmount() {
-            return this.amount;
-        }
-
-        public final void setAmount(BigDecimal var1) {
-            this.amount = var1;
-        }
-
-        public final int getDay() {
-            return this.day;
-        }
-
-        public final void setDay(int var1) {
-            this.day = var1;
-        }
-
-        public final int getMonth() {
-            return this.month;
-        }
-
-        public final void setMonth(int var1) {
-            this.month = var1;
-        }
-
-        public final int getYear() {
-            return this.year;
-        }
-
-        public final void setYear(int var1) {
-            this.year = var1;
-        }
-
-        public final int getTransactionTypeId() {
-            return this.transactionTypeId;
-        }
-
-        public final void setTransactionTypeId(int var1) {
-            this.transactionTypeId = var1;
-        }
-
-        public final String getComment() {
-            return this.comment;
-        }
-
-        public final void setComment(String var1) {
-            this.comment = var1;
-        }
-
-        public final boolean getChecked() {
-            return this.checked;
-        }
-
-        public final void setChecked(boolean var1) {
-            this.checked = var1;
-        }
-
-        public final int getAccountDebitedId() {
+        public int getAccountDebitedId() {
             return this.accountDebitedId;
         }
 
-        public final void setAccountDebitedId(int var1) {
-            this.accountDebitedId = var1;
-        }
-
-        public final int getAccountCreditedId() {
+        public int getAccountCreditedId() {
             return this.accountCreditedId;
         }
 
-        public final void setAccountCreditedId(int var1) {
-            this.accountCreditedId = var1;
-        }
-
-        public final int getAccountDebitedTypeId() {
-            return this.accountDebitedTypeId;
-        }
-
-        public final void setAccountDebitedTypeId(int var1) {
-            this.accountDebitedTypeId = var1;
-        }
-
-        public final int getAccountCreditedTypeId() {
-            return this.accountCreditedTypeId;
-        }
-
-        public final void setAccountCreditedTypeId(int var1) {
-            this.accountCreditedTypeId = var1;
-        }
-
-        public final int getAccountDebitedCategoryId() {
-            return this.accountDebitedCategoryId;
-        }
-
-        public final void setAccountDebitedCategoryId(int var1) {
-            this.accountDebitedCategoryId = var1;
-        }
-
-        public final int getAccountCreditedCategoryId() {
-            return this.accountCreditedCategoryId;
-        }
-
-        public final void setAccountCreditedCategoryId(int var1) {
-            this.accountCreditedCategoryId = var1;
-        }
-
-        public final int getGroupId() {
-            return this.groupId;
-        }
-
-        public final void setGroupId(int var1) {
-            this.groupId = var1;
-        }
-
-        public final int getContactId() {
-            return this.contactId;
-        }
-
-        public final void setContactId(int var1) {
-            this.contactId = var1;
-        }
-
-
-        public final BigDecimal getRate() {
-            return this.rate;
-        }
-
-        public final void setRate(BigDecimal var1) {
-            this.rate = var1;
-        }
-
-        public final int getRateDirection() {
-            return this.rateDirection;
-        }
-
-        public final void setRateDirection(int var1) {
-            this.rateDirection = var1;
-        }
-
-
-        public final String getInvoiceNumber() {
-            return this.invoiceNumber;
-        }
-
-        public final void setInvoiceNumber(String var1) {
-            this.invoiceNumber = var1;
-        }
-
-        public final long getModified() {
-            return this.modified;
-        }
-
-        public final void setModified(long var1) {
-            this.modified = var1;
-        }
-
-        public final Builder id(int id) {
+        public Builder id(int id) {
             this.id = id;
             return this;
         }
 
-        public final Builder amount(BigDecimal amount) {
+        public Builder amount(BigDecimal amount) {
             Objects.requireNonNull(amount);
             this.amount = amount;
             return this;
         }
 
-        public final Builder day(int day) {
+        public Builder day(int day) {
             this.day = day;
             return this;
         }
 
-        public final Builder month(int month) {
+        public Builder month(int month) {
             this.month = month;
             return this;
         }
 
 
-        public final Builder year(int year) {
+        public Builder year(int year) {
             this.year = year;
             return this;
         }
 
 
-        public final Builder transactionTypeId(int id) {
+        public Builder transactionTypeId(int id) {
             this.transactionTypeId = id;
             return this;
         }
 
-        public final Builder transactionType(TransactionType type) {
+        public Builder transactionType(TransactionType type) {
             Objects.requireNonNull(type);
             this.transactionTypeId = type.getId();
             return this;
         }
 
-        public final Builder comment(String comment) {
+        public Builder comment(String comment) {
             Objects.requireNonNull(comment);
             this.comment = comment;
             return this;
         }
 
-        public final Builder checked(boolean checked) {
+        public Builder checked(boolean checked) {
             this.checked = checked;
             return this;
         }
 
-        public final Builder accountDebitedId(int id) {
+        public Builder accountDebitedId(int id) {
             this.accountDebitedId = id;
             return this;
         }
 
-        public final Builder accountCreditedId(int id) {
+        public Builder accountCreditedId(int id) {
             this.accountCreditedId = id;
             return this;
         }
 
-        public final Builder accountDebitedTypeId(int id) {
-            this.accountCreditedTypeId = id;
+        public Builder accountDebitedTypeId(int id) {
+            this.accountDebitedTypeId = id;
             return this;
         }
 
-        public final Builder accountDebitedType(CategoryType type) {
+        public Builder accountDebitedType(CategoryType type) {
             this.accountDebitedTypeId = type.getId();
             return this;
         }
 
-        public final Builder accountCreditedTypeId(int id) {
+        public Builder accountCreditedTypeId(int id) {
             this.accountCreditedTypeId = id;
             return this;
         }
 
-        public final Builder accountCreditedType(CategoryType type) {
+        public Builder accountCreditedType(CategoryType type) {
             this.accountCreditedTypeId = type.getId();
             return this;
         }
 
-        public final Builder accountDebitedCategoryId(int id) {
+        public Builder accountDebitedCategoryId(int id) {
             this.accountDebitedCategoryId = id;
             return this;
         }
 
-        public final Builder accountCreditedCategoryId(int id) {
+        public Builder accountCreditedCategoryId(int id) {
             this.accountCreditedCategoryId = id;
             return this;
         }
 
-        public final Builder groupId(int id) {
-            this.groupId = id;
-            return this;
-        }
-
-        public final Builder contactId(int id) {
+        public Builder contactId(int id) {
             this.contactId = id;
             return this;
         }
 
-        public final Builder rate(BigDecimal rate) {
+        public Builder rate(BigDecimal rate) {
             Objects.requireNonNull(rate);
             this.rate = rate;
             return this;
         }
 
-        public final Builder rateDirection(int rateDirection) {
+        public Builder rateDirection(int rateDirection) {
             this.rateDirection = rateDirection;
             return this;
         }
 
-        public final Builder invoiceNumber(String invoiceNumber) {
+        public Builder invoiceNumber(String invoiceNumber) {
             Objects.requireNonNull(invoiceNumber);
             this.invoiceNumber = invoiceNumber;
             return this;
         }
 
-        public final Transaction build() {
+        public Builder guid(String guid) {
+            Objects.requireNonNull(guid);
+            this.guid = guid;
+            return this;
+        }
+
+        public Builder modified(long modified) {
+            this.modified = modified;
+            return this;
+        }
+
+        public Builder timestamp() {
+            this.modified = System.currentTimeMillis();
+            return this;
+        }
+
+        public Builder parentId(int parentId) {
+            this.parentId = parentId;
+            return this;
+        }
+
+        public Builder detailed(boolean detailed) {
+            this.detailed = detailed;
+            return this;
+        }
+
+        public Transaction build() {
             if (this.transactionTypeId == 0) {
                 this.transactionTypeId = TransactionType.UNDEFINED.getId();
             }
 
+            if (guid == null || guid.isEmpty()) {
+                guid = UUID.randomUUID().toString();
+            }
+
+            if (modified == 0) {
+                modified = System.currentTimeMillis();
+            }
+
             if (this.id != 0 && this.accountDebitedId != 0 && this.accountCreditedId != 0
-                    && this.accountDebitedTypeId != 0 && this.accountCreditedTypeId != 0
-                    && this.accountDebitedCategoryId != 0
-                    && this.accountCreditedCategoryId != 0) {
+                && this.accountDebitedTypeId != 0 && this.accountCreditedTypeId != 0
+                && this.accountDebitedCategoryId != 0
+                && this.accountCreditedCategoryId != 0)
+            {
                 return new Transaction(id, amount, day, month, year, transactionTypeId, comment,
-                        checked, accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
-                        accountDebitedCategoryId, accountCreditedCategoryId, groupId, contactId,
-                        rate, rateDirection, invoiceNumber, UUID.randomUUID().toString(), System.currentTimeMillis());
+                    checked, accountDebitedId, accountCreditedId, accountDebitedTypeId, accountCreditedTypeId,
+                    accountDebitedCategoryId, accountCreditedCategoryId, contactId,
+                    rate, rateDirection, invoiceNumber, guid, modified, parentId, detailed);
             } else {
                 throw new IllegalStateException();
             }

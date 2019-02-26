@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
-import org.panteleyev.money.persistence.model.TransactionGroup;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
@@ -46,7 +45,6 @@ public class Import {
     private final List<Account> accounts;
     private final List<Contact> contacts;
     private final List<Currency> currencies;
-    private final List<TransactionGroup> transactionGroups;
     private final List<Transaction> transactions;
 
     private static Schema moneySchema = null;
@@ -56,7 +54,6 @@ public class Import {
         accounts = importParser.getAccounts();
         contacts = importParser.getContacts();
         currencies = importParser.getCurrencies();
-        transactionGroups = importParser.getTransactionGroups();
         transactions = importParser.getTransactions();
     }
 
@@ -74,10 +71,6 @@ public class Import {
 
     public List<Currency> getCurrencies() {
         return currencies;
-    }
-
-    public List<TransactionGroup> getTransactionGroups() {
-        return transactionGroups;
     }
 
     public List<Transaction> getTransactions() {

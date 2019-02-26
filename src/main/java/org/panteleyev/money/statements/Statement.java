@@ -35,27 +35,33 @@ public final class Statement {
         UNKNOWN,
         RAIFFEISEN_CREDIT_CARD_CSV,
         RAIFFEISEN_ACCOUNT_CSV,
-        RAIFFEISEN_CARD_OFX,
+        RAIFFEISEN_OFX,
         SBERBANK_HTML,
         YANDEX_MONEY
     }
 
     private final StatementType type;
+    private final String accountNumber;
     private final List<StatementRecord> records;
     private final BigDecimal balance;
 
-    public Statement(StatementType type, List<StatementRecord> records) {
-        this(type, records, BigDecimal.ZERO);
+    public Statement(StatementType type, String accountNumber, List<StatementRecord> records) {
+        this(type, accountNumber, records, BigDecimal.ZERO);
     }
 
-    public Statement(StatementType type, List<StatementRecord> records, BigDecimal balance) {
+    public Statement(StatementType type, String accountNumber, List<StatementRecord> records, BigDecimal balance) {
         this.type = type;
+        this.accountNumber = accountNumber == null ? "" : accountNumber;
         this.records = records;
         this.balance = balance;
     }
 
     public StatementType getType() {
         return type;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
     public List<StatementRecord> getRecords() {
@@ -78,11 +84,12 @@ public final class Statement {
 
         var that = (Statement) o;
         return type == that.type
-                && Objects.equals(records, that.records);
+            && Objects.equals(accountNumber,  that.accountNumber)
+            && Objects.equals(records, that.records);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, records);
+        return Objects.hash(type, accountNumber, records);
     }
 }
