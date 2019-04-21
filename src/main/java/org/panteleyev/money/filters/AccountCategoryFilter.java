@@ -28,6 +28,7 @@ package org.panteleyev.money.filters;
 
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public class AccountCategoryFilter implements Predicate<Account> {
@@ -39,6 +40,6 @@ public class AccountCategoryFilter implements Predicate<Account> {
 
     @Override
     public boolean test(Account account) {
-        return account.getCategoryId() == category.getId();
+        return Objects.equals(account.getCategoryUuid(),  category.getGuid());
     }
 }

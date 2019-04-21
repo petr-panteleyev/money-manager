@@ -41,15 +41,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
-import org.controlsfx.control.textfield.AutoCompletionBinding;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.BaseCompletionProvider;
-import org.panteleyev.money.Options;
 import org.panteleyev.money.RecordEditorCallback;
 import org.panteleyev.money.Styles;
 import org.panteleyev.money.ToStringConverter;
@@ -237,7 +234,7 @@ final class DetailEditorPane extends BorderPane {
         categories.stream()
             .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
             .forEach(x -> {
-                List<Account> accounts = getDao().getAccountsByCategory(x.getId());
+                List<Account> accounts = getDao().getAccountsByCategory(x.getGuid());
 
                 if (!accounts.isEmpty()) {
                     creditedMenuButton.getItems().add(new MenuItem(x.getName()));
@@ -278,7 +275,7 @@ final class DetailEditorPane extends BorderPane {
             newTransactionProperty.set(false);
 
             // Accounts
-            Optional<Account> accCredited = getDao().getAccount(tr.getAccountCreditedId());
+            Optional<Account> accCredited = getDao().getAccount(tr.getAccountCreditedUuid());
             creditedAccountEdit.setText(accCredited.map(Account::getName).orElse(""));
 
             // Other fields
@@ -294,11 +291,11 @@ final class DetailEditorPane extends BorderPane {
     }
 
     private Optional<TransactionDetail> buildTransactionDetail() {
-        var builder = new TransactionDetail.Builder(transactionDetail == null ? 0 : transactionDetail.getId());
+        var builder = new TransactionDetail.Builder(transactionDetail == null ? null : transactionDetail.getUuid());
 
         var creditedAccount = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
         if (creditedAccount.isPresent()) {
-            builder.accountCreditedId(creditedAccount.get().getId());
+            builder.accountCreditedUuid(creditedAccount.get().getGuid());
         } else {
             return Optional.empty();
         }
@@ -333,7 +330,6 @@ final class DetailEditorPane extends BorderPane {
             var account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
-            //builder.accountCreditedId(account.map(Account::getId).orElse(0));
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
@@ -353,7 +349,7 @@ final class DetailEditorPane extends BorderPane {
         expenseCategories.stream()
             .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
             .forEach(x -> {
-                var accounts = getDao().getAccountsByCategory(x.getId());
+                var accounts = getDao().getAccountsByCategory(x.getGuid());
 
                 if (!accounts.isEmpty()) {
                     creditedMenuButton.getItems().add(new MenuItem(x.getName()));
@@ -377,7 +373,7 @@ final class DetailEditorPane extends BorderPane {
 
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
-            var catName = getDao().getCategory(account.getCategoryId()).map(Category::getName).orElse("");
+            var catName = getDao().getCategory(account.getCategoryUuid()).map(Category::getName).orElse("");
             label.setText(account.getType().getTypeName() + " | " + catName);
         } else {
             label.setText("");

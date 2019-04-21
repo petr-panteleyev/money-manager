@@ -185,7 +185,7 @@ public class MainWindowController extends BaseController {
         var sshMenuItem = new MenuItem("SSH...");
         sshMenuItem.setOnAction(a -> sshManager.getEditor().showAndWait());
         var profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
-        profilesMenuItem.setOnAction(a -> profileManager.getEditor().showAndWait());
+        profilesMenuItem.setOnAction(a -> profileManager.getEditor(false).showAndWait());
 
         var optionsMenuItem = new MenuItem(RB.getString("menu.Tools.Options"));
         optionsMenuItem.setOnAction(event -> onOptions());
@@ -334,7 +334,6 @@ public class MainWindowController extends BaseController {
         sshManager.setupTunnel(profile.getSshSession());
         var ds = onBuildDatasource(profile);
 
-        getDao().setEncryptionKey(profile.getEncryptionKey());
         getDao().initialize(ds);
 
         Future loadResult = CompletableFuture
@@ -420,6 +419,7 @@ public class MainWindowController extends BaseController {
             ds.setUser(profile.getDataBaseUser());
             ds.setPassword(profile.getDataBasePassword());
             ds.setDatabaseName(profile.getSchema());
+            ds.setAllowPublicKeyRetrieval(true);
 
             return ds;
         } catch (SQLException ex) {

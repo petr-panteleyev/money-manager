@@ -27,25 +27,17 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.BaseTest;
-import org.panteleyev.money.persistence.model.Account;
-import org.panteleyev.money.persistence.model.Category;
-import org.panteleyev.money.persistence.model.Contact;
-import org.panteleyev.money.persistence.model.Currency;
-import org.panteleyev.money.persistence.model.Transaction;
 import org.testng.SkipException;
-import java.util.UUID;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 public class BaseDaoTest extends BaseTest {
     private static final String TEST_DB_NAME = "TestDB";
-    static final String PASSWORD = UUID.randomUUID().toString();
 
     public void setupAndSkip() throws Exception {
         var dbName = System.getProperty("mysql.database", TEST_DB_NAME);
         var host = System.getProperty("mysql.host", "localhost");
-        var user = System.getProperty("mysql.user");
-        var password = System.getProperty("mysql.password");
+        var user = System.getProperty("mysql.user", null);
+        var password = System.getProperty("mysql.password", null);
 
         if (user == null || password == null) {
             throw new SkipException("Test config is not set");
@@ -58,7 +50,6 @@ public class BaseDaoTest extends BaseTest {
             .name(dbName)
             .build();
 
-        getDao().setEncryptionKey(PASSWORD);
         getDao().initialize(dataSource);
     }
 
@@ -68,25 +59,5 @@ public class BaseDaoTest extends BaseTest {
     protected void initializeEmptyMoneyFile() {
         getDao().createTables();
         getDao().preload(t -> { });
-    }
-
-    protected int newCategoryId() {
-        return getDao().generatePrimaryKey(dtoClass(Category.class));
-    }
-
-    protected int newAccountId() {
-        return getDao().generatePrimaryKey(dtoClass(Account.class));
-    }
-
-    protected int newCurrencyId() {
-        return getDao().generatePrimaryKey(dtoClass(Currency.class));
-    }
-
-    protected int newContactId() {
-        return getDao().generatePrimaryKey(dtoClass(Contact.class));
-    }
-
-    protected int newTransactionId() {
-        return getDao().generatePrimaryKey(dtoClass(Transaction.class));
     }
 }

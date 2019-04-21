@@ -33,16 +33,17 @@ import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Represents record storage capable to retrieve record by its id. Main purpose is to mock
  * MoneyDAO in various tests.
  */
 public interface RecordSource {
-    Optional<Category> getCategory(int id);
-    Optional<Currency> getCurrency(int id);
-    Optional<Contact> getContact(int id);
-    Optional<Account> getAccount(int id);
-    Optional<Transaction> getTransaction(int id);
+    Optional<Category> getCategory(UUID uuid);
+    Optional<Currency> getCurrency(UUID uuid);
+    Optional<Contact> getContact(UUID uuid);
+    Optional<Account> getAccount(UUID uuid);
+    Optional<Transaction> getTransaction(UUID uuid);
     List<Transaction> getTransactionDetails(Transaction parent);
 }

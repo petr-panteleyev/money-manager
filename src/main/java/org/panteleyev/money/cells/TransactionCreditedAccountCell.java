@@ -39,7 +39,7 @@ public class TransactionCreditedAccountCell extends TableCell<Transaction, Trans
         if (empty || transaction == null) {
             setText("");
         } else {
-            setText(getDao().getAccount(transaction.getAccountCreditedId())
+            setText(getDao().getAccount(transaction.getAccountCreditedUuid())
                 .map(Account::getName)
                 .orElse(""));
         }

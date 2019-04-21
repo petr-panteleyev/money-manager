@@ -26,32 +26,63 @@
 
 package org.panteleyev.money.persistence.model;
 
+import org.panteleyev.persistence.annotations.Column;
+import org.panteleyev.persistence.annotations.PrimaryKey;
+import org.panteleyev.persistence.annotations.RecordBuilder;
+import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
 import java.util.UUID;
 
+@Table("contact")
 public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
-    private final int id;
+    @PrimaryKey
+    @Column("uuid")
+    private final UUID guid;
+    @Column("name")
     private final String name;
+    @Column("type_id")
     private final int typeId;
+    @Column("phone")
     private final String phone;
+    @Column("mobile")
     private final String mobile;
+    @Column("email")
     private final String email;
+    @Column("web")
     private final String web;
+    @Column("comment")
     private final String comment;
+    @Column("street")
     private final String street;
+    @Column("city")
     private final String city;
+    @Column("country")
     private final String country;
+    @Column("zip")
     private final String zip;
-    private final String guid;
+    @Column("created")
+    private final long created;
+    @Column("modified")
     private final long modified;
 
     private final ContactType type;
 
-    private Contact(int id, String name, int typeId, String phone, String mobile, String email, String web,
-                    String comment, String street, String city, String country, String zip,
-                    String guid, long modified)
+    @RecordBuilder
+    public Contact(@Column("name") String name,
+                   @Column("type_id") int typeId,
+                   @Column("phone") String phone,
+                   @Column("mobile") String mobile,
+                   @Column("email") String email,
+                   @Column("web") String web,
+                   @Column("comment") String comment,
+                   @Column("street") String street,
+                   @Column("city") String city,
+                   @Column("country") String country,
+                   @Column("zip") String zip,
+                   @Column("uuid") UUID guid,
+                   @Column("created") long created,
+                   @Column("modified") long modified)
     {
-        this.id = id;
         this.name = name;
         this.typeId = typeId;
         this.phone = phone;
@@ -64,12 +95,9 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         this.country = country;
         this.zip = zip;
         this.guid = guid;
+        this.created = created;
         this.modified = modified;
         this.type = ContactType.get(this.typeId);
-    }
-
-    public Contact copy(int newId) {
-        return new Builder(newId).build();
     }
 
     public final ContactType getType() {
@@ -79,11 +107,6 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
     @Override
     public int compareTo(Contact other) {
         return name.compareToIgnoreCase(other.name);
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     @Override
@@ -132,8 +155,13 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
     }
 
     @Override
-    public String getGuid() {
+    public UUID getGuid() {
         return guid;
+    }
+
+    @Override
+    public long getCreated() {
+        return created;
     }
 
     @Override
@@ -143,8 +171,8 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, typeId, phone, mobile, email, web, comment, street, city, country, zip, guid,
-            modified);
+        return Objects.hash(name, typeId, phone, mobile, email, web, comment, street, city, country, zip, guid,
+            created, modified);
     }
 
     public boolean equals(Object other) {
@@ -157,8 +185,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         }
 
         Contact that = (Contact) other;
-        return id == that.id
-            && Objects.equals(name, that.name)
+        return Objects.equals(name, that.name)
             && typeId == that.typeId
             && Objects.equals(phone, that.phone)
             && Objects.equals(mobile, that.mobile)
@@ -170,11 +197,11 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             && Objects.equals(country, that.country)
             && Objects.equals(zip, that.zip)
             && Objects.equals(guid, that.guid)
+            && created == that.created
             && modified == that.modified;
     }
 
     public static final class Builder {
-        private int id;
         private String name = "";
         private int typeId = ContactType.PERSONAL.getId();
         private String phone = "";
@@ -186,14 +213,11 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         private String city = "";
         private String country = "";
         private String zip = "";
-        private String guid = null;
+        private UUID guid = null;
+        private long created = 0L;
         private long modified = 0L;
 
         public Builder() {
-        }
-
-        public Builder(int id) {
-            this.id = id;
         }
 
         public Builder(Contact c) {
@@ -201,7 +225,6 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
                 return;
             }
 
-            id = c.getId();
             name = c.getName();
             typeId = c.getTypeId();
             phone = c.getPhone();
@@ -214,6 +237,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             country = c.getCountry();
             zip = c.getZip();
             guid = c.getGuid();
+            created = c.getCreated();
             modified = c.getModified();
         }
 
@@ -223,20 +247,19 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             }
 
             if (guid == null) {
-                guid = UUID.randomUUID().toString();
+                guid = UUID.randomUUID();
             }
 
+            long now = System.currentTimeMillis();
+            if (created == 0) {
+                created = now;
+            }
             if (modified == 0) {
-                modified = System.currentTimeMillis();
+                modified = now;
             }
 
-            return new Contact(id, name, typeId, phone, mobile, email, web, comment, street, city, country, zip,
-                guid, modified);
-        }
-
-        public Builder id(int id) {
-            this.id = id;
-            return this;
+            return new Contact(name, typeId, phone, mobile, email, web, comment, street, city, country, zip,
+                guid, created, modified);
         }
 
         public Builder name(String name) {
@@ -297,8 +320,13 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             return this;
         }
 
-        public Builder guid(String guid) {
+        public Builder guid(UUID guid) {
             this.guid = guid;
+            return this;
+        }
+
+        public Builder created(long created) {
+            this.created = created;
             return this;
         }
 

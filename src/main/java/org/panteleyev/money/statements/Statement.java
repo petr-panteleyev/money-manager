@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,6 @@ import java.util.Objects;
 public final class Statement {
     public enum StatementType {
         UNKNOWN,
-        RAIFFEISEN_CREDIT_CARD_CSV,
-        RAIFFEISEN_ACCOUNT_CSV,
         RAIFFEISEN_OFX,
         SBERBANK_HTML,
         YANDEX_MONEY
@@ -84,7 +82,7 @@ public final class Statement {
 
         var that = (Statement) o;
         return type == that.type
-            && Objects.equals(accountNumber,  that.accountNumber)
+            && Objects.equals(accountNumber, that.accountNumber)
             && Objects.equals(records, that.records);
     }
 

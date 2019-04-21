@@ -41,6 +41,7 @@ import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.persistence.TransactionFilter;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -85,10 +86,10 @@ public class AccountFilterSelectionBox extends HBox {
         categoryTypeChoiceBox.setOnAction(event -> setupCategoryBox(getSelectedCategoryType()));
         categoryChoiceBox.setOnAction(event -> setupAccountBox(getSelectedCategory()));
 
-        MapChangeListener<Integer, Category> categoryListener = change ->
+        MapChangeListener<UUID, Category> categoryListener = change ->
                 Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
 
-        MapChangeListener<Integer, Account> accountListener = change ->
+        MapChangeListener<UUID, Account> accountListener = change ->
                 Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
 
         getDao().categories().addListener(categoryListener);
@@ -128,7 +129,7 @@ public class AccountFilterSelectionBox extends HBox {
         var items = accountChoiceBox.getItems();
         items.setAll(ALL_ACCOUNTS_STRING);
 
-        category.ifPresent(cat -> getDao().getAccountsByCategory(cat.getId()).stream()
+        category.ifPresent(cat -> getDao().getAccountsByCategory(cat.getGuid()).stream()
                 .filter(Account::getEnabled)
                 .forEach(items::add));
 
@@ -155,22 +156,22 @@ public class AccountFilterSelectionBox extends HBox {
     }
 
     Predicate<Transaction> getTransactionFilter() {
-        return getSelectedAccount().map(a -> TransactionFilter.byAccount(a.getId()))
-                .orElseGet(() -> getSelectedCategory().map(c -> TransactionFilter.byCategory(c.getId()))
+        return getSelectedAccount().map(a -> TransactionFilter.byAccount(a.getGuid()))
+                .orElseGet(() -> getSelectedCategory().map(c -> TransactionFilter.byCategory(c.getGuid()))
                         .orElseGet(() -> getSelectedCategoryType().map(t -> TransactionFilter.byCategoryType(t.getId()))
                                 .orElse(x -> true)));
     }
 
     public Predicate<Account> getAccountFilter() {
-        return getSelectedAccount().map(a -> AccountFilter.byAccount(a.getId()))
-                .orElseGet(() -> getSelectedCategory().map(c -> AccountFilter.byCategory(c.getId()))
+        return getSelectedAccount().map(a -> AccountFilter.byAccount(a.getGuid()))
+                .orElseGet(() -> getSelectedCategory().map(c -> AccountFilter.byCategory(c.getGuid()))
                         .orElseGet(() -> getSelectedCategoryType().map(t -> AccountFilter.byCategoryType(t.getId()))
                                 .orElse(x -> true)));
     }
 
     public void setAccount(Account account) {
         var type = account.getType();
-        var category = getDao().getCategory(account.getCategoryId()).orElseThrow();
+        var category = getDao().getCategory(account.getCategoryUuid()).orElseThrow();
 
         categoryTypeChoiceBox.getSelectionModel().select(type);
         categoryChoiceBox.getSelectionModel().select(category);

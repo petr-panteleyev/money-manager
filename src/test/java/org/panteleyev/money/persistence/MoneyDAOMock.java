@@ -33,61 +33,63 @@ import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MoneyDAOMock implements RecordSource {
-    private final Map<Integer, Category> categories;
-    private final Map<Integer, Account> accounts;
-    private final Map<Integer, Contact> contacts;
-    private final Map<Integer, Currency> currencies;
-    private final Map<Integer, Transaction> transactions;
+    private final Map<UUID, Category> categories;
+    private final Map<UUID, Account> accounts;
+    private final Map<UUID, Contact> contacts;
+    private final Map<UUID, Currency> currencies;
+    private final Map<UUID, Transaction> transactions;
 
     public MoneyDAOMock(List<Category> categories, List<Account> accounts, List<Contact> contacts,
                         List<Currency> currencies, List<Transaction> transactions)
     {
         this.categories = categories.stream()
-            .collect(Collectors.toMap(Category::getId, Function.identity()));
+            .collect(Collectors.toMap(Category::getGuid, Function.identity()));
         this.accounts = accounts.stream()
-            .collect(Collectors.toMap(Account::getId, Function.identity()));
+            .collect(Collectors.toMap(Account::getGuid, Function.identity()));
         this.contacts = contacts.stream()
-            .collect(Collectors.toMap(Contact::getId, Function.identity()));
+            .collect(Collectors.toMap(Contact::getGuid, Function.identity()));
         this.currencies = currencies.stream()
-            .collect(Collectors.toMap(Currency::getId, Function.identity()));
+            .collect(Collectors.toMap(Currency::getGuid, Function.identity()));
         this.transactions = transactions.stream()
-            .collect(Collectors.toMap(Transaction::getId, Function.identity()));
+            .collect(Collectors.toMap(Transaction::getGuid, Function.identity()));
     }
 
     @Override
-    public Optional<Category> getCategory(int id) {
-        return Optional.ofNullable(categories.get(id));
+    public Optional<Category> getCategory(UUID uuid) {
+        return Optional.ofNullable(categories.get(uuid));
     }
 
     @Override
-    public Optional<Currency> getCurrency(int id) {
-        return Optional.ofNullable(currencies.get(id));
+    public Optional<Currency> getCurrency(UUID uuid) {
+        return Optional.ofNullable(currencies.get(uuid));
     }
 
     @Override
-    public Optional<Contact> getContact(int id) {
-        return Optional.ofNullable(contacts.get(id));
+    public Optional<Contact> getContact(UUID uuid) {
+        return Optional.ofNullable(contacts.get(uuid));
     }
 
     @Override
-    public Optional<Account> getAccount(int id) {
-        return Optional.ofNullable(accounts.get(id));
+    public Optional<Account> getAccount(UUID uuid) {
+        return Optional.ofNullable(accounts.get(uuid));
     }
 
     @Override
-    public Optional<Transaction> getTransaction(int id) {
-        return Optional.ofNullable(transactions.get(id));
+    public Optional<Transaction> getTransaction(UUID uuid) {
+        return Optional.ofNullable(transactions.get(uuid));
     }
 
     @Override
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return transactions.values().stream()
-            .filter(t -> t.getParentId() == parent.getId())
+            .filter(t -> Objects.equals(t.getParentUuid().orElse(null),  parent.getGuid()))
             .collect(Collectors.toList());
     }
 }

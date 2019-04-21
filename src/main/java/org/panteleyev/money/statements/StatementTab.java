@@ -60,6 +60,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -97,22 +98,17 @@ public class StatementTab extends BorderPane {
         new ComboBox<>(FXCollections.observableArrayList(SourceType.values()));
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<Integer, Account> accountListener = change ->
+    private final MapChangeListener<UUID, Account> accountListener = change ->
         Platform.runLater(this::setupAccountComboBox);
 
     private static final FileChooser.ExtensionFilter OFX_EXTENSION =
         new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
-    private static final FileChooser.ExtensionFilter RBA_CARD_STATEMENT_CSV =
-        new FileChooser.ExtensionFilter("Raiffeisen Card Statement", "*.csv");
-    private static final FileChooser.ExtensionFilter RBA_ACCOUNT_STATEMENT_CSV =
-        new FileChooser.ExtensionFilter("Raiffeisen Account Statement", "*.csv");
     private static final FileChooser.ExtensionFilter SBERBANK_HTML =
         new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
-    private BiConsumer<StatementRecord, Account> newTransactionCallback = (x, y) -> {
-    };
+    private BiConsumer<StatementRecord, Account> newTransactionCallback = (x, y) -> { };
 
     public StatementTab() {
         var loadButton = new Button(RB.getString("button.Load"));
@@ -232,8 +228,6 @@ public class StatementTab extends BorderPane {
         var chooser = new FileChooser();
         chooser.setTitle(RB.getString("Statement"));
         chooser.getExtensionFilters().addAll(
-            RBA_CARD_STATEMENT_CSV,
-            RBA_ACCOUNT_STATEMENT_CSV,
             OFX_EXTENSION,
             SBERBANK_HTML
         );
@@ -251,10 +245,6 @@ public class StatementTab extends BorderPane {
             var filter = chooser.getSelectedExtensionFilter();
             if (OFX_EXTENSION.equals(filter)) {
                 statementType = Statement.StatementType.RAIFFEISEN_OFX;
-            } else if (RBA_CARD_STATEMENT_CSV.equals(filter)) {
-                statementType = Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV;
-            } else if (RBA_ACCOUNT_STATEMENT_CSV.equals(filter)) {
-                statementType = Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV;
             } else if (SBERBANK_HTML.equals(filter)) {
                 statementType = Statement.StatementType.SBERBANK_HTML;
             } else {

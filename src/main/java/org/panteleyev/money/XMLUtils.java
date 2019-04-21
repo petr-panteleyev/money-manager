@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,6 +37,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
 
 public interface XMLUtils {
     static void appendTextNode(Element e, String name, String value) {
@@ -60,6 +62,14 @@ public interface XMLUtils {
     }
 
     static void appendTextNode(Element e, String name, BigDecimal value) {
+        appendTextNode(e, name, value.toString());
+    }
+
+    static void appendTextNode(Element e, String name, LocalDate value) {
+        appendTextNode(e, name, value.toEpochDay());
+    }
+
+    static void appendTextNode(Element e, String name, UUID value) {
         appendTextNode(e, name, value.toString());
     }
 

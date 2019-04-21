@@ -36,16 +36,19 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
 class ImportParser extends DefaultHandler {
     enum Tag {
@@ -55,13 +58,13 @@ class ImportParser extends DefaultHandler {
         Contact(ImportParser::parseContact),
         Transaction(ImportParser::parseTransaction);
 
-        Tag(BiFunction<Integer, Map<String, String>, MoneyRecord> parseMethod) {
+        Tag(Function<Map<String, String>, MoneyRecord> parseMethod) {
             this.parseMethod = parseMethod;
         }
 
-        private BiFunction<Integer, Map<String, String>, MoneyRecord> parseMethod;
+        private Function<Map<String, String>, MoneyRecord> parseMethod;
 
-        BiFunction<Integer, Map<String, String>, MoneyRecord> getParseMethod() {
+        Function<Map<String, String>, MoneyRecord> getParseMethod() {
             return parseMethod;
         }
 
@@ -93,7 +96,6 @@ class ImportParser extends DefaultHandler {
     );
 
     private Map<String, String> tags = null;
-    private int currentId = 0;
     private final StringBuilder currentCharacters = new StringBuilder();
 
     public List<Category> getCategories() {
@@ -121,7 +123,6 @@ class ImportParser extends DefaultHandler {
         super.startElement(uri, localName, qName, attributes);
 
         if (NAMES.contains(qName)) {
-            currentId = parseInt(attributes.getValue("id"));
             tags = new HashMap<>();
         }
     }
@@ -132,7 +133,7 @@ class ImportParser extends DefaultHandler {
 
         Tag.getTag(qName).ifPresentOrElse(tag -> {
             List<? extends MoneyRecord> list = RECORD_LISTS.get(tag);
-            MoneyRecord record = tag.getParseMethod().apply(currentId, tags);
+            MoneyRecord record = tag.getParseMethod().apply(tags);
             ((List<MoneyRecord>) list).add(record);
             tags = null;
         }, () -> {
@@ -149,18 +150,29 @@ class ImportParser extends DefaultHandler {
         currentCharacters.append(new String(ch, start, length));
     }
 
-    private static Category parseCategory(int id, Map<String, String> tags) {
-        return new Category.Builder(id)
+    private static Category parseCategory(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"));
+        var createdObj = tags.get("created");
+        var created = createdObj == null ? modified : parseLong(createdObj);
+
+        return new Category.Builder()
             .name(tags.get("name"))
             .comment(tags.get("comment"))
             .catTypeId(parseInt(tags.get("catTypeId")))
-            .guid(tags.get("guid"))
-            .modified(Long.parseLong(tags.get("modified")))
+            .guid(UUID.fromString(tags.get("guid")))
+            .created(created)
+            .modified(modified)
             .build();
     }
 
-    private static Account parseAccount(int id, Map<String, String> tags) {
-        return new Account.Builder(id)
+    private static Account parseAccount(Map<String, String> tags) {
+        var interestObj = tags.get("interest");
+        var closingDateObj = tags.get("closingDate");
+        var modified = parseLong(tags.get("modified"));
+        var createdObj = tags.get("created");
+        var created = createdObj == null ? modified : parseLong(createdObj);
+
+        return new Account.Builder()
             .name(tags.get("name"))
             .comment(tags.get("comment"))
             .accountNumber(tags.get("accountNumber"))
@@ -168,16 +180,22 @@ class ImportParser extends DefaultHandler {
             .accountLimit(new BigDecimal(tags.get("accountLimit")))
             .currencyRate(new BigDecimal(tags.get("currencyRate")))
             .typeId(parseInt(tags.get("typeId")))
-            .categoryId(parseInt(tags.get("categoryId")))
-            .currencyId(parseInt(tags.get("currencyId")))
+            .categoryUuid(parseUuid(tags.get("categoryUuid")))
+            .currencyUuid(parseUuid(tags.get("currencyUuid")))
             .enabled(parseBoolean(tags.get("enabled")))
-            .guid(tags.get("guid"))
-            .modified(Long.parseLong(tags.get("modified")))
+            .interest(interestObj == null ? BigDecimal.ZERO : new BigDecimal(interestObj))
+            .closingDate(closingDateObj == null ? null : LocalDate.ofEpochDay(parseLong(closingDateObj)))
+            .guid(UUID.fromString(tags.get("guid")))
+            .created(created)
+            .modified(modified)
             .build();
     }
 
-    private static Currency parseCurrency(int id, Map<String, String> tags) {
-        return new Currency.Builder(id)
+    private static Currency parseCurrency(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"));
+        var createdObj = tags.get("created");
+        var created = createdObj == null ? modified : parseLong(createdObj);
+        return new Currency.Builder()
             .symbol(tags.get("symbol"))
             .description(tags.get("description"))
             .formatSymbol(tags.get("formatSymbol"))
@@ -187,13 +205,17 @@ class ImportParser extends DefaultHandler {
             .rate(new BigDecimal(tags.get("rate")))
             .direction(parseInt(tags.get("direction")))
             .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator")))
-            .guid(tags.get("guid"))
-            .modified(Long.parseLong(tags.get("modified")))
+            .guid(UUID.fromString(tags.get("guid")))
+            .created(created)
+            .modified(modified)
             .build();
     }
 
-    private static Contact parseContact(int id, Map<String, String> tags) {
-        return new Contact.Builder(id)
+    private static Contact parseContact(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"));
+        var createdObj = tags.get("created");
+        var created = createdObj == null ? modified : parseLong(createdObj);
+        return new Contact.Builder()
             .name(tags.get("name"))
             .typeId(parseInt(tags.get("typeId")))
             .phone(tags.get("phone"))
@@ -205,16 +227,18 @@ class ImportParser extends DefaultHandler {
             .city(tags.get("city"))
             .country(tags.get("country"))
             .zip(tags.get("zip"))
-            .guid(tags.get("guid"))
-            .modified(Long.parseLong(tags.get("modified")))
+            .guid(UUID.fromString(tags.get("guid")))
+            .created(created)
+            .modified(modified)
             .build();
     }
 
-    private static Transaction parseTransaction(int id, Map<String, String> tags) {
-        var parentIdObj = tags.get("parentId");
+    private static Transaction parseTransaction(Map<String, String> tags) {
         var detailedObj = tags.get("detailed");
+        var modified = parseLong(tags.get("modified"));
+        var createdObj = tags.get("created");
+        var created = createdObj == null ? modified : parseLong(createdObj);
         return new Transaction.Builder()
-            .id(id)
             .amount(new BigDecimal(tags.get("amount")))
             .day(parseInt(tags.get("day")))
             .month(parseInt(tags.get("month")))
@@ -222,20 +246,25 @@ class ImportParser extends DefaultHandler {
             .transactionTypeId(parseInt(tags.get("transactionTypeId")))
             .comment(tags.get("comment"))
             .checked(parseBoolean(tags.get("checked")))
-            .accountDebitedId(parseInt(tags.get("accountDebitedId")))
-            .accountCreditedId(parseInt(tags.get("accountCreditedId")))
+            .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
+            .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
             .accountDebitedTypeId(parseInt(tags.get("accountDebitedTypeId")))
             .accountCreditedTypeId(parseInt(tags.get("accountCreditedTypeId")))
-            .accountDebitedCategoryId(parseInt(tags.get("accountDebitedCategoryId")))
-            .accountCreditedCategoryId(parseInt(tags.get("accountCreditedCategoryId")))
-            .contactId(parseInt(tags.get("contactId")))
+            .accountDebitedCategoryUuid(parseUuid(tags.get("accountDebitedCategoryUuid")))
+            .accountCreditedCategoryUuid(parseUuid(tags.get("accountCreditedCategoryUuid")))
+            .contactUuid(parseUuid(tags.get("contactUuid")))
             .rate(new BigDecimal(tags.get("rate")))
             .rateDirection(parseInt(tags.get("rateDirection")))
             .invoiceNumber(tags.get("invoiceNumber"))
-            .parentId(parentIdObj == null ? 0 : parseInt(tags.get("parentId")))
+            .parentUuid(parseUuid(tags.get("parentUuid")))
             .detailed(detailedObj != null && parseBoolean(tags.get("detailed")))
-            .guid(tags.get("guid"))
-            .modified(Long.parseLong(tags.get("modified")))
+            .guid(UUID.fromString(tags.get("guid")))
+            .created(created)
+            .modified(modified)
             .build();
+    }
+
+    private static UUID parseUuid(String value) {
+        return value == null ? null : UUID.fromString(value);
     }
 }

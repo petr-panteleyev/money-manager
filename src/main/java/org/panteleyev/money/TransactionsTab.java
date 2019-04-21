@@ -30,9 +30,7 @@ import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -56,16 +54,13 @@ import java.time.format.TextStyle;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class TransactionsTab extends BorderPane implements TransactionTableView.TransactionDetailsCallback {
-    private final static Logger LOGGER = Logger.getLogger(TransactionsTab.class.getName());
-
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
     private final Spinner<Integer> yearSpinner = new Spinner<>();
@@ -75,7 +70,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         new TransactionTableView(TransactionTableView.Mode.ACCOUNT, this);
     private final TransactionEditorPane transactionEditor = new TransactionEditorPane();
 
-    private final MapChangeListener<Integer, Account> accountListener = change -> {
+    private final MapChangeListener<UUID, Account> accountListener = change -> {
         Platform.runLater(this::initAccountFilterBox);
         Platform.runLater(this::reloadTransactions);
     };
@@ -262,8 +257,9 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
 
         var selected = accountFilterBox.getSelectionModel().getSelectedItem();
         if (selected instanceof Account) {
-            int id = ((Account) selected).getId();
-            filter = filter.and(t -> t.getAccountCreditedId() == id || t.getAccountDebitedId() == id);
+            var uuid = ((Account) selected).getGuid();
+            filter = filter.and(t -> Objects.equals(t.getAccountCreditedUuid(), uuid)
+                || Objects.equals(t.getAccountDebitedUuid(), uuid));
         }
 
         transactionTable.setTransactionFilter(filter);
@@ -283,7 +279,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
 
     private Contact createContact(String name) {
         var contact = new Contact.Builder()
-            .id(getDao().generatePrimaryKey(dtoClass(Contact.class)))
+            .guid(UUID.randomUUID())
             .name(name)
             .build();
 
@@ -294,15 +290,15 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
     private void onAddTransaction(Transaction.Builder builder, String c) {
         // contact
         if (c != null && !c.isEmpty()) {
-            builder.contactId(createContact(c).getId());
+            var newContact = createContact(c);
+            builder.contactUuid(newContact.getGuid());
         }
 
         // date
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        builder.id(getDao().generatePrimaryKey(dtoClass(Transaction.class)))
-            .month(month)
+        builder.month(month)
             .year(year);
 
         transactionEditor.clear();
@@ -312,7 +308,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
     private void onUpdateTransaction(Transaction.Builder builder, String c) {
         // contact
         if (c != null && !c.isEmpty()) {
-            builder.contactId(createContact(c).getId());
+            builder.contactUuid(createContact(c).getGuid());
         }
 
         // date
@@ -325,15 +321,19 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         getDao().updateTransaction(builder.build());
     }
 
-    private void onDeleteTransaction(int id) {
+    private void onDeleteTransaction(UUID uuid) {
+        throw new UnsupportedOperationException();
+        /*
         new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
             .showAndWait()
             .ifPresent(r -> {
                 if (r == ButtonType.OK) {
                     transactionEditor.clear();
-                    getDao().deleteTransaction(id);
+                    getDao().deleteTransaction(uuid);
                 }
             });
+
+         */
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
@@ -364,7 +364,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         if (details.isEmpty()) {
             if (!childTransactions.isEmpty()) {
                 for (Transaction child : childTransactions) {
-                    getDao().deleteTransaction(child.getId());
+                    getDao().deleteTransaction(child.getGuid());
                 }
                 var noChildren = new Transaction.Builder(transaction)
                     .detailed(false)
@@ -379,17 +379,16 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
                 .build());
 
             for (Transaction ch : childTransactions) {
-                getDao().deleteTransaction(ch.getId());
+                getDao().deleteTransaction(ch.getGuid());
             }
 
             for (var transactionDetail : details) {
                 var newDetail = new Transaction.Builder(transaction)
-                    .id(getDao().generatePrimaryKey(dtoClass(Transaction.class)))
-                    .accountCreditedId(transactionDetail.getAccountCreditedId())
+                    .accountCreditedUuid(transactionDetail.getAccountCreditedUuid())
                     .amount(transactionDetail.getAmount())
                     .comment(transactionDetail.getComment())
-                    .guid(UUID.randomUUID().toString())
-                    .parentId(transaction.getId())
+                    .guid(UUID.randomUUID())
+                    .parentUuid(transaction.getGuid())
                     .detailed(false)
                     .timestamp()
                     .build();

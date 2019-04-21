@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.XMLUtils.appendElement;
 import static org.panteleyev.money.XMLUtils.appendTextNode;
@@ -77,18 +78,18 @@ public class Export {
 
         if (withDeps) {
             categories = accounts.stream()
-                    .map(Account::getCategoryId)
-                    .distinct()
-                    .map(source::getCategory)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
+                .map(Account::getCategoryUuid)
+                .distinct()
+                .map(source::getCategory)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList());
 
             currencies = accounts.stream()
-                    .map(Account::getCurrencyId)
-                    .distinct()
-                    .map(source::getCurrency)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
+                .flatMap(a -> a.getCurrencyUuid().stream())
+                .distinct()
+                .map(source::getCurrency)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList());
         }
 
         return this;
@@ -107,7 +108,7 @@ public class Export {
     public Export withTransactions(Collection<Transaction> toExport, boolean withDeps) {
         if (withDeps) {
             transactions = toExport.stream()
-                .filter(t -> t.getParentId() == 0)
+                .filter(t -> t.getParentUuid().isEmpty())
                 .collect(Collectors.toCollection(ArrayList::new));
 
             var details = toExport.stream()
@@ -118,22 +119,21 @@ public class Export {
             transactions.addAll(details);
 
             contacts = toExport.stream()
-                    .filter(t -> t.getContactId() != 0)
-                    .map(Transaction::getContactId)
-                    .distinct()
-                    .map(source::getContact)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList());
+                .flatMap(t -> t.getContactUuid().stream())
+                .distinct()
+                .map(source::getContact)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList());
 
-            var accIdList = new HashSet<Integer>();
+            var accIdList = new HashSet<UUID>();
             for (var t : transactions) {
-                accIdList.add(t.getAccountDebitedId());
-                accIdList.add(t.getAccountCreditedId());
+                accIdList.add(t.getAccountDebitedUuid());
+                accIdList.add(t.getAccountCreditedUuid());
             }
             withAccounts(accIdList.stream()
-                    .map(source::getAccount)
-                    .flatMap(Optional::stream)
-                    .collect(Collectors.toList()), true);
+                .map(source::getAccount)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()), true);
         } else {
             transactions = toExport;
         }
@@ -179,12 +179,12 @@ public class Export {
 
     private static Element exportCategory(Document doc, Category category) {
         var e = doc.createElement("Category");
-        e.setAttribute("id", Integer.toString(category.getId()));
 
         appendTextNode(e, "name", category.getName());
         appendTextNode(e, "comment", category.getComment());
         appendTextNode(e, "catTypeId", category.getCatTypeId());
         appendTextNode(e, "guid", category.getGuid());
+        appendTextNode(e, "created", category.getCreated());
         appendTextNode(e, "modified", category.getModified());
 
         return e;
@@ -192,7 +192,6 @@ public class Export {
 
     private static Element exportAccount(Document doc, Account account) {
         var e = doc.createElement("Account");
-        e.setAttribute("id", Integer.toString(account.getId()));
 
         appendTextNode(e, "name", account.getName());
         appendTextNode(e, "comment", account.getComment());
@@ -201,10 +200,13 @@ public class Export {
         appendTextNode(e, "accountLimit", account.getAccountLimit());
         appendTextNode(e, "currencyRate", account.getCurrencyRate());
         appendTextNode(e, "typeId", account.getTypeId());
-        appendTextNode(e, "categoryId", account.getCategoryId());
-        appendTextNode(e, "currencyId", account.getCurrencyId());
+        appendTextNode(e, "categoryUuid", account.getCategoryUuid());
+        account.getCurrencyUuid().ifPresent(uuid -> appendTextNode(e, "currencyUuid", uuid));
         appendTextNode(e, "enabled", account.getEnabled());
+        appendTextNode(e, "interest", account.getInterest());
+        account.getClosingDate().ifPresent(closingDate -> appendTextNode(e, "closingDate", closingDate));
         appendTextNode(e, "guid", account.getGuid());
+        appendTextNode(e, "created", account.getCreated());
         appendTextNode(e, "modified", account.getModified());
 
         return e;
@@ -212,7 +214,6 @@ public class Export {
 
     private static Element exportContact(Document doc, Contact contact) {
         var e = doc.createElement("Contact");
-        e.setAttribute("id", Integer.toString(contact.getId()));
 
         appendTextNode(e, "name", contact.getName());
         appendTextNode(e, "typeId", contact.getTypeId());
@@ -226,6 +227,7 @@ public class Export {
         appendTextNode(e, "country", contact.getCountry());
         appendTextNode(e, "zip", contact.getZip());
         appendTextNode(e, "guid", contact.getGuid());
+        appendTextNode(e, "created", contact.getCreated());
         appendTextNode(e, "modified", contact.getModified());
 
         return e;
@@ -233,7 +235,6 @@ public class Export {
 
     private static Element exportCurrency(Document doc, Currency currency) {
         var e = doc.createElement("Currency");
-        e.setAttribute("id", Integer.toString(currency.getId()));
 
         appendTextNode(e, "symbol", currency.getSymbol());
         appendTextNode(e, "description", currency.getDescription());
@@ -245,6 +246,7 @@ public class Export {
         appendTextNode(e, "direction", currency.getDirection());
         appendTextNode(e, "useThousandSeparator", currency.getUseThousandSeparator());
         appendTextNode(e, "guid", currency.getGuid());
+        appendTextNode(e, "created", currency.getCreated());
         appendTextNode(e, "modified", currency.getModified());
 
         return e;
@@ -252,7 +254,6 @@ public class Export {
 
     private static Element exportTransaction(Document doc, Transaction t) {
         var e = doc.createElement("Transaction");
-        e.setAttribute("id", Integer.toString(t.getId()));
 
         appendTextNode(e, "amount", t.getAmount());
         appendTextNode(e, "day", t.getDay());
@@ -261,19 +262,20 @@ public class Export {
         appendTextNode(e, "transactionTypeId", t.getTransactionTypeId());
         appendTextNode(e, "comment", t.getComment());
         appendTextNode(e, "checked", t.getChecked());
-        appendTextNode(e, "accountDebitedId", t.getAccountDebitedId());
-        appendTextNode(e, "accountCreditedId", t.getAccountCreditedId());
+        appendTextNode(e, "accountDebitedUuid", t.getAccountDebitedUuid());
+        appendTextNode(e, "accountCreditedUuid", t.getAccountCreditedUuid());
         appendTextNode(e, "accountDebitedTypeId", t.getAccountDebitedTypeId());
         appendTextNode(e, "accountCreditedTypeId", t.getAccountCreditedTypeId());
-        appendTextNode(e, "accountDebitedCategoryId", t.getAccountDebitedCategoryId());
-        appendTextNode(e, "accountCreditedCategoryId", t.getAccountCreditedCategoryId());
-        appendTextNode(e, "contactId", t.getContactId());
+        appendTextNode(e, "accountDebitedCategoryUuid", t.getAccountDebitedCategoryUuid());
+        appendTextNode(e, "accountCreditedCategoryUuid", t.getAccountCreditedCategoryUuid());
+        t.getContactUuid().ifPresent(uuid -> appendTextNode(e, "contactUuid", uuid));
         appendTextNode(e, "rate", t.getRate());
         appendTextNode(e, "rateDirection", t.getRateDirection());
         appendTextNode(e, "invoiceNumber", t.getInvoiceNumber());
         appendTextNode(e, "guid", t.getGuid());
+        appendTextNode(e, "created", t.getCreated());
         appendTextNode(e, "modified", t.getModified());
-        appendTextNode(e, "parentId", t.getParentId());
+        t.getParentUuid().ifPresent(uuid -> appendTextNode(e, "parentUuid", uuid));
         appendTextNode(e, "detailed", t.isDetailed());
 
         return e;

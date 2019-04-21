@@ -36,15 +36,12 @@ import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.persistence.model.TransactionType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
 public interface BaseTestUtils {
     Random RANDOM = new Random(System.currentTimeMillis());
-
-    static int randomId() {
-        return RANDOM.nextInt(Integer.MAX_VALUE) + 1;
-    }
 
     static int randomDay() {
         return 1 + RANDOM.nextInt(28);
@@ -60,6 +57,10 @@ public interface BaseTestUtils {
 
     static String randomString() {
         return UUID.randomUUID().toString();
+    }
+
+    static boolean randomBoolean() {
+        return RANDOM.nextBoolean();
     }
 
     static BigDecimal randomBigDecimal() {
@@ -90,59 +91,49 @@ public interface BaseTestUtils {
         }
     }
 
-    static Account newAccount() {
-        return newAccount(randomId(), randomCategoryType(), randomId(), randomId());
-    }
-
-    static Account newAccount(int id) {
-        return newAccount(id, randomCategoryType(), randomId(), randomId());
-    }
-
-    static Account newAccount(int id, Category category, Currency currency) {
-        return newAccount(id, category.getType(), category.getId(), currency.getId());
-    }
-
-    static Account newAccount(int id, CategoryType type, int categoryId, int currencyId) {
-        return new Account.Builder(id)
+    static Account newAccount(Category category, Currency currency) {
+        return new Account.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
-            .typeId(type.getId())
-            .categoryId(categoryId)
-            .currencyId(currencyId)
+            .typeId(category.getType().getId())
+            .categoryUuid(category.getGuid())
+            .currencyUuid(currency.getGuid())
             .enabled(RANDOM.nextBoolean())
-            .guid(UUID.randomUUID().toString())
+            .interest(randomBigDecimal())
+            .closingDate(LocalDate.now())
+            .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }
 
     static Category newCategory() {
-        return newCategory(randomId(), randomCategoryType());
+        return newCategory(UUID.randomUUID(), randomCategoryType());
     }
 
-    static Category newCategory(int id) {
-        return newCategory(id, randomCategoryType());
+    static Category newCategory(UUID uuid) {
+        return newCategory(uuid, randomCategoryType());
     }
 
-    static Category newCategory(int id, CategoryType type) {
-        return new Category.Builder(id)
+    static Category newCategory(UUID uuid, CategoryType type) {
+        return new Category.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .catTypeId(type.getId())
-            .guid(UUID.randomUUID().toString())
+            .guid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
 
     static Currency newCurrency() {
-        return newCurrency(randomId());
+        return newCurrency(UUID.randomUUID());
     }
 
-    static Currency newCurrency(int id) {
-        return new Currency.Builder(id)
+    static Currency newCurrency(UUID uuid) {
+        return new Currency.Builder()
             .symbol(UUID.randomUUID().toString())
             .description(UUID.randomUUID().toString())
             .formatSymbol(UUID.randomUUID().toString())
@@ -152,17 +143,17 @@ public interface BaseTestUtils {
             .rate(randomBigDecimal())
             .direction(RANDOM.nextInt(2))
             .useThousandSeparator(RANDOM.nextBoolean())
-            .guid(UUID.randomUUID().toString())
+            .guid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
 
     static Contact newContact() {
-        return newContact(randomId());
+        return newContact(UUID.randomUUID());
     }
 
-    static Contact newContact(int id) {
-        return new Contact.Builder(id)
+    static Contact newContact(UUID uuid) {
+        return new Contact.Builder()
             .name(UUID.randomUUID().toString())
             .typeId(randomContactType().getId())
             .phone(UUID.randomUUID().toString())
@@ -174,13 +165,13 @@ public interface BaseTestUtils {
             .city(UUID.randomUUID().toString())
             .country(UUID.randomUUID().toString())
             .zip(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID().toString())
+            .guid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
 
-    static Contact newContact(int id, String name) {
-        return new Contact.Builder(id)
+    static Contact newContact(String name) {
+        return new Contact.Builder()
             .name(name)
             .typeId(randomContactType().getId())
             .phone(UUID.randomUUID().toString())
@@ -192,64 +183,69 @@ public interface BaseTestUtils {
             .city(UUID.randomUUID().toString())
             .country(UUID.randomUUID().toString())
             .zip(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID().toString())
+            .guid(UUID.randomUUID())
+            .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
     }
 
     static Transaction newTransaction() {
-        return newTransaction(randomId());
+        return newTransaction(UUID.randomUUID());
     }
 
-    static Transaction newTransaction(int id) {
-        return newTransaction(id,
-            randomBigDecimal(),
-            randomBigDecimal(),
-            randomTransactionType(),
-            randomId(),
-            randomId(),
-            randomCategoryType(),
-            randomCategoryType(),
-            randomId(),
-            randomId(),
-            0);
+    static Transaction newTransaction(UUID uuid) {
+        return new Transaction.Builder()
+            .guid(uuid)
+            .amount(randomBigDecimal())
+            .day(randomDay())
+            .month(randomMonth())
+            .year(randomYear())
+            .transactionTypeId(randomTransactionType().getId())
+            .comment(UUID.randomUUID().toString())
+            .checked(RANDOM.nextBoolean())
+            .accountDebitedUuid(UUID.randomUUID())
+            .accountCreditedUuid(UUID.randomUUID())
+            .accountDebitedTypeId(randomCategoryType().getId())
+            .accountCreditedTypeId(randomCategoryType().getId())
+            .accountDebitedCategoryUuid(UUID.randomUUID())
+            .accountCreditedCategoryUuid(UUID.randomUUID())
+            .contactUuid(UUID.randomUUID())
+            .rate(randomBigDecimal())
+            .rateDirection(RANDOM.nextInt(2))
+            .invoiceNumber(UUID.randomUUID().toString())
+            .modified(System.currentTimeMillis())
+            .build();
     }
 
-    static Transaction newTransaction(
-        Account accountDebited,
-        Account accountCredited,
-        Contact contact)
-    {
-        return newTransaction(randomId(),
-            randomBigDecimal(),
-            randomBigDecimal(),
-            randomTransactionType(),
-            accountDebited.getId(),
-            accountCredited.getId(),
-            accountDebited.getType(),
-            accountCredited.getType(),
-            randomId(),
-            randomId(),
-            contact.getId());
+    static Transaction newTransaction(Account accountDebited, Account accountCredited, Contact contact) {
+        return new Transaction.Builder()
+            .amount(randomBigDecimal())
+            .day(randomDay())
+            .month(randomMonth())
+            .year(randomYear())
+            .transactionTypeId(randomTransactionType().getId())
+            .comment(UUID.randomUUID().toString())
+            .checked(RANDOM.nextBoolean())
+            .accountDebitedUuid(accountDebited.getGuid())
+            .accountCreditedUuid(accountCredited.getGuid())
+            .accountDebitedTypeId(accountDebited.getType().getId())
+            .accountCreditedTypeId(accountCredited.getType().getId())
+            .accountDebitedCategoryUuid(accountDebited.getCategoryUuid())
+            .accountCreditedCategoryUuid(accountCredited.getCategoryUuid())
+            .contactUuid(contact == null ? null : contact.getGuid())
+            .rate(randomBigDecimal())
+            .rateDirection(RANDOM.nextInt(2))
+            .invoiceNumber(UUID.randomUUID().toString())
+            .guid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
     }
 
-    static Transaction newTransaction(
-        Account accountDebited,
-        Account accountCredited)
-    {
-        return newTransaction(randomId(),
-            randomBigDecimal(),
-            randomBigDecimal(),
-            randomTransactionType(),
-            accountDebited.getId(),
-            accountCredited.getId(),
-            randomCategoryType(),
-            randomCategoryType(),
-            randomId(),
-            randomId(),
-            0);
+    static Transaction newTransaction(Account accountDebited, Account accountCredited) {
+        return newTransaction(accountDebited, accountCredited, null);
     }
 
+    /*
     static Transaction newTransaction(
         int id,
         TransactionType type,
@@ -262,7 +258,6 @@ public interface BaseTestUtils {
         int contactId)
     {
         return new Transaction.Builder()
-            .id(id)
             .amount(randomBigDecimal())
             .day(randomDay())
             .month(randomMonth())
@@ -280,11 +275,14 @@ public interface BaseTestUtils {
             .rate(randomBigDecimal())
             .rateDirection(RANDOM.nextInt(2))
             .invoiceNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID().toString())
+            .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }
 
+     */
+
+    /*
     static Transaction newTransaction(
         int id,
         BigDecimal amount,
@@ -317,8 +315,10 @@ public interface BaseTestUtils {
             .rate(rate)
             .rateDirection(RANDOM.nextInt(2))
             .invoiceNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID().toString())
+            .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }
+
+     */
 }

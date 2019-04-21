@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,19 +43,19 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.model.Category;
 import java.util.Optional;
+import java.util.UUID;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class CategoryWindowController extends BaseController {
     private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
     private final TableView<Category> categoryTable = new TableView<>();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<Integer, Category> categoriesListener = change ->
-            Platform.runLater(this::updateWindow);
+    private final MapChangeListener<UUID, Category> categoriesListener = change ->
+        Platform.runLater(this::updateWindow);
 
 
     CategoryWindowController() {
@@ -66,17 +66,17 @@ final class CategoryWindowController extends BaseController {
         var disableBinding = categoryTable.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = newMenuBar(
-                new Menu(RB.getString("menu.File"), null,
-                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
-                new Menu(RB.getString("menu.Edit"), null,
-                        newMenuItem(RB, "menu.Edit.Add", addHandler),
-                        newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
-                createHelpMenu(RB));
+            new Menu(RB.getString("menu.File"), null,
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            new Menu(RB.getString("menu.Edit"), null,
+                newMenuItem(RB, "menu.Edit.Add", addHandler),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+            createHelpMenu(RB));
 
         // Context Menu
         categoryTable.setContextMenu(new ContextMenu(
-                newMenuItem(RB, "menu.Edit.Add", addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
+            newMenuItem(RB, "menu.Edit.Add", addHandler),
+            newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
         var colType = new TableColumn<Category, String>(RB.getString("column.Type"));
@@ -97,11 +97,11 @@ final class CategoryWindowController extends BaseController {
         updateList();
 
         colType.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
         colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getName()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
         colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
 
         colType.setSortable(true);
         categoryTable.getSortOrder().add(colType);
@@ -131,26 +131,17 @@ final class CategoryWindowController extends BaseController {
     private void onTableMouseClick(Event event) {
         var me = (MouseEvent) event;
         if (me.getClickCount() == 2) {
-            getSelectedCategory().ifPresent(this::openCategoryDialog);
+            onMenuEdit();
         }
     }
 
     private void onMenuEdit() {
-        getSelectedCategory().ifPresent(this::openCategoryDialog);
+        getSelectedCategory().ifPresent(category ->
+            new CategoryDialog(category).showAndWait().ifPresent(c -> getDao().updateCategory(c)));
     }
 
     private void onMenuAdd() {
-        openCategoryDialog(null);
-    }
-
-    private void openCategoryDialog(Category category) {
-        new CategoryDialog(category).showAndWait().ifPresent(c -> {
-            if (c.getId() != 0) {
-                getDao().updateCategory(c);
-            } else {
-                getDao().insertCategory(c.copy(getDao().generatePrimaryKey(dtoClass(Category.class))));
-            }
-        });
+        new CategoryDialog(null).showAndWait().ifPresent(c -> getDao().insertCategory(c));
     }
 
     private void updateWindow() {

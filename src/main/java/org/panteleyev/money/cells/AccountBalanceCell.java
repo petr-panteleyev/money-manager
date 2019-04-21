@@ -45,7 +45,7 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
 
     public AccountBalanceCell(boolean total, Predicate<Transaction> filter) {
         this.total = total;
-        this.filter = filter.and(t -> t.getParentId() == 0);
+        this.filter = filter.and(t -> t.getParentUuid().isEmpty());
     }
 
     @Override
@@ -59,9 +59,10 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
         } else {
             var sum = account.calculateBalance(total, filter);
 
-            setText(getDao().getCurrency(account.getCurrencyId())
-                    .map(curr -> curr.formatValue(sum))
-                    .orElse(Currency.defaultFormatValue(sum)));
+            // TODO: use flatMap
+            setText(getDao().getCurrency(account.getCurrencyUuid().orElse(null))
+                .map(curr -> curr.formatValue(sum))
+                .orElse(Currency.defaultFormatValue(sum)));
 
             getStyleClass().remove(RED_TEXT);
             if (sum.signum() < 0) {

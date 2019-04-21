@@ -38,10 +38,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.ContactType;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import org.panteleyev.commons.fx.BaseDialog;
 import java.util.UUID;
 import static org.panteleyev.money.MainWindowController.RB;
 
@@ -92,7 +92,7 @@ final class ContactDialog extends BaseDialog<Contact> {
         nameField.setPrefColumnCount(20);
 
         typeChoiceBox.setItems(FXCollections.observableArrayList(ContactType.values()));
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter<ContactType>() {
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(ContactType type) {
                 return type.getTypeName();
             }
@@ -117,7 +117,9 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Contact.Builder(contact != null ? contact.getId() : 0)
+                long now = System.currentTimeMillis();
+
+                var builder = new Contact.Builder(contact)
                     .name(nameField.getText())
                     .typeId(typeChoiceBox.getSelectionModel().getSelectedItem().getId())
                     .phone(phoneField.getText())
@@ -129,9 +131,14 @@ final class ContactDialog extends BaseDialog<Contact> {
                     .city(cityField.getText())
                     .country(countryField.getText())
                     .zip(zipField.getText())
-                    .guid(contact != null ? contact.getGuid() : UUID.randomUUID().toString())
-                    .modified(System.currentTimeMillis())
-                    .build();
+                    .modified(now);
+
+                if (contact == null) {
+                    builder.guid(UUID.randomUUID())
+                        .created(now);
+                }
+
+                return builder.build();
             } else {
                 return null;
             }

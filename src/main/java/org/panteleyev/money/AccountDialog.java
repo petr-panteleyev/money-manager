@@ -32,17 +32,18 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Currency;
-import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import org.panteleyev.commons.fx.BaseDialog;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
@@ -60,6 +61,8 @@ class AccountDialog extends BaseDialog<Account> {
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
     private final CheckBox activeCheckBox = new CheckBox(RB.getString("account.Dialog.Active"));
+    private final TextField interestEdit = new TextField();
+    private final DatePicker closingDatePicker = new DatePicker();
 
     private final Collection<Category> categories;
 
@@ -72,7 +75,6 @@ class AccountDialog extends BaseDialog<Account> {
 
         setTitle(RB.getString("account.Dialog.Title"));
 
-
         var gridPane = new GridPane();
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
@@ -84,6 +86,8 @@ class AccountDialog extends BaseDialog<Account> {
         gridPane.addRow(index++, new Label(RB.getString("label.Account.Number")), accountNumberEdit);
         gridPane.addRow(index++, new Label(RB.getString("label.Comment")), commentEdit);
         gridPane.addRow(index++, new Label(RB.getString("account.Dialog.Currency")), currencyComboBox);
+        gridPane.addRow(index++, new Label(RB.getString("label.interest")), interestEdit);
+        gridPane.addRow(index++, new Label(RB.getString("label.closing.date")), closingDatePicker);
         gridPane.add(activeCheckBox, 1, index);
 
         getDialogPane().setContent(gridPane);
@@ -117,12 +121,14 @@ class AccountDialog extends BaseDialog<Account> {
             nameEdit.setText("");
             initialEdit.setText("0.0");
             activeCheckBox.setSelected(true);
+            interestEdit.setText("0.0");
+            closingDatePicker.setValue(null);
 
             if (initialCategory != null) {
                 typeComboBox.getSelectionModel().select(initialCategory.getType());
                 onCategoryTypeSelected();
                 categoryComboBox.getSelectionModel()
-                    .select(getDao().getCategory(initialCategory.getId()).orElse(null));
+                    .select(getDao().getCategory(initialCategory.getGuid()).orElse(null));
             } else {
                 typeComboBox.getSelectionModel().select(0);
                 onCategoryTypeSelected();
@@ -135,12 +141,14 @@ class AccountDialog extends BaseDialog<Account> {
             accountNumberEdit.setText(account.getAccountNumber());
             initialEdit.setText(account.getOpeningBalance().toString());
             activeCheckBox.setSelected(account.getEnabled());
+            interestEdit.setText(account.getInterest().toString());
+            closingDatePicker.setValue(account.getClosingDate().orElse(null));
 
             typeComboBox.getSelectionModel().select(account.getType());
             categoryComboBox.getSelectionModel()
-                .select(getDao().getCategory(account.getCategoryId()).orElse(null));
+                .select(getDao().getCategory(account.getCategoryUuid()).orElse(null));
             currencyComboBox.getSelectionModel()
-                .select(getDao().getCurrency(account.getCurrencyId()).orElse(null));
+                .select(getDao().getCurrency(account.getCurrencyUuid().orElse(null)).orElse(null));
         }
 
         setResultConverter((ButtonType b) -> {
@@ -148,18 +156,27 @@ class AccountDialog extends BaseDialog<Account> {
                 // TODO: reconsider using null currency value
                 var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
 
-                return new Account.Builder(account != null ? account.getId() : 0)
+                long now = System.currentTimeMillis();
+
+                var builder = new Account.Builder(account)
                     .name(nameEdit.getText())
                     .comment(commentEdit.getText())
                     .accountNumber(accountNumberEdit.getText())
                     .openingBalance(new BigDecimal(initialEdit.getText()))
                     .typeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
-                    .categoryId(categoryComboBox.getSelectionModel().getSelectedItem().getId())
-                    .currencyId(selectedCurrency != null ? selectedCurrency.getId() : 0)
+                    .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().getGuid())
+                    .currencyUuid(selectedCurrency != null ? selectedCurrency.getGuid() : null)
                     .enabled(activeCheckBox.isSelected())
-                    .guid(account != null ? account.getGuid() : UUID.randomUUID().toString())
-                    .modified(System.currentTimeMillis())
-                    .build();
+                    .interest(new BigDecimal(interestEdit.getText()))
+                    .closingDate(closingDatePicker.getValue())
+                    .modified(now);
+
+                if (account == null) {
+                    builder.guid(UUID.randomUUID())
+                        .created(now);
+                }
+
+                return builder.build();
             } else {
                 return null;
             }
@@ -190,6 +207,7 @@ class AccountDialog extends BaseDialog<Account> {
         validation.registerValidator(categoryComboBox,
             (Control control, Category value) -> ValidationResult.fromErrorIf(control, null, value == null));
         validation.registerValidator(initialEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
+        validation.registerValidator(interestEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.initInitialDecoration();
     }
 }

@@ -39,7 +39,7 @@ public class TransactionContactCell extends TableCell<Transaction, Transaction> 
         if (empty || transaction == null) {
             setText("");
         } else {
-            setText(getDao().getContact(transaction.getContactId())
+            setText(getDao().getContact(transaction.getContactUuid().orElse(null))
                 .map(Contact::getName)
                 .orElse(""));
         }

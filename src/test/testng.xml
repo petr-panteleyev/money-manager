@@ -33,11 +33,6 @@
             <class name="org.panteleyev.money.ymoney.TestClientId"/>
         </classes>
     </test>
-    <test name="DTO">
-        <classes>
-            <class name="org.panteleyev.money.persistence.dto.TestDto"/>
-        </classes>
-    </test>
     <test name="Model">
         <classes>
             <class name="org.panteleyev.money.persistence.model.TestAccount"/>
@@ -56,14 +51,17 @@
     <test name="Import/Export">
         <classes>
             <class name="org.panteleyev.money.TestImportExport"/>
-            <class name="org.panteleyev.money.TestImportRecords"/>
+            <!--            <class name="org.panteleyev.money.TestImportRecords"/>-->
             <class name="org.panteleyev.money.TestXsdNegative"/>
         </classes>
     </test>
-    <test name="Misc">
+    <test name="UI">
         <classes>
-            <class name="org.panteleyev.money.TestEditorPane"/>
-            <class name="org.panteleyev.money.TestStatements"/>
+            <class name="org.panteleyev.money.CategoryDialogTest"/>
+            <class name="org.panteleyev.money.CurrencyDialogTest"/>
+            <class name="org.panteleyev.money.ContactDialogTest"/>
+            <class name="org.panteleyev.money.AccountDialogTest"/>
+            <class name="org.panteleyev.money.EditorPaneTest"/>
         </classes>
     </test>
 </suite>

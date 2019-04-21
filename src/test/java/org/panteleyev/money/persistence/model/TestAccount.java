@@ -29,18 +29,16 @@ package org.panteleyev.money.persistence.model;
 import org.panteleyev.money.BaseTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import java.time.LocalDate;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.BaseTestUtils.randomId;
-import static org.panteleyev.money.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestAccount extends BaseTest {
     @Test
     public void testEquals() {
-        int id = randomId();
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
         var accountNumber = UUID.randomUUID().toString();
@@ -48,39 +46,48 @@ public class TestAccount extends BaseTest {
         var limit = randomBigDecimal();
         var rate = randomBigDecimal();
         var type = randomCategoryType();
-        var categoryId = randomId();
-        var currencyId = randomId();
+        var categoryUuid = UUID.randomUUID();
+        var currencyUuid = UUID.randomUUID();
         var enabled = RANDOM.nextBoolean();
-        var uuid = randomString();
+        var interest = randomBigDecimal();
+        var closingDate = LocalDate.now();
+        var uuid = UUID.randomUUID();
+        var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
 
         var a1 = new Account.Builder()
-            .id(id).name(name)
+            .name(name)
             .comment(comment)
             .accountNumber(accountNumber)
             .openingBalance(opening)
             .accountLimit(limit)
             .currencyRate(rate)
             .typeId(type.getId())
-            .categoryId(categoryId)
-            .currencyId(currencyId)
+            .categoryUuid(categoryUuid)
+            .currencyUuid(currencyUuid)
             .enabled(enabled)
+            .interest(interest)
+            .closingDate(closingDate)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
         var a2 = new Account.Builder()
-            .id(id).name(name)
+            .name(name)
             .comment(comment)
             .accountNumber(accountNumber)
             .openingBalance(opening)
             .accountLimit(limit)
             .currencyRate(rate)
             .typeId(type.getId())
-            .categoryId(categoryId)
-            .currencyId(currencyId)
+            .categoryUuid(categoryUuid)
+            .currencyUuid(currencyUuid)
             .enabled(enabled)
+            .interest(interest)
+            .closingDate(closingDate)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
@@ -103,10 +110,10 @@ public class TestAccount extends BaseTest {
         var a = new Account.Builder()
             .accountNumber(accountNumber)
             .typeId(CategoryType.DEBTS.getId())
-            .categoryId(0)
-            .currencyId(0)
-            .guid("")
-            .modified(0)
+            .categoryUuid(UUID.randomUUID())
+            .guid(UUID.randomUUID())
+            .created(System.currentTimeMillis())
+            .modified(System.currentTimeMillis())
             .build();
 
         assertEquals(a.getAccountNumber(), accountNumber);
@@ -116,7 +123,6 @@ public class TestAccount extends BaseTest {
     @Test
     public void testBuilder() {
         var original = new Account.Builder()
-            .id(randomId())
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
@@ -124,10 +130,13 @@ public class TestAccount extends BaseTest {
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
             .typeId(randomCategoryType().getId())
-            .categoryId(randomId())
-            .currencyId(randomId())
+            .categoryUuid(UUID.randomUUID())
+            .currencyUuid(UUID.randomUUID())
             .enabled(RANDOM.nextBoolean())
-            .guid(randomString())
+            .interest(randomBigDecimal())
+            .closingDate(LocalDate.now())
+            .guid(UUID.randomUUID())
+            .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -135,7 +144,6 @@ public class TestAccount extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Account.Builder()
-            .id(original.getId())
             .name(original.getName())
             .comment(original.getComment())
             .accountNumber(original.getAccountNumber())
@@ -143,10 +151,13 @@ public class TestAccount extends BaseTest {
             .accountLimit(original.getAccountLimit())
             .currencyRate(original.getCurrencyRate())
             .typeId(original.getTypeId())
-            .categoryId(original.getCategoryId())
-            .currencyId(original.getCurrencyId())
+            .categoryUuid(original.getCategoryUuid())
+            .currencyUuid(original.getCurrencyUuid().orElse(null))
             .enabled(original.getEnabled())
+            .interest(original.getInterest())
+            .closingDate(original.getClosingDate().orElse(null))
             .guid(original.getGuid())
+            .created(original.getCreated())
             .modified(original.getModified())
             .build();
         assertEquals(manualCopy, original);

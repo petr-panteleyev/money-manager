@@ -10,6 +10,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e6219be-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Cash</name>
             <openingBalance>-137373.710000</openingBalance>
@@ -24,6 +25,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e624826-7470-11e7-857e-389c6424842b</guid>
+            <created>2000</created>
             <modified>2000</modified>
             <name>Tips</name>
             <openingBalance>0.000000</openingBalance>
@@ -37,6 +39,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e621946-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>7777 8888 9999 0000</name>
             <openingBalance>-1451.200000</openingBalance>
@@ -50,6 +53,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e624614-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Dinner</name>
             <openingBalance>0.000000</openingBalance>
@@ -63,6 +67,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e62452e-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Grocery</name>
             <openingBalance>0.000000</openingBalance>
@@ -76,6 +81,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e6277c4-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>1234 5678 3456 6789</name>
             <openingBalance>0.000000</openingBalance>
@@ -89,6 +95,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e625d84-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>No.Money</name>
             <openingBalance>0.000000</openingBalance>
@@ -102,6 +109,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e6270da-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Computer games</name>
             <openingBalance>0.000000</openingBalance>
@@ -115,6 +123,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e628f20-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Coffee</name>
             <openingBalance>0.000000</openingBalance>
@@ -128,6 +137,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e62934e-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>2222 3333 4444 5555</name>
             <openingBalance>0.000000</openingBalance>
@@ -141,6 +151,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>3e6213c4-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Electricity Bills</name>
             <openingBalance>0.000000</openingBalance>
@@ -154,6 +165,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>fd93e156-748d-11e7-8cf7-a6006ad3dba0</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>New Account</name>
             <openingBalance>0.000000</openingBalance>
@@ -167,6 +179,7 @@
             <currencyRate>0.000000</currencyRate>
             <enabled>true</enabled>
             <guid>0fd97204-748e-11e7-8cf7-a6006ad3dba0</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>New Account 2</name>
             <openingBalance>0.000000</openingBalance>
@@ -179,6 +192,7 @@
             <comment></comment>
             <expanded>false</expanded>
             <guid>3e6886fa-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Cash</name>
         </Category>
@@ -187,6 +201,7 @@
             <comment></comment>
             <expanded>false</expanded>
             <guid>3e68883a-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Misc</name>
         </Category>
@@ -195,6 +210,7 @@
             <comment></comment>
             <expanded>true</expanded>
             <guid>3e68868c-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Credit cards</name>
         </Category>
@@ -203,6 +219,7 @@
             <comment></comment>
             <expanded>false</expanded>
             <guid>3e6887cc-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Food</name>
         </Category>
@@ -211,6 +228,7 @@
             <comment></comment>
             <expanded>true</expanded>
             <guid>3e6884fc-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Bank2</name>
         </Category>
@@ -219,6 +237,7 @@
             <comment></comment>
             <expanded>false</expanded>
             <guid>3e68903c-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Fictional Money</name>
         </Category>
@@ -227,6 +246,7 @@
             <comment></comment>
             <expanded>true</expanded>
             <guid>3e688326-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Bank1</name>
         </Category>
@@ -235,6 +255,7 @@
             <comment></comment>
             <expanded>false</expanded>
             <guid>3e68861e-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Accounts</name>
         </Category>
@@ -247,6 +268,7 @@
             <email></email>
             <guid>3e6ede06-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Las Torres</name>
             <phone></phone>
@@ -262,6 +284,7 @@
             <email></email>
             <guid>3e6f5282-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Cantina</name>
             <phone></phone>
@@ -277,6 +300,7 @@
             <email></email>
             <guid>3e6ed4ba-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Store</name>
             <phone></phone>
@@ -292,6 +316,7 @@
             <email></email>
             <guid>3e6f322a-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Train Station</name>
             <phone></phone>
@@ -307,6 +332,7 @@
             <email></email>
             <guid>3e6f52d2-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Bar</name>
             <phone></phone>
@@ -322,6 +348,7 @@
             <email></email>
             <guid>3e6f2d98-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Starbucks</name>
             <phone></phone>
@@ -337,6 +364,7 @@
             <email></email>
             <guid>3e6ea3e6-7470-11e7-857e-389c6424842b</guid>
             <mobile></mobile>
+            <created>1000</created>
             <modified>1000</modified>
             <name>Power Station</name>
             <phone></phone>
@@ -354,6 +382,7 @@
             <formatSymbol></formatSymbol>
             <formatSymbolPosition>0</formatSymbolPosition>
             <guid>3e75c388-7470-11e7-857e-389c6424842b</guid>
+            <created>1000</created>
             <modified>1000</modified>
             <rate>1.000000</rate>
             <showFormatSymbol>false</showFormatSymbol>
@@ -378,6 +407,7 @@
             <groupId>0</groupId>
             <guid>3e96ae72-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -400,6 +430,7 @@
             <groupId>0</groupId>
             <guid>3e96b020-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -422,6 +453,7 @@
             <groupId>0</groupId>
             <guid>3e96b066-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -444,6 +476,7 @@
             <groupId>0</groupId>
             <guid>3e96bef8-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -466,6 +499,7 @@
             <groupId>0</groupId>
             <guid>3e96c3bc-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -488,6 +522,7 @@
             <groupId>0</groupId>
             <guid>3e96b12e-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -510,6 +545,7 @@
             <groupId>0</groupId>
             <guid>3e96b232-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -532,6 +568,7 @@
             <groupId>0</groupId>
             <guid>3e96b462-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -554,6 +591,7 @@
             <groupId>0</groupId>
             <guid>3e96b520-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -576,6 +614,7 @@
             <groupId>0</groupId>
             <guid>3e96b5de-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -598,6 +637,7 @@
             <groupId>0</groupId>
             <guid>3e96b836-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -620,6 +660,7 @@
             <groupId>0</groupId>
             <guid>3e96b8f4-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -642,6 +683,7 @@
             <groupId>0</groupId>
             <guid>3e96baca-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -664,6 +706,7 @@
             <groupId>0</groupId>
             <guid>3e96bca0-7470-11e7-857e-389c6424842b</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -686,6 +729,7 @@
             <groupId>0</groupId>
             <guid>a270a6e0-7485-11e7-8cf7-a6006ad3dba0</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -708,6 +752,7 @@
             <groupId>0</groupId>
             <guid>251e8da2-748e-11e7-8cf7-a6006ad3dba0</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>
@@ -731,6 +776,7 @@
             <groupId>0</groupId>
             <guid>251e8da2-748e-11e7-8cf7-a6006ad3dba1</guid>
             <invoiceNumber></invoiceNumber>
+            <created>1000</created>
             <modified>1000</modified>
             <month>7</month>
             <rate>1.000000</rate>

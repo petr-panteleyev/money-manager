@@ -94,16 +94,20 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return category != null ?
-                    category.copy(nameEdit.getText(), commentEdit.getText(),
-                        typeComboBox.getSelectionModel().getSelectedItem().getId()) :
-                    new Category.Builder()
-                        .name(nameEdit.getText())
-                        .comment(commentEdit.getText())
-                        .catTypeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
-                        .guid(UUID.randomUUID().toString())
-                        .modified(System.currentTimeMillis())
-                        .build();
+                long now = System.currentTimeMillis();
+
+                var builder = new Category.Builder(category)
+                    .name(nameEdit.getText())
+                    .comment(commentEdit.getText())
+                    .catTypeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
+                    .modified(now);
+
+                if (category == null) {
+                    builder.guid(UUID.randomUUID())
+                        .created(now);
+                }
+
+                return builder.build();
             } else {
                 return null;
             }

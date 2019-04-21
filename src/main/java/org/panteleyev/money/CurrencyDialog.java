@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -112,7 +112,9 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setResultConverter((ButtonType b) -> {
             if (b == ButtonType.OK) {
-                return new Currency.Builder(currency != null ? currency.getId() : 0)
+                long now = System.currentTimeMillis();
+
+                var builder = new Currency.Builder(currency)
                     .symbol(nameEdit.getText())
                     .description(descrEdit.getText())
                     .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
@@ -122,9 +124,14 @@ final class CurrencyDialog extends BaseDialog<Currency> {
                     .rate(new BigDecimal(rateEdit.getText()))
                     .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
                     .useThousandSeparator(thousandSeparatorCheck.isSelected())
-                    .guid(currency != null ? currency.getGuid() : UUID.randomUUID().toString())
-                    .modified(System.currentTimeMillis())
-                    .build();
+                    .modified(now);
+
+                if (currency == null) {
+                    builder.guid(UUID.randomUUID())
+                        .created(now);
+                }
+
+                return builder.build();
             } else {
                 return null;
             }

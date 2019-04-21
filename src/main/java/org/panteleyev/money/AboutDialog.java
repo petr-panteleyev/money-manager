@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
-    private static final String COPYRIGHT = "Copyright (c) 2016, 2018, Petr Panteleyev";
+    private static final String COPYRIGHT = "Copyright (c) 2016, 2019, Petr Panteleyev";
     private static final String BUILD_INFO = "org.panteleyev.money.res.buildInfo";
 
     AboutDialog() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,6 @@ import java.io.InputStream;
 public final class StatementParser {
     public static Statement parse(Statement.StatementType type, InputStream inStream) {
         switch (type) {
-            case RAIFFEISEN_CREDIT_CARD_CSV:
-                return RBAParser.parseCardCSV(inStream);
-
-            case RAIFFEISEN_ACCOUNT_CSV:
-                return RBAParser.parseAccountCSV(inStream);
-
             case RAIFFEISEN_OFX:
                 return RBAParser.parseOfx(inStream);
 

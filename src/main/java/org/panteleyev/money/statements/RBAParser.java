@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,95 +26,13 @@
 
 package org.panteleyev.money.statements;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.panteleyev.ofx.BankTransactionList;
 import org.panteleyev.ofx.OFXParser;
 import org.panteleyev.ofx.StatementTransaction;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
-import java.nio.charset.Charset;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
 class RBAParser {
-    private static final DateTimeFormatter CSV_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    private static final char CSV_DELIMITER = ';';
-    private static final int CSV_CARD_RECORD_SIZE = 10;
-    private static final int CSV_ACCOUNT_RECORD_SIZE = 6;
-    private static final String CSV_ENCODING = "windows-1251";
-
-    static Statement parseAccountCSV(InputStream inStream) {
-        try {
-            var records = new ArrayList<StatementRecord>();
-            var parser = CSVParser.parse(inStream, Charset.forName(CSV_ENCODING),
-                CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
-
-            for (var r : parser.getRecords()) {
-                if (r.getRecordNumber() == 1L || r.size() < CSV_ACCOUNT_RECORD_SIZE) {
-                    continue;
-                }
-
-                var date = LocalDate.parse(r.get(0), CSV_DATE_FORMAT);
-
-                records.add(new StatementRecord(
-                    date,
-                    date,
-                    r.get(1),
-                    "",
-                    "",
-                    "",
-                    r.get(2),
-                    r.get(3).replaceAll(" ", ""),
-                    r.get(4),
-                    r.get(5).replaceAll(" ", "")
-                ));
-            }
-
-            return new Statement(Statement.StatementType.RAIFFEISEN_ACCOUNT_CSV, null, records);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        } catch (DateTimeParseException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    static Statement parseCardCSV(InputStream inStream) {
-        try {
-            var records = new ArrayList<StatementRecord>();
-            var parser = CSVParser.parse(inStream, Charset.forName(CSV_ENCODING),
-                CSVFormat.EXCEL.withDelimiter(CSV_DELIMITER));
-
-            for (var r : parser.getRecords()) {
-                if (r.getRecordNumber() == 1L || r.size() < CSV_CARD_RECORD_SIZE) {
-                    continue;
-                }
-
-                records.add(new StatementRecord(
-                    LocalDate.parse(r.get(0), CSV_DATE_FORMAT),
-                    LocalDate.parse(r.get(1), CSV_DATE_FORMAT),
-                    r.get(2),
-                    r.get(3),
-                    r.get(4),
-                    r.get(5),
-                    r.get(6),
-                    r.get(7).replaceAll(" ", ""),
-                    r.get(8),
-                    r.get(9).replaceAll(" ", "")
-                ));
-            }
-
-            return new Statement(Statement.StatementType.RAIFFEISEN_CREDIT_CARD_CSV, null, records);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        } catch (DateTimeParseException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     static Statement parseOfx(InputStream inStream) {
         var records = new ArrayList<StatementRecord>();
 

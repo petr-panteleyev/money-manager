@@ -51,8 +51,8 @@ public class BaseTest {
 
     protected static <T extends MoneyRecord> List<T> sortedById(Collection<T> list) {
         return list.stream()
-                .sorted(Comparator.comparingInt(Record::getId))
-                .collect(Collectors.toList());
+            .sorted(Comparator.comparing(MoneyRecord::getGuid))
+            .collect(Collectors.toList());
     }
 
     static void assertEmpty(Collection c) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,10 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.persistence.Record;
+import java.util.UUID;
 
-public interface MoneyRecord extends Record {
-    String getGuid();
+public interface MoneyRecord extends Record<UUID> {
+    UUID getGuid();
+    long getCreated();
     long getModified();
 }

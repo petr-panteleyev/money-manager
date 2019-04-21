@@ -52,6 +52,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.cells.AccountBalanceCell;
+import org.panteleyev.money.cells.AccountInterestCell;
+import org.panteleyev.money.cells.LocalDateCell;
 import org.panteleyev.money.comparators.AccountByCategory;
 import org.panteleyev.money.comparators.AccountByName;
 import org.panteleyev.money.filters.AccountActiveFilter;
@@ -63,15 +65,17 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Currency;
 import org.panteleyev.money.persistence.model.Transaction;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 class AccountsTab extends BorderPane {
     private static class TypeListItem {
@@ -122,28 +126,16 @@ class AccountsTab extends BorderPane {
     private Consumer<Account> accountTransactionsConsumer = x -> { };
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<Integer, Account> accountListener =
-        (MapChangeListener.Change<? extends Integer, ? extends Account> change) ->
+    private final MapChangeListener<UUID, Account> accountListener =
+        (MapChangeListener.Change<? extends UUID, ? extends Account> change) ->
             Platform.runLater(() -> handleAccountMapChange(change));
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<Integer, Transaction> transactionListener =
+    private final MapChangeListener<UUID, Transaction> transactionListener =
         change -> Platform.runLater(tableView::refresh);
 
     AccountsTab() {
-        // Table
-        var nameColumn = new TableColumn<Account, String>(RB.getString("column.Name"));
-        var typeColumn = new TableColumn<Account, String>(RB.getString("column.Type"));
-        var categoryColumn = new TableColumn<Account, String>(RB.getString("column.Category"));
-        var commentColumn = new TableColumn<Account, String>(RB.getString("column.Comment"));
-        var currencyColumn = new TableColumn<Account, String>(RB.getString("column.Currency"));
-        var approvedColumn = new TableColumn<Account, Account>(RB.getString("column.Approved"));
-        var balanceColumn = new TableColumn<Account, Account>(RB.getString("column.Balance"));
-        var waitingColumn = new TableColumn<Account, Account>(RB.getString("column.Waiting"));
-
-        //noinspection unchecked
-        tableView.getColumns().setAll(nameColumn, typeColumn, categoryColumn, commentColumn, currencyColumn,
-            approvedColumn, balanceColumn, waitingColumn);
+        setupTableColumns();
 
         // Context menu
         var addAccountMenuItem = newMenuItem(RB, "menu.Edit.newAccount", event -> onNewAccount());
@@ -198,35 +190,6 @@ class AccountsTab extends BorderPane {
 
         initAccountFilterBox();
 
-        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
-        typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
-        categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(getDao().getCategory(p.getValue().getCategoryId()).map(Category::getName).orElse("")));
-        commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
-        currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(getDao().getCurrency(p.getValue().getCurrencyId()).map(Currency::getSymbol).orElse("")));
-        approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        approvedColumn.setCellFactory((x) -> new AccountBalanceCell(true, Transaction::getChecked));
-        balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        balanceColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> true));
-        waitingColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        waitingColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> !t.getChecked()));
-
-        nameColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.15));
-        typeColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
-        categoryColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
-        commentColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.35));
-        currencyColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
-        approvedColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
-        balanceColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
-        waitingColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
-
         showDeactivatedAccountsCheckBox.setSelected(Options.getShowDeactivatedAccounts());
         showDeactivatedAccountsCheckBox.setOnAction(event -> onShowDeactivatedAccounts());
 
@@ -253,6 +216,66 @@ class AccountsTab extends BorderPane {
                 Platform.runLater(this::initAccountList);
             }
         });
+    }
+
+    private void setupTableColumns() {
+        // Table
+        var nameColumn = new TableColumn<Account, String>(RB.getString("column.Name"));
+        var categoryColumn = new TableColumn<Account, String>(RB.getString("column.Category"));
+        var commentColumn = new TableColumn<Account, String>(RB.getString("column.Comment"));
+        var currencyColumn = new TableColumn<Account, String>(RB.getString("column.Currency"));
+        var approvedColumn = new TableColumn<Account, Account>(RB.getString("column.Approved"));
+        var balanceColumn = new TableColumn<Account, Account>(RB.getString("column.Balance"));
+        var waitingColumn = new TableColumn<Account, Account>(RB.getString("column.Waiting"));
+        var interestColumn = new TableColumn<Account, BigDecimal>("%%");
+        var closingDateColumn = new TableColumn<Account, LocalDate>(RB.getString("column.closing.date"));
+
+        //noinspection unchecked
+        tableView.getColumns().setAll(
+            nameColumn,
+            categoryColumn,
+            currencyColumn,
+            interestColumn,
+            closingDateColumn,
+            commentColumn,
+            approvedColumn,
+            balanceColumn,
+            waitingColumn
+        );
+
+        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
+        categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
+            new ReadOnlyObjectWrapper<>(getDao().getCategory(p.getValue().getCategoryUuid()).map(Category::getName).orElse("")));
+        commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
+        currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
+            new ReadOnlyObjectWrapper<>(getDao().getCurrency(p.getValue().getCurrencyUuid().orElse(null)).map(Currency::getSymbol).orElse("")));
+        approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        approvedColumn.setCellFactory((x) -> new AccountBalanceCell(true, Transaction::getChecked));
+        balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        balanceColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> true));
+        waitingColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        waitingColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> !t.getChecked()));
+        interestColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, BigDecimal> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue().getInterest()));
+        interestColumn.setCellFactory((x) -> new AccountInterestCell());
+        closingDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, LocalDate> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue().getClosingDate().orElse(null)));
+        closingDateColumn.setCellFactory((x) -> new LocalDateCell<>());
+
+        nameColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.15));
+        categoryColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
+        commentColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.32));
+        currencyColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
+        approvedColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
+        balanceColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
+        waitingColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
+        interestColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.03));
+        closingDateColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
     }
 
     private void initAccountFilterBox() {
@@ -316,11 +339,10 @@ class AccountsTab extends BorderPane {
     }
 
     private void onNewAccount() {
-        Category initialCategory = getSelectedAccount().map(account -> getDao().getCategory(account.getCategoryId())
+        Category initialCategory = getSelectedAccount().map(account -> getDao().getCategory(account.getCategoryUuid())
             .orElse(null)).orElse(null);
 
-        new AccountDialog(initialCategory).showAndWait().ifPresent(it ->
-            getDao().insertAccount(it.copy(getDao().generatePrimaryKey(dtoClass(Account.class)))));
+        new AccountDialog(initialCategory).showAndWait().ifPresent(it -> getDao().insertAccount(it));
     }
 
     private void onEditAccount() {
@@ -363,7 +385,7 @@ class AccountsTab extends BorderPane {
     }
 
     // Must be executed in UI thread
-    private void handleAccountMapChange(MapChangeListener.Change<? extends Integer, ? extends Account> change) {
+    private void handleAccountMapChange(MapChangeListener.Change<? extends UUID, ? extends Account> change) {
         var removedAccount = change.getValueRemoved();
         var addedAccount = change.getValueAdded();
         if (removedAccount == null && addedAccount == null) {

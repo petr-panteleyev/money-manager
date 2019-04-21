@@ -106,19 +106,21 @@
     <xsd:complexType name="Account">
         <xsd:all>
             <xsd:element name="accountLimit" type="xsd:decimal"/>
-            <xsd:element name="categoryId" type="Id"/>
+            <xsd:element name="categoryUuid" type="UUID"/>
             <xsd:element name="comment" type="xsd:string"/>
             <xsd:element name="accountNumber" type="xsd:string"/>
-            <xsd:element name="currencyId" type="OptionalId"/>
+            <xsd:element name="currencyUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="currencyRate" type="xsd:decimal"/>
             <xsd:element name="enabled" type="xsd:boolean"/>
             <xsd:element name="name" type="xsd:string"/>
             <xsd:element name="openingBalance" type="xsd:decimal"/>
             <xsd:element name="typeId" type="CategoryType"/>
+            <xsd:element name="interest" type="xsd:decimal"/>
+            <xsd:element name="closingDate" type="Timestamp"/>
             <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
         </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
     <xsd:complexType name="Category">
@@ -127,9 +129,9 @@
             <xsd:element name="catTypeId" type="CategoryType"/>
             <xsd:element name="comment" type="xsd:string"/>
             <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
         </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
     <xsd:complexType name="Contact">
@@ -146,9 +148,9 @@
             <xsd:element name="country" type="xsd:string"/>
             <xsd:element name="zip" type="xsd:string"/>
             <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
         </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
     <xsd:complexType name="Currency">
@@ -163,23 +165,23 @@
             <xsd:element name="symbol" type="xsd:string"/>
             <xsd:element name="useThousandSeparator" type="xsd:boolean"/>
             <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
         </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
     <xsd:complexType name="Transaction">
         <xsd:all>
-            <xsd:element name="accountCreditedCategoryId" type="Id"/>
-            <xsd:element name="accountCreditedId" type="Id"/>
+            <xsd:element name="accountCreditedCategoryUuid" type="UUID"/>
+            <xsd:element name="accountCreditedUuid" type="UUID"/>
             <xsd:element name="accountCreditedTypeId" type="CategoryType"/>
-            <xsd:element name="accountDebitedCategoryId" type="Id"/>
-            <xsd:element name="accountDebitedId" type="Id"/>
+            <xsd:element name="accountDebitedCategoryUuid" type="UUID"/>
+            <xsd:element name="accountDebitedUuid" type="UUID"/>
             <xsd:element name="accountDebitedTypeId" type="CategoryType"/>
             <xsd:element name="amount" type="xsd:decimal"/>
             <xsd:element name="checked" type="xsd:boolean"/>
             <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="contactId" type="OptionalId"/>
+            <xsd:element name="contactUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="day" type="Day"/>
             <xsd:element name="invoiceNumber" type="xsd:string"/>
             <xsd:element name="month" type="Month"/>
@@ -188,11 +190,11 @@
             <xsd:element name="transactionTypeId" type="TransactionType"/>
             <xsd:element name="year" type="Year"/>
             <xsd:element name="guid" type="UUID"/>
+            <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
-            <xsd:element name="parentId" type="OptionalId"/>
+            <xsd:element name="parentUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="detailed" type="xsd:boolean"/>
         </xsd:all>
-        <xsd:attribute name="id" type="Id"/>
     </xsd:complexType>
 
     <xsd:simpleType name="UUID">
@@ -261,18 +263,6 @@
             <xsd:enumeration value="18"/>
             <xsd:enumeration value="20"/>
             <xsd:enumeration value="21"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="OptionalId">
-        <xsd:restriction base="xsd:int">
-            <xsd:minInclusive value="0"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-
-    <xsd:simpleType name="Id">
-        <xsd:restriction base="xsd:int">
-            <xsd:minInclusive value="1"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,45 +45,45 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.ContactType;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 class ContactListWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
     private final TableView<Contact> contactTable = new TableView<>();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private MapChangeListener<Integer, Contact> contactsListener = change ->
-            Platform.runLater(this::reloadContacts);
+    private MapChangeListener<UUID, Contact> contactsListener = change ->
+        Platform.runLater(this::reloadContacts);
 
 
     ContactListWindowController() {
-        EventHandler<ActionEvent> addHandler = event -> openContactDialog(null);
-        EventHandler<ActionEvent> editHandler = event -> getSelectedContact().ifPresent(this::openContactDialog);
+        EventHandler<ActionEvent> addHandler = event -> onAddContact();
+        EventHandler<ActionEvent> editHandler = event -> onEditContact();
 
         var disableBinding = contactTable.getSelectionModel().selectedItemProperty().isNull();
 
         // Menu bar
         var menuBar = newMenuBar(
-                new Menu(RB.getString("menu.File"), null,
-                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
-                new Menu(RB.getString("menu.Edit"), null,
-                        newMenuItem(RB, "menu.Edit.Add", addHandler),
-                        newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
-                createHelpMenu(RB));
+            new Menu(RB.getString("menu.File"), null,
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            new Menu(RB.getString("menu.Edit"), null,
+                newMenuItem(RB, "menu.Edit.Add", addHandler),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+            createHelpMenu(RB));
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-                newMenuItem(RB, "menu.Edit.Add", addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
+            newMenuItem(RB, "menu.Edit.Add", addHandler),
+            newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
         var pane = new BorderPane();
@@ -123,13 +123,13 @@ class ContactListWindowController extends BaseController {
         typeChoiceBox.valueProperty().addListener((x, y, newValue) -> onTypeChanged(newValue));
 
         nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getName()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
         phoneColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getPhone()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getPhone()));
         emailColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getEmail()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getEmail()));
 
         reloadContacts();
         getDao().contacts().addListener(new WeakMapChangeListener<>(contactsListener));
@@ -160,20 +160,19 @@ class ContactListWindowController extends BaseController {
         }
     }
 
-    private void openContactDialog(Contact contact) {
-        new ContactDialog(contact).showAndWait()
-                .ifPresent(c -> {
-                    if (c.getId() != 0) {
-                        getDao().updateContact(c);
-                    } else {
-                        getDao().insertContact(c.copy(getDao().generatePrimaryKey(dtoClass(Contact.class))));
-                    }
-                });
+    private void onAddContact() {
+        new ContactDialog(null).showAndWait()
+            .ifPresent(c -> getDao().insertContact(c));
+    }
+
+    private void onEditContact() {
+        getSelectedContact().ifPresent(selected ->
+            new ContactDialog(selected).showAndWait().ifPresent(c -> getDao().updateContact(c)));
     }
 
     private void onTableMouseClick(Event event) {
         if (((MouseEvent) event).getClickCount() == 2) {
-            getSelectedContact().ifPresent(this::openContactDialog);
+            onEditContact();
         }
     }
 }

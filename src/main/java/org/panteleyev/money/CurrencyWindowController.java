@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,12 +40,13 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.persistence.model.Currency;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
-import static org.panteleyev.money.persistence.dto.Dto.dtoClass;
 
 final class CurrencyWindowController extends BaseController {
     private final ObservableList<Currency> currencyList = FXCollections.observableArrayList();
@@ -53,27 +54,27 @@ final class CurrencyWindowController extends BaseController {
     private final TableView<Currency> table = new TableView<>();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<Integer, Currency> currencyListener = change ->
-            Platform.runLater(() -> onCurrencyUpdate(change));
+    private final MapChangeListener<UUID, Currency> currencyListener = change ->
+        Platform.runLater(() -> onCurrencyUpdate(change));
 
     CurrencyWindowController() {
-        EventHandler<ActionEvent> addHandler = event -> openCurrencyDialog(null);
-        EventHandler<ActionEvent> editHandler = event -> getSelectedCurrency().ifPresent(this::openCurrencyDialog);
+        EventHandler<ActionEvent> addHandler = event -> onAddCurrency();
+        EventHandler<ActionEvent> editHandler = event -> onEditCurrency();
 
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = newMenuBar(
-                new Menu(RB.getString("menu.File"), null,
-                        newMenuItem(RB, "menu.File.Close", event -> onClose())),
-                new Menu(RB.getString("menu.Edit"), null,
-                        newMenuItem(RB, "menu.Edit.Add", addHandler),
-                        newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
-                createHelpMenu(RB));
+            new Menu(RB.getString("menu.File"), null,
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            new Menu(RB.getString("menu.Edit"), null,
+                newMenuItem(RB, "menu.Edit.Add", addHandler),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+            createHelpMenu(RB));
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-                newMenuItem(RB, "menu.Edit.Add", addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
+            newMenuItem(RB, "menu.Edit.Add", addHandler),
+            newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
         var colName = new TableColumn<Currency, String>(RB.getString("column.Name"));
@@ -105,26 +106,25 @@ final class CurrencyWindowController extends BaseController {
         return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
     }
 
-    private void openCurrencyDialog(Currency currency) {
-        new CurrencyDialog(currency).showAndWait().ifPresent(c -> {
-            if (c.getId() != 0) {
-                getDao().updateCurrency(c);
-            } else {
-                getDao().insertCurrency(c.copy(getDao().generatePrimaryKey(dtoClass(Currency.class))));
-            }
-        });
+    private void onAddCurrency() {
+        new CurrencyDialog(null).showAndWait().ifPresent(c -> getDao().insertCurrency(c));
     }
 
-    private void onCurrencyUpdate(MapChangeListener.Change<? extends Integer, ? extends Currency> change) {
+    private void onEditCurrency() {
+        getSelectedCurrency().ifPresent(selected ->
+            new CurrencyDialog(selected).showAndWait().ifPresent(c -> getDao().insertCurrency(c)));
+    }
+
+    private void onCurrencyUpdate(MapChangeListener.Change<? extends UUID, ? extends Currency> change) {
         if (change.wasAdded()) {
             var currency = change.getValueAdded();
 
             // find if we have item with this id
             int index = currencyList.stream()
-                    .filter(c -> c.getId() == currency.getId())
-                    .findFirst()
-                    .map(currencyList::indexOf)
-                    .orElse(-1);
+                .filter(c -> Objects.equals(c.getGuid(), currency.getGuid()))
+                .findFirst()
+                .map(currencyList::indexOf)
+                .orElse(-1);
 
             if (index != -1) {
                 currencyList.remove(index);

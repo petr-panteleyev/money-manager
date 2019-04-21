@@ -26,50 +26,56 @@
 
 package org.panteleyev.money.persistence.model;
 
+import org.panteleyev.persistence.annotations.Column;
+import org.panteleyev.persistence.annotations.PrimaryKey;
+import org.panteleyev.persistence.annotations.RecordBuilder;
+import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
 import java.util.UUID;
 
+@Table("category")
 public final class Category implements MoneyRecord, Named {
-    private final int id;
+    @PrimaryKey
+    @Column("uuid")
+    private final UUID guid;
+
+    @Column("name")
     private final String name;
+
+    @Column("comment")
     private final String comment;
+
+    @Column("cat_type_id")
     private final int catTypeId;
-    private final String guid;
+
+    @Column("created")
+    private final long created;
+
+    @Column("modified")
     private final long modified;
 
     private final CategoryType type;
 
-    private Category(int id, String name, String comment, int catTypeId, String guid, long modified) {
-        this.id = id;
+    @RecordBuilder
+    public Category(@Column("name") String name,
+                    @Column("comment") String comment,
+                    @Column("cat_type_id") int catTypeId,
+                    @Column("uuid") UUID guid,
+                    @Column("created") long created,
+                    @Column("modified") long modified)
+    {
         this.name = name;
         this.comment = comment;
         this.catTypeId = catTypeId;
         this.guid = guid;
+        this.created = created;
         this.modified = modified;
 
         this.type = CategoryType.get(this.catTypeId);
     }
 
-    public Category copy(String newName, String newComment, int newCatTypeId) {
-        return new Builder(this)
-            .name(newName)
-            .comment(newComment)
-            .catTypeId(newCatTypeId)
-            .modified(System.currentTimeMillis())
-            .build();
-    }
-
     public CategoryType getType() {
         return type;
-    }
-
-    public Category copy(int newId) {
-        return new Builder(this).id(newId).build();
-    }
-
-    @Override
-    public int getId() {
-        return id;
     }
 
     @Override
@@ -86,8 +92,13 @@ public final class Category implements MoneyRecord, Named {
     }
 
     @Override
-    public String getGuid() {
+    public UUID getGuid() {
         return guid;
+    }
+
+    @Override
+    public long getCreated() {
+        return created;
     }
 
     @Override
@@ -97,7 +108,7 @@ public final class Category implements MoneyRecord, Named {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, comment, catTypeId, guid, modified);
+        return Objects.hash(name, comment, catTypeId, guid, created, modified);
     }
 
     @Override
@@ -112,27 +123,23 @@ public final class Category implements MoneyRecord, Named {
 
         Category that = (Category) other;
 
-        return this.id == that.id
-            && Objects.equals(this.name, that.name)
+        return Objects.equals(this.name, that.name)
             && Objects.equals(this.comment, that.comment)
             && this.catTypeId == that.catTypeId
             && Objects.equals(this.guid, that.guid)
+            && this.created == that.created
             && this.modified == that.modified;
     }
 
     public static class Builder {
-        private int id = 0;
         private String name = "";
         private String comment = "";
         private int catTypeId = 0;
-        private String guid = null;
+        private UUID guid = null;
+        private long created = 0L;
         private long modified = 0L;
 
         public Builder() {
-        }
-
-        public Builder(int id) {
-            this.id = id;
         }
 
         public Builder(Category c) {
@@ -140,29 +147,28 @@ public final class Category implements MoneyRecord, Named {
                 return;
             }
 
-            id = c.getId();
             name = c.getName();
             comment = c.getComment();
             catTypeId = c.getCatTypeId();
             guid = c.getGuid();
+            created = c.getCreated();
             modified = c.getModified();
         }
 
         public Category build() {
             if (guid == null) {
-                guid = UUID.randomUUID().toString();
+                guid = UUID.randomUUID();
             }
 
+            long now = System.currentTimeMillis();
+            if (created == 0) {
+                created = now;
+            }
             if (modified == 0) {
-                modified = System.currentTimeMillis();
+                modified = now;
             }
 
-            return new Category(id, name, comment, catTypeId, guid, modified);
-        }
-
-        public Builder id(int id) {
-            this.id = id;
-            return this;
+            return new Category(name, comment, catTypeId, guid, created, modified);
         }
 
         public Builder name(String name) {
@@ -183,8 +189,13 @@ public final class Category implements MoneyRecord, Named {
             return this;
         }
 
-        public Builder guid(String guid) {
+        public Builder guid(UUID guid) {
             this.guid = guid;
+            return this;
+        }
+
+        public Builder created(long created) {
+            this.created = created;
             return this;
         }
 

@@ -30,16 +30,18 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 class StatementPredicate implements Predicate<Transaction> {
-    private final int accountId;
+    private final UUID accountUuid;
     private final StatementRecord record;
     private final boolean ignoreExecutionDate;
 
     StatementPredicate(Account account, StatementRecord record, boolean ignoreExecutionDate) {
-        this.accountId = account == null ? 0 : account.getId();
+        this.accountUuid = account == null ? null : account.getGuid();
         this.record = record;
         this.ignoreExecutionDate = ignoreExecutionDate;
     }
@@ -50,27 +52,27 @@ class StatementPredicate implements Predicate<Transaction> {
             return false;
         }
 
-        var result = (transaction.getAccountDebitedId() == accountId
-                || transaction.getAccountCreditedId() == accountId)
-                && (compareDate(record.getActual(), transaction)
-                || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));
+        var result = (Objects.equals(transaction.getAccountDebitedUuid(), accountUuid)
+            || Objects.equals(transaction.getAccountCreditedUuid(), accountUuid))
+            && (compareDate(record.getActual(), transaction)
+            || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));
 
         result = result && (compareAmount(record.getAmountDecimal(), transaction)
-                || compareAmount(record.getAccountAmountDecimal(), transaction));
+            || compareAmount(record.getAccountAmountDecimal(), transaction));
 
         return result;
     }
 
     private boolean compareDate(LocalDate date, Transaction transaction) {
         return transaction.getDay() == date.getDayOfMonth()
-                && transaction.getMonth() == date.getMonthValue()
-                && transaction.getYear() == date.getYear();
+            && transaction.getMonth() == date.getMonthValue()
+            && transaction.getYear() == date.getYear();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private boolean compareAmount(Optional<BigDecimal> amount, Transaction transaction) {
         return amount.map(BigDecimal::abs)
-                .map(a -> a.compareTo(transaction.getAmount()) == 0)
-                .orElse(false);
+            .map(a -> a.compareTo(transaction.getAmount()) == 0)
+            .orElse(false);
     }
 }

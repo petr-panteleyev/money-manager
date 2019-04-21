@@ -31,7 +31,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public enum TransactionFilter {
@@ -113,12 +115,14 @@ public enum TransactionFilter {
         return description;
     }
 
-    public static Predicate<Transaction> byAccount(int id) {
-        return it -> it.getAccountDebitedId() == id || it.getAccountCreditedId() == id;
+    public static Predicate<Transaction> byAccount(UUID uuid) {
+        return it -> Objects.equals(it.getAccountDebitedUuid(), uuid)
+            || Objects.equals(it.getAccountCreditedUuid(), uuid);
     }
 
-    public static Predicate<Transaction> byCategory(int id) {
-        return it -> it.getAccountDebitedCategoryId() == id || it.getAccountCreditedCategoryId() == id;
+    public static Predicate<Transaction> byCategory(UUID uuid) {
+        return it -> Objects.equals(it.getAccountDebitedCategoryUuid(), uuid)
+            || Objects.equals(it.getAccountCreditedCategoryUuid(), uuid);
     }
 
     public static Predicate<Transaction> byCategoryType(int id) {

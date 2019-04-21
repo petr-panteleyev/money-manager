@@ -28,16 +28,14 @@ package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.money.BaseTest;
 import org.testng.annotations.Test;
-import static org.panteleyev.money.BaseTestUtils.RANDOM;
+import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.randomContactType;
-import static org.panteleyev.money.BaseTestUtils.randomId;
 import static org.panteleyev.money.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestContact extends BaseTest {
     @Test
     public void testEquals() {
-        var id = randomId();
         var name = randomString();
         var type = randomContactType();
         var phone = randomString();
@@ -49,10 +47,11 @@ public class TestContact extends BaseTest {
         var city = randomString();
         var country = randomString();
         var zip = randomString();
-        var uuid = randomString();
+        var uuid = UUID.randomUUID();
+        var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
 
-        var c1 = new Contact.Builder(id)
+        var c1 = new Contact.Builder()
             .name(name)
             .typeId(type.getId())
             .phone(phone)
@@ -65,10 +64,11 @@ public class TestContact extends BaseTest {
             .country(country)
             .zip(zip)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
-        var c2 = new Contact.Builder(id)
+        var c2 = new Contact.Builder()
             .name(name)
             .typeId(type.getId())
             .phone(phone)
@@ -81,6 +81,7 @@ public class TestContact extends BaseTest {
             .country(country)
             .zip(zip)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
@@ -90,7 +91,7 @@ public class TestContact extends BaseTest {
 
     @Test
     public void testBuilder() {
-        var original = new Contact.Builder(randomId())
+        var original = new Contact.Builder()
             .name(randomString())
             .typeId(randomContactType().getId())
             .phone(randomString())
@@ -102,15 +103,16 @@ public class TestContact extends BaseTest {
             .city(randomString())
             .country(randomString())
             .zip(randomString())
-            .guid(randomString())
-            .modified(RANDOM.nextLong())
+            .guid(UUID.randomUUID())
+            .created(System.currentTimeMillis())
+            .modified(System.currentTimeMillis())
             .build();
 
         var copy = new Contact.Builder(original).build();
         assertEquals(copy, original);
         assertEquals(copy.hashCode(), original.hashCode());
 
-        var manualCopy = new Contact.Builder(original.getId())
+        var manualCopy = new Contact.Builder()
             .name(original.getName())
             .typeId(original.getTypeId())
             .phone(original.getPhone())
@@ -123,6 +125,7 @@ public class TestContact extends BaseTest {
             .country(original.getCountry())
             .zip(original.getZip())
             .guid(original.getGuid())
+            .created(original.getCreated())
             .modified(original.getModified())
             .build();
         assertEquals(manualCopy, original);

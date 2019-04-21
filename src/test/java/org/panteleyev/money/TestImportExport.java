@@ -46,7 +46,6 @@ import static org.panteleyev.money.BaseTestUtils.newCategory;
 import static org.panteleyev.money.BaseTestUtils.newContact;
 import static org.panteleyev.money.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.BaseTestUtils.newTransaction;
-import static org.panteleyev.money.BaseTestUtils.randomId;
 
 /**
  * This test covers XML export/import without database interaction.
@@ -60,9 +59,9 @@ public class TestImportExport extends BaseTest {
     private final Currency curr2 = newCurrency();
     private final Currency curr3 = newCurrency();
 
-    private final Account acc1 = newAccount(randomId(), cat1, curr1);
-    private final Account acc2 = newAccount(randomId(), cat2, curr1);
-    private final Account acc3 = newAccount(randomId(), cat3, curr3);
+    private final Account acc1 = newAccount(cat1, curr1);
+    private final Account acc2 = newAccount(cat2, curr1);
+    private final Account acc3 = newAccount(cat3, curr3);
 
     private final Contact con1 = newContact();
     private final Contact con2 = newContact();
@@ -77,12 +76,11 @@ public class TestImportExport extends BaseTest {
         .detailed(true)
         .build();
     private final Transaction detail1 = new Transaction.Builder(newTransaction(acc2, acc1, con1))
-        .parentId(detailedTransaction.getId())
+        .parentUuid(detailedTransaction.getGuid())
         .build();
     private final Transaction detail2 = new Transaction.Builder(newTransaction(acc2, acc3))
-        .parentId(detailedTransaction.getId())
+        .parentUuid(detailedTransaction.getGuid())
         .build();
-
 
     private final MoneyDAOMock mock = new MoneyDAOMock(
         List.of(cat1, cat2, cat3),
@@ -100,11 +98,14 @@ public class TestImportExport extends BaseTest {
                 List.of(), List.of(), List.of(), List.of(), List.of()
             },
             {
-                List.of(newCategory(), newCategory()),
-                List.of(newAccount(), newAccount(), newAccount()),
-                List.of(newContact(), newContact(), newContact(randomId(), "A & B <some@email.com>")),
+                List.of(cat1, cat2),
+                List.of(acc1, acc2, acc3),
+                List.of(newContact(), newContact(), newContact("A & B <some@email.com>")),
                 List.of(newCurrency(), newCurrency(), newCurrency()),
-                List.of(newTransaction(), newTransaction(), newTransaction(), newTransaction())
+                List.of(newTransaction(acc1, acc2),
+                    newTransaction(acc2, acc3),
+                    newTransaction(acc1, acc3),
+                    newTransaction(acc1, acc2))
             }
         };
     }

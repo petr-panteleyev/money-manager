@@ -30,32 +30,33 @@ import org.panteleyev.money.BaseTest;
 import org.testng.annotations.Test;
 import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.BaseTestUtils.randomId;
 import static org.panteleyev.money.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestCategory extends BaseTest {
     @Test
     public void testEquals() {
-        var id = randomId();
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
         var type = randomCategoryType();
-        var uuid = UUID.randomUUID().toString();
+        var uuid = UUID.randomUUID();
+        var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
 
-        var c1 = new Category.Builder(id)
+        var c1 = new Category.Builder()
             .name(name)
             .comment(comment)
             .catTypeId(type.getId())
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
-        var c2 = new Category.Builder(id)
+        var c2 = new Category.Builder()
             .name(name)
             .comment(comment)
             .catTypeId(type.getId())
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
@@ -65,11 +66,12 @@ public class TestCategory extends BaseTest {
 
     @Test
     public void testBuilder() {
-        var original = new Category.Builder(randomId())
+        var original = new Category.Builder()
             .name(randomString())
             .comment(randomString())
             .catTypeId(randomCategoryType().getId())
-            .guid(randomString())
+            .guid(UUID.randomUUID())
+            .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -77,11 +79,11 @@ public class TestCategory extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Category.Builder()
-            .id(original.getId())
             .name(original.getName())
             .comment(original.getComment())
             .catTypeId(original.getCatTypeId())
             .guid(original.getGuid())
+            .created(original.getCreated())
             .modified(original.getModified())
             .build();
         assertEquals(manualCopy, original);

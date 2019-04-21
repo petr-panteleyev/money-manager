@@ -46,6 +46,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -72,7 +73,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var accountCreditedColumn = new TableColumn<TransactionDetail, String>(RB.getString("column.Account.Credited"));
         accountCreditedColumn.setCellValueFactory((TableColumn.CellDataFeatures<TransactionDetail, String> p) ->
-            new ReadOnlyObjectWrapper<>(getDao().getAccount(p.getValue().getAccountCreditedId()).map(Account::getName)
+            new ReadOnlyObjectWrapper<>(getDao().getAccount(p.getValue().getAccountCreditedUuid()).map(Account::getName)
                 .orElse("")));
         accountCreditedColumn.setSortable(false);
 
@@ -145,7 +146,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     @Override
     public void updateRecord(TransactionDetail detail) {
         for (int index = 0; index < details.size(); index++) {
-            if (details.get(index).getId() == detail.getId()) {
+            if (Objects.equals(details.get(index).getUuid(), detail.getUuid())) {
                 details.set(index, detail);
                 calculateDelta();
                 return;
@@ -156,7 +157,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     @Override
     public void deleteRecord(TransactionDetail detail) {
         for (var index = 0; index < details.size(); index++) {
-            if (details.get(index).getId() == detail.getId()) {
+            if (Objects.equals(details.get(index).getUuid(), detail.getUuid())) {
                 details.remove(index);
                 detailsTable.getSelectionModel().clearSelection();
                 calculateDelta();

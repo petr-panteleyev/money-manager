@@ -36,6 +36,6 @@ public class LocalDateCell<T> extends TableCell<T, LocalDate> {
     @Override
     public void updateItem(LocalDate date, boolean empty) {
         super.updateItem(date, empty);
-        setText(empty || date == null ? "" : FORMATTER.format(date));
+        setText(empty || date == null || LocalDate.EPOCH.equals(date)? "" : FORMATTER.format(date));
     }
 }

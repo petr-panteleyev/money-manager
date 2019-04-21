@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.persistence.model.Account;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 public enum AccountFilter {
@@ -43,12 +45,12 @@ public enum AccountFilter {
         return predicate;
     }
 
-    public static Predicate<Account> byAccount(int id) {
-        return it -> it.getId() == id;
+    public static Predicate<Account> byAccount(UUID uuid) {
+        return it -> Objects.equals(it.getGuid(), uuid);
     }
 
-    public static Predicate<Account> byCategory(int id) {
-        return it -> it.getCategoryId() == id;
+    public static Predicate<Account> byCategory(UUID uuid) {
+        return it -> Objects.equals(it.getCategoryUuid(), uuid);
     }
 
     public static Predicate<Account> byCategoryType(int id) {

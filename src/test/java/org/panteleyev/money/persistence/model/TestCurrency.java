@@ -32,14 +32,11 @@ import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.BaseTestUtils.randomId;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 
 public class TestCurrency extends BaseTest {
     @Test
     public void testEquals() {
-        var id = randomId();
         var symbol = UUID.randomUUID().toString();
         var description = UUID.randomUUID().toString();
         var formatSymbol = UUID.randomUUID().toString();
@@ -49,10 +46,11 @@ public class TestCurrency extends BaseTest {
         var rate = randomBigDecimal();
         var direction = RANDOM.nextInt();
         var useSeparator = RANDOM.nextBoolean();
-        var uuid = UUID.randomUUID().toString();
+        var uuid = UUID.randomUUID();
+        var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
 
-        var c1 = new Currency.Builder(id)
+        var c1 = new Currency.Builder()
             .symbol(symbol)
             .description(description)
             .formatSymbol(formatSymbol)
@@ -63,10 +61,11 @@ public class TestCurrency extends BaseTest {
             .direction(direction)
             .useThousandSeparator(useSeparator)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
-        var c2 = new Currency.Builder(id)
+        var c2 = new Currency.Builder()
             .symbol(symbol)
             .description(description)
             .formatSymbol(formatSymbol)
@@ -77,32 +76,12 @@ public class TestCurrency extends BaseTest {
             .direction(direction)
             .useThousandSeparator(useSeparator)
             .guid(uuid)
+            .created(created)
             .modified(modified)
             .build();
 
         assertEquals(c1, c2);
         assertEquals(c1.hashCode(), c2.hashCode());
-    }
-
-    @Test
-    public void testCopy() {
-        var currency = newCurrency();
-
-        var newId = randomId();
-        var copy = currency.copy(newId);
-
-        assertNotEquals(currency, copy);
-
-        assertNotEquals(currency.getId(), copy.getId());
-        assertEquals(currency.getSymbol(), copy.getSymbol());
-        assertEquals(currency.getDescription(), copy.getDescription());
-        assertEquals(currency.getDef(), copy.getDef());
-        assertEquals(currency.getFormatSymbol(), copy.getFormatSymbol());
-        assertEquals(currency.getDirection(), copy.getDirection());
-        assertEquals(currency.getFormatSymbolPosition(), copy.getFormatSymbolPosition());
-        assertEquals(currency.getGuid(), copy.getGuid());
-        assertEquals(currency.getModified(), copy.getModified());
-        assertEquals(currency.getRate(), copy.getRate());
     }
 
     @Test
@@ -113,7 +92,6 @@ public class TestCurrency extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Currency.Builder()
-            .id(original.getId())
             .symbol(original.getSymbol())
             .description(original.getDescription())
             .formatSymbol(original.getFormatSymbol())
@@ -124,6 +102,7 @@ public class TestCurrency extends BaseTest {
             .direction(original.getDirection())
             .useThousandSeparator(original.getUseThousandSeparator())
             .guid(original.getGuid())
+            .created(original.getCreated())
             .modified(original.getModified())
             .build();
         assertEquals(manualCopy, original);

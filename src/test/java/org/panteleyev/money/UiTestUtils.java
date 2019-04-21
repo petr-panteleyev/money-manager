@@ -24,18 +24,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.comparators;
+package org.panteleyev.money;
 
-import org.panteleyev.money.persistence.model.Account;
-import org.panteleyev.money.persistence.model.Category;
-import java.util.Comparator;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import java.lang.reflect.Field;
 
-public class AccountByCategory implements Comparator<Account> {
-    @Override
-    public int compare(Account a1, Account a2) {
-        var c1 = getDao().getCategory(a1.getCategoryUuid()).map(Category::getName).orElse("");
-        var c2 = getDao().getCategory(a2.getCategoryUuid()).map(Category::getName).orElse("");
-        return c1.compareTo(c2);
+class UiTestUtils {
+
+    static <T> T getControl(Object pane, String name) {
+        try {
+            Field f = pane.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            return (T) f.get(pane);
+        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    static TextField getTextField(Object pane, String name) {
+        return getControl(pane, name);
+    }
+
+    static CheckBox getCheckBox(Object pane, String name) {
+        return getControl(pane, name);
+    }
+
+    static <T> ComboBox<T> getComboBox(Object parent, String name) {
+        return getControl(parent, name);
+    }
+
+    static <T> ChoiceBox<T> getChoiceBox(Object parent, String name) {
+        return getControl(parent, name);
+    }
+
+    static TextArea getTextArea(Object parent, String name) {
+        return getControl(parent, name);
     }
 }

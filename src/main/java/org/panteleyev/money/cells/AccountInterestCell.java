@@ -24,18 +24,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.comparators;
+package org.panteleyev.money.cells;
 
+import javafx.geometry.Pos;
+import javafx.scene.control.TableCell;
 import org.panteleyev.money.persistence.model.Account;
-import org.panteleyev.money.persistence.model.Category;
-import java.util.Comparator;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
-public class AccountByCategory implements Comparator<Account> {
+public class AccountInterestCell extends TableCell<Account, BigDecimal> {
     @Override
-    public int compare(Account a1, Account a2) {
-        var c1 = getDao().getCategory(a1.getCategoryUuid()).map(Category::getName).orElse("");
-        var c2 = getDao().getCategory(a2.getCategoryUuid()).map(Category::getName).orElse("");
-        return c1.compareTo(c2);
+    public void updateItem(BigDecimal interest, boolean empty) {
+        super.updateItem(interest, empty);
+
+        setAlignment(Pos.CENTER_RIGHT);
+
+        if (empty || interest == null || interest.compareTo(BigDecimal.ZERO) == 0) {
+            setText("");
+        } else {
+            setText(interest.setScale(2, RoundingMode.HALF_UP).toString() + "%");
+        }
     }
 }

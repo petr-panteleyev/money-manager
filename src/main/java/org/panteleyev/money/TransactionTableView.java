@@ -58,6 +58,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
@@ -117,21 +118,9 @@ public class TransactionTableView extends TableView<Transaction> {
         dayColumn.setSortable(true);
 
         if (mode.isFullDate()) {
-            dayColumn.comparatorProperty().set((o1, o2) -> {
-                int res = o1.getYear() - o2.getYear();
-                if (res != 0) {
-                    return res;
-                } else {
-                    res = o1.getMonth() - o2.getMonth();
-                    if (res != 0) {
-                        return res;
-                    } else {
-                        return o1.getDay() - o2.getDay();
-                    }
-                }
-            });
+            dayColumn.comparatorProperty().set(Transaction.BY_DATE);
         } else {
-            dayColumn.comparatorProperty().set(Comparator.comparingInt(Transaction::getDay));
+            dayColumn.comparatorProperty().set(Transaction.BY_DAY);
         }
 
         var typeColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Type"));
@@ -147,7 +136,7 @@ public class TransactionTableView extends TableView<Transaction> {
         accountFromColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue()));
 
-        accountFromColumn.setComparator(Comparator.comparingInt(Transaction::getAccountDebitedId)
+        accountFromColumn.setComparator(Comparator.comparing(Transaction::getAccountDebitedUuid)
             .thenComparing(dayColumn.getComparator()));
 
         typeColumn.setSortable(true);
@@ -257,7 +246,7 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     public void setTransactionFilter(Predicate<Transaction> filter) {
-        transactionFilter = filter.and(t -> t.getParentId() == 0);
+        transactionFilter = filter.and(t -> t.getParentUuid().isEmpty());
 
         getSelectionModel().clearSelection();
         clear();
@@ -309,7 +298,7 @@ public class TransactionTableView extends TableView<Transaction> {
         }
     }
 
-    private void transactionListener(MapChangeListener.Change<? extends Integer, ? extends Transaction> change) {
+    private void transactionListener(MapChangeListener.Change<? extends UUID, ? extends Transaction> change) {
         var added = change.wasAdded() && transactionFilter.test(change.getValueAdded()) ?
             change.getValueAdded() : null;
 
@@ -347,7 +336,7 @@ public class TransactionTableView extends TableView<Transaction> {
                 if (transactionDetailsCallback == null) {
                     return;
                 }
-                new TransactionDetailsDialog(childTransactions,  t.getAmount(), false)
+                new TransactionDetailsDialog(childTransactions, t.getAmount(), false)
                     .showAndWait()
                     .ifPresent(list -> transactionDetailsCallback.handleTransactionDetails(t, list));
             } else {

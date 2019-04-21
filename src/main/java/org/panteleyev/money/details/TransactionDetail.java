@@ -28,40 +28,41 @@ package org.panteleyev.money.details;
 
 import org.panteleyev.money.persistence.model.Transaction;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class TransactionDetail {
-    private final int id;
+    private final UUID uuid;
     private final BigDecimal amount;
-    private final int accountCreditedId;
+    private final UUID accountCreditedUuid;
     private final String comment;
     private final long modified;
 
     TransactionDetail(Transaction transaction) {
-        id = transaction.getId();
+        uuid = transaction.getGuid();
         amount = transaction.getAmount();
-        accountCreditedId = transaction.getAccountCreditedId();
+        accountCreditedUuid = transaction.getAccountCreditedUuid();
         comment = transaction.getComment();
         modified = transaction.getModified();
     }
 
-    private TransactionDetail(int id, BigDecimal amount, int accountCreditedId, String comment, long modified) {
-        this.id = id;
+    private TransactionDetail(UUID uuid, BigDecimal amount, UUID accountCreditedUuid, String comment, long modified) {
+        this.uuid = uuid;
         this.amount = amount;
-        this.accountCreditedId = accountCreditedId;
+        this.accountCreditedUuid = accountCreditedUuid;
         this.comment = comment;
         this.modified = modified;
     }
 
-    public int getId() {
-        return id;
+    public UUID getUuid() {
+        return uuid;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public int getAccountCreditedId() {
-        return accountCreditedId;
+    public UUID getAccountCreditedUuid() {
+        return accountCreditedUuid;
     }
 
     public String getComment() {
@@ -73,21 +74,21 @@ public class TransactionDetail {
     }
 
     public static final class Builder {
-        private int id;
+        private UUID uuid;
         private BigDecimal amount;
-        private int accountCreditedId;
+        private UUID accountCreditedUuid;
         private String comment;
 
         public TransactionDetail build() {
-            return new TransactionDetail(id, amount, accountCreditedId, comment, System.currentTimeMillis());
+            return new TransactionDetail(uuid, amount, accountCreditedUuid, comment, System.currentTimeMillis());
         }
 
-        public Builder(int id) {
-            this.id = id;
+        public Builder(UUID uuid) {
+            this.uuid = uuid;
         }
 
-        public Builder id(int id) {
-            this.id = id;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -96,8 +97,8 @@ public class TransactionDetail {
             return this;
         }
 
-        public Builder accountCreditedId(int accountCreditedId) {
-            this.accountCreditedId = accountCreditedId;
+        public Builder accountCreditedUuid(UUID accountCreditedUuid) {
+            this.accountCreditedUuid = accountCreditedUuid;
             return this;
         }
 

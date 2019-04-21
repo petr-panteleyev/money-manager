@@ -38,7 +38,7 @@ public class TransactionDebitedAccountCell extends TableCell<Transaction, Transa
         if (empty || transaction == null) {
             setText("");
         } else {
-            setText(getDao().getAccount(transaction.getAccountDebitedId())
+            setText(getDao().getAccount(transaction.getAccountDebitedUuid())
                 .map(Account::getName)
                 .orElse(""));
         }

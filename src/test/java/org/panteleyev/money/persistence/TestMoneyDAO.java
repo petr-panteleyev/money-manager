@@ -26,21 +26,23 @@
 
 package org.panteleyev.money.persistence;
 
-import org.panteleyev.money.persistence.dto.AccountDto;
-import org.panteleyev.money.persistence.dto.CategoryDto;
-import org.panteleyev.money.persistence.dto.ContactDto;
-import org.panteleyev.money.persistence.dto.CurrencyDto;
-import org.panteleyev.money.persistence.dto.TransactionDto;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Transaction;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import static org.panteleyev.money.BaseTestUtils.newAccount;
+import java.time.LocalDate;
+import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.newCategory;
 import static org.panteleyev.money.BaseTestUtils.newContact;
 import static org.panteleyev.money.BaseTestUtils.newCurrency;
-import static org.panteleyev.money.BaseTestUtils.newTransaction;
+import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.persistence.model.CategoryType.BANKS_AND_CASH;
 import static org.testng.Assert.assertEquals;
 
 public class TestMoneyDAO extends BaseDaoTest {
@@ -65,86 +67,132 @@ public class TestMoneyDAO extends BaseDaoTest {
 
     @Test
     public void testCategory() {
-        int id = newCategoryId();
-        var category = newCategory(id);
+        var uuid = UUID.randomUUID();
+        var category = newCategory(uuid);
 
         getDao().insertCategory(category);
-        assertEquals(getDao().getCategory(id).orElseThrow(), category);
-        var dto = getDao().get(id, CategoryDto.class);
-        assertEquals(dto.decrypt(PASSWORD), category);
+        assertEquals(getDao().getCategory(uuid).orElseThrow(), category);
+        var retrieved = getDao().get(uuid, Category.class);
+        assertEquals(retrieved.orElseThrow(), category);
 
-        var update = newCategory(id);
+        var update = newCategory(uuid);
         getDao().updateCategory(update);
-        assertEquals(getDao().getCategory(id).orElseThrow(), update);
-        dto = getDao().get(id, CategoryDto.class);
-        assertEquals(dto.decrypt(PASSWORD), update);
+        assertEquals(getDao().getCategory(uuid).orElseThrow(), update);
+        retrieved = getDao().get(uuid, Category.class);
+        assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testCurrency() {
-        int id = newCurrencyId();
-        var category = newCurrency(id);
+        var uuid = UUID.randomUUID();
+        var category = newCurrency(uuid);
 
         getDao().insertCurrency(category);
-        assertEquals(getDao().getCurrency(id).orElseThrow(), category);
-        var dto = getDao().get(id, CurrencyDto.class);
-        assertEquals(dto.decrypt(PASSWORD), category);
+        assertEquals(getDao().getCurrency(uuid).orElseThrow(), category);
+        var retrieved = getDao().get(uuid, Currency.class);
+        assertEquals(retrieved.orElseThrow(), category);
 
-        var update = newCurrency(id);
+        var update = newCurrency(uuid);
         getDao().updateCurrency(update);
-        assertEquals(getDao().getCurrency(id).orElseThrow(), update);
-        dto = getDao().get(id, CurrencyDto.class);
-        assertEquals(dto.decrypt(PASSWORD), update);
+        assertEquals(getDao().getCurrency(uuid).orElseThrow(), update);
+        retrieved = getDao().get(uuid, Currency.class);
+        assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testContact() {
-        int id = newContactId();
-        var category = newContact(id);
+        var uuid = UUID.randomUUID();
+        var contact = newContact(uuid);
 
-        getDao().insertContact(category);
-        assertEquals(getDao().getContact(id).orElseThrow(), category);
-        var dto = getDao().get(id, ContactDto.class);
-        assertEquals(dto.decrypt(PASSWORD), category);
+        getDao().insertContact(contact);
+        assertEquals(getDao().getContact(uuid).orElseThrow(), contact);
+        var retrieved = getDao().get(uuid, Contact.class);
+        assertEquals(retrieved.orElseThrow(), contact);
 
-        var update = newContact(id);
+        var update = newContact(uuid);
         getDao().updateContact(update);
-        assertEquals(getDao().getContact(id).orElseThrow(), update);
-        dto = getDao().get(id, ContactDto.class);
-        assertEquals(dto.decrypt(PASSWORD), update);
+        assertEquals(getDao().getContact(uuid).orElseThrow(), update);
+        retrieved = getDao().get(uuid, Contact.class);
+        assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testAccount() {
-        int id = newAccountId();
-        var category = newAccount(id);
+        var category = new Category.Builder()
+            .catTypeId(BANKS_AND_CASH.getId())
+            .guid(UUID.randomUUID())
+            .build();
+        getDao().insertCategory(category);
 
-        getDao().insertAccount(category);
-        assertEquals(getDao().getAccount(id).orElseThrow(), category);
-        var dto = getDao().get(id, AccountDto.class);
-        assertEquals(dto.decrypt(PASSWORD), category);
+        var accountId = UUID.randomUUID();
 
-        var update = newAccount(id);
+        var account = new Account.Builder()
+            .guid(accountId)
+            .typeId(category.getCatTypeId())
+            .categoryUuid(category.getGuid())
+            .accountNumber("123456")
+            .build();
+        getDao().insertAccount(account);
+
+        assertEquals(getDao().getAccount(accountId).orElseThrow(), account);
+        var retrieved = getDao().get(accountId, Account.class);
+        assertEquals(retrieved.orElseThrow(), account);
+
+        var update = new Account.Builder(account)
+            .accountNumber(UUID.randomUUID().toString())
+            .build();
+
         getDao().updateAccount(update);
-        assertEquals(getDao().getAccount(id).orElseThrow(), update);
-        dto = getDao().get(id, AccountDto.class);
-        assertEquals(dto.decrypt(PASSWORD), update);
+        assertEquals(getDao().getAccount(accountId).orElseThrow(), update);
+        retrieved = getDao().get(accountId, Account.class);
+        assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testTransaction() {
-        int id = newTransactionId();
-        var category = newTransaction(id);
+        var category = new Category.Builder()
+            .catTypeId(BANKS_AND_CASH.getId())
+            .guid(UUID.randomUUID())
+            .build();
+        getDao().insertCategory(category);
 
-        getDao().insertTransaction(category);
-        assertEquals(getDao().getTransaction(id).orElseThrow(), category);
-        var dto = getDao().get(id, TransactionDto.class);
-        assertEquals(dto.decrypt(PASSWORD), category);
+        var account = new Account.Builder()
+            .typeId(category.getCatTypeId())
+            .categoryUuid(category.getGuid())
+            .accountNumber("123456")
+            .build();
+        getDao().insertAccount(account);
 
-        var update = newTransaction(id);
+        var id = UUID.randomUUID();
+
+        var now = LocalDate.now();
+        var transaction = new Transaction.Builder()
+            .guid(id)
+            .day(now.getDayOfMonth())
+            .month(now.getMonthValue())
+            .year(now.getYear())
+            .amount(randomBigDecimal())
+            .accountDebitedUuid(account.getGuid())
+            .accountCreditedUuid(account.getGuid())
+            .accountDebitedCategoryUuid(category.getGuid())
+            .accountCreditedCategoryUuid(category.getGuid())
+            .accountDebitedTypeId(account.getTypeId())
+            .accountCreditedTypeId(account.getTypeId())
+            .build();
+
+
+        getDao().insertTransaction(transaction);
+        assertEquals(getDao().getTransaction(id).orElseThrow(), transaction);
+        var retrieved = getDao().get(id, Transaction.class);
+        assertEquals(retrieved.orElseThrow(), transaction);
+
+        var update = new Transaction.Builder(transaction)
+            .comment(UUID.randomUUID().toString())
+            .build();
+
         getDao().updateTransaction(update);
         assertEquals(getDao().getTransaction(id).orElseThrow(), update);
-        dto = getDao().get(id, TransactionDto.class);
-        assertEquals(dto.decrypt(PASSWORD), update);
+        retrieved = getDao().get(id, Transaction.class);
+        assertEquals(retrieved.orElseThrow(), update);
     }
 }
