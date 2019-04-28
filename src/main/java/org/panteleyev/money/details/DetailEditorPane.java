@@ -47,6 +47,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.BaseCompletionProvider;
+import org.panteleyev.money.Options;
 import org.panteleyev.money.RecordEditorCallback;
 import org.panteleyev.money.Styles;
 import org.panteleyev.money.ToStringConverter;
@@ -74,7 +75,7 @@ final class DetailEditorPane extends BorderPane {
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
-            super(set);
+            super(set, Options::getAutoCompleteLength);
         }
 
         public String getElementString(T element) {
@@ -84,7 +85,7 @@ final class DetailEditorPane extends BorderPane {
 
     private class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
-            super(set);
+            super(set, Options::getAutoCompleteLength);
         }
 
         public String getElementString(String element) {

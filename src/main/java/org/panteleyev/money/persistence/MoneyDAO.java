@@ -295,10 +295,8 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     public void deleteTransaction(UUID uuid) {
-        // Temporary
-        var t = transactions.get(uuid);
+        delete(uuid, Transaction.class);
         transactions.remove(uuid);
-        delete(t);
     }
 
     public Collection<Transaction> getTransactions() {

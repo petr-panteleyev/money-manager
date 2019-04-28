@@ -100,7 +100,7 @@ public class TransactionEditorPane extends TitledPane {
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
-            super(set);
+            super(set, Options::getAutoCompleteLength);
         }
 
         public String getElementString(T element) {
@@ -110,7 +110,7 @@ public class TransactionEditorPane extends TitledPane {
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
-            super(set);
+            super(set, Options::getAutoCompleteLength);
         }
 
 
@@ -121,7 +121,7 @@ public class TransactionEditorPane extends TitledPane {
 
     private class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
-            super(set);
+            super(set, Options::getAutoCompleteLength);
         }
 
         public String getElementString(String element) {

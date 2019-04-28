@@ -30,7 +30,9 @@ import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -322,8 +324,6 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
     }
 
     private void onDeleteTransaction(UUID uuid) {
-        throw new UnsupportedOperationException();
-        /*
         new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
             .showAndWait()
             .ifPresent(r -> {
@@ -332,8 +332,6 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
                     getDao().deleteTransaction(uuid);
                 }
             });
-
-         */
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {

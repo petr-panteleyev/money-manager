@@ -31,22 +31,25 @@ import org.controlsfx.control.textfield.AutoCompletionBinding;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding.ISuggestionRequest,
     Collection<T>>
 {
     private final Set<T> set;
+    private final Supplier<Integer> minLengthSupplier;
 
-    public BaseCompletionProvider(Set<T> set) {
+    public BaseCompletionProvider(Set<T> set, Supplier<Integer> minLengthSupplier) {
         this.set = set;
+        this.minLengthSupplier = minLengthSupplier;
     }
 
     public abstract String getElementString(T element);
 
     @Override
     public Collection<T> call(AutoCompletionBinding.ISuggestionRequest req) {
-        if (req.getUserText().length() >= Options.getAutoCompleteLength()) {
+        if (req.getUserText().length() >= minLengthSupplier.get()) {
             var userText = req.getUserText();
 
             var result = set.stream()

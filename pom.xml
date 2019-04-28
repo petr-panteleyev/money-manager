@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>19.2.0</version>
+    <version>19.2.1</version>
     <packaging>jar</packaging>
     <name>MoneyManager</name>
 
@@ -16,9 +16,9 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <persistence-version>19.2.0</persistence-version>
-        <commons-version>19.2.0</commons-version>
+        <commons-version>19.2.1</commons-version>
         <javafx-version>11.0.2</javafx-version>
-        <controlsfx-version>9.0.0</controlsfx-version>
+        <controlsfx-version>11.0.0</controlsfx-version>
         <mysql-connector-version>8.0.15</mysql-connector-version>
         <jsoup-version>1.11.3</jsoup-version>
         <jsch-version>0.1.55</jsch-version>
@@ -95,6 +95,11 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
+            <version>${javafx-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
             <version>${javafx-version}</version>
         </dependency>
         <dependency>
@@ -190,8 +195,8 @@
                     </suiteXmlFiles>
                     <argLine>
                         --add-reads org.panteleyev.persistence=org.panteleyev.money
-                        --add-exports javafx.base/com.sun.javafx.event=controlsfx
-                        --add-opens javafx.graphics/javafx.scene=controlsfx
+                        --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+                        --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
                         -Dmysql.host=${money.test.mysql.host}
                         -Dmysql.user=${money.test.mysql.user}
                         -Dmysql.password=${money.test.mysql.password}

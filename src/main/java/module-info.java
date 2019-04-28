@@ -12,6 +12,8 @@ open module org.panteleyev.money {
     requires javafx.web;
     requires javafx.swing;          // for tests
 
+    requires org.controlsfx.controls;
+
     requires org.panteleyev.persistence;
     requires org.panteleyev.commons.ssh;
     requires org.panteleyev.commons.database;
@@ -19,7 +21,6 @@ open module org.panteleyev.money {
 
     // Automatic modules
     requires mysql.connector.java;
-    requires controlsfx;
     requires org.jsoup;
     requires gson;
     requires jsch;
