@@ -83,7 +83,11 @@ public class MoneyApplication extends Application {
         Application.launch(MoneyApplication.class, args);
     }
 
+    static String generateFileName(String prefix) {
+        return prefix + "-" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
     static String generateFileName() {
-        return "Money-" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+        return generateFileName("Money");
     }
 }

@@ -30,6 +30,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.Map;
@@ -40,25 +41,33 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MoneyDAOMock implements RecordSource {
+    private final Map<UUID, Icon> icons;
     private final Map<UUID, Category> categories;
     private final Map<UUID, Account> accounts;
     private final Map<UUID, Contact> contacts;
     private final Map<UUID, Currency> currencies;
     private final Map<UUID, Transaction> transactions;
 
-    public MoneyDAOMock(List<Category> categories, List<Account> accounts, List<Contact> contacts,
+    public MoneyDAOMock(List<Icon> icons, List<Category> categories, List<Account> accounts, List<Contact> contacts,
                         List<Currency> currencies, List<Transaction> transactions)
     {
+        this.icons = icons.stream()
+            .collect(Collectors.toMap(Icon::getUuid, Function.identity()));
         this.categories = categories.stream()
-            .collect(Collectors.toMap(Category::getGuid, Function.identity()));
+            .collect(Collectors.toMap(Category::getUuid, Function.identity()));
         this.accounts = accounts.stream()
-            .collect(Collectors.toMap(Account::getGuid, Function.identity()));
+            .collect(Collectors.toMap(Account::getUuid, Function.identity()));
         this.contacts = contacts.stream()
-            .collect(Collectors.toMap(Contact::getGuid, Function.identity()));
+            .collect(Collectors.toMap(Contact::getUuid, Function.identity()));
         this.currencies = currencies.stream()
-            .collect(Collectors.toMap(Currency::getGuid, Function.identity()));
+            .collect(Collectors.toMap(Currency::getUuid, Function.identity()));
         this.transactions = transactions.stream()
-            .collect(Collectors.toMap(Transaction::getGuid, Function.identity()));
+            .collect(Collectors.toMap(Transaction::getUuid, Function.identity()));
+    }
+
+    @Override
+    public Optional<Icon> getIcon(UUID uuid) {
+        return Optional.ofNullable(icons.get(uuid));
     }
 
     @Override
@@ -89,7 +98,7 @@ public class MoneyDAOMock implements RecordSource {
     @Override
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return transactions.values().stream()
-            .filter(t -> Objects.equals(t.getParentUuid().orElse(null),  parent.getGuid()))
+            .filter(t -> Objects.equals(t.getParentUuid().orElse(null),  parent.getUuid()))
             .collect(Collectors.toList());
     }
 }

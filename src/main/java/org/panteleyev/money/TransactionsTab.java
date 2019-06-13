@@ -62,7 +62,7 @@ import java.util.function.Predicate;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-final class TransactionsTab extends BorderPane implements TransactionTableView.TransactionDetailsCallback {
+final class TransactionsTab extends BorderPane implements TransactionTableView.TransactionDetailsCallback, TransactionListTab {
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
     private final Spinner<Integer> yearSpinner = new Spinner<>();
@@ -175,6 +175,10 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         return transactionEditor;
     }
 
+    public Predicate<Transaction> getTransactionFilter() {
+        return transactionTable.getTransactionFilter();
+    }
+
     private ImageView getButtonImage(String name) {
         var image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
         image.setFitHeight(16.0);
@@ -259,7 +263,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
 
         var selected = accountFilterBox.getSelectionModel().getSelectedItem();
         if (selected instanceof Account) {
-            var uuid = ((Account) selected).getGuid();
+            var uuid = ((Account) selected).getUuid();
             filter = filter.and(t -> Objects.equals(t.getAccountCreditedUuid(), uuid)
                 || Objects.equals(t.getAccountDebitedUuid(), uuid));
         }
@@ -293,7 +297,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         // contact
         if (c != null && !c.isEmpty()) {
             var newContact = createContact(c);
-            builder.contactUuid(newContact.getGuid());
+            builder.contactUuid(newContact.getUuid());
         }
 
         // date
@@ -310,7 +314,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
     private void onUpdateTransaction(Transaction.Builder builder, String c) {
         // contact
         if (c != null && !c.isEmpty()) {
-            builder.contactUuid(createContact(c).getGuid());
+            builder.contactUuid(createContact(c).getUuid());
         }
 
         // date
@@ -362,7 +366,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
         if (details.isEmpty()) {
             if (!childTransactions.isEmpty()) {
                 for (Transaction child : childTransactions) {
-                    getDao().deleteTransaction(child.getGuid());
+                    getDao().deleteTransaction(child.getUuid());
                 }
                 var noChildren = new Transaction.Builder(transaction)
                     .detailed(false)
@@ -377,7 +381,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
                 .build());
 
             for (Transaction ch : childTransactions) {
-                getDao().deleteTransaction(ch.getGuid());
+                getDao().deleteTransaction(ch.getUuid());
             }
 
             for (var transactionDetail : details) {
@@ -386,7 +390,7 @@ final class TransactionsTab extends BorderPane implements TransactionTableView.T
                     .amount(transactionDetail.getAmount())
                     .comment(transactionDetail.getComment())
                     .guid(UUID.randomUUID())
-                    .parentUuid(transaction.getGuid())
+                    .parentUuid(transaction.getUuid())
                     .detailed(false)
                     .timestamp()
                     .build();

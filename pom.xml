@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>19.2.1</version>
+    <version>19.3.0</version>
     <packaging>jar</packaging>
     <name>MoneyManager</name>
 
@@ -103,6 +103,11 @@
             <version>${javafx-version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testng-version}</version>
@@ -134,7 +139,6 @@
                     <toolchains>
                         <jdk>
                             <version>11</version>
-                            <vendor>openjdk</vendor>
                         </jdk>
                     </toolchains>
                 </configuration>

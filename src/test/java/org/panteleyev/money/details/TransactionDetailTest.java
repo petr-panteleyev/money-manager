@@ -37,7 +37,7 @@ public class TransactionDetailTest {
 
         var detail = new TransactionDetail(transaction);
 
-        assertEquals(detail.getUuid(), transaction.getGuid());
+        assertEquals(detail.getUuid(), transaction.getUuid());
         assertEquals(detail.getAccountCreditedUuid(), transaction.getAccountCreditedUuid());
         assertEquals(detail.getAmount(), transaction.getAmount());
         assertEquals(detail.getComment(), transaction.getComment());

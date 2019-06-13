@@ -39,6 +39,7 @@ public class TestCategory extends BaseTest {
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
         var type = randomCategoryType();
+        var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -47,6 +48,7 @@ public class TestCategory extends BaseTest {
             .name(name)
             .comment(comment)
             .catTypeId(type.getId())
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -55,6 +57,7 @@ public class TestCategory extends BaseTest {
             .name(name)
             .comment(comment)
             .catTypeId(type.getId())
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -70,6 +73,7 @@ public class TestCategory extends BaseTest {
             .name(randomString())
             .comment(randomString())
             .catTypeId(randomCategoryType().getId())
+            .iconUuid(UUID.randomUUID())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
@@ -82,7 +86,8 @@ public class TestCategory extends BaseTest {
             .name(original.getName())
             .comment(original.getComment())
             .catTypeId(original.getCatTypeId())
-            .guid(original.getGuid())
+            .iconUuid(original.getIconUuid())
+            .guid(original.getUuid())
             .created(original.getCreated())
             .modified(original.getModified())
             .build();

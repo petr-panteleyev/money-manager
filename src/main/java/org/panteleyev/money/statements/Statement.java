@@ -35,7 +35,8 @@ public final class Statement {
         UNKNOWN,
         RAIFFEISEN_OFX,
         SBERBANK_HTML,
-        YANDEX_MONEY
+        YANDEX_MONEY,
+        YANDEX_MONEY_CSV
     }
 
     private final StatementType type;

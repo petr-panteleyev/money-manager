@@ -36,9 +36,6 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import static org.panteleyev.money.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.BaseTestUtils.randomString;
-import static org.panteleyev.money.UiTestUtils.getChoiceBox;
-import static org.panteleyev.money.UiTestUtils.getTextArea;
-import static org.panteleyev.money.UiTestUtils.getTextField;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -67,17 +64,17 @@ public class ContactDialogTest extends BaseTest {
     }
 
     private void setupDialog(ContactDialog dialog) {
-        getTextField(dialog, "nameField").setText(CONTACT.getName());
-        getTextField(dialog, "phoneField").setText(CONTACT.getPhone());
-        getTextField(dialog, "mobileField").setText(CONTACT.getMobile());
-        getTextField(dialog, "emailField").setText(CONTACT.getEmail());
-        getTextField(dialog, "webField").setText(CONTACT.getWeb());
-        getTextArea(dialog, "commentEdit").setText(CONTACT.getComment());
-        getTextField(dialog, "streetField").setText(CONTACT.getStreet());
-        getTextField(dialog, "cityField").setText(CONTACT.getCity());
-        getTextField(dialog, "countryField").setText(CONTACT.getCountry());
-        getTextField(dialog, "zipField").setText(CONTACT.getZip());
-        getChoiceBox(dialog, "typeChoiceBox").getSelectionModel().select(CONTACT.getType());
+        dialog.getNameField().setText(CONTACT.getName());
+        dialog.getPhoneField().setText(CONTACT.getPhone());
+        dialog.getMobileField().setText(CONTACT.getMobile());
+        dialog.getEmailField().setText(CONTACT.getEmail());
+        dialog.getWebField().setText(CONTACT.getWeb());
+        dialog.getCommentEdit().setText(CONTACT.getComment());
+        dialog.getStreetField().setText(CONTACT.getStreet());
+        dialog.getCityField().setText(CONTACT.getCity());
+        dialog.getCountryField().setText(CONTACT.getCountry());
+        dialog.getZipField().setText(CONTACT.getZip());
+        dialog.getTypeChoiceBox().getSelectionModel().select(CONTACT.getType());
     }
 
     @Test
@@ -93,7 +90,7 @@ public class ContactDialogTest extends BaseTest {
 
         var contact = queue.take();
 
-        assertNotNull(contact.getGuid());
+        assertNotNull(contact.getUuid());
         assertContact(contact);
         assertEquals(contact.getCreated(), contact.getModified());
     }
@@ -110,7 +107,7 @@ public class ContactDialogTest extends BaseTest {
 
         var contact = queue.take();
 
-        assertEquals(contact.getGuid(), CONTACT.getGuid());
+        assertEquals(contact.getUuid(), CONTACT.getUuid());
         assertContact(contact);
         assertTrue(contact.getModified() > CONTACT.getModified());
         assertTrue(contact.getModified() > contact.getCreated());

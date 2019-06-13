@@ -38,6 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.UUID;
 
 public interface XMLUtils {
@@ -70,7 +71,13 @@ public interface XMLUtils {
     }
 
     static void appendTextNode(Element e, String name, UUID value) {
-        appendTextNode(e, name, value.toString());
+        if (value != null) {
+            appendTextNode(e, name, value.toString());
+        }
+    }
+
+    static void appendTextNode(Element e, String name, byte[] value) {
+        appendTextNode(e, name, Base64.getEncoder().encodeToString(value));
     }
 
     static Element appendElement(Element parent, String name) {

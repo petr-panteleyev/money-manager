@@ -39,23 +39,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-/*
-Migration:
-
-update transaction
-set contact_uuid = (select uuid from contact where contact.id = transaction.contact_id),
-acc_debited_uuid = (select uuid from account where account.id = transaction.acc_debited_id),
-acc_credited_uuid = (select uuid from account where account.id = transaction.acc_credited_id),
-acc_debited_category_uuid = (select uuid from category where category.id = transaction.acc_debited_category_id),
-acc_credited_category_uuid = (select uuid from category where category.id = transaction.acc_credited_category_id)
-;
-
-update transaction as t1 join (select id, uuid from transaction) as t2
-set t1.parent_uuid = t2.uuid
-where t1.parent_id = t2.id;
- */
-
-
 @Table("transaction")
 public class Transaction implements MoneyRecord {
     public static final Comparator<Transaction> BY_DATE =
@@ -353,7 +336,7 @@ public class Transaction implements MoneyRecord {
         return invoiceNumber;
     }
 
-    public UUID getGuid() {
+    public UUID getUuid() {
         return guid;
     }
 
@@ -424,7 +407,7 @@ public class Transaction implements MoneyRecord {
                 this.modified = t.getModified();
                 this.parentUuid = t.getParentUuid().orElse(null);
                 this.detailed = t.isDetailed();
-                this.guid = t.getGuid();
+                this.guid = t.getUuid();
             }
         }
 

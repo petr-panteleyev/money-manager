@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.panteleyev.money.AccountFilterSelectionBox;
 import org.panteleyev.money.TransactionFilterBox;
-import org.panteleyev.money.persistence.AccountFilter;
+import org.panteleyev.money.persistence.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -66,13 +66,13 @@ public class ChartsTab extends BorderPane {
 
     private void updateChart() {
         var accountFilter = selectionBox.getAccountFilter()
-                .and(AccountFilter.ENABLED.predicate());
+                .and(Account.FILTER_ENABLED);
 
         ObservableList<PieChart.Data> data = FXCollections.observableArrayList();
 
         var transactionFilter = transactionFilterBox.getTransactionFilter();
 
-        var list = getDao().getAccounts(accountFilter).stream()
+        var list = getDao().getAccounts(accountFilter)
                 .map(a -> new Pair<>(a.getName(), a.calculateBalance(true, transactionFilter).abs()))
                 .filter(p -> BigDecimal.ZERO.compareTo(p.getValue()) != 0)
                 .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))

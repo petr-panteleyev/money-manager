@@ -30,24 +30,29 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
+import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.money.persistence.model.Icon;
 import java.util.List;
 import java.util.UUID;
+import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.MainWindowController.RB;
+import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryDialog extends BaseDialog<Category> {
     private final ChoiceBox<CategoryType> typeComboBox = new ChoiceBox<>();
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();
-
+    private final ComboBox<Icon> iconComboBox = new ComboBox<>();
 
     CategoryDialog(Category category) {
         super(MainWindowController.CSS_PATH);
@@ -58,9 +63,12 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         int index = 0;
         pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(index++, new Label(RB.getString("label.Type")), typeComboBox);
+        pane.addRow(index++, new Label(RB.getString("label.Type")), typeComboBox, iconComboBox);
         pane.addRow(index++, new Label(RB.getString("label.Name")), nameEdit);
         pane.addRow(index, new Label(RB.getString("label.Comment")), commentEdit);
+
+        GridPane.setColumnSpan(nameEdit, 2);
+        GridPane.setColumnSpan(commentEdit, 2);
 
         nameEdit.setPrefColumnCount(20);
 
@@ -70,6 +78,8 @@ final class CategoryDialog extends BaseDialog<Category> {
             typeComboBox.getSelectionModel().select(0);
         }
 
+        IconManager.setupComboBox(iconComboBox);
+
         if (category != null) {
             list.stream()
                 .filter(t -> t == category.getType())
@@ -78,6 +88,9 @@ final class CategoryDialog extends BaseDialog<Category> {
 
             nameEdit.setText(category.getName());
             commentEdit.setText(category.getComment());
+            iconComboBox.getSelectionModel().select(getDao().getIcon(category.getIconUuid()).orElse(EMPTY_ICON));
+        } else {
+            iconComboBox.getSelectionModel().select(EMPTY_ICON);
         }
 
         typeComboBox.setConverter(new StringConverter<>() {
@@ -100,6 +113,7 @@ final class CategoryDialog extends BaseDialog<Category> {
                     .name(nameEdit.getText())
                     .comment(commentEdit.getText())
                     .catTypeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().getUuid())
                     .modified(now);
 
                 if (category == null) {
@@ -123,5 +137,17 @@ final class CategoryDialog extends BaseDialog<Category> {
         validation.registerValidator(nameEdit, (Control control, String value) ->
             ValidationResult.fromErrorIf(control, null, value.isEmpty()));
         validation.initInitialDecoration();
+    }
+
+    ChoiceBox<CategoryType> getTypeComboBox() {
+        return typeComboBox;
+    }
+
+    TextField getNameEdit() {
+        return nameEdit;
+    }
+
+    TextField getCommentEdit() {
+        return commentEdit;
     }
 }

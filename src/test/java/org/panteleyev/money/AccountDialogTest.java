@@ -45,8 +45,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.UiTestUtils.getComboBox;
-import static org.panteleyev.money.UiTestUtils.getTextField;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -126,8 +124,8 @@ public class AccountDialogTest extends BaseDaoTest {
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
             .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getGuid())
-            .currencyUuid(curr_1.getGuid())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(curr_1.getUuid())
             .enabled(true)
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
@@ -143,15 +141,15 @@ public class AccountDialogTest extends BaseDaoTest {
     }
 
     private void setupDialog(AccountDialog dialog) {
-        getTextField(dialog, "nameEdit").setText(ACCOUNT_NAME);
-        getTextField(dialog, "commentEdit").setText(ACCOUNT_COMMENT);
-        getTextField(dialog, "accountNumberEdit").setText(ACCOUNT_NUMBER);
-        getTextField(dialog, "interestEdit").setText(ACCOUNT_INTEREST.toString());
-        getComboBox(dialog, "currencyComboBox").getSelectionModel().select(curr_1);
+        dialog.getNameEdit().setText(ACCOUNT_NAME);
+        dialog.getCommentEdit().setText(ACCOUNT_COMMENT);
+        dialog.getAccountNumberEdit().setText(ACCOUNT_NUMBER);
+        dialog.getInterestEdit().setText(ACCOUNT_INTEREST.toString());
+        dialog.getCurrencyComboBox().getSelectionModel().select(curr_1);
     }
 
     private void setupDialog(AccountDialog dialog, Account account) {
-        getComboBox(dialog, "currencyComboBox").getSelectionModel().select(curr_2);
+        dialog.getCurrencyComboBox().getSelectionModel().select(curr_2);
     }
 
     @Test
@@ -167,15 +165,15 @@ public class AccountDialogTest extends BaseDaoTest {
 
         var account = queue.take();
 
-        assertNotNull(account.getGuid());
+        assertNotNull(account.getUuid());
         assertEquals(account.getName(), ACCOUNT_NAME);
         assertEquals(account.getComment(), ACCOUNT_COMMENT);
         assertEquals(account.getAccountNumber(), ACCOUNT_NUMBER);
-        assertEquals(account.getCategoryUuid(), category.getGuid());
+        assertEquals(account.getCategoryUuid(), category.getUuid());
         assertEquals(account.getTypeId(), category.getType().getId());
         assertEquals(account.getInterest().stripTrailingZeros(), ACCOUNT_INTEREST.stripTrailingZeros());
         assertTrue(account.getEnabled());
-        assertEquals(account.getCurrencyUuid().orElse(null), curr_1.getGuid());
+        assertEquals(account.getCurrencyUuid().orElse(null), curr_1.getUuid());
     }
 
     @Test
@@ -191,15 +189,15 @@ public class AccountDialogTest extends BaseDaoTest {
 
         var account = queue.take();
 
-        assertEquals(account.getGuid(), acc_1.getGuid());
+        assertEquals(account.getUuid(), acc_1.getUuid());
         assertEquals(account.getName(), acc_1.getName());
         assertEquals(account.getComment(), acc_1.getComment());
         assertEquals(account.getAccountNumber(), acc_1.getAccountNumber());
-        assertEquals(account.getCategoryUuid(), category.getGuid());
+        assertEquals(account.getCategoryUuid(), category.getUuid());
         assertEquals(account.getTypeId(), category.getType().getId());
         assertEquals(account.getInterest().stripTrailingZeros(), acc_1.getInterest().stripTrailingZeros());
         assertEquals(account.getCreated(), acc_1.getCreated());
-        assertEquals(account.getCurrencyUuid().orElse(null), curr_2.getGuid());
+        assertEquals(account.getCurrencyUuid().orElse(null), curr_2.getUuid());
         assertEquals(account.getClosingDate(), acc_1.getClosingDate());
         assertTrue(account.getModified() > acc_1.getModified());
         assertEquals(account.getOpeningBalance().stripTrailingZeros(), acc_1.getOpeningBalance().stripTrailingZeros());

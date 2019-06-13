@@ -30,6 +30,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +41,7 @@ import java.util.UUID;
  * MoneyDAO in various tests.
  */
 public interface RecordSource {
+    Optional<Icon> getIcon(UUID uuid);
     Optional<Category> getCategory(UUID uuid);
     Optional<Currency> getCurrency(UUID uuid);
     Optional<Contact> getContact(UUID uuid);

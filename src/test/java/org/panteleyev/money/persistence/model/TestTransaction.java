@@ -167,7 +167,7 @@ public class TestTransaction extends BaseTest {
         assertEquals(t2.getRateDirection(), t1.getRateDirection());
         assertEquals(t2.getInvoiceNumber(), t1.getInvoiceNumber());
         assertEquals(t2.getParentUuid(), t1.getParentUuid());
-        assertEquals(t2.getGuid(), t1.getGuid());
+        assertEquals(t2.getUuid(), t1.getUuid());
         assertEquals(t1.getCreated(), t2.getCreated());
         assertTrue(t2.getModified() >= t1.getModified());
     }

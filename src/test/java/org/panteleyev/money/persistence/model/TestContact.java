@@ -47,6 +47,7 @@ public class TestContact extends BaseTest {
         var city = randomString();
         var country = randomString();
         var zip = randomString();
+        var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -63,6 +64,7 @@ public class TestContact extends BaseTest {
             .city(city)
             .country(country)
             .zip(zip)
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -80,6 +82,7 @@ public class TestContact extends BaseTest {
             .city(city)
             .country(country)
             .zip(zip)
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -103,6 +106,7 @@ public class TestContact extends BaseTest {
             .city(randomString())
             .country(randomString())
             .zip(randomString())
+            .iconUuid(UUID.randomUUID())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
@@ -124,7 +128,8 @@ public class TestContact extends BaseTest {
             .city(original.getCity())
             .country(original.getCountry())
             .zip(original.getZip())
-            .guid(original.getGuid())
+            .iconUuid(original.getIconUuid())
+            .guid(original.getUuid())
             .created(original.getCreated())
             .modified(original.getModified())
             .build();

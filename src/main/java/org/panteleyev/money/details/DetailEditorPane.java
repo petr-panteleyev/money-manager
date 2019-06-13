@@ -235,7 +235,7 @@ final class DetailEditorPane extends BorderPane {
         categories.stream()
             .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
             .forEach(x -> {
-                List<Account> accounts = getDao().getAccountsByCategory(x.getGuid());
+                List<Account> accounts = getDao().getAccountsByCategory(x.getUuid());
 
                 if (!accounts.isEmpty()) {
                     creditedMenuButton.getItems().add(new MenuItem(x.getName()));
@@ -296,7 +296,7 @@ final class DetailEditorPane extends BorderPane {
 
         var creditedAccount = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
         if (creditedAccount.isPresent()) {
-            builder.accountCreditedUuid(creditedAccount.get().getGuid());
+            builder.accountCreditedUuid(creditedAccount.get().getUuid());
         } else {
             return Optional.empty();
         }
@@ -350,7 +350,7 @@ final class DetailEditorPane extends BorderPane {
         expenseCategories.stream()
             .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
             .forEach(x -> {
-                var accounts = getDao().getAccountsByCategory(x.getGuid());
+                var accounts = getDao().getAccountsByCategory(x.getUuid());
 
                 if (!accounts.isEmpty()) {
                     creditedMenuButton.getItems().add(new MenuItem(x.getName()));

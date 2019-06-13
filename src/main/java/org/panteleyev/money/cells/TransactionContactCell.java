@@ -27,7 +27,7 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.model.Contact;
+import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -36,12 +36,17 @@ public class TransactionContactCell extends TableCell<Transaction, Transaction> 
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
+
+        setText("");
+        setGraphic(null);
+
         if (empty || transaction == null) {
-            setText("");
-        } else {
-            setText(getDao().getContact(transaction.getContactUuid().orElse(null))
-                .map(Contact::getName)
-                .orElse(""));
+            return;
         }
+
+        getDao().getContact(transaction.getContactUuid().orElse(null)).ifPresent(contact -> {
+            setText(contact.getName());
+            setGraphic(IconManager.getImageView(contact.getIconUuid()));
+        });
     }
 }

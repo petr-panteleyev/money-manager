@@ -24,18 +24,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.comparators;
+package org.panteleyev.money.cells;
 
-import org.panteleyev.money.persistence.model.Account;
-import org.panteleyev.money.persistence.model.Category;
-import java.util.Comparator;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.icons.IconManager;
+import org.panteleyev.money.persistence.model.Contact;
 
-public class AccountByCategory implements Comparator<Account> {
+public class ContactNameCell extends TableCell<Contact, Contact> {
     @Override
-    public int compare(Account a1, Account a2) {
-        var c1 = getDao().getCategory(a1.getCategoryUuid()).map(Category::getName).orElse("");
-        var c2 = getDao().getCategory(a2.getCategoryUuid()).map(Category::getName).orElse("");
-        return c1.compareTo(c2);
+    protected void updateItem(Contact contact, boolean empty) {
+        super.updateItem(contact, empty);
+
+        if (empty || contact == null) {
+            setText("");
+            setGraphic(null);
+        } else {
+            setText(contact.getName());
+            setGraphic(IconManager.getImageView(contact.getIconUuid()));
+        }
     }
 }

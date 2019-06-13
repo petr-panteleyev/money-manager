@@ -9,6 +9,20 @@
     <xsd:element name="Money">
         <xsd:complexType>
             <xsd:sequence>
+                <xsd:element name="Icons">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Icon"
+                                         type="Icon"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="IconUniqueUUID">
+                        <xsd:selector xpath="Icon"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
                 <xsd:element name="Accounts">
                     <xsd:complexType>
                         <xsd:sequence>
@@ -18,10 +32,6 @@
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="AccountUniqueId">
-                        <xsd:selector xpath="Account"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
                     <xsd:unique name="AccountUniqueUUID">
                         <xsd:selector xpath="Account"/>
                         <xsd:field xpath="./guid"/>
@@ -36,10 +46,6 @@
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="CategoryUniqueId">
-                        <xsd:selector xpath="Category"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
                     <xsd:unique name="CategoryUniqueUUID">
                         <xsd:selector xpath="Category"/>
                         <xsd:field xpath="./guid"/>
@@ -54,10 +60,6 @@
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="ContactUniqueId">
-                        <xsd:selector xpath="Contact"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
                     <xsd:unique name="ContactUniqueUUID">
                         <xsd:selector xpath="Contact"/>
                         <xsd:field xpath="./guid"/>
@@ -72,10 +74,6 @@
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="CurrencyUniqueId">
-                        <xsd:selector xpath="Currency"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
                     <xsd:unique name="CurrencyUniqueUUID">
                         <xsd:selector xpath="Currency"/>
                         <xsd:field xpath="./guid"/>
@@ -90,10 +88,6 @@
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="TransactionUniqueId">
-                        <xsd:selector xpath="Transaction"/>
-                        <xsd:field xpath="@id"/>
-                    </xsd:unique>
                     <xsd:unique name="TransactionUniqueUUID">
                         <xsd:selector xpath="Transaction"/>
                         <xsd:field xpath="./guid"/>
@@ -102,6 +96,16 @@
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
+
+    <xsd:complexType name="Icon">
+        <xsd:all>
+            <xsd:element name="uuid" type="UUID"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="bytes" type="xsd:string"/>
+            <xsd:element name="created" type="Timestamp"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+    </xsd:complexType>
 
     <xsd:complexType name="Account">
         <xsd:all>
@@ -117,6 +121,7 @@
             <xsd:element name="typeId" type="CategoryType"/>
             <xsd:element name="interest" type="xsd:decimal"/>
             <xsd:element name="closingDate" type="Timestamp"/>
+            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
@@ -128,6 +133,7 @@
             <xsd:element name="name" type="xsd:string"/>
             <xsd:element name="catTypeId" type="CategoryType"/>
             <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
@@ -147,6 +153,7 @@
             <xsd:element name="city" type="xsd:string"/>
             <xsd:element name="country" type="xsd:string"/>
             <xsd:element name="zip" type="xsd:string"/>
+            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>

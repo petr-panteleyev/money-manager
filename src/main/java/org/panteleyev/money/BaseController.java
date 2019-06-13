@@ -37,7 +37,7 @@ public class BaseController extends Controller {
         super(null);
     }
 
-    BaseController(Stage stage, String css) {
+    protected  BaseController(Stage stage, String css) {
         super(stage, css);
     }
 
@@ -45,7 +45,7 @@ public class BaseController extends Controller {
         getStage().close();
     }
 
-    Menu createHelpMenu(ResourceBundle rb) {
+    protected Menu createHelpMenu(ResourceBundle rb) {
         var item = new MenuItem(rb.getString("menu.Help.About"));
         item.setOnAction(a -> new AboutDialog().showAndWait());
         return new Menu(rb.getString("menu.Help"), null, item);

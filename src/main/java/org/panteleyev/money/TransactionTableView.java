@@ -49,6 +49,8 @@ import org.panteleyev.money.cells.TransactionSumCell;
 import org.panteleyev.money.cells.TransactionTypeCell;
 import org.panteleyev.money.details.TransactionDetail;
 import org.panteleyev.money.details.TransactionDetailsDialog;
+import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.xml.Export;
 import java.io.FileOutputStream;
@@ -223,6 +225,8 @@ public class TransactionTableView extends TableView<Transaction> {
         setContextMenu(ctxMenu);
 
         getDao().transactions().addListener(this::transactionListener);
+        getDao().contacts().addListener((MapChangeListener<UUID, Contact>) change -> redraw());
+        getDao().categories().addListener((MapChangeListener<UUID, Category>) change -> redraw());
     }
 
     TableColumn<Transaction, Transaction> getDayColumn() {
@@ -238,6 +242,10 @@ public class TransactionTableView extends TableView<Transaction> {
 
     void clear() {
         getItems().clear();
+    }
+
+    public Predicate<Transaction> getTransactionFilter() {
+        return transactionFilter;
     }
 
     private void addRecords(List<Transaction> transactions) {
@@ -326,6 +334,11 @@ public class TransactionTableView extends TableView<Transaction> {
                 getSelectionModel().select(added);
             }
         });
+    }
+
+    private void redraw() {
+        getColumns().get(0).setVisible(false);
+        getColumns().get(0).setVisible(true);
     }
 
     private void onTransactionDetails() {

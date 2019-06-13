@@ -37,8 +37,6 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import static org.panteleyev.money.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.UiTestUtils.getChoiceBox;
-import static org.panteleyev.money.UiTestUtils.getTextField;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -62,15 +60,14 @@ public class CategoryDialogTest extends BaseTest {
         new JFXPanel();
     }
 
-
     private void setupDialog(CategoryDialog dialog) {
-        getTextField(dialog, "nameEdit").setText(CATEGORY_NAME);
-        getTextField(dialog, "commentEdit").setText(CATEGORY_COMMENT);
-        getChoiceBox(dialog, "typeComboBox").getSelectionModel().select(CATEGORY_TYPE);
+        dialog.getNameEdit().setText(CATEGORY_NAME);
+        dialog.getCommentEdit().setText(CATEGORY_COMMENT);
+        dialog.getTypeComboBox().getSelectionModel().select(CATEGORY_TYPE);
     }
 
     private void setupDialogUpdate(CategoryDialog dialog) {
-        getChoiceBox(dialog, "typeComboBox").getSelectionModel().select(CATEGORY_TYPE_NEW);
+        dialog.getTypeComboBox().getSelectionModel().select(CATEGORY_TYPE_NEW);
     }
 
     @Test
@@ -86,7 +83,7 @@ public class CategoryDialogTest extends BaseTest {
 
         var category = queue.take();
 
-        assertNotNull(category.getGuid());
+        assertNotNull(category.getUuid());
         assertEquals(category.getName(), CATEGORY_NAME);
         assertEquals(category.getComment(), CATEGORY_COMMENT);
         assertEquals(category.getType(), CATEGORY_TYPE);
@@ -106,7 +103,7 @@ public class CategoryDialogTest extends BaseTest {
 
         var category = queue.take();
 
-        assertEquals(category.getGuid(), CATEGORY.getGuid());
+        assertEquals(category.getUuid(), CATEGORY.getUuid());
         assertEquals(category.getName(), CATEGORY.getName());
         assertEquals(category.getComment(), CATEGORY.getComment());
         assertEquals(category.getType(), CATEGORY_TYPE_NEW);

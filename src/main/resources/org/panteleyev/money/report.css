@@ -1,0 +1,13 @@
+table, th, td {
+    border: 1px solid black;
+    border-spacing: 0;
+}
+
+th, td {
+    padding: 5;
+    font-size: small;
+}
+
+td.amount {
+    text-align: right;
+}

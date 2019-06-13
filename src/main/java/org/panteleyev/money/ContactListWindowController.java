@@ -30,6 +30,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
@@ -40,17 +41,26 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import org.panteleyev.money.cells.ContactNameCell;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.ContactType;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
@@ -58,12 +68,15 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class ContactListWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
-    private final TableView<Contact> contactTable = new TableView<>();
+    private final TextField searchField = FXFactory.newSearchField(s -> updatePredicate());
+
+    private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
+    private final FilteredList<Contact> filteredList = new FilteredList<>(contacts);
+    private final TableView<Contact> contactTable = new TableView<>(filteredList);
 
     @SuppressWarnings("FieldCanBeLocal")
     private MapChangeListener<UUID, Contact> contactsListener = change ->
         Platform.runLater(this::reloadContacts);
-
 
     ContactListWindowController() {
         EventHandler<ActionEvent> addHandler = event -> onAddContact();
@@ -77,7 +90,11 @@ class ContactListWindowController extends BaseController {
                 newMenuItem(RB, "menu.File.Close", event -> onClose())),
             new Menu(RB.getString("menu.Edit"), null,
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.Edit.Search",
+                    new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
+                    actionEvent -> searchField.requestFocus())),
             createHelpMenu(RB));
 
         // Context menu
@@ -88,7 +105,7 @@ class ContactListWindowController extends BaseController {
         // Table
         var pane = new BorderPane();
 
-        var nameColumn = new TableColumn<Contact, String>(RB.getString("column.Name"));
+        var nameColumn = new TableColumn<Contact, Contact>(RB.getString("column.Name"));
         var typeColumn = new TableColumn<Contact, String>(RB.getString("column.Type"));
         var phoneColumn = new TableColumn<Contact, String>(RB.getString("column.Phone"));
         var emailColumn = new TableColumn<Contact, String>(RB.getString("column.Email"));
@@ -97,8 +114,7 @@ class ContactListWindowController extends BaseController {
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox
-        var hBox = new HBox(typeChoiceBox);
-
+        var hBox = new HBox(5, searchField, typeChoiceBox);
         pane.setTop(hBox);
         pane.setCenter(contactTable);
 
@@ -120,10 +136,11 @@ class ContactListWindowController extends BaseController {
             }
         });
 
-        typeChoiceBox.valueProperty().addListener((x, y, newValue) -> onTypeChanged(newValue));
+        typeChoiceBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
 
-        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
+        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, Contact> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        nameColumn.setCellFactory(x -> new ContactNameCell());
         typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
         phoneColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
@@ -146,18 +163,29 @@ class ContactListWindowController extends BaseController {
     }
 
     private void reloadContacts() {
-        var list = FXCollections.observableArrayList(getDao().getContacts());
-        contactTable.setItems(list.filtered(x -> true));
-        onTypeChanged(typeChoiceBox.getSelectionModel().getSelectedItem());
+        contacts.setAll(getDao().getContacts().stream()
+            .sorted(Comparator.comparing(Contact::getName)).collect(Collectors.toList()));
+        updatePredicate();
     }
 
-    private void onTypeChanged(Object newValue) {
-        if (newValue instanceof String) {
-            ((FilteredList<Contact>) contactTable.getItems()).setPredicate(x -> true);
+    private Predicate<Contact> getPredicate() {
+        Predicate<Contact> filter;
+
+        // Type
+        var type = typeChoiceBox.getSelectionModel().getSelectedItem();
+        if (type instanceof String) {
+            filter = x -> true;
         } else {
-            var type = (ContactType) newValue;
-            ((FilteredList<Contact>) contactTable.getItems()).setPredicate(x -> x.getType().equals(type));
+            filter = x -> x.getType() == type;
         }
+
+        // Name
+        var search = searchField.getText().toLowerCase();
+        if (!search.isEmpty()) {
+            filter = filter.and(x -> x.getName().toLowerCase().contains(search));
+        }
+
+        return filter;
     }
 
     private void onAddContact() {
@@ -174,5 +202,9 @@ class ContactListWindowController extends BaseController {
         if (((MouseEvent) event).getClickCount() == 2) {
             onEditContact();
         }
+    }
+
+    private void updatePredicate() {
+        filteredList.setPredicate(getPredicate());
     }
 }

@@ -27,7 +27,7 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -36,12 +36,17 @@ public class TransactionCreditedAccountCell extends TableCell<Transaction, Trans
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
+
+        setText("");
+        setGraphic(null);
+
         if (empty || transaction == null) {
-            setText("");
-        } else {
-            setText(getDao().getAccount(transaction.getAccountCreditedUuid())
-                .map(Account::getName)
-                .orElse(""));
+            return;
         }
+
+        getDao().getAccount(transaction.getAccountCreditedUuid()).ifPresent(account -> {
+            setText(account.getName());
+            setGraphic(IconManager.getAccountImageView(account));
+        });
     }
 }

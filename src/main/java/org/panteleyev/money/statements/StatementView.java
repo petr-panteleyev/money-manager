@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.cells.LocalDateCell;
+import org.panteleyev.money.cells.StatementRow;
 import org.panteleyev.money.cells.StatementSumCell;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -55,32 +56,32 @@ public class StatementView extends BorderPane {
         var actualDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.Date"));
         actualDateColumn.setCellFactory(x -> new LocalDateCell<>());
         actualDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getActual()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getActual()));
 
         var executionDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.ExecutionDate"));
         executionDateColumn.setCellFactory(x -> new LocalDateCell<>());
         executionDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getExecution()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getExecution()));
 
         var descriptionColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Description"));
         descriptionColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
 
         var counterPartyColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Payer.Payee"));
         counterPartyColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getCounterParty()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getCounterParty()));
 
         var placeColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Place"));
         placeColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
 
         var countryColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Country"));
         countryColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue().getCountry()));
+            new ReadOnlyObjectWrapper<>(p.getValue().getCountry()));
 
         var amountColumn = new TableColumn<StatementRecord, StatementRecord>(RB.getString("column.Sum"));
         amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, StatementRecord> p) ->
-                new ReadOnlyObjectWrapper<>(p.getValue()));
+            new ReadOnlyObjectWrapper<>(p.getValue()));
         amountColumn.setCellFactory(x -> new StatementSumCell());
 
         actualDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
@@ -91,14 +92,16 @@ public class StatementView extends BorderPane {
         countryColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
         amountColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.10));
 
+        tableView.setRowFactory(x -> new StatementRow());
+
         //noinspection unchecked
         tableView.getColumns().addAll(actualDateColumn,
-                executionDateColumn,
-                descriptionColumn,
-                counterPartyColumn,
-                placeColumn,
-                countryColumn,
-                amountColumn
+            executionDateColumn,
+            descriptionColumn,
+            counterPartyColumn,
+            placeColumn,
+            countryColumn,
+            amountColumn
         );
 
         createMenu();
@@ -106,7 +109,7 @@ public class StatementView extends BorderPane {
         setCenter(tableView);
 
         tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) ->
-                recordSelectedCallback.accept(newValue));
+            recordSelectedCallback.accept(newValue));
     }
 
     private Optional<StatementRecord> getSelectedRecord() {

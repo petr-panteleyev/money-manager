@@ -30,6 +30,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
@@ -41,6 +42,7 @@ import java.util.List;
 public class Import {
     private static final String SCHEMA = "/org/panteleyev/money/xml/money.xsd";
 
+    private final List<Icon> icons;
     private final List<Category> categories;
     private final List<Account> accounts;
     private final List<Contact> contacts;
@@ -50,11 +52,16 @@ public class Import {
     private static Schema moneySchema = null;
 
     private Import(ImportParser importParser) {
+        icons = importParser.getIcons();
         categories = importParser.getCategories();
         accounts = importParser.getAccounts();
         contacts = importParser.getContacts();
         currencies = importParser.getCurrencies();
         transactions = importParser.getTransactions();
+    }
+
+    public List<Icon> getIcons() {
+        return icons;
     }
 
     public List<Category> getCategories() {

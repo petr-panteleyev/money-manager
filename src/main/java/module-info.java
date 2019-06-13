@@ -24,4 +24,5 @@ open module org.panteleyev.money {
     requires org.jsoup;
     requires gson;
     requires jsch;
+    requires commons.csv;
 }

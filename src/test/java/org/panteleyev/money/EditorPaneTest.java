@@ -29,8 +29,6 @@ package org.panteleyev.money;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.Spinner;
 import org.panteleyev.money.persistence.BaseDaoTest;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
@@ -53,14 +51,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import static org.panteleyev.money.BaseTestUtils.RANDOM;
-import static org.panteleyev.money.UiTestUtils.getCheckBox;
-import static org.panteleyev.money.UiTestUtils.getControl;
-import static org.panteleyev.money.UiTestUtils.getTextField;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class EditorPaneTest extends BaseDaoTest {
-    private Currency curr_1;
-    private Currency curr_2;
     private Category category;
     private Contact contact;
     private Account acc_1;
@@ -88,7 +81,7 @@ public class EditorPaneTest extends BaseDaoTest {
     }
 
     private void createData() {
-        curr_1 = new Currency.Builder()
+        var curr_1 = new Currency.Builder()
             .symbol(UUID.randomUUID().toString())
             .description(UUID.randomUUID().toString())
             .formatSymbol(UUID.randomUUID().toString())
@@ -102,7 +95,7 @@ public class EditorPaneTest extends BaseDaoTest {
             .modified(System.currentTimeMillis())
             .build();
 
-        curr_2 = new Currency.Builder()
+        var curr_2 = new Currency.Builder()
             .symbol(UUID.randomUUID().toString())
             .description(UUID.randomUUID().toString())
             .formatSymbol(UUID.randomUUID().toString())
@@ -133,8 +126,8 @@ public class EditorPaneTest extends BaseDaoTest {
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
             .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getGuid())
-            .currencyUuid(curr_1.getGuid())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(curr_1.getUuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -146,8 +139,8 @@ public class EditorPaneTest extends BaseDaoTest {
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
             .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getGuid())
-            .currencyUuid(curr_2.getGuid())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(curr_2.getUuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -159,8 +152,8 @@ public class EditorPaneTest extends BaseDaoTest {
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
             .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getGuid())
-            .currencyUuid(curr_1.getGuid())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(curr_1.getUuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -187,28 +180,28 @@ public class EditorPaneTest extends BaseDaoTest {
 
     private void setUserInput(TransactionEditorPane pane, Transaction t, String contactName) {
         // Transaction type
-        getTextField(pane, "typeEdit").setText(t.getTransactionType().getTypeName());
+        pane.getTypeEdit().setText(t.getTransactionType().getTypeName());
 
         // Debited account
-        getTextField(pane, "debitedAccountEdit").setText(getDao().getAccount(t.getAccountDebitedUuid())
+        pane.getDebitedAccountEdit().setText(getDao().getAccount(t.getAccountDebitedUuid())
             .map(Account::getName)
             .orElse(""));
 
         // Credited account
-        getTextField(pane, "creditedAccountEdit").setText(getDao().getAccount(t.getAccountCreditedUuid())
+        pane.getCreditedAccountEdit().setText(getDao().getAccount(t.getAccountCreditedUuid())
             .map(Account::getName)
             .orElse(""));
 
-        getTextField(pane, "commentEdit").setText(t.getComment());
-        getTextField(pane, "sumEdit").setText(t.getAmount().toString());
-        getCheckBox(pane, "checkedCheckBox").setSelected(t.getChecked());
+        pane.getCommentEdit().setText(t.getComment());
+        pane.getSumEdit().setText(t.getAmount().toString());
+        pane.getCheckedCheckBox().setSelected(t.getChecked());
 
-        t.getContactUuid().ifPresent(uuid -> {
-            var cntct = getDao().getContact(uuid);
-            getTextField(pane, "contactEdit").setText(cntct.map(Contact::getName).orElse(""));
-        });
+        t.getContactUuid().ifPresent(uuid -> pane.getContactEdit().setText(getDao()
+            .getContact(uuid)
+            .map(Contact::getName)
+            .orElse("")));
         if (contactName != null) {
-            getTextField(pane, "contactEdit").setText(contactName);
+            pane.getContactEdit().setText(contactName);
         }
     }
 
@@ -222,27 +215,16 @@ public class EditorPaneTest extends BaseDaoTest {
         }
     }
 
-    private void pressButton(Object object, String name) {
-        try {
-            var f = object.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            var button = (Button) f.get(object);
-            button.fireEvent(new ActionEvent());
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+    private void pressAddButton(TransactionEditorPane pane) {
+        pane.getAddButton().fireEvent(new ActionEvent());
     }
 
-    private void pressAddButton(Object object) {
-        pressButton(object, "addButton");
+    private void pressUpdateButton(TransactionEditorPane pane) {
+        pane.getUpdateButton().fireEvent(new ActionEvent());
     }
 
-    private void pressUpdateButton(Object object) {
-        pressButton(object, "updateButton");
-    }
-
-    private void pressDeleteButton(Object object) {
-        pressButton(object, "deleteButton");
+    private void pressDeleteButton(TransactionEditorPane pane) {
+        pane.getDeleteButton().fireEvent(new ActionEvent());
     }
 
     private Transaction createTestTransaction(Account debit, Account credit, Contact contact) {
@@ -252,10 +234,10 @@ public class EditorPaneTest extends BaseDaoTest {
             .transactionType(TransactionType.CARD_PAYMENT)
             .accountCreditedType(category.getType())
             .accountDebitedType(category.getType())
-            .accountCreditedCategoryUuid(category.getGuid())
-            .accountDebitedCategoryUuid(category.getGuid())
-            .accountDebitedUuid(debit.getGuid())
-            .accountCreditedUuid(credit.getGuid())
+            .accountCreditedCategoryUuid(category.getUuid())
+            .accountDebitedCategoryUuid(category.getUuid())
+            .accountDebitedUuid(debit.getUuid())
+            .accountCreditedUuid(credit.getUuid())
             .day(now.getDayOfMonth())
             .month(now.getMonthValue())
             .year(now.getYear())
@@ -270,7 +252,7 @@ public class EditorPaneTest extends BaseDaoTest {
         }
 
         if (contact != null) {
-            builder.contactUuid(contact.getGuid());
+            builder.contactUuid(contact.getUuid());
         }
 
         return builder.build();
@@ -309,11 +291,9 @@ public class EditorPaneTest extends BaseDaoTest {
     }
 
     private void assertStatementRecord(TransactionEditorPane pane, StatementRecord record) {
-        var sumEdit = getTextField(pane, "sumEdit");
-        Assert.assertEquals(sumEdit.getText(), record.getAmount());
-
-        Spinner<Integer> daySpinner = getControl(pane, "daySpinner");
-        Assert.assertEquals((int) daySpinner.getValueFactory().getValue(), record.getActual().getDayOfMonth());
+        Assert.assertEquals(pane.getSumEdit().getText(), record.getAmount());
+        Assert.assertEquals((int) pane.getDaySpinner().getValueFactory().getValue(),
+            record.getActual().getDayOfMonth());
     }
 
     private void failOnEmptyBuilder() {
@@ -332,7 +312,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
-                Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertTrue(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -367,7 +347,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
-                Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertTrue(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -403,7 +383,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertEquals(c, newContact);
-                Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertTrue(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -436,7 +416,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
-                Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertTrue(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -446,7 +426,7 @@ public class EditorPaneTest extends BaseDaoTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getGuid(), transaction.getGuid());
+            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
@@ -469,7 +449,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnAddTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
-                Assert.assertFalse(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertFalse(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -479,7 +459,7 @@ public class EditorPaneTest extends BaseDaoTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getGuid(), transaction.getGuid());
+            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
@@ -503,7 +483,7 @@ public class EditorPaneTest extends BaseDaoTest {
 
             pane.setOnUpdateTransaction((builder, c) -> {
                 Assert.assertTrue(c.isEmpty());
-                Assert.assertTrue(getTextField(pane, "rate1Edit").isDisabled());
+                Assert.assertTrue(pane.getRate1Edit().isDisabled());
                 queue.add(Optional.ofNullable(builder));
             });
 
@@ -513,7 +493,7 @@ public class EditorPaneTest extends BaseDaoTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getGuid(), transaction.getGuid());
+            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
@@ -540,7 +520,7 @@ public class EditorPaneTest extends BaseDaoTest {
         });
 
         var resultedUuid = queue.take();
-        Assert.assertEquals(resultedUuid, transaction.getGuid());
+        Assert.assertEquals(resultedUuid, transaction.getUuid());
     }
 
     @Test

@@ -37,6 +37,9 @@ public final class StatementParser {
             case SBERBANK_HTML:
                 return SberbankParser.parseCreditCardHtml(inStream);
 
+            case YANDEX_MONEY_CSV:
+                return YandexMoneyCsvParser.parseYandexMoneyCsv(inStream);
+
             default:
                 throw new IllegalArgumentException();
         }

@@ -29,7 +29,12 @@ package org.panteleyev.money.ymoney;
 import com.google.gson.JsonObject;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
 
 class Operation {
     private final String id;
@@ -49,8 +54,10 @@ class Operation {
         var absAmount = json.get("amount").getAsBigDecimal();
         amount = "out".equalsIgnoreCase(direction) ? absAmount.negate() : absAmount;
 
-        var dateString = json.get("datetime").getAsString().substring(0, 10);
-        date = LocalDate.parse(dateString, DateTimeFormatter.ISO_DATE);
+        var dateString = json.get("datetime").getAsString();
+        var local = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+        var utc = ZonedDateTime.of(local, ZoneOffset.UTC);
+        date = LocalDate.ofInstant(utc.toInstant(), ZoneId.systemDefault());
     }
 
     String getId() {

@@ -39,6 +39,9 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
@@ -53,7 +56,10 @@ import org.panteleyev.commons.fx.Controller;
 import org.panteleyev.commons.fx.WindowManager;
 import org.panteleyev.commons.ssh.SshManager;
 import org.panteleyev.money.charts.ChartsTab;
+import org.panteleyev.money.icons.IconWindowController;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.statements.StatementTab;
 import org.panteleyev.money.xml.Export;
 import java.io.FileInputStream;
@@ -70,6 +76,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -77,7 +85,7 @@ public class MainWindowController extends BaseController {
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.money.res.ui";
-    static final URL CSS_PATH = MainWindowController.class.getResource("/org/panteleyev/money/res/main.css");
+    public static final URL CSS_PATH = MainWindowController.class.getResource("/org/panteleyev/money/res/main.css");
 
     public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
@@ -145,16 +153,14 @@ public class MainWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = new MenuItem(RB.getString("menu.File.Connect"));
-        fileConnectMenuItem.setOnAction(event -> onOpenConnection());
-        var fileCloseMenuItem = new MenuItem(RB.getString("menu.File.Close"));
-        fileCloseMenuItem.setOnAction(event -> onClose());
-        var fileExitMenuItem = new MenuItem(RB.getString("menu.File.Exit"));
-        fileExitMenuItem.setOnAction(event -> onExit());
-        var exportMenuItem = new MenuItem(RB.getString("menu.Tools.Export"));
-        exportMenuItem.setOnAction(event -> xmlDump());
+        var fileConnectMenuItem = newMenuItem(RB, "menu.File.Connect",
+            new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), event -> onOpenConnection());
+        var fileCloseMenuItem = newMenuItem(RB, "menu.File.Close", event -> onClose());
+        var fileExitMenuItem = newMenuItem(RB, "menu.File.Exit", event -> onExit());
+        var exportMenuItem = newMenuItem(RB, "menu.Tools.Export", event -> xmlDump());
         var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
         importMenuItem.setOnAction(event -> onImport());
+        var reportMenuItem = newMenuItem(RB, "menu.File.Report", event -> onReport());
 
         var fileMenu = new Menu(RB.getString("menu.File"), null,
             fileConnectMenuItem,
@@ -162,18 +168,20 @@ public class MainWindowController extends BaseController {
             importMenuItem,
             exportMenuItem,
             new SeparatorMenuItem(),
+            reportMenuItem,
+            new SeparatorMenuItem(),
             fileCloseMenuItem,
             new SeparatorMenuItem(),
             fileExitMenuItem);
 
         var editDeleteMenuItem = new MenuItem(RB.getString("menu.Edit.Delete"));
 
-        var currenciesMenuItem = new MenuItem(RB.getString("menu.Edit.Currencies"));
-        currenciesMenuItem.setOnAction(event -> onManageCurrencies());
-        var categoriesMenuItem = new MenuItem(RB.getString("menu.Edit.Categories"));
-        categoriesMenuItem.setOnAction(event -> onManageCategories());
-        var contactsMenuItem = new MenuItem(RB.getString("menu.Edit.Contacts"));
-        contactsMenuItem.setOnAction(event -> onManageContacts());
+        var currenciesMenuItem = newMenuItem(RB, "menu.Edit.Currencies",
+            new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN), event -> onManageCurrencies());
+        var categoriesMenuItem = newMenuItem(RB, "menu.Edit.Categories",
+            new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN), event -> onManageCategories());
+        var contactsMenuItem = newMenuItem(RB, "menu.Edit.Contacts",
+            new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN), event -> onManageContacts());
 
         var editMenu = new Menu(RB.getString("menu.Edit"), null,
             editDeleteMenuItem,
@@ -187,16 +195,17 @@ public class MainWindowController extends BaseController {
         var profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
         profilesMenuItem.setOnAction(a -> profileManager.getEditor(false).showAndWait());
 
-        var optionsMenuItem = new MenuItem(RB.getString("menu.Tools.Options"));
-        optionsMenuItem.setOnAction(event -> onOptions());
-        var importSettingsMenuItem = new MenuItem(RB.getString("menu.tools.import.settings"));
-        importSettingsMenuItem.setOnAction(a -> onImportSettings());
-        var exportSettingsMenuItem = new MenuItem(RB.getString("menu.tool.export.settings"));
-        exportSettingsMenuItem.setOnAction(a -> onExportSettings());
+        var optionsMenuItem = newMenuItem(RB, "menu.Tools.Options", event -> onOptions());
+        var importSettingsMenuItem = newMenuItem(RB, "menu.tools.import.settings", event -> onImportSettings());
+        var exportSettingsMenuItem = newMenuItem(RB, "menu.tool.export.settings", event -> onExportSettings());
+        var iconWindowMenuItem = new MenuItem(RB.getString("string.icons") + "...");
+        iconWindowMenuItem.setOnAction(a -> onIconWindow());
 
         var toolsMenu = new Menu(RB.getString("menu.Tools"), null,
             sshMenuItem,
             profilesMenuItem,
+            new SeparatorMenuItem(),
+            iconWindowMenuItem,
             new SeparatorMenuItem(),
             optionsMenuItem,
             importSettingsMenuItem,
@@ -214,9 +223,11 @@ public class MainWindowController extends BaseController {
         currenciesMenuItem.disableProperty().bind(dbOpenProperty.not());
         categoriesMenuItem.disableProperty().bind(dbOpenProperty.not());
         contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
+        iconWindowMenuItem.disableProperty().bind(dbOpenProperty.not());
 
         exportMenuItem.disableProperty().bind(dbOpenProperty.not());
         importMenuItem.disableProperty().bind(dbOpenProperty.not());
+        reportMenuItem.disableProperty().bind(dbOpenProperty.not());
 
         return menuBar;
     }
@@ -290,6 +301,15 @@ public class MainWindowController extends BaseController {
         stage.toFront();
     }
 
+    private void onIconWindow() {
+        var controller = WindowManager.find(IconWindowController.class)
+            .orElseGet(IconWindowController::new);
+
+        var stage = controller.getStage();
+        stage.show();
+        stage.toFront();
+    }
+
     private void onExit() {
         getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
@@ -336,7 +356,7 @@ public class MainWindowController extends BaseController {
 
         getDao().initialize(ds);
 
-        Future loadResult = CompletableFuture
+        var loadResult = CompletableFuture
             .runAsync(() -> getDao().preload())
             .thenRun(() -> Platform.runLater(() -> {
                 setTitle(AboutDialog.APP_TITLE + " - " + profile.getName() + " - " + profile.getConnectionString());
@@ -378,29 +398,76 @@ public class MainWindowController extends BaseController {
             new FileChooser.ExtensionFilter("All Files", "*.*"));
 
         var selected = fileChooser.showSaveDialog(null);
-
-        if (selected != null) {
-            CompletableFuture.runAsync(() -> {
-                try (var outputStream = new FileOutputStream(selected)) {
-                    new Export()
-                        .withCategories(getDao().getCategories())
-                        .withAccounts(getDao().getAccounts(), false)
-                        .withCurrencies(getDao().getCurrencies())
-                        .withContacts(getDao().getContacts())
-                        .withTransactions(getDao().getTransactions(), false)
-                        .doExport(outputStream);
-                    Options.setLastExportDir(selected.getParent());
-                } catch (IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
-            });
+        if (selected == null) {
+            return;
         }
+
+        CompletableFuture.runAsync(() -> {
+            try (var outputStream = new FileOutputStream(selected)) {
+                new Export()
+                    .withIcons(getDao().getIcons())
+                    .withCategories(getDao().getCategories(), false)
+                    .withAccounts(getDao().getAccounts(), false)
+                    .withCurrencies(getDao().getCurrencies())
+                    .withContacts(getDao().getContacts(), false)
+                    .withTransactions(getDao().getTransactions(), false)
+                    .doExport(outputStream);
+                Options.setLastExportDir(selected.getParent());
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void onImport() {
         new ImportWizard().showAndWait();
     }
 
+    private void onReport() {
+        var tab = tabPane.getSelectionModel().getSelectedItem().getContent();
+        String prefix;
+        if (tab instanceof TransactionListTab) {
+            prefix = "transactions";
+        } else if (tab instanceof AccountsTab) {
+            prefix = "accounts";
+        } else if (tab instanceof StatementTab) {
+            prefix = "statement";
+        } else {
+            return;
+        }
+
+        var fileChooser = new FileChooser();
+        fileChooser.setTitle("Report");
+        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        fileChooser.setInitialFileName(generateFileName(prefix));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
+
+        var selected = fileChooser.showSaveDialog(null);
+        if (selected == null) {
+            return;
+        }
+
+        try (var outputStream = new FileOutputStream(selected)) {
+            if (tab instanceof TransactionListTab) {
+                var filter = ((TransactionListTab) tab).getTransactionFilter();
+                var transactions = getDao().getTransactions(filter)
+                    .sorted(Transaction.BY_DATE)
+                    .collect(Collectors.toList());
+                Reports.reportTransactions(transactions, outputStream);
+            } else if (tab instanceof AccountsTab) {
+                var filter = ((AccountsTab) tab).getAccountFilter();
+                var accounts = getDao().getAccounts(filter)
+                    .sorted(Account.COMPARE_BY_CATEGORY.thenComparing(Account.COMPARE_BY_NAME))
+                    .collect(Collectors.toList());
+                Reports.reportAccounts(accounts, outputStream);
+            } else {
+                ((StatementTab) tab).getStatement()
+                    .ifPresent(statement -> Reports.reportStatement(statement, outputStream));
+            }
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
 
     private Exception onInitDatabase(org.panteleyev.commons.database.ConnectionProfile profile) {
         var ds = onBuildDatasource(profile);

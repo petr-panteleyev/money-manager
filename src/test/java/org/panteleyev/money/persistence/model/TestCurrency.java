@@ -101,7 +101,7 @@ public class TestCurrency extends BaseTest {
             .rate(original.getRate())
             .direction(original.getDirection())
             .useThousandSeparator(original.getUseThousandSeparator())
-            .guid(original.getGuid())
+            .guid(original.getUuid())
             .created(original.getCreated())
             .modified(original.getModified())
             .build();

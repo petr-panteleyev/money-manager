@@ -31,10 +31,10 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.xml.Export;
 import org.panteleyev.money.xml.Import;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.io.ByteArrayInputStream;
@@ -45,23 +45,32 @@ import static org.panteleyev.money.BaseTestUtils.newAccount;
 import static org.panteleyev.money.BaseTestUtils.newCategory;
 import static org.panteleyev.money.BaseTestUtils.newContact;
 import static org.panteleyev.money.BaseTestUtils.newCurrency;
+import static org.panteleyev.money.BaseTestUtils.newIcon;
 import static org.panteleyev.money.BaseTestUtils.newTransaction;
+import static org.panteleyev.money.persistence.BaseDaoTest.ICON_DOLLAR;
+import static org.panteleyev.money.persistence.BaseDaoTest.ICON_EURO;
+import static org.panteleyev.money.persistence.BaseDaoTest.ICON_JAVA;
+import static org.testng.Assert.assertEquals;
 
 /**
  * This test covers XML export/import without database interaction.
  */
 public class TestImportExport extends BaseTest {
-    private final Category cat1 = newCategory();
-    private final Category cat2 = newCategory();
-    private final Category cat3 = newCategory();
+    private final Icon icon1 = newIcon(ICON_DOLLAR);
+    private final Icon icon2 = newIcon(ICON_EURO);
+    private final Icon icon3 = newIcon(ICON_JAVA);
+
+    private final Category cat1 = newCategory(icon1);
+    private final Category cat2 = newCategory(icon1);
+    private final Category cat3 = newCategory(icon2);
 
     private final Currency curr1 = newCurrency();
     private final Currency curr2 = newCurrency();
     private final Currency curr3 = newCurrency();
 
     private final Account acc1 = newAccount(cat1, curr1);
-    private final Account acc2 = newAccount(cat2, curr1);
-    private final Account acc3 = newAccount(cat3, curr3);
+    private final Account acc2 = newAccount(cat2, curr1, icon2);
+    private final Account acc3 = newAccount(cat3, curr3, icon3);
 
     private final Contact con1 = newContact();
     private final Contact con2 = newContact();
@@ -76,13 +85,14 @@ public class TestImportExport extends BaseTest {
         .detailed(true)
         .build();
     private final Transaction detail1 = new Transaction.Builder(newTransaction(acc2, acc1, con1))
-        .parentUuid(detailedTransaction.getGuid())
+        .parentUuid(detailedTransaction.getUuid())
         .build();
     private final Transaction detail2 = new Transaction.Builder(newTransaction(acc2, acc3))
-        .parentUuid(detailedTransaction.getGuid())
+        .parentUuid(detailedTransaction.getUuid())
         .build();
 
     private final MoneyDAOMock mock = new MoneyDAOMock(
+        List.of(icon1, icon2, icon3),
         List.of(cat1, cat2, cat3),
         List.of(acc1, acc2, acc3),
         List.of(con1, con2, con3),
@@ -95,9 +105,10 @@ public class TestImportExport extends BaseTest {
         return new Object[][]{
             {
                 // Empty lists
-                List.of(), List.of(), List.of(), List.of(), List.of()
+                List.of(), List.of(), List.of(), List.of(), List.of(), List.of()
             },
             {
+                List.of(icon1, icon2, icon3),
                 List.of(cat1, cat2),
                 List.of(acc1, acc2, acc3),
                 List.of(newContact(), newContact(), newContact("A & B <some@email.com>")),
@@ -111,7 +122,8 @@ public class TestImportExport extends BaseTest {
     }
 
     @Test(dataProvider = "importExportData")
-    public void testExportAndImport(List<Category> categories,
+    public void testExportAndImport(List<Icon> icons,
+                                    List<Category> categories,
                                     List<Account> accounts,
                                     List<Contact> contacts,
                                     List<Currency> currencies,
@@ -119,20 +131,65 @@ public class TestImportExport extends BaseTest {
     {
         var outStream = new ByteArrayOutputStream();
 
-        new Export().withCategories(categories)
+        new Export().withIcons(icons)
+            .withCategories(categories, false)
             .withAccounts(accounts, false)
-            .withContacts(contacts)
+            .withContacts(contacts, false)
             .withCurrencies(currencies)
             .withTransactions(transactions, false)
             .doExport(outStream);
 
         var imp = Import.doImport(new ByteArrayInputStream(outStream.toByteArray()));
 
-        Assert.assertEquals(imp.getCategories(), categories);
-        Assert.assertEquals(imp.getAccounts(), accounts);
-        Assert.assertEquals(imp.getContacts(), contacts);
-        Assert.assertEquals(imp.getCurrencies(), currencies);
-        Assert.assertEquals(imp.getTransactions(), transactions);
+        assertEquals(imp.getIcons(), icons);
+        assertEquals(imp.getCategories(), categories);
+        assertEquals(imp.getAccounts(), accounts);
+        assertEquals(imp.getContacts(), contacts);
+        assertEquals(imp.getCurrencies(), currencies);
+        assertEquals(imp.getTransactions(), transactions);
+    }
+
+    @Test
+    public void testCategoriesWithDependencies() throws Exception {
+        var outStream = new ByteArrayOutputStream();
+
+        new Export(mock).withCategories(List.of(), true).doExport(outStream);
+        var bytes1 = outStream.toByteArray();
+        validateXML(new ByteArrayInputStream(bytes1));
+
+        var imp1 = Import.doImport(new ByteArrayInputStream(bytes1));
+        assertEmpty(imp1.getIcons());
+        assertEmpty(imp1.getTransactions());
+        assertEmpty(imp1.getContacts());
+        assertEmpty(imp1.getCategories());
+        assertEmpty(imp1.getCurrencies());
+        assertEmpty(imp1.getAccounts());
+
+        outStream.reset();
+        new Export(mock).withCategories(List.of(cat1, cat2), true).doExport(outStream);
+        var bytes2 = outStream.toByteArray();
+        validateXML(new ByteArrayInputStream(bytes2));
+
+        var imp2 = Import.doImport(new ByteArrayInputStream(bytes2));
+        assertEmpty(imp2.getAccounts());
+        assertEmpty(imp2.getTransactions());
+        assertEmpty(imp2.getContacts());
+
+        assertRecords(imp2.getIcons(), icon1);
+        assertRecords(imp2.getCategories(), cat1, cat2);
+
+        outStream.reset();
+        new Export(mock).withCategories(List.of(cat1, cat3), true).doExport(outStream);
+        var bytes3 = outStream.toByteArray();
+        validateXML(new ByteArrayInputStream(bytes3));
+
+        var imp3 = Import.doImport(new ByteArrayInputStream(bytes3));
+        assertEmpty(imp3.getAccounts());
+        assertEmpty(imp3.getTransactions());
+        assertEmpty(imp3.getContacts());
+
+        assertRecords(imp3.getIcons(), icon1, icon2);
+        assertRecords(imp3.getCategories(), cat1, cat3);
     }
 
     @Test
@@ -144,6 +201,7 @@ public class TestImportExport extends BaseTest {
         validateXML(new ByteArrayInputStream(bytes1));
 
         var imp1 = Import.doImport(new ByteArrayInputStream(bytes1));
+        assertEmpty(imp1.getIcons());
         assertEmpty(imp1.getTransactions());
         assertEmpty(imp1.getContacts());
         assertEmpty(imp1.getCategories());
@@ -159,6 +217,7 @@ public class TestImportExport extends BaseTest {
         assertEmpty(imp2.getTransactions());
         assertEmpty(imp2.getContacts());
 
+        assertRecords(imp2.getIcons(), icon1, icon2, icon3);
         assertRecords(imp2.getCategories(), cat1, cat2, cat3);
         assertRecords(imp2.getCurrencies(), curr1, curr3);
         assertRecords(imp2.getAccounts(), acc1, acc2, acc3);
@@ -173,6 +232,7 @@ public class TestImportExport extends BaseTest {
         assertEmpty(imp3.getTransactions());
         assertEmpty(imp3.getContacts());
 
+        assertRecords(imp3.getIcons(), icon2, icon3);
         assertRecords(imp3.getCategories(), cat3);
         assertRecords(imp3.getCurrencies(), curr3);
         assertRecords(imp3.getAccounts(), acc3);
@@ -187,6 +247,7 @@ public class TestImportExport extends BaseTest {
         assertEmpty(imp4.getTransactions());
         assertEmpty(imp4.getContacts());
 
+        assertRecords(imp4.getIcons(), icon1, icon2);
         assertRecords(imp4.getCategories(), cat1, cat2);
         assertRecords(imp4.getCurrencies(), curr1);
         assertRecords(imp4.getAccounts(), acc1, acc2);
@@ -201,6 +262,7 @@ public class TestImportExport extends BaseTest {
         validateXML(new ByteArrayInputStream(bytes1));
 
         var imp1 = Import.doImport(new ByteArrayInputStream(bytes1));
+        assertRecords(imp1.getIcons(), icon1, icon2, icon3);
         assertRecords(imp1.getCategories(), cat1, cat2, cat3);
         assertRecords(imp1.getAccounts(), acc1, acc2, acc3);
         assertRecords(imp1.getCurrencies(), curr1, curr3);

@@ -30,7 +30,7 @@ import org.panteleyev.persistence.Record;
 import java.util.UUID;
 
 public interface MoneyRecord extends Record<UUID> {
-    UUID getGuid();
+    UUID getUuid();
     long getCreated();
     long getModified();
 }

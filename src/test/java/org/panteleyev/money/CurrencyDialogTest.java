@@ -36,8 +36,6 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.BaseTestUtils.randomBoolean;
-import static org.panteleyev.money.UiTestUtils.getCheckBox;
-import static org.panteleyev.money.UiTestUtils.getTextField;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -64,11 +62,11 @@ public class CurrencyDialogTest extends BaseTest {
     }
 
     private void setupDialog(CurrencyDialog dialog) {
-        getTextField(dialog, "nameEdit").setText(CURRENCY.getSymbol());
-        getTextField(dialog, "descrEdit").setText(CURRENCY.getDescription());
-        getTextField(dialog, "rateEdit").setText(CURRENCY.getRate().toString());
-        getCheckBox(dialog, "thousandSeparatorCheck").setSelected(CURRENCY.getUseThousandSeparator());
-        getCheckBox(dialog, "defaultCheck").setSelected(CURRENCY.getDef());
+        dialog.getNameEdit().setText(CURRENCY.getSymbol());
+        dialog.getDescrEdit().setText(CURRENCY.getDescription());
+        dialog.getRateEdit().setText(CURRENCY.getRate().toString());
+        dialog.getThousandSeparatorCheck().setSelected(CURRENCY.getUseThousandSeparator());
+        dialog.getDefaultCheck().setSelected(CURRENCY.getDef());
     }
 
     private void setupDialogUpdate(CurrencyDialog dialog) {
@@ -87,7 +85,7 @@ public class CurrencyDialogTest extends BaseTest {
 
         var currency = queue.take();
 
-        assertNotNull(currency.getGuid());
+        assertNotNull(currency.getUuid());
         assertCurrency(currency);
         assertEquals(currency.getCreated(), currency.getModified());
     }
@@ -105,7 +103,7 @@ public class CurrencyDialogTest extends BaseTest {
 
         var currency = queue.take();
 
-        assertEquals(currency.getGuid(), CURRENCY.getGuid());
+        assertEquals(currency.getUuid(), CURRENCY.getUuid());
         assertCurrency(currency);
         assertTrue(currency.getModified() > CURRENCY.getModified());
         assertTrue(currency.getModified() > currency.getCreated());

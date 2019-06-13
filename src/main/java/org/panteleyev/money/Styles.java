@@ -47,4 +47,9 @@ public interface Styles {
     // Transaction Editor
     String RATE_LABEL = "rateLabel";
     String SUB_LABEL = "subLabel";
+
+    // Statement
+    String STATEMENT_NOT_FOUND = "statementRed";
+    String STATEMENT_ALL_CHECKED = "statementGreen";
+    String STATEMENT_NOT_CHECKED = "statementYellow";
 }

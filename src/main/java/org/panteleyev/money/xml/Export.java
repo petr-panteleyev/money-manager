@@ -31,6 +31,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,6 +39,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,6 +52,7 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 public class Export {
     private final RecordSource source;
 
+    private Collection<Icon> icons = new LinkedHashSet<>();
     private Collection<Category> categories = new ArrayList<>();
     private Collection<Account> accounts = new ArrayList<>();
     private Collection<Contact> contacts = new ArrayList<>();
@@ -68,8 +71,23 @@ public class Export {
         return source;
     }
 
-    public Export withCategories(Collection<Category> categories) {
-        this.categories = categories;
+    public Export withIcons(Collection<Icon> icons) {
+        this.icons.addAll(icons);
+        return this;
+    }
+
+    public Export withCategories(Collection<Category> categories, boolean withDeps) {
+        this.categories.addAll(categories);
+
+        if (withDeps) {
+            icons.addAll(categories.stream()
+                .map(Category::getIconUuid)
+                .distinct()
+                .map(source::getIcon)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()));
+        }
+
         return this;
     }
 
@@ -77,12 +95,19 @@ public class Export {
         this.accounts = accounts;
 
         if (withDeps) {
-            categories = accounts.stream()
+            withCategories(accounts.stream()
                 .map(Account::getCategoryUuid)
                 .distinct()
                 .map(source::getCategory)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), true);
+
+            icons.addAll(accounts.stream()
+                .map(Account::getIconUuid)
+                .distinct()
+                .map(source::getIcon)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()));
 
             currencies = accounts.stream()
                 .flatMap(a -> a.getCurrencyUuid().stream())
@@ -95,8 +120,18 @@ public class Export {
         return this;
     }
 
-    public Export withContacts(Collection<Contact> contacts) {
+    public Export withContacts(Collection<Contact> contacts, boolean withDeps) {
         this.contacts = contacts;
+
+        if (withDeps) {
+            icons.addAll(contacts.stream()
+                .map(Contact::getIconUuid)
+                .distinct()
+                .map(source::getIcon)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList()));
+        }
+
         return this;
     }
 
@@ -118,12 +153,12 @@ public class Export {
                 .collect(Collectors.toList());
             transactions.addAll(details);
 
-            contacts = toExport.stream()
+            withContacts(toExport.stream()
                 .flatMap(t -> t.getContactUuid().stream())
                 .distinct()
                 .map(source::getContact)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), true);
 
             var accIdList = new HashSet<UUID>();
             for (var t : transactions) {
@@ -145,6 +180,11 @@ public class Export {
         try {
             var rootElement = createDocument("Money");
             var doc = rootElement.getOwnerDocument();
+
+            var iconRoot = appendElement(rootElement, "Icons");
+            for (var icon : icons) {
+                iconRoot.appendChild(exportIcon(doc, icon));
+            }
 
             var accountRoot = appendElement(rootElement, "Accounts");
             for (var account : accounts) {
@@ -177,13 +217,26 @@ public class Export {
         }
     }
 
+    private static Element exportIcon(Document doc, Icon icon) {
+        var e = doc.createElement("Icon");
+
+        appendTextNode(e, "uuid", icon.getUuid());
+        appendTextNode(e, "name", icon.getName());
+        appendTextNode(e, "bytes", icon.getBytes());
+        appendTextNode(e, "created", icon.getCreated());
+        appendTextNode(e, "modified", icon.getModified());
+
+        return e;
+    }
+
     private static Element exportCategory(Document doc, Category category) {
         var e = doc.createElement("Category");
 
         appendTextNode(e, "name", category.getName());
         appendTextNode(e, "comment", category.getComment());
         appendTextNode(e, "catTypeId", category.getCatTypeId());
-        appendTextNode(e, "guid", category.getGuid());
+        appendTextNode(e, "iconUuid", category.getIconUuid());
+        appendTextNode(e, "guid", category.getUuid());
         appendTextNode(e, "created", category.getCreated());
         appendTextNode(e, "modified", category.getModified());
 
@@ -205,7 +258,8 @@ public class Export {
         appendTextNode(e, "enabled", account.getEnabled());
         appendTextNode(e, "interest", account.getInterest());
         account.getClosingDate().ifPresent(closingDate -> appendTextNode(e, "closingDate", closingDate));
-        appendTextNode(e, "guid", account.getGuid());
+        appendTextNode(e, "iconUuid", account.getIconUuid());
+        appendTextNode(e, "guid", account.getUuid());
         appendTextNode(e, "created", account.getCreated());
         appendTextNode(e, "modified", account.getModified());
 
@@ -226,7 +280,8 @@ public class Export {
         appendTextNode(e, "city", contact.getCity());
         appendTextNode(e, "country", contact.getCountry());
         appendTextNode(e, "zip", contact.getZip());
-        appendTextNode(e, "guid", contact.getGuid());
+        appendTextNode(e, "iconUuid", contact.getIconUuid());
+        appendTextNode(e, "guid", contact.getUuid());
         appendTextNode(e, "created", contact.getCreated());
         appendTextNode(e, "modified", contact.getModified());
 
@@ -245,7 +300,7 @@ public class Export {
         appendTextNode(e, "rate", currency.getRate().toString());
         appendTextNode(e, "direction", currency.getDirection());
         appendTextNode(e, "useThousandSeparator", currency.getUseThousandSeparator());
-        appendTextNode(e, "guid", currency.getGuid());
+        appendTextNode(e, "guid", currency.getUuid());
         appendTextNode(e, "created", currency.getCreated());
         appendTextNode(e, "modified", currency.getModified());
 
@@ -272,7 +327,7 @@ public class Export {
         appendTextNode(e, "rate", t.getRate());
         appendTextNode(e, "rateDirection", t.getRateDirection());
         appendTextNode(e, "invoiceNumber", t.getInvoiceNumber());
-        appendTextNode(e, "guid", t.getGuid());
+        appendTextNode(e, "guid", t.getUuid());
         appendTextNode(e, "created", t.getCreated());
         appendTextNode(e, "modified", t.getModified());
         t.getParentUuid().ifPresent(uuid -> appendTextNode(e, "parentUuid", uuid));

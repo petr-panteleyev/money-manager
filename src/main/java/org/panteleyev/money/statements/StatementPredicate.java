@@ -41,7 +41,7 @@ class StatementPredicate implements Predicate<Transaction> {
     private final boolean ignoreExecutionDate;
 
     StatementPredicate(Account account, StatementRecord record, boolean ignoreExecutionDate) {
-        this.accountUuid = account == null ? null : account.getGuid();
+        this.accountUuid = account == null ? null : account.getUuid();
         this.record = record;
         this.ignoreExecutionDate = ignoreExecutionDate;
     }

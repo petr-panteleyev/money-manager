@@ -32,31 +32,49 @@ import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakMapChangeListener;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
+import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import org.panteleyev.money.cells.CategoryNameCell;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.persistence.model.Category;
+import org.panteleyev.money.persistence.model.CategoryType;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import static org.panteleyev.money.FXFactory.newMenuBar;
 import static org.panteleyev.money.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryWindowController extends BaseController {
+    private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
+    private final TextField searchField = FXFactory.newSearchField(s -> updatePredicate());
+
     private final ObservableList<Category> categoryList = FXCollections.observableArrayList();
-    private final TableView<Category> categoryTable = new TableView<>();
+    private final FilteredList<Category> filteredList = new FilteredList<>(categoryList);
+    private final TableView<Category> categoryTable = new TableView<>(filteredList);
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<UUID, Category> categoriesListener = change ->
         Platform.runLater(this::updateWindow);
-
 
     CategoryWindowController() {
         // Event handlers
@@ -70,7 +88,11 @@ final class CategoryWindowController extends BaseController {
                 newMenuItem(RB, "menu.File.Close", event -> onClose())),
             new Menu(RB.getString("menu.Edit"), null,
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+                newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.Edit.Search",
+                    new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
+                    actionEvent -> searchField.requestFocus())),
             createHelpMenu(RB));
 
         // Context Menu
@@ -80,7 +102,7 @@ final class CategoryWindowController extends BaseController {
 
         // Table
         var colType = new TableColumn<Category, String>(RB.getString("column.Type"));
-        var colName = new TableColumn<Category, String>(RB.getString("column.Name"));
+        var colName = new TableColumn<Category, Category>(RB.getString("column.Name"));
         var colDescription = new TableColumn<Category, String>(RB.getString("column.Description"));
 
         //noinspection unchecked
@@ -88,28 +110,44 @@ final class CategoryWindowController extends BaseController {
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
+        var hBox = new HBox(5, searchField, typeChoiceBox);
+        var pane = new BorderPane();
+        pane.setTop(hBox);
+        pane.setCenter(categoryTable);
+
+        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+
         var self = new BorderPane();
         self.setPrefSize(600.0, 400.0);
         self.setTop(menuBar);
-        self.setCenter(categoryTable);
+        self.setCenter(pane);
 
-        categoryTable.setItems(categoryList);
+        typeChoiceBox.getItems().add(RB.getString("contact.Window.AllTypes"));
+        typeChoiceBox.getItems().add(new Separator());
+        typeChoiceBox.getItems().addAll(CategoryType.values());
+        typeChoiceBox.getSelectionModel().select(0);
+
+        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
+            public String toString(Object obj) {
+                return obj instanceof CategoryType ? ((CategoryType) obj).getTypeName() : obj.toString();
+            }
+        });
+
+        typeChoiceBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
+
         updateList();
 
         colType.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
-        colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
+        colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, Category> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        colName.setCellFactory(x -> new CategoryNameCell());
         colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
 
-        colType.setSortable(true);
-        categoryTable.getSortOrder().add(colType);
-        colType.setSortType(TableColumn.SortType.ASCENDING);
-
         colType.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
-        colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
-        colDescription.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.6));
+        colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.4));
+        colDescription.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.4));
 
         getDao().categories().addListener(new WeakMapChangeListener<>(categoriesListener));
         setupWindow(self);
@@ -125,7 +163,30 @@ final class CategoryWindowController extends BaseController {
     }
 
     private void updateList() {
-        categoryList.setAll(getDao().getCategories());
+        categoryList.setAll(getDao().categories().values().stream()
+            .sorted(Category.COMPARE_BY_TYPE.thenComparing(Category.COMPARE_BY_NAME))
+            .collect(Collectors.toList()));
+        updatePredicate();
+    }
+
+    private Predicate<Category> getPredicate() {
+        Predicate<Category> filter;
+
+        // Type
+        var type = typeChoiceBox.getSelectionModel().getSelectedItem();
+        if (type instanceof String) {
+            filter = x -> true;
+        } else {
+            filter = x -> x.getType() == type;
+        }
+
+        // Name
+        var search = searchField.getText().toLowerCase();
+        if (!search.isEmpty()) {
+            filter = filter.and(x -> x.getName().toLowerCase().contains(search));
+        }
+
+        return filter;
     }
 
     private void onTableMouseClick(Event event) {
@@ -146,7 +207,11 @@ final class CategoryWindowController extends BaseController {
 
     private void updateWindow() {
         int selIndex = categoryTable.getSelectionModel().getSelectedIndex();
-        categoryList.setAll(getDao().categories().values());
+        updateList();
         categoryTable.getSelectionModel().select(selIndex);
+    }
+
+    private void updatePredicate() {
+        filteredList.setPredicate(getPredicate());
     }
 }

@@ -127,7 +127,7 @@ public final class Currency implements MoneyRecord {
         return this.useThousandSeparator;
     }
 
-    public UUID getGuid() {
+    public UUID getUuid() {
         return this.guid;
     }
 
@@ -216,7 +216,7 @@ public final class Currency implements MoneyRecord {
             rate = c.getRate();
             direction = c.getDirection();
             useThousandSeparator = c.getUseThousandSeparator();
-            guid = c.getGuid();
+            guid = c.getUuid();
             created = c.getCreated();
             modified = c.getModified();
         }

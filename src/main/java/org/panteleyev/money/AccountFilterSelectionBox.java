@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.persistence.model.Account;
-import org.panteleyev.money.persistence.AccountFilter;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
@@ -60,7 +59,7 @@ public class AccountFilterSelectionBox extends HBox {
         setAlignment(Pos.CENTER_LEFT);
 
         getChildren().addAll(new Label(RB.getString("text.In.Semicolon")),
-                categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
+            categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
 
         categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
@@ -87,10 +86,10 @@ public class AccountFilterSelectionBox extends HBox {
         categoryChoiceBox.setOnAction(event -> setupAccountBox(getSelectedCategory()));
 
         MapChangeListener<UUID, Category> categoryListener = change ->
-                Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
+            Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
 
         MapChangeListener<UUID, Account> accountListener = change ->
-                Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
+            Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
 
         getDao().categories().addListener(categoryListener);
         getDao().accounts().addListener(accountListener);
@@ -129,9 +128,9 @@ public class AccountFilterSelectionBox extends HBox {
         var items = accountChoiceBox.getItems();
         items.setAll(ALL_ACCOUNTS_STRING);
 
-        category.ifPresent(cat -> getDao().getAccountsByCategory(cat.getGuid()).stream()
-                .filter(Account::getEnabled)
-                .forEach(items::add));
+        category.ifPresent(cat -> getDao().getAccountsByCategory(cat.getUuid()).stream()
+            .filter(Account::getEnabled)
+            .forEach(items::add));
 
         if (items.size() > 1) {
             items.add(1, new Separator());
@@ -156,17 +155,17 @@ public class AccountFilterSelectionBox extends HBox {
     }
 
     Predicate<Transaction> getTransactionFilter() {
-        return getSelectedAccount().map(a -> TransactionFilter.byAccount(a.getGuid()))
-                .orElseGet(() -> getSelectedCategory().map(c -> TransactionFilter.byCategory(c.getGuid()))
-                        .orElseGet(() -> getSelectedCategoryType().map(t -> TransactionFilter.byCategoryType(t.getId()))
-                                .orElse(x -> true)));
+        return getSelectedAccount().map(a -> TransactionFilter.byAccount(a.getUuid()))
+            .orElseGet(() -> getSelectedCategory().map(c -> TransactionFilter.byCategory(c.getUuid()))
+                .orElseGet(() -> getSelectedCategoryType().map(t -> TransactionFilter.byCategoryType(t.getId()))
+                    .orElse(x -> true)));
     }
 
     public Predicate<Account> getAccountFilter() {
-        return getSelectedAccount().map(a -> AccountFilter.byAccount(a.getGuid()))
-                .orElseGet(() -> getSelectedCategory().map(c -> AccountFilter.byCategory(c.getGuid()))
-                        .orElseGet(() -> getSelectedCategoryType().map(t -> AccountFilter.byCategoryType(t.getId()))
-                                .orElse(x -> true)));
+        return getSelectedAccount().map(a -> Account.getFilterByAccount(a.getUuid()))
+            .orElseGet(() -> getSelectedCategory().map(c -> Account.getFilterByCategory(c.getUuid()))
+                .orElseGet(() -> getSelectedCategoryType().map(t -> Account.getFilterByCategoryType(t.getId()))
+                    .orElse(x -> true)));
     }
 
     public void setAccount(Account account) {

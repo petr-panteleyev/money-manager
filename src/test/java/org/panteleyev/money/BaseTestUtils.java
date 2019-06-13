@@ -32,8 +32,11 @@ import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.ContactType;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.persistence.model.TransactionType;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -100,11 +103,31 @@ public interface BaseTestUtils {
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
             .typeId(category.getType().getId())
-            .categoryUuid(category.getGuid())
-            .currencyUuid(currency.getGuid())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(currency.getUuid())
             .enabled(RANDOM.nextBoolean())
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
+            .guid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
+    }
+
+    static Account newAccount(Category category, Currency currency, Icon icon) {
+        return new Account.Builder()
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .openingBalance(randomBigDecimal())
+            .accountLimit(randomBigDecimal())
+            .currencyRate(randomBigDecimal())
+            .typeId(category.getType().getId())
+            .categoryUuid(category.getUuid())
+            .currencyUuid(currency.getUuid())
+            .enabled(RANDOM.nextBoolean())
+            .interest(randomBigDecimal())
+            .closingDate(LocalDate.now())
+            .iconUuid(icon.getUuid())
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
@@ -114,15 +137,28 @@ public interface BaseTestUtils {
         return newCategory(UUID.randomUUID(), randomCategoryType());
     }
 
+    static Category newCategory(Icon icon) {
+        return newCategory(UUID.randomUUID(), icon.getUuid());
+    }
+
     static Category newCategory(UUID uuid) {
         return newCategory(uuid, randomCategoryType());
     }
 
+    static Category newCategory(UUID uuid, UUID iconUuid) {
+        return newCategory(uuid, randomCategoryType(), iconUuid);
+    }
+
     static Category newCategory(UUID uuid, CategoryType type) {
+        return newCategory(uuid, type, null);
+    }
+
+    static Category newCategory(UUID uuid, CategoryType type, UUID iconUuid) {
         return new Category.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .catTypeId(type.getId())
+            .iconUuid(iconUuid)
             .guid(uuid)
             .modified(System.currentTimeMillis())
             .build();
@@ -153,6 +189,10 @@ public interface BaseTestUtils {
     }
 
     static Contact newContact(UUID uuid) {
+        return newContact(uuid, null);
+    }
+
+    static Contact newContact(UUID uuid, UUID iconUuid) {
         return new Contact.Builder()
             .name(UUID.randomUUID().toString())
             .typeId(randomContactType().getId())
@@ -165,6 +205,7 @@ public interface BaseTestUtils {
             .city(UUID.randomUUID().toString())
             .country(UUID.randomUUID().toString())
             .zip(UUID.randomUUID().toString())
+            .iconUuid(iconUuid)
             .guid(uuid)
             .modified(System.currentTimeMillis())
             .build();
@@ -226,13 +267,13 @@ public interface BaseTestUtils {
             .transactionTypeId(randomTransactionType().getId())
             .comment(UUID.randomUUID().toString())
             .checked(RANDOM.nextBoolean())
-            .accountDebitedUuid(accountDebited.getGuid())
-            .accountCreditedUuid(accountCredited.getGuid())
+            .accountDebitedUuid(accountDebited.getUuid())
+            .accountCreditedUuid(accountCredited.getUuid())
             .accountDebitedTypeId(accountDebited.getType().getId())
             .accountCreditedTypeId(accountCredited.getType().getId())
             .accountDebitedCategoryUuid(accountDebited.getCategoryUuid())
             .accountCreditedCategoryUuid(accountCredited.getCategoryUuid())
-            .contactUuid(contact == null ? null : contact.getGuid())
+            .contactUuid(contact == null ? null : contact.getUuid())
             .rate(randomBigDecimal())
             .rateDirection(RANDOM.nextInt(2))
             .invoiceNumber(UUID.randomUUID().toString())
@@ -245,80 +286,17 @@ public interface BaseTestUtils {
         return newTransaction(accountDebited, accountCredited, null);
     }
 
-    /*
-    static Transaction newTransaction(
-        int id,
-        TransactionType type,
-        int accountDebitedId,
-        int accountCreditedId,
-        CategoryType accountDebitedType,
-        CategoryType accountCreditedType,
-        int accountDebitedCategoryId,
-        int accountCreditedCategoryId,
-        int contactId)
-    {
-        return new Transaction.Builder()
-            .amount(randomBigDecimal())
-            .day(randomDay())
-            .month(randomMonth())
-            .year(randomYear())
-            .transactionTypeId(type.getId())
-            .comment(UUID.randomUUID().toString())
-            .checked(RANDOM.nextBoolean())
-            .accountDebitedId(accountDebitedId)
-            .accountCreditedId(accountCreditedId)
-            .accountDebitedTypeId(accountDebitedType.getId())
-            .accountCreditedTypeId(accountCreditedType.getId())
-            .accountDebitedCategoryId(accountDebitedCategoryId)
-            .accountCreditedCategoryId(accountCreditedCategoryId)
-            .contactId(contactId)
-            .rate(randomBigDecimal())
-            .rateDirection(RANDOM.nextInt(2))
-            .invoiceNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+    static Icon newIcon(String name) {
+        return newIcon(UUID.randomUUID(), name);
     }
 
-     */
-
-    /*
-    static Transaction newTransaction(
-        int id,
-        BigDecimal amount,
-        BigDecimal rate,
-        TransactionType type,
-        int accountDebitedId,
-        int accountCreditedId,
-        CategoryType accountDebitedType,
-        CategoryType accountCreditedType,
-        int accountDebitedCategoryId,
-        int accountCreditedCategoryId,
-        int contactId)
-    {
-        return new Transaction.Builder()
-            .id(id)
-            .amount(amount)
-            .day(randomDay())
-            .month(randomMonth())
-            .year(randomYear())
-            .transactionTypeId(type.getId())
-            .comment(UUID.randomUUID().toString())
-            .checked(RANDOM.nextBoolean())
-            .accountDebitedId(accountDebitedId)
-            .accountCreditedId(accountCreditedId)
-            .accountDebitedTypeId(accountDebitedType.getId())
-            .accountCreditedTypeId(accountCreditedType.getId())
-            .accountDebitedCategoryId(accountDebitedCategoryId)
-            .accountCreditedCategoryId(accountCreditedCategoryId)
-            .contactId(contactId)
-            .rate(rate)
-            .rateDirection(RANDOM.nextInt(2))
-            .invoiceNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+    static Icon newIcon(UUID uuid, String name) {
+        try (var inputStream = BaseTestUtils.class.getResourceAsStream("/org/panteleyev/money/icons/" + name)) {
+            var bytes = inputStream.readAllBytes();
+            var timestamp = System.currentTimeMillis();
+            return new Icon(uuid, name, bytes, timestamp, timestamp);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
-
-     */
 }

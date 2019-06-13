@@ -35,9 +35,10 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Transaction;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-class RequestTab extends BorderPane {
+class RequestTab extends BorderPane implements TransactionListTab {
     private static final ResourceBundle rb = MainWindowController.RB;
 
     private final TransactionTableView table = new TransactionTableView(TransactionTableView.Mode.QUERY);
@@ -62,6 +63,10 @@ class RequestTab extends BorderPane {
         BorderPane.setMargin(vBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
         table.setOnCheckTransaction(this::onCheckTransaction);
+    }
+
+    public Predicate<Transaction> getTransactionFilter() {
+        return table.getTransactionFilter();
     }
 
     private void onFindButton() {

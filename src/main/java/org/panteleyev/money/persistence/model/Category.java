@@ -27,14 +27,21 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.persistence.annotations.Column;
+import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.PrimaryKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
+import org.panteleyev.persistence.annotations.ReferenceOption;
 import org.panteleyev.persistence.annotations.Table;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 
 @Table("category")
 public final class Category implements MoneyRecord, Named {
+    public static final Comparator<Category> COMPARE_BY_NAME = Comparator.comparing(Category::getName);
+    public static final Comparator<Category> COMPARE_BY_TYPE =
+        (o1, o2) -> o1.getType().getTypeName().compareToIgnoreCase(o2.getType().getTypeName());
+
     @PrimaryKey
     @Column("uuid")
     private final UUID guid;
@@ -48,6 +55,10 @@ public final class Category implements MoneyRecord, Named {
     @Column("cat_type_id")
     private final int catTypeId;
 
+    @Column("icon_uuid")
+    @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
+    private final UUID iconUuid;
+
     @Column("created")
     private final long created;
 
@@ -60,6 +71,7 @@ public final class Category implements MoneyRecord, Named {
     public Category(@Column("name") String name,
                     @Column("comment") String comment,
                     @Column("cat_type_id") int catTypeId,
+                    @Column("icon_uuid") UUID iconUuid,
                     @Column("uuid") UUID guid,
                     @Column("created") long created,
                     @Column("modified") long modified)
@@ -67,6 +79,7 @@ public final class Category implements MoneyRecord, Named {
         this.name = name;
         this.comment = comment;
         this.catTypeId = catTypeId;
+        this.iconUuid = iconUuid;
         this.guid = guid;
         this.created = created;
         this.modified = modified;
@@ -91,8 +104,12 @@ public final class Category implements MoneyRecord, Named {
         return catTypeId;
     }
 
+    public UUID getIconUuid() {
+        return iconUuid;
+    }
+
     @Override
-    public UUID getGuid() {
+    public UUID getUuid() {
         return guid;
     }
 
@@ -108,7 +125,7 @@ public final class Category implements MoneyRecord, Named {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, comment, catTypeId, guid, created, modified);
+        return Objects.hash(name, comment, catTypeId, iconUuid, guid, created, modified);
     }
 
     @Override
@@ -126,6 +143,7 @@ public final class Category implements MoneyRecord, Named {
         return Objects.equals(this.name, that.name)
             && Objects.equals(this.comment, that.comment)
             && this.catTypeId == that.catTypeId
+            && Objects.equals(this.iconUuid, that.iconUuid)
             && Objects.equals(this.guid, that.guid)
             && this.created == that.created
             && this.modified == that.modified;
@@ -135,6 +153,7 @@ public final class Category implements MoneyRecord, Named {
         private String name = "";
         private String comment = "";
         private int catTypeId = 0;
+        private UUID iconUuid = null;
         private UUID guid = null;
         private long created = 0L;
         private long modified = 0L;
@@ -150,9 +169,14 @@ public final class Category implements MoneyRecord, Named {
             name = c.getName();
             comment = c.getComment();
             catTypeId = c.getCatTypeId();
-            guid = c.getGuid();
+            iconUuid = c.getIconUuid();
+            guid = c.getUuid();
             created = c.getCreated();
             modified = c.getModified();
+        }
+
+        public UUID getUuid() {
+            return guid;
         }
 
         public Category build() {
@@ -168,7 +192,7 @@ public final class Category implements MoneyRecord, Named {
                 modified = now;
             }
 
-            return new Category(name, comment, catTypeId, guid, created, modified);
+            return new Category(name, comment, catTypeId, iconUuid, guid, created, modified);
         }
 
         public Builder name(String name) {
@@ -186,6 +210,11 @@ public final class Category implements MoneyRecord, Named {
 
         public Builder catTypeId(int catTypeId) {
             this.catTypeId = catTypeId;
+            return this;
+        }
+
+        public Builder iconUuid(UUID iconUuid) {
+            this.iconUuid = iconUuid;
             return this;
         }
 

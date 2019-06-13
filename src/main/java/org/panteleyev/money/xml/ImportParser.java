@@ -30,6 +30,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.MoneyRecord;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.xml.sax.Attributes;
@@ -39,6 +40,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,12 +48,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
-import static java.lang.Long.parseLong;
 
 class ImportParser extends DefaultHandler {
     enum Tag {
+        Icon(ImportParser::parseIcon),
         Category(ImportParser::parseCategory),
         Account(ImportParser::parseAccount),
         Currency(ImportParser::parseCurrency),
@@ -81,6 +82,7 @@ class ImportParser extends DefaultHandler {
         .map(Tag::name)
         .collect(Collectors.toList());
 
+    private final List<Icon> icons = new ArrayList<>();
     private final List<Category> categories = new ArrayList<>();
     private final List<Account> accounts = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
@@ -88,6 +90,7 @@ class ImportParser extends DefaultHandler {
     private final List<Transaction> transactions = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
+        Map.entry(Tag.Icon, icons),
         Map.entry(Tag.Category, categories),
         Map.entry(Tag.Account, accounts),
         Map.entry(Tag.Currency, currencies),
@@ -97,6 +100,10 @@ class ImportParser extends DefaultHandler {
 
     private Map<String, String> tags = null;
     private final StringBuilder currentCharacters = new StringBuilder();
+
+    public List<Icon> getIcons() {
+        return icons;
+    }
 
     public List<Category> getCategories() {
         return categories;
@@ -132,8 +139,8 @@ class ImportParser extends DefaultHandler {
         super.endElement(uri, localName, qName);
 
         Tag.getTag(qName).ifPresentOrElse(tag -> {
-            List<? extends MoneyRecord> list = RECORD_LISTS.get(tag);
-            MoneyRecord record = tag.getParseMethod().apply(tags);
+            var list = RECORD_LISTS.get(tag);
+            var record = tag.getParseMethod().apply(tags);
             ((List<MoneyRecord>) list).add(record);
             tags = null;
         }, () -> {
@@ -150,15 +157,25 @@ class ImportParser extends DefaultHandler {
         currentCharacters.append(new String(ch, start, length));
     }
 
-    private static Category parseCategory(Map<String, String> tags) {
-        var modified = parseLong(tags.get("modified"));
-        var createdObj = tags.get("created");
-        var created = createdObj == null ? modified : parseLong(createdObj);
+    private static Icon parseIcon(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
 
+        return new Icon(UUID.fromString(tags.get("uuid")),
+            tags.get("name"),
+            Base64.getDecoder().decode(tags.get("bytes")),
+            created,
+            modified);
+    }
+
+    private static Category parseCategory(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
         return new Category.Builder()
             .name(tags.get("name"))
             .comment(tags.get("comment"))
             .catTypeId(parseInt(tags.get("catTypeId")))
+            .iconUuid(parseUuid(tags.get("iconUuid")))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -166,12 +183,8 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Account parseAccount(Map<String, String> tags) {
-        var interestObj = tags.get("interest");
-        var closingDateObj = tags.get("closingDate");
-        var modified = parseLong(tags.get("modified"));
-        var createdObj = tags.get("created");
-        var created = createdObj == null ? modified : parseLong(createdObj);
-
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
         return new Account.Builder()
             .name(tags.get("name"))
             .comment(tags.get("comment"))
@@ -182,9 +195,10 @@ class ImportParser extends DefaultHandler {
             .typeId(parseInt(tags.get("typeId")))
             .categoryUuid(parseUuid(tags.get("categoryUuid")))
             .currencyUuid(parseUuid(tags.get("currencyUuid")))
-            .enabled(parseBoolean(tags.get("enabled")))
-            .interest(interestObj == null ? BigDecimal.ZERO : new BigDecimal(interestObj))
-            .closingDate(closingDateObj == null ? null : LocalDate.ofEpochDay(parseLong(closingDateObj)))
+            .enabled(parseBoolean(tags.get("enabled"), true))
+            .interest(parseBigDecimal(tags.get("interest"), BigDecimal.ZERO))
+            .closingDate(parseLocalDate(tags.get("closingDate"), null))
+            .iconUuid(parseUuid(tags.get("iconUuid")))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -192,19 +206,18 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Currency parseCurrency(Map<String, String> tags) {
-        var modified = parseLong(tags.get("modified"));
-        var createdObj = tags.get("created");
-        var created = createdObj == null ? modified : parseLong(createdObj);
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
         return new Currency.Builder()
             .symbol(tags.get("symbol"))
             .description(tags.get("description"))
             .formatSymbol(tags.get("formatSymbol"))
             .formatSymbolPosition(parseInt(tags.get("formatSymbolPosition")))
-            .showFormatSymbol(parseBoolean(tags.get("showFormatSymbol")))
-            .def(parseBoolean(tags.get("default")))
+            .showFormatSymbol(parseBoolean(tags.get("showFormatSymbol"), false))
+            .def(parseBoolean(tags.get("default"), false))
             .rate(new BigDecimal(tags.get("rate")))
             .direction(parseInt(tags.get("direction")))
-            .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator")))
+            .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator"), false))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -212,9 +225,8 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Contact parseContact(Map<String, String> tags) {
-        var modified = parseLong(tags.get("modified"));
-        var createdObj = tags.get("created");
-        var created = createdObj == null ? modified : parseLong(createdObj);
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
         return new Contact.Builder()
             .name(tags.get("name"))
             .typeId(parseInt(tags.get("typeId")))
@@ -227,6 +239,7 @@ class ImportParser extends DefaultHandler {
             .city(tags.get("city"))
             .country(tags.get("country"))
             .zip(tags.get("zip"))
+            .iconUuid(parseUuid(tags.get("iconUuid")))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -234,10 +247,8 @@ class ImportParser extends DefaultHandler {
     }
 
     private static Transaction parseTransaction(Map<String, String> tags) {
-        var detailedObj = tags.get("detailed");
-        var modified = parseLong(tags.get("modified"));
-        var createdObj = tags.get("created");
-        var created = createdObj == null ? modified : parseLong(createdObj);
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
         return new Transaction.Builder()
             .amount(new BigDecimal(tags.get("amount")))
             .day(parseInt(tags.get("day")))
@@ -245,7 +256,7 @@ class ImportParser extends DefaultHandler {
             .year(parseInt(tags.get("year")))
             .transactionTypeId(parseInt(tags.get("transactionTypeId")))
             .comment(tags.get("comment"))
-            .checked(parseBoolean(tags.get("checked")))
+            .checked(parseBoolean(tags.get("checked"), false))
             .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
             .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
             .accountDebitedTypeId(parseInt(tags.get("accountDebitedTypeId")))
@@ -257,7 +268,7 @@ class ImportParser extends DefaultHandler {
             .rateDirection(parseInt(tags.get("rateDirection")))
             .invoiceNumber(tags.get("invoiceNumber"))
             .parentUuid(parseUuid(tags.get("parentUuid")))
-            .detailed(detailedObj != null && parseBoolean(tags.get("detailed")))
+            .detailed(parseBoolean(tags.get("detailed"), false))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -266,5 +277,21 @@ class ImportParser extends DefaultHandler {
 
     private static UUID parseUuid(String value) {
         return value == null ? null : UUID.fromString(value);
+    }
+
+    private static BigDecimal parseBigDecimal(String rawValue, BigDecimal defaultValue) {
+        return rawValue == null ? defaultValue : new BigDecimal(rawValue);
+    }
+
+    private static LocalDate parseLocalDate(String rawValue, LocalDate defaultValue) {
+        return rawValue == null ? defaultValue : LocalDate.ofEpochDay(Long.parseLong(rawValue));
+    }
+
+    private static boolean parseBoolean(String rawValue, boolean defaultValue) {
+        return rawValue == null ? defaultValue : Boolean.parseBoolean(rawValue);
+    }
+
+    private static long parseLong(String rawValue, long defaultValue) {
+        return rawValue == null ? defaultValue : Long.parseLong(rawValue);
     }
 }

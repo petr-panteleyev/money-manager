@@ -51,6 +51,7 @@ public class TestAccount extends BaseTest {
         var enabled = RANDOM.nextBoolean();
         var interest = randomBigDecimal();
         var closingDate = LocalDate.now();
+        var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -68,6 +69,7 @@ public class TestAccount extends BaseTest {
             .enabled(enabled)
             .interest(interest)
             .closingDate(closingDate)
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -86,6 +88,7 @@ public class TestAccount extends BaseTest {
             .enabled(enabled)
             .interest(interest)
             .closingDate(closingDate)
+            .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -135,6 +138,7 @@ public class TestAccount extends BaseTest {
             .enabled(RANDOM.nextBoolean())
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
+            .iconUuid(UUID.randomUUID())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
@@ -156,7 +160,8 @@ public class TestAccount extends BaseTest {
             .enabled(original.getEnabled())
             .interest(original.getInterest())
             .closingDate(original.getClosingDate().orElse(null))
-            .guid(original.getGuid())
+            .iconUuid(original.getIconUuid())
+            .guid(original.getUuid())
             .created(original.getCreated())
             .modified(original.getModified())
             .build();

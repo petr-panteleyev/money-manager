@@ -121,7 +121,7 @@ final class CurrencyWindowController extends BaseController {
 
             // find if we have item with this id
             int index = currencyList.stream()
-                .filter(c -> Objects.equals(c.getGuid(), currency.getGuid()))
+                .filter(c -> Objects.equals(c.getUuid(), currency.getUuid()))
                 .findFirst()
                 .map(currencyList::indexOf)
                 .orElse(-1);

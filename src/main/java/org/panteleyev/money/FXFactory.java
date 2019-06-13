@@ -32,25 +32,57 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import org.controlsfx.control.textfield.CustomTextField;
+import org.controlsfx.control.textfield.TextFields;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
-final class FXFactory {
-    static MenuItem newMenuItem(ResourceBundle rb, String key, EventHandler<ActionEvent> action) {
+public final class FXFactory {
+    public static MenuItem newMenuItem(ResourceBundle rb, String key, EventHandler<ActionEvent> action) {
         var menuItem = new MenuItem(rb.getString(key));
         menuItem.setOnAction(action);
         return menuItem;
     }
 
-    static MenuItem newMenuItem(ResourceBundle rb, String key, EventHandler<ActionEvent> action,
-                                BooleanBinding disableBinding) {
+    public static MenuItem newMenuItem(ResourceBundle rb,
+                                       String key,
+                                       KeyCombination keyCombination,
+                                       EventHandler<ActionEvent> action)
+    {
+        var menuItem = new MenuItem(rb.getString(key));
+        menuItem.setAccelerator(keyCombination);
+        menuItem.setOnAction(action);
+        return menuItem;
+    }
+
+    public static MenuItem newMenuItem(ResourceBundle rb, String key, EventHandler<ActionEvent> action,
+                                       BooleanBinding disableBinding)
+    {
         var menuItem = newMenuItem(rb, key, action);
         menuItem.disableProperty().bind(disableBinding);
         return menuItem;
     }
 
-    static MenuBar newMenuBar(Menu... menus) {
+    public static MenuBar newMenuBar(Menu... menus) {
         var menuBar = new MenuBar(menus);
         menuBar.setUseSystemMenuBar(true);
         return menuBar;
+    }
+
+    static TextField newSearchField(Consumer<String> valueCallback) {
+        var searchField = TextFields.createClearableTextField();
+        searchField.setPrefColumnCount(20);
+        ((CustomTextField) searchField).setLeft(new ImageView(Images.SEARCH));
+        searchField.textProperty().addListener((x, y, newValue) -> valueCallback.accept(newValue));
+        searchField.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                searchField.clear();
+            }
+        });
+        return searchField;
     }
 }

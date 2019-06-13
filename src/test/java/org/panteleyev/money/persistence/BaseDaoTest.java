@@ -33,6 +33,10 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 public class BaseDaoTest extends BaseTest {
     private static final String TEST_DB_NAME = "TestDB";
 
+    public static final String ICON_DOLLAR = "dollar.png";
+    public static final String ICON_EURO = "euro.png";
+    public static final String ICON_JAVA = "java.png";
+
     public void setupAndSkip() throws Exception {
         var dbName = System.getProperty("mysql.database", TEST_DB_NAME);
         var host = System.getProperty("mysql.host", "localhost");

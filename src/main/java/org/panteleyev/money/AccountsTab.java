@@ -44,6 +44,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
@@ -52,10 +53,10 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.cells.AccountBalanceCell;
+import org.panteleyev.money.cells.AccountCategoryCell;
 import org.panteleyev.money.cells.AccountInterestCell;
+import org.panteleyev.money.cells.AccountNameCell;
 import org.panteleyev.money.cells.LocalDateCell;
-import org.panteleyev.money.comparators.AccountByCategory;
-import org.panteleyev.money.comparators.AccountByName;
 import org.panteleyev.money.filters.AccountActiveFilter;
 import org.panteleyev.money.filters.AccountCategoryFilter;
 import org.panteleyev.money.filters.AccountTypeFilter;
@@ -117,13 +118,23 @@ class AccountsTab extends BorderPane {
     private final TableView<Account> tableView = new TableView<>(filteredAccounts);
 
     // Filters
+    private Predicate<Account> accountFilter;
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
     private final CheckBox showDeactivatedAccountsCheckBox =
         new CheckBox(RB.getString("check.showDeactivatedAccounts"));
+    private final TextField searchField = FXFactory.newSearchField(x -> updateFilters());
 
     // Listeners
     private Consumer<Account> accountTransactionsConsumer = x -> { };
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Category> categoryListener =
+        (MapChangeListener.Change<? extends UUID, ? extends Category> change) ->
+            Platform.runLater(() -> {
+                tableView.getColumns().get(0).setVisible(false);
+                tableView.getColumns().get(0).setVisible(true);
+            });
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<UUID, Account> accountListener =
@@ -150,6 +161,10 @@ class AccountsTab extends BorderPane {
         copyNameMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
         var showTransactionsMenuItem = newMenuItem(RB, "menu.show.transactions", event -> onShowTransactions());
         showTransactionsMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
+        var searchMenuItem = newMenuItem(RB, "menu.Edit.Search",
+            new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
+            actionEvent -> searchField.requestFocus());
+
 
         var contextMenu = new ContextMenu(
             addAccountMenuItem,
@@ -159,6 +174,8 @@ class AccountsTab extends BorderPane {
             new SeparatorMenuItem(),
             copyNameMenuItem,
             activateAccountMenuItem,
+            new SeparatorMenuItem(),
+            searchMenuItem,
             new SeparatorMenuItem(),
             showTransactionsMenuItem
         );
@@ -173,6 +190,7 @@ class AccountsTab extends BorderPane {
 
         // Tool box
         var hBox = new HBox(5.0,
+            searchField,
             accountFilterBox,
             categoryChoiceBox,
             showDeactivatedAccountsCheckBox
@@ -186,7 +204,7 @@ class AccountsTab extends BorderPane {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        sortedAccounts.setComparator(new AccountByCategory().thenComparing(new AccountByName()));
+        sortedAccounts.setComparator(Account.COMPARE_BY_CATEGORY.thenComparing(Account.COMPARE_BY_NAME));
 
         initAccountFilterBox();
 
@@ -207,6 +225,7 @@ class AccountsTab extends BorderPane {
         categoryChoiceBox.getSelectionModel().select(0);
         categoryChoiceBox.valueProperty().addListener((x, y, z) -> updateFilters());
 
+        getDao().categories().addListener(categoryListener);
         getDao().accounts().addListener(accountListener);
         getDao().transactions().addListener(transactionListener);
 
@@ -218,10 +237,14 @@ class AccountsTab extends BorderPane {
         });
     }
 
+    Predicate<Account> getAccountFilter() {
+        return accountFilter;
+    }
+
     private void setupTableColumns() {
         // Table
-        var nameColumn = new TableColumn<Account, String>(RB.getString("column.Name"));
-        var categoryColumn = new TableColumn<Account, String>(RB.getString("column.Category"));
+        var nameColumn = new TableColumn<Account, Account>(RB.getString("column.Name"));
+        var categoryColumn = new TableColumn<Account, Account>(RB.getString("column.Category"));
         var commentColumn = new TableColumn<Account, String>(RB.getString("column.Comment"));
         var currencyColumn = new TableColumn<Account, String>(RB.getString("column.Currency"));
         var approvedColumn = new TableColumn<Account, Account>(RB.getString("column.Approved"));
@@ -238,19 +261,22 @@ class AccountsTab extends BorderPane {
             interestColumn,
             closingDateColumn,
             commentColumn,
-            approvedColumn,
             balanceColumn,
+            approvedColumn,
             waitingColumn
         );
 
-        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getName()));
-        categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(getDao().getCategory(p.getValue().getCategoryUuid()).map(Category::getName).orElse("")));
+        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        nameColumn.setCellFactory((x) -> new AccountNameCell());
+        categoryColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        categoryColumn.setCellFactory(x -> new AccountCategoryCell());
         commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
         currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
-            new ReadOnlyObjectWrapper<>(getDao().getCurrency(p.getValue().getCurrencyUuid().orElse(null)).map(Currency::getSymbol).orElse("")));
+            new ReadOnlyObjectWrapper<>(getDao().getCurrency(p.getValue().getCurrencyUuid().orElse(null))
+                .map(Currency::getSymbol).orElse("")));
         approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue()));
         approvedColumn.setCellFactory((x) -> new AccountBalanceCell(true, Transaction::getChecked));
@@ -326,7 +352,13 @@ class AccountsTab extends BorderPane {
             }
         }
 
-        filteredAccounts.setPredicate(filter);
+        var searchText = searchField.getText().toLowerCase();
+        if (!searchText.isEmpty()) {
+            filter = filter.and(account -> account.getName().toLowerCase().contains(searchText));
+        }
+
+        accountFilter = filter;
+        filteredAccounts.setPredicate(accountFilter);
     }
 
     private void onShowDeactivatedAccounts() {

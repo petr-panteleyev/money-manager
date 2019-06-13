@@ -48,9 +48,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.Options;
 import org.panteleyev.money.TransactionTableView;
+import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.CategoryType;
-import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.ymoney.YandexMoneyClient;
 import java.io.File;
@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -105,10 +106,14 @@ public class StatementTab extends BorderPane {
         new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
     private static final FileChooser.ExtensionFilter SBERBANK_HTML =
         new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
+    private static final FileChooser.ExtensionFilter YANDEX_CSV =
+        new FileChooser.ExtensionFilter("Yandex Money Statement", "*.csv");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
     private BiConsumer<StatementRecord, Account> newTransactionCallback = (x, y) -> { };
+
+    private Statement statement = null;
 
     public StatementTab() {
         var loadButton = new Button(RB.getString("button.Load"));
@@ -180,7 +185,6 @@ public class StatementTab extends BorderPane {
         var toolBar = new VBox(5.0, lowerBox, hBox);
         BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
 
-
         setTop(toolBar);
         setCenter(splitPane);
 
@@ -201,10 +205,19 @@ public class StatementTab extends BorderPane {
             }
         });
 
+        getDao().transactions().addListener((MapChangeListener<UUID, Transaction>) change -> calculateTransactions());
+
+        accountComboBox.getSelectionModel()
+            .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
+
         statementTable.setNewTransactionCallback(record -> {
             Account account = accountComboBox.getSelectionModel().getSelectedItem();
             newTransactionCallback.accept(record, account);
         });
+    }
+
+    public Optional<Statement> getStatement() {
+        return Optional.ofNullable(statement);
     }
 
     private void setupAccountComboBox() {
@@ -229,7 +242,8 @@ public class StatementTab extends BorderPane {
         chooser.setTitle(RB.getString("Statement"));
         chooser.getExtensionFilters().addAll(
             OFX_EXTENSION,
-            SBERBANK_HTML
+            SBERBANK_HTML,
+            YANDEX_CSV
         );
 
         var lastDirString = Options.getLastStatementDir();
@@ -247,6 +261,8 @@ public class StatementTab extends BorderPane {
                 statementType = Statement.StatementType.RAIFFEISEN_OFX;
             } else if (SBERBANK_HTML.equals(filter)) {
                 statementType = Statement.StatementType.SBERBANK_HTML;
+            } else if (YANDEX_CSV.equals(filter)) {
+                statementType = Statement.StatementType.YANDEX_MONEY_CSV;
             } else {
                 statementType = Statement.StatementType.UNKNOWN;
             }
@@ -288,10 +304,12 @@ public class StatementTab extends BorderPane {
     }
 
     private void analyzeStatement(Statement statement) {
-        statementTable.setStatement(statement);
-        ymAccountBalanceLabel.setText(statement.getBalance().toString());
+        this.statement = statement;
+        accountComboBox.getSelectionModel().clearSelection();
         getDao().getAccountByNumber(statement.getAccountNumber())
-            .ifPresent(a -> accountComboBox.getSelectionModel().select(a));
+            .ifPresentOrElse(a -> accountComboBox.getSelectionModel().select(a),
+                () -> accountComboBox.getSelectionModel().selectFirst());
+        ymAccountBalanceLabel.setText(statement.getBalance().toString());
     }
 
     private void onClear() {
@@ -307,5 +325,23 @@ public class StatementTab extends BorderPane {
 
     private SourceType getSourceType() {
         return sourceTypeComboBox.getSelectionModel().getSelectedItem();
+    }
+
+    private void calculateTransactions() {
+        calculateTransactions(accountComboBox.getSelectionModel().getSelectedItem());
+    }
+
+    private void calculateTransactions(Account account) {
+        if (statement == null || account == null) {
+            return;
+        }
+
+        for (var record : statement.getRecords()) {
+            record.setTransactions(getDao().getTransactions().stream()
+                .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
+                .collect(Collectors.toList()));
+        }
+
+        statementTable.setStatement(statement);
     }
 }

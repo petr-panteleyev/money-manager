@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,9 +27,14 @@
 package org.panteleyev.money.statements;
 
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Transaction;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -112,13 +117,15 @@ public final class StatementRecord {
     // calculated fields
     private final UUID currencyUuid;
     private final UUID accountCurrencyUuid;
-    private BigDecimal amountDecimal;
-    private BigDecimal accountAmountDecimal;
+    private final BigDecimal amountDecimal;
+    private final BigDecimal accountAmountDecimal;
+
+    // associated transactions
+    private final List<Transaction> transactions = new ArrayList<>();
 
     public StatementRecord(LocalDate actual, LocalDate execution, String description, String counterParty, String place,
                            String country, String currency, String amount, String accountCurrency,
-                           String accountAmount)
-    {
+                           String accountAmount) {
         this.actual = actual;
         this.execution = execution;
         this.description = description;
@@ -137,14 +144,14 @@ public final class StatementRecord {
             .filter(c -> c.getDescription().equalsIgnoreCase(currency)
                 || c.getSymbol().equalsIgnoreCase(currency))
             .findAny()
-            .map(Currency::getGuid)
+            .map(Currency::getUuid)
             .orElse(null);
 
         accountCurrencyUuid = getDao().getCurrencies().stream()
             .filter(c -> c.getDescription().equalsIgnoreCase(accountCurrency)
                 || c.getSymbol().equalsIgnoreCase(accountCurrency))
             .findAny()
-            .map(Currency::getGuid)
+            .map(Currency::getUuid)
             .orElse(null);
     }
 
@@ -275,5 +282,14 @@ public final class StatementRecord {
         }
 
         return result.toString();
+    }
+
+    public Collection<Transaction> getTransactions() {
+        return Collections.unmodifiableCollection(transactions);
+    }
+
+    public void setTransactions(Collection<Transaction> transactions) {
+        this.transactions.clear();
+        this.transactions.addAll(transactions);
     }
 }

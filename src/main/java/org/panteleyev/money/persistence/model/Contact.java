@@ -27,8 +27,10 @@
 package org.panteleyev.money.persistence.model;
 
 import org.panteleyev.persistence.annotations.Column;
+import org.panteleyev.persistence.annotations.ForeignKey;
 import org.panteleyev.persistence.annotations.PrimaryKey;
 import org.panteleyev.persistence.annotations.RecordBuilder;
+import org.panteleyev.persistence.annotations.ReferenceOption;
 import org.panteleyev.persistence.annotations.Table;
 import java.util.Objects;
 import java.util.UUID;
@@ -38,30 +40,47 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
     @PrimaryKey
     @Column("uuid")
     private final UUID guid;
+
     @Column("name")
     private final String name;
+
     @Column("type_id")
     private final int typeId;
+
     @Column("phone")
     private final String phone;
+
     @Column("mobile")
     private final String mobile;
+
     @Column("email")
     private final String email;
+
     @Column("web")
     private final String web;
+
     @Column("comment")
     private final String comment;
+
     @Column("street")
     private final String street;
+
     @Column("city")
     private final String city;
+
     @Column("country")
     private final String country;
+
     @Column("zip")
     private final String zip;
+
+    @Column("icon_uuid")
+    @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
+    private final UUID iconUuid;
+
     @Column("created")
     private final long created;
+
     @Column("modified")
     private final long modified;
 
@@ -79,6 +98,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
                    @Column("city") String city,
                    @Column("country") String country,
                    @Column("zip") String zip,
+                   @Column("icon_uuid") UUID iconUuid,
                    @Column("uuid") UUID guid,
                    @Column("created") long created,
                    @Column("modified") long modified)
@@ -94,6 +114,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         this.city = city;
         this.country = country;
         this.zip = zip;
+        this.iconUuid = iconUuid;
         this.guid = guid;
         this.created = created;
         this.modified = modified;
@@ -154,8 +175,12 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         return zip;
     }
 
+    public UUID getIconUuid() {
+        return iconUuid;
+    }
+
     @Override
-    public UUID getGuid() {
+    public UUID getUuid() {
         return guid;
     }
 
@@ -171,8 +196,8 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, typeId, phone, mobile, email, web, comment, street, city, country, zip, guid,
-            created, modified);
+        return Objects.hash(name, typeId, phone, mobile, email, web, comment, street, city, country, zip, iconUuid,
+            guid, created, modified);
     }
 
     public boolean equals(Object other) {
@@ -196,6 +221,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             && Objects.equals(city, that.city)
             && Objects.equals(country, that.country)
             && Objects.equals(zip, that.zip)
+            && Objects.equals(iconUuid, that.iconUuid)
             && Objects.equals(guid, that.guid)
             && created == that.created
             && modified == that.modified;
@@ -213,6 +239,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
         private String city = "";
         private String country = "";
         private String zip = "";
+        private UUID iconUuid = null;
         private UUID guid = null;
         private long created = 0L;
         private long modified = 0L;
@@ -236,9 +263,14 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
             city = c.getCity();
             country = c.getCountry();
             zip = c.getZip();
-            guid = c.getGuid();
+            iconUuid = c.getIconUuid();
+            guid = c.getUuid();
             created = c.getCreated();
             modified = c.getModified();
+        }
+
+        public UUID getUuid() {
+            return guid;
         }
 
         public Contact build() {
@@ -258,7 +290,7 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
                 modified = now;
             }
 
-            return new Contact(name, typeId, phone, mobile, email, web, comment, street, city, country, zip,
+            return new Contact(name, typeId, phone, mobile, email, web, comment, street, city, country, zip, iconUuid,
                 guid, created, modified);
         }
 
@@ -317,6 +349,11 @@ public final class Contact implements MoneyRecord, Named, Comparable<Contact> {
 
         public Builder zip(String zip) {
             this.zip = zip == null ? "" : zip;
+            return this;
+        }
+
+        public Builder iconUuid(UUID iconUuid) {
+            this.iconUuid = iconUuid;
             return this;
         }
 

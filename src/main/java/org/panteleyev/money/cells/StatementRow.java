@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,36 +24,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.persistence;
+package org.panteleyev.money.cells;
 
-import org.panteleyev.money.persistence.model.Account;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Predicate;
+import javafx.scene.control.TableRow;
+import org.panteleyev.money.persistence.model.Transaction;
+import org.panteleyev.money.statements.StatementRecord;
+import static org.panteleyev.money.Styles.STATEMENT_ALL_CHECKED;
+import static org.panteleyev.money.Styles.STATEMENT_NOT_CHECKED;
+import static org.panteleyev.money.Styles.STATEMENT_NOT_FOUND;
 
-public enum AccountFilter {
-    ALL(it -> true),
-    ENABLED(Account::getEnabled);
+public class StatementRow extends TableRow<StatementRecord> {
+    @Override
+    public void updateItem(StatementRecord item, boolean empty) {
+        super.updateItem(item, empty);
 
-    private final Predicate<Account> predicate;
+        getStyleClass().removeAll(STATEMENT_NOT_FOUND, STATEMENT_NOT_CHECKED, STATEMENT_ALL_CHECKED);
+        if (item == null || empty) {
+            return;
+        }
 
-    AccountFilter(Predicate<Account> predicate) {
-        this.predicate = predicate;
-    }
+        var transactions = item.getTransactions();
 
-    public Predicate<Account> predicate() {
-        return predicate;
-    }
-
-    public static Predicate<Account> byAccount(UUID uuid) {
-        return it -> Objects.equals(it.getGuid(), uuid);
-    }
-
-    public static Predicate<Account> byCategory(UUID uuid) {
-        return it -> Objects.equals(it.getCategoryUuid(), uuid);
-    }
-
-    public static Predicate<Account> byCategoryType(int id) {
-        return it -> it.getTypeId() == id;
+        if (transactions.isEmpty()) {
+            getStyleClass().add(STATEMENT_NOT_FOUND);
+        } else {
+            if (transactions.stream().allMatch(Transaction::getChecked)) {
+                getStyleClass().add(STATEMENT_ALL_CHECKED);
+            } else {
+                getStyleClass().add(STATEMENT_NOT_CHECKED);
+            }
+        }
     }
 }

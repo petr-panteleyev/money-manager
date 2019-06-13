@@ -27,7 +27,7 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.persistence.model.Account;
+import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.persistence.model.Transaction;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -35,12 +35,17 @@ public class TransactionDebitedAccountCell extends TableCell<Transaction, Transa
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
+
+        setText("");
+        setGraphic(null);
+
         if (empty || transaction == null) {
-            setText("");
-        } else {
-            setText(getDao().getAccount(transaction.getAccountDebitedUuid())
-                .map(Account::getName)
-                .orElse(""));
+            return;
         }
+
+        getDao().getAccount(transaction.getAccountDebitedUuid()).ifPresent(account -> {
+            setText(account.getName());
+            setGraphic(IconManager.getAccountImageView(account));
+        });
     }
 }

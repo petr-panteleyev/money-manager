@@ -24,14 +24,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.comparators;
+package org.panteleyev.money.cells;
 
-import org.panteleyev.money.persistence.model.Account;
-import java.util.Comparator;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.icons.IconManager;
+import org.panteleyev.money.persistence.model.Category;
 
-public class AccountByName implements Comparator<Account> {
+public class CategoryNameCell extends TableCell<Category, Category> {
     @Override
-    public int compare(Account a1, Account a2) {
-        return a1.getName().compareTo(a2.getName());
+    protected void updateItem(Category category, boolean empty) {
+        super.updateItem(category, empty);
+
+        if (empty || category == null) {
+            setText("");
+            setGraphic(null);
+        } else {
+            setText(category.getName());
+            setGraphic(IconManager.getImageView(category.getIconUuid()));
+        }
     }
 }

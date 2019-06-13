@@ -31,4 +31,6 @@ import javafx.scene.image.Image;
 public interface Images {
     Image APP_ICON = new Image("org/panteleyev/money/res/icon48.png");
     Image WARNING = new Image("org/panteleyev/money/res/warning-16.png");
+    Image EMPTY = new Image("org/panteleyev/money/res/empty.png");
+    Image SEARCH = new Image("org/panteleyev/money/res/search.png");
 }

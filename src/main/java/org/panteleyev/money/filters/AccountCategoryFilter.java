@@ -40,6 +40,6 @@ public class AccountCategoryFilter implements Predicate<Account> {
 
     @Override
     public boolean test(Account account) {
-        return Objects.equals(account.getCategoryUuid(),  category.getGuid());
+        return Objects.equals(account.getCategoryUuid(),  category.getUuid());
     }
 }

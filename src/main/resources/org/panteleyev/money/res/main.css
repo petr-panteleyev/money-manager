@@ -51,3 +51,29 @@
     -fx-font-family: System;
     -fx-font-size: 14;
 }
+
+.statementRed {
+    -fx-control-inner-background: #f5b7b1;
+    -fx-control-inner-background-alt: #f5b7b1;
+}
+
+.statementGreen {
+    -fx-control-inner-background: #abebc6;
+    -fx-control-inner-background-alt: #abebc6;
+}
+
+.statementYellow {
+    -fx-control-inner-background: #f9e79f;
+    -fx-control-inner-background-alt: #f9e79f;
+}
+
+.iconLabel {
+    -fx-font-size: 10;
+}
+
+.selectedIconCell {
+    -fx-background: -fx-accent;
+    -fx-background-color: -fx-focus-color, -fx-cell-focus-inner-border, -fx-selection-bar;
+    -fx-background-insets: 0, 1, 2;
+    -fx-text-fill: -fx-selection-bar-text;
+}

@@ -149,4 +149,24 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         validation.registerValidator(rateEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.initInitialDecoration();
     }
+
+    TextField getNameEdit() {
+        return nameEdit;
+    }
+
+    TextField getDescrEdit() {
+        return descrEdit;
+    }
+
+    TextField getRateEdit() {
+        return rateEdit;
+    }
+
+    CheckBox getDefaultCheck() {
+        return defaultCheck;
+    }
+
+    CheckBox getThousandSeparatorCheck() {
+        return thousandSeparatorCheck;
+    }
 }

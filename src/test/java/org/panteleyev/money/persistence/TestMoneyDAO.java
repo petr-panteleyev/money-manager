@@ -30,6 +30,7 @@ import org.panteleyev.money.persistence.model.Account;
 import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.testng.SkipException;
 import org.testng.annotations.AfterClass;
@@ -40,6 +41,7 @@ import java.util.UUID;
 import static org.panteleyev.money.BaseTestUtils.newCategory;
 import static org.panteleyev.money.BaseTestUtils.newContact;
 import static org.panteleyev.money.BaseTestUtils.newCurrency;
+import static org.panteleyev.money.BaseTestUtils.newIcon;
 import static org.panteleyev.money.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 import static org.panteleyev.money.persistence.model.CategoryType.BANKS_AND_CASH;
@@ -66,9 +68,30 @@ public class TestMoneyDAO extends BaseDaoTest {
     }
 
     @Test
-    public void testCategory() {
+    public void testIcon() {
         var uuid = UUID.randomUUID();
-        var category = newCategory(uuid);
+        var icon = newIcon(uuid, ICON_DOLLAR);
+
+        getDao().insertIcon(icon);
+        assertEquals(getDao().getIcon(uuid).orElseThrow(), icon);
+        var retrieved = getDao().get(uuid, Icon.class);
+        assertEquals(retrieved.orElseThrow(), icon);
+
+        var update = newIcon(uuid, ICON_EURO);
+        getDao().updateIcon(update);
+        assertEquals(getDao().getIcon(uuid).orElseThrow(), update);
+        retrieved = getDao().get(uuid, Icon.class);
+        assertEquals(retrieved.orElseThrow(), update);
+    }
+
+    @Test
+    public void testCategory() {
+        var iconUuid = UUID.randomUUID();
+        var icon = newIcon(iconUuid, ICON_DOLLAR);
+        getDao().insertIcon(icon);
+
+        var uuid = UUID.randomUUID();
+        var category = newCategory(uuid, iconUuid);
 
         getDao().insertCategory(category);
         assertEquals(getDao().getCategory(uuid).orElseThrow(), category);
@@ -101,8 +124,12 @@ public class TestMoneyDAO extends BaseDaoTest {
 
     @Test
     public void testContact() {
+        var iconUuid = UUID.randomUUID();
+        var icon = newIcon(iconUuid, ICON_DOLLAR);
+        getDao().insertIcon(icon);
+
         var uuid = UUID.randomUUID();
-        var contact = newContact(uuid);
+        var contact = newContact(uuid, iconUuid);
 
         getDao().insertContact(contact);
         assertEquals(getDao().getContact(uuid).orElseThrow(), contact);
@@ -118,6 +145,10 @@ public class TestMoneyDAO extends BaseDaoTest {
 
     @Test
     public void testAccount() {
+        var iconUuid = UUID.randomUUID();
+        var icon = newIcon(iconUuid, ICON_DOLLAR);
+        getDao().insertIcon(icon);
+
         var category = new Category.Builder()
             .catTypeId(BANKS_AND_CASH.getId())
             .guid(UUID.randomUUID())
@@ -129,8 +160,9 @@ public class TestMoneyDAO extends BaseDaoTest {
         var account = new Account.Builder()
             .guid(accountId)
             .typeId(category.getCatTypeId())
-            .categoryUuid(category.getGuid())
+            .categoryUuid(category.getUuid())
             .accountNumber("123456")
+            .iconUuid(iconUuid)
             .build();
         getDao().insertAccount(account);
 
@@ -158,7 +190,7 @@ public class TestMoneyDAO extends BaseDaoTest {
 
         var account = new Account.Builder()
             .typeId(category.getCatTypeId())
-            .categoryUuid(category.getGuid())
+            .categoryUuid(category.getUuid())
             .accountNumber("123456")
             .build();
         getDao().insertAccount(account);
@@ -172,10 +204,10 @@ public class TestMoneyDAO extends BaseDaoTest {
             .month(now.getMonthValue())
             .year(now.getYear())
             .amount(randomBigDecimal())
-            .accountDebitedUuid(account.getGuid())
-            .accountCreditedUuid(account.getGuid())
-            .accountDebitedCategoryUuid(category.getGuid())
-            .accountCreditedCategoryUuid(category.getGuid())
+            .accountDebitedUuid(account.getUuid())
+            .accountCreditedUuid(account.getUuid())
+            .accountDebitedCategoryUuid(category.getUuid())
+            .accountCreditedCategoryUuid(category.getUuid())
             .accountDebitedTypeId(account.getTypeId())
             .accountCreditedTypeId(account.getTypeId())
             .build();

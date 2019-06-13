@@ -24,44 +24,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money;
+package org.panteleyev.money.cells;
 
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import java.lang.reflect.Field;
+import javafx.scene.control.TableCell;
+import org.panteleyev.money.icons.IconManager;
+import org.panteleyev.money.persistence.model.Account;
 
-class UiTestUtils {
+public class AccountNameCell extends TableCell<Account, Account> {
+    @Override
+    protected void updateItem(Account account, boolean empty) {
+        super.updateItem(account, empty);
 
-    static <T> T getControl(Object pane, String name) {
-        try {
-            Field f = pane.getClass().getDeclaredField(name);
-            f.setAccessible(true);
-            return (T) f.get(pane);
-        } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
-            throw new RuntimeException(ex);
+        if (empty || account == null) {
+            setText("");
+            setGraphic(null);
+        } else {
+            setText(account.getName());
+            setGraphic(IconManager.getImageView(account.getIconUuid()));
         }
-    }
-
-    static TextField getTextField(Object pane, String name) {
-        return getControl(pane, name);
-    }
-
-    static CheckBox getCheckBox(Object pane, String name) {
-        return getControl(pane, name);
-    }
-
-    static <T> ComboBox<T> getComboBox(Object parent, String name) {
-        return getControl(parent, name);
-    }
-
-    static <T> ChoiceBox<T> getChoiceBox(Object parent, String name) {
-        return getControl(parent, name);
-    }
-
-    static TextArea getTextArea(Object parent, String name) {
-        return getControl(parent, name);
     }
 }

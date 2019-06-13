@@ -36,6 +36,7 @@ import org.panteleyev.money.persistence.model.Category;
 import org.panteleyev.money.persistence.model.CategoryType;
 import org.panteleyev.money.persistence.model.Contact;
 import org.panteleyev.money.persistence.model.Currency;
+import org.panteleyev.money.persistence.model.Icon;
 import org.panteleyev.money.persistence.model.MoneyRecord;
 import org.panteleyev.money.persistence.model.Transaction;
 import org.panteleyev.money.xml.Import;
@@ -58,6 +59,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MoneyDAO extends DAO implements RecordSource {
     private static final MoneyDAO MONEY_DAO = new MoneyDAO();
@@ -74,6 +76,7 @@ public class MoneyDAO extends DAO implements RecordSource {
     };
 
     private static final List<Class<? extends Record>> TABLE_CLASSES = List.of(
+        Icon.class,
         Category.class,
         Contact.class,
         Currency.class,
@@ -86,8 +89,12 @@ public class MoneyDAO extends DAO implements RecordSource {
         Account.class,
         Currency.class,
         Contact.class,
-        Category.class
+        Category.class,
+        Icon.class
     );
+
+    private final Map<UUID, Icon> iconsMap = new ConcurrentHashMap<>();
+    private final ObservableMap<UUID, Icon> icons = FXCollections.observableMap(iconsMap);
 
     private final Map<UUID, Category> categoriesMap = new ConcurrentHashMap<>();
     private final ObservableMap<UUID, Category> categories
@@ -116,6 +123,32 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    // Icons
+    ////////////////////////////////////////////////////////////////////////////
+
+    public ObservableMap<UUID, Icon> icons() {
+        return icons;
+    }
+
+    public Optional<Icon> getIcon(UUID uuid) {
+        return uuid == null ? Optional.empty() : Optional.ofNullable(iconsMap.get(uuid));
+    }
+
+    public void insertIcon(Icon icon) {
+        insert(icon);
+        icons.put(icon.getUuid(), icon);
+    }
+
+    public void updateIcon(Icon icon) {
+        update(icon);
+        icons.put(icon.getUuid(), icon);
+    }
+
+    public Collection<Icon> getIcons() {
+        return iconsMap.values();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // Categories
     ////////////////////////////////////////////////////////////////////////////
 
@@ -129,12 +162,12 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public void insertCategory(Category category) {
         insert(category);
-        categories.put(category.getGuid(), category);
+        categories.put(category.getUuid(), category);
     }
 
     public void updateCategory(Category category) {
         update(category);
-        categories.put(category.getGuid(), category);
+        categories.put(category.getUuid(), category);
     }
 
     public Collection<Category> getCategories() {
@@ -169,12 +202,12 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public void insertCurrency(Currency currency) {
         insert(currency);
-        currencies.put(currency.getGuid(), currency);
+        currencies.put(currency.getUuid(), currency);
     }
 
     public void updateCurrency(Currency currency) {
         update(currency);
-        currencies.put(currency.getGuid(), currency);
+        currencies.put(currency.getUuid(), currency);
     }
 
     public Collection<Currency> getCurrencies() {
@@ -199,12 +232,12 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public void insertContact(Contact contact) {
         insert(contact);
-        contacts.put(contact.getGuid(), contact);
+        contacts.put(contact.getUuid(), contact);
     }
 
     public void updateContact(Contact contact) {
         update(contact);
-        contacts.put(contact.getGuid(), contact);
+        contacts.put(contact.getUuid(), contact);
     }
 
     public Collection<Contact> getContacts() {
@@ -225,16 +258,16 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public void insertAccount(Account account) {
         insert(account);
-        accounts.put(account.getGuid(), account);
+        accounts.put(account.getUuid(), account);
     }
 
     public void updateAccount(Account account) {
         update(account);
-        accounts.put(account.getGuid(), account);
+        accounts.put(account.getUuid(), account);
     }
 
     public void deleteAccount(Account account) {
-        accounts.remove(account.getGuid());
+        accounts.remove(account.getUuid());
         delete(account);
     }
 
@@ -242,8 +275,8 @@ public class MoneyDAO extends DAO implements RecordSource {
         return accountsMap.values();
     }
 
-    public Collection<Account> getAccounts(Predicate<Account> filter) {
-        return accountsMap.values().stream().filter(filter).collect(Collectors.toList());
+    public Stream<Account> getAccounts(Predicate<Account> filter) {
+        return accountsMap.values().stream().filter(filter);
     }
 
     public List<Account> getAccountsByType(CategoryType type) {
@@ -286,12 +319,12 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public void insertTransaction(Transaction transaction) {
         insert(transaction);
-        transactions.put(transaction.getGuid(), transaction);
+        transactions.put(transaction.getUuid(), transaction);
     }
 
     public void updateTransaction(Transaction transaction) {
         update(transaction);
-        transactions.put(transaction.getGuid(), transaction);
+        transactions.put(transaction.getUuid(), transaction);
     }
 
     public void deleteTransaction(UUID uuid) {
@@ -305,7 +338,7 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public List<Transaction> getTransactions(Collection<Account> accounts) {
         var ids = accounts.stream()
-            .map(Account::getGuid)
+            .map(Account::getUuid)
             .collect(Collectors.toList());
 
         return getTransactions().stream()
@@ -316,7 +349,7 @@ public class MoneyDAO extends DAO implements RecordSource {
     @Override
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return getTransactions().stream()
-            .filter(t -> Objects.equals(t.getParentUuid().orElse(null), parent.getGuid()))
+            .filter(t -> Objects.equals(t.getParentUuid().orElse(null), parent.getUuid()))
             .collect(Collectors.toList());
     }
 
@@ -327,7 +360,7 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     public List<Transaction> getTransactions(Account account) {
-        var uuid = account.getGuid();
+        var uuid = account.getUuid();
         return getTransactions().stream()
             .filter(tr -> Objects.equals(tr.getAccountDebitedUuid(), uuid)
                 || Objects.equals(tr.getAccountCreditedUuid(), uuid))
@@ -336,7 +369,7 @@ public class MoneyDAO extends DAO implements RecordSource {
 
     public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
         var uuids = categories.stream()
-            .map(Category::getGuid)
+            .map(Category::getUuid)
             .collect(Collectors.toList());
 
         return getTransactions().stream()
@@ -353,12 +386,16 @@ public class MoneyDAO extends DAO implements RecordSource {
     }
 
     public long getTransactionCount(Account account) {
-        var uuid = account.getGuid();
+        var uuid = account.getUuid();
 
         return getTransactions().stream()
             .filter(tr -> Objects.equals(tr.getAccountDebitedUuid(), uuid)
                 || Objects.equals(tr.getAccountCreditedUuid(), uuid))
             .count();
+    }
+
+    public Stream<Transaction> getTransactions(Predicate<Transaction> filter) {
+        return getTransactions().stream().filter(filter);
     }
 
     public void createTables(Connection conn) {
@@ -386,6 +423,10 @@ public class MoneyDAO extends DAO implements RecordSource {
             progress.accept(" done\n");
 
             progress.accept("Preloading data...\n");
+
+            progress.accept("    icons... ");
+            getAll(Icon.class, iconsMap);
+            progress.accept("done\n");
 
             progress.accept("    categories... ");
             getAll(Category.class, categoriesMap);
@@ -425,6 +466,7 @@ public class MoneyDAO extends DAO implements RecordSource {
             setDataSource(ds, DatabaseType.MYSQL);
 
             preloadingProperty.set(true);
+            iconsMap.clear();
             categoriesMap.clear();
             contactsMap.clear();
             currencyMap.clear();
@@ -445,6 +487,10 @@ public class MoneyDAO extends DAO implements RecordSource {
             progress.accept(" done\n");
 
             progress.accept("Importing data...\n");
+
+            progress.accept("    icons... ");
+            insert(conn, BATCH_SIZE, imp.getIcons());
+            progress.accept("done\n");
 
             progress.accept("    categories... ");
             insert(conn, BATCH_SIZE, imp.getCategories());
@@ -481,14 +527,14 @@ public class MoneyDAO extends DAO implements RecordSource {
                                   List<? extends MoneyRecord> toImport)
     {
         for (MoneyRecord record : toImport) {
-            var found = existing.get(record.getGuid());
+            var found = existing.get(record.getUuid());
             if (found == null) {
-                idMap.put(record.getGuid(), ImportAction.INSERT);
+                idMap.put(record.getUuid(), ImportAction.INSERT);
             } else {
                 if (record.getModified() > found.getModified()) {
-                    idMap.put(record.getGuid(), ImportAction.UPDATE);
+                    idMap.put(record.getUuid(), ImportAction.UPDATE);
                 } else {
-                    idMap.put(record.getGuid(), ImportAction.IGNORE);
+                    idMap.put(record.getUuid(), ImportAction.IGNORE);
                 }
             }
         }
@@ -499,7 +545,7 @@ public class MoneyDAO extends DAO implements RecordSource {
                                                      Map<UUID, ImportAction> importActions)
     {
         for (T item : toImport) {
-            switch(importActions.get(item.getGuid())) {
+            switch (importActions.get(item.getUuid())) {
                 case IGNORE:
                     continue;
 

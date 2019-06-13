@@ -38,7 +38,7 @@ public class TransactionDetail {
     private final long modified;
 
     TransactionDetail(Transaction transaction) {
-        uuid = transaction.getGuid();
+        uuid = transaction.getUuid();
         amount = transaction.getAmount();
         accountCreditedUuid = transaction.getAccountCreditedUuid();
         comment = transaction.getComment();
