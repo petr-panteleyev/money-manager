@@ -29,7 +29,6 @@ package org.panteleyev.money.details;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
@@ -66,6 +65,9 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -84,7 +86,7 @@ final class DetailEditorPane extends BorderPane {
         }
     }
 
-    private class StringCompletionProvider extends BaseCompletionProvider<String> {
+    private static class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
             super(set, Options::getAutoCompleteLength);
         }
@@ -131,40 +133,36 @@ final class DetailEditorPane extends BorderPane {
         commentEdit.setPrefColumnCount(30);
         sumEdit.setPrefColumnCount(8);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, new Label(RB.getString("creditedAccountLabel")),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "creditedAccountLabel"),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, new Label(RB.getString("sumLabel")), hBox1);
+        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "sumLabel"), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, new Label(RB.getString("commentLabel")), commentEdit);
+        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "commentLabel"), commentEdit);
 
         var filler = new Region();
 
-        var clearButton = new Button(RB.getString("clearButton"));
-        clearButton.setOnAction(event -> clear());
+        var clearButton = newButton(RB, "clearButton", x -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = new Button(RB.getString("addButton"));
-        addButton.setOnAction(event -> buildTransactionDetail()
+        var addButton = newButton(RB, "addButton", x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.addRecord(t);
                 clear();
             }));
 
-        var updateButton = new Button(RB.getString("updateButton"));
-        updateButton.setOnAction(event -> buildTransactionDetail()
+        var updateButton = newButton(RB, "updateButton", x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.updateRecord(t);
                 clear();
             })
         );
 
-        var deleteButton = new Button(RB.getString("deleteButton"));
-        deleteButton.setOnAction(event -> {
+        var deleteButton = newButton(RB, "deleteButton", x -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();
@@ -212,10 +210,9 @@ final class DetailEditorPane extends BorderPane {
         banksAndCash.stream()
             .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
             .forEach(acc -> {
-                var menuItem = new MenuItem('[' + acc.getName() + ']');
-                menuItem.setOnAction(event -> onCreditedAccountSelected(acc));
-
-                creditedMenuButton.getItems().add(menuItem);
+                creditedMenuButton.getItems().add(
+                    newMenuItem('[' + acc.getName() + ']',
+                        event -> onCreditedAccountSelected(acc)));
                 creditedSuggestions.add(acc);
             });
 
@@ -248,9 +245,9 @@ final class DetailEditorPane extends BorderPane {
                     accounts.stream()
                         .filter(Account::getEnabled)
                         .forEach(acc -> {
-                            var menuItem = new MenuItem("  " + prefix + ' ' + acc.getName());
-                            menuItem.setOnAction(event -> onCreditedAccountSelected(acc));
-                            creditedMenuButton.getItems().add(menuItem);
+                            creditedMenuButton.getItems().add(
+                                newMenuItem("  " + prefix + ' ' + acc.getName(),
+                                    event -> onCreditedAccountSelected(acc)));
                             creditedSuggestions.add(acc);
                         });
                 }
@@ -362,9 +359,8 @@ final class DetailEditorPane extends BorderPane {
 
                     accounts.forEach(acc -> {
                         creditedSuggestions.add(acc);
-                        var accMenuItem = new MenuItem("  - " + acc.getName());
-                        accMenuItem.setOnAction(event -> onCreditedAccountSelected(acc));
-                        creditedMenuButton.getItems().add(accMenuItem);
+                        creditedMenuButton.getItems().add(
+                            newMenuItem("  - " + acc.getName(), event -> onCreditedAccountSelected(acc)));
                     });
                 }
             });

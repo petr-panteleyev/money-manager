@@ -342,6 +342,7 @@ public class DataCache {
                 }
                 return amount;
             })
-            .reduce(total ? account.getOpeningBalance() : BigDecimal.ZERO, BigDecimal::add);
+            .reduce(total ? account.getOpeningBalance().add(account.getAccountLimit()) : BigDecimal.ZERO,
+                BigDecimal::add);
     }
 }

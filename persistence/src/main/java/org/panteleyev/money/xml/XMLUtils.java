@@ -80,6 +80,10 @@ public interface XMLUtils {
         appendTextNode(e, name, Base64.getEncoder().encodeToString(value));
     }
 
+    static void appendTextNode(Element e, String name, Enum<?> value) {
+        appendTextNode(e, name, value.name());
+    }
+
     static Element appendElement(Element parent, String name) {
         var element = parent.getOwnerDocument().createElement(name);
         parent.appendChild(element);

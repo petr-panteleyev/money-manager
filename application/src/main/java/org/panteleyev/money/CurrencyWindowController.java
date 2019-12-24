@@ -35,7 +35,6 @@ import javafx.collections.WeakMapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -43,8 +42,9 @@ import org.panteleyev.money.model.Currency;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import static org.panteleyev.money.FXFactory.newMenuBar;
-import static org.panteleyev.money.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -65,11 +65,12 @@ final class CurrencyWindowController extends BaseController {
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = newMenuBar(
-            new Menu(RB.getString("menu.File"), null,
+            newMenu(RB, "menu.File",
                 newMenuItem(RB, "menu.File.Close", event -> onClose())),
-            new Menu(RB.getString("menu.Edit"), null,
+            newMenu(RB, "menu.Edit",
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
                 newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
+            createWindowMenu(RB),
             createHelpMenu(RB));
 
         // Context Menu
@@ -85,7 +86,6 @@ final class CurrencyWindowController extends BaseController {
         table.getColumns().setAll(colName, colDescription);
 
         var root = new BorderPane();
-        root.setPrefSize(600.0, 400.0);
         root.setTop(menuBar);
         root.setCenter(table);
 
@@ -96,6 +96,7 @@ final class CurrencyWindowController extends BaseController {
 
         cache().currencies().addListener(new WeakMapChangeListener<>(currencyListener));
         setupWindow(root);
+        Options.loadStageDimensions(getClass(), getStage());
     }
 
     @Override
@@ -112,8 +113,8 @@ final class CurrencyWindowController extends BaseController {
     }
 
     private void onEditCurrency() {
-        getSelectedCurrency().ifPresent(selected ->
-            new CurrencyDialog(selected).showAndWait().ifPresent(c -> getDao().insertCurrency(c)));
+        getSelectedCurrency().flatMap(selected ->
+            new CurrencyDialog(selected).showAndWait()).ifPresent(c -> getDao().insertCurrency(c));
     }
 
     private void onCurrencyUpdate(MapChangeListener.Change<? extends UUID, ? extends Currency> change) {

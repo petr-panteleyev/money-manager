@@ -31,12 +31,12 @@ import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.commons.fx.BaseDialog;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 
 class OptionsDialog extends BaseDialog<ButtonType> {
@@ -52,9 +52,9 @@ class OptionsDialog extends BaseDialog<ButtonType> {
 
         var pane = new GridPane();
         pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(0, new Label(RB.getString("options.Dialog.Prefix.Length")), autoCompleteLength);
-        pane.addRow(1, new Label(RB.getString("options.Dialog.closing.day.delta")), accountClosingDayDeltaEdit);
-        pane.addRow(2, new Label(RB.getString("label.YandexMoneyToken")), ymToken);
+        pane.addRow(0, newLabel(RB, "options.Dialog.Prefix.Length"), autoCompleteLength);
+        pane.addRow(1, newLabel(RB, "options.Dialog.closing.day.delta"), accountClosingDayDeltaEdit);
+        pane.addRow(2, newLabel(RB, "label.YandexMoneyToken"), ymToken);
         getDialogPane().setContent(pane);
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));

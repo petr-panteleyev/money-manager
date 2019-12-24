@@ -110,7 +110,7 @@ class YandexMoneyClient {
                 throw new RuntimeException("Invalid history");
             }
 
-            var element = (JsonObject) new JsonParser().parse(httpResponse.body());
+            var element = (JsonObject) JsonParser.parseString(httpResponse.body());
             var operations = element.get("operations").getAsJsonArray();
 
             var statementRecords = new ArrayList<StatementRecord>();
@@ -160,7 +160,7 @@ class YandexMoneyClient {
                     throw new RuntimeException("Invalid response");
                 }
 
-                var element = (JsonObject) new JsonParser().parse(httpResponse.body());
+                var element = (JsonObject) JsonParser.parseString(httpResponse.body());
                 var error = element.get("error");
                 if (error == null) {
                     var tokenElement = element.get("access_token");
@@ -196,7 +196,7 @@ class YandexMoneyClient {
             if (status != 200) {
                 return Optional.empty();
             }
-            var accountObject = (JsonObject) new JsonParser().parse(httpResponse.body());
+            var accountObject = (JsonObject) JsonParser.parseString(httpResponse.body());
             return Optional.of(new AccountInfo(accountObject));
         } catch (Exception ex) {
             throw new RuntimeException(ex);

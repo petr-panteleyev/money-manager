@@ -24,11 +24,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money;
+package org.panteleyev.money.cells;
 
+import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
-import java.util.function.Predicate;
 
-public interface TransactionListTab {
-    Predicate<Transaction> getTransactionFilter();
+public class TransactionCheckCell extends TableCell<Transaction, Transaction> {
+    private static final String CHECK_SYMBOL = "✔︎";
+
+    @Override
+    public void updateItem(Transaction transaction, boolean empty) {
+        super.updateItem(transaction, empty);
+
+        setGraphic(null);
+
+        if (empty || transaction == null || !transaction.getChecked()) {
+            setText("");
+        } else {
+            setText(CHECK_SYMBOL);
+        }
+    }
 }

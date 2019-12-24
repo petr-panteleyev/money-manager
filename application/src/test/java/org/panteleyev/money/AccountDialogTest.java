@@ -30,6 +30,7 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
@@ -53,6 +54,9 @@ public class AccountDialogTest extends BaseTest {
     private static final String ACCOUNT_COMMENT = UUID.randomUUID().toString();
     private static final String ACCOUNT_NUMBER = UUID.randomUUID().toString();
     private static final BigDecimal ACCOUNT_INTEREST = BigDecimal.TEN;
+    private static final CardType ACCOUNT_CARD_TYPE = CardType.VISA;
+    private static final String ACCOUNT_CARD_NUMBER = UUID.randomUUID().toString();
+    private static final BigDecimal ACCOUNT_CREDIT = BigDecimal.ONE;
 
     private final Currency curr_1;
     private final Currency curr_2;
@@ -133,7 +137,10 @@ public class AccountDialogTest extends BaseTest {
         dialog.getCommentEdit().setText(ACCOUNT_COMMENT);
         dialog.getAccountNumberEdit().setText(ACCOUNT_NUMBER);
         dialog.getInterestEdit().setText(ACCOUNT_INTEREST.toString());
+        dialog.getCardTypeComboBox().getSelectionModel().select(ACCOUNT_CARD_TYPE);
+        dialog.getCardNumberEdit().setText(ACCOUNT_CARD_NUMBER);
         dialog.getCurrencyComboBox().getSelectionModel().select(curr_1);
+        dialog.getCreditEdit().setText(ACCOUNT_CREDIT.toString());
     }
 
     private void setupDialog(AccountDialog dialog, Account account) {
@@ -160,6 +167,9 @@ public class AccountDialogTest extends BaseTest {
         assertEquals(account.getCategoryUuid(), category.getUuid());
         assertEquals(account.getTypeId(), category.getType().getId());
         assertEquals(account.getInterest().stripTrailingZeros(), ACCOUNT_INTEREST.stripTrailingZeros());
+        assertEquals(account.getCardType(), ACCOUNT_CARD_TYPE);
+        assertEquals(account.getCardNumber(), ACCOUNT_CARD_NUMBER);
+        assertEquals(account.getAccountLimit(), ACCOUNT_CREDIT);
         assertTrue(account.getEnabled());
         assertEquals(account.getCurrencyUuid().orElse(null), curr_1.getUuid());
     }
@@ -189,6 +199,9 @@ public class AccountDialogTest extends BaseTest {
         assertEquals(account.getClosingDate(), acc_1.getClosingDate());
         assertTrue(account.getModified() > acc_1.getModified());
         assertEquals(account.getOpeningBalance().stripTrailingZeros(), acc_1.getOpeningBalance().stripTrailingZeros());
+        assertEquals(account.getAccountLimit().stripTrailingZeros(), acc_1.getAccountLimit().stripTrailingZeros());
         assertTrue(account.getEnabled());
+        assertEquals(account.getCardType(), acc_1.getCardType());
+        assertEquals(account.getCardNumber(), acc_1.getCardNumber());
     }
 }

@@ -28,13 +28,11 @@ package org.panteleyev.money;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.money.MainWindowController;
 import org.panteleyev.money.cells.LocalDateCell;
 import org.panteleyev.money.cells.StatementRow;
 import org.panteleyev.money.cells.StatementSumCell;
@@ -44,15 +42,14 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 
 public class StatementView extends BorderPane {
     private final TableView<StatementRecord> tableView = new TableView<>();
-    private Consumer<StatementRecord> newTransactionCallback = x -> {
-    };
+    private Consumer<StatementRecord> newTransactionCallback = x -> { };
 
-    private Consumer<StatementRecord> recordSelectedCallback = x -> {
-    };
+    private Consumer<StatementRecord> recordSelectedCallback = x -> { };
 
     StatementView() {
         var actualDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.Date"));
@@ -114,18 +111,19 @@ public class StatementView extends BorderPane {
             recordSelectedCallback.accept(newValue));
     }
 
-    private Optional<StatementRecord> getSelectedRecord() {
+    Optional<StatementRecord> getSelectedRecord() {
         return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
+    }
+
+    void setSelectedRecord(StatementRecord record) {
+        tableView.getSelectionModel().select(record);
     }
 
     private void createMenu() {
         var menu = new ContextMenu();
 
-        var addMenuItem = new MenuItem(MainWindowController.RB.getString("menu.Edit.Add"));
-        addMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.INSERT));
-        addMenuItem.setOnAction(event -> onAddTransaction());
-
-        menu.getItems().addAll(addMenuItem);
+        menu.getItems().addAll(newMenuItem(RB, "menu.Edit.Add",
+            new KeyCodeCombination(KeyCode.INSERT), x -> onAddTransaction()));
 
         tableView.setContextMenu(menu);
     }

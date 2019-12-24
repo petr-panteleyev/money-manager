@@ -90,6 +90,12 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
     private final UUID iconUuid;
 
+    @Column("card_type")
+    private final CardType cardType;
+
+    @Column("card_number")
+    private final String cardNumber;
+
     @Column("created")
     private final long created;
 
@@ -112,6 +118,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
                    @Column("interest") BigDecimal interest,
                    @Column("closing_date") LocalDate closingDate,
                    @Column("icon_uuid") UUID iconUuid,
+                   @Column("card_type") CardType cardType,
+                   @Column("card_number") String cardNumber,
                    @Column("uuid") UUID guid,
                    @Column("created") long created,
                    @Column("modified") long modified)
@@ -129,6 +137,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         this.interest = interest;
         this.closingDate = closingDate;
         this.iconUuid = iconUuid;
+        this.cardType = cardType;
+        this.cardNumber = cardNumber;
         this.guid = guid;
         this.created = created;
         this.modified = modified;
@@ -205,6 +215,14 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         return iconUuid;
     }
 
+    public CardType getCardType() {
+        return cardType;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
     @Override
     public UUID getUuid() {
         return guid;
@@ -245,6 +263,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             && interest.compareTo(that.interest) == 0
             && Objects.equals(closingDate, that.closingDate)
             && Objects.equals(iconUuid, that.iconUuid)
+            && cardType == that.cardType
+            && Objects.equals(cardNumber, that.cardNumber)
             && Objects.equals(guid, that.guid)
             && created == that.created
             && modified == that.modified;
@@ -254,7 +274,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
     public int hashCode() {
         return Objects.hash(name, comment, accountNumber, openingBalance.stripTrailingZeros(),
             accountLimit.stripTrailingZeros(), currencyRate.stripTrailingZeros(), typeId, categoryUuid, currencyUuid,
-            enabled, interest, closingDate, iconUuid, guid, created, modified);
+            enabled, interest, closingDate, iconUuid, cardType, cardNumber, guid, created, modified);
     }
 
     @Override
@@ -266,11 +286,14 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             + " accountNumber:" + accountNumber
             + " categoryUuid:" + categoryUuid
             + "]";
-
     }
 
     public String getAccountNumberNoSpaces() {
         return getAccountNumber().replaceAll(" ", "");
+    }
+
+    public String getCardNumberNoSpaces() {
+        return getCardNumber().replaceAll(" ", "");
     }
 
     public static Predicate<Account> getFilterByAccount(UUID uuid) {
@@ -299,6 +322,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         private BigDecimal interest = BigDecimal.ZERO;
         private LocalDate closingDate = null;
         private UUID iconUuid = null;
+        private CardType cardType = CardType.NONE;
+        private String cardNumber = "";
         private UUID guid = null;
         private long created = 0;
         private long modified = 0;
@@ -324,6 +349,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             interest = account.getInterest();
             closingDate = account.getClosingDate().orElse(null);
             iconUuid = account.getIconUuid();
+            cardType = account.getCardType();
+            cardNumber = account.getCardNumber();
             guid = account.getUuid();
             created = account.getCreated();
             modified = account.getModified();
@@ -348,7 +375,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
             return new Account(name, comment, accountNumber, openingBalance,
                 accountLimit, currencyRate, typeId, categoryUuid,
-                currencyUuid, enabled, interest, closingDate, iconUuid, guid, created, modified);
+                currencyUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
+                guid, created, modified);
         }
 
         public Builder name(String name) {
@@ -416,6 +444,16 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
         public Builder iconUuid(UUID iconUuid) {
             this.iconUuid = iconUuid;
+            return this;
+        }
+
+        public Builder cardType(CardType cardType) {
+            this.cardType = cardType;
+            return this;
+        }
+
+        public Builder cardNumber(String cardNumber) {
+            this.cardNumber = cardNumber == null ? "" : cardNumber;
             return this;
         }
 

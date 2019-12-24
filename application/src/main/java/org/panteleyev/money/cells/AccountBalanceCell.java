@@ -39,10 +39,6 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
     private final boolean total;
     private final Predicate<Transaction> filter;
 
-    public AccountBalanceCell(Predicate<Transaction> filter) {
-        this(false, filter);
-    }
-
     public AccountBalanceCell(boolean total, Predicate<Transaction> filter) {
         this.total = total;
         this.filter = filter.and(t -> t.getParentUuid().isEmpty());

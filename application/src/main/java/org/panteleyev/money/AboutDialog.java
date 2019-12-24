@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2018, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.panteleyev.commons.fx.BaseDialog;
 import java.util.ResourceBundle;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
@@ -54,8 +55,8 @@ final class AboutDialog extends BaseDialog {
 
         var grid = new GridPane();
         grid.getStyleClass().add(Styles.GRID_PANE);
-        grid.addRow(0, new Label("Version:"), new Label(rb.getString("version")));
-        grid.addRow(1, new Label("Build:"), new Label(rb.getString("timestamp")));
+        grid.addRow(0, new Label("Version:"), newLabel(rb, "version"));
+        grid.addRow(1, new Label("Build:"), newLabel(rb, "timestamp"));
 
         var appLabel = new Label(APP_TITLE);
         appLabel.getStyleClass().add(Styles.ABOUT_APP_TITLE_LABEL);

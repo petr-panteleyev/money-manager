@@ -32,7 +32,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
@@ -44,6 +43,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
 import java.util.List;
 import java.util.UUID;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -63,9 +63,9 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         int index = 0;
         pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(index++, new Label(RB.getString("label.Type")), typeComboBox, iconComboBox);
-        pane.addRow(index++, new Label(RB.getString("label.Name")), nameEdit);
-        pane.addRow(index, new Label(RB.getString("label.Comment")), commentEdit);
+        pane.addRow(index++, newLabel(RB, "label.Type"), typeComboBox, iconComboBox);
+        pane.addRow(index++, newLabel(RB, "label.Name"), nameEdit);
+        pane.addRow(index, newLabel(RB, "label.Comment"), commentEdit);
 
         GridPane.setColumnSpan(nameEdit, 2);
         GridPane.setColumnSpan(commentEdit, 2);

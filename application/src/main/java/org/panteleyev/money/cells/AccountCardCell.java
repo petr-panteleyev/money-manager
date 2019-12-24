@@ -27,43 +27,23 @@
 package org.panteleyev.money.cells;
 
 import javafx.scene.control.TableCell;
+import javafx.scene.image.ImageView;
 import org.panteleyev.money.model.Account;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import static org.panteleyev.money.Styles.RED_TEXT;
+import static org.panteleyev.money.Images.getCardTypeIcon;
 
-public class AccountClosingDateCell extends TableCell<Account, Account> {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    private static final DateTimeFormatter CARD_FORMATTER = DateTimeFormatter.ofPattern("MM/yy");
-
-    private final int delta;
-
-    public AccountClosingDateCell(int delta) {
-        if (delta < 0) {
-            throw new IllegalArgumentException("delta must be >= 0");
-        }
-
-        this.delta = delta;
-    }
-
+public class AccountCardCell extends TableCell<Account, Account> {
     @Override
-    public void updateItem(Account account, boolean empty) {
+    protected void updateItem(Account account, boolean empty) {
         super.updateItem(account, empty);
 
         setText("");
-        getStyleClass().remove(RED_TEXT);
+        setGraphic(null);
 
-        if (empty || account == null) {
+        if (empty || account == null || account.getCardNumber().isBlank()) {
             return;
         }
 
-        account.getClosingDate().ifPresent(date -> {
-            if (LocalDate.now().until(date, ChronoUnit.DAYS) < delta) {
-                getStyleClass().add(RED_TEXT);
-            }
-            var formatter = account.getCardNumber().isBlank()? FORMATTER : CARD_FORMATTER;
-            setText(LocalDate.EPOCH.equals(date) ? "" : formatter.format(date));
-        });
+        setText(account.getCardNumber());
+        setGraphic(new ImageView(getCardTypeIcon(account.getCardType())));
     }
 }

@@ -27,6 +27,7 @@
 package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -199,6 +200,8 @@ class ImportParser extends DefaultHandler {
             .interest(parseBigDecimal(tags.get("interest"), BigDecimal.ZERO))
             .closingDate(parseLocalDate(tags.get("closingDate"), null))
             .iconUuid(parseUuid(tags.get("iconUuid")))
+            .cardType(parseCardType(tags.get("cardType")))
+            .cardNumber(tags.get("cardNumber"))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -293,5 +296,9 @@ class ImportParser extends DefaultHandler {
 
     private static long parseLong(String rawValue, long defaultValue) {
         return rawValue == null ? defaultValue : Long.parseLong(rawValue);
+    }
+
+    private static CardType parseCardType(String rawValue) {
+        return rawValue == null ? CardType.NONE : CardType.valueOf(rawValue);
     }
 }

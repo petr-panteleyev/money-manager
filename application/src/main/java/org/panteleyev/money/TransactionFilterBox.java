@@ -26,7 +26,6 @@
 
 package org.panteleyev.money;
 
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
@@ -40,7 +39,6 @@ import org.panteleyev.money.model.TransactionFilter;
 import java.time.LocalDate;
 import java.util.function.Predicate;
 import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionFilterBox extends HBox {
     private ChoiceBox<Object> filterChoice = new ChoiceBox<>();
@@ -103,15 +101,9 @@ public class TransactionFilterBox extends HBox {
         filterYearsIndex = filterChoice.getItems().size();
 
         filterChoice.getSelectionModel().select(0);
-
-        getDao().preloadingProperty().addListener((x, y, newValue) -> {
-            if (!newValue) {
-                Platform.runLater(this::setFilterYears);
-            }
-        });
     }
 
-    private void setFilterYears() {
+    void setFilterYears() {
         // remove existing years
         if (filterYearsIndex < filterChoice.getItems().size()) {
             filterChoice.getItems().remove(filterYearsIndex, filterChoice.getItems().size());
@@ -132,7 +124,8 @@ public class TransactionFilterBox extends HBox {
                 return ((TransactionFilter) selected).predicate();
             } else if (selected instanceof Integer) {
                 return TransactionFilter.byYear((int) selected);
-            } else throw new IllegalStateException("Unexpected filter selection");
+            } else
+                throw new IllegalStateException("Unexpected filter selection");
         } else {
             return TransactionFilter.byDates(fromPicker.getValue(), toPicker.getValue());
         }

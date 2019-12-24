@@ -46,6 +46,7 @@ import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.UUID;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -74,17 +75,17 @@ final class ContactDialog extends BaseDialog<Contact> {
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
         int index = 0;
-        gridPane.addRow(index++, new Label(RB.getString("label.Type")), typeChoiceBox, iconComboBox);
-        gridPane.addRow(index++, new Label(RB.getString("label.Name")), nameField);
-        gridPane.addRow(index++, new Label(RB.getString("label.Phone")), phoneField);
-        gridPane.addRow(index++, new Label(RB.getString("label.Mobile")), mobileField);
-        gridPane.addRow(index++, new Label(RB.getString("label.Email")), emailField);
+        gridPane.addRow(index++, newLabel(RB, "label.Type"), typeChoiceBox, iconComboBox);
+        gridPane.addRow(index++, newLabel(RB, "label.Name"), nameField);
+        gridPane.addRow(index++, newLabel(RB, "label.Phone"), phoneField);
+        gridPane.addRow(index++, newLabel(RB, "label.Mobile"), mobileField);
+        gridPane.addRow(index++, newLabel(RB, "label.Email"), emailField);
         gridPane.addRow(index++, new Label("URL:"), webField);
-        gridPane.addRow(index++, new Label(RB.getString("label.Street")), streetField);
-        gridPane.addRow(index++, new Label(RB.getString("label.City")), cityField);
-        gridPane.addRow(index++, new Label(RB.getString("label.Country")), countryField);
-        gridPane.addRow(index++, new Label(RB.getString("label.ZIP")), zipField);
-        gridPane.addRow(index, new Label(RB.getString("label.Comment")), commentEdit);
+        gridPane.addRow(index++, newLabel(RB, "label.Street"), streetField);
+        gridPane.addRow(index++, newLabel(RB, "label.City"), cityField);
+        gridPane.addRow(index++, newLabel(RB, "label.Country"), countryField);
+        gridPane.addRow(index++, newLabel(RB, "label.ZIP"), zipField);
+        gridPane.addRow(index, newLabel(RB, "label.Comment"), commentEdit);
 
         GridPane.setColumnSpan(nameField, 2);
         GridPane.setColumnSpan(phoneField, 2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,17 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.WeakMapChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
@@ -52,11 +54,13 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import org.panteleyev.money.cells.AccountBalanceCell;
+import org.panteleyev.money.cells.AccountCardCell;
 import org.panteleyev.money.cells.AccountCategoryCell;
+import org.panteleyev.money.cells.AccountClosingDateCell;
 import org.panteleyev.money.cells.AccountInterestCell;
 import org.panteleyev.money.cells.AccountNameCell;
-import org.panteleyev.money.cells.AccountClosingDateCell;
 import org.panteleyev.money.filters.AccountActiveFilter;
 import org.panteleyev.money.filters.AccountCategoryFilter;
 import org.panteleyev.money.filters.AccountTypeFilter;
@@ -67,19 +71,27 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
-import static org.panteleyev.money.FXFactory.newMenuItem;
+import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newCheckMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newSearchField;
 import static org.panteleyev.money.MainWindowController.RB;
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-class AccountsTab extends BorderPane {
+final class AccountWindowController extends BaseController {
     private static class TypeListItem {
         private final String text;
         private final EnumSet<CategoryType> types;
@@ -122,12 +134,7 @@ class AccountsTab extends BorderPane {
     private Predicate<Account> accountFilter;
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
-    private final CheckBox showDeactivatedAccountsCheckBox =
-        new CheckBox(RB.getString("check.showDeactivatedAccounts"));
-    private final TextField searchField = FXFactory.newSearchField(x -> updateFilters());
-
-    // Listeners
-    private Consumer<Account> accountTransactionsConsumer = x -> { };
+    private final TextField searchField = newSearchField(Images.SEARCH, x -> updateFilters());
 
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<UUID, Category> categoryListener =
@@ -146,60 +153,25 @@ class AccountsTab extends BorderPane {
     private final MapChangeListener<UUID, Transaction> transactionListener =
         change -> Platform.runLater(tableView::refresh);
 
-    AccountsTab() {
+    AccountWindowController() {
         setupTableColumns();
-
-        // Context menu
-        var addAccountMenuItem = newMenuItem(RB, "menu.Edit.newAccount", event -> onNewAccount());
-        var editAccountMenuItem = newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount());
-        editAccountMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        var deleteAccountMenuItem = newMenuItem(RB, "menu.Edit.Delete", event -> onDeleteAccount());
-        deleteAccountMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        var activateAccountMenuItem = newMenuItem(RB, "menu.edit.deactivate", event -> onActivateDeactivateAccount());
-        activateAccountMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        var copyNameMenuItem = newMenuItem(RB, "menu.CopyName", event -> onCopyName());
-        copyNameMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN));
-        copyNameMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        var showTransactionsMenuItem = newMenuItem(RB, "menu.show.transactions", event -> onShowTransactions());
-        showTransactionsMenuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-        var searchMenuItem = newMenuItem(RB, "menu.Edit.Search",
-            new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
-            actionEvent -> searchField.requestFocus());
-
-
-        var contextMenu = new ContextMenu(
-            addAccountMenuItem,
-            editAccountMenuItem,
-            new SeparatorMenuItem(),
-            deleteAccountMenuItem,
-            new SeparatorMenuItem(),
-            copyNameMenuItem,
-            activateAccountMenuItem,
-            new SeparatorMenuItem(),
-            searchMenuItem,
-            new SeparatorMenuItem(),
-            showTransactionsMenuItem
-        );
-
-        contextMenu.setOnShowing(event -> getSelectedAccount()
-            .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
-                account.getEnabled() ? "menu.edit.deactivate" : "menu.edit.activate")
-            ))
-        );
-
-        tableView.setContextMenu(contextMenu);
+        createContextMenu();
 
         // Tool box
         var hBox = new HBox(5.0,
             searchField,
             accountFilterBox,
-            categoryChoiceBox,
-            showDeactivatedAccountsCheckBox
+            categoryChoiceBox
         );
         hBox.setAlignment(Pos.CENTER_LEFT);
 
-        setTop(hBox);
-        setCenter(tableView);
+        var centerBox = new BorderPane();
+        centerBox.setTop(hBox);
+        centerBox.setCenter(tableView);
+
+        var self = new BorderPane();
+        self.setTop(createMainMenu());
+        self.setCenter(centerBox);
 
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
@@ -209,9 +181,6 @@ class AccountsTab extends BorderPane {
             .thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME));
 
         initAccountFilterBox();
-
-        showDeactivatedAccountsCheckBox.setSelected(Options.getShowDeactivatedAccounts());
-        showDeactivatedAccountsCheckBox.setOnAction(event -> onShowDeactivatedAccounts());
 
         categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
@@ -227,20 +196,71 @@ class AccountsTab extends BorderPane {
         categoryChoiceBox.getSelectionModel().select(0);
         categoryChoiceBox.valueProperty().addListener((x, y, z) -> updateFilters());
 
-        cache().categories().addListener(categoryListener);
-        cache().accounts().addListener(accountListener);
-        cache().transactions().addListener(transactionListener);
+        cache().categories().addListener(new WeakMapChangeListener<>(categoryListener));
+        cache().accounts().addListener(new WeakMapChangeListener<>(accountListener));
+        cache().transactions().addListener(new WeakMapChangeListener<>(transactionListener));
 
-        getDao().preloadingProperty().addListener((x, y, newValue) -> {
-            if (!newValue) {
-                Platform.runLater(this::initAccountFilterBox);
-                Platform.runLater(this::initAccountList);
-            }
-        });
+        initAccountFilterBox();
+        initAccountList();
+
+        setupWindow(self);
+        Options.loadStageDimensions(getClass(), getStage());
     }
 
-    Predicate<Account> getAccountFilter() {
-        return accountFilter;
+    @Override
+    public String getTitle() {
+        return RB.getString("account.window.title");
+    }
+
+    private MenuBar createMainMenu() {
+        var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
+
+        var activateAccountMenuItem = newMenuItem(RB, "menu.edit.deactivate",
+            event -> onActivateDeactivateAccount(),
+            disableBinding);
+
+        var editMenu = newMenu(RB, "menu.Edit",
+            newMenuItem(RB, "menu.Edit.newAccount", event -> onNewAccount()),
+            newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.Edit.Delete", event -> onDeleteAccount(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.CopyName",
+                new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN),
+                event -> onCopyName(),
+                disableBinding),
+            newMenuItem(RB, "menu.edit.deactivate", event -> onActivateDeactivateAccount(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.Edit.Search",
+                new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
+                actionEvent -> searchField.requestFocus()),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.show.transactions", event -> onShowTransactions(), disableBinding)
+        );
+
+        editMenu.setOnShowing(event -> getSelectedAccount()
+            .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
+                account.getEnabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+            ))
+        );
+
+        return newMenuBar(
+            newMenu(RB, "menu.File",
+                newMenuItem(RB, "menu.File.Report", event -> onReport()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            editMenu,
+            newMenu(RB, "menu.view",
+                newCheckMenuItem(RB, "check.showDeactivatedAccounts",
+                    Options.getShowDeactivatedAccounts(),
+                    new KeyCodeCombination(KeyCode.H, KeyCombination.SHORTCUT_DOWN), x -> {
+                        Options.setShowDeactivatedAccounts(((CheckMenuItem) x.getSource()).isSelected());
+                        updateFilters();
+                    }
+                )
+            ),
+            createWindowMenu(RB),
+            createHelpMenu(RB));
     }
 
     private void setupTableColumns() {
@@ -249,7 +269,7 @@ class AccountsTab extends BorderPane {
         var categoryColumn = new TableColumn<Account, Account>(RB.getString("column.Category"));
         var commentColumn = new TableColumn<Account, String>(RB.getString("column.Comment"));
         var currencyColumn = new TableColumn<Account, String>(RB.getString("column.Currency"));
-        var approvedColumn = new TableColumn<Account, Account>(RB.getString("column.Approved"));
+        var cardColumn = new TableColumn<Account, Account>(RB.getString("column.card"));
         var balanceColumn = new TableColumn<Account, Account>(RB.getString("column.Balance"));
         var waitingColumn = new TableColumn<Account, Account>(RB.getString("column.Waiting"));
         var interestColumn = new TableColumn<Account, BigDecimal>("%%");
@@ -260,11 +280,11 @@ class AccountsTab extends BorderPane {
             nameColumn,
             categoryColumn,
             currencyColumn,
+            cardColumn,
             interestColumn,
             closingDateColumn,
             commentColumn,
             balanceColumn,
-            approvedColumn,
             waitingColumn
         );
 
@@ -279,37 +299,74 @@ class AccountsTab extends BorderPane {
         currencyColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, String> p) ->
             new ReadOnlyObjectWrapper<>(cache().getCurrency(p.getValue().getCurrencyUuid().orElse(null))
                 .map(Currency::getSymbol).orElse("")));
-        approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        approvedColumn.setCellFactory((x) -> new AccountBalanceCell(true, Transaction::getChecked));
         balanceColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue()));
-        balanceColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> true));
+        balanceColumn.setCellFactory(x -> new AccountBalanceCell(true, t -> true));
         waitingColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue()));
-        waitingColumn.setCellFactory((x) -> new AccountBalanceCell(true, t -> !t.getChecked()));
+        waitingColumn.setCellFactory(x -> new AccountBalanceCell(false, t -> !t.getChecked()));
         interestColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, BigDecimal> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue().getInterest()));
-        interestColumn.setCellFactory((x) -> new AccountInterestCell());
+        interestColumn.setCellFactory(x -> new AccountInterestCell());
         closingDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
             new ReadOnlyObjectWrapper<>(p.getValue()));
         closingDateColumn.setCellFactory((x) -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()));
+        cardColumn.setCellValueFactory((TableColumn.CellDataFeatures<Account, Account> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        cardColumn.setCellFactory(x -> new AccountCardCell());
 
         nameColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.15));
         categoryColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
-        commentColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.32));
+        commentColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.3));
         currencyColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
-        approvedColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
         balanceColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
         waitingColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
         interestColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.03));
         closingDateColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.05));
+        cardColumn.prefWidthProperty().bind(tableView.widthProperty().subtract(20).multiply(0.1));
+    }
+
+    private void createContextMenu() {
+        var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
+
+        var activateAccountMenuItem = newMenuItem(RB, "menu.edit.deactivate",
+            event -> onActivateDeactivateAccount(),
+            disableBinding);
+
+        var contextMenu = new ContextMenu(
+            newMenuItem(RB, "menu.Edit.newAccount", event -> onNewAccount()),
+            newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.Edit.Delete", event -> onDeleteAccount(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.CopyName",
+                new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN),
+                event -> onCopyName(),
+                disableBinding),
+            activateAccountMenuItem,
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.Edit.Search",
+                new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
+                actionEvent -> searchField.requestFocus()),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.show.transactions", event -> onShowTransactions(), disableBinding)
+        );
+
+        contextMenu.setOnShowing(event -> getSelectedAccount()
+            .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
+                account.getEnabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+            ))
+        );
+
+        tableView.setContextMenu(contextMenu);
     }
 
     private void initAccountFilterBox() {
         accountFilterBox.getItems().setAll(
-            new TypeListItem(RB.getString("text.AccountsCashCards"), CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
-            new TypeListItem(RB.getString("account.Tree.IncomesExpenses"), CategoryType.INCOMES, CategoryType.EXPENSES),
+            new TypeListItem(RB.getString("text.AccountsCashCards"),
+                CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
+            new TypeListItem(RB.getString("account.Tree.IncomesExpenses"),
+                CategoryType.INCOMES, CategoryType.EXPENSES),
             new Separator(),
             new TypeListItem(RB.getString("text.All.Accounts")),
             new Separator()
@@ -363,26 +420,22 @@ class AccountsTab extends BorderPane {
         filteredAccounts.setPredicate(accountFilter);
     }
 
-    private void onShowDeactivatedAccounts() {
-        Options.setShowDeactivatedAccounts(showDeactivatedAccountsCheckBox.isSelected());
-        updateFilters();
-    }
-
     private Optional<Account> getSelectedAccount() {
         return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
     }
 
     private void onNewAccount() {
-        Category initialCategory = getSelectedAccount().map(account -> cache().getCategory(account.getCategoryUuid())
-            .orElse(null)).orElse(null);
+        var initialCategory = getSelectedAccount()
+            .flatMap(account -> cache().getCategory(account.getCategoryUuid()))
+            .orElse(null);
 
         new AccountDialog(initialCategory).showAndWait().ifPresent(it -> getDao().insertAccount(it));
     }
 
     private void onEditAccount() {
-        getSelectedAccount().ifPresent(account ->
-            new AccountDialog(account, null).showAndWait()
-                .ifPresent(it -> getDao().updateAccount(it)));
+        getSelectedAccount().flatMap(account -> new AccountDialog(account, null)
+            .showAndWait())
+            .ifPresent(it -> getDao().updateAccount(it));
     }
 
     private void onDeleteAccount() {
@@ -470,10 +523,30 @@ class AccountsTab extends BorderPane {
     }
 
     private void onShowTransactions() {
-        getSelectedAccount().ifPresent(account -> accountTransactionsConsumer.accept(account));
+        getSelectedAccount().ifPresent(account ->
+            getController(RequestWindowController.class).showTransactionsForAccount(account)
+        );
     }
 
-    void setAccountTransactionsConsumer(Consumer<Account> accountTransactionsConsumer) {
-        this.accountTransactionsConsumer = accountTransactionsConsumer;
+    private void onReport() {
+        var fileChooser = new FileChooser();
+        fileChooser.setTitle("Report");
+        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        fileChooser.setInitialFileName(generateFileName("accounts"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
+
+        var selected = fileChooser.showSaveDialog(null);
+        if (selected == null) {
+            return;
+        }
+
+        try (var outputStream = new FileOutputStream(selected)) {
+            var accounts = cache().getAccounts(accountFilter)
+                .sorted(MoneyDAO.COMPARE_ACCOUNT_BY_CATEGORY.thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME))
+                .collect(Collectors.toList());
+            Reports.reportAccounts(accounts, outputStream);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 }

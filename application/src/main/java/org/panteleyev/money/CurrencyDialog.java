@@ -34,7 +34,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -44,6 +43,8 @@ import org.panteleyev.money.model.Currency;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -52,11 +53,11 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     private final TextField descrEdit = new TextField();
     private final TextField rateEdit = new TextField();
     private final ChoiceBox<String> rateDirectionChoice = new ChoiceBox<>();
-    private final CheckBox defaultCheck = new CheckBox(RB.getString("currency.Dialog.Default"));
+    private final CheckBox defaultCheck = newCheckBox(RB, "currency.Dialog.Default");
     private final CheckBox showSymbolCheck = new CheckBox();
     private final ComboBox<String> formatSymbolCombo = new ComboBox<>();
     private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
-    private final CheckBox thousandSeparatorCheck = new CheckBox(RB.getString("currency.Dialog.ShowSeparator"));
+    private final CheckBox thousandSeparatorCheck = newCheckBox(RB, "currency.Dialog.ShowSeparator");
 
     CurrencyDialog(Currency currency) {
         super(MainWindowController.CSS_PATH);
@@ -67,9 +68,9 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
         int index = 0;
-        gridPane.addRow(index++, new Label(RB.getString("label.Symbol")), nameEdit);
-        gridPane.addRow(index++, new Label(RB.getString("label.Description")), descrEdit);
-        gridPane.addRow(index++, new Label(RB.getString("label.Rate")), rateEdit, rateDirectionChoice);
+        gridPane.addRow(index++, newLabel(RB, "label.Symbol"), nameEdit);
+        gridPane.addRow(index++, newLabel(RB, "label.Description"), descrEdit);
+        gridPane.addRow(index++, newLabel(RB, "label.Rate"), rateEdit, rateDirectionChoice);
 
         var hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
         hBox.setAlignment(Pos.CENTER_LEFT);

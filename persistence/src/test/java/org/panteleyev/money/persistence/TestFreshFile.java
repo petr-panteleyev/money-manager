@@ -28,13 +28,13 @@ package org.panteleyev.money.persistence;
 
 import org.testng.Assert;
 import org.testng.SkipException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class TestFreshFile extends BaseDaoTest {
-    @BeforeMethod
+    @BeforeClass
     @Override
     public void setupAndSkip() {
         try {
@@ -44,7 +44,7 @@ public class TestFreshFile extends BaseDaoTest {
         }
     }
 
-    @AfterMethod
+    @AfterClass
     @Override
     public void cleanup() throws Exception {
         super.cleanup();

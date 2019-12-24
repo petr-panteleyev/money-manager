@@ -43,28 +43,28 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.money.xml.Import;
 import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.money.xml.Import;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.commons.fx.FXFactory.newRadioButton;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-final class ImportWizard extends BaseDialog {
+final class ImportWizard extends BaseDialog<Object> {
     private final StartPage startPage = new StartPage();
     private final ProgressPage progressPage = new ProgressPage();
 
     private static class StartPage extends GridPane {
-        private ToggleGroup btnGroup = new ToggleGroup();
-        private RadioButton fullDumpRadio = new RadioButton(RB.getString("label.FullDump"));
-        private RadioButton partialImportRadio = new RadioButton(RB.getString("label.PartialImport"));
-        TextField fileNameEdit = createFileNameEdit();
-        private Button browseButton = createBrowseButton();
-        private Label warningLabel = createWarningLabel();
-        CheckBox warningCheck = createWarningCheckBox();
+        private final ToggleGroup btnGroup = new ToggleGroup();
+        private final RadioButton fullDumpRadio = newRadioButton(RB, "label.FullDump", btnGroup);
+        final TextField fileNameEdit = createFileNameEdit();
+        final CheckBox warningCheck = createWarningCheckBox();
 
         String getFileName() {
             return fileNameEdit.getText();
@@ -77,12 +77,12 @@ final class ImportWizard extends BaseDialog {
         StartPage() {
             getStyleClass().add(Styles.GRID_PANE);
 
-            fullDumpRadio.setToggleGroup(btnGroup);
-            partialImportRadio.setToggleGroup(btnGroup);
-            partialImportRadio.setSelected(true);
 
+            var partialImportRadio = newRadioButton(RB, "label.PartialImport", btnGroup, true);
 
-            addRow(0, fileNameEdit, browseButton);
+            var warningLabel = createWarningLabel();
+
+            addRow(0, fileNameEdit, newButton("...", x -> onBrowse()));
             addRow(1, partialImportRadio);
             addRow(2, fullDumpRadio);
 
@@ -102,21 +102,15 @@ final class ImportWizard extends BaseDialog {
             return field;
         }
 
-        private Button createBrowseButton() {
-            var btn = new Button("...");
-            btn.setOnAction(event -> onBrowse());
-            return btn;
-        }
-
         private Label createWarningLabel() {
-            var label = new Label(RB.getString("label.FullDumpImportWarning"));
+            var label = newLabel(RB, "label.FullDumpImportWarning");
             label.setWrapText(true);
             label.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return label;
         }
 
         private CheckBox createWarningCheckBox() {
-            var checkBox = new CheckBox(RB.getString("check.FullDumpImport"));
+            var checkBox = newCheckBox(RB, "check.FullDumpImport");
             checkBox.getStyleClass().add(Styles.BOLD_TEXT);
             checkBox.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return checkBox;
@@ -171,13 +165,11 @@ final class ImportWizard extends BaseDialog {
 
                     if (fullDump) {
                         getDao().importFullDump(imp, progress);
-                        progress.accept("\n");
-                        getDao().preload(progress);
                     } else {
                         getDao().importRecords(imp, progress);
-                        progress.accept("\n");
-                        getDao().preload(progress);
                     }
+                    progress.accept("\n");
+                    getDao().preload(progress);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }

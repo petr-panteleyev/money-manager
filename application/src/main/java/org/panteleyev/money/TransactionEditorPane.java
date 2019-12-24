@@ -76,6 +76,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -120,7 +123,7 @@ public final class TransactionEditorPane extends TitledPane {
         }
     }
 
-    private class StringCompletionProvider extends BaseCompletionProvider<String> {
+    private static class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
             super(set, Options::getAutoCompleteLength);
         }
@@ -133,6 +136,8 @@ public final class TransactionEditorPane extends TitledPane {
     private ResourceBundle rb = ResourceBundle.getBundle("org.panteleyev.money.res.TransactionEditorPane");
 
     private final DataCache cache;
+
+    private UUID uuid;      // current transaction uuid if any
 
     private Spinner<Integer> daySpinner = new Spinner<>();
 
@@ -155,10 +160,9 @@ public final class TransactionEditorPane extends TitledPane {
     private final MenuButton creditedMenuButton = new MenuButton();
     private final MenuButton contactMenuButton = new MenuButton();
 
-    private final Button addButton = new Button(rb.getString("addButton"));
-    private final Button updateButton = new Button(rb.getString("updateButton"));
-    private final Button deleteButton = new Button(rb.getString("deleteButton"));
-    private final Button clearButton = new Button(rb.getString("clearButton"));
+    private final Button addButton = newButton(rb, "addButton", x -> onAddButton());
+    private final Button updateButton = newButton(rb, "updateButton", x -> onUpdateButton());
+    private final Button deleteButton = newButton(rb, "deleteButton", x -> onDeleteButton());
 
     private BiConsumer<Transaction.Builder, String> addTransactionConsumer = (x, y) -> { };
     private BiConsumer<Transaction.Builder, String> updateTransactionConsumer = (x, y) -> { };
@@ -200,56 +204,50 @@ public final class TransactionEditorPane extends TitledPane {
         change -> Platform.runLater(this::setupAccountMenus);
     @SuppressWarnings("FieldCanBeLocal")
     private final MapChangeListener<UUID, Transaction> transactionListener =
-        this::transactionChangeListener;
+        change -> Platform.runLater(() -> transactionChangeListener(change));
 
     TransactionEditorPane(DataCache cache) {
         this.cache = cache;
 
-        var debitedBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("debitedAccountLabel")),
+        var debitedBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "debitedAccountLabel"),
             new HBox(debitedAccountEdit, debitedMenuButton),
             debitedCategoryLabel);
         HBox.setHgrow(debitedAccountEdit, Priority.ALWAYS);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("creditedAccountLabel")),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "creditedAccountLabel"),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
-        var contactBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("contactLabel")),
+        var contactBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "contactLabel"),
             new HBox(contactEdit, contactMenuButton));
         HBox.setHgrow(contactEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit, checkedCheckBox);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("sumLabel")), hBox1);
+        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "sumLabel"), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("commentLabel")), commentEdit);
+        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "commentLabel"), commentEdit);
 
-        var rateBox = new VBox(Styles.SMALL_SPACING, new Label(rb.getString("rateLabel")),
+        var rateBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "rateLabel"),
             new HBox(rate1Edit, rateDir1Combo),
             rateAmoutLabel);
 
         var filler = new Region();
 
-        clearButton.setOnAction(event -> onClearButton());
+        var clearButton = newButton(rb, "clearButton", x -> onClearButton());
         clearButton.setCancelButton(true);
-
-        addButton.setOnAction(event -> onAddButton());
         addButton.setDefaultButton(true);
 
-        updateButton.setOnAction(event -> onUpdateButton());
-
-        deleteButton.setOnAction(event -> onDeleteButton());
-
         var row3 = new HBox(Styles.BIG_SPACING,
-            new VBox(2.0, new Label(rb.getString("invoiceLabel")), invoiceNumberEdit),
+            new VBox(2.0, newLabel(rb, "invoiceLabel"), invoiceNumberEdit),
             filler, clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
         setContent(new VBox(Styles.BIG_SPACING,
             new HBox(Styles.BIG_SPACING,
-                new VBox(Styles.SMALL_SPACING, new Label(rb.getString("dayLabel")), daySpinner),
-                new VBox(Styles.SMALL_SPACING, new Label(rb.getString("typeLabel")),
+                new VBox(Styles.SMALL_SPACING, newLabel(rb, "dayLabel"), daySpinner),
+                new VBox(Styles.SMALL_SPACING, newLabel(rb, "typeLabel"),
                     new HBox(typeEdit, typeMenuButton)),
                 debitedBox, creditedBox, contactBox, sumBox),
             new HBox(Styles.BIG_SPACING, commentBox, rateBox),
@@ -288,11 +286,11 @@ public final class TransactionEditorPane extends TitledPane {
         valueFactory.setConverter(new IntegerStringConverter() {
             @Override
             public Integer fromString(String s) {
-                if (s == null || s.isBlank()) {
+                try {
+                    return Integer.parseInt(s);
+                } catch (Exception ex) {
                     valueFactory.valueProperty().set(-1);       // enforce internal change listeners
                     return LocalDate.now().getDayOfMonth();
-                } else {
-                    return super.fromString(s);
                 }
             }
         });
@@ -377,14 +375,8 @@ public final class TransactionEditorPane extends TitledPane {
                 if (acc.getEnabled()) {
                     var title = "[" + acc.getName() + "]";
 
-                    var m1 = new MenuItem(title);
-                    m1.setOnAction(event -> onDebitedAccountSelected(acc));
-
-                    var m2 = new MenuItem(title);
-                    m2.setOnAction(event -> onCreditedAccountSelected(acc));
-
-                    debitedMenuButton.getItems().add(m1);
-                    creditedMenuButton.getItems().add(m2);
+                    debitedMenuButton.getItems().add(newMenuItem(title, event -> onDebitedAccountSelected(acc)));
+                    creditedMenuButton.getItems().add(newMenuItem(title, event -> onCreditedAccountSelected(acc)));
 
                     debitedSuggestions.add(acc);
                     creditedSuggestions.add(acc);
@@ -423,14 +415,11 @@ public final class TransactionEditorPane extends TitledPane {
 
                         if (acc.getEnabled()) {
                             var title = "  " + prefix + " " + acc.getName();
-                            var m1 = new MenuItem(title);
-                            m1.setOnAction(event -> onDebitedAccountSelected(acc));
 
-                            var m2 = new MenuItem(title);
-                            m2.setOnAction(event -> onCreditedAccountSelected(acc));
-
-                            debitedMenuButton.getItems().add(m1);
-                            creditedMenuButton.getItems().add(m2);
+                            debitedMenuButton.getItems().add(
+                                newMenuItem(title, event -> onDebitedAccountSelected(acc)));
+                            creditedMenuButton.getItems().add(
+                                newMenuItem(title, event -> onCreditedAccountSelected(acc)));
 
                             debitedSuggestions.add(acc);
                             creditedSuggestions.add(acc);
@@ -446,6 +435,7 @@ public final class TransactionEditorPane extends TitledPane {
     }
 
     void clear() {
+        uuid = null;
         builder = new Transaction.Builder();
 
         newTransactionProperty.set(true);
@@ -471,11 +461,13 @@ public final class TransactionEditorPane extends TitledPane {
     }
 
     public void setTransaction(Transaction tr) {
+        uuid = tr.getUuid();
+
         builder = new Transaction.Builder(tr);
 
         newTransactionProperty.set(false);
 
-        setText(rb.getString("title") + ": " + tr.getUuid());
+        setText(rb.getString("title") + ": " + uuid);
 
         // Type
         typeEdit.setText(tr.getTransactionType().getTypeName());
@@ -759,10 +751,7 @@ public final class TransactionEditorPane extends TitledPane {
         cache.getContacts().stream()
             .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
             .forEach(x -> {
-                var m = new MenuItem(x.getName());
-                m.setOnAction(event -> onContactSelected(x));
-
-                contactMenuButton.getItems().add(m);
+                contactMenuButton.getItems().add(newMenuItem(x.getName(), event -> onContactSelected(x)));
                 contactSuggestions.add(x);
             });
 
@@ -777,9 +766,8 @@ public final class TransactionEditorPane extends TitledPane {
             if (x.isSeparator()) {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
-                var m = new MenuItem(x.getTypeName());
-                m.setOnAction(event -> onTransactionTypeSelected(x));
-                typeMenuButton.getItems().add(m);
+                typeMenuButton.getItems().add(
+                    newMenuItem(x.getTypeName(), event -> onTransactionTypeSelected(x)));
                 typeSuggestions.add(x);
             }
         });
@@ -807,9 +795,8 @@ public final class TransactionEditorPane extends TitledPane {
                     debitedMenuButton.getItems().add(new MenuItem(x.getName()));
 
                     accounts.forEach(acc -> {
-                        var accMenuItem = new MenuItem("  + " + acc.getName());
-                        accMenuItem.setOnAction(event -> onDebitedAccountSelected(acc));
-                        debitedMenuButton.getItems().add(accMenuItem);
+                        debitedMenuButton.getItems().add(
+                            newMenuItem("  + " + acc.getName(), events -> onDebitedAccountSelected(acc)));
                         debitedSuggestionsAll.add(acc);
                         debitedSuggestions.add(acc);
                     });
@@ -833,9 +820,8 @@ public final class TransactionEditorPane extends TitledPane {
                     accounts.forEach(acc -> {
                         creditedSuggestionsAll.add(acc);
                         creditedSuggestions.add(acc);
-                        var accMenuItem = new MenuItem("  - " + acc.getName());
-                        accMenuItem.setOnAction(event -> onCreditedAccountSelected(acc));
-                        creditedMenuButton.getItems().add(accMenuItem);
+                        creditedMenuButton.getItems().add(
+                            newMenuItem("  - " + acc.getName(), event -> onCreditedAccountSelected(acc)));
                     });
                 }
             });
@@ -855,9 +841,15 @@ public final class TransactionEditorPane extends TitledPane {
 
     private void transactionChangeListener(MapChangeListener.Change<? extends UUID, ? extends Transaction> change) {
         if (change.wasAdded()) {
-            var comment = change.getValueAdded().getComment();
+            var addedTransaction = change.getValueAdded();
+
+            var comment = addedTransaction.getComment();
             if (!comment.isEmpty()) {
                 commentSuggestions.add(comment);
+            }
+
+            if (addedTransaction.getUuid().equals(uuid)) {
+                checkedCheckBox.setSelected(change.getValueAdded().getChecked());
             }
         }
     }

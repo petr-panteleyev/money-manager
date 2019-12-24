@@ -26,6 +26,7 @@
 
 package org.panteleyev.money;
 
+import javafx.stage.Stage;
 import java.io.File;
 import java.util.Optional;
 import java.util.prefs.Preferences;
@@ -113,7 +114,7 @@ public class Options {
     }
 
     public static String getYandexMoneyToken() {
-        return PREFS.get(Option.YM_TOKEN.toString(), null);
+        return PREFS.get(Option.YM_TOKEN.toString(), "");
     }
 
     static Optional<File> getLastExportDir() {
@@ -131,6 +132,29 @@ public class Options {
 
     static void setAccountClosingDayDelta(int delta) {
         PREFS.putInt(Option.ACCOUNT_CLOSING_DAY_DELTA.toString(), delta);
+    }
+
+    static void saveStageDimensions(Class<?> parentClass, Stage stage) {
+        var key = parentClass.getSimpleName().toLowerCase() + "_size";
+        var value = String.format("%d;%d;%d;%d",
+            (int)stage.getX(),
+            (int)stage.getY(),
+            (int)stage.getWidth(),
+            (int)stage.getHeight());
+        PREFS.put(key, value);
+    }
+
+    static void loadStageDimensions(Class<?> parentClass, Stage stage) {
+        var key = parentClass.getSimpleName().toLowerCase() + "_size";
+        var parts = PREFS.get(key, "").split(";");
+        if (parts.length != 4) {
+            return;
+        }
+
+        stage.setX(Double.parseDouble(parts[0]));
+        stage.setY(Double.parseDouble(parts[1]));
+        stage.setWidth(Double.parseDouble(parts[2]));
+        stage.setHeight(Double.parseDouble(parts[3]));
     }
 
     static {

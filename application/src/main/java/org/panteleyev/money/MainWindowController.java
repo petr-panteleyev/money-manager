@@ -29,21 +29,32 @@ package org.panteleyev.money;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.MapChangeListener;
+import javafx.collections.WeakMapChangeListener;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -55,9 +66,15 @@ import org.panteleyev.commons.database.ConnectionProfileManager;
 import org.panteleyev.commons.fx.Controller;
 import org.panteleyev.commons.fx.WindowManager;
 import org.panteleyev.commons.ssh.SshManager;
-import org.panteleyev.money.charts.ChartsTab;
 import org.panteleyev.money.icons.IconWindowController;
+import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CategoryType;
+import org.panteleyev.money.model.Contact;
+import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.MoneyDAO;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import org.panteleyev.money.statements.StatementRecord;
 import org.panteleyev.money.xml.Export;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -66,20 +83,29 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-public class MainWindowController extends BaseController {
+public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.money.res.ui";
@@ -88,24 +114,9 @@ public class MainWindowController extends BaseController {
     public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
     private final BorderPane self = new BorderPane();
-    private final TabPane tabPane = new TabPane();
 
     private final Label progressLabel = new Label();
     private final ProgressBar progressBar = new ProgressBar();
-
-    private final Menu windowMenu = new Menu(RB.getString("menu.Window"));
-
-    private final AccountsTab accountsTab = new AccountsTab();
-    private final TransactionsTab transactionTab = new TransactionsTab();
-    private final RequestTab requestTab = new RequestTab();
-    private final StatementTab statementsTab = new StatementTab();
-    private final ChartsTab chartsTab = new ChartsTab();
-
-    private final Tab tabAccounts = new Tab(RB.getString("tab.Accouts"), accountsTab);
-    private final Tab tabTransactions = new Tab(RB.getString("tab.Transactions"), transactionTab);
-    private final Tab tabRequests = new Tab(RB.getString("tab.Requests"), requestTab);
-    private final Tab tabStatements = new Tab(RB.getString("Statement"), statementsTab);
-    private final Tab tabCharts = new Tab(RB.getString("tab.Charts"), chartsTab);
 
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
@@ -113,6 +124,21 @@ public class MainWindowController extends BaseController {
     private final ConnectionProfileManager profileManager =
         new ConnectionProfileManager(this::onInitDatabase, this::onBuildDatasource,
             PREFERENCES, sshManager);
+
+    // Transaction view box
+    private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
+    private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
+    private final Spinner<Integer> yearSpinner = new Spinner<>();
+
+    private final TransactionTableView transactionTable =
+        new TransactionTableView(TransactionTableView.Mode.ACCOUNT, this);
+    private final TransactionEditorPane transactionEditor = new TransactionEditorPane(cache());
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Account> accountListener = change -> {
+        Platform.runLater(this::initAccountFilterBox);
+        Platform.runLater(this::reloadTransactions);
+    };
 
     static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -126,9 +152,13 @@ public class MainWindowController extends BaseController {
     };
 
     private static final List<Class<? extends Controller>> WINDOW_CLASSES = List.of(
+        AccountWindowController.class,
+        StatementWindowController.class,
         ContactListWindowController.class,
         CategoryWindowController.class,
-        CurrencyWindowController.class
+        CurrencyWindowController.class,
+        RequestWindowController.class,
+        ChartsWindowController.class
     );
 
     public MainWindowController(Stage stage) {
@@ -152,15 +182,15 @@ public class MainWindowController extends BaseController {
     private MenuBar createMainMenu() {
         // Main menu
         var fileConnectMenuItem = newMenuItem(RB, "menu.File.Connect",
-            new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), event -> onOpenConnection());
-        var fileCloseMenuItem = newMenuItem(RB, "menu.File.Close", event -> onClose());
-        var fileExitMenuItem = newMenuItem(RB, "menu.File.Exit", event -> onExit());
-        var exportMenuItem = newMenuItem(RB, "menu.Tools.Export", event -> xmlDump());
+            new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), x -> onOpenConnection());
+        var fileCloseMenuItem = newMenuItem(RB, "menu.File.Close", x -> onClose());
+        var fileExitMenuItem = newMenuItem(RB, "menu.File.Exit", x -> onExit());
+        var exportMenuItem = newMenuItem(RB, "menu.Tools.Export", x -> xmlDump());
         var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
         importMenuItem.setOnAction(event -> onImport());
-        var reportMenuItem = newMenuItem(RB, "menu.File.Report", event -> onReport());
+        var reportMenuItem = newMenuItem(RB, "menu.File.Report", x -> onReport());
 
-        var fileMenu = new Menu(RB.getString("menu.File"), null,
+        var fileMenu = newMenu(RB, "menu.File",
             fileConnectMenuItem,
             new SeparatorMenuItem(),
             importMenuItem,
@@ -172,34 +202,42 @@ public class MainWindowController extends BaseController {
             new SeparatorMenuItem(),
             fileExitMenuItem);
 
-        var editDeleteMenuItem = new MenuItem(RB.getString("menu.Edit.Delete"));
-
-        var currenciesMenuItem = newMenuItem(RB, "menu.Edit.Currencies",
-            new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN), event -> onManageCurrencies());
-        var categoriesMenuItem = newMenuItem(RB, "menu.Edit.Categories",
-            new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN), event -> onManageCategories());
-        var contactsMenuItem = newMenuItem(RB, "menu.Edit.Contacts",
-            new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN), event -> onManageContacts());
-
-        var editMenu = new Menu(RB.getString("menu.Edit"), null,
-            editDeleteMenuItem,
+        var editMenu = newMenu(RB, "menu.Edit",
+            newMenuItem(RB, "menu.item.details", x -> transactionTable.onTransactionDetails()),
             new SeparatorMenuItem(),
-            currenciesMenuItem,
-            categoriesMenuItem,
-            contactsMenuItem);
+            newMenuItem(RB, "menu.item.check",
+                new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN),
+                x -> transactionTable.onCheckTransactions(true)),
+            newMenuItem(RB, "menu.item.uncheck",
+                new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN),
+                x -> transactionTable.onCheckTransactions(false))
+        );
+
+        var viewMenu = newMenu(RB, "menu.view",
+            newMenuItem(RB, "menu.view.currentMonth",
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.SHORTCUT_DOWN),
+                x -> onCurrentMonth()),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "menu.view.nextMonth",
+                new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN),
+                x -> onNextMonth()),
+            newMenuItem(RB, "menu.view.prevMonth",
+                new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN),
+                x -> onPrevMonth())
+        );
 
         var sshMenuItem = new MenuItem("SSH...");
         sshMenuItem.setOnAction(a -> sshManager.getEditor().showAndWait());
-        var profilesMenuItem = new MenuItem(RB.getString("menu.Tools.Profiles"));
-        profilesMenuItem.setOnAction(a -> profileManager.getEditor(false).showAndWait());
+        var profilesMenuItem = newMenuItem(RB, "menu.Tools.Profiles",
+            x -> profileManager.getEditor(false).showAndWait());
 
-        var optionsMenuItem = newMenuItem(RB, "menu.Tools.Options", event -> onOptions());
-        var importSettingsMenuItem = newMenuItem(RB, "menu.tools.import.settings", event -> onImportSettings());
-        var exportSettingsMenuItem = newMenuItem(RB, "menu.tool.export.settings", event -> onExportSettings());
+        var optionsMenuItem = newMenuItem(RB, "menu.Tools.Options", x -> onOptions());
+        var importSettingsMenuItem = newMenuItem(RB, "menu.tools.import.settings", x -> onImportSettings());
+        var exportSettingsMenuItem = newMenuItem(RB, "menu.tool.export.settings", x -> onExportSettings());
         var iconWindowMenuItem = new MenuItem(RB.getString("string.icons") + "...");
         iconWindowMenuItem.setOnAction(a -> onIconWindow());
 
-        var toolsMenu = new Menu(RB.getString("menu.Tools"), null,
+        var toolsMenu = newMenu(RB, "menu.Tools",
             sshMenuItem,
             profilesMenuItem,
             new SeparatorMenuItem(),
@@ -210,17 +248,11 @@ public class MainWindowController extends BaseController {
             exportSettingsMenuItem
         );
 
-        /* Dummy menu item is required in order to let onShowing() fire up first time */
-        windowMenu.getItems().setAll(new MenuItem("dummy"));
-
-        var menuBar = new MenuBar(fileMenu, editMenu, toolsMenu,
-            windowMenu, createHelpMenu(RB));
+        var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
+            createWindowMenu(RB, dbOpenProperty), createHelpMenu(RB));
 
         menuBar.setUseSystemMenuBar(true);
 
-        currenciesMenuItem.disableProperty().bind(dbOpenProperty.not());
-        categoriesMenuItem.disableProperty().bind(dbOpenProperty.not());
-        contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
         iconWindowMenuItem.disableProperty().bind(dbOpenProperty.not());
 
         exportMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -231,10 +263,98 @@ public class MainWindowController extends BaseController {
     }
 
     private void initialize() {
-        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-
         self.setTop(createMainMenu());
-        self.setCenter(tabPane);
+
+        var transactionTab = new BorderPane();
+
+        monthFilterBox.setOnAction(event -> onMonthChanged());
+
+        var transactionCountLabel = new Label();
+        transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
+
+        var f1 = new Region();
+        var hBox = new HBox(5.0,
+            accountFilterBox,
+            monthFilterBox,
+            yearSpinner,
+            f1,
+            new Label("Transactions:"),
+            transactionCountLabel
+        );
+        HBox.setHgrow(f1, Priority.ALWAYS);
+        hBox.setAlignment(Pos.CENTER_LEFT);
+
+        transactionTab.setTop(hBox);
+        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+
+        transactionTable.setOnMouseClicked(event -> onTransactionSelected());
+
+        transactionTab.setCenter(transactionTable);
+        transactionTab.setBottom(transactionEditor);
+
+        for (int i = 1; i <= 12; i++) {
+            monthFilterBox.getItems()
+                .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
+        }
+
+        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
+            .IntegerSpinnerValueFactory(1970, 2050);
+        yearSpinner.setValueFactory(valueFactory);
+        yearSpinner.valueProperty().addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
+
+        transactionEditor.setOnAddTransaction(this::onAddTransaction);
+        transactionEditor.setOnUpdateTransaction(this::onUpdateTransaction);
+        transactionEditor.setOnDeleteTransaction(this::onDeleteTransaction);
+
+        transactionTable.setOnCheckTransaction(this::onCheckTransaction);
+
+        setCurrentDate();
+
+        accountFilterBox.setConverter(new ReadOnlyStringConverter<>() {
+            public String toString(Object obj) {
+                if (obj instanceof String) {
+                    return obj.toString();
+                }
+
+                if (obj instanceof Account) {
+                    Account account = (Account) obj;
+                    switch (account.getType()) {
+                        case BANKS_AND_CASH:
+                            return "[" + account.getName() + "]";
+                        case INCOMES:
+                            return "+ " + account.getName();
+                        case EXPENSES:
+                            return "- " + account.getName();
+                        case DEBTS:
+                            return "! " + account.getName();
+                        case ASSETS:
+                            return ". " + account.getName();
+                        default:
+                            return account.getName();
+                    }
+                }
+
+                return null;
+            }
+        });
+
+        accountFilterBox.getSelectionModel().selectedIndexProperty()
+            .addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
+
+        cache().accounts().addListener(new WeakMapChangeListener<>(accountListener));
+
+        getDao().preloadingProperty().addListener(
+            (x, y, newValue) -> {
+                if (!newValue) {
+                    Platform.runLater(() -> {
+                        initAccountFilterBox();
+                        reloadTransactions();
+                        scrollToEnd();
+                    });
+                }
+            });
+
+        self.setCenter(transactionTab);
         self.setBottom(new HBox(progressLabel, progressBar));
 
         HBox.setMargin(progressLabel, new Insets(0.0, 0.0, 0.0, 5.0));
@@ -242,45 +362,6 @@ public class MainWindowController extends BaseController {
 
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
-
-        tabTransactions.selectedProperty().addListener((x, y, newValue) -> {
-            if (newValue) {
-                Platform.runLater(transactionTab::scrollToEnd);
-            }
-        });
-
-        tabPane.getTabs().addAll(
-            tabTransactions,
-            tabAccounts,
-            tabRequests,
-            tabStatements,
-            tabCharts
-        );
-
-        accountsTab.setAccountTransactionsConsumer(account -> {
-            requestTab.showTransactionsForAccount(account);
-            tabPane.getSelectionModel().select(tabRequests);
-        });
-
-        statementsTab.setNewTransactionCallback((record, account) -> {
-            tabPane.getSelectionModel().select(tabTransactions);
-            transactionTab.handleStatementRecord(record, account);
-        });
-
-        windowMenu.setOnShowing(event -> {
-            windowMenu.getItems().clear();
-
-            windowMenu.getItems().add(new MenuItem("Money Manager"));
-            windowMenu.getItems().add(new SeparatorMenuItem());
-
-            WindowManager.getFrames().forEach(frame -> {
-                if (frame != this) {
-                    var item = new MenuItem(frame.getTitle());
-                    item.setOnAction(action -> frame.getStage().toFront());
-                    windowMenu.getItems().add(item);
-                }
-            });
-        });
 
         getStage().setOnHiding(event -> onWindowClosing());
 
@@ -290,44 +371,12 @@ public class MainWindowController extends BaseController {
         profileManager.getProfileToOpen(MoneyApplication.application).ifPresent(this::open);
     }
 
-    private void onManageCategories() {
-        var controller = WindowManager.find(CategoryWindowController.class)
-            .orElseGet(CategoryWindowController::new);
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
-    }
-
     private void onIconWindow() {
-        var controller = WindowManager.find(IconWindowController.class)
-            .orElseGet(IconWindowController::new);
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
+        getController(IconWindowController.class);
     }
 
     private void onExit() {
         getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
-    }
-
-    private void onManageCurrencies() {
-        var controller = WindowManager.find(CurrencyWindowController.class)
-            .orElseGet(CurrencyWindowController::new);
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
-    }
-
-    private void onManageContacts() {
-        var controller = WindowManager.find(ContactListWindowController.class)
-            .orElseGet(ContactListWindowController::new);
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
     }
 
     @Override
@@ -335,8 +384,6 @@ public class MainWindowController extends BaseController {
         for (var clazz : WINDOW_CLASSES) {
             WindowManager.find(clazz).ifPresent(c -> ((BaseController) c).onClose());
         }
-
-        tabPane.getSelectionModel().select(0);
 
         setTitle(AboutDialog.APP_TITLE);
         getDao().initialize(null);
@@ -422,22 +469,10 @@ public class MainWindowController extends BaseController {
     }
 
     private void onReport() {
-        var tab = tabPane.getSelectionModel().getSelectedItem().getContent();
-        String prefix;
-        if (tab instanceof TransactionListTab) {
-            prefix = "transactions";
-        } else if (tab instanceof AccountsTab) {
-            prefix = "accounts";
-        } else if (tab instanceof StatementTab) {
-            prefix = "statement";
-        } else {
-            return;
-        }
-
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Report");
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName(prefix));
+        fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
         var selected = fileChooser.showSaveDialog(null);
@@ -446,22 +481,11 @@ public class MainWindowController extends BaseController {
         }
 
         try (var outputStream = new FileOutputStream(selected)) {
-            if (tab instanceof TransactionListTab) {
-                var filter = ((TransactionListTab) tab).getTransactionFilter();
-                var transactions = cache().getTransactions(filter)
-                    .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
-                    .collect(Collectors.toList());
-                Reports.reportTransactions(transactions, outputStream);
-            } else if (tab instanceof AccountsTab) {
-                var filter = ((AccountsTab) tab).getAccountFilter();
-                var accounts = cache().getAccounts(filter)
-                    .sorted(MoneyDAO.COMPARE_ACCOUNT_BY_CATEGORY.thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME))
-                    .collect(Collectors.toList());
-                Reports.reportAccounts(accounts, outputStream);
-            } else {
-                ((StatementTab) tab).getStatement()
-                    .ifPresent(statement -> Reports.reportStatement(statement, outputStream));
-            }
+            var filter = transactionTable.getTransactionFilter();
+            var transactions = cache().getTransactions(filter)
+                .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
+                .collect(Collectors.toList());
+            Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
@@ -522,6 +546,226 @@ public class MainWindowController extends BaseController {
                 PREFERENCES.exportSubtree(out);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    private ImageView getButtonImage(String name) {
+        var image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
+        image.setFitHeight(16.0);
+        image.setFitWidth(16.0);
+        return image;
+    }
+
+    private void addAccountsToChoiceBox(Collection<Account> aList) {
+        if (!aList.isEmpty()) {
+            accountFilterBox.getItems().add(new Separator());
+
+            aList.stream()
+                .filter(Account::getEnabled)
+                .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
+                .forEach(account -> accountFilterBox.getItems().add(account));
+        }
+    }
+
+    private void initAccountFilterBox() {
+        accountFilterBox.getItems().setAll(RB.getString("text.All.Accounts"));
+
+        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.BANKS_AND_CASH));
+        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.DEBTS));
+        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.ASSETS));
+
+        accountFilterBox.getSelectionModel().clearAndSelect(0);
+    }
+
+    private void setCurrentDate() {
+        var now = LocalDate.now();
+        monthFilterBox.getSelectionModel().select(now.getMonth().getValue() - 1);
+        yearSpinner.getValueFactory().setValue(now.getYear());
+    }
+
+    private void setDate(LocalDate date) {
+        monthFilterBox.getSelectionModel().select(date.getMonth().getValue() - 1);
+        yearSpinner.getValueFactory().setValue(date.getYear());
+    }
+
+    private void onPrevMonth() {
+        int month = monthFilterBox.getSelectionModel().getSelectedIndex() - 1;
+
+        if (month < 0) {
+            month = 11;
+            yearSpinner.getValueFactory().decrement(1);
+        }
+
+        monthFilterBox.getSelectionModel().select(month);
+
+        reloadTransactions();
+    }
+
+    private void onNextMonth() {
+        int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
+
+        if (month == 12) {
+            month = 0;
+            yearSpinner.getValueFactory().increment(1);
+        }
+
+        monthFilterBox.getSelectionModel().select(month);
+
+        reloadTransactions();
+    }
+
+    private void onCurrentMonth() {
+        setCurrentDate();
+
+        reloadTransactions();
+    }
+
+    private void reloadTransactions() {
+        transactionTable.clear();
+        transactionTable.getSelectionModel().select(null);
+
+        int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
+        int year = yearSpinner.getValue();
+
+        Predicate<Transaction> filter = t -> t.getMonth() == month
+            && t.getYear() == year;
+//            && t.getParentId() == 0;
+
+        var selected = accountFilterBox.getSelectionModel().getSelectedItem();
+        if (selected instanceof Account) {
+            var uuid = ((Account) selected).getUuid();
+            filter = filter.and(t -> Objects.equals(t.getAccountCreditedUuid(), uuid)
+                || Objects.equals(t.getAccountDebitedUuid(), uuid));
+        }
+
+        transactionTable.setTransactionFilter(filter);
+        transactionTable.sort();
+    }
+
+    private void onMonthChanged() {
+        reloadTransactions();
+    }
+
+    private void onTransactionSelected() {
+        transactionEditor.clear();
+        if (transactionTable.getSelectedTransactionCount() == 1) {
+            transactionTable.getSelectedTransaction().ifPresent(transactionEditor::setTransaction);
+        }
+    }
+
+    private Contact createContact(String name) {
+        var contact = new Contact.Builder()
+            .guid(UUID.randomUUID())
+            .name(name)
+            .build();
+
+        getDao().insertContact(contact);
+        return contact;
+    }
+
+    private void onAddTransaction(Transaction.Builder builder, String c) {
+        // contact
+        if (c != null && !c.isEmpty()) {
+            var newContact = createContact(c);
+            builder.contactUuid(newContact.getUuid());
+        }
+
+        // date
+        int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
+        int year = yearSpinner.getValue();
+
+        builder.month(month)
+            .year(year);
+
+        transactionEditor.clear();
+        getDao().insertTransaction(builder.build());
+    }
+
+    private void onUpdateTransaction(Transaction.Builder builder, String c) {
+        // contact
+        if (c != null && !c.isEmpty()) {
+            builder.contactUuid(createContact(c).getUuid());
+        }
+
+        // date
+        int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
+        builder.month(month);
+        int year = yearSpinner.getValue();
+        builder.year(year);
+
+        transactionEditor.clear();
+        getDao().updateTransaction(builder.build());
+    }
+
+    private void onDeleteTransaction(UUID uuid) {
+        new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
+            .showAndWait()
+            .ifPresent(r -> {
+                if (r == ButtonType.OK) {
+                    transactionEditor.clear();
+                    getDao().deleteTransaction(uuid);
+                }
+            });
+    }
+
+    private void onCheckTransaction(List<Transaction> transactions, boolean check) {
+        for (var t : transactions) {
+            getDao().updateTransaction(t.check(check));
+        }
+    }
+
+    private void scrollToEnd() {
+        if (transactionTable.getDayColumn().getSortType().equals(TableColumn.SortType.ASCENDING)) {
+            transactionTable.scrollTo(cache().transactions().size() - 1);
+        } else {
+            transactionTable.scrollTo(0);
+        }
+    }
+
+    void handleStatementRecord(StatementRecord record, Account account) {
+        Platform.runLater(() -> {
+            setDate(record.getActual());
+            transactionEditor.setTransactionFromStatement(record, account);
+        });
+    }
+
+    @Override
+    public void handleTransactionDetails(Transaction transaction, List<TransactionDetail> details) {
+        var childTransactions = cache().getTransactionDetails(transaction);
+
+        if (details.isEmpty()) {
+            if (!childTransactions.isEmpty()) {
+                for (Transaction child : childTransactions) {
+                    getDao().deleteTransaction(child.getUuid());
+                }
+                var noChildren = new Transaction.Builder(transaction)
+                    .detailed(false)
+                    .timestamp()
+                    .build();
+                getDao().updateTransaction(noChildren);
+            }
+        } else {
+            getDao().updateTransaction(new Transaction.Builder(transaction)
+                .detailed(true)
+                .timestamp()
+                .build());
+
+            for (Transaction ch : childTransactions) {
+                getDao().deleteTransaction(ch.getUuid());
+            }
+
+            for (var transactionDetail : details) {
+                var newDetail = new Transaction.Builder(transaction)
+                    .accountCreditedUuid(transactionDetail.getAccountCreditedUuid())
+                    .amount(transactionDetail.getAmount())
+                    .comment(transactionDetail.getComment())
+                    .guid(UUID.randomUUID())
+                    .parentUuid(transaction.getUuid())
+                    .detailed(false)
+                    .timestamp()
+                    .build();
+                getDao().insertTransaction(newDetail);
             }
         }
     }

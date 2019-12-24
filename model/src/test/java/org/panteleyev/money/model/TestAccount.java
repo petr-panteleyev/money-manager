@@ -52,6 +52,8 @@ public class TestAccount extends BaseTest {
         var interest = randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
+        var cardType = CardType.MASTERCARD;
+        var cardNumber = UUID.randomUUID().toString();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -70,6 +72,8 @@ public class TestAccount extends BaseTest {
             .interest(interest)
             .closingDate(closingDate)
             .iconUuid(iconUuid)
+            .cardType(cardType)
+            .cardNumber(cardNumber)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -89,6 +93,8 @@ public class TestAccount extends BaseTest {
             .interest(interest)
             .closingDate(closingDate)
             .iconUuid(iconUuid)
+            .cardType(cardType)
+            .cardNumber(cardNumber)
             .guid(uuid)
             .created(created)
             .modified(modified)
@@ -139,6 +145,8 @@ public class TestAccount extends BaseTest {
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
             .iconUuid(UUID.randomUUID())
+            .cardType(CardType.VISA)
+            .cardNumber(UUID.randomUUID().toString())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
@@ -161,6 +169,8 @@ public class TestAccount extends BaseTest {
             .interest(original.getInterest())
             .closingDate(original.getClosingDate().orElse(null))
             .iconUuid(original.getIconUuid())
+            .cardType(original.getCardType())
+            .cardNumber(original.getCardNumber())
             .guid(original.getUuid())
             .created(original.getCreated())
             .modified(original.getModified())

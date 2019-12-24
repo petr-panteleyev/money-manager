@@ -49,6 +49,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -97,7 +98,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         detailsTable.setItems(details);
 
-        var hBox = new HBox(Styles.BIG_SPACING, new Label(RB.getString("label.delta")), deltaLabel);
+        var hBox = new HBox(Styles.BIG_SPACING, newLabel(RB,"label.delta"), deltaLabel);
         var vBox = new VBox(Styles.BIG_SPACING, hBox, detailEditor
         );
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));

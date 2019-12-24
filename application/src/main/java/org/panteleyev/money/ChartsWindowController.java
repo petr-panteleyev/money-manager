@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,44 +24,68 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.panteleyev.money.charts;
+package org.panteleyev.money;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Button;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
-import org.panteleyev.money.AccountFilterSelectionBox;
-import org.panteleyev.money.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
-public class ChartsTab extends BorderPane {
+public class ChartsWindowController extends BaseController {
     private static final int PIE_CHART_SIZE = 10;  // meaningful items
 
     private final AccountFilterSelectionBox selectionBox = new AccountFilterSelectionBox();
     private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
     private final PieChart pieChart = new PieChart();
 
-    public ChartsTab() {
+    public ChartsWindowController() {
         var topPanel = new HBox(5.0);
-        var button = new Button(RB.getString("button.Refresh"));
-        button.setOnAction(event -> updateChart());
 
-        topPanel.getChildren().addAll(selectionBox, transactionFilterBox, button);
-
-        setTop(topPanel);
+        topPanel.getChildren().addAll(selectionBox,
+            transactionFilterBox,
+            newButton(RB, "button.Refresh", x -> updateChart()));
         BorderPane.setMargin(topPanel, new Insets(5.0, 5.0, 5.0, 5.0));
-
-        setCenter(pieChart);
-
         pieChart.legendVisibleProperty().set(false);
+
+        var centerPane = new BorderPane();
+        centerPane.setTop(topPanel);
+        centerPane.setCenter(pieChart);
+
+        var root = new BorderPane();
+        root.setTop(createMainMenu());
+        root.setCenter(centerPane);
+
+        transactionFilterBox.setFilterYears();
+        selectionBox.setupCategoryTypesBox();
+
+        setupWindow(root);
+        Options.loadStageDimensions(getClass(), getStage());
+    }
+
+    @Override
+    public String getTitle() {
+        return RB.getString("tab.Charts");
+    }
+
+    private MenuBar createMainMenu() {
+        return newMenuBar(
+            newMenu(RB, "menu.File",
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            createWindowMenu(RB),
+            createHelpMenu(RB));
     }
 
     private void updateChart() {

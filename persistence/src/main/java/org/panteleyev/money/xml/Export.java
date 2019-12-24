@@ -251,6 +251,8 @@ public class Export {
         XMLUtils.appendTextNode(e, "interest", account.getInterest());
         account.getClosingDate().ifPresent(closingDate -> XMLUtils.appendTextNode(e, "closingDate", closingDate));
         XMLUtils.appendTextNode(e, "iconUuid", account.getIconUuid());
+        XMLUtils.appendTextNode(e, "cardType", account.getCardType());
+        XMLUtils.appendTextNode(e, "cardNumber", account.getCardNumber());
         XMLUtils.appendTextNode(e, "guid", account.getUuid());
         XMLUtils.appendTextNode(e, "created", account.getCreated());
         XMLUtils.appendTextNode(e, "modified", account.getModified());

@@ -25,8 +25,9 @@ open module org.panteleyev.money {
     requires org.panteleyev.money.statements;
     requires org.panteleyev.money.ymoney;
 
+    requires com.google.gson;
+
     requires mysql.connector.java;
 
     requires jsch;
-    requires gson;
 }

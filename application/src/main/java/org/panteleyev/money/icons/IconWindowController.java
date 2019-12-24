@@ -33,7 +33,6 @@ import javafx.collections.transformation.SortedList;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionModel;
 import javafx.scene.control.SeparatorMenuItem;
@@ -61,8 +60,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.FXFactory.newMenuBar;
-import static org.panteleyev.money.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -81,7 +81,7 @@ public final class IconWindowController extends BaseController {
         }
     }
 
-    private class DuplicateAlert extends Alert {
+    private static class DuplicateAlert extends Alert {
         DuplicateAlert(String contentText) {
             super(Alert.AlertType.WARNING, contentText, ButtonType.CLOSE);
             getDialogPane().setContent(new TextArea(contentText));
@@ -98,7 +98,7 @@ public final class IconWindowController extends BaseController {
         super(new Stage(), MainWindowController.CSS_PATH.toString());
 
         var menuBar = newMenuBar(
-            new Menu(RB.getString("menu.File"), null,
+            newMenu(RB, "menu.File",
                 newMenuItem(RB, "menu.File.Upload",
                     new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN),
                     event -> onUpload()),

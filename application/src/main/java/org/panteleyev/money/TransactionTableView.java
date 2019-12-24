@@ -32,14 +32,17 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
-import javafx.scene.control.CheckBox;
+import javafx.collections.WeakMapChangeListener;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.stage.FileChooser;
+import org.panteleyev.money.cells.TransactionCheckCell;
 import org.panteleyev.money.cells.TransactionContactCell;
 import org.panteleyev.money.cells.TransactionCreditedAccountCell;
 import org.panteleyev.money.cells.TransactionDayCell;
@@ -57,7 +60,6 @@ import org.panteleyev.money.xml.Export;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -66,10 +68,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
-public class TransactionTableView extends TableView<Transaction> {
+class TransactionTableView extends TableView<Transaction> {
     public interface TransactionDetailsCallback {
         void handleTransactionDetails(Transaction transaction, List<TransactionDetail> details);
     }
@@ -94,6 +97,16 @@ public class TransactionTableView extends TableView<Transaction> {
     private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> { };
     private final TransactionDetailsCallback transactionDetailsCallback;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Transaction> transactionChangeListener = change ->
+        Platform.runLater(() -> transactionListener(change));
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Contact> contactChangeLister = change -> Platform.runLater(this::redraw);
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Category> categoryChangeLister = change -> Platform.runLater(this::redraw);
+
     // Columns
     private final TableColumn<Transaction, Transaction> dayColumn;
 
@@ -103,7 +116,7 @@ public class TransactionTableView extends TableView<Transaction> {
     // List size property
     private SimpleIntegerProperty listSizeProperty = new SimpleIntegerProperty(0);
 
-    public TransactionTableView(Mode mode) {
+    TransactionTableView(Mode mode) {
         this(mode, null);
     }
 
@@ -168,16 +181,17 @@ public class TransactionTableView extends TableView<Transaction> {
         sumColumn.setComparator(Comparator.comparing(Transaction::getSignedAmount));
         sumColumn.setSortable(true);
 
-        var approvedColumn = new TableColumn<Transaction, CheckBox>("");
-
-        approvedColumn.setCellValueFactory(p -> {
-            var cb = new CheckBox();
-
-            var value = p.getValue();
-            cb.setSelected(value.getChecked());
-            cb.setOnAction(event -> onCheckTransaction(Collections.singletonList(value), cb.isSelected()));
-
-            return new ReadOnlyObjectWrapper<>(cb);
+        var approvedColumn = new TableColumn<Transaction, Transaction>("");
+        approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
+            new ReadOnlyObjectWrapper<>(p.getValue()));
+        approvedColumn.setCellFactory(x ->  {
+            var cell = new TransactionCheckCell();
+            cell.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2) {
+                    toggleTransactionCheck();
+                }
+            });
+            return cell;
         });
         approvedColumn.setSortable(false);
 
@@ -205,29 +219,12 @@ public class TransactionTableView extends TableView<Transaction> {
         approvedColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        var exportMenuItem = new MenuItem(RB.getString("menu.Context.Export"));
-        exportMenuItem.setOnAction(event -> onExportTransactions());
 
-        var ctxMenu = new ContextMenu(exportMenuItem);
-        ctxMenu.setOnShowing(event -> onShowingContextMenu());
+        createContextMenu();
 
-        if (mode != Mode.STATEMENT) {
-            var detailsMenuItem = new MenuItem(RB.getString("menu.item.details"));
-            detailsMenuItem.setOnAction(event -> onTransactionDetails());
-
-            detailsMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
-
-            ctxMenu.getItems().addAll(
-                new SeparatorMenuItem(),
-                detailsMenuItem
-            );
-        }
-
-        setContextMenu(ctxMenu);
-
-        cache().transactions().addListener(this::transactionListener);
-        cache().contacts().addListener((MapChangeListener<UUID, Contact>) change -> redraw());
-        cache().categories().addListener((MapChangeListener<UUID, Category>) change -> redraw());
+        cache().transactions().addListener(new WeakMapChangeListener<>(transactionChangeListener));
+        cache().contacts().addListener(new WeakMapChangeListener<>(contactChangeLister));
+        cache().categories().addListener(new WeakMapChangeListener<>(categoryChangeLister));
     }
 
     TableColumn<Transaction, Transaction> getDayColumn() {
@@ -238,14 +235,42 @@ public class TransactionTableView extends TableView<Transaction> {
         return listSizeProperty;
     }
 
-    private void onShowingContextMenu() {
+    private void createContextMenu() {
+        var exportMenuItem = newMenuItem(RB, "menu.Context.Export", x -> onExportTransactions());
+        var detailsMenuItem = newMenuItem(RB, "menu.item.details", x -> onTransactionDetails());
+        var checkMenuItem = newMenuItem(RB, "menu.item.check",
+            new KeyCodeCombination(KeyCode.K, KeyCombination.SHORTCUT_DOWN),
+            x -> onCheckTransactions(true));
+        var uncheckMenuItem = newMenuItem(RB, "menu.item.uncheck",
+            new KeyCodeCombination(KeyCode.U, KeyCombination.SHORTCUT_DOWN),
+            x -> onCheckTransactions(false));
+
+        detailsMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
+
+        var ctxMenu = new ContextMenu();
+
+        if (mode != Mode.STATEMENT) {
+            ctxMenu.getItems().addAll(
+                exportMenuItem,
+                new SeparatorMenuItem(),
+                detailsMenuItem,
+                new SeparatorMenuItem()
+            );
+        }
+
+        ctxMenu.getItems().addAll(
+            checkMenuItem,
+            uncheckMenuItem
+        );
+
+        setContextMenu(ctxMenu);
     }
 
     void clear() {
         getItems().clear();
     }
 
-    public Predicate<Transaction> getTransactionFilter() {
+    Predicate<Transaction> getTransactionFilter() {
         return transactionFilter;
     }
 
@@ -254,7 +279,7 @@ public class TransactionTableView extends TableView<Transaction> {
         listSizeProperty.set(getItems().size());
     }
 
-    public void setTransactionFilter(Predicate<Transaction> filter) {
+    void setTransactionFilter(Predicate<Transaction> filter) {
         transactionFilter = filter.and(t -> t.getParentUuid().isEmpty());
 
         getSelectionModel().clearSelection();
@@ -276,7 +301,7 @@ public class TransactionTableView extends TableView<Transaction> {
         checkTransactionConsumer.accept(t, checked);
     }
 
-    public void setOnCheckTransaction(BiConsumer<List<Transaction>, Boolean> c) {
+    void setOnCheckTransaction(BiConsumer<List<Transaction>, Boolean> c) {
         checkTransactionConsumer = c;
     }
 
@@ -342,7 +367,7 @@ public class TransactionTableView extends TableView<Transaction> {
         getColumns().get(0).setVisible(true);
     }
 
-    private void onTransactionDetails() {
+    void onTransactionDetails() {
         getSelectedTransaction().ifPresent(t -> {
             var childTransactions = cache().getTransactionDetails(t);
 
@@ -357,5 +382,17 @@ public class TransactionTableView extends TableView<Transaction> {
                 new TransactionDetailsDialog(childTransactions, BigDecimal.ZERO, true).showAndWait();
             }
         });
+    }
+
+    private void toggleTransactionCheck() {
+        getSelectedTransaction().ifPresent(t -> onCheckTransaction(List.of(t), !t.getChecked()));
+    }
+
+    void onCheckTransactions(boolean check) {
+        var process = getSelectionModel().getSelectedItems().stream()
+            .filter(t -> t.getChecked() != check)
+            .collect(Collectors.toList());
+
+        onCheckTransaction(process, check);
     }
 }

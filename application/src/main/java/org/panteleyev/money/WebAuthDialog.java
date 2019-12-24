@@ -30,12 +30,7 @@ import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.panteleyev.money.BaseController;
-import java.awt.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 class WebAuthDialog extends BaseController {
     private final StringProperty responseUri = new SimpleStringProperty();

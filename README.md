@@ -2,12 +2,13 @@
 
 Personal finance manager. Work in progress.
 
-## Running with Java 11
+## Running with Java 13
 
 The following options must be added to java command line:
 
 * --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
 * --add-reads org.panteleyev.persistence=org.panteleyev.money.model
+* -Dfile.encoding=UTF-8
 
 **Example**:
 

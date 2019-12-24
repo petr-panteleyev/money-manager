@@ -39,7 +39,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Menu;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
@@ -61,15 +60,17 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.FXFactory.newMenuBar;
-import static org.panteleyev.money.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.commons.fx.FXFactory.newSearchField;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class ContactListWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
-    private final TextField searchField = FXFactory.newSearchField(s -> updatePredicate());
+    private final TextField searchField = newSearchField(Images.SEARCH, s -> updatePredicate());
 
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
     private final FilteredList<Contact> filteredList = new FilteredList<>(contacts);
@@ -87,15 +88,16 @@ class ContactListWindowController extends BaseController {
 
         // Menu bar
         var menuBar = newMenuBar(
-            new Menu(RB.getString("menu.File"), null,
+            newMenu(RB, "menu.File",
                 newMenuItem(RB, "menu.File.Close", event -> onClose())),
-            new Menu(RB.getString("menu.Edit"), null,
+            newMenu(RB, "menu.Edit",
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
                 newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding),
                 new SeparatorMenuItem(),
                 newMenuItem(RB, "menu.Edit.Search",
                     new KeyCodeCombination(KeyCode.F, KeyCombination.SHORTCUT_DOWN),
                     actionEvent -> searchField.requestFocus())),
+            createWindowMenu(RB),
             createHelpMenu(RB));
 
         // Context menu
@@ -195,8 +197,8 @@ class ContactListWindowController extends BaseController {
     }
 
     private void onEditContact() {
-        getSelectedContact().ifPresent(selected ->
-            new ContactDialog(selected).showAndWait().ifPresent(c -> getDao().updateContact(c)));
+        getSelectedContact().flatMap(selected ->
+            new ContactDialog(selected).showAndWait()).ifPresent(c -> getDao().updateContact(c));
     }
 
     private void onTableMouseClick(Event event) {

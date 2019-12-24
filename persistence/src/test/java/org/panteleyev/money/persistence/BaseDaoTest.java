@@ -26,8 +26,10 @@
 
 package org.panteleyev.money.persistence;
 
+import com.mysql.cj.jdbc.MysqlDataSource;
 import org.panteleyev.money.test.BaseTest;
 import org.testng.SkipException;
+import javax.sql.DataSource;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class BaseDaoTest extends BaseTest {
@@ -37,8 +39,11 @@ public class BaseDaoTest extends BaseTest {
     public static final String ICON_EURO = "euro.png";
     public static final String ICON_JAVA = "java.png";
 
+    private DataSource dataSource;
+    private String databaseName;
+
     public void setupAndSkip() throws Exception {
-        var dbName = System.getProperty("mysql.database", TEST_DB_NAME);
+        databaseName = System.getProperty("mysql.database", TEST_DB_NAME);
         var host = System.getProperty("mysql.host", "localhost");
         var user = System.getProperty("mysql.user", null);
         var password = System.getProperty("mysql.password", null);
@@ -47,17 +52,25 @@ public class BaseDaoTest extends BaseTest {
             throw new SkipException("Test config is not set");
         }
 
-        var dataSource = new MySQLBuilder()
+        dataSource = new MySQLBuilder()
             .host(host)
             .user(user)
             .password(password)
-            .name(dbName)
             .build();
+
+        try (var conn = dataSource.getConnection(); var st = conn.createStatement()) {
+            st.execute("DROP DATABASE IF EXISTS " + databaseName);
+            st.execute("CREATE DATABASE " + databaseName);
+            ((MysqlDataSource) dataSource).setDatabaseName(databaseName);
+        }
 
         getDao().initialize(dataSource);
     }
 
     public void cleanup() throws Exception {
+        try (var conn = dataSource.getConnection(); var st = conn.createStatement()) {
+            st.execute("DROP DATABASE " + databaseName);
+        }
     }
 
     protected void initializeEmptyMoneyFile() {

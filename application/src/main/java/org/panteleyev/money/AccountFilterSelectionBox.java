@@ -28,23 +28,23 @@ package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.collections.MapChangeListener;
+import javafx.collections.WeakMapChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionFilter;
+import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class AccountFilterSelectionBox extends HBox {
     private final ChoiceBox<Object> categoryTypeChoiceBox = new ChoiceBox<>();
@@ -55,11 +55,19 @@ public class AccountFilterSelectionBox extends HBox {
     private final static String ALL_CATEGORIES_STRING = RB.getString("account.Window.AllCategories");
     private final static String ALL_ACCOUNTS_STRING = RB.getString("text.All.Accounts");
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Category> categoryListener = change ->
+        Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Account> accountListener = change ->
+        Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
+
     public AccountFilterSelectionBox() {
         super(5.0);
         setAlignment(Pos.CENTER_LEFT);
 
-        getChildren().addAll(new Label(RB.getString("text.In.Semicolon")),
+        getChildren().addAll(newLabel(RB, "text.In.Semicolon"),
             categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
 
         categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
@@ -86,19 +94,8 @@ public class AccountFilterSelectionBox extends HBox {
         categoryTypeChoiceBox.setOnAction(event -> setupCategoryBox(getSelectedCategoryType()));
         categoryChoiceBox.setOnAction(event -> setupAccountBox(getSelectedCategory()));
 
-        MapChangeListener<UUID, Category> categoryListener = change ->
-            Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
-
-        MapChangeListener<UUID, Account> accountListener = change ->
-            Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
-
-        cache().categories().addListener(categoryListener);
-        cache().accounts().addListener(accountListener);
-        getDao().preloadingProperty().addListener((x, y, newValue) -> {
-            if (!newValue) {
-                Platform.runLater(this::setupCategoryTypesBox);
-            }
-        });
+        cache().categories().addListener(new WeakMapChangeListener<>(categoryListener));
+        cache().accounts().addListener(new WeakMapChangeListener<>(accountListener));
     }
 
     void setupCategoryTypesBox() {

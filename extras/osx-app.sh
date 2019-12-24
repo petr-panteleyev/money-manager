@@ -8,6 +8,8 @@ $JPACKAGE_HOME/bin/jpackage \
     --verbose \
     --dest target/dist \
     -p target/jmods \
-    --java-options "--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls --add-reads org.panteleyev.persistence=org.panteleyev.money.model" \
+    --java-options "--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls --add-reads org.panteleyev.persistence=org.panteleyev.money.model -Dfile.encoding=UTF-8" \
     --icon icons/icons.icns \
-    --name "Money Manager"
+    --name "Money Manager" \
+    --app-version 19.5.0 \
+    --vendor panteleyev.org

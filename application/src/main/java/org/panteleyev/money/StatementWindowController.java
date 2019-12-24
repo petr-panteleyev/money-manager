@@ -29,14 +29,16 @@ package org.panteleyev.money;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
+import javafx.collections.WeakMapChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -46,30 +48,35 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementParser;
 import org.panteleyev.money.statements.StatementPredicate;
-import org.panteleyev.money.statements.StatementRecord;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+import static org.panteleyev.commons.fx.FXFactory.newButton;
+import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
+import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.commons.fx.FXFactory.newMenu;
+import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
+import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-class StatementTab extends BorderPane {
+class StatementWindowController extends BaseController {
     private static final ResourceBundle SOURCE_TYPE_RB =
         ResourceBundle.getBundle("org.panteleyev.money.res.SourceType");
 
@@ -88,7 +95,7 @@ class StatementTab extends BorderPane {
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();
     private final TextField statementFileEdit = new TextField();
-    private final CheckBox ignoreExecutionDate = new CheckBox(RB.getString("check.IgnoreExecutionDate"));
+    private final CheckBox ignoreExecutionDate = newCheckBox(RB, "check.IgnoreExecutionDate");
 
     private final YandexMoneyClient yandexMoneyClient = new YandexMoneyClient(Options.getYandexMoneyToken());
 
@@ -101,8 +108,12 @@ class StatementTab extends BorderPane {
         new ComboBox<>(FXCollections.observableArrayList(SourceType.values()));
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<UUID, Account> accountListener = change ->
-        Platform.runLater(this::setupAccountComboBox);
+    private final MapChangeListener<UUID, Account> accountListener =
+        change -> Platform.runLater(this::setupAccountComboBox);
+    @SuppressWarnings("FieldCanBeLocal")
+    private final MapChangeListener<UUID, Transaction> transactionListener =
+        change -> calculateTransactions();
+
 
     private static final FileChooser.ExtensionFilter OFX_EXTENSION =
         new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
@@ -115,31 +126,23 @@ class StatementTab extends BorderPane {
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
-    private BiConsumer<StatementRecord, Account> newTransactionCallback = (x, y) -> { };
-
     private Statement statement = null;
 
-    public StatementTab() {
-        var loadButton = new Button(RB.getString("button.Load"));
-        loadButton.setOnAction(event -> onLoad());
-
-        var clearButton = new Button(RB.getString("button.Clear"));
-        clearButton.setOnAction(event -> onClear());
+    StatementWindowController() {
+        var root = new BorderPane();
 
         sourceTypeComboBox.getSelectionModel().select(0);
 
         // File load controls
-        var browseButton = new Button("...");
-        browseButton.setOnAction(event -> onBrowse());
-        var fileLoadControls = new HBox(5.0, statementFileEdit, browseButton);
+        var fileLoadControls = new HBox(5.0, statementFileEdit,
+            newButton("...", x -> onBrowse()));
         fileLoadControls.visibleProperty().bind(
             sourceTypeComboBox.getSelectionModel().selectedItemProperty().isEqualTo(SourceType.FILE));
         fileLoadControls.setAlignment(Pos.CENTER_LEFT);
         ////////////////////////////////////////////////////////
 
         // Yandex Money controls
-        var ymAuthButton = new Button("Authorize...");
-        ymAuthButton.setOnAction(event -> yandexMoneyClient.authorize());
+        var ymAuthButton = newButton("Authorize...", x -> yandexMoneyClient.authorize());
 
         limitComboBox.getSelectionModel().selectFirst();
         var yandexMoneyControls = new HBox(5.0,
@@ -157,17 +160,17 @@ class StatementTab extends BorderPane {
         var stackPane = new StackPane(fileLoadControls, yandexMoneyControls);
 
         var balanceBox = new HBox(5.0,
-            new Label(RB.getString("label.StatementBalance")),
+            newLabel(RB, "label.StatementBalance"),
             ymAccountBalanceLabel);
         balanceBox.setAlignment(Pos.CENTER_LEFT);
 
         var filler1 = new Region();
 
         var hBox = new HBox(5.0,
-            new Label(RB.getString("label.Account")),
+            newLabel(RB, "label.Account"),
             accountComboBox,
-            loadButton,
-            clearButton,
+            newButton(RB, "button.Load", x -> onLoad()),
+            newButton(RB, "button.Clear", x -> onClear()),
             ignoreExecutionDate,
             filler1,
             balanceBox
@@ -182,6 +185,8 @@ class StatementTab extends BorderPane {
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.setDividerPosition(0, 0.9);
 
+        transactionTable.setFocusTraversable(false);
+
         accountComboBox.setConverter(new ReadOnlyNamedConverter<>());
 
         var lowerBox = new HBox(5.0, sourceTypeComboBox, stackPane);
@@ -189,39 +194,61 @@ class StatementTab extends BorderPane {
         var toolBar = new VBox(5.0, lowerBox, hBox);
         BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
 
-        setTop(toolBar);
-        setCenter(splitPane);
+        var centerBox = new BorderPane();
+        centerBox.setTop(toolBar);
+        centerBox.setCenter(splitPane);
+
+        root.setTop(createMainMenu());
+        root.setCenter(centerBox);
 
         statementTable.setRecordSelectedCallback(record ->
             transactionTable.setTransactionFilter(new StatementPredicate(accountComboBox.getValue(), record,
                 ignoreExecutionDate.isSelected())));
 
         transactionTable.setOnCheckTransaction((transactions, check) -> {
+            var selected = statementTable.getSelectedRecord();
+
             for (Transaction t : transactions) {
                 getDao().updateTransaction(t.check(check));
             }
+
+            Platform.runLater(() -> selected.ifPresent(statementTable::setSelectedRecord));
         });
 
-        cache().accounts().addListener(accountListener);
-        getDao().preloadingProperty().addListener((x, y, newValue) -> {
-            if (!newValue) {
-                Platform.runLater(this::setupAccountComboBox);
-            }
-        });
-
-        cache().transactions().addListener((MapChangeListener<UUID, Transaction>) change -> calculateTransactions());
+        cache().accounts().addListener(new WeakMapChangeListener<>(accountListener));
+        cache().transactions().addListener(new WeakMapChangeListener<>(transactionListener));
 
         accountComboBox.getSelectionModel()
             .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
 
         statementTable.setNewTransactionCallback(record -> {
-            Account account = accountComboBox.getSelectionModel().getSelectedItem();
-            newTransactionCallback.accept(record, account);
+            var account = accountComboBox.getSelectionModel().getSelectedItem();
+            var mainWindow = getController(MainWindowController.class);
+            mainWindow.handleStatementRecord(record, account);
         });
+
+        setupWindow(root);
+        setupAccountComboBox();
+        Options.loadStageDimensions(getClass(), getStage());
     }
 
-    public Optional<Statement> getStatement() {
+    @Override
+    public String getTitle() {
+        return RB.getString("statement.window.title");
+    }
+
+    private Optional<Statement> getStatement() {
         return Optional.ofNullable(statement);
+    }
+
+    private MenuBar createMainMenu() {
+        return newMenuBar(
+            newMenu(RB, "menu.File",
+                newMenuItem(RB, "menu.File.Report", event -> onReport()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            createWindowMenu(RB),
+            createHelpMenu(RB));
     }
 
     private void setupAccountComboBox() {
@@ -325,11 +352,6 @@ class StatementTab extends BorderPane {
         statementTable.clear();
     }
 
-    public void setNewTransactionCallback(BiConsumer<StatementRecord, Account> callback) {
-        Objects.requireNonNull(callback);
-        newTransactionCallback = callback;
-    }
-
     private SourceType getSourceType() {
         return sourceTypeComboBox.getSelectionModel().getSelectedItem();
     }
@@ -349,6 +371,25 @@ class StatementTab extends BorderPane {
                 .collect(Collectors.toList()));
         }
 
-        statementTable.setStatement(statement);
+        Platform.runLater(() -> statementTable.setStatement(statement));
+    }
+
+    private void onReport() {
+        var fileChooser = new FileChooser();
+        fileChooser.setTitle("Report");
+        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        fileChooser.setInitialFileName(generateFileName("statement"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
+
+        var selected = fileChooser.showSaveDialog(null);
+        if (selected == null) {
+            return;
+        }
+
+        try (var outputStream = new FileOutputStream(selected)) {
+            getStatement().ifPresent(statement -> Reports.reportStatement(statement, outputStream));
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 }
