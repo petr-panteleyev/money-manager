@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,9 +76,9 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import static org.panteleyev.commons.fx.FXFactory.newButton;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newButton;
+import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -552,6 +552,9 @@ public final class TransactionEditorPane extends TitledPane {
 
     private void onAddButton() {
         if (buildTransaction()) {
+            builder.guid(UUID.randomUUID())
+                .modified(0)
+                .created(0);
             addTransactionConsumer.accept(builder, newContactName);
             daySpinner.requestFocus();
         }

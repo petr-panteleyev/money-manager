@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -78,7 +78,7 @@ public class CurrencyDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Currency>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CurrencyDialog(null);
+            var dialog = new CurrencyDialog(null, null);
             setupDialog(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
@@ -96,7 +96,7 @@ public class CurrencyDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Currency>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CurrencyDialog(CURRENCY);
+            var dialog = new CurrencyDialog(null, CURRENCY);
             setupDialogUpdate(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);

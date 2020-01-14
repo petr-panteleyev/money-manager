@@ -14,20 +14,16 @@ open module org.panteleyev.money {
 
     requires org.controlsfx.controls;
 
-    requires org.panteleyev.persistence;
-    requires org.panteleyev.commons.ssh;
-    requires org.panteleyev.commons.database;
-    requires org.panteleyev.commons.fx;
+    requires org.panteleyev.fx;
 
     requires org.panteleyev.money.model;
     requires org.panteleyev.ofx;
     requires org.panteleyev.money.persistence;
     requires org.panteleyev.money.statements;
     requires org.panteleyev.money.ymoney;
+    requires org.panteleyev.money.database;
 
     requires com.google.gson;
 
     requires mysql.connector.java;
-
-    requires jsch;
 }

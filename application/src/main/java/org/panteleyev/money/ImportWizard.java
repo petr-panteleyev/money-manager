@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,16 +43,16 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.money.xml.Import;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import static org.panteleyev.commons.fx.FXFactory.newButton;
-import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
-import static org.panteleyev.commons.fx.FXFactory.newRadioButton;
+import static org.panteleyev.fx.FxFactory.newButton;
+import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newRadioButton;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 

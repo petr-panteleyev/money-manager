@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

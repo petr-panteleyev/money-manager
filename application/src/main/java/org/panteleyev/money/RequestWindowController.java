@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -45,10 +45,10 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newButton;
-import static org.panteleyev.commons.fx.FXFactory.newMenu;
-import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newButton;
+import static org.panteleyev.fx.FxFactory.newMenu;
+import static org.panteleyev.fx.FxFactory.newMenuBar;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;

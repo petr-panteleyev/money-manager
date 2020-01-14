@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.money.cells.CardTypeComboBoxCell;
 import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.model.Account;
@@ -53,8 +54,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -77,20 +78,20 @@ class AccountDialog extends BaseDialog<Account> {
 
     private final Collection<Category> categories;
 
-    AccountDialog(Category initialCategory) {
-        this(null, initialCategory, cache());
+    AccountDialog(Controller owner, Category initialCategory) {
+        this(owner, null, initialCategory, cache());
     }
 
-    AccountDialog(Category initialCategory, DataCache cache) {
-        this(null, initialCategory, cache);
+    AccountDialog(Controller owner, Category initialCategory, DataCache cache) {
+        this(owner, null, initialCategory, cache);
     }
 
-    AccountDialog(Account account, Category initialCategory) {
-        this(account, initialCategory, cache());
+    AccountDialog(Controller owner, Account account, Category initialCategory) {
+        this(owner, account, initialCategory, cache());
     }
 
-    AccountDialog(Account account, Category initialCategory, DataCache cache) {
-        super(MainWindowController.CSS_PATH);
+    AccountDialog(Controller owner, Account account, Category initialCategory, DataCache cache) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("account.Dialog.Title"));
 

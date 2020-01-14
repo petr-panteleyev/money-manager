@@ -2,16 +2,57 @@
 
 Personal finance manager. Work in progress.
 
-## Running with Java 13
+## Build and Run
 
-The following options must be added to java command line:
+### Build
 
-* --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-* --add-reads org.panteleyev.persistence=org.panteleyev.money.model
-* -Dfile.encoding=UTF-8
+Make sure Maven toolchain configuration ```toolchain.xml``` contains the following
+definition:
+```xml
+<toolchain>
+    <type>jdk</type>
+    <provides>
+        <version>13</version>
+    </provides>
+    <configuration>
+        <jdkHome>/path/to/jdk-13</jdkHome>
+    </configuration>
+</toolchain>
+```
+Execute the following:
+```shell script
+$ mvn clean package
+```
 
-**Example**:
+Application JAR and all dependencies will be placed in ```target/jmods```.
 
-java --module-path c:\apps\money-manager --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \
-  --add-reads org.panteleyev.persistence=org.panteleyev.money.model -Dfile.encoding=UTF-8 \
+### Run
+
+JDK-13 is required to run the application.
+
+```shell script
+$ java --module-path target/jmods --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \
+  --add-reads org.panteleyev.mysqlapi=org.panteleyev.money.model -Dfile.encoding=UTF-8 \
   -m org.panteleyev.money/org.panteleyev.money.MoneyApplication
+```
+
+### Binary Packages
+
+To build binary installers perform the following steps:
+* Install [JDK-14 EA](https://jdk.java.net/14/) build
+* Set ```JPACKAGE_HOME``` environment variable to the root directory of JDK-14
+* On Microsoft Windows: install [WiX Toolset](https://wixtoolset.org/releases/), add its binary directory to ```PATH``` 
+environment variable
+* Execute the following commands:
+```shell script
+$ mvn clean package
+$ ./extras/osx-app.sh
+  or
+$ ./extras/win-app.sh
+```
+
+Installation packages will be found in ```target/dist``` directory.
+
+## Support
+
+There is no support for this application.

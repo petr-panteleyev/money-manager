@@ -6,15 +6,12 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-parent</artifactId>
-        <version>19.5.0</version>
+        <version>20.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>money-ofx</artifactId>
     <packaging>jar</packaging>
     <name>Money Manager OFX Parser</name>
-
-    <dependencies>
-    </dependencies>
 
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 
 public class StatementView extends BorderPane {

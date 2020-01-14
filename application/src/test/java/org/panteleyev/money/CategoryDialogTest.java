@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ public class CategoryDialogTest extends BaseTest {
         BlockingQueue<Category> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CategoryDialog(null);
+            var dialog = new CategoryDialog(null, null);
             setupDialog(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
@@ -96,7 +96,7 @@ public class CategoryDialogTest extends BaseTest {
         BlockingQueue<Category> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CategoryDialog(CATEGORY);
+            var dialog = new CategoryDialog(null, CATEGORY);
             setupDialogUpdate(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);

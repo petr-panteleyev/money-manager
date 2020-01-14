@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 

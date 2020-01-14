@@ -63,10 +63,10 @@ public class Options {
         }
     }
 
-    private static Preferences PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
+    private static final Preferences PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
 
     // Cached values
-    private static int autoCompleteLength = AUTO_COMPLETE_LENGTH;
+    private static int autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
 
     static boolean getShowDeactivatedAccounts() {
         return PREFS.getBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), false);
@@ -157,15 +157,12 @@ public class Options {
         stage.setHeight(Double.parseDouble(parts[3]));
     }
 
-    static {
-        // Load values into cache
-        autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
-    }
-
     public static File getSettingsDirectory() {
         var dir = new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY);
         if (!dir.exists()) {
-            dir.mkdir();
+            if (!dir.mkdir()) {
+                throw new RuntimeException("Options directory cannot be opened/created");
+            }
         } else {
             if (!dir.isDirectory()) {
                 throw new RuntimeException("Options directory cannot be opened/created");

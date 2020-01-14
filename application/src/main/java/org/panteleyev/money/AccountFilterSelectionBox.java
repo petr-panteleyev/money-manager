@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,7 +42,7 @@ import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 

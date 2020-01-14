@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-parent</artifactId>
-        <version>19.5.0</version>
+        <version>20.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -40,38 +40,18 @@
             <artifactId>money-ymoney</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>money-model</artifactId>
+            <artifactId>money-database</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>persistence</artifactId>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
-            <artifactId>org-panteleyev-commons-ssh</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>org-panteleyev-commons-database</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>org-panteleyev-commons-fx</artifactId>
+            <artifactId>java-fx-helpers</artifactId>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -97,6 +77,13 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>money-model</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -111,7 +98,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
                 <configuration>
                     <outputDirectory>../target/jmods</outputDirectory>
                     <archive>
@@ -124,7 +110,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>${mavenDependencyPluginVersion}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-parent</artifactId>
-    <version>19.5.0</version>
+    <version>20.1.0</version>
     <packaging>pom</packaging>
     <name>Money Manager Parent</name>
 
@@ -15,22 +15,23 @@
         <app.main.class>org.panteleyev.money.MoneyApplication</app.main.class>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
-        <persistence-version>19.2.0</persistence-version>
-        <commons-version>19.3.0</commons-version>
-        <javafx-version>13.0.1</javafx-version>
-        <controlsfx-version>11.0.1</controlsfx-version>
-        <mysql-connector-version>8.0.15</mysql-connector-version>
-        <jsoup-version>1.12.1</jsoup-version>
-        <jsch-version>0.1.55</jsch-version>
-        <gson-version>2.8.6</gson-version>
-        <testng-version>6.14.3</testng-version>
-        <!-- Plugins -->
+        <!-- dependencies -->
+        <javaApiForMySqlVersion>1.0.0</javaApiForMySqlVersion>
+        <javaFxVersion>13.0.1</javaFxVersion>
+        <javaFxHelpersVersion>1.0.0</javaFxHelpersVersion>
+        <controlsFxVersion>11.0.1</controlsFxVersion>
+        <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
+        <jsoupVersion>1.12.1</jsoupVersion>
+        <gsonVersion>2.8.6</gsonVersion>
+        <testngVersion>6.14.3</testngVersion>
+        <!-- plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <mavenVersionPluginVersion>2.7</mavenVersionPluginVersion>
+        <mavenFailsafePluginVersion>3.0.0-M4</mavenFailsafePluginVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
         <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>
@@ -44,6 +45,7 @@
         <module>ofx</module>
         <module>statements</module>
         <module>ymoney</module>
+        <module>database</module>
         <module>application</module>
     </modules>
 
@@ -51,78 +53,63 @@
         <dependencies>
             <dependency>
                 <groupId>org.panteleyev</groupId>
-                <artifactId>persistence</artifactId>
-                <version>${persistence-version}</version>
+                <artifactId>java-api-for-mysql</artifactId>
+                <version>${javaApiForMySqlVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.panteleyev</groupId>
-                <artifactId>org-panteleyev-commons-ssh</artifactId>
-                <version>${commons-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.panteleyev</groupId>
-                <artifactId>org-panteleyev-commons-database</artifactId>
-                <version>${commons-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.panteleyev</groupId>
-                <artifactId>org-panteleyev-commons-fx</artifactId>
-                <version>${commons-version}</version>
+                <artifactId>java-fx-helpers</artifactId>
+                <version>${javaFxHelpersVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.controlsfx</groupId>
                 <artifactId>controlsfx</artifactId>
-                <version>${controlsfx-version}</version>
+                <version>${controlsFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>${mysql-connector-version}</version>
+                <version>${mysqlConnectorVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
-                <version>${jsoup-version}</version>
+                <version>${jsoupVersion}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
-                <version>${gson-version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.jcraft</groupId>
-                <artifactId>jsch</artifactId>
-                <version>${jsch-version}</version>
+                <version>${gsonVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-base</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-controls</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-web</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-swing</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-media</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-graphics</artifactId>
-                <version>${javafx-version}</version>
+                <version>${javaFxVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -136,7 +123,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>${testng-version}</version>
+            <version>${testngVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -192,28 +179,66 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                </configuration>
             </plugin>
         </plugins>
 
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${mavenDependencyPluginVersion}</version>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
-                            <id>copy-dependencies</id>
-                            <phase>package</phase>
+                            <id>add-integration-test-source</id>
+                            <phase>generate-test-sources</phase>
                             <goals>
-                                <goal>copy-dependencies</goal>
+                                <goal>add-test-source</goal>
                             </goals>
                             <configuration>
-                                <includeScope>runtime</includeScope>
-                                <outputDirectory>target/jmods</outputDirectory>
+                                <sources>
+                                    <source>src/integ-test/java</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>add-integration-test-resources</id>
+                            <phase>generate-test-resources</phase>
+                            <goals>
+                                <goal>add-test-resource</goal>
+                            </goals>
+                            <configuration>
+                                <resources>
+                                    <resource>
+                                        <directory>src/integ-test/resources</directory>
+                                    </resource>
+                                </resources>
                             </configuration>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${mavenFailsafePluginVersion}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <suiteXmlFiles>
+                            <suiteXmlFile>src/integ-test/resources/testng.xml</suiteXmlFile>
+                        </suiteXmlFiles>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

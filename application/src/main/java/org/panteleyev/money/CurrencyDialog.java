@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,13 +38,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.money.model.Currency;
 import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newCheckBox;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -59,8 +60,8 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
     private final CheckBox thousandSeparatorCheck = newCheckBox(RB, "currency.Dialog.ShowSeparator");
 
-    CurrencyDialog(Currency currency) {
-        super(MainWindowController.CSS_PATH);
+    CurrencyDialog(Controller owner, Currency currency) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("currency.Dialog.Title"));
 

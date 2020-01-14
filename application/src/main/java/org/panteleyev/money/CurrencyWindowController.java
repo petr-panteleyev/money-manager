@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,9 @@ import org.panteleyev.money.model.Currency;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import static org.panteleyev.commons.fx.FXFactory.newMenu;
-import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenu;
+import static org.panteleyev.fx.FxFactory.newMenuBar;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -109,12 +109,12 @@ final class CurrencyWindowController extends BaseController {
     }
 
     private void onAddCurrency() {
-        new CurrencyDialog(null).showAndWait().ifPresent(c -> getDao().insertCurrency(c));
+        new CurrencyDialog(this, null).showAndWait().ifPresent(c -> getDao().insertCurrency(c));
     }
 
     private void onEditCurrency() {
         getSelectedCurrency().flatMap(selected ->
-            new CurrencyDialog(selected).showAndWait()).ifPresent(c -> getDao().insertCurrency(c));
+            new CurrencyDialog(this, selected).showAndWait()).ifPresent(c -> getDao().insertCurrency(c));
     }
 
     private void onCurrencyUpdate(MapChangeListener.Change<? extends UUID, ? extends Currency> change) {

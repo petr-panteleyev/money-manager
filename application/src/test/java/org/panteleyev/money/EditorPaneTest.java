@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2018, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ public class EditorPaneTest extends BaseTest {
             .formatSymbolPosition(1)
             .showFormatSymbol(false)
             .def(false)
-            .rate(new BigDecimal(RANDOM.nextDouble()))
+            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
             .guid(UUID.randomUUID())
@@ -83,7 +83,7 @@ public class EditorPaneTest extends BaseTest {
             .formatSymbolPosition(1)
             .showFormatSymbol(false)
             .def(false)
-            .rate(new BigDecimal(RANDOM.nextDouble()))
+            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
             .guid(UUID.randomUUID())
@@ -229,13 +229,13 @@ public class EditorPaneTest extends BaseTest {
             .month(now.getMonthValue())
             .year(now.getYear())
             .comment(UUID.randomUUID().toString())
-            .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
+            .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
             .checked(RANDOM.nextBoolean());
 
         if (Objects.equals(debit.getCurrencyUuid(), credit.getCurrencyUuid())) {
             builder.rate(BigDecimal.ONE);
         } else {
-            builder.rate(new BigDecimal(RANDOM.nextDouble()));
+            builder.rate(BigDecimal.valueOf(RANDOM.nextDouble()));
         }
 
         if (contact != null) {
@@ -248,7 +248,7 @@ public class EditorPaneTest extends BaseTest {
     private StatementRecord createTestStatementRecord() {
         var builder = new StatementRecord.Builder()
             .actual(LocalDate.now())
-            .amount(new BigDecimal(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
+            .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
         return builder.build();
     }
 
@@ -413,7 +413,7 @@ public class EditorPaneTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
+            Assert.assertNotEquals(resultedTransaction.getUuid(), transaction.getUuid());
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
@@ -446,7 +446,7 @@ public class EditorPaneTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
+            Assert.assertNotEquals(resultedTransaction.getUuid(), transaction.getUuid());
 
             assertMainFields(resultedTransaction, transaction);
             Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),

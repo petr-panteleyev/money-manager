@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -81,11 +81,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newCheckMenuItem;
-import static org.panteleyev.commons.fx.FXFactory.newMenu;
-import static org.panteleyev.commons.fx.FXFactory.newMenuBar;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
-import static org.panteleyev.commons.fx.FXFactory.newSearchField;
+import static org.panteleyev.fx.FxFactory.newCheckMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenu;
+import static org.panteleyev.fx.FxFactory.newMenuBar;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -429,11 +429,11 @@ final class AccountWindowController extends BaseController {
             .flatMap(account -> cache().getCategory(account.getCategoryUuid()))
             .orElse(null);
 
-        new AccountDialog(initialCategory).showAndWait().ifPresent(it -> getDao().insertAccount(it));
+        new AccountDialog(this, initialCategory).showAndWait().ifPresent(it -> getDao().insertAccount(it));
     }
 
     private void onEditAccount() {
-        getSelectedAccount().flatMap(account -> new AccountDialog(account, null)
+        getSelectedAccount().flatMap(account -> new AccountDialog(this, account, null)
             .showAndWait())
             .ifPresent(it -> getDao().updateAccount(it));
     }

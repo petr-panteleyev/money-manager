@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,11 +37,9 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.xml.Import;
-import org.panteleyev.persistence.DAO;
-import org.panteleyev.persistence.Record;
+import org.panteleyev.mysqlapi.MySqlClient;
+import org.panteleyev.mysqlapi.Record;
 import javax.sql.DataSource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -49,19 +47,21 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class MoneyDAO extends DAO {
+public class MoneyDAO {
     private static final MoneyDAO MONEY_DAO = new MoneyDAO();
 
     private static final DataCache cache = DataCache.cache();
 
     public static MoneyDAO getDao() {
         return MONEY_DAO;
+    }
+
+    public static MySqlClient getClient() {
+        return MONEY_DAO.client;
     }
 
     public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::getName);
@@ -85,8 +85,7 @@ public class MoneyDAO extends DAO {
 
     private static final int BATCH_SIZE = 1000;
 
-    public static final Consumer<String> IGNORE_PROGRESS = x -> {
-    };
+    public static final Consumer<String> IGNORE_PROGRESS = x -> { };
 
     private static final List<Class<? extends Record>> TABLE_CLASSES = List.of(
         Icon.class,
@@ -113,17 +112,19 @@ public class MoneyDAO extends DAO {
         return preloadingProperty;
     }
 
+    private final MySqlClient client = new MySqlClient();
+
     ////////////////////////////////////////////////////////////////////////////
     // Icons
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertIcon(Icon icon) {
-        insert(icon);
+        client.insert(icon);
         cache.icons().put(icon.getUuid(), icon);
     }
 
     public void updateIcon(Icon icon) {
-        update(icon);
+        client.update(icon);
         cache.icons().put(icon.getUuid(), icon);
     }
 
@@ -132,12 +133,12 @@ public class MoneyDAO extends DAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertCategory(Category category) {
-        insert(category);
+        client.insert(category);
         cache.categories().put(category.getUuid(), category);
     }
 
     public void updateCategory(Category category) {
-        update(category);
+        client.update(category);
         cache.categories().put(category.getUuid(), category);
     }
 
@@ -147,12 +148,12 @@ public class MoneyDAO extends DAO {
 
 
     public void insertCurrency(Currency currency) {
-        insert(currency);
+        client.insert(currency);
         cache.currencies().put(currency.getUuid(), currency);
     }
 
     public void updateCurrency(Currency currency) {
-        update(currency);
+        client.update(currency);
         cache.currencies().put(currency.getUuid(), currency);
     }
 
@@ -163,12 +164,12 @@ public class MoneyDAO extends DAO {
 
 
     public void insertContact(Contact contact) {
-        insert(contact);
+        client.insert(contact);
         cache.contacts().put(contact.getUuid(), contact);
     }
 
     public void updateContact(Contact contact) {
-        update(contact);
+        client.update(contact);
         cache.contacts().put(contact.getUuid(), contact);
     }
 
@@ -177,18 +178,18 @@ public class MoneyDAO extends DAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertAccount(Account account) {
-        insert(account);
+        client.insert(account);
         cache.accounts().put(account.getUuid(), account);
     }
 
     public void updateAccount(Account account) {
-        update(account);
+        client.update(account);
         cache.accounts().put(account.getUuid(), account);
     }
 
     public void deleteAccount(Account account) {
         cache.accounts().remove(account.getUuid());
-        delete(account);
+        client.delete(account);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -196,30 +197,30 @@ public class MoneyDAO extends DAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertTransaction(Transaction transaction) {
-        insert(transaction);
+        client.insert(transaction);
         cache.transactions().put(transaction.getUuid(), transaction);
     }
 
     public void updateTransaction(Transaction transaction) {
-        update(transaction);
+        client.update(transaction);
         cache.transactions().put(transaction.getUuid(), transaction);
     }
 
     public void deleteTransaction(UUID uuid) {
-        delete(uuid, Transaction.class);
+        client.delete(uuid, Transaction.class);
         cache.transactions().remove(uuid);
     }
 
     public void createTables(Connection conn) {
-        super.createTables(conn, TABLE_CLASSES);
+        client.createTables(conn, TABLE_CLASSES);
     }
 
     public void createTables() {
-        super.createTables(TABLE_CLASSES);
+        client.createTables(TABLE_CLASSES);
     }
 
     public void dropTables() {
-        super.dropTables(TABLE_CLASSES_REVERSED);
+        client.dropTables(TABLE_CLASSES_REVERSED);
     }
 
     public void preload() {
@@ -231,33 +232,33 @@ public class MoneyDAO extends DAO {
             preloadingProperty.set(true);
 
             progress.accept("Preloading primary keys... ");
-            preload(TABLE_CLASSES);
+            client.preload(TABLE_CLASSES);
             progress.accept(" done\n");
 
             progress.accept("Preloading data...\n");
 
             progress.accept("    icons... ");
-            getAll(Icon.class, cache.iconsMap());
+            client.getAll(Icon.class, cache.iconsMap());
             progress.accept("done\n");
 
             progress.accept("    categories... ");
-            getAll(Category.class, cache.categoriesMap());
+            client.getAll(Category.class, cache.categoriesMap());
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
-            getAll(Contact.class, cache.contactsMap());
+            client.getAll(Contact.class, cache.contactsMap());
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
-            getAll(Currency.class, cache.currencyMap());
+            client.getAll(Currency.class, cache.currencyMap());
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
-            getAll(Account.class, cache.accountsMap());
+            client.getAll(Account.class, cache.accountsMap());
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
-            getAll(Transaction.class, cache.transactionsMap());
+            client.getAll(Transaction.class, cache.transactionsMap());
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -266,7 +267,7 @@ public class MoneyDAO extends DAO {
     }
 
     private void deleteAll(Connection conn, List<Class<? extends Record>> tables) {
-        truncate(conn, tables);
+        client.truncate(conn, tables);
         tables.forEach(t -> {
 //            deleteAll(conn, t);
 //            resetPrimaryKey(t);
@@ -275,7 +276,7 @@ public class MoneyDAO extends DAO {
 
     public void initialize(DataSource ds) {
         synchronized (preloadingProperty) {
-            setDataSource(ds, DatabaseType.MYSQL);
+            client.setDataSource(ds);
 
             preloadingProperty.set(true);
             cache.clear();
@@ -284,11 +285,11 @@ public class MoneyDAO extends DAO {
     }
 
     public boolean isOpen() {
-        return getDataSource() != null;
+        return client.getDataSource() != null;
     }
 
     public void importFullDump(Import imp, Consumer<String> progress) {
-        try (var conn = getDataSource().getConnection()) {
+        try (var conn = client.getDataSource().getConnection()) {
             progress.accept("Recreating tables... ");
             createTables(conn);
             progress.accept(" done\n");
@@ -296,29 +297,29 @@ public class MoneyDAO extends DAO {
             progress.accept("Importing data...\n");
 
             progress.accept("    icons... ");
-            insert(conn, BATCH_SIZE, imp.getIcons());
+            client.insert(conn, BATCH_SIZE, imp.getIcons());
             progress.accept("done\n");
 
             progress.accept("    categories... ");
-            insert(conn, BATCH_SIZE, imp.getCategories());
+            client.insert(conn, BATCH_SIZE, imp.getCategories());
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
-            insert(conn, BATCH_SIZE, imp.getCurrencies());
+            client.insert(conn, BATCH_SIZE, imp.getCurrencies());
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
-            insert(conn, BATCH_SIZE, imp.getAccounts());
+            client.insert(conn, BATCH_SIZE, imp.getAccounts());
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
-            insert(conn, BATCH_SIZE, imp.getContacts());
+            client.insert(conn, BATCH_SIZE, imp.getContacts());
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
-            insert(conn, BATCH_SIZE,
+            client.insert(conn, BATCH_SIZE,
                 imp.getTransactions().stream().filter(t -> t.getParentUuid().isEmpty()).collect(Collectors.toList()));
-            insert(conn, BATCH_SIZE,
+            client.insert(conn, BATCH_SIZE,
                 imp.getTransactions().stream().filter(t -> t.getParentUuid().isPresent()).collect(Collectors.toList()));
             progress.accept("done\n");
 
@@ -357,11 +358,11 @@ public class MoneyDAO extends DAO {
                     continue;
 
                 case INSERT:
-                    insert(conn, item);
+                    client.insert(conn, item);
                     break;
 
                 case UPDATE:
-                    update(conn, item);
+                    client.update(conn, item);
                     break;
             }
         }
@@ -382,7 +383,7 @@ public class MoneyDAO extends DAO {
         calculateActions(accountActions, cache.accountsMap(), imp.getAccounts());
         calculateActions(transactionActions, cache.transactionsMap(), imp.getTransactions());
 
-        try (var conn = getDataSource().getConnection()) {
+        try (var conn = client.getDataSource().getConnection()) {
             try {
                 conn.setAutoCommit(false);
 
@@ -411,7 +412,7 @@ public class MoneyDAO extends DAO {
 
             dataSource.setDatabaseName(schema);
 
-            var dao = new DAO(dataSource, DatabaseType.MYSQL);
+            var dao = new MySqlClient(dataSource);
             dao.createTables(TABLE_CLASSES);
 
             return null;

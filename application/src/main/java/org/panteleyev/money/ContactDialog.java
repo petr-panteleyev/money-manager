@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -39,14 +39,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.money.icons.IconManager;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.UUID;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -65,8 +66,8 @@ final class ContactDialog extends BaseDialog<Contact> {
     private final TextField zipField = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
 
-    ContactDialog(Contact contact) {
-        super(MainWindowController.CSS_PATH);
+    ContactDialog(Controller owner, Contact contact) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("contact.Dialog.Title"));
 

@@ -152,7 +152,7 @@ public class AccountDialogTest extends BaseTest {
         BlockingQueue<Account> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new AccountDialog(category, cache);
+            var dialog = new AccountDialog(null, category, cache);
             setupDialog(dialog);
             var account = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(account);
@@ -179,7 +179,7 @@ public class AccountDialogTest extends BaseTest {
         BlockingQueue<Account> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new AccountDialog(acc_1, null, cache);
+            var dialog = new AccountDialog(null, acc_1, null, cache);
             setupDialog(dialog, acc_1);
             var account = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(account);

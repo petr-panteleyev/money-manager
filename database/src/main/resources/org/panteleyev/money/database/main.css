@@ -1,0 +1,12 @@
+.redText {
+    -fx-text-fill: red;
+}
+
+.greenText {
+    -fx-text-fill: green
+}
+
+.gridPane {
+    -fx-hgap: 5;
+    -fx-vgap: 5;
+}

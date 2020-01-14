@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,14 +33,16 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
-import org.panteleyev.commons.fx.Controller;
-import org.panteleyev.commons.fx.WindowManager;
+import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.WindowManager;
 import java.util.ResourceBundle;
-import static org.panteleyev.commons.fx.FXFactory.newMenu;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenu;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.CSS_PATH;
 
 public class BaseController extends Controller {
+    static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
+
     BaseController() {
         super(CSS_PATH.toString());
     }
@@ -109,12 +111,12 @@ public class BaseController extends Controller {
 
     protected Menu createHelpMenu(ResourceBundle rb) {
         return newMenu(rb, "menu.Help",
-            newMenuItem(rb, "menu.Help.About", x -> new AboutDialog().showAndWait()));
+            newMenuItem(rb, "menu.Help.About", x -> new AboutDialog(this).showAndWait()));
     }
 
     static <T extends BaseController> T getController(Class<T> clazz) {
         @SuppressWarnings("unchecked")
-        T controller = (T) WindowManager.find(clazz).orElseGet(() -> {
+        T controller = (T) WINDOW_MANAGER.find(clazz).orElseGet(() -> {
             try {
                 return clazz.getDeclaredConstructor().newInstance();
             } catch (Exception ex) {

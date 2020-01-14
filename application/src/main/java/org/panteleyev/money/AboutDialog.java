@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,17 +33,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.panteleyev.commons.fx.BaseDialog;
+import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import java.util.ResourceBundle;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import static org.panteleyev.fx.FxFactory.newLabel;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
     private static final String COPYRIGHT = "Copyright (c) 2016, 2019, Petr Panteleyev";
     private static final String BUILD_INFO = "org.panteleyev.money.res.buildInfo";
 
-    AboutDialog() {
-        super(MainWindowController.CSS_PATH);
+    AboutDialog(Controller owner) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(APP_TITLE);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,12 @@
 
 package org.panteleyev.money.model;
 
-import org.panteleyev.persistence.annotations.Column;
-import org.panteleyev.persistence.annotations.ForeignKey;
-import org.panteleyev.persistence.annotations.PrimaryKey;
-import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.ReferenceOption;
-import org.panteleyev.persistence.annotations.Table;
+import org.panteleyev.mysqlapi.annotations.Column;
+import org.panteleyev.mysqlapi.annotations.ForeignKey;
+import org.panteleyev.mysqlapi.annotations.PrimaryKey;
+import org.panteleyev.mysqlapi.annotations.RecordBuilder;
+import org.panteleyev.mysqlapi.annotations.ReferenceOption;
+import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -65,11 +65,11 @@ public class Transaction implements MoneyRecord {
     @Column("checked")
     private final boolean checked;
 
-    @Column(value = "acc_debited_uuid", nullable = true)
+    @Column(value = "acc_debited_uuid")
     @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     private final UUID accountDebitedUuid;
 
-    @Column(value = "acc_credited_uuid", nullable = true)
+    @Column(value = "acc_credited_uuid")
     @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     private final UUID accountCreditedUuid;
 
@@ -79,11 +79,11 @@ public class Transaction implements MoneyRecord {
     @Column("acc_credited_type_id")
     private final int accountCreditedTypeId;
 
-    @Column(value = "acc_debited_category_uuid", nullable = true)
+    @Column(value = "acc_debited_category_uuid")
     @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     private final UUID accountDebitedCategoryUuid;
 
-    @Column(value = "acc_credited_category_uuid", nullable = true)
+    @Column(value = "acc_credited_category_uuid")
     @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     private final UUID accountCreditedCategoryUuid;
 

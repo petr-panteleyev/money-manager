@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,14 +27,8 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.model.MoneyRecord;
-import org.panteleyev.persistence.Record;
+import org.panteleyev.mysqlapi.Record;
 import org.testng.Assert;
-import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;

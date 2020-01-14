@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,10 @@
 package org.panteleyev.money.model;
 
 import javafx.scene.image.Image;
-import org.panteleyev.persistence.annotations.Column;
-import org.panteleyev.persistence.annotations.PrimaryKey;
-import org.panteleyev.persistence.annotations.RecordBuilder;
-import org.panteleyev.persistence.annotations.Table;
+import org.panteleyev.mysqlapi.annotations.Column;
+import org.panteleyev.mysqlapi.annotations.PrimaryKey;
+import org.panteleyev.mysqlapi.annotations.RecordBuilder;
+import org.panteleyev.mysqlapi.annotations.Table;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;

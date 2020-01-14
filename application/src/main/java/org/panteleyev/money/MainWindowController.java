@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -60,12 +60,10 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
-import org.panteleyev.commons.database.ConnectDialog;
-import org.panteleyev.commons.database.ConnectionProfile;
-import org.panteleyev.commons.database.ConnectionProfileManager;
-import org.panteleyev.commons.fx.Controller;
-import org.panteleyev.commons.fx.WindowManager;
-import org.panteleyev.commons.ssh.SshManager;
+import org.panteleyev.fx.Controller;
+import org.panteleyev.money.database.ConnectDialog;
+import org.panteleyev.money.database.ConnectionProfile;
+import org.panteleyev.money.database.ConnectionProfileManager;
 import org.panteleyev.money.icons.IconWindowController;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
@@ -99,8 +97,8 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import static org.panteleyev.commons.fx.FXFactory.newMenu;
-import static org.panteleyev.commons.fx.FXFactory.newMenuItem;
+import static org.panteleyev.fx.FxFactory.newMenu;
+import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -120,10 +118,9 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
-    private final SshManager sshManager = new SshManager(PREFERENCES);
     private final ConnectionProfileManager profileManager =
         new ConnectionProfileManager(this::onInitDatabase, this::onBuildDatasource,
-            PREFERENCES, sshManager);
+            PREFERENCES);
 
     // Transaction view box
     private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
@@ -164,10 +161,7 @@ public class MainWindowController extends BaseController implements TransactionT
     public MainWindowController(Stage stage) {
         super(stage, CSS_PATH.toString());
 
-        sshManager.loadSessions();
         profileManager.loadProfiles();
-
-        stage.setOnCloseRequest(event -> sshManager.closeAllSessions());
 
         stage.getIcons().add(Images.APP_ICON);
         initialize();
@@ -226,8 +220,6 @@ public class MainWindowController extends BaseController implements TransactionT
                 x -> onPrevMonth())
         );
 
-        var sshMenuItem = new MenuItem("SSH...");
-        sshMenuItem.setOnAction(a -> sshManager.getEditor().showAndWait());
         var profilesMenuItem = newMenuItem(RB, "menu.Tools.Profiles",
             x -> profileManager.getEditor(false).showAndWait());
 
@@ -238,7 +230,6 @@ public class MainWindowController extends BaseController implements TransactionT
         iconWindowMenuItem.setOnAction(a -> onIconWindow());
 
         var toolsMenu = newMenu(RB, "menu.Tools",
-            sshMenuItem,
             profilesMenuItem,
             new SeparatorMenuItem(),
             iconWindowMenuItem,
@@ -382,7 +373,7 @@ public class MainWindowController extends BaseController implements TransactionT
     @Override
     public void onClose() {
         for (var clazz : WINDOW_CLASSES) {
-            WindowManager.find(clazz).ifPresent(c -> ((BaseController) c).onClose());
+            WINDOW_MANAGER.find(clazz).ifPresent(c -> ((BaseController) c).onClose());
         }
 
         setTitle(AboutDialog.APP_TITLE);
@@ -396,7 +387,6 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void open(ConnectionProfile profile) {
-        sshManager.setupTunnel(profile.getSshSession());
         var ds = onBuildDatasource(profile);
 
         getDao().initialize(ds);
@@ -420,7 +410,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onOptions() {
-        new OptionsDialog().showAndWait();
+        new OptionsDialog(this).showAndWait();
     }
 
     private void setTitle(String title) {
@@ -428,7 +418,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onWindowClosing() {
-        WINDOW_CLASSES.forEach(clazz -> WindowManager.find(clazz).ifPresent(c -> ((BaseController) c).onClose()));
+        WINDOW_CLASSES.forEach(clazz -> WINDOW_MANAGER.find(clazz).ifPresent(c -> ((BaseController) c).onClose()));
 
         Options.setMainWindowWidth(getStage().widthProperty().doubleValue());
         Options.setMainWindowHeight(getStage().heightProperty().doubleValue());
@@ -491,12 +481,12 @@ public class MainWindowController extends BaseController implements TransactionT
         }
     }
 
-    private Exception onInitDatabase(org.panteleyev.commons.database.ConnectionProfile profile) {
+    private Exception onInitDatabase(ConnectionProfile profile) {
         var ds = onBuildDatasource(profile);
         return MoneyDAO.initDatabase(ds, profile.getSchema());
     }
 
-    private MysqlDataSource onBuildDatasource(org.panteleyev.commons.database.ConnectionProfile profile) {
+    private MysqlDataSource onBuildDatasource(ConnectionProfile profile) {
         try {
             var ds = new MysqlDataSource();
 
@@ -526,7 +516,6 @@ public class MainWindowController extends BaseController implements TransactionT
         if (file != null) {
             try (var in = new FileInputStream(file)) {
                 Preferences.importPreferences(in);
-                sshManager.loadSessions();
                 profileManager.loadProfiles();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);

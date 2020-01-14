@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,8 +35,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
-import org.panteleyev.commons.fx.BaseDialog;
-import static org.panteleyev.commons.fx.FXFactory.newLabel;
+import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
+import static org.panteleyev.fx.FxFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 
 class OptionsDialog extends BaseDialog<ButtonType> {
@@ -44,8 +45,8 @@ class OptionsDialog extends BaseDialog<ButtonType> {
     private TextField accountClosingDayDeltaEdit = new TextField();
     private PasswordField ymToken = new PasswordField();
 
-    OptionsDialog() {
-        super(MainWindowController.CSS_PATH);
+    OptionsDialog(Controller owner) {
+        super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("options.Dialog.Title"));
         createDefaultButtons(RB);
