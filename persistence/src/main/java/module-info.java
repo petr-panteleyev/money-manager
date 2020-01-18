@@ -2,7 +2,7 @@ module org.panteleyev.money.persistence {
     exports org.panteleyev.money.persistence;
     exports org.panteleyev.money.xml;
 
-    requires org.panteleyev.mysqlapi;
+    requires transitive org.panteleyev.mysqlapi;
     requires org.panteleyev.money.model;
 
     requires java.xml;

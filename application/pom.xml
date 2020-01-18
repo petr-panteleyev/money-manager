@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-parent</artifactId>
-        <version>20.1.0</version>
+        <version>20.2.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -38,11 +38,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>money-ymoney</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>money-database</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -78,6 +73,10 @@
             <artifactId>javafx-media</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>money-model</artifactId>
             <version>${project.version}</version>
@@ -102,7 +101,7 @@
                     <outputDirectory>../target/jmods</outputDirectory>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>${app.main.class}</Main-Class>
+                            <Main-Class>${appMainClass}</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -133,6 +132,18 @@
                         --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
                         --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
                     </argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${appModule}/${appMainClass}</mainClass>
+                    <options>
+                        <option>-Dfile.encoding=UTF-8</option>
+                        <option>--add-exports</option>
+                        <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                    </options>
                 </configuration>
             </plugin>
         </plugins>

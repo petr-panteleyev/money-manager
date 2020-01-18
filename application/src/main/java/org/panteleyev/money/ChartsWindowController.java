@@ -34,20 +34,22 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.util.Pair;
+import org.panteleyev.money.filters.AccountSelectionBox;
+import org.panteleyev.money.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newButton;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class ChartsWindowController extends BaseController {
     private static final int PIE_CHART_SIZE = 10;  // meaningful items
 
-    private final AccountFilterSelectionBox selectionBox = new AccountFilterSelectionBox();
+    private final AccountSelectionBox selectionBox = new AccountSelectionBox();
     private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
     private final PieChart pieChart = new PieChart();
 
@@ -56,7 +58,7 @@ public class ChartsWindowController extends BaseController {
 
         topPanel.getChildren().addAll(selectionBox,
             transactionFilterBox,
-            newButton(RB, "button.Refresh", x -> updateChart()));
+            newButton(RB, "Refresh", x -> updateChart()));
         BorderPane.setMargin(topPanel, new Insets(5.0, 5.0, 5.0, 5.0));
         pieChart.legendVisibleProperty().set(false);
 
@@ -82,8 +84,8 @@ public class ChartsWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         return newMenuBar(
-            newMenu(RB, "menu.File",
-                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            newMenu(RB, "File",
+                newMenuItem(RB, "Close", event -> onClose())),
             createWindowMenu(RB),
             createHelpMenu(RB));
     }

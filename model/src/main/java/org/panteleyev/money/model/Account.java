@@ -296,18 +296,6 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         return getCardNumber().replaceAll(" ", "");
     }
 
-    public static Predicate<Account> getFilterByAccount(UUID uuid) {
-        return it -> Objects.equals(it.getUuid(), uuid);
-    }
-
-    public static Predicate<Account> getFilterByCategory(UUID uuid) {
-        return it -> Objects.equals(it.getCategoryUuid(), uuid);
-    }
-
-    public static Predicate<Account> getFilterByCategoryType(int id) {
-        return it -> it.getTypeId() == id;
-    }
-
     public static final class Builder {
         private String name = "";
         private String comment = "";

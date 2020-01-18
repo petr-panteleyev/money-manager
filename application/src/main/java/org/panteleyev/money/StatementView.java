@@ -26,9 +26,7 @@
 
 package org.panteleyev.money;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -38,70 +36,34 @@ import org.panteleyev.money.cells.StatementRow;
 import org.panteleyev.money.cells.StatementSumCell;
 import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementRecord;
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MainWindowController.RB;
 
 public class StatementView extends BorderPane {
     private final TableView<StatementRecord> tableView = new TableView<>();
     private Consumer<StatementRecord> newTransactionCallback = x -> { };
-
     private Consumer<StatementRecord> recordSelectedCallback = x -> { };
 
     StatementView() {
-        var actualDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.Date"));
-        actualDateColumn.setCellFactory(x -> new LocalDateCell<>());
-        actualDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getActual()));
-
-        var executionDateColumn = new TableColumn<StatementRecord, LocalDate>(RB.getString("column.ExecutionDate"));
-        executionDateColumn.setCellFactory(x -> new LocalDateCell<>());
-        executionDateColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, LocalDate> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getExecution()));
-
-        var descriptionColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Description"));
-        descriptionColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
-
-        var counterPartyColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Payer.Payee"));
-        counterPartyColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getCounterParty()));
-
-        var placeColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Place"));
-        placeColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getPlace()));
-
-        var countryColumn = new TableColumn<StatementRecord, String>(RB.getString("column.Country"));
-        countryColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getCountry()));
-
-        var amountColumn = new TableColumn<StatementRecord, StatementRecord>(RB.getString("column.Sum"));
-        amountColumn.setCellValueFactory((TableColumn.CellDataFeatures<StatementRecord, StatementRecord> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        amountColumn.setCellFactory(x -> new StatementSumCell());
-
-        actualDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
-        executionDateColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
-        descriptionColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.5));
-        counterPartyColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.15));
-        placeColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.10));
-        countryColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
-        amountColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.10));
-
         tableView.setRowFactory(x -> new StatementRow());
 
-        //noinspection unchecked
-        tableView.getColumns().addAll(actualDateColumn,
-            executionDateColumn,
-            descriptionColumn,
-            counterPartyColumn,
-            placeColumn,
-            countryColumn,
-            amountColumn
-        );
+        var w = tableView.widthProperty().subtract(20);
+        tableView.getColumns().addAll(List.of(
+            newTableColumn(RB, "column.Date", x -> new LocalDateCell<>(),
+                StatementRecord::getActual, w.multiply(0.05)),
+            newTableColumn(RB, "column.ExecutionDate", x -> new LocalDateCell<>(),
+                StatementRecord::getExecution, w.multiply(0.05)),
+            newTableColumn(RB, "Description", null, StatementRecord::getDescription, w.multiply(0.5)),
+            newTableColumn(RB, "Counterparty", null, StatementRecord::getCounterParty, w.multiply(0.15)),
+            newTableColumn(RB, "column.Place", null, StatementRecord::getPlace, w.multiply(0.10)),
+            newTableColumn(RB, "Country", null, StatementRecord::getCountry, w.multiply(0.05)),
+            newTableColumn(RB, "column.Sum", x -> new StatementSumCell(), w.multiply(0.1))
+        ));
 
         createMenu();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 package org.panteleyev.money.model;
 
 import java.util.Arrays;
-import java.util.ResourceBundle;
+import static org.panteleyev.money.model.Bundles.CATEGORY_TYPE_BUNDLE;
 
 public enum CategoryType {
     BANKS_AND_CASH(1),
@@ -45,9 +45,8 @@ public enum CategoryType {
     CategoryType(int id) {
         this.id = id;
 
-        ResourceBundle bundle = ResourceBundle.getBundle("org.panteleyev.money.model.CategoryType");
-        typeName = bundle.getString("name" + id);
-        comment = bundle.getString("comment" + id);
+        typeName = CATEGORY_TYPE_BUNDLE.getString("name" + id);
+        comment = CATEGORY_TYPE_BUNDLE.getString("comment" + id);
     }
 
     public int getId() {
@@ -64,8 +63,8 @@ public enum CategoryType {
 
     public static CategoryType get(int id) {
         return Arrays.stream(CategoryType.values())
-                .filter(t -> t.id == id)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+            .filter(t -> t.id == id)
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
     }
 }

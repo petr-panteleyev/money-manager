@@ -45,7 +45,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.money.Constants.COLON;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -63,15 +64,15 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     CurrencyDialog(Controller owner, Currency currency) {
         super(owner, MainWindowController.CSS_PATH);
 
-        setTitle(RB.getString("currency.Dialog.Title"));
+        setTitle(RB.getString("Currency"));
 
         var gridPane = new GridPane();
         gridPane.getStyleClass().add(Styles.GRID_PANE);
 
         int index = 0;
         gridPane.addRow(index++, newLabel(RB, "label.Symbol"), nameEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.Description"), descrEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.Rate"), rateEdit, rateDirectionChoice);
+        gridPane.addRow(index++, newLabel(RB, "Description", COLON), descrEdit);
+        gridPane.addRow(index++, newLabel(RB, "Rate", COLON), rateEdit, rateDirectionChoice);
 
         var hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
         hBox.setAlignment(Pos.CENTER_LEFT);

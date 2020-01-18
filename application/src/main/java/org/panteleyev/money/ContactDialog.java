@@ -47,7 +47,8 @@ import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.UUID;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.money.Constants.COLON;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -78,15 +79,15 @@ final class ContactDialog extends BaseDialog<Contact> {
         int index = 0;
         gridPane.addRow(index++, newLabel(RB, "label.Type"), typeChoiceBox, iconComboBox);
         gridPane.addRow(index++, newLabel(RB, "label.Name"), nameField);
-        gridPane.addRow(index++, newLabel(RB, "label.Phone"), phoneField);
+        gridPane.addRow(index++, newLabel(RB, "Phone", COLON), phoneField);
         gridPane.addRow(index++, newLabel(RB, "label.Mobile"), mobileField);
-        gridPane.addRow(index++, newLabel(RB, "label.Email"), emailField);
+        gridPane.addRow(index++, newLabel(RB, "Email", COLON), emailField);
         gridPane.addRow(index++, new Label("URL:"), webField);
         gridPane.addRow(index++, newLabel(RB, "label.Street"), streetField);
         gridPane.addRow(index++, newLabel(RB, "label.City"), cityField);
         gridPane.addRow(index++, newLabel(RB, "label.Country"), countryField);
         gridPane.addRow(index++, newLabel(RB, "label.ZIP"), zipField);
-        gridPane.addRow(index, newLabel(RB, "label.Comment"), commentEdit);
+        gridPane.addRow(index, newLabel(RB, "Comment", COLON), commentEdit);
 
         GridPane.setColumnSpan(nameField, 2);
         GridPane.setColumnSpan(phoneField, 2);

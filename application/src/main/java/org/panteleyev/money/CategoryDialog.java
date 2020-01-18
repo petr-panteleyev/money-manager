@@ -44,7 +44,8 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
 import java.util.List;
 import java.util.UUID;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.money.Constants.COLON;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -58,15 +59,15 @@ final class CategoryDialog extends BaseDialog<Category> {
     CategoryDialog(Controller owner, Category category) {
         super(owner, MainWindowController.CSS_PATH);
 
-        setTitle(RB.getString("category.Dialog.Title"));
+        setTitle(RB.getString("Category"));
 
         var pane = new GridPane();
 
         int index = 0;
         pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(index++, newLabel(RB, "label.Type"), typeComboBox, iconComboBox);
+        pane.addRow(index++, newLabel(RB, "Type", COLON), typeComboBox, iconComboBox);
         pane.addRow(index++, newLabel(RB, "label.Name"), nameEdit);
-        pane.addRow(index, newLabel(RB, "label.Comment"), commentEdit);
+        pane.addRow(index, newLabel(RB, "Comment", COLON), commentEdit);
 
         GridPane.setColumnSpan(nameEdit, 2);
         GridPane.setColumnSpan(commentEdit, 2);

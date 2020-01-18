@@ -70,15 +70,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import static org.panteleyev.fx.FxFactory.newButton;
-import static org.panteleyev.fx.FxFactory.newLabel;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.money.Constants.COLON;
+import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -133,8 +134,6 @@ public final class TransactionEditorPane extends TitledPane {
         }
     }
 
-    private ResourceBundle rb = ResourceBundle.getBundle("org.panteleyev.money.res.TransactionEditorPane");
-
     private final DataCache cache;
 
     private UUID uuid;      // current transaction uuid if any
@@ -160,9 +159,9 @@ public final class TransactionEditorPane extends TitledPane {
     private final MenuButton creditedMenuButton = new MenuButton();
     private final MenuButton contactMenuButton = new MenuButton();
 
-    private final Button addButton = newButton(rb, "addButton", x -> onAddButton());
-    private final Button updateButton = newButton(rb, "updateButton", x -> onUpdateButton());
-    private final Button deleteButton = newButton(rb, "deleteButton", x -> onDeleteButton());
+    private final Button addButton = newButton(RB, "Add", x -> onAddButton());
+    private final Button updateButton = newButton(RB, "Update", x -> onUpdateButton());
+    private final Button deleteButton = newButton(RB, "Delete", x -> onDeleteButton());
 
     private BiConsumer<Transaction.Builder, String> addTransactionConsumer = (x, y) -> { };
     private BiConsumer<Transaction.Builder, String> updateTransactionConsumer = (x, y) -> { };
@@ -209,45 +208,45 @@ public final class TransactionEditorPane extends TitledPane {
     TransactionEditorPane(DataCache cache) {
         this.cache = cache;
 
-        var debitedBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "debitedAccountLabel"),
+        var debitedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "column.Account.Debited", COLON),
             new HBox(debitedAccountEdit, debitedMenuButton),
             debitedCategoryLabel);
         HBox.setHgrow(debitedAccountEdit, Priority.ALWAYS);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "creditedAccountLabel"),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "column.Account.Credited", COLON),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
-        var contactBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "contactLabel"),
+        var contactBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Counterparty", COLON),
             new HBox(contactEdit, contactMenuButton));
         HBox.setHgrow(contactEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit, checkedCheckBox);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "sumLabel"), hBox1);
+        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Sum", COLON), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "commentLabel"), commentEdit);
+        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Comment", COLON), commentEdit);
 
-        var rateBox = new VBox(Styles.SMALL_SPACING, newLabel(rb, "rateLabel"),
+        var rateBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Rate", COLON),
             new HBox(rate1Edit, rateDir1Combo),
             rateAmoutLabel);
 
         var filler = new Region();
 
-        var clearButton = newButton(rb, "clearButton", x -> onClearButton());
+        var clearButton = newButton(RB, "Clear", x -> onClearButton());
         clearButton.setCancelButton(true);
         addButton.setDefaultButton(true);
 
         var row3 = new HBox(Styles.BIG_SPACING,
-            new VBox(2.0, newLabel(rb, "invoiceLabel"), invoiceNumberEdit),
+            new VBox(2.0, newLabel(RB, "Invoice", COLON), invoiceNumberEdit),
             filler, clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
         setContent(new VBox(Styles.BIG_SPACING,
             new HBox(Styles.BIG_SPACING,
-                new VBox(Styles.SMALL_SPACING, newLabel(rb, "dayLabel"), daySpinner),
-                new VBox(Styles.SMALL_SPACING, newLabel(rb, "typeLabel"),
+                new VBox(Styles.SMALL_SPACING, newLabel(RB, "Day", COLON), daySpinner),
+                new VBox(Styles.SMALL_SPACING, newLabel(RB, "Type", COLON),
                     new HBox(typeEdit, typeMenuButton)),
                 debitedBox, creditedBox, contactBox, sumBox),
             new HBox(Styles.BIG_SPACING, commentBox, rateBox),
@@ -342,7 +341,7 @@ public final class TransactionEditorPane extends TitledPane {
     }
 
     private void clearTitle() {
-        setText(rb.getString("title") + ": ###");
+        setText(RB.getString("Transaction") + ": ###");
     }
 
     void initControls() {
@@ -467,7 +466,7 @@ public final class TransactionEditorPane extends TitledPane {
 
         newTransactionProperty.set(false);
 
-        setText(rb.getString("title") + ": " + uuid);
+        setText(RB.getString("Transaction") + ": " + uuid);
 
         // Type
         typeEdit.setText(tr.getTransactionType().getTypeName());

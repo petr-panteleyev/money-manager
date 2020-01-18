@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@ package org.panteleyev.money.model;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
+import static org.panteleyev.money.model.Bundles.TRANSACTION_TYPE_BUNDLE;
 
 public enum TransactionType {
     CARD_PAYMENT(1),
@@ -68,8 +68,7 @@ public enum TransactionType {
         if (separator) {
             typeName = "";
         } else {
-            var bundle = ResourceBundle.getBundle("org.panteleyev.money.model.TransactionType");
-            typeName = bundle.getString("name" + id);
+            typeName = TRANSACTION_TYPE_BUNDLE.getString("name" + id);
         }
     }
 
@@ -87,9 +86,9 @@ public enum TransactionType {
 
     public static TransactionType get(int id) {
         return Arrays.stream(TransactionType.values())
-                .filter(t -> t.id == id)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+            .filter(t -> t.id == id)
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
     }
 
     public static List<TransactionType> valuesAsList() {

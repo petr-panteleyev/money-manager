@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2019, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 package org.panteleyev.money.model;
 
 import java.util.Arrays;
-import java.util.ResourceBundle;
+import static org.panteleyev.money.model.Bundles.CONTACT_TYPE_BUNDLE;
 
 public enum ContactType {
     PERSONAL(1),
@@ -37,16 +37,12 @@ public enum ContactType {
     EMPLOYER(5),
     SERVICE(6);
 
-    private static final String BUNDLE_NAME = "org.panteleyev.money.model.ContactType";
-
     private final int id;
     private final String typeName;
 
     ContactType(int id) {
         this.id = id;
-
-        ResourceBundle bundle = ResourceBundle.getBundle(BUNDLE_NAME);
-        typeName = bundle.getString("name" + id);
+        typeName = CONTACT_TYPE_BUNDLE.getString("name" + id);
     }
 
     public int getId() {
@@ -59,9 +55,9 @@ public enum ContactType {
 
     public static ContactType get(int id) {
         return Arrays.stream(ContactType.values())
-                .filter(t -> t.id == id)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+            .filter(t -> t.id == id)
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
 
     }
 }

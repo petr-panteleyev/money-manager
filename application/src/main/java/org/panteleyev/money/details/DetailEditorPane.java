@@ -61,13 +61,14 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newButton;
-import static org.panteleyev.fx.FxFactory.newLabel;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.money.Constants.COLON;
+import static org.panteleyev.money.MainWindowController.RB;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -96,7 +97,8 @@ final class DetailEditorPane extends BorderPane {
         }
     }
 
-    private static final ResourceBundle RB = ResourceBundle.getBundle("org.panteleyev.money.res.TransactionEditorPane");
+//    private static final ResourceBundle RB = ResourceBundle.getBundle("org.panteleyev.money.res
+//    .TransactionEditorPane");
 
     private final DataCache cache;
 
@@ -133,36 +135,36 @@ final class DetailEditorPane extends BorderPane {
         commentEdit.setPrefColumnCount(30);
         sumEdit.setPrefColumnCount(8);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "creditedAccountLabel"),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Credited_Account", COLON),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "sumLabel"), hBox1);
+        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Sum", COLON), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "commentLabel"), commentEdit);
+        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Comment", COLON), commentEdit);
 
         var filler = new Region();
 
-        var clearButton = newButton(RB, "clearButton", x -> clear());
+        var clearButton = newButton(RB, "Clear", x -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = newButton(RB, "addButton", x -> buildTransactionDetail()
+        var addButton = newButton(RB, "Add", x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.addRecord(t);
                 clear();
             }));
 
-        var updateButton = newButton(RB, "updateButton", x -> buildTransactionDetail()
+        var updateButton = newButton(RB, "Update", x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.updateRecord(t);
                 clear();
             })
         );
 
-        var deleteButton = newButton(RB, "deleteButton", x -> {
+        var deleteButton = newButton(RB, "Delete", x -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();

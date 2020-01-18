@@ -29,8 +29,6 @@ package org.panteleyev.money;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -49,10 +47,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import static org.panteleyev.fx.FxFactory.newButton;
+import static javafx.scene.control.ButtonType.CANCEL;
+import static javafx.scene.control.ButtonType.CLOSE;
+import static javafx.scene.control.ButtonType.NEXT;
+import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.ButtonFactory.newRadioButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxFactory.newLabel;
-import static org.panteleyev.fx.FxFactory.newRadioButton;
+import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -188,30 +189,31 @@ final class ImportWizard extends BaseDialog<Object> {
         super(MainWindowController.CSS_PATH);
         setTitle(RB.getString("word.Import"));
 
-        getDialogPane().getButtonTypes().addAll(ButtonType.NEXT, ButtonType.CANCEL);
+        getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);
 
-        var nextButton = (Button) getDialogPane().lookupButton(ButtonType.NEXT);
-        nextButton.setText(RB.getString("word.Import"));
 
         getDialogPane().setContent(new StackPane(progressPage, startPage));
         progressPage.setVisible(false);
 
-        nextButton.addEventFilter(ActionEvent.ACTION, event -> {
-            event.consume();
+        getButton(NEXT).ifPresent(nextButton -> {
+            nextButton.setText(RB.getString("word.Import"));
+            nextButton.addEventFilter(ActionEvent.ACTION, event -> {
+                event.consume();
 
-            startPage.setVisible(false);
-            progressPage.setVisible(true);
+                startPage.setVisible(false);
+                progressPage.setVisible(true);
 
-            getDialogPane().getButtonTypes().remove(ButtonType.CANCEL);
-            getDialogPane().getButtonTypes().remove(ButtonType.NEXT);
-            getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+                getDialogPane().getButtonTypes().remove(CANCEL);
+                getDialogPane().getButtonTypes().remove(NEXT);
+                getDialogPane().getButtonTypes().add(CLOSE);
 
-            getDialogPane().lookupButton(ButtonType.CLOSE).disableProperty().bind(progressPage.inProgressProperty);
+                getButton(CLOSE).ifPresent(b ->
+                    b.disableProperty().bind(progressPage.inProgressProperty));
 
-            progressPage.start(startPage.getFileName(), startPage.getFullDump());
+                progressPage.start(startPage.getFileName(), startPage.getFullDump());
+            });
+            nextButton.disableProperty().bind(validation.invalidProperty());
         });
-
-        nextButton.disableProperty().bind(validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

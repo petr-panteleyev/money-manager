@@ -60,7 +60,7 @@ class Reports {
             th(w, RB.getString("column.Account.Debited"));
             th(w, RB.getString("column.Account.Credited"));
             th(w, RB.getString("column.Payer.Payee"));
-            th(w, RB.getString("column.Comment"));
+            th(w, RB.getString("Comment"));
             th(w, RB.getString("column.Sum"));
 
             for (var t : transactions) {
@@ -86,10 +86,10 @@ class Reports {
             w.println("<table>\n<tr>");
             th(w, RB.getString("column.Name"));
             th(w, RB.getString("column.Category"));
-            th(w, RB.getString("column.Currency"));
+            th(w, RB.getString("Currency"));
             w.println("<th>%%");
             th(w, RB.getString("column.closing.date"));
-            th(w, RB.getString("column.Comment"));
+            th(w, RB.getString("Comment"));
             th(w, RB.getString("column.Balance"));
 
             for (var a : accounts) {

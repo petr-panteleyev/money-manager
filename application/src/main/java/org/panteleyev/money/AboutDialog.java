@@ -28,20 +28,20 @@ package org.panteleyev.money;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import java.util.ResourceBundle;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import java.time.LocalDate;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.money.Bundles.BUILD_INFO_BUNDLE;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
-    private static final String COPYRIGHT = "Copyright (c) 2016, 2019, Petr Panteleyev";
-    private static final String BUILD_INFO = "org.panteleyev.money.res.buildInfo";
+    private static final String COPYRIGHT = String.format(
+        "Copyright © 2016, %d, Petr Panteleyev", LocalDate.now().getYear());
 
     AboutDialog(Controller owner) {
         super(owner, MainWindowController.CSS_PATH);
@@ -52,17 +52,21 @@ final class AboutDialog extends BaseDialog {
         icon.setFitHeight(48);
         icon.setFitWidth(48);
 
-        var rb = ResourceBundle.getBundle(BUILD_INFO);
-
         var grid = new GridPane();
         grid.getStyleClass().add(Styles.GRID_PANE);
-        grid.addRow(0, new Label("Version:"), newLabel(rb, "version"));
-        grid.addRow(1, new Label("Build:"), newLabel(rb, "timestamp"));
+        grid.addRow(0, newLabel("Version:"), newLabel(BUILD_INFO_BUNDLE, "version"));
+        grid.addRow(1, newLabel("Build:"), newLabel(BUILD_INFO_BUNDLE, "timestamp"));
+        grid.addRow(2, newLabel("Java:"), newLabel(
+            String.format("%s by %s",
+                System.getProperty("java.version"),
+                System.getProperty("java.vendor")
+            ))
+        );
 
-        var appLabel = new Label(APP_TITLE);
+        var appLabel = newLabel(APP_TITLE);
         appLabel.getStyleClass().add(Styles.ABOUT_APP_TITLE_LABEL);
 
-        var copyrightLabel = new Label(COPYRIGHT);
+        var copyrightLabel = newLabel(COPYRIGHT);
         copyrightLabel.getStyleClass().add(Styles.ABOUT_LABEL);
 
         var vBox = new VBox(10, appLabel, copyrightLabel, grid);

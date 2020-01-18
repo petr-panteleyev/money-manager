@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2019, Petr Panteleyev <petr@panteleyev.org>
+ * Copyright (c) 2017, 2020, Petr Panteleyev <petr@panteleyev.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,12 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import org.panteleyev.money.model.Account;
+import org.panteleyev.mysqlapi.MySqlClient;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -46,6 +49,8 @@ public class MoneyApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        MySqlClient.addReads(List.of(Account.class.getModule()));
+
         application = this;
 
         if (initLogDirectory()) {

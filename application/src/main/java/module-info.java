@@ -7,12 +7,8 @@ open module org.panteleyev.money {
 
     requires jdk.crypto.cryptoki;
 
-    requires javafx.base;
-    requires javafx.controls;
     requires javafx.web;
     requires javafx.swing;          // for tests
-
-    requires org.controlsfx.controls;
 
     requires org.panteleyev.fx;
 
@@ -21,9 +17,9 @@ open module org.panteleyev.money {
     requires org.panteleyev.money.persistence;
     requires org.panteleyev.money.statements;
     requires org.panteleyev.money.ymoney;
-    requires org.panteleyev.money.database;
 
     requires com.google.gson;
+    requires freemarker;
 
     requires mysql.connector.java;
 }

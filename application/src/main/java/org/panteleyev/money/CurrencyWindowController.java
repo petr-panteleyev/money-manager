@@ -27,7 +27,6 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -35,16 +34,17 @@ import javafx.collections.WeakMapChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.model.Currency;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -65,8 +65,8 @@ final class CurrencyWindowController extends BaseController {
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = newMenuBar(
-            newMenu(RB, "menu.File",
-                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            newMenu(RB, "File",
+                newMenuItem(RB, "Close", event -> onClose())),
             newMenu(RB, "menu.Edit",
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
                 newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)),
@@ -79,11 +79,11 @@ final class CurrencyWindowController extends BaseController {
             newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
-        var colName = new TableColumn<Currency, String>(RB.getString("column.Name"));
-        var colDescription = new TableColumn<Currency, String>(RB.getString("column.Description"));
-
-        //noinspection unchecked
-        table.getColumns().setAll(colName, colDescription);
+        var w = table.widthProperty().subtract(20);
+        table.getColumns().setAll(List.of(
+            newTableColumn(RB, "column.Name", null, Currency::getSymbol, w.multiply(0.2)),
+            newTableColumn(RB, "Description", null, Currency::getDescription, w.multiply(0.8))
+        ));
 
         var root = new BorderPane();
         root.setTop(menuBar);
@@ -91,8 +91,6 @@ final class CurrencyWindowController extends BaseController {
 
         currencyList.addAll(cache().currencies().values());
         table.setItems(currencyList);
-        colName.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getSymbol()));
-        colDescription.setCellValueFactory(p -> new ReadOnlyObjectWrapper<>(p.getValue().getDescription()));
 
         cache().currencies().addListener(new WeakMapChangeListener<>(currencyListener));
         setupWindow(root);
@@ -101,7 +99,7 @@ final class CurrencyWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("currency.Window.Title");
+        return RB.getString("Currencies");
     }
 
     private Optional<Currency> getSelectedCurrency() {

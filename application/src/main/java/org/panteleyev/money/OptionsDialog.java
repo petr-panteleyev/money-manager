@@ -37,7 +37,7 @@ import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.MainWindowController.RB;
 
 class OptionsDialog extends BaseDialog<ButtonType> {

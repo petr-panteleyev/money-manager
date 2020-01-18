@@ -27,7 +27,6 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -41,7 +40,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -60,10 +58,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -88,8 +87,8 @@ class ContactListWindowController extends BaseController {
 
         // Menu bar
         var menuBar = newMenuBar(
-            newMenu(RB, "menu.File",
-                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            newMenu(RB, "File",
+                newMenuItem(RB, "Close", event -> onClose())),
             newMenu(RB, "menu.Edit",
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
                 newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding),
@@ -108,12 +107,13 @@ class ContactListWindowController extends BaseController {
         // Table
         var pane = new BorderPane();
 
-        var nameColumn = new TableColumn<Contact, Contact>(RB.getString("column.Name"));
-        var typeColumn = new TableColumn<Contact, String>(RB.getString("column.Type"));
-        var phoneColumn = new TableColumn<Contact, String>(RB.getString("column.Phone"));
-        var emailColumn = new TableColumn<Contact, String>(RB.getString("column.Email"));
-
-        contactTable.getColumns().setAll(List.of(nameColumn, typeColumn, phoneColumn, emailColumn));
+        var w = contactTable.widthProperty().subtract(20);
+        contactTable.getColumns().setAll(List.of(
+            newTableColumn(RB, "Name", x -> new ContactNameCell(), w.multiply(0.4)),
+            newTableColumn(RB, "Type", null, (Contact p) -> p.getType().getTypeName(), w.multiply(0.2)),
+            newTableColumn(RB, "Phone", null, Contact::getPhone, w.multiply(0.2)),
+            newTableColumn(RB, "Email", null, Contact::getEmail, w.multiply(0.2))
+        ));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox
@@ -128,7 +128,7 @@ class ContactListWindowController extends BaseController {
         self.setTop(menuBar);
         self.setCenter(pane);
 
-        typeChoiceBox.getItems().add(RB.getString("contact.Window.AllTypes"));
+        typeChoiceBox.getItems().add(RB.getString("All_Types"));
         typeChoiceBox.getItems().add(new Separator());
         typeChoiceBox.getItems().addAll(ContactType.values());
         typeChoiceBox.getSelectionModel().select(0);
@@ -141,16 +141,6 @@ class ContactListWindowController extends BaseController {
 
         typeChoiceBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
 
-        nameColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, Contact> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        nameColumn.setCellFactory(x -> new ContactNameCell());
-        typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
-        phoneColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getPhone()));
-        emailColumn.setCellValueFactory((TableColumn.CellDataFeatures<Contact, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getEmail()));
-
         reloadContacts();
         cache().contacts().addListener(new WeakMapChangeListener<>(contactsListener));
         setupWindow(self);
@@ -162,7 +152,7 @@ class ContactListWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("contact.Window.Title");
+        return RB.getString("Contacts");
     }
 
     private void reloadContacts() {

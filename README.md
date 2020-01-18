@@ -4,6 +4,8 @@ Personal finance manager. Work in progress.
 
 ## Build and Run
 
+JDK 13 is required to build and run the application.
+
 ### Build
 
 Make sure Maven toolchain configuration ```toolchain.xml``` contains the following
@@ -28,12 +30,8 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 
 ### Run
 
-JDK-13 is required to run the application.
-
 ```shell script
-$ java --module-path target/jmods --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \
-  --add-reads org.panteleyev.mysqlapi=org.panteleyev.money.model -Dfile.encoding=UTF-8 \
-  -m org.panteleyev.money/org.panteleyev.money.MoneyApplication
+$ mvn -pl application javafx:run
 ```
 
 ### Binary Packages

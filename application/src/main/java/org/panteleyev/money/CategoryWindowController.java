@@ -27,7 +27,6 @@
 package org.panteleyev.money;
 
 import javafx.application.Platform;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
@@ -41,7 +40,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -55,14 +53,16 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -87,8 +87,8 @@ final class CategoryWindowController extends BaseController {
         var disableBinding = categoryTable.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = newMenuBar(
-            newMenu(RB, "menu.File",
-                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+            newMenu(RB, "File",
+                newMenuItem(RB, "Close", event -> onClose())),
             newMenu(RB, "menu.Edit",
                 newMenuItem(RB, "menu.Edit.Add", addHandler),
                 newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding),
@@ -105,12 +105,12 @@ final class CategoryWindowController extends BaseController {
             newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding)));
 
         // Table
-        var colType = new TableColumn<Category, String>(RB.getString("column.Type"));
-        var colName = new TableColumn<Category, Category>(RB.getString("column.Name"));
-        var colDescription = new TableColumn<Category, String>(RB.getString("column.Description"));
-
-        //noinspection unchecked
-        categoryTable.getColumns().setAll(colType, colName, colDescription);
+        var w = categoryTable.widthProperty().subtract(20);
+        categoryTable.getColumns().setAll(List.of(
+            newTableColumn(RB, "Type", null, c -> c.getType().getTypeName(), w.multiply(0.2)),
+            newTableColumn(RB, "column.Name", x -> new CategoryNameCell(), w.multiply(0.4)),
+            newTableColumn(RB, "Comment", null, Category::getComment, w.multiply(0.4))
+        ));
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
@@ -126,7 +126,7 @@ final class CategoryWindowController extends BaseController {
         self.setTop(menuBar);
         self.setCenter(pane);
 
-        typeChoiceBox.getItems().add(RB.getString("contact.Window.AllTypes"));
+        typeChoiceBox.getItems().add(RB.getString("All_Types"));
         typeChoiceBox.getItems().add(new Separator());
         typeChoiceBox.getItems().addAll(CategoryType.values());
         typeChoiceBox.getSelectionModel().select(0);
@@ -141,18 +141,6 @@ final class CategoryWindowController extends BaseController {
 
         updateList();
 
-        colType.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getType().getTypeName()));
-        colName.setCellValueFactory((TableColumn.CellDataFeatures<Category, Category> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        colName.setCellFactory(x -> new CategoryNameCell());
-        colDescription.setCellValueFactory((TableColumn.CellDataFeatures<Category, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
-
-        colType.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.2));
-        colName.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.4));
-        colDescription.prefWidthProperty().bind(categoryTable.widthProperty().subtract(20).multiply(0.4));
-
         cache().categories().addListener(new WeakMapChangeListener<>(categoriesListener));
         setupWindow(self);
     }
@@ -163,7 +151,7 @@ final class CategoryWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("category.Window.Title");
+        return RB.getString("Categories");
     }
 
     private void updateList() {

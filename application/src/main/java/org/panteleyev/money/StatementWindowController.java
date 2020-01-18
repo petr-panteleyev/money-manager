@@ -65,12 +65,13 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newButton;
+import static org.panteleyev.fx.ButtonFactory.newButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxFactory.newLabel;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuBar;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuBar;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.money.Constants.ELLIPSIS;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -234,7 +235,7 @@ class StatementWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("statement.window.title");
+        return RB.getString("Statements");
     }
 
     private Optional<Statement> getStatement() {
@@ -243,10 +244,10 @@ class StatementWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         return newMenuBar(
-            newMenu(RB, "menu.File",
-                newMenuItem(RB, "menu.File.Report", event -> onReport()),
+            newMenu(RB, "File",
+                newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.File.Close", event -> onClose())),
+                newMenuItem(RB, "Close", event -> onClose())),
             createWindowMenu(RB),
             createHelpMenu(RB));
     }
@@ -376,7 +377,7 @@ class StatementWindowController extends BaseController {
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle("Report");
+        fileChooser.setTitle(RB.getString("Report"));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("statement"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));

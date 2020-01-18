@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-parent</artifactId>
-    <version>20.1.0</version>
+    <version>20.2.0</version>
     <packaging>pom</packaging>
     <name>Money Manager Parent</name>
 
@@ -12,18 +12,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>13</maven.compiler.source>
         <maven.compiler.target>13</maven.compiler.target>
-        <app.main.class>org.panteleyev.money.MoneyApplication</app.main.class>
+        <appModule>org.panteleyev.money</appModule>
+        <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <!-- dependencies -->
-        <javaApiForMySqlVersion>1.0.0</javaApiForMySqlVersion>
+        <javaApiForMySqlVersion>1.1.0</javaApiForMySqlVersion>
         <javaFxVersion>13.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.0.0</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.1.0</javaFxHelpersVersion>
         <controlsFxVersion>11.0.1</controlsFxVersion>
         <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
         <jsoupVersion>1.12.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
         <testngVersion>6.14.3</testngVersion>
+        <freemarkerVersion>2.3.29</freemarkerVersion>
         <!-- plugins -->
         <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
@@ -32,6 +34,7 @@
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <mavenVersionPluginVersion>2.7</mavenVersionPluginVersion>
         <mavenFailsafePluginVersion>3.0.0-M4</mavenFailsafePluginVersion>
+        <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
         <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>
@@ -45,7 +48,6 @@
         <module>ofx</module>
         <module>statements</module>
         <module>ymoney</module>
-        <module>database</module>
         <module>application</module>
     </modules>
 
@@ -115,6 +117,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-csv</artifactId>
                 <version>1.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarkerVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -239,6 +246,11 @@
                             <suiteXmlFile>src/integ-test/resources/testng.xml</suiteXmlFile>
                         </suiteXmlFiles>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-maven-plugin</artifactId>
+                    <version>${javaFxPluginVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

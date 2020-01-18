@@ -36,8 +36,9 @@ import javafx.stage.Stage;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
 import java.util.ResourceBundle;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.money.Constants.ELLIPSIS;
 import static org.panteleyev.money.MainWindowController.CSS_PATH;
 
 public class BaseController extends Controller {
@@ -61,28 +62,28 @@ public class BaseController extends Controller {
     }
 
     Menu createWindowMenu(ResourceBundle rb, BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = newMenuItem(rb, "menu.window.transactions",
+        var transactionsMenuItem = newMenuItem(rb, "Transactions", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN),
             x -> getController(MainWindowController.class));
-        var accountsMenuItem = newMenuItem(rb, "menu.window.accounts",
+        var accountsMenuItem = newMenuItem(rb, "Accounts", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN),
             x -> getController(AccountWindowController.class));
-        var statementMenuItem = newMenuItem(rb, "menu.window.statement",
+        var statementMenuItem = newMenuItem(rb, "Statements", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN),
             x -> getController(StatementWindowController.class));
-        var requestsMenuItem = newMenuItem(rb, "menu.window.requests",
+        var requestsMenuItem = newMenuItem(rb, "Requests", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN),
             x -> getController(RequestWindowController.class));
-        var chartsMenuItem = newMenuItem(rb, "menu.window.charts",
+        var chartsMenuItem = newMenuItem(rb, "Incomes_and_Expenses", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.SHORTCUT_DOWN),
-            x -> getController(ChartsWindowController.class));
-        var currenciesMenuItem = newMenuItem(rb, "menu.Edit.Currencies",
+            x -> getController(IncomesAndExpensesWindowController.class));
+        var currenciesMenuItem = newMenuItem(rb, "Currencies", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.SHORTCUT_DOWN),
             x -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = newMenuItem(rb, "menu.Edit.Categories",
+        var categoriesMenuItem = newMenuItem(rb, "Categories", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.SHORTCUT_DOWN),
             x -> getController(CategoryWindowController.class));
-        var contactsMenuItem = newMenuItem(rb, "menu.Edit.Contacts",
+        var contactsMenuItem = newMenuItem(rb, "Contacts", ELLIPSIS,
             new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.SHORTCUT_DOWN),
             x -> getController(ContactListWindowController.class));
 
@@ -96,7 +97,7 @@ public class BaseController extends Controller {
             chartsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
-        return newMenu(rb, "menu.Window",
+        return newMenu(rb, "Window",
             transactionsMenuItem,
             new SeparatorMenuItem(),
             accountsMenuItem,

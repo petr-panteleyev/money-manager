@@ -41,13 +41,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableColumn;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -66,12 +63,10 @@ import org.panteleyev.money.database.ConnectionProfile;
 import org.panteleyev.money.database.ConnectionProfileManager;
 import org.panteleyev.money.icons.IconWindowController;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.MoneyDAO;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import org.panteleyev.money.statements.StatementRecord;
 import org.panteleyev.money.xml.Export;
 import java.io.FileInputStream;
@@ -84,10 +79,8 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -97,8 +90,9 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newMenu;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.money.Constants.ELLIPSIS;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -123,7 +117,6 @@ public class MainWindowController extends BaseController implements TransactionT
             PREFERENCES);
 
     // Transaction view box
-    private final ChoiceBox<Object> accountFilterBox = new ChoiceBox<>();
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
     private final Spinner<Integer> yearSpinner = new Spinner<>();
 
@@ -132,10 +125,8 @@ public class MainWindowController extends BaseController implements TransactionT
     private final TransactionEditorPane transactionEditor = new TransactionEditorPane(cache());
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final MapChangeListener<UUID, Account> accountListener = change -> {
-        Platform.runLater(this::initAccountFilterBox);
-        Platform.runLater(this::reloadTransactions);
-    };
+    private final MapChangeListener<UUID, Account> accountListener =
+        change -> Platform.runLater(this::reloadTransactions);
 
     static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -155,7 +146,8 @@ public class MainWindowController extends BaseController implements TransactionT
         CategoryWindowController.class,
         CurrencyWindowController.class,
         RequestWindowController.class,
-        ChartsWindowController.class
+        ChartsWindowController.class,
+        IncomesAndExpensesWindowController.class
     );
 
     public MainWindowController(Stage stage) {
@@ -175,16 +167,16 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = newMenuItem(RB, "menu.File.Connect",
+        var fileConnectMenuItem = newMenuItem(RB, "Connection", ELLIPSIS,
             new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN), x -> onOpenConnection());
-        var fileCloseMenuItem = newMenuItem(RB, "menu.File.Close", x -> onClose());
-        var fileExitMenuItem = newMenuItem(RB, "menu.File.Exit", x -> onExit());
+        var fileCloseMenuItem = newMenuItem(RB, "Close", x -> onClose());
+        var fileExitMenuItem = newMenuItem(RB, "Exit", x -> onExit());
         var exportMenuItem = newMenuItem(RB, "menu.Tools.Export", x -> xmlDump());
         var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
         importMenuItem.setOnAction(event -> onImport());
-        var reportMenuItem = newMenuItem(RB, "menu.File.Report", x -> onReport());
+        var reportMenuItem = newMenuItem(RB, "Report", ELLIPSIS, x -> onReport());
 
-        var fileMenu = newMenu(RB, "menu.File",
+        var fileMenu = newMenu(RB, "File",
             fileConnectMenuItem,
             new SeparatorMenuItem(),
             importMenuItem,
@@ -209,14 +201,14 @@ public class MainWindowController extends BaseController implements TransactionT
 
         var viewMenu = newMenu(RB, "menu.view",
             newMenuItem(RB, "menu.view.currentMonth",
-                new KeyCodeCombination(KeyCode.UP, KeyCombination.SHORTCUT_DOWN),
+                new KeyCodeCombination(KeyCode.UP, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onCurrentMonth()),
             new SeparatorMenuItem(),
             newMenuItem(RB, "menu.view.nextMonth",
-                new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN),
+                new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onNextMonth()),
             newMenuItem(RB, "menu.view.prevMonth",
-                new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN),
+                new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onPrevMonth())
         );
 
@@ -265,7 +257,6 @@ public class MainWindowController extends BaseController implements TransactionT
 
         var f1 = new Region();
         var hBox = new HBox(5.0,
-            accountFilterBox,
             monthFilterBox,
             yearSpinner,
             f1,
@@ -301,44 +292,12 @@ public class MainWindowController extends BaseController implements TransactionT
 
         setCurrentDate();
 
-        accountFilterBox.setConverter(new ReadOnlyStringConverter<>() {
-            public String toString(Object obj) {
-                if (obj instanceof String) {
-                    return obj.toString();
-                }
-
-                if (obj instanceof Account) {
-                    Account account = (Account) obj;
-                    switch (account.getType()) {
-                        case BANKS_AND_CASH:
-                            return "[" + account.getName() + "]";
-                        case INCOMES:
-                            return "+ " + account.getName();
-                        case EXPENSES:
-                            return "- " + account.getName();
-                        case DEBTS:
-                            return "! " + account.getName();
-                        case ASSETS:
-                            return ". " + account.getName();
-                        default:
-                            return account.getName();
-                    }
-                }
-
-                return null;
-            }
-        });
-
-        accountFilterBox.getSelectionModel().selectedIndexProperty()
-            .addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
-
         cache().accounts().addListener(new WeakMapChangeListener<>(accountListener));
 
         getDao().preloadingProperty().addListener(
             (x, y, newValue) -> {
                 if (!newValue) {
                     Platform.runLater(() -> {
-                        initAccountFilterBox();
                         reloadTransactions();
                         scrollToEnd();
                     });
@@ -460,7 +419,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle("Report");
+        fileChooser.setTitle(RB.getString("Report"));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
@@ -539,34 +498,6 @@ public class MainWindowController extends BaseController implements TransactionT
         }
     }
 
-    private ImageView getButtonImage(String name) {
-        var image = new ImageView(new Image("/org/panteleyev/money/res/" + name));
-        image.setFitHeight(16.0);
-        image.setFitWidth(16.0);
-        return image;
-    }
-
-    private void addAccountsToChoiceBox(Collection<Account> aList) {
-        if (!aList.isEmpty()) {
-            accountFilterBox.getItems().add(new Separator());
-
-            aList.stream()
-                .filter(Account::getEnabled)
-                .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
-                .forEach(account -> accountFilterBox.getItems().add(account));
-        }
-    }
-
-    private void initAccountFilterBox() {
-        accountFilterBox.getItems().setAll(RB.getString("text.All.Accounts"));
-
-        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.BANKS_AND_CASH));
-        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.DEBTS));
-        addAccountsToChoiceBox(cache().getAccountsByType(CategoryType.ASSETS));
-
-        accountFilterBox.getSelectionModel().clearAndSelect(0);
-    }
-
     private void setCurrentDate() {
         var now = LocalDate.now();
         monthFilterBox.getSelectionModel().select(now.getMonth().getValue() - 1);
@@ -620,13 +551,6 @@ public class MainWindowController extends BaseController implements TransactionT
         Predicate<Transaction> filter = t -> t.getMonth() == month
             && t.getYear() == year;
 //            && t.getParentId() == 0;
-
-        var selected = accountFilterBox.getSelectionModel().getSelectedItem();
-        if (selected instanceof Account) {
-            var uuid = ((Account) selected).getUuid();
-            filter = filter.and(t -> Objects.equals(t.getAccountCreditedUuid(), uuid)
-                || Objects.equals(t.getAccountDebitedUuid(), uuid));
-        }
 
         transactionTable.setTransactionFilter(filter);
         transactionTable.sort();

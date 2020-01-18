@@ -28,9 +28,7 @@ package org.panteleyev.money;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.MapChangeListener;
 import javafx.collections.WeakMapChangeListener;
 import javafx.scene.control.ContextMenu;
@@ -68,7 +66,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newMenuItem;
+import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -127,96 +126,38 @@ class TransactionTableView extends TableView<Transaction> {
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        dayColumn = new TableColumn<>(RB.getString("column.Day"));
-        dayColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new SimpleObjectProperty<>(p.getValue()));
-        dayColumn.setCellFactory(x -> new TransactionDayCell(mode.isFullDate()));
-        dayColumn.setSortable(true);
+        var w = widthProperty().subtract(20);
 
-        if (mode.isFullDate()) {
-            dayColumn.comparatorProperty().set(MoneyDAO.COMPARE_TRANSACTION_BY_DATE);
-        } else {
-            dayColumn.comparatorProperty().set(MoneyDAO.COMPARE_TRANSACTION_BY_DAY);
-        }
+        dayColumn = newTableColumn(RB, "Day", x -> new TransactionDayCell(mode.isFullDate()),
+            mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY,
+            w.multiply(0.05));
+        dayColumn.setSortType(TableColumn.SortType.ASCENDING);
 
-        var typeColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Type"));
-        typeColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        typeColumn.setCellFactory(x -> new TransactionTypeCell());
-        typeColumn.setComparator(Comparator.comparingInt((Transaction t) -> t.getTransactionType().getId())
-            .thenComparing(dayColumn.getComparator()));
-        typeColumn.setSortable(true);
-
-        var accountFromColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Account.Debited"));
-        accountFromColumn.setCellFactory(x -> new TransactionDebitedAccountCell());
-        accountFromColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-
-        accountFromColumn.setComparator(Comparator.comparing(Transaction::getAccountDebitedUuid)
-            .thenComparing(dayColumn.getComparator()));
-
-        typeColumn.setSortable(true);
-
-        var accountCreditedColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Account.Credited"));
-        accountCreditedColumn.setCellFactory(x -> new TransactionCreditedAccountCell());
-        accountCreditedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        accountCreditedColumn.setSortable(false);
-
-        var contactColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Payer.Payee"));
-        contactColumn.setCellFactory(x -> new TransactionContactCell());
-        contactColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        contactColumn.setSortable(false);
-
-        var commentColumn = new TableColumn<Transaction, String>(RB.getString("column.Comment"));
-        commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
-        commentColumn.setSortable(false);
-
-        var sumColumn = new TableColumn<Transaction, Transaction>(RB.getString("column.Sum"));
-        sumColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        sumColumn.setCellFactory(x -> new TransactionSumCell());
-        sumColumn.setComparator(Comparator.comparing(Transaction::getSignedAmount));
-        sumColumn.setSortable(true);
-
-        var approvedColumn = new TableColumn<Transaction, Transaction>("");
-        approvedColumn.setCellValueFactory((TableColumn.CellDataFeatures<Transaction, Transaction> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        approvedColumn.setCellFactory(x ->  {
-            var cell = new TransactionCheckCell();
-            cell.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2) {
-                    toggleTransactionCheck();
-                }
-            });
-            return cell;
-        });
-        approvedColumn.setSortable(false);
-
-        getColumns().setAll(List.of(dayColumn,
-            typeColumn,
-            accountFromColumn,
-            accountCreditedColumn,
-            contactColumn,
-            commentColumn,
-            sumColumn,
-            approvedColumn
+        getColumns().setAll(List.of(
+            dayColumn,
+            newTableColumn(RB, "Type", x -> new TransactionTypeCell(),
+                Comparator.comparingInt((Transaction t) -> t.getTransactionType().getId())
+                    .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
+            newTableColumn(RB, "column.Account.Debited", x -> new TransactionDebitedAccountCell(),
+                Comparator.comparing(Transaction::getAccountDebitedUuid)
+                    .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
+            newTableColumn(RB, "column.Account.Credited", x -> new TransactionCreditedAccountCell(), w.multiply(0.1)),
+            newTableColumn(RB, "Counterparty", x -> new TransactionContactCell(), w.multiply(0.2)),
+            newTableColumn(RB, "Comment", null, Transaction::getComment, w.multiply(0.35)),
+            newTableColumn(RB, "Sum", x -> new TransactionSumCell(),
+                Comparator.comparing(Transaction::getSignedAmount), w.multiply(0.05)),
+            newTableColumn("", x -> {
+                var cell = new TransactionCheckCell();
+                cell.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        toggleTransactionCheck();
+                    }
+                });
+                return cell;
+            }, w.multiply(0.05))
         ));
 
         getSortOrder().add(dayColumn);
-        dayColumn.setSortType(TableColumn.SortType.ASCENDING);
-
-        // Column width. Temporary solution, there should be a better option.
-        dayColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
-        typeColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.1));
-        accountFromColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.1));
-        accountCreditedColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.1));
-        contactColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.2));
-        commentColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.35));
-        sumColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
-        approvedColumn.prefWidthProperty().bind(widthProperty().subtract(20).multiply(0.05));
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 

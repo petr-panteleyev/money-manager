@@ -26,14 +26,12 @@
 
 package org.panteleyev.money.details;
 
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -49,7 +47,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.FxFactory.newLabel;
+import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.money.Constants.COLON;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -73,34 +73,21 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         calculateDelta();
 
-        var accountCreditedColumn = new TableColumn<TransactionDetail, String>(RB.getString("column.Account.Credited"));
-        accountCreditedColumn.setCellValueFactory((TableColumn.CellDataFeatures<TransactionDetail, String> p) ->
-            new ReadOnlyObjectWrapper<>(cache().getAccount(p.getValue().getAccountCreditedUuid()).map(Account::getName)
-                .orElse("")));
-        accountCreditedColumn.setSortable(false);
-
-        TableColumn<TransactionDetail, String> commentColumn = new TableColumn<>(RB.getString("column.Comment"));
-        commentColumn.setCellValueFactory((TableColumn.CellDataFeatures<TransactionDetail, String> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue().getComment()));
-        commentColumn.setSortable(false);
-
-        TableColumn<TransactionDetail, TransactionDetail> sumColumn = new TableColumn<>(RB.getString("column.Sum"));
-        sumColumn.setCellValueFactory((TableColumn.CellDataFeatures<TransactionDetail, TransactionDetail> p) ->
-            new ReadOnlyObjectWrapper<>(p.getValue()));
-        sumColumn.setCellFactory(x -> new TransactionDetailSumCell());
-
-        accountCreditedColumn.prefWidthProperty().bind(detailsTable.widthProperty().subtract(20).multiply(0.3));
-        commentColumn.prefWidthProperty().bind(detailsTable.widthProperty().subtract(20).multiply(0.6));
-        sumColumn.prefWidthProperty().bind(detailsTable.widthProperty().subtract(20).multiply(0.1));
-
         detailsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        detailsTable.getColumns().setAll(accountCreditedColumn, commentColumn, sumColumn);
+
+        var w = detailsTable.widthProperty().subtract(20);
+        detailsTable.getColumns().setAll(List.of(
+            newTableColumn(RB, "Credited_Account", null,
+                d -> cache().getAccount(d.getAccountCreditedUuid()).map(Account::getName)
+                    .orElse(""), w.multiply(0.3)),
+            newTableColumn(RB, "Comment", null, TransactionDetail::getComment, w.multiply(0.6)),
+            newTableColumn(RB, "Sum", x -> new TransactionDetailSumCell(), w.multiply(0.1))
+        ));
 
         detailsTable.setItems(details);
 
-        var hBox = new HBox(Styles.BIG_SPACING, newLabel(RB,"label.delta"), deltaLabel);
-        var vBox = new VBox(Styles.BIG_SPACING, hBox, detailEditor
-        );
+        var hBox = new HBox(Styles.BIG_SPACING, newLabel(RB, "Delta", COLON), deltaLabel);
+        var vBox = new VBox(Styles.BIG_SPACING, hBox, detailEditor);
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
 
         var content = new BorderPane();
