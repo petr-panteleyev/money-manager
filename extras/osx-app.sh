@@ -11,5 +11,5 @@ $JPACKAGE_HOME/bin/jpackage \
     --java-options "--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls -Dfile.encoding=UTF-8" \
     --icon icons/icons.icns \
     --name "Money Manager" \
-    --app-version 20.2.0 \
+    --app-version 20.2.1 \
     --vendor panteleyev.org
