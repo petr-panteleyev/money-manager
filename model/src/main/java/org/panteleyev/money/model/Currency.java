@@ -7,146 +7,43 @@ package org.panteleyev.money.model;
 
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.RecordBuilder;
 import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Objects;
 import java.util.UUID;
 
 @Table("currency")
-public final class Currency implements MoneyRecord {
+public record Currency(
     @PrimaryKey
     @Column("uuid")
-    private final UUID guid;
+    UUID uuid,
     @Column("symbol")
-    private final String symbol;
+    String symbol,
     @Column("description")
-    private final String description;
+    String description,
     @Column("format_symbol")
-    private final String formatSymbol;
+    String formatSymbol,
     @Column("format_symbol_pos")
-    private final int formatSymbolPosition;
+    int formatSymbolPosition,
     @Column("show_format_symbol")
-    private final boolean showFormatSymbol;
+    boolean showFormatSymbol,
     @Column("def")
-    private final boolean def;
+    boolean def,
     @Column("rate")
-    private final BigDecimal rate;
+    BigDecimal rate,
     @Column("rate_direction")
-    private final int direction;
+    int direction,
     @Column("use_th_separator")
-    private final boolean useThousandSeparator;
+    boolean useThousandSeparator,
     @Column("created")
-    private final long created;
+    long created,
     @Column("modified")
-    private final long modified;
+    long modified
 
-    @RecordBuilder
-    public Currency(@Column("symbol") String symbol,
-                    @Column("description") String description,
-                    @Column("format_symbol") String formatSymbol,
-                    @Column("format_symbol_pos") int formatSymbolPosition,
-                    @Column("show_format_symbol") boolean showFormatSymbol,
-                    @Column("def") boolean def,
-                    @Column("rate") BigDecimal rate,
-                    @Column("rate_direction") int direction,
-                    @Column("use_th_separator") boolean useThousandSeparator,
-                    @Column("uuid") UUID guid,
-                    @Column("created") long created,
-                    @Column("modified") long modified)
-    {
-        this.symbol = symbol;
-        this.description = description;
-        this.formatSymbol = formatSymbol;
-        this.formatSymbolPosition = formatSymbolPosition;
-        this.showFormatSymbol = showFormatSymbol;
-        this.def = def;
-        this.rate = rate;
-        this.direction = direction;
-        this.useThousandSeparator = useThousandSeparator;
-        this.guid = guid;
-        this.created = created;
-        this.modified = modified;
-    }
+) implements MoneyRecord {
 
-    public String getSymbol() {
-        return this.symbol;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public String getFormatSymbol() {
-        return this.formatSymbol;
-    }
-
-    public int getFormatSymbolPosition() {
-        return this.formatSymbolPosition;
-    }
-
-    public boolean getShowFormatSymbol() {
-        return this.showFormatSymbol;
-    }
-
-    public boolean getDef() {
-        return this.def;
-    }
-
-    public BigDecimal getRate() {
-        return this.rate;
-    }
-
-    public int getDirection() {
-        return this.direction;
-    }
-
-    public boolean getUseThousandSeparator() {
-        return this.useThousandSeparator;
-    }
-
-    public UUID getUuid() {
-        return this.guid;
-    }
-
-    public long getCreated() {
-        return created;
-    }
-
-    public long getModified() {
-        return this.modified;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (!(other instanceof Currency)) {
-            return false;
-        }
-
-        Currency that = (Currency) other;
-        return Objects.equals(symbol, that.symbol)
-            && Objects.equals(description, that.description)
-            && Objects.equals(formatSymbol, that.formatSymbol)
-            && formatSymbolPosition == that.formatSymbolPosition
-            && showFormatSymbol == that.showFormatSymbol
-            && def == that.def
-            && rate.compareTo(that.rate) == 0
-            && direction == that.direction
-            && useThousandSeparator == that.useThousandSeparator
-            && Objects.equals(guid, that.guid)
-            && created == that.created
-            && modified == that.modified;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(symbol, description, formatSymbol, formatSymbolPosition, showFormatSymbol, def,
-            rate.stripTrailingZeros(), direction, useThousandSeparator, guid, created, modified);
+    public Currency {
+        this.rate = MoneyRecord.normalize(rate);
     }
 
     public String formatValue(BigDecimal value) {
@@ -174,7 +71,7 @@ public final class Currency implements MoneyRecord {
         private BigDecimal rate = BigDecimal.ONE;
         private int direction = 1;
         private boolean useThousandSeparator = false;
-        private UUID guid = null;
+        private UUID uuid = null;
         private long created = 0;
         private long modified = 0;
 
@@ -186,23 +83,23 @@ public final class Currency implements MoneyRecord {
                 return;
             }
 
-            symbol = c.getSymbol();
-            description = c.getDescription();
-            formatSymbol = c.getFormatSymbol();
-            formatSymbolPosition = c.getFormatSymbolPosition();
-            showFormatSymbol = c.getShowFormatSymbol();
-            def = c.getDef();
-            rate = c.getRate();
-            direction = c.getDirection();
-            useThousandSeparator = c.getUseThousandSeparator();
-            guid = c.getUuid();
-            created = c.getCreated();
-            modified = c.getModified();
+            symbol = c.symbol();
+            description = c.description();
+            formatSymbol = c.formatSymbol();
+            formatSymbolPosition = c.formatSymbolPosition();
+            showFormatSymbol = c.showFormatSymbol();
+            def = c.def();
+            rate = c.rate();
+            direction = c.direction();
+            useThousandSeparator = c.useThousandSeparator();
+            uuid = c.uuid();
+            created = c.created();
+            modified = c.modified();
         }
 
         public Currency build() {
-            if (guid == null) {
-                guid = UUID.randomUUID();
+            if (uuid == null) {
+                uuid = UUID.randomUUID();
             }
 
             long now = System.currentTimeMillis();
@@ -213,8 +110,8 @@ public final class Currency implements MoneyRecord {
                 modified = now;
             }
 
-            return new Currency(symbol, description, formatSymbol, formatSymbolPosition,
-                showFormatSymbol, def, rate, direction, useThousandSeparator, guid, created, modified);
+            return new Currency(uuid, symbol, description, formatSymbol, formatSymbolPosition,
+                showFormatSymbol, def, rate, direction, useThousandSeparator, created, modified);
         }
 
         public Builder symbol(String symbol) {
@@ -263,7 +160,7 @@ public final class Currency implements MoneyRecord {
         }
 
         public Builder guid(UUID guid) {
-            this.guid = guid;
+            this.uuid = guid;
             return this;
         }
 

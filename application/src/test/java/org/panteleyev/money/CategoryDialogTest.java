@@ -30,7 +30,7 @@ public class CategoryDialogTest extends BaseTest {
     private final static Category CATEGORY = new Category.Builder()
         .name(UUID.randomUUID().toString())
         .comment(UUID.randomUUID().toString())
-        .catTypeId(CategoryType.BANKS_AND_CASH.getId())
+        .type(CategoryType.BANKS_AND_CASH)
         .guid(UUID.randomUUID())
         .modified(System.currentTimeMillis())
         .build();
@@ -63,11 +63,11 @@ public class CategoryDialogTest extends BaseTest {
 
         var category = queue.take();
 
-        assertNotNull(category.getUuid());
-        assertEquals(category.getName(), CATEGORY_NAME);
-        assertEquals(category.getComment(), CATEGORY_COMMENT);
-        assertEquals(category.getType(), CATEGORY_TYPE);
-        assertEquals(category.getCreated(), category.getModified());
+        assertNotNull(category.uuid());
+        assertEquals(category.name(), CATEGORY_NAME);
+        assertEquals(category.comment(), CATEGORY_COMMENT);
+        assertEquals(category.type(), CATEGORY_TYPE);
+        assertEquals(category.created(), category.modified());
     }
 
     @Test
@@ -83,11 +83,11 @@ public class CategoryDialogTest extends BaseTest {
 
         var category = queue.take();
 
-        assertEquals(category.getUuid(), CATEGORY.getUuid());
-        assertEquals(category.getName(), CATEGORY.getName());
-        assertEquals(category.getComment(), CATEGORY.getComment());
-        assertEquals(category.getType(), CATEGORY_TYPE_NEW);
-        assertTrue(category.getModified() > CATEGORY.getModified());
-        assertTrue(category.getModified() > category.getCreated());
+        assertEquals(category.uuid(), CATEGORY.uuid());
+        assertEquals(category.name(), CATEGORY.name());
+        assertEquals(category.comment(), CATEGORY.comment());
+        assertEquals(category.type(), CATEGORY_TYPE_NEW);
+        assertTrue(category.modified() > CATEGORY.modified());
+        assertTrue(category.modified() > category.created());
     }
 }

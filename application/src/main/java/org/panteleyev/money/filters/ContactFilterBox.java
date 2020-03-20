@@ -8,6 +8,7 @@ package org.panteleyev.money.filters;
 import javafx.scene.control.TextField;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.model.Transaction;
+import java.util.Optional;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.money.Predicates.contactByName;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -28,7 +29,7 @@ public class ContactFilterBox {
         if (contactString.isBlank()) {
             predicateProperty.reset();
         } else {
-            predicateProperty.set(t -> t.getContactUuid()
+            predicateProperty.set(t -> Optional.ofNullable(t.contactUuid())
                 .flatMap(uuid -> cache().getContact(uuid))
                 .filter(contactByName(contactString))
                 .isPresent());

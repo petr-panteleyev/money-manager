@@ -20,17 +20,12 @@ public interface Images {
     Image MIR = new Image("org/panteleyev/money/res/mir.png", Icon.ICON_SIZE, Icon.ICON_SIZE, true, true);
 
     static Image getCardTypeIcon(CardType cardType) {
-        switch (cardType) {
-            case VISA:
-                return Images.VISA;
-            case MASTERCARD:
-                return Images.MASTERCARD;
-            case AMEX:
-                return Images.AMEX;
-            case MIR:
-                return Images.MIR;
-            default:
-                return null;
-        }
+        return switch (cardType) {
+            case VISA -> Images.VISA;
+            case MASTERCARD -> Images.MASTERCARD;
+            case AMEX -> Images.AMEX;
+            case MIR -> Images.MIR;
+            default -> null;
+        };
     }
 }

@@ -43,7 +43,7 @@ public class AccountClosingDateCellTest {
 
         var today = LocalDate.now();
         var account = new Account.Builder()
-            .typeId(CategoryType.BANKS_AND_CASH.getId())
+            .type(CategoryType.BANKS_AND_CASH)
             .closingDate(today.plusDays(delta))
             .build();
 

@@ -6,5 +6,5 @@ package org.panteleyev.money.model;
  */
 
 public interface Named {
-    String getName();
+    String name();
 }

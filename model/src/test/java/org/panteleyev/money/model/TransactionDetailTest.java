@@ -16,10 +16,10 @@ public class TransactionDetailTest {
 
         var detail = new TransactionDetail(transaction);
 
-        assertEquals(detail.getUuid(), transaction.getUuid());
-        assertEquals(detail.getAccountCreditedUuid(), transaction.getAccountCreditedUuid());
-        assertEquals(detail.getAmount(), transaction.getAmount());
-        assertEquals(detail.getComment(), transaction.getComment());
-        assertEquals(detail.getModified(), transaction.getModified());
+        assertEquals(detail.uuid(), transaction.uuid());
+        assertEquals(detail.accountCreditedUuid(), transaction.accountCreditedUuid());
+        assertEquals(detail.amount(), transaction.amount());
+        assertEquals(detail.comment(), transaction.comment());
+        assertEquals(detail.modified(), transaction.modified());
     }
 }

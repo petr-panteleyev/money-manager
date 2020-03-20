@@ -23,8 +23,8 @@ public class TransactionCreditedAccountCell extends TableCell<Transaction, Trans
             return;
         }
 
-        cache().getAccount(transaction.getAccountCreditedUuid()).ifPresent(account -> {
-            setText(account.getName());
+        cache().getAccount(transaction.accountCreditedUuid()).ifPresent(account -> {
+            setText(account.name());
             setGraphic(IconManager.getAccountImageView(account));
         });
     }

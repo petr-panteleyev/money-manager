@@ -9,22 +9,22 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-parent</artifactId>
-    <version>20.2.1</version>
+    <version>20.3.0</version>
     <packaging>pom</packaging>
     <name>Money Manager Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>13</maven.compiler.source>
-        <maven.compiler.target>13</maven.compiler.target>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
         <appModule>org.panteleyev.money</appModule>
         <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <!-- dependencies -->
-        <javaApiForMySqlVersion>1.1.0</javaApiForMySqlVersion>
-        <javaFxVersion>13.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.1.0</javaFxHelpersVersion>
+        <javaApiForMySqlVersion>1.2.0</javaApiForMySqlVersion>
+        <javaFxVersion>14</javaFxVersion>
+        <javaFxHelpersVersion>1.2.0</javaFxHelpersVersion>
         <controlsFxVersion>11.0.1</controlsFxVersion>
         <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
         <jsoupVersion>1.12.1</jsoupVersion>
@@ -38,8 +38,8 @@
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <mavenVersionPluginVersion>2.7</mavenVersionPluginVersion>
-        <mavenFailsafePluginVersion>3.0.0-M4</mavenFailsafePluginVersion>
         <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
+        <execMavenPluginVersion>1.6.0</execMavenPluginVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
         <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>
@@ -168,18 +168,19 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>13</version>
+                            <version>14</version>
                         </jdk>
                     </toolchains>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
                 <configuration>
-                    <release>13</release>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -192,66 +193,104 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
+                    <argLine>--enable-preview</argLine>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${execMavenPluginVersion}</version>
+                <configuration>
+                    <longModulepath>false</longModulepath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>dist-win</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${java.home}/bin/jpackage
+                            </executable>
+                            <arguments>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                                <argument>--runtime-image</argument>
+                                <argument>${java.home}</argument>
+                                <argument>--dest</argument>
+                                <argument>target/dist</argument>
+                                <argument>-p</argument>
+                                <argument>target/jmods</argument>
+                                <argument>--java-options</argument>
+                                <argument>
+                                    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+                                    -Dfile.encoding=UTF-8
+                                    --enable-preview
+                                </argument>
+                                <argument>--icon</argument>
+                                <argument>icons/icons.ico</argument>
+                                <argument>--name</argument>
+                                <argument>Money Manager</argument>
+                                <argument>--app-version</argument>
+                                <argument>${project.version}</argument>
+                                <argument>--vendor</argument>
+                                <argument>panteleyev.org</argument>
+                                <argument>--win-menu</argument>
+                                <argument>--win-dir-chooser</argument>
+                                <argument>--win-upgrade-uuid</argument>
+                                <argument>38dac4b6-91d2-4ca8-aacb-2e0cfd54127a</argument>
+                                <argument>--win-menu-group</argument>
+                                <argument>panteleyev.org</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>dist-mac</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>
+                                ${java.home}/bin/jpackage
+                            </executable>
+                            <arguments>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                                <argument>--runtime-image</argument>
+                                <argument>${java.home}</argument>
+                                <argument>--dest</argument>
+                                <argument>target/dist</argument>
+                                <argument>-p</argument>
+                                <argument>target/jmods</argument>
+                                <argument>--java-options</argument>
+                                <argument>
+                                    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
+                                    -Dfile.encoding=UTF-8
+                                    --enable-preview
+                                </argument>
+                                <argument>--icon</argument>
+                                <argument>icons/icons.icns</argument>
+                                <argument>--name</argument>
+                                <argument>Money Manager</argument>
+                                <argument>--app-version</argument>
+                                <argument>${project.version}</argument>
+                                <argument>--vendor</argument>
+                                <argument>panteleyev.org</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
-                    <executions>
-                        <execution>
-                            <id>add-integration-test-source</id>
-                            <phase>generate-test-sources</phase>
-                            <goals>
-                                <goal>add-test-source</goal>
-                            </goals>
-                            <configuration>
-                                <sources>
-                                    <source>src/integ-test/java</source>
-                                </sources>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>add-integration-test-resources</id>
-                            <phase>generate-test-resources</phase>
-                            <goals>
-                                <goal>add-test-resource</goal>
-                            </goals>
-                            <configuration>
-                                <resources>
-                                    <resource>
-                                        <directory>src/integ-test/resources</directory>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>${mavenFailsafePluginVersion}</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <suiteXmlFiles>
-                            <suiteXmlFile>src/integ-test/resources/testng.xml</suiteXmlFile>
-                        </suiteXmlFiles>
-                    </configuration>
-                </plugin>
                 <plugin>
                     <groupId>org.openjfx</groupId>
                     <artifactId>javafx-maven-plugin</artifactId>

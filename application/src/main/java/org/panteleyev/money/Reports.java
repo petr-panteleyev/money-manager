@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class Reports {
     private static final String CSS_PATH = "/org/panteleyev/money/report.css";
@@ -44,11 +43,11 @@ class Reports {
 
             for (var t : transactions) {
                 w.print("<tr>");
-                td(w, String.format("%02d.%02d.%04d", t.getDay(), t.getMonth(), t.getYear()));
-                td(w, cache().getAccount(t.getAccountDebitedUuid()).map(Account::getName).orElse(""));
-                td(w, cache().getAccount(t.getAccountCreditedUuid()).map(Account::getName).orElse(""));
-                td(w, cache().getContact(t.getContactUuid().orElse(null)).map(Contact::getName).orElse(""));
-                td(w, t.getComment());
+                td(w, String.format("%02d.%02d.%04d", t.day(), t.month(), t.year()));
+                td(w, cache().getAccount(t.accountDebitedUuid()).map(Account::name).orElse(""));
+                td(w, cache().getAccount(t.accountCreditedUuid()).map(Account::name).orElse(""));
+                td(w, cache().getContact(t.contactUuid()).map(Contact::name).orElse(""));
+                td(w, t.comment());
                 td(w, "amount", formatAmount(t.getSignedAmount()));
                 w.println();
             }
@@ -73,14 +72,14 @@ class Reports {
 
             for (var a : accounts) {
                 w.println("<tr>");
-                td(w, a.getName());
-                td(w, cache().getCategory(a.getCategoryUuid())
-                    .map(Category::getName).orElse(""));
-                td(w, cache().getCurrency(a.getCurrencyUuid().orElse(null))
-                    .map(Currency::getSymbol).orElse(""));
-                td(w, formatAmount(a.getInterest()));
-                td(w, a.getClosingDate().toString());
-                td(w, a.getComment());
+                td(w, a.name());
+                td(w, cache().getCategory(a.categoryUuid())
+                    .map(Category::name).orElse(""));
+                td(w, cache().getCurrency(a.currencyUuid())
+                    .map(Currency::symbol).orElse(""));
+                td(w, formatAmount(a.interest()));
+                td(w, a.closingDate().toString());
+                td(w, a.comment());
                 td(w, "amount", cache().calculateBalance(a, true, t -> true).toString());
                 w.println();
             }

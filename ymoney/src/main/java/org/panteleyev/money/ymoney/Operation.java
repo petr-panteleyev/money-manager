@@ -13,49 +13,24 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjuster;
 
-public class Operation {
-    private final String id;
-    private final String title;
-    private final BigDecimal amount;
-    private final String details;
-    private final LocalDate date;
-
-    public Operation(JsonObject json) {
-        id = json.get("operation_id").getAsString();
-        title = json.get("title").getAsString();
+public record Operation(String id, String title, BigDecimal amount, String details, LocalDate date) {
+    public static Operation of(JsonObject json) {
+        var id = json.get("operation_id").getAsString();
+        var title = json.get("title").getAsString();
 
         var detailsElement = json.get("details");
-        details = detailsElement == null ? null : detailsElement.getAsString();
+        var details = detailsElement == null ? null : detailsElement.getAsString();
 
         var direction = json.get("direction").getAsString();
         var absAmount = json.get("amount").getAsBigDecimal();
-        amount = "out".equalsIgnoreCase(direction) ? absAmount.negate() : absAmount;
+        var amount = "out".equalsIgnoreCase(direction) ? absAmount.negate() : absAmount;
 
         var dateString = json.get("datetime").getAsString();
         var local = LocalDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
         var utc = ZonedDateTime.of(local, ZoneOffset.UTC);
-        date = LocalDate.ofInstant(utc.toInstant(), ZoneId.systemDefault());
-    }
+        var date = LocalDate.ofInstant(utc.toInstant(), ZoneId.systemDefault());
 
-    public String getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public LocalDate getDate() {
-        return date;
+        return new Operation(id, title, amount, details, date);
     }
 }

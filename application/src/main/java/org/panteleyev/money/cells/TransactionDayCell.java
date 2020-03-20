@@ -24,9 +24,9 @@ public class TransactionDayCell extends TableCell<Transaction, Transaction> {
         } else {
             if (fullDate) {
                 setText(String.format("%02d.%02d.%04d",
-                    transaction.getDay(), transaction.getMonth(), transaction.getYear()));
+                    transaction.day(), transaction.month(), transaction.year()));
             } else {
-                setText(Integer.toString(transaction.getDay()));
+                setText(Integer.toString(transaction.day()));
             }
         }
     }

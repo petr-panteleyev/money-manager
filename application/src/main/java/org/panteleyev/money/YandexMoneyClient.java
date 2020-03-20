@@ -51,12 +51,12 @@ class YandexMoneyClient {
         var scope = URLEncoder.encode("operation-details account-info operation-history", StandardCharsets.UTF_8);
 
         var authUrl = OAUTH_ENDPOINT
-            + "?client_id=" + clientId.getClientId()
+            + "?client_id=" + clientId.clientId()
             + "&scope=" + scope
             + "&response_type=code"
-            + "&redirect_uri=" + clientId.getEncodedRedirectUri();
+            + "&redirect_uri=" + clientId.encodedRedirectUri();
 
-        var authDialog = new WebAuthDialog(authUrl, clientId.getRedirectUri());
+        var authDialog = new WebAuthDialog(authUrl, clientId.redirectUri());
         authDialog.responseUriProperty().addListener((x, y, redirectUri) -> onAuthComplete(redirectUri));
 
         var stage = authDialog.getStage();
@@ -66,8 +66,8 @@ class YandexMoneyClient {
 
     Statement load(int limit, LocalDate from, LocalDate to) {
         var accountInfo = accountInfoRequest();
-        var balance = accountInfo.map(AccountInfo::getBalance).orElse(BigDecimal.ZERO);
-        var accountNumber = accountInfo.map(AccountInfo::getId).orElse("");
+        var balance = accountInfo.map(AccountInfo::balance).orElse(BigDecimal.ZERO);
+        var accountNumber = accountInfo.map(AccountInfo::id).orElse("");
 
         try {
             var body = "records=" +
@@ -95,19 +95,19 @@ class YandexMoneyClient {
             var statementRecords = new ArrayList<StatementRecord>();
 
             for (var opn : operations) {
-                var operation = new Operation((JsonObject) opn);
+                var operation = Operation.of((JsonObject) opn);
 
-                var title = operation.getDetails() == null ?
-                    operation.getTitle() : operation.getDetails();
+                var title = operation.details() == null ?
+                    operation.title() : operation.details();
 
                 var record = new StatementRecord(
-                    operation.getDate(), operation.getDate(),
+                    operation.date(), operation.date(),
                     title,
                     "", "", "",
                     "RUB",
-                    operation.getAmount().toString(),
+                    operation.amount().toString(),
                     "RUB",
-                    operation.getAmount().toString()
+                    operation.amount().toString()
                 );
 
                 statementRecords.add(record);
@@ -120,13 +120,13 @@ class YandexMoneyClient {
     }
 
     private void onAuthComplete(String redirectUri) {
-        var response = new AuthResponse(redirectUri);
-        if (response.getError() == null) {
+        var response = AuthResponse.of(redirectUri);
+        if (response.error() == null) {
             try {
-                var body = "code=" + response.getCode()
-                    + "&client_id=" + clientId.getClientId()
+                var body = "code=" + response.code()
+                    + "&client_id=" + clientId.clientId()
                     + "&grant_type=authorization_code"
-                    + "&redirect_uri=" + clientId.getEncodedRedirectUri();
+                    + "&redirect_uri=" + clientId.encodedRedirectUri();
 
                 var builder = HttpRequest.newBuilder(new URI(TOKEN_ENDPOINT));
                 var httpRequest = builder
@@ -154,7 +154,7 @@ class YandexMoneyClient {
                 throw new RuntimeException(ex);
             }
         } else {
-            LOGGER.log(Level.INFO, "Yandex Money authorization error: " + response.getError());
+            LOGGER.log(Level.INFO, "Yandex Money authorization error: " + response.error());
         }
     }
 
@@ -176,7 +176,7 @@ class YandexMoneyClient {
                 return Optional.empty();
             }
             var accountObject = (JsonObject) JsonParser.parseString(httpResponse.body());
-            return Optional.of(new AccountInfo(accountObject));
+            return Optional.of(AccountInfo.of(accountObject));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

@@ -44,9 +44,9 @@ public class IconManager {
     }
 
     public static ImageView getAccountImageView(Account account) {
-        var uuid = account.getIconUuid();
+        var uuid = account.iconUuid();
         if (uuid == null) {
-            uuid = cache().getCategory(account.getCategoryUuid()).map(Category::getIconUuid).orElse(null);
+            uuid = cache().getCategory(account.categoryUuid()).map(Category::iconUuid).orElse(null);
         }
 
         return getImageView(uuid);

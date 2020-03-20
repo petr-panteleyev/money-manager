@@ -112,13 +112,13 @@ public class DataCache {
         var typeList = List.of(types);
 
         return getCategories().stream()
-            .filter(category -> typeList.contains(category.getType()))
+            .filter(category -> typeList.contains(category.type()))
             .collect(Collectors.toList());
     }
 
     public List<Category> getCategoriesByType(EnumSet<CategoryType> types) {
         return getCategories().stream()
-            .filter(category -> types.contains(category.getType()))
+            .filter(category -> types.contains(category.type()))
             .collect(Collectors.toList());
     }
 
@@ -143,7 +143,7 @@ public class DataCache {
     }
 
     public Optional<Currency> getDefaultCurrency() {
-        return getCurrencies().stream().filter(Currency::getDef).findFirst();
+        return getCurrencies().stream().filter(Currency::def).findFirst();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -192,13 +192,13 @@ public class DataCache {
 
     public List<Account> getAccountsByType(CategoryType type) {
         return getAccounts().stream()
-            .filter(account -> account.getType() == type)
+            .filter(account -> account.type() == type)
             .collect(Collectors.toList());
     }
 
     public List<Account> getAccountsByCategory(UUID uuid) {
         return getAccounts().stream()
-            .filter(account -> account.getCategoryUuid().equals(uuid))
+            .filter(account -> account.categoryUuid().equals(uuid))
             .collect(Collectors.toList());
     }
 
@@ -206,7 +206,7 @@ public class DataCache {
         var catIDs = List.of(ids);
 
         return getAccounts().stream()
-            .filter(account -> catIDs.contains(account.getCategoryUuid()))
+            .filter(account -> catIDs.contains(account.categoryUuid()))
             .collect(Collectors.toList());
     }
 
@@ -238,58 +238,58 @@ public class DataCache {
 
     public List<Transaction> getTransactions(Collection<Account> accounts) {
         var ids = accounts.stream()
-            .map(Account::getUuid)
+            .map(Account::uuid)
             .collect(Collectors.toList());
 
         return getTransactions().stream()
-            .filter(tr -> ids.contains(tr.getAccountDebitedUuid()) || ids.contains(tr.getAccountCreditedUuid()))
+            .filter(tr -> ids.contains(tr.accountDebitedUuid()) || ids.contains(tr.accountCreditedUuid()))
             .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return getTransactions().stream()
-            .filter(t -> Objects.equals(t.getParentUuid().orElse(null), parent.getUuid()))
+            .filter(t -> Objects.equals(t.parentUuid(), parent.uuid()))
             .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactions(int month, int year) {
         return getTransactions().stream()
-            .filter(tr -> tr.getMonth() == month && tr.getYear() == year)
+            .filter(tr -> tr.month() == month && tr.year() == year)
             .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactions(Account account) {
-        var uuid = account.getUuid();
+        var uuid = account.uuid();
         return getTransactions().stream()
-            .filter(tr -> Objects.equals(tr.getAccountDebitedUuid(), uuid)
-                || Objects.equals(tr.getAccountCreditedUuid(), uuid))
+            .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
+                || Objects.equals(tr.accountCreditedUuid(), uuid))
             .collect(Collectors.toList());
     }
 
     public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
         var uuids = categories.stream()
-            .map(Category::getUuid)
+            .map(Category::uuid)
             .collect(Collectors.toList());
 
         return getTransactions().stream()
-            .filter(tr -> uuids.contains(tr.getAccountDebitedCategoryUuid())
-                || uuids.contains(tr.getAccountCreditedCategoryUuid()))
+            .filter(tr -> uuids.contains(tr.accountDebitedCategoryUuid())
+                || uuids.contains(tr.accountCreditedCategoryUuid()))
             .collect(Collectors.toList());
     }
 
     public Set<String> getUniqueTransactionComments() {
         return getTransactions().stream()
-            .map(Transaction::getComment)
+            .map(Transaction::comment)
             .filter(c -> !c.isEmpty())
             .collect(Collectors.toSet());
     }
 
     public long getTransactionCount(Account account) {
-        var uuid = account.getUuid();
+        var uuid = account.uuid();
 
         return getTransactions().stream()
-            .filter(tr -> Objects.equals(tr.getAccountDebitedUuid(), uuid)
-                || Objects.equals(tr.getAccountCreditedUuid(), uuid))
+            .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
+                || Objects.equals(tr.accountCreditedUuid(), uuid))
             .count();
     }
 
@@ -305,15 +305,15 @@ public class DataCache {
      */
     public BigDecimal calculateBalance(Account account, boolean total, Predicate<Transaction> filter) {
         return getTransactions(account).stream()
-            .filter(t -> t.getParentUuid().isEmpty())
+            .filter(t -> t.parentUuid() == null)
             .filter(filter)
             .map(t -> {
-                BigDecimal amount = t.getAmount();
-                if (Objects.equals(account.getUuid(), t.getAccountCreditedUuid())) {
+                BigDecimal amount = t.amount();
+                if (Objects.equals(account.uuid(), t.accountCreditedUuid())) {
                     // handle conversion rate
-                    var rate = t.getRate();
+                    var rate = t.rate();
                     if (rate.compareTo(BigDecimal.ZERO) != 0) {
-                        amount = t.getRateDirection() == 0 ?
+                        amount = t.rateDirection() == 0 ?
                             amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
                     }
                 } else {
@@ -321,7 +321,7 @@ public class DataCache {
                 }
                 return amount;
             })
-            .reduce(total ? account.getOpeningBalance().add(account.getAccountLimit()) : BigDecimal.ZERO,
+            .reduce(total ? account.openingBalance().add(account.accountLimit()) : BigDecimal.ZERO,
                 BigDecimal::add);
     }
 }

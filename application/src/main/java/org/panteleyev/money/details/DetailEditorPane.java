@@ -52,7 +52,7 @@ import static org.panteleyev.money.MainWindowController.RB;
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
         public String toString(Account obj) {
-            return obj.getName();
+            return obj.name();
         }
     };
 
@@ -62,7 +62,7 @@ final class DetailEditorPane extends BorderPane {
         }
 
         public String getElementString(T element) {
-            return element.getName();
+            return element.name();
         }
     }
 
@@ -185,14 +185,14 @@ final class DetailEditorPane extends BorderPane {
 
     private void setupBanksAndCashMenuItems(Set<Account> creditedSuggestions) {
         var banksAndCash = cache.getAccountsByType(CategoryType.BANKS_AND_CASH).stream()
-            .filter(Account::getEnabled)
+            .filter(Account::enabled)
             .collect(Collectors.toList());
 
         banksAndCash.stream()
-            .sorted((a1, a2) -> a1.getName().compareToIgnoreCase(a2.getName()))
+            .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
             .forEach(acc -> {
                 creditedMenuButton.getItems().add(
-                    newMenuItem('[' + acc.getName() + ']',
+                    newMenuItem('[' + acc.name() + ']',
                         event -> onCreditedAccountSelected(acc)));
                 creditedSuggestions.add(acc);
             });
@@ -216,18 +216,18 @@ final class DetailEditorPane extends BorderPane {
         var categories = cache.getCategoriesByType(categoryType);
 
         categories.stream()
-            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
             .forEach(x -> {
-                List<Account> accounts = cache.getAccountsByCategory(x.getUuid());
+                List<Account> accounts = cache.getAccountsByCategory(x.uuid());
 
                 if (!accounts.isEmpty()) {
-                    creditedMenuButton.getItems().add(new MenuItem(x.getName()));
+                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
                     accounts.stream()
-                        .filter(Account::getEnabled)
+                        .filter(Account::enabled)
                         .forEach(acc -> {
                             creditedMenuButton.getItems().add(
-                                newMenuItem("  " + prefix + ' ' + acc.getName(),
+                                newMenuItem("  " + prefix + ' ' + acc.name(),
                                     event -> onCreditedAccountSelected(acc)));
                             creditedSuggestions.add(acc);
                         });
@@ -259,27 +259,27 @@ final class DetailEditorPane extends BorderPane {
             newTransactionProperty.set(false);
 
             // Accounts
-            Optional<Account> accCredited = cache.getAccount(tr.getAccountCreditedUuid());
-            creditedAccountEdit.setText(accCredited.map(Account::getName).orElse(""));
+            Optional<Account> accCredited = cache.getAccount(tr.accountCreditedUuid());
+            creditedAccountEdit.setText(accCredited.map(Account::name).orElse(""));
 
             // Other fields
-            commentEdit.setText(tr.getComment());
+            commentEdit.setText(tr.comment());
 
             // Sum
-            sumEdit.setText(tr.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
+            sumEdit.setText(tr.amount().setScale(2, RoundingMode.HALF_UP).toString());
         }
     }
 
     private void onCreditedAccountSelected(Account acc) {
-        creditedAccountEdit.setText(acc.getName());
+        creditedAccountEdit.setText(acc.name());
     }
 
     private Optional<TransactionDetail> buildTransactionDetail() {
-        var builder = new TransactionDetail.Builder(transactionDetail == null ? null : transactionDetail.getUuid());
+        var builder = new TransactionDetail.Builder(transactionDetail == null ? null : transactionDetail.uuid());
 
         var creditedAccount = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
         if (creditedAccount.isPresent()) {
-            builder.accountCreditedUuid(creditedAccount.get().getUuid());
+            builder.accountCreditedUuid(creditedAccount.get().uuid());
         } else {
             return Optional.empty();
         }
@@ -331,17 +331,17 @@ final class DetailEditorPane extends BorderPane {
         // Expenses to creditable accounts
         List<Category> expenseCategories = cache.getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
-            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
+            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
             .forEach(x -> {
-                var accounts = cache.getAccountsByCategory(x.getUuid());
+                var accounts = cache.getAccountsByCategory(x.uuid());
 
                 if (!accounts.isEmpty()) {
-                    creditedMenuButton.getItems().add(new MenuItem(x.getName()));
+                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
                     accounts.forEach(acc -> {
                         creditedSuggestions.add(acc);
                         creditedMenuButton.getItems().add(
-                            newMenuItem("  - " + acc.getName(), event -> onCreditedAccountSelected(acc)));
+                            newMenuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
                     });
                 }
             });
@@ -356,8 +356,8 @@ final class DetailEditorPane extends BorderPane {
 
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
-            var catName = cache.getCategory(account.getCategoryUuid()).map(Category::getName).orElse("");
-            label.setText(account.getType().getTypeName() + " | " + catName);
+            var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
+            label.setText(account.type().getTypeName() + " | " + catName);
         } else {
             label.setText("");
         }

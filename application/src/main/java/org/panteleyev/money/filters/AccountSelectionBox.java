@@ -16,6 +16,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.Predicates;
+import org.panteleyev.money.TransactionPredicate;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -30,7 +31,6 @@ import static org.panteleyev.money.Predicates.accountByCategory;
 import static org.panteleyev.money.Predicates.accountByUuid;
 import static org.panteleyev.money.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.TransactionPredicate.transactionByCategory;
-import static org.panteleyev.money.TransactionPredicate.transactionByCategoryType;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class AccountSelectionBox extends HBox {
@@ -50,7 +50,7 @@ public class AccountSelectionBox extends HBox {
     private final MapChangeListener<UUID, Account> accountListener =
         change -> Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
 
-    private PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
+    private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
 
     private final EventHandler<ActionEvent> categoryTypeHandler =
         event -> setupCategoryBox(getSelectedCategoryType());
@@ -70,21 +70,21 @@ public class AccountSelectionBox extends HBox {
         categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
-                return obj instanceof CategoryType ? ((CategoryType) obj).getTypeName() : obj.toString();
+                return obj instanceof CategoryType type ? type.getTypeName() : obj.toString();
             }
         });
 
         categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
-                return obj instanceof Category ? ((Category) obj).getName() : obj.toString();
+                return obj instanceof Category category ? category.name() : obj.toString();
             }
         });
 
         accountChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
-                return obj instanceof Account ? ((Account) obj).getName() : obj.toString();
+                return obj instanceof Account account ? account.name() : obj.toString();
             }
         });
 
@@ -134,7 +134,7 @@ public class AccountSelectionBox extends HBox {
         var items = accountChoiceBox.getItems();
         items.setAll(ALL_ACCOUNTS_STRING);
 
-        category.ifPresent(cat -> items.addAll(cache().getAccountsByCategory(cat.getUuid())));
+        category.ifPresent(cat -> items.addAll(cache().getAccountsByCategory(cat.uuid())));
 
         if (items.size() > 1) {
             items.add(1, new Separator());
@@ -146,36 +146,36 @@ public class AccountSelectionBox extends HBox {
 
     private Optional<Account> getSelectedAccount() {
         var obj = accountChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Account ? Optional.of((Account) obj) : Optional.empty();
+        return obj instanceof Account account ? Optional.of(account) : Optional.empty();
     }
 
     private Optional<Category> getSelectedCategory() {
         var obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Category ? Optional.of((Category) obj) : Optional.empty();
+        return obj instanceof Category category ? Optional.of(category) : Optional.empty();
     }
 
     private Optional<CategoryType> getSelectedCategoryType() {
         var obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof CategoryType ? Optional.of((CategoryType) obj) : Optional.empty();
+        return obj instanceof CategoryType type ? Optional.of(type) : Optional.empty();
     }
 
     Predicate<Transaction> getTransactionFilter() {
-        return getSelectedAccount().map(a -> transactionByAccount(a.getUuid()))
-            .orElseGet(() -> getSelectedCategory().map(c -> transactionByCategory(c.getUuid()))
-                .orElseGet(() -> getSelectedCategoryType().map(t -> transactionByCategoryType(t.getId()))
+        return getSelectedAccount().map(a -> transactionByAccount(a.uuid()))
+            .orElseGet(() -> getSelectedCategory().map(c -> transactionByCategory(c.uuid()))
+                .orElseGet(() -> getSelectedCategoryType().map(TransactionPredicate::transactionByCategoryType)
                     .orElse(x -> true)));
     }
 
     public Predicate<Account> getAccountFilter() {
-        return getSelectedAccount().map(a -> accountByUuid(a.getUuid()))
-            .orElseGet(() -> getSelectedCategory().map(c -> accountByCategory(c.getUuid()))
+        return getSelectedAccount().map(a -> accountByUuid(a.uuid()))
+            .orElseGet(() -> getSelectedCategory().map(c -> accountByCategory(c.uuid()))
                 .orElseGet(() -> getSelectedCategoryType().map(Predicates::accountByCategoryType)
                     .orElse(x -> true)));
     }
 
     public void setAccount(Account account) {
-        var type = account.getType();
-        var category = cache().getCategory(account.getCategoryUuid()).orElseThrow();
+        var type = account.type();
+        var category = cache().getCategory(account.categoryUuid()).orElseThrow();
 
         categoryTypeChoiceBox.getSelectionModel().select(type);
         categoryChoiceBox.getSelectionModel().select(category);

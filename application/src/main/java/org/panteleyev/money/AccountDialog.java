@@ -122,7 +122,7 @@ class AccountDialog extends BaseDialog<Account> {
         currencyComboBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Currency currency) {
-                return currency == null ? "" : currency.getSymbol();
+                return currency == null ? "" : currency.symbol();
             }
         });
 
@@ -152,10 +152,10 @@ class AccountDialog extends BaseDialog<Account> {
             cardNumberEdit.setText("");
 
             if (initialCategory != null) {
-                typeComboBox.getSelectionModel().select(initialCategory.getType());
+                typeComboBox.getSelectionModel().select(initialCategory.type());
                 onCategoryTypeSelected();
                 categoryComboBox.getSelectionModel()
-                    .select(cache.getCategory(initialCategory.getUuid()).orElse(null));
+                    .select(cache.getCategory(initialCategory.uuid()).orElse(null));
             } else {
                 typeComboBox.getSelectionModel().select(0);
                 onCategoryTypeSelected();
@@ -163,23 +163,23 @@ class AccountDialog extends BaseDialog<Account> {
 
             currencyComboBox.getSelectionModel().select(cache.getDefaultCurrency().orElse(null));
         } else {
-            nameEdit.setText(account.getName());
-            commentEdit.setText(account.getComment());
-            accountNumberEdit.setText(account.getAccountNumber());
-            initialEdit.setText(account.getOpeningBalance().toString());
-            creditEdit.setText(account.getAccountLimit().toString());
-            activeCheckBox.setSelected(account.getEnabled());
-            interestEdit.setText(account.getInterest().toString());
-            closingDatePicker.setValue(account.getClosingDate().orElse(null));
-            iconComboBox.getSelectionModel().select(cache.getIcon(account.getIconUuid()).orElse(EMPTY_ICON));
-            cardTypeComboBox.getSelectionModel().select(account.getCardType());
-            cardNumberEdit.setText(account.getCardNumber());
+            nameEdit.setText(account.name());
+            commentEdit.setText(account.comment());
+            accountNumberEdit.setText(account.accountNumber());
+            initialEdit.setText(account.openingBalance().toString());
+            creditEdit.setText(account.accountLimit().toString());
+            activeCheckBox.setSelected(account.enabled());
+            interestEdit.setText(account.interest().toString());
+            closingDatePicker.setValue(account.closingDate());
+            iconComboBox.getSelectionModel().select(cache.getIcon(account.iconUuid()).orElse(EMPTY_ICON));
+            cardTypeComboBox.getSelectionModel().select(account.cardType());
+            cardNumberEdit.setText(account.cardNumber());
 
-            typeComboBox.getSelectionModel().select(account.getType());
+            typeComboBox.getSelectionModel().select(account.type());
             categoryComboBox.getSelectionModel()
-                .select(cache.getCategory(account.getCategoryUuid()).orElse(null));
+                .select(cache.getCategory(account.categoryUuid()).orElse(null));
             currencyComboBox.getSelectionModel()
-                .select(cache.getCurrency(account.getCurrencyUuid().orElse(null)).orElse(null));
+                .select(cache.getCurrency(account.currencyUuid()).orElse(null));
         }
         onCardTypeSelected();
 
@@ -196,13 +196,13 @@ class AccountDialog extends BaseDialog<Account> {
                     .accountNumber(accountNumberEdit.getText())
                     .openingBalance(new BigDecimal(initialEdit.getText()))
                     .accountLimit(new BigDecimal(creditEdit.getText()))
-                    .typeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
-                    .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().getUuid())
-                    .currencyUuid(selectedCurrency != null ? selectedCurrency.getUuid() : null)
+                    .type(typeComboBox.getSelectionModel().getSelectedItem())
+                    .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().uuid())
+                    .currencyUuid(selectedCurrency != null ? selectedCurrency.uuid() : null)
                     .enabled(activeCheckBox.isSelected())
                     .interest(new BigDecimal(interestEdit.getText()))
                     .closingDate(closingDatePicker.getValue())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().getUuid())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
                     .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
                     .cardNumber(cardNumberEdit.getText())
                     .modified(now);
@@ -227,7 +227,7 @@ class AccountDialog extends BaseDialog<Account> {
         var type = typeComboBox.getSelectionModel().getSelectedItem();
 
         List<Category> filtered = categories.stream()
-            .filter(c -> c.getType().equals(type))
+            .filter(c -> c.type().equals(type))
             .collect(Collectors.toList());
 
         categoryComboBox.setItems(FXCollections.observableArrayList(filtered));

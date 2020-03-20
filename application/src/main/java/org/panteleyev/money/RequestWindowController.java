@@ -183,8 +183,8 @@ class RequestWindowController extends BaseController {
     private void setupContactMenu() {
         contactSuggestions.clear();
         cache().getContacts().stream()
-            .sorted((c1, c2) -> c1.getName().compareToIgnoreCase(c2.getName()))
-            .map(Contact::getName)
+            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+            .map(Contact::name)
             .forEach(contactSuggestions::add);
     }
 }

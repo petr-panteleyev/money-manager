@@ -17,7 +17,7 @@ public class TransactionCheckCell extends TableCell<Transaction, Transaction> {
 
         setGraphic(null);
 
-        if (empty || transaction == null || !transaction.getChecked()) {
+        if (empty || transaction == null || !transaction.checked()) {
             setText("");
         } else {
             setText(CHECK_SYMBOL);

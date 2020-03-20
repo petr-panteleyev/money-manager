@@ -57,9 +57,9 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
             newTableColumn(RB, "Credited_Account", null,
-                d -> cache().getAccount(d.getAccountCreditedUuid()).map(Account::getName)
+                d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name)
                     .orElse(""), w.multiply(0.3)),
-            newTableColumn(RB, "Comment", null, TransactionDetail::getComment, w.multiply(0.6)),
+            newTableColumn(RB, "Comment", null, TransactionDetail::comment, w.multiply(0.6)),
             newTableColumn(RB, "Sum", x -> new TransactionDetailSumCell(), w.multiply(0.1))
         ));
 
@@ -100,7 +100,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     private void calculateDelta() {
         deltaLabel.setText(
             details.stream()
-                .map(TransactionDetail::getAmount)
+                .map(TransactionDetail::amount)
                 .reduce(totalAmount, BigDecimal::subtract).toString()
         );
     }
@@ -114,7 +114,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     @Override
     public void updateRecord(TransactionDetail detail) {
         for (int index = 0; index < details.size(); index++) {
-            if (Objects.equals(details.get(index).getUuid(), detail.getUuid())) {
+            if (Objects.equals(details.get(index).uuid(), detail.uuid())) {
                 details.set(index, detail);
                 calculateDelta();
                 return;
@@ -125,7 +125,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     @Override
     public void deleteRecord(TransactionDetail detail) {
         for (var index = 0; index < details.size(); index++) {
-            if (Objects.equals(details.get(index).getUuid(), detail.getUuid())) {
+            if (Objects.equals(details.get(index).uuid(), detail.uuid())) {
                 details.remove(index);
                 detailsTable.getSelectionModel().clearSelection();
                 calculateDelta();

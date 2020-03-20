@@ -18,8 +18,8 @@ public class ContactNameCell extends TableCell<Contact, Contact> {
             setText("");
             setGraphic(null);
         } else {
-            setText(contact.getName());
-            setGraphic(IconManager.getImageView(contact.getIconUuid()));
+            setText(contact.name());
+            setGraphic(IconManager.getImageView(contact.iconUuid()));
         }
     }
 }

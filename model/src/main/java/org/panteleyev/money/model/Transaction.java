@@ -8,163 +8,76 @@ package org.panteleyev.money.model;
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.ForeignKey;
 import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.RecordBuilder;
 import org.panteleyev.mysqlapi.annotations.ReferenceOption;
 import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Table("transaction")
-public class Transaction implements MoneyRecord {
+public record Transaction(
     @PrimaryKey
     @Column("uuid")
-    private final UUID guid;
-
+    UUID uuid,
     @Column("amount")
-    private final BigDecimal amount;
-
+    BigDecimal amount,
     @Column("day")
-    private final int day;
-
+    int day,
     @Column("month")
-    private final int month;
-
+    int month,
     @Column("year")
-    private final int year;
-
-    @Column("type_id")
-    private final int transactionTypeId;
-
+    int year,
+    @Column("type")
+    TransactionType type,
     @Column("comment")
-    private final String comment;
-
+    String comment,
     @Column("checked")
-    private final boolean checked;
-
+    boolean checked,
     @Column(value = "acc_debited_uuid")
     @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID accountDebitedUuid;
-
+    UUID accountDebitedUuid,
     @Column(value = "acc_credited_uuid")
     @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID accountCreditedUuid;
-
-    @Column("acc_debited_type_id")
-    private final int accountDebitedTypeId;
-
-    @Column("acc_credited_type_id")
-    private final int accountCreditedTypeId;
-
+    UUID accountCreditedUuid,
+    @Column("acc_debited_type")
+    CategoryType accountDebitedType,
+    @Column("acc_credited_type")
+    CategoryType accountCreditedType,
     @Column(value = "acc_debited_category_uuid")
     @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID accountDebitedCategoryUuid;
-
+    UUID accountDebitedCategoryUuid,
     @Column(value = "acc_credited_category_uuid")
     @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID accountCreditedCategoryUuid;
-
+    UUID accountCreditedCategoryUuid,
     @Column("contact_uuid")
     @ForeignKey(table = Contact.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID contactUuid;
-
+    UUID contactUuid,
     @Column("rate")
-    private final BigDecimal rate;
-
+    BigDecimal rate,
     @Column("rate_direction")
-    private final int rateDirection;
-
+    int rateDirection,
     @Column("invoice_number")
-    private final String invoiceNumber;
-
-    @Column("created")
-    private final long created;
-
-    @Column("modified")
-    private final long modified;
-
+    String invoiceNumber,
     @Column("parent_uuid")
     @ForeignKey(table = Transaction.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID parentUuid;
-
+    UUID parentUuid,
     @Column("detailed")
-    private final boolean detailed;
+    boolean detailed,
+    @Column("created")
+    long created,
+    @Column("modified")
+    long modified
 
-    private final TransactionType transactionType;
-    private final CategoryType accountDebitedType;
-    private final CategoryType accountCreditedType;
-    private final LocalDate date;
+) implements MoneyRecord {
 
-    @RecordBuilder
-    public Transaction(@Column("amount") BigDecimal amount,
-                       @Column("day") int day,
-                       @Column("month") int month,
-                       @Column("year") int year,
-                       @Column("type_id") int transactionTypeId,
-                       @Column("comment") String comment,
-                       @Column("checked") boolean checked,
-                       @Column("acc_debited_uuid") UUID accountDebitedUuid,
-                       @Column("acc_credited_uuid") UUID accountCreditedUuid,
-                       @Column("acc_debited_type_id") int accountDebitedTypeId,
-                       @Column("acc_credited_type_id") int accountCreditedTypeId,
-                       @Column("acc_debited_category_uuid") UUID accountDebitedCategoryUuid,
-                       @Column("acc_credited_category_uuid") UUID accountCreditedCategoryUuid,
-                       @Column("contact_uuid") UUID contactUuid,
-                       @Column("rate") BigDecimal rate,
-                       @Column("rate_direction") int rateDirection,
-                       @Column("invoice_number") String invoiceNumber,
-                       @Column("uuid") UUID guid,
-                       @Column("created") long created,
-                       @Column("modified") long modified,
-                       @Column("parent_uuid") UUID parentUuid,
-                       @Column("detailed") boolean detailed) {
-        this.amount = amount;
-        this.day = day;
-        this.month = month;
-        this.year = year;
-        this.transactionTypeId = transactionTypeId;
-        this.comment = comment;
-        this.checked = checked;
-        this.accountDebitedUuid = accountDebitedUuid;
-        this.accountCreditedUuid = accountCreditedUuid;
-        this.accountDebitedTypeId = accountDebitedTypeId;
-        this.accountCreditedTypeId = accountCreditedTypeId;
-        this.accountDebitedCategoryUuid = accountDebitedCategoryUuid;
-        this.accountCreditedCategoryUuid = accountCreditedCategoryUuid;
-        this.contactUuid = contactUuid;
-        this.rate = rate;
-        this.rateDirection = rateDirection;
-        this.invoiceNumber = invoiceNumber;
-        this.guid = guid;
-        this.created = created;
-        this.modified = modified;
-        this.parentUuid = parentUuid;
-        this.detailed = detailed;
-
-        this.transactionType = TransactionType.get(this.transactionTypeId);
-        this.accountDebitedType = CategoryType.get(this.accountDebitedTypeId);
-        this.accountCreditedType = CategoryType.get(this.accountCreditedTypeId);
-
-        this.date = LocalDate.of(year, month, day);
+    public Transaction {
+        this.amount = MoneyRecord.normalize(amount);
+        this.rate = MoneyRecord.normalize(rate);
     }
 
     public BigDecimal getSignedAmount() {
         return accountCreditedType != accountDebitedType && accountDebitedType != CategoryType.INCOMES ?
             amount.negate() : amount;
-    }
-
-    public final TransactionType getTransactionType() {
-        return this.transactionType;
-    }
-
-    public final CategoryType getAccountDebitedType() {
-        return this.accountDebitedType;
-    }
-
-    public final CategoryType getAccountCreditedType() {
-        return this.accountCreditedType;
     }
 
     public Transaction check(boolean check) {
@@ -181,166 +94,18 @@ public class Transaction implements MoneyRecord {
             .build();
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(amount.stripTrailingZeros(), day, month, year, transactionTypeId, comment,
-            checked, accountDebitedUuid, accountCreditedUuid,
-            accountDebitedTypeId, accountCreditedTypeId, accountDebitedCategoryUuid,
-            accountCreditedCategoryUuid, contactUuid, rate.stripTrailingZeros(),
-            rateDirection, invoiceNumber, guid, created, modified, parentUuid, detailed);
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (!(other instanceof Transaction)) {
-            return false;
-        }
-
-        Transaction that = (Transaction) other;
-        return day == that.day
-            && month == that.month
-            && year == that.year
-            && transactionTypeId == that.transactionTypeId
-            && checked == that.checked
-            && Objects.equals(accountDebitedUuid, that.accountDebitedUuid)
-            && Objects.equals(accountCreditedUuid, that.accountCreditedUuid)
-            && accountDebitedTypeId == that.accountDebitedTypeId
-            && accountCreditedTypeId == that.accountCreditedTypeId
-            && Objects.equals(accountDebitedCategoryUuid, that.accountDebitedCategoryUuid)
-            && Objects.equals(accountCreditedCategoryUuid, that.accountCreditedCategoryUuid)
-            && Objects.equals(contactUuid, that.contactUuid)
-            && rateDirection == that.rateDirection
-            && amount.compareTo(that.amount) == 0
-            && Objects.equals(comment, that.comment)
-            && rate.compareTo(that.rate) == 0
-            && Objects.equals(invoiceNumber, that.invoiceNumber)
-            && Objects.equals(guid, that.guid)
-            && created == that.created
-            && modified == that.modified
-            && Objects.equals(parentUuid, that.parentUuid)
-            && detailed == that.detailed;
-    }
-
-    public String toString() {
-        return "[Transaction "
-            + " guid=" + guid
-            + " amount=" + amount
-            + " accountDebitedUuid=" + accountDebitedUuid
-            + " accountCreditedUuid=" + accountCreditedUuid
-            + " comment=" + comment
-            + " parentUuid=" + parentUuid
-            + "]";
-    }
-
-    public final BigDecimal getAmount() {
-        return amount;
-    }
-
-    public final int getDay() {
-        return day;
-    }
-
-    public final int getMonth() {
-        return month;
-    }
-
-    public final int getYear() {
-        return year;
-    }
-
-    public final int getTransactionTypeId() {
-        return transactionTypeId;
-    }
-
-    public final String getComment() {
-        return comment;
-    }
-
-    public final boolean getChecked() {
-        return checked;
-    }
-
-    public UUID getAccountDebitedUuid() {
-        return accountDebitedUuid;
-    }
-
-    public UUID getAccountCreditedUuid() {
-        return accountCreditedUuid;
-    }
-
-    public UUID getAccountDebitedCategoryUuid() {
-        return accountDebitedCategoryUuid;
-    }
-
-    public UUID getAccountCreditedCategoryUuid() {
-        return accountCreditedCategoryUuid;
-    }
-
-    public Optional<UUID> getContactUuid() {
-        return Optional.ofNullable(contactUuid);
-    }
-
-    public Optional<UUID> getParentUuid() {
-        return Optional.ofNullable(parentUuid);
-    }
-
-    public final int getAccountDebitedTypeId() {
-        return accountDebitedTypeId;
-    }
-
-    public final int getAccountCreditedTypeId() {
-        return accountCreditedTypeId;
-    }
-
-    public final BigDecimal getRate() {
-        return rate;
-    }
-
-    public final int getRateDirection() {
-        return rateDirection;
-    }
-
-    public final String getInvoiceNumber() {
-        return invoiceNumber;
-    }
-
-    public UUID getUuid() {
-        return guid;
-    }
-
-    @Override
-    public long getCreated() {
-        return created;
-    }
-
-    public long getModified() {
-        return modified;
-    }
-
-    public boolean isDetailed() {
-        return detailed;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
     public static final class Builder {
         private BigDecimal amount = BigDecimal.ZERO;
         private int day;
         private int month;
         private int year;
-        private int transactionTypeId;
+        private TransactionType type;
         private String comment = "";
         private boolean checked;
         private UUID accountDebitedUuid;
         private UUID accountCreditedUuid;
-        private int accountDebitedTypeId;
-        private int accountCreditedTypeId;
+        private CategoryType accountDebitedType;
+        private CategoryType accountCreditedType;
         private UUID accountDebitedCategoryUuid;
         private UUID accountCreditedCategoryUuid;
         private UUID contactUuid;
@@ -349,7 +114,7 @@ public class Transaction implements MoneyRecord {
         private String invoiceNumber = "";
         private long created = 0;
         private long modified = 0;
-        private UUID guid;
+        private UUID uuid;
         private UUID parentUuid;
         private boolean detailed = false;
 
@@ -358,33 +123,33 @@ public class Transaction implements MoneyRecord {
 
         public Builder(Transaction t) {
             if (t != null) {
-                this.amount = t.getAmount();
-                this.day = t.getDay();
-                this.month = t.getMonth();
-                this.year = t.getYear();
-                this.transactionTypeId = t.getTransactionTypeId();
-                this.comment = t.getComment();
-                this.checked = t.getChecked();
-                this.accountDebitedUuid = t.getAccountDebitedUuid();
-                this.accountCreditedUuid = t.getAccountCreditedUuid();
-                this.accountDebitedTypeId = t.getAccountDebitedTypeId();
-                this.accountCreditedTypeId = t.getAccountCreditedTypeId();
-                this.accountDebitedCategoryUuid = t.getAccountDebitedCategoryUuid();
-                this.accountCreditedCategoryUuid = t.getAccountCreditedCategoryUuid();
-                this.contactUuid = t.getContactUuid().orElse(null);
-                this.rate = t.getRate();
-                this.rateDirection = t.getRateDirection();
-                this.invoiceNumber = t.getInvoiceNumber();
-                this.created = t.getCreated();
-                this.modified = t.getModified();
-                this.parentUuid = t.getParentUuid().orElse(null);
-                this.detailed = t.isDetailed();
-                this.guid = t.getUuid();
+                this.amount = t.amount();
+                this.day = t.day();
+                this.month = t.month();
+                this.year = t.year();
+                this.type = t.type();
+                this.comment = t.comment();
+                this.checked = t.checked();
+                this.accountDebitedUuid = t.accountDebitedUuid();
+                this.accountCreditedUuid = t.accountCreditedUuid();
+                this.accountDebitedType = t.accountDebitedType();
+                this.accountCreditedType = t.accountCreditedType();
+                this.accountDebitedCategoryUuid = t.accountDebitedCategoryUuid();
+                this.accountCreditedCategoryUuid = t.accountCreditedCategoryUuid();
+                this.contactUuid = t.contactUuid();
+                this.rate = t.rate();
+                this.rateDirection = t.rateDirection();
+                this.invoiceNumber = t.invoiceNumber();
+                this.created = t.created();
+                this.modified = t.modified();
+                this.parentUuid = t.parentUuid();
+                this.detailed = t.detailed();
+                this.uuid = t.uuid();
             }
         }
 
         public UUID getUuid() {
-            return this.guid;
+            return this.uuid;
         }
 
         public UUID getAccountDebitedUuid() {
@@ -417,14 +182,9 @@ public class Transaction implements MoneyRecord {
             return this;
         }
 
-        public Builder transactionTypeId(int id) {
-            this.transactionTypeId = id;
-            return this;
-        }
-
-        public Builder transactionType(TransactionType type) {
+        public Builder type(TransactionType type) {
             Objects.requireNonNull(type);
-            this.transactionTypeId = type.getId();
+            this.type = type;
             return this;
         }
 
@@ -449,23 +209,13 @@ public class Transaction implements MoneyRecord {
             return this;
         }
 
-        public Builder accountDebitedTypeId(int id) {
-            this.accountDebitedTypeId = id;
-            return this;
-        }
-
         public Builder accountDebitedType(CategoryType type) {
-            this.accountDebitedTypeId = type.getId();
-            return this;
-        }
-
-        public Builder accountCreditedTypeId(int id) {
-            this.accountCreditedTypeId = id;
+            this.accountDebitedType = type;
             return this;
         }
 
         public Builder accountCreditedType(CategoryType type) {
-            this.accountCreditedTypeId = type.getId();
+            this.accountCreditedType = type;
             return this;
         }
 
@@ -503,7 +253,7 @@ public class Transaction implements MoneyRecord {
 
         public Builder guid(UUID guid) {
             Objects.requireNonNull(guid);
-            this.guid = guid;
+            this.uuid = guid;
             return this;
         }
 
@@ -533,12 +283,12 @@ public class Transaction implements MoneyRecord {
         }
 
         public Transaction build() {
-            if (this.transactionTypeId == 0) {
-                this.transactionTypeId = TransactionType.UNDEFINED.getId();
+            if (this.type == null) {
+                this.type = TransactionType.UNDEFINED;
             }
 
-            if (guid == null) {
-                guid = UUID.randomUUID();
+            if (uuid == null) {
+                uuid = UUID.randomUUID();
             }
 
             long now = System.currentTimeMillis();
@@ -549,14 +299,14 @@ public class Transaction implements MoneyRecord {
                 modified = now;
             }
 
-            if (this.guid != null && this.accountDebitedUuid != null && this.accountCreditedUuid != null
-                && this.accountDebitedTypeId != 0 && this.accountCreditedTypeId != 0
+            if (this.uuid != null && this.accountDebitedUuid != null && this.accountCreditedUuid != null
+                && this.accountDebitedType != null && this.accountCreditedType != null
                 && this.accountDebitedCategoryUuid != null && this.accountCreditedCategoryUuid != null) {
-                return new Transaction(amount, day, month, year, transactionTypeId, comment,
+                return new Transaction(uuid, amount, day, month, year, type, comment,
                     checked, accountDebitedUuid, accountCreditedUuid,
-                    accountDebitedTypeId, accountCreditedTypeId,
+                    accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    rate, rateDirection, invoiceNumber, guid, created, modified, parentUuid, detailed);
+                    rate, rateDirection, invoiceNumber, parentUuid, detailed, created, modified);
             } else {
                 throw new IllegalStateException();
             }

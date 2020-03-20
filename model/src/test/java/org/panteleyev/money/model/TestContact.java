@@ -33,7 +33,7 @@ public class TestContact extends BaseTest {
 
         var c1 = new Contact.Builder()
             .name(name)
-            .typeId(type.getId())
+            .type(type)
             .phone(phone)
             .mobile(mobile)
             .email(email)
@@ -51,7 +51,7 @@ public class TestContact extends BaseTest {
 
         var c2 = new Contact.Builder()
             .name(name)
-            .typeId(type.getId())
+            .type(type)
             .phone(phone)
             .mobile(mobile)
             .email(email)
@@ -75,7 +75,7 @@ public class TestContact extends BaseTest {
     public void testBuilder() {
         var original = new Contact.Builder()
             .name(randomString())
-            .typeId(randomContactType().getId())
+            .type(randomContactType())
             .phone(randomString())
             .mobile(randomString())
             .email(randomString())
@@ -96,21 +96,21 @@ public class TestContact extends BaseTest {
         assertEquals(copy.hashCode(), original.hashCode());
 
         var manualCopy = new Contact.Builder()
-            .name(original.getName())
-            .typeId(original.getTypeId())
-            .phone(original.getPhone())
-            .mobile(original.getMobile())
-            .email(original.getEmail())
-            .web(original.getWeb())
-            .comment(original.getComment())
-            .street(original.getStreet())
-            .city(original.getCity())
-            .country(original.getCountry())
-            .zip(original.getZip())
-            .iconUuid(original.getIconUuid())
-            .guid(original.getUuid())
-            .created(original.getCreated())
-            .modified(original.getModified())
+            .name(original.name())
+            .type(original.type())
+            .phone(original.phone())
+            .mobile(original.mobile())
+            .email(original.email())
+            .web(original.web())
+            .comment(original.comment())
+            .street(original.street())
+            .city(original.city())
+            .country(original.country())
+            .zip(original.zip())
+            .iconUuid(original.iconUuid())
+            .guid(original.uuid())
+            .created(original.created())
+            .modified(original.modified())
             .build();
         assertEquals(manualCopy, original);
         assertEquals(manualCopy.hashCode(), original.hashCode());

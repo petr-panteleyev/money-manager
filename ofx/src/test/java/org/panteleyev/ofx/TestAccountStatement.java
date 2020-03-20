@@ -72,24 +72,24 @@ public class TestAccountStatement {
 
 
             var r1 = accountStatement.get(0);
-            var statementList = r1.getAccountStatementList();
+            var statementList = r1.accountStatementList();
             assertEquals(statementList.size(), 1);
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.getCurrency(), STATEMENT_CURRENCY);
-            var accountInfo = statement.getBankAccountFrom();
-            assertEquals(accountInfo.getAccountNumber(), ACCOUNT_NUMBER);
-            assertEquals(accountInfo.getBankId(), BANK_ID);
-            assertEquals(accountInfo.getType(), AccountInfo.Type.SAVINGS);
+            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            var accountInfo = statement.bankAccountFrom();
+            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
+            assertEquals(accountInfo.bankId(), BANK_ID);
+            assertEquals(accountInfo.type(), AccountInfo.Type.SAVINGS);
 
-            var bankTransactionList = statement.getBankTransactionList();
+            var bankTransactionList = statement.bankTransactionList();
 
-            assertEquals(bankTransactionList.getDateStart(),
+            assertEquals(bankTransactionList.dateStart(),
                 LocalDateTime.of(2018, 8, 10, 12, 0));
-            assertEquals(bankTransactionList.getDateEnd(),
+            assertEquals(bankTransactionList.dateEnd(),
                 LocalDateTime.of(2018, 7, 18, 12, 0));
-            assertEquals(bankTransactionList.getTransactions(), EXPECTED_TRANSACTIONS);
+            assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
         }
     }
 

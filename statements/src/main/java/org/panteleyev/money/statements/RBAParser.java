@@ -24,14 +24,14 @@ class RBAParser {
         if (!ofxStatement.getAccountStatements().isEmpty()) {
             var statement = ofxStatement.getAccountStatements().get(0);
             transactionList = statement.getBankTransactionList();
-            accountNumber = statement.getAccountInfo().getAccountNumber();
+            accountNumber = statement.getAccountInfo().accountNumber();
         } else if (!ofxStatement.getCreditCardStatements().isEmpty()) {
             var statement = ofxStatement.getCreditCardStatements().get(0);
             transactionList = ofxStatement.getCreditCardStatements().get(0).getBankTransactionList();
-            accountNumber = statement.getAccountInfo().getAccountNumber();
+            accountNumber = statement.getAccountInfo().accountNumber();
         }
 
-        for (StatementTransaction tr : transactionList.getTransactions()) {
+        for (StatementTransaction tr : transactionList.transactions()) {
             var builder = new StatementRecord.Builder()
                 .amount(tr.getAmount().toString())
                 .counterParty(tr.getName())

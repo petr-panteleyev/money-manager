@@ -6,10 +6,18 @@ package org.panteleyev.money.model;
  */
 
 import org.panteleyev.mysqlapi.Record;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 public interface MoneyRecord extends Record<UUID> {
-    UUID getUuid();
-    long getCreated();
-    long getModified();
+    UUID uuid();
+
+    long created();
+
+    long modified();
+
+    static BigDecimal normalize(BigDecimal value) {
+        return value == null ? null : value.setScale(6, RoundingMode.HALF_UP);
+    }
 }

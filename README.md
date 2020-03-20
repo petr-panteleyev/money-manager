@@ -4,7 +4,7 @@ Personal finance manager. Work in progress.
 
 ## Build and Run
 
-JDK 13 is required to build and run the application.
+JDK 14 is required to build and run the application.
 
 ### Build
 
@@ -14,10 +14,10 @@ definition:
 <toolchain>
     <type>jdk</type>
     <provides>
-        <version>13</version>
+        <version>14</version>
     </provides>
     <configuration>
-        <jdkHome>/path/to/jdk-13</jdkHome>
+        <jdkHome>/path/to/jdk-14</jdkHome>
     </configuration>
 </toolchain>
 ```
@@ -37,16 +37,14 @@ $ mvn -pl application javafx:run
 ### Binary Packages
 
 To build binary installers perform the following steps:
-* Install [JDK-14 EA](https://jdk.java.net/14/) build
-* Set ```JPACKAGE_HOME``` environment variable to the root directory of JDK-14
 * On Microsoft Windows: install [WiX Toolset](https://wixtoolset.org/releases/), add its binary directory to ```PATH``` 
 environment variable
 * Execute the following commands:
 ```shell script
 $ mvn clean package
-$ ./extras/osx-app.sh
+$ mvn -pl . exec:exec@dist-mac
   or
-$ ./extras/win-app.sh
+$ mvn -pl . exec:exec@dist-win
 ```
 
 Installation packages will be found in ```target/dist``` directory.

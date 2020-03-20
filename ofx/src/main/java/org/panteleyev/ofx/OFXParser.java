@@ -72,7 +72,7 @@ public class OFXParser {
                         var bankTransactionList = parseBankTransactionList(bankTransactionListNode);
 
                         var statementResponse = new AccountStatement(currency, accountInfo,
-                                bankTransactionList);
+                            bankTransactionList);
                         statementResponseList.add(statementResponse);
                     }
 
@@ -113,8 +113,8 @@ public class OFXParser {
                         var pendingTransactionList = parsePendingTransactionList(pendingTransactionListNode);
 
                         var statementResponse = new CreditCardStatement(currency, accountInfo,
-                                bankTransactionList,
-                                pendingTransactionList);
+                            bankTransactionList,
+                            pendingTransactionList);
                         creditCardStatementResponseList.add(statementResponse);
                     }
 
@@ -139,10 +139,10 @@ public class OFXParser {
         // Dates
         var dateStartExpr = xPath.compile("DTSTART");
         var dateStartString = (String) dateStartExpr.evaluate(bankTransactionListNode,
-                XPathConstants.STRING);
+            XPathConstants.STRING);
         var dateEndExpr = xPath.compile("DTEND");
         var dateEndString = (String) dateEndExpr.evaluate(bankTransactionListNode,
-                XPathConstants.STRING);
+            XPathConstants.STRING);
 
         // Transacitons
         var trList = new ArrayList<StatementTransaction>();
@@ -157,25 +157,23 @@ public class OFXParser {
         }
 
         return new BankTransactionList(
-                LocalDateTime.parse(dateStartString, OFX_DATE_FORMAT),
-                LocalDateTime.parse(dateEndString, OFX_DATE_FORMAT),
-                trList);
+            LocalDateTime.parse(dateStartString, OFX_DATE_FORMAT),
+            LocalDateTime.parse(dateEndString, OFX_DATE_FORMAT),
+            trList);
     }
 
     private AccountInfo parseAccount(Node accountNode) throws Exception {
         String accountId = null;
         String bankId = null;
-        AccountInfo.Type type = AccountInfo.Type.NONE;
+        var type = AccountInfo.Type.NONE;
 
-        NodeList children = accountNode.getChildNodes();
+        var children = accountNode.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             var item = children.item(i);
-            if (!(item instanceof Element)) {
+            if (!(item instanceof Element field)) {
                 continue;
             }
 
-
-            var field = (Element) item;
             if ("ACCTID".equals(field.getTagName())) {
                 accountId = field.getTextContent();
             }
@@ -203,7 +201,7 @@ public class OFXParser {
         // Dates
         var dateAsOfExpr = xPath.compile("DTASOF");
         var dateAsOfString = (String) dateAsOfExpr.evaluate(pendingTransactionListNode,
-                XPathConstants.STRING);
+            XPathConstants.STRING);
 
         // Transacitons
         var trList = new ArrayList<PendingTransaction>();
@@ -218,8 +216,8 @@ public class OFXParser {
         }
 
         return new PendingTransactionList(
-                LocalDateTime.parse(dateAsOfString, OFX_DATE_FORMAT),
-                trList);
+            LocalDateTime.parse(dateAsOfString, OFX_DATE_FORMAT),
+            trList);
     }
 
     private StatementTransaction parseStatementTransaction(Element transaction) {
@@ -228,36 +226,19 @@ public class OFXParser {
         var builder = new StatementTransaction.Builder();
         for (int n = 0; n < children.getLength(); n++) {
             var item = children.item(n);
-            if (!(item instanceof Element)) {
+            if (!(item instanceof Element field)) {
                 continue;
             }
-            var field = (Element) item;
 
             switch (field.getTagName()) {
-                case "TRNTYPE":
-                    builder.type(field.getTextContent());
-                    break;
-                case "NAME":
-                    builder.name(field.getTextContent());
-                    break;
-                case "MEMO":
-                    builder.memo(field.getTextContent());
-                    break;
-                case "DTPOSTED":
-                    builder.datePosted(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                    break;
-                case "DTAVAIL":
-                    builder.dateAvailable(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                    break;
-                case "DTUSER":
-                    builder.dateUser(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                    break;
-                case "TRNAMT":
-                    builder.amount(field.getTextContent());
-                    break;
-                case "CHECKNUM":
-                    builder.checkNum(field.getTextContent());
-                    break;
+                case "TRNTYPE" -> builder.type(field.getTextContent());
+                case "NAME" -> builder.name(field.getTextContent());
+                case "MEMO" -> builder.memo(field.getTextContent());
+                case "DTPOSTED" -> builder.datePosted(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
+                case "DTAVAIL" -> builder.dateAvailable(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
+                case "DTUSER" -> builder.dateUser(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
+                case "TRNAMT" -> builder.amount(field.getTextContent());
+                case "CHECKNUM" -> builder.checkNum(field.getTextContent());
             }
         }
 
@@ -270,30 +251,17 @@ public class OFXParser {
         var builder = new PendingTransaction.Builder();
         for (int n = 0; n < children.getLength(); n++) {
             var item = children.item(n);
-            if (!(item instanceof Element)) {
+            if (!(item instanceof Element field)) {
                 continue;
             }
-            var field = (Element) item;
 
             switch (field.getTagName()) {
-                case "TRNTYPE":
-                    builder.type(field.getTextContent());
-                    break;
-                case "NAME":
-                    builder.name(field.getTextContent());
-                    break;
-                case "MEMO":
-                    builder.memo(field.getTextContent());
-                    break;
-                case "DTTRAN":
-                    builder.dateTransaction(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                    break;
-                case "DTEXPIRE":
-                    builder.dateExpire(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
-                    break;
-                case "TRNAMT":
-                    builder.amount(field.getTextContent());
-                    break;
+                case "TRNTYPE" -> builder.type(field.getTextContent());
+                case "NAME" -> builder.name(field.getTextContent());
+                case "MEMO" -> builder.memo(field.getTextContent());
+                case "DTTRAN" -> builder.dateTransaction(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
+                case "DTEXPIRE" -> builder.dateExpire(LocalDateTime.parse(field.getTextContent(), OFX_DATE_FORMAT));
+                case "TRNAMT" -> builder.amount(field.getTextContent());
             }
         }
 
@@ -301,34 +269,34 @@ public class OFXParser {
     }
 
     private Header parseHeader(Document doc) {
-        NodeList rootChildren = doc.getChildNodes();
+        var rootChildren = doc.getChildNodes();
         for (int i = 0; i < rootChildren.getLength(); i++) {
-            Node node = rootChildren.item(i);
-            String nodeName = node.getNodeName();
+            var node = rootChildren.item(i);
+            var nodeName = node.getNodeName();
 
             if (!OFX_PI.equals(nodeName) || node.getNodeType() != Node.PROCESSING_INSTRUCTION_NODE) {
                 continue;
             }
 
             var ofx = (ProcessingInstruction) node;
-            String data = ofx.getData();
-            String[] attributes = data.split(" ");
+            var data = ofx.getData();
+            var attributes = data.split(" ");
 
             var attrMap = new HashMap<String, String>();
-            for (String attr : attributes) {
-                String[] nameValue = attr.trim().split("=");
+            for (var attr : attributes) {
+                var nameValue = attr.trim().split("=");
                 if (nameValue.length != 2) {
                     throw new OFXParserException("Invalid OFX processing instruction");
                 }
 
-                String name = nameValue[0];
-                String value = nameValue[1];
+                var name = nameValue[0];
+                var value = nameValue[1];
 
                 attrMap.put(name, value.substring(1, value.length() - 1));
             }
 
             return new Header(attrMap.get("OFXHEADER"), attrMap.get("VERSION"), attrMap.get("SECURITY"),
-                    attrMap.get("OLDFILEUID"), attrMap.get("OLDFILEUID"));
+                attrMap.get("OLDFILEUID"), attrMap.get("OLDFILEUID"));
         }
 
         return null;

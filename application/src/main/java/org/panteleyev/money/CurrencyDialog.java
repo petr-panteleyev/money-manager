@@ -72,7 +72,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             RB.getString("currency.Dialog.After"));
 
         formatSymbolCombo.getItems().setAll(cache().getCurrencies().stream()
-            .map(Currency::getFormatSymbol)
+            .map(Currency::formatSymbol)
             .filter(s -> !s.isEmpty())
             .collect(Collectors.toSet()));
 
@@ -81,15 +81,15 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             formatSymbolPositionChoice.getSelectionModel().select(0);
             rateEdit.setText("1");
         } else {
-            nameEdit.setText(currency.getSymbol());
-            descrEdit.setText(currency.getDescription());
-            rateEdit.setText(currency.getRate().toString());
-            defaultCheck.setSelected(currency.getDef());
-            rateDirectionChoice.getSelectionModel().select(currency.getDirection());
-            showSymbolCheck.setSelected(currency.getShowFormatSymbol());
-            formatSymbolCombo.getSelectionModel().select(currency.getFormatSymbol());
-            formatSymbolPositionChoice.getSelectionModel().select(currency.getFormatSymbolPosition());
-            thousandSeparatorCheck.setSelected(currency.getUseThousandSeparator());
+            nameEdit.setText(currency.symbol());
+            descrEdit.setText(currency.description());
+            rateEdit.setText(currency.rate().toString());
+            defaultCheck.setSelected(currency.def());
+            rateDirectionChoice.getSelectionModel().select(currency.direction());
+            showSymbolCheck.setSelected(currency.showFormatSymbol());
+            formatSymbolCombo.getSelectionModel().select(currency.formatSymbol());
+            formatSymbolPositionChoice.getSelectionModel().select(currency.formatSymbolPosition());
+            thousandSeparatorCheck.setSelected(currency.useThousandSeparator());
         }
 
         setResultConverter((ButtonType b) -> {

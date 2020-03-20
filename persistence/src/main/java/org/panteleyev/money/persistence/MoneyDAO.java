@@ -43,22 +43,25 @@ public class MoneyDAO {
         return MONEY_DAO.client;
     }
 
-    public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::getName);
+    public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
     public static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
-        (o1, o2) -> o1.getType().getTypeName().compareToIgnoreCase(o2.getType().getTypeName());
+        (o1, o2) -> o1.type().getTypeName().compareToIgnoreCase(o2.type().getTypeName());
 
-    public final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::getName);
+    public final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::name);
     public final static Comparator<Account> COMPARE_ACCOUNT_BY_CATEGORY = (a1, a2) -> {
-        var c1 = cache.getCategory(a1.getCategoryUuid()).map(Category::getName).orElse("");
-        var c2 = cache.getCategory(a2.getCategoryUuid()).map(Category::getName).orElse("");
+        var c1 = cache.getCategory(a1.categoryUuid()).map(Category::name).orElse("");
+        var c2 = cache.getCategory(a2.categoryUuid()).map(Category::name).orElse("");
         return c1.compareTo(c2);
     };
 
     public static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DATE =
-        Comparator.comparing(Transaction::getDate).thenComparingLong(Transaction::getCreated);
+        Comparator.comparing(Transaction::year)
+            .thenComparing(Transaction::month)
+            .thenComparing(Transaction::day)
+            .thenComparingLong(Transaction::created);
 
     public static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DAY =
-        Comparator.comparingInt(Transaction::getDay).thenComparingLong(Transaction::getCreated);
+        Comparator.comparingInt(Transaction::day).thenComparingLong(Transaction::created);
 
     public static final int FIELD_SCALE = 6;
 
@@ -99,12 +102,12 @@ public class MoneyDAO {
 
     public void insertIcon(Icon icon) {
         client.insert(icon);
-        cache.icons().put(icon.getUuid(), icon);
+        cache.icons().put(icon.uuid(), icon);
     }
 
     public void updateIcon(Icon icon) {
         client.update(icon);
-        cache.icons().put(icon.getUuid(), icon);
+        cache.icons().put(icon.uuid(), icon);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -113,12 +116,12 @@ public class MoneyDAO {
 
     public void insertCategory(Category category) {
         client.insert(category);
-        cache.categories().put(category.getUuid(), category);
+        cache.categories().put(category.uuid(), category);
     }
 
     public void updateCategory(Category category) {
         client.update(category);
-        cache.categories().put(category.getUuid(), category);
+        cache.categories().put(category.uuid(), category);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -128,12 +131,12 @@ public class MoneyDAO {
 
     public void insertCurrency(Currency currency) {
         client.insert(currency);
-        cache.currencies().put(currency.getUuid(), currency);
+        cache.currencies().put(currency.uuid(), currency);
     }
 
     public void updateCurrency(Currency currency) {
         client.update(currency);
-        cache.currencies().put(currency.getUuid(), currency);
+        cache.currencies().put(currency.uuid(), currency);
     }
 
 
@@ -144,12 +147,12 @@ public class MoneyDAO {
 
     public void insertContact(Contact contact) {
         client.insert(contact);
-        cache.contacts().put(contact.getUuid(), contact);
+        cache.contacts().put(contact.uuid(), contact);
     }
 
     public void updateContact(Contact contact) {
         client.update(contact);
-        cache.contacts().put(contact.getUuid(), contact);
+        cache.contacts().put(contact.uuid(), contact);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -158,16 +161,16 @@ public class MoneyDAO {
 
     public void insertAccount(Account account) {
         client.insert(account);
-        cache.accounts().put(account.getUuid(), account);
+        cache.accounts().put(account.uuid(), account);
     }
 
     public void updateAccount(Account account) {
         client.update(account);
-        cache.accounts().put(account.getUuid(), account);
+        cache.accounts().put(account.uuid(), account);
     }
 
     public void deleteAccount(Account account) {
-        cache.accounts().remove(account.getUuid());
+        cache.accounts().remove(account.uuid());
         client.delete(account);
     }
 
@@ -177,12 +180,12 @@ public class MoneyDAO {
 
     public void insertTransaction(Transaction transaction) {
         client.insert(transaction);
-        cache.transactions().put(transaction.getUuid(), transaction);
+        cache.transactions().put(transaction.uuid(), transaction);
     }
 
     public void updateTransaction(Transaction transaction) {
         client.update(transaction);
-        cache.transactions().put(transaction.getUuid(), transaction);
+        cache.transactions().put(transaction.uuid(), transaction);
     }
 
     public void deleteTransaction(UUID uuid) {
@@ -297,9 +300,9 @@ public class MoneyDAO {
 
             progress.accept("    transactions... ");
             client.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.getParentUuid().isEmpty()).collect(Collectors.toList()));
+                imp.getTransactions().stream().filter(t -> t.parentUuid() == null).collect(Collectors.toList()));
             client.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.getParentUuid().isPresent()).collect(Collectors.toList()));
+                imp.getTransactions().stream().filter(t -> t.parentUuid() != null).collect(Collectors.toList()));
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -314,14 +317,14 @@ public class MoneyDAO {
                                   List<? extends MoneyRecord> toImport)
     {
         for (MoneyRecord record : toImport) {
-            var found = existing.get(record.getUuid());
+            var found = existing.get(record.uuid());
             if (found == null) {
-                idMap.put(record.getUuid(), ImportAction.INSERT);
+                idMap.put(record.uuid(), ImportAction.INSERT);
             } else {
-                if (record.getModified() > found.getModified()) {
-                    idMap.put(record.getUuid(), ImportAction.UPDATE);
+                if (record.modified() > found.modified()) {
+                    idMap.put(record.uuid(), ImportAction.UPDATE);
                 } else {
-                    idMap.put(record.getUuid(), ImportAction.IGNORE);
+                    idMap.put(record.uuid(), ImportAction.IGNORE);
                 }
             }
         }
@@ -332,7 +335,7 @@ public class MoneyDAO {
                                                      Map<UUID, ImportAction> importActions)
     {
         for (T item : toImport) {
-            switch (importActions.get(item.getUuid())) {
+            switch (importActions.get(item.uuid())) {
                 case IGNORE:
                     continue;
 

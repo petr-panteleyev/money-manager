@@ -54,19 +54,19 @@ public interface BaseTestUtils {
     }
 
     static CategoryType randomCategoryType() {
-        int id = 1 + RANDOM.nextInt(CategoryType.values().length - 1);
-        return CategoryType.get(id);
+        int index = RANDOM.nextInt(CategoryType.values().length);
+        return CategoryType.values()[index];
     }
 
     static ContactType randomContactType() {
-        int id = 1 + RANDOM.nextInt(ContactType.values().length - 1);
-        return ContactType.get(id);
+        int index = RANDOM.nextInt(ContactType.values().length);
+        return ContactType.values()[index];
     }
 
     static TransactionType randomTransactionType() {
         while (true) {
-            int id = 1 + RANDOM.nextInt(TransactionType.values().length - 1);
-            var type = TransactionType.get(id);
+            int index = RANDOM.nextInt(TransactionType.values().length);
+            var type = TransactionType.values()[index];
             if (!type.isSeparator()) {
                 return type;
             }
@@ -81,9 +81,9 @@ public interface BaseTestUtils {
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
-            .typeId(category.getType().getId())
-            .categoryUuid(category.getUuid())
-            .currencyUuid(currency.getUuid())
+            .type(category.type())
+            .categoryUuid(category.uuid())
+            .currencyUuid(currency.uuid())
             .enabled(RANDOM.nextBoolean())
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
@@ -100,13 +100,13 @@ public interface BaseTestUtils {
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
-            .typeId(category.getType().getId())
-            .categoryUuid(category.getUuid())
-            .currencyUuid(currency.getUuid())
+            .type(category.type())
+            .categoryUuid(category.uuid())
+            .currencyUuid(currency.uuid())
             .enabled(RANDOM.nextBoolean())
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
-            .iconUuid(icon.getUuid())
+            .iconUuid(icon.uuid())
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
@@ -117,7 +117,7 @@ public interface BaseTestUtils {
     }
 
     static Category newCategory(Icon icon) {
-        return newCategory(UUID.randomUUID(), icon.getUuid());
+        return newCategory(UUID.randomUUID(), icon.uuid());
     }
 
     static Category newCategory(UUID uuid) {
@@ -136,7 +136,7 @@ public interface BaseTestUtils {
         return new Category.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
-            .catTypeId(type.getId())
+            .type(type)
             .iconUuid(iconUuid)
             .guid(uuid)
             .modified(System.currentTimeMillis())
@@ -174,7 +174,7 @@ public interface BaseTestUtils {
     static Contact newContact(UUID uuid, UUID iconUuid) {
         return new Contact.Builder()
             .name(UUID.randomUUID().toString())
-            .typeId(randomContactType().getId())
+            .type(randomContactType())
             .phone(UUID.randomUUID().toString())
             .mobile(UUID.randomUUID().toString())
             .email(UUID.randomUUID().toString())
@@ -193,7 +193,7 @@ public interface BaseTestUtils {
     static Contact newContact(String name) {
         return new Contact.Builder()
             .name(name)
-            .typeId(randomContactType().getId())
+            .type(randomContactType())
             .phone(UUID.randomUUID().toString())
             .mobile(UUID.randomUUID().toString())
             .email(UUID.randomUUID().toString())
@@ -220,13 +220,13 @@ public interface BaseTestUtils {
             .day(randomDay())
             .month(randomMonth())
             .year(randomYear())
-            .transactionTypeId(randomTransactionType().getId())
+            .type(randomTransactionType())
             .comment(UUID.randomUUID().toString())
             .checked(RANDOM.nextBoolean())
             .accountDebitedUuid(UUID.randomUUID())
             .accountCreditedUuid(UUID.randomUUID())
-            .accountDebitedTypeId(randomCategoryType().getId())
-            .accountCreditedTypeId(randomCategoryType().getId())
+            .accountDebitedType(randomCategoryType())
+            .accountCreditedType(randomCategoryType())
             .accountDebitedCategoryUuid(UUID.randomUUID())
             .accountCreditedCategoryUuid(UUID.randomUUID())
             .contactUuid(UUID.randomUUID())
@@ -243,16 +243,16 @@ public interface BaseTestUtils {
             .day(randomDay())
             .month(randomMonth())
             .year(randomYear())
-            .transactionTypeId(randomTransactionType().getId())
+            .type(randomTransactionType())
             .comment(UUID.randomUUID().toString())
             .checked(RANDOM.nextBoolean())
-            .accountDebitedUuid(accountDebited.getUuid())
-            .accountCreditedUuid(accountCredited.getUuid())
-            .accountDebitedTypeId(accountDebited.getType().getId())
-            .accountCreditedTypeId(accountCredited.getType().getId())
-            .accountDebitedCategoryUuid(accountDebited.getCategoryUuid())
-            .accountCreditedCategoryUuid(accountCredited.getCategoryUuid())
-            .contactUuid(contact == null ? null : contact.getUuid())
+            .accountDebitedUuid(accountDebited.uuid())
+            .accountCreditedUuid(accountCredited.uuid())
+            .accountDebitedType(accountDebited.type())
+            .accountCreditedType(accountCredited.type())
+            .accountDebitedCategoryUuid(accountDebited.categoryUuid())
+            .accountCreditedCategoryUuid(accountCredited.categoryUuid())
+            .contactUuid(contact == null ? null : contact.uuid())
             .rate(randomBigDecimal())
             .rateDirection(RANDOM.nextInt(2))
             .invoiceNumber(UUID.randomUUID().toString())

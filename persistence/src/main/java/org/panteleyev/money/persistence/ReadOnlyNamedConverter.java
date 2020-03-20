@@ -11,7 +11,7 @@ import org.panteleyev.money.model.Named;
 public class ReadOnlyNamedConverter<T extends Named> extends StringConverter<T> {
     @Override
     public String toString(T object) {
-        return object == null ? null : object.getName();
+        return object == null ? null : object.name();
     }
 
     @Override

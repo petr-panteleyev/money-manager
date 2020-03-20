@@ -17,7 +17,7 @@ public class TransactionRow extends TableRow<Transaction> {
         getStyleClass().removeAll(GROUP_CELL);
 
         if (item != null && !empty) {
-            if (item.isDetailed()) {
+            if (item.detailed()) {
                 getStyleClass().add(GROUP_CELL);
             }
         }

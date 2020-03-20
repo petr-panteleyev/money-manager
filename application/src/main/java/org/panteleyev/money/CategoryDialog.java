@@ -63,13 +63,13 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         if (category != null) {
             list.stream()
-                .filter(t -> t == category.getType())
+                .filter(t -> t == category.type())
                 .findFirst()
                 .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
 
-            nameEdit.setText(category.getName());
-            commentEdit.setText(category.getComment());
-            iconComboBox.getSelectionModel().select(cache().getIcon(category.getIconUuid()).orElse(EMPTY_ICON));
+            nameEdit.setText(category.name());
+            commentEdit.setText(category.comment());
+            iconComboBox.getSelectionModel().select(cache().getIcon(category.iconUuid()).orElse(EMPTY_ICON));
         } else {
             iconComboBox.getSelectionModel().select(EMPTY_ICON);
         }
@@ -93,8 +93,8 @@ final class CategoryDialog extends BaseDialog<Category> {
                 var builder = new Category.Builder(category)
                     .name(nameEdit.getText())
                     .comment(commentEdit.getText())
-                    .catTypeId(typeComboBox.getSelectionModel().getSelectedItem().getId())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().getUuid())
+                    .type(typeComboBox.getSelectionModel().getSelectedItem())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
                     .modified(now);
 
                 if (category == null) {

@@ -20,16 +20,16 @@ public class CreditCardStatementList {
 
     public AccountInfo getAccountInfo() {
         return creditCardStatementList.isEmpty() ?
-            new AccountInfo() : creditCardStatementList.get(0).getCreditCardAccountFrom();
+            new AccountInfo() : creditCardStatementList.get(0).creditCardAccountFrom();
     }
 
     public BankTransactionList getBankTransactionList() {
         return creditCardStatementList.isEmpty() ?
-            new BankTransactionList() : creditCardStatementList.get(0).getBankTransactionList();
+            new BankTransactionList() : creditCardStatementList.get(0).bankTransactionList();
     }
 
     public PendingTransactionList getPendingTransactionList() {
         return creditCardStatementList.isEmpty() ?
-            new PendingTransactionList() : creditCardStatementList.get(0).getPendingTransactionList();
+            new PendingTransactionList() : creditCardStatementList.get(0).pendingTransactionList();
     }
 }

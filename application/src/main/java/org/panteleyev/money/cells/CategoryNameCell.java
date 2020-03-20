@@ -18,8 +18,8 @@ public class CategoryNameCell extends TableCell<Category, Category> {
             setText("");
             setGraphic(null);
         } else {
-            setText(category.getName());
-            setGraphic(IconManager.getImageView(category.getIconUuid()));
+            setText(category.name());
+            setGraphic(IconManager.getImageView(category.iconUuid()));
         }
     }
 }

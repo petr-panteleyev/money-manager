@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-parent</artifactId>
-        <version>20.2.1</version>
+        <version>20.3.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -134,6 +134,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <argLine>
+                        --enable-preview
                         --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
                         --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
                     </argLine>
@@ -145,6 +146,7 @@
                 <configuration>
                     <mainClass>${appModule}/${appMainClass}</mainClass>
                     <options>
+                        <option>--enable-preview</option>
                         <option>-Dfile.encoding=UTF-8</option>
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>

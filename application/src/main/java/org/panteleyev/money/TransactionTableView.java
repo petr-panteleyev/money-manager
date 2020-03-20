@@ -115,14 +115,14 @@ class TransactionTableView extends TableView<Transaction> {
         getColumns().setAll(List.of(
             dayColumn,
             newTableColumn(RB, "Type", x -> new TransactionTypeCell(),
-                Comparator.comparingInt((Transaction t) -> t.getTransactionType().getId())
+                Comparator.comparingInt((Transaction t) -> t.type().ordinal())
                     .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
             newTableColumn(RB, "column.Account.Debited", x -> new TransactionDebitedAccountCell(),
-                Comparator.comparing(Transaction::getAccountDebitedUuid)
+                Comparator.comparing(Transaction::accountDebitedUuid)
                     .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
             newTableColumn(RB, "column.Account.Credited", x -> new TransactionCreditedAccountCell(), w.multiply(0.1)),
             newTableColumn(RB, "Counterparty", x -> new TransactionContactCell(), w.multiply(0.2)),
-            newTableColumn(RB, "Comment", null, Transaction::getComment, w.multiply(0.35)),
+            newTableColumn(RB, "Comment", null, Transaction::comment, w.multiply(0.35)),
             newTableColumn(RB, "Sum", x -> new TransactionSumCell(),
                 Comparator.comparing(Transaction::getSignedAmount), w.multiply(0.05)),
             newTableColumn("", x -> {
@@ -200,7 +200,7 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     void setTransactionFilter(Predicate<Transaction> filter) {
-        transactionFilter = filter.and(t -> t.getParentUuid().isEmpty());
+        transactionFilter = filter.and(t -> t.parentUuid() == null);
 
         getSelectionModel().clearSelection();
         clear();
@@ -295,7 +295,7 @@ class TransactionTableView extends TableView<Transaction> {
                 if (transactionDetailsCallback == null) {
                     return;
                 }
-                new TransactionDetailsDialog(childTransactions, t.getAmount(), false)
+                new TransactionDetailsDialog(childTransactions, t.amount(), false)
                     .showAndWait()
                     .ifPresent(list -> transactionDetailsCallback.handleTransactionDetails(t, list));
             } else {
@@ -305,12 +305,12 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     private void toggleTransactionCheck() {
-        getSelectedTransaction().ifPresent(t -> onCheckTransaction(List.of(t), !t.getChecked()));
+        getSelectedTransaction().ifPresent(t -> onCheckTransaction(List.of(t), !t.checked()));
     }
 
     void onCheckTransactions(boolean check) {
         var process = getSelectionModel().getSelectedItems().stream()
-            .filter(t -> t.getChecked() != check)
+            .filter(t -> t.checked() != check)
             .collect(Collectors.toList());
 
         onCheckTransaction(process, check);

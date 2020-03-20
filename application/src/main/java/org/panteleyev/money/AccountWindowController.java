@@ -175,7 +175,7 @@ final class AccountWindowController extends BaseController {
 
         editMenu.setOnShowing(event -> getSelectedAccount()
             .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
-                account.getEnabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+                account.enabled() ? "menu.edit.deactivate" : "menu.edit.activate")
             ))
         );
 
@@ -204,15 +204,15 @@ final class AccountWindowController extends BaseController {
         tableView.getColumns().setAll(List.of(
             newTableColumn(RB, "column.Name", x -> new AccountNameCell(), w.multiply(0.15)),
             newTableColumn(RB, "Category", x -> new AccountCategoryCell(), w.multiply(0.1)),
-            newTableColumn(RB, "Currency", null, a -> cache().getCurrency(a.getCurrencyUuid().orElse(null))
-                .map(Currency::getSymbol).orElse(""), w.multiply(0.05)),
+            newTableColumn(RB, "Currency", null, a -> cache().getCurrency(a.currencyUuid())
+                .map(Currency::symbol).orElse(""), w.multiply(0.05)),
             newTableColumn(RB, "Card", x -> new AccountCardCell(), w.multiply(0.1)),
-            newTableColumn("%%", x -> new AccountInterestCell(), Account::getInterest, w.multiply(0.03)),
+            newTableColumn("%%", x -> new AccountInterestCell(), Account::interest, w.multiply(0.03)),
             newTableColumn(RB, "column.closing.date",
                 x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()), w.multiply(0.05)),
-            newTableColumn(RB, "Comment", null, Account::getComment, w.multiply(0.3)),
+            newTableColumn(RB, "Comment", null, Account::comment, w.multiply(0.3)),
             newTableColumn(RB, "Balance", x -> new AccountBalanceCell(true, t -> true), w.multiply(0.1)),
-            newTableColumn(RB, "Waiting", x -> new AccountBalanceCell(false, t -> !t.getChecked()), w.multiply(0.1))
+            newTableColumn(RB, "Waiting", x -> new AccountBalanceCell(false, t -> !t.checked()), w.multiply(0.1))
         ));
     }
 
@@ -244,7 +244,7 @@ final class AccountWindowController extends BaseController {
 
         contextMenu.setOnShowing(event -> getSelectedAccount()
             .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
-                account.getEnabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+                account.enabled() ? "menu.edit.deactivate" : "menu.edit.activate")
             ))
         );
 
@@ -261,7 +261,7 @@ final class AccountWindowController extends BaseController {
 
     private void onNewAccount() {
         var initialCategory = getSelectedAccount()
-            .flatMap(account -> cache().getCategory(account.getCategoryUuid()))
+            .flatMap(account -> cache().getCategory(account.categoryUuid()))
             .orElse(null);
 
         new AccountDialog(this, initialCategory).showAndWait().ifPresent(it -> getDao().insertAccount(it));
@@ -292,13 +292,13 @@ final class AccountWindowController extends BaseController {
 
     private void onActivateDeactivateAccount() {
         getSelectedAccount().ifPresent(account -> {
-            boolean enabled = account.getEnabled();
+            boolean enabled = account.enabled();
             getDao().updateAccount(account.enable(!enabled));
         });
     }
 
     private void onCopyName() {
-        getSelectedAccount().map(Account::getName).ifPresent(name -> {
+        getSelectedAccount().map(Account::name).ifPresent(name -> {
             Clipboard cb = Clipboard.getSystemClipboard();
             ClipboardContent ct = new ClipboardContent();
             ct.putString(name);
@@ -315,7 +315,7 @@ final class AccountWindowController extends BaseController {
         }
 
         if (removedAccount == null) {
-            if (Options.getShowDeactivatedAccounts() || addedAccount.getEnabled()) {
+            if (Options.getShowDeactivatedAccounts() || addedAccount.enabled()) {
                 accounts.add(addedAccount);
             }
         } else {

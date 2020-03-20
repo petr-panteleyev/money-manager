@@ -17,7 +17,7 @@ public class BaseTest {
 
     protected static <T extends MoneyRecord> List<T> sortedById(Collection<T> list) {
         return list.stream()
-            .sorted(Comparator.comparing(MoneyRecord::getUuid))
+            .sorted(Comparator.comparing(MoneyRecord::uuid))
             .collect(Collectors.toList());
     }
 

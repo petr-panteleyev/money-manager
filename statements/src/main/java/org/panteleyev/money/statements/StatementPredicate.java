@@ -20,7 +20,7 @@ public class StatementPredicate implements Predicate<Transaction> {
     private final boolean ignoreExecutionDate;
 
     public StatementPredicate(Account account, StatementRecord record, boolean ignoreExecutionDate) {
-        this.accountUuid = account == null ? null : account.getUuid();
+        this.accountUuid = account == null ? null : account.uuid();
         this.record = record;
         this.ignoreExecutionDate = ignoreExecutionDate;
     }
@@ -31,8 +31,8 @@ public class StatementPredicate implements Predicate<Transaction> {
             return false;
         }
 
-        var result = (Objects.equals(transaction.getAccountDebitedUuid(), accountUuid)
-            || Objects.equals(transaction.getAccountCreditedUuid(), accountUuid))
+        var result = (Objects.equals(transaction.accountDebitedUuid(), accountUuid)
+            || Objects.equals(transaction.accountCreditedUuid(), accountUuid))
             && (compareDate(record.getActual(), transaction)
             || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));
 
@@ -43,15 +43,15 @@ public class StatementPredicate implements Predicate<Transaction> {
     }
 
     private boolean compareDate(LocalDate date, Transaction transaction) {
-        return transaction.getDay() == date.getDayOfMonth()
-            && transaction.getMonth() == date.getMonthValue()
-            && transaction.getYear() == date.getYear();
+        return transaction.day() == date.getDayOfMonth()
+            && transaction.month() == date.getMonthValue()
+            && transaction.year() == date.getYear();
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private boolean compareAmount(Optional<BigDecimal> amount, Transaction transaction) {
         return amount.map(BigDecimal::abs)
-            .map(a -> a.compareTo(transaction.getAmount()) == 0)
+            .map(a -> a.compareTo(transaction.amount()) == 0)
             .orElse(false);
     }
 }

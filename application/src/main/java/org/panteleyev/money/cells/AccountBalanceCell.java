@@ -20,7 +20,7 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
 
     public AccountBalanceCell(boolean total, Predicate<Transaction> filter) {
         this.total = total;
-        this.filter = filter.and(t -> t.getParentUuid().isEmpty());
+        this.filter = filter.and(t -> t.parentUuid() == null);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
             var sum = cache().calculateBalance(account, total, filter);
 
             // TODO: use flatMap
-            setText(cache().getCurrency(account.getCurrencyUuid().orElse(null))
+            setText(cache().getCurrency(account.currencyUuid())
                 .map(curr -> curr.formatValue(sum))
                 .orElse(Currency.defaultFormatValue(sum)));
 

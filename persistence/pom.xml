@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-parent</artifactId>
-        <version>20.2.1</version>
+        <version>20.3.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -50,22 +50,19 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
+                <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>--enable-preview --add-reads org.panteleyev.mysqlapi=org.panteleyev.money.model</argLine>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                     <systemPropertyVariables>
                         <mysql.host>${money.test.mysql.host}</mysql.host>
                         <mysql.user>${money.test.mysql.user}</mysql.user>
                         <mysql.password>${money.test.mysql.password}</mysql.password>
                         <mysql.database>${money.test.mysql.database}</mysql.database>
                     </systemPropertyVariables>
-                    <argLine>
-                        --add-reads org.panteleyev.persistence=org.panteleyev.money.model
-                    </argLine>
                 </configuration>
             </plugin>
         </plugins>

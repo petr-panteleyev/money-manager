@@ -527,8 +527,8 @@ public class MainWindowController extends BaseController implements TransactionT
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        Predicate<Transaction> filter = t -> t.getMonth() == month
-            && t.getYear() == year;
+        Predicate<Transaction> filter = t -> t.month() == month
+            && t.year() == year;
 //            && t.getParentId() == 0;
 
         transactionTable.setTransactionFilter(filter);
@@ -560,7 +560,7 @@ public class MainWindowController extends BaseController implements TransactionT
         // contact
         if (c != null && !c.isEmpty()) {
             var newContact = createContact(c);
-            builder.contactUuid(newContact.getUuid());
+            builder.contactUuid(newContact.uuid());
         }
 
         // date
@@ -577,7 +577,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void onUpdateTransaction(Transaction.Builder builder, String c) {
         // contact
         if (c != null && !c.isEmpty()) {
-            builder.contactUuid(createContact(c).getUuid());
+            builder.contactUuid(createContact(c).uuid());
         }
 
         // date
@@ -629,7 +629,7 @@ public class MainWindowController extends BaseController implements TransactionT
         if (details.isEmpty()) {
             if (!childTransactions.isEmpty()) {
                 for (Transaction child : childTransactions) {
-                    getDao().deleteTransaction(child.getUuid());
+                    getDao().deleteTransaction(child.uuid());
                 }
                 var noChildren = new Transaction.Builder(transaction)
                     .detailed(false)
@@ -644,16 +644,16 @@ public class MainWindowController extends BaseController implements TransactionT
                 .build());
 
             for (Transaction ch : childTransactions) {
-                getDao().deleteTransaction(ch.getUuid());
+                getDao().deleteTransaction(ch.uuid());
             }
 
             for (var transactionDetail : details) {
                 var newDetail = new Transaction.Builder(transaction)
-                    .accountCreditedUuid(transactionDetail.getAccountCreditedUuid())
-                    .amount(transactionDetail.getAmount())
-                    .comment(transactionDetail.getComment())
+                    .accountCreditedUuid(transactionDetail.accountCreditedUuid())
+                    .amount(transactionDetail.amount())
+                    .comment(transactionDetail.comment())
                     .guid(UUID.randomUUID())
-                    .parentUuid(transaction.getUuid())
+                    .parentUuid(transaction.uuid())
                     .detailed(false)
                     .timestamp()
                     .build();

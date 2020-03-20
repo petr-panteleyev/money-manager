@@ -8,125 +8,66 @@ package org.panteleyev.money.model;
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.ForeignKey;
 import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.RecordBuilder;
 import org.panteleyev.mysqlapi.annotations.ReferenceOption;
 import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
 @Table("account")
-public final class Account implements MoneyRecord, Named, Comparable<Account> {
-    public final static Predicate<Account> FILTER_ALL = x -> true;
-    public final static Predicate<Account> FILTER_ENABLED = Account::getEnabled;
-
+public record Account(
     @PrimaryKey
     @Column("uuid")
-    private final UUID guid;
-
+    UUID uuid,
     @Column("name")
-    private final String name;
-
+    String name,
     @Column("comment")
-    private final String comment;
-
+    String comment,
     @Column("number")
-    private final String accountNumber;
-
+    String accountNumber,
     @Column("opening")
-    private final BigDecimal openingBalance;
-
+    BigDecimal openingBalance,
     @Column("account_limit")
-    private final BigDecimal accountLimit;
-
+    BigDecimal accountLimit,
     @Column("rate")
-    private final BigDecimal currencyRate;
-
-    @Column("type_id")
-    private final int typeId;
-
+    BigDecimal currencyRate,
+    @Column("type")
+    CategoryType type,
     @Column(value = "category_uuid")
     @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID categoryUuid;
-
+    UUID categoryUuid,
     @Column("currency_uuid")
     @ForeignKey(table = Currency.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
-    private final UUID currencyUuid;
-
+    UUID currencyUuid,
     @Column("enabled")
-    private final boolean enabled;
-
+    boolean enabled,
     @Column("interest")
-    private final BigDecimal interest;
-
+    BigDecimal interest,
     @Column("closing_date")
-    private final LocalDate closingDate;
-
+    LocalDate closingDate,
     @Column("icon_uuid")
     @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
-    private final UUID iconUuid;
-
+    UUID iconUuid,
     @Column("card_type")
-    private final CardType cardType;
-
+    CardType cardType,
     @Column("card_number")
-    private final String cardNumber;
-
+    String cardNumber,
     @Column("created")
-    private final long created;
-
+    long created,
     @Column("modified")
-    private final long modified;
+    long modified
 
-    private final CategoryType type;
+) implements MoneyRecord, Named, Comparable<Account> {
+    public final static Predicate<Account> FILTER_ALL = x -> true;
+    public final static Predicate<Account> FILTER_ENABLED = Account::enabled;
 
-    @RecordBuilder
-    public Account(@Column("name") String name,
-                   @Column("comment") String comment,
-                   @Column("number") String accountNumber,
-                   @Column("opening") BigDecimal openingBalance,
-                   @Column("account_limit") BigDecimal accountLimit,
-                   @Column("rate") BigDecimal currencyRate,
-                   @Column("type_id") int typeId,
-                   @Column("category_uuid") UUID categoryUuid,
-                   @Column("currency_uuid") UUID currencyUuid,
-                   @Column("enabled") boolean enabled,
-                   @Column("interest") BigDecimal interest,
-                   @Column("closing_date") LocalDate closingDate,
-                   @Column("icon_uuid") UUID iconUuid,
-                   @Column("card_type") CardType cardType,
-                   @Column("card_number") String cardNumber,
-                   @Column("uuid") UUID guid,
-                   @Column("created") long created,
-                   @Column("modified") long modified)
-    {
-        this.name = name;
-        this.comment = comment;
-        this.accountNumber = accountNumber;
-        this.openingBalance = openingBalance;
-        this.accountLimit = accountLimit;
-        this.currencyRate = currencyRate;
-        this.typeId = typeId;
-        this.categoryUuid = categoryUuid;
-        this.currencyUuid = currencyUuid;
-        this.enabled = enabled;
-        this.interest = interest;
-        this.closingDate = closingDate;
-        this.iconUuid = iconUuid;
-        this.cardType = cardType;
-        this.cardNumber = cardNumber;
-        this.guid = guid;
-        this.created = created;
-        this.modified = modified;
-
-        this.type = CategoryType.get(this.typeId);
-    }
-
-    public CategoryType getType() {
-        return type;
+    public Account {
+        this.openingBalance = MoneyRecord.normalize(openingBalance);
+        this.accountLimit = MoneyRecord.normalize(accountLimit);
+        this.currencyRate = MoneyRecord.normalize(currencyRate);
+        this.interest = MoneyRecord.normalize(interest);
     }
 
     @Override
@@ -141,138 +82,12 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             .build();
     }
 
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public String getAccountNumber() {
-        return accountNumber;
-    }
-
-    public BigDecimal getOpeningBalance() {
-        return openingBalance;
-    }
-
-    public BigDecimal getAccountLimit() {
-        return accountLimit;
-    }
-
-    public BigDecimal getCurrencyRate() {
-        return currencyRate;
-    }
-
-    public int getTypeId() {
-        return typeId;
-    }
-
-    public UUID getCategoryUuid() {
-        return categoryUuid;
-    }
-
-    public Optional<UUID> getCurrencyUuid() {
-        return Optional.ofNullable(currencyUuid);
-    }
-
-    public boolean getEnabled() {
-        return enabled;
-    }
-
-    public BigDecimal getInterest() {
-        return interest;
-    }
-
-    public Optional<LocalDate> getClosingDate() {
-        return Optional.ofNullable(closingDate);
-    }
-
-    public UUID getIconUuid() {
-        return iconUuid;
-    }
-
-    public CardType getCardType() {
-        return cardType;
-    }
-
-    public String getCardNumber() {
-        return cardNumber;
-    }
-
-    @Override
-    public UUID getUuid() {
-        return guid;
-    }
-
-    @Override
-    public long getCreated() {
-        return created;
-    }
-
-    @Override
-    public long getModified() {
-        return modified;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (!(other instanceof Account)) {
-            return false;
-        }
-
-        Account that = (Account) other;
-
-        return Objects.equals(name, that.name)
-            && Objects.equals(comment, that.comment)
-            && Objects.equals(accountNumber, that.accountNumber)
-            && openingBalance.compareTo(that.openingBalance) == 0
-            && accountLimit.compareTo(that.accountLimit) == 0
-            && currencyRate.compareTo(that.currencyRate) == 0
-            && typeId == that.typeId
-            && Objects.equals(categoryUuid, that.categoryUuid)
-            && Objects.equals(currencyUuid, that.currencyUuid)
-            && enabled == that.enabled
-            && interest.compareTo(that.interest) == 0
-            && Objects.equals(closingDate, that.closingDate)
-            && Objects.equals(iconUuid, that.iconUuid)
-            && cardType == that.cardType
-            && Objects.equals(cardNumber, that.cardNumber)
-            && Objects.equals(guid, that.guid)
-            && created == that.created
-            && modified == that.modified;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, comment, accountNumber, openingBalance.stripTrailingZeros(),
-            accountLimit.stripTrailingZeros(), currencyRate.stripTrailingZeros(), typeId, categoryUuid, currencyUuid,
-            enabled, interest, closingDate, iconUuid, cardType, cardNumber, guid, created, modified);
-    }
-
-    @Override
-    public String toString() {
-        return "Account ["
-            + " uuid:" + guid
-            + " name:" + name
-            + " comment:" + comment
-            + " accountNumber:" + accountNumber
-            + " categoryUuid:" + categoryUuid
-            + "]";
-    }
-
     public String getAccountNumberNoSpaces() {
-        return getAccountNumber().replaceAll(" ", "");
+        return accountNumber().replaceAll(" ", "");
     }
 
     public String getCardNumberNoSpaces() {
-        return getCardNumber().replaceAll(" ", "");
+        return cardNumber().replaceAll(" ", "");
     }
 
     public static final class Builder {
@@ -282,7 +97,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         private BigDecimal openingBalance = BigDecimal.ZERO;
         private BigDecimal accountLimit = BigDecimal.ZERO;
         private BigDecimal currencyRate = BigDecimal.ONE;
-        private int typeId;
+        private CategoryType type;
         private UUID categoryUuid;
         private UUID currencyUuid;
         private boolean enabled = true;
@@ -291,7 +106,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
         private UUID iconUuid = null;
         private CardType cardType = CardType.NONE;
         private String cardNumber = "";
-        private UUID guid = null;
+        private UUID uuid = null;
         private long created = 0;
         private long modified = 0;
 
@@ -303,33 +118,33 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
                 return;
             }
 
-            name = account.getName();
-            comment = account.getComment();
-            accountNumber = account.getAccountNumber();
-            openingBalance = account.getOpeningBalance();
-            accountLimit = account.getAccountLimit();
-            currencyRate = account.getCurrencyRate();
-            typeId = account.getTypeId();
-            categoryUuid = account.getCategoryUuid();
-            currencyUuid = account.getCurrencyUuid().orElse(null);
-            enabled = account.getEnabled();
-            interest = account.getInterest();
-            closingDate = account.getClosingDate().orElse(null);
-            iconUuid = account.getIconUuid();
-            cardType = account.getCardType();
-            cardNumber = account.getCardNumber();
-            guid = account.getUuid();
-            created = account.getCreated();
-            modified = account.getModified();
+            name = account.name();
+            comment = account.comment();
+            accountNumber = account.accountNumber();
+            openingBalance = account.openingBalance();
+            accountLimit = account.accountLimit();
+            currencyRate = account.currencyRate();
+            type = account.type();
+            categoryUuid = account.categoryUuid();
+            currencyUuid = account.currencyUuid();
+            enabled = account.enabled();
+            interest = account.interest();
+            closingDate = account.closingDate();
+            iconUuid = account.iconUuid();
+            cardType = account.cardType();
+            cardNumber = account.cardNumber();
+            uuid = account.uuid();
+            created = account.created();
+            modified = account.modified();
         }
 
         public UUID getUuid() {
-            return guid;
+            return uuid;
         }
 
         public Account build() {
-            if (guid == null) {
-                guid = UUID.randomUUID();
+            if (uuid == null) {
+                uuid = UUID.randomUUID();
             }
 
             long now = System.currentTimeMillis();
@@ -340,10 +155,10 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
                 modified = now;
             }
 
-            return new Account(name, comment, accountNumber, openingBalance,
-                accountLimit, currencyRate, typeId, categoryUuid,
+            return new Account(uuid, name, comment, accountNumber, openingBalance,
+                accountLimit, currencyRate, type, categoryUuid,
                 currencyUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
-                guid, created, modified);
+                created, modified);
         }
 
         public Builder name(String name) {
@@ -379,8 +194,8 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
             return this;
         }
 
-        public Builder typeId(int typeId) {
-            this.typeId = typeId;
+        public Builder type(CategoryType type) {
+            this.type = type;
             return this;
         }
 
@@ -426,7 +241,7 @@ public final class Account implements MoneyRecord, Named, Comparable<Account> {
 
         public Builder guid(UUID guid) {
             Objects.requireNonNull(guid);
-            this.guid = guid;
+            this.uuid = guid;
             return this;
         }
 

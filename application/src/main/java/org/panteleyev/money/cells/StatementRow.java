@@ -27,7 +27,7 @@ public class StatementRow extends TableRow<StatementRecord> {
         if (transactions.isEmpty()) {
             getStyleClass().add(STATEMENT_NOT_FOUND);
         } else {
-            if (transactions.stream().allMatch(Transaction::getChecked)) {
+            if (transactions.stream().allMatch(Transaction::checked)) {
                 getStyleClass().add(STATEMENT_ALL_CHECKED);
             } else {
                 getStyleClass().add(STATEMENT_NOT_CHECKED);

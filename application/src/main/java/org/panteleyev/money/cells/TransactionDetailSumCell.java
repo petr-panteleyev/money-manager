@@ -20,7 +20,7 @@ public class TransactionDetailSumCell extends TableCell<TransactionDetail, Trans
         if (empty || item == null) {
             setText("");
         } else {
-            setText(item.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
+            setText(item.amount().setScale(2, RoundingMode.HALF_UP).toString());
         }
     }
 }

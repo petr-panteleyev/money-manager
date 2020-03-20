@@ -114,7 +114,7 @@ public class TransactionFilterBox extends HBox {
 
         // Add years from existing transactions
         cache().getTransactions().stream()
-            .map(Transaction::getYear)
+            .map(Transaction::year)
             .distinct()
             .sorted()
             .forEach(filterChoice.getItems()::add);
@@ -125,8 +125,8 @@ public class TransactionFilterBox extends HBox {
     public Predicate<Transaction> getTransactionFilter() {
         if (periodRadio.isSelected()) {
             var selected = filterChoice.getSelectionModel().getSelectedItem();
-            if (selected instanceof TransactionPredicate) {
-                return ((TransactionPredicate) selected);
+            if (selected instanceof TransactionPredicate transactionPredicate) {
+                return transactionPredicate;
             } else if (selected instanceof Integer) {
                 return transactionByYear((int) selected);
             } else

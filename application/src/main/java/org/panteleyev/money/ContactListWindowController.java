@@ -89,9 +89,9 @@ class ContactListWindowController extends BaseController {
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
             newTableColumn(RB, "Name", x -> new ContactNameCell(), w.multiply(0.4)),
-            newTableColumn(RB, "Type", null, (Contact p) -> p.getType().getTypeName(), w.multiply(0.2)),
-            newTableColumn(RB, "Phone", null, Contact::getPhone, w.multiply(0.2)),
-            newTableColumn(RB, "Email", null, Contact::getEmail, w.multiply(0.2))
+            newTableColumn(RB, "Type", null, (Contact p) -> p.type().getTypeName(), w.multiply(0.2)),
+            newTableColumn(RB, "Phone", null, Contact::phone, w.multiply(0.2)),
+            newTableColumn(RB, "Email", null, Contact::email, w.multiply(0.2))
         ));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
@@ -114,7 +114,7 @@ class ContactListWindowController extends BaseController {
 
         typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
-                return obj instanceof ContactType ? ((ContactType) obj).getTypeName() : obj.toString();
+                return obj instanceof ContactType type ? type.getTypeName() : obj.toString();
             }
         });
 
@@ -136,7 +136,7 @@ class ContactListWindowController extends BaseController {
 
     private void reloadContacts() {
         contacts.setAll(cache().getContacts().stream()
-            .sorted(Comparator.comparing(Contact::getName)).collect(Collectors.toList()));
+            .sorted(Comparator.comparing(Contact::name)).collect(Collectors.toList()));
         updatePredicate();
     }
 
@@ -148,13 +148,13 @@ class ContactListWindowController extends BaseController {
         if (type instanceof String) {
             filter = x -> true;
         } else {
-            filter = x -> x.getType() == type;
+            filter = x -> x.type() == type;
         }
 
         // Name
         var search = searchField.getText().toLowerCase();
         if (!search.isEmpty()) {
-            filter = filter.and(x -> x.getName().toLowerCase().contains(search));
+            filter = filter.and(x -> x.name().toLowerCase().contains(search));
         }
 
         return filter;

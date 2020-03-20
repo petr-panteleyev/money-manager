@@ -12,6 +12,6 @@ public class TransactionTypeCell extends TableCell<Transaction, Transaction> {
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
-        setText(empty || transaction == null ? "" : transaction.getTransactionType().getTypeName());
+        setText(empty || transaction == null ? "" : transaction.type().getTypeName());
     }
 }

@@ -8,11 +8,14 @@ package org.panteleyev.money.xml;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
+import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
+import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.TransactionType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -154,7 +157,7 @@ class ImportParser extends DefaultHandler {
         return new Category.Builder()
             .name(tags.get("name"))
             .comment(tags.get("comment"))
-            .catTypeId(parseInt(tags.get("catTypeId")))
+            .type(parseCategoryType(tags.get("type")))
             .iconUuid(parseUuid(tags.get("iconUuid")))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
@@ -172,7 +175,7 @@ class ImportParser extends DefaultHandler {
             .openingBalance(new BigDecimal(tags.get("openingBalance")))
             .accountLimit(new BigDecimal(tags.get("accountLimit")))
             .currencyRate(new BigDecimal(tags.get("currencyRate")))
-            .typeId(parseInt(tags.get("typeId")))
+            .type(parseCategoryType(tags.get("type")))
             .categoryUuid(parseUuid(tags.get("categoryUuid")))
             .currencyUuid(parseUuid(tags.get("currencyUuid")))
             .enabled(parseBoolean(tags.get("enabled"), true))
@@ -211,7 +214,7 @@ class ImportParser extends DefaultHandler {
         var created = parseLong(tags.get("created"), modified);
         return new Contact.Builder()
             .name(tags.get("name"))
-            .typeId(parseInt(tags.get("typeId")))
+            .type(parseContactType(tags.get("type")))
             .phone(tags.get("phone"))
             .mobile(tags.get("mobile"))
             .email(tags.get("email"))
@@ -236,13 +239,13 @@ class ImportParser extends DefaultHandler {
             .day(parseInt(tags.get("day")))
             .month(parseInt(tags.get("month")))
             .year(parseInt(tags.get("year")))
-            .transactionTypeId(parseInt(tags.get("transactionTypeId")))
+            .type(parseTransactionType(tags.get("type")))
             .comment(tags.get("comment"))
             .checked(parseBoolean(tags.get("checked"), false))
             .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
             .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
-            .accountDebitedTypeId(parseInt(tags.get("accountDebitedTypeId")))
-            .accountCreditedTypeId(parseInt(tags.get("accountCreditedTypeId")))
+            .accountDebitedType(parseCategoryType(tags.get("accountDebitedType")))
+            .accountCreditedType(parseCategoryType(tags.get("accountCreditedType")))
             .accountDebitedCategoryUuid(parseUuid(tags.get("accountDebitedCategoryUuid")))
             .accountCreditedCategoryUuid(parseUuid(tags.get("accountCreditedCategoryUuid")))
             .contactUuid(parseUuid(tags.get("contactUuid")))
@@ -279,5 +282,17 @@ class ImportParser extends DefaultHandler {
 
     private static CardType parseCardType(String rawValue) {
         return rawValue == null ? CardType.NONE : CardType.valueOf(rawValue);
+    }
+
+    private static CategoryType parseCategoryType(String rawValue) {
+        return rawValue == null ? CategoryType.BANKS_AND_CASH : CategoryType.valueOf(rawValue);
+    }
+
+    private static ContactType parseContactType(String rawValue) {
+        return rawValue == null ? ContactType.PERSONAL : ContactType.valueOf(rawValue);
+    }
+
+    private static TransactionType parseTransactionType(String rawValue) {
+        return rawValue == null ? TransactionType.UNDEFINED : TransactionType.valueOf(rawValue);
     }
 }

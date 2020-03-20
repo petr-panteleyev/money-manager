@@ -127,7 +127,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         getDao().insertIcon(icon);
 
         var category = new Category.Builder()
-            .catTypeId(CategoryType.BANKS_AND_CASH.getId())
+            .type(CategoryType.BANKS_AND_CASH)
             .guid(UUID.randomUUID())
             .build();
         getDao().insertCategory(category);
@@ -136,8 +136,8 @@ public class TestMoneyDAO extends BaseDaoTest {
 
         var account = new Account.Builder()
             .guid(accountId)
-            .typeId(category.getCatTypeId())
-            .categoryUuid(category.getUuid())
+            .type(category.type())
+            .categoryUuid(category.uuid())
             .accountNumber("123456")
             .iconUuid(iconUuid)
             .build();
@@ -160,14 +160,14 @@ public class TestMoneyDAO extends BaseDaoTest {
     @Test
     public void testTransaction() {
         var category = new Category.Builder()
-            .catTypeId(CategoryType.BANKS_AND_CASH.getId())
+            .type(CategoryType.BANKS_AND_CASH)
             .guid(UUID.randomUUID())
             .build();
         getDao().insertCategory(category);
 
         var account = new Account.Builder()
-            .typeId(category.getCatTypeId())
-            .categoryUuid(category.getUuid())
+            .type(category.type())
+            .categoryUuid(category.uuid())
             .accountNumber("123456")
             .build();
         getDao().insertAccount(account);
@@ -181,12 +181,12 @@ public class TestMoneyDAO extends BaseDaoTest {
             .month(now.getMonthValue())
             .year(now.getYear())
             .amount(BaseTestUtils.randomBigDecimal())
-            .accountDebitedUuid(account.getUuid())
-            .accountCreditedUuid(account.getUuid())
-            .accountDebitedCategoryUuid(category.getUuid())
-            .accountCreditedCategoryUuid(category.getUuid())
-            .accountDebitedTypeId(account.getTypeId())
-            .accountCreditedTypeId(account.getTypeId())
+            .accountDebitedUuid(account.uuid())
+            .accountCreditedUuid(account.uuid())
+            .accountDebitedCategoryUuid(category.uuid())
+            .accountCreditedCategoryUuid(category.uuid())
+            .accountDebitedType(account.type())
+            .accountCreditedType(account.type())
             .build();
 
 

@@ -66,7 +66,7 @@ public class Icon implements MoneyRecord {
     }
 
     @Override
-    public UUID getUuid() {
+    public UUID uuid() {
         return uuid;
     }
 
@@ -83,12 +83,12 @@ public class Icon implements MoneyRecord {
     }
 
     @Override
-    public long getCreated() {
+    public long created() {
         return created;
     }
 
     @Override
-    public long getModified() {
+    public long modified() {
         return modified;
     }
 

@@ -8,47 +8,14 @@ package org.panteleyev.money.model;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class TransactionDetail {
-    private final UUID uuid;
-    private final BigDecimal amount;
-    private final UUID accountCreditedUuid;
-    private final String comment;
-    private final long modified;
+public record TransactionDetail(UUID uuid, BigDecimal amount, UUID accountCreditedUuid, String comment, long modified) {
+    public TransactionDetail {
+        this.amount = MoneyRecord.normalize(amount);
+    }
 
     public TransactionDetail(Transaction transaction) {
-        uuid = transaction.getUuid();
-        amount = transaction.getAmount();
-        accountCreditedUuid = transaction.getAccountCreditedUuid();
-        comment = transaction.getComment();
-        modified = transaction.getModified();
-    }
-
-    private TransactionDetail(UUID uuid, BigDecimal amount, UUID accountCreditedUuid, String comment, long modified) {
-        this.uuid = uuid;
-        this.amount = amount;
-        this.accountCreditedUuid = accountCreditedUuid;
-        this.comment = comment;
-        this.modified = modified;
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public UUID getAccountCreditedUuid() {
-        return accountCreditedUuid;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public long getModified() {
-        return modified;
+        this(transaction.uuid(), transaction.amount(),
+            transaction.accountCreditedUuid(), transaction.comment(), transaction.modified());
     }
 
     public static final class Builder {

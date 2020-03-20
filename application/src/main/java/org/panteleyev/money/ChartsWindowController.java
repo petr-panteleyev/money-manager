@@ -78,7 +78,7 @@ public class ChartsWindowController extends BaseController {
         var transactionFilter = transactionFilterBox.getTransactionFilter();
 
         var list = cache().getAccounts(accountFilter)
-            .map(a -> new Pair<>(a.getName(), cache().calculateBalance(a, true, transactionFilter).abs()))
+            .map(a -> new Pair<>(a.name(), cache().calculateBalance(a, true, transactionFilter).abs()))
             .filter(p -> BigDecimal.ZERO.compareTo(p.getValue()) != 0)
             .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
             .collect(Collectors.toList());

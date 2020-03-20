@@ -22,9 +22,9 @@ public class AccountCategoryCell extends TableCell<Account, Account> {
             return;
         }
 
-        cache().getCategory(item.getCategoryUuid()).ifPresent(category -> {
-            setText(category.getName());
-            setGraphic(IconManager.getImageView(category.getIconUuid()));
+        cache().getCategory(item.categoryUuid()).ifPresent(category -> {
+            setText(category.name());
+            setGraphic(IconManager.getImageView(category.iconUuid()));
         });
     }
 }

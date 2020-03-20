@@ -7,6 +7,8 @@ package org.panteleyev.money.ymoney;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class TestClientId {
@@ -19,24 +21,21 @@ public class TestClientId {
         for (int i = 0; i < 100; i++) {
             String clientId = UUID.randomUUID().toString();
             String redirectUri = UUID.randomUUID().toString();
-            ClientId id = new ClientId(clientId, redirectUri);
-            Assert.assertEquals(id.getClientId(), clientId);
-            Assert.assertEquals(id.getRedirectUri(), redirectUri);
+            String encodedRedirectUri = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+            ClientId id = new ClientId(clientId, redirectUri, encodedRedirectUri);
+            Assert.assertEquals(id.clientId(), clientId);
+            Assert.assertEquals(id.redirectUri(), redirectUri);
         }
-    }
-
-    @Test(expectedExceptions = {NullPointerException.class})
-    public void testNewInstanceNegative() {
-        new ClientId(null, null);
     }
 
     @Test
     public void testEquals() {
         var clientId = UUID.randomUUID().toString();
         var redirectUri = UUID.randomUUID().toString();
+        String encodedRedirectUri = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
 
-        var id1 = new ClientId(clientId, redirectUri);
-        var id2 = new ClientId(clientId, redirectUri);
+        var id1 = new ClientId(clientId, redirectUri, encodedRedirectUri);
+        var id2 = new ClientId(clientId, redirectUri, encodedRedirectUri);
 
         Assert.assertEquals(id1, id2);
         Assert.assertEquals(id1.hashCode(), id2.hashCode());
@@ -45,7 +44,7 @@ public class TestClientId {
     @Test
     public void testLoad() {
         var id = ClientId.load(TEST_PROPERTIES);
-        Assert.assertEquals(id.getClientId(), TEST_CLIENT_ID);
-        Assert.assertEquals(id.getRedirectUri(), TEST_REDIRECT_URI);
+        Assert.assertEquals(id.clientId(), TEST_CLIENT_ID);
+        Assert.assertEquals(id.redirectUri(), TEST_REDIRECT_URI);
     }
 }

@@ -71,18 +71,18 @@ public class TestCurrency extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Currency.Builder()
-            .symbol(original.getSymbol())
-            .description(original.getDescription())
-            .formatSymbol(original.getFormatSymbol())
-            .formatSymbolPosition(original.getFormatSymbolPosition())
-            .showFormatSymbol(original.getShowFormatSymbol())
-            .def(original.getDef())
-            .rate(original.getRate())
-            .direction(original.getDirection())
-            .useThousandSeparator(original.getUseThousandSeparator())
-            .guid(original.getUuid())
-            .created(original.getCreated())
-            .modified(original.getModified())
+            .symbol(original.symbol())
+            .description(original.description())
+            .formatSymbol(original.formatSymbol())
+            .formatSymbolPosition(original.formatSymbolPosition())
+            .showFormatSymbol(original.showFormatSymbol())
+            .def(original.def())
+            .rate(original.rate())
+            .direction(original.direction())
+            .useThousandSeparator(original.useThousandSeparator())
+            .guid(original.uuid())
+            .created(original.created())
+            .modified(original.modified())
             .build();
         assertEquals(manualCopy, original);
     }

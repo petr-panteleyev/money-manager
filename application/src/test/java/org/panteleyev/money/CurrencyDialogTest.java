@@ -42,11 +42,11 @@ public class CurrencyDialogTest extends BaseTest {
     }
 
     private void setupDialog(CurrencyDialog dialog) {
-        dialog.getNameEdit().setText(CURRENCY.getSymbol());
-        dialog.getDescrEdit().setText(CURRENCY.getDescription());
-        dialog.getRateEdit().setText(CURRENCY.getRate().toString());
-        dialog.getThousandSeparatorCheck().setSelected(CURRENCY.getUseThousandSeparator());
-        dialog.getDefaultCheck().setSelected(CURRENCY.getDef());
+        dialog.getNameEdit().setText(CURRENCY.symbol());
+        dialog.getDescrEdit().setText(CURRENCY.description());
+        dialog.getRateEdit().setText(CURRENCY.rate().toString());
+        dialog.getThousandSeparatorCheck().setSelected(CURRENCY.useThousandSeparator());
+        dialog.getDefaultCheck().setSelected(CURRENCY.def());
     }
 
     private void setupDialogUpdate(CurrencyDialog dialog) {
@@ -65,9 +65,9 @@ public class CurrencyDialogTest extends BaseTest {
 
         var currency = queue.take();
 
-        assertNotNull(currency.getUuid());
+        assertNotNull(currency.uuid());
         assertCurrency(currency);
-        assertEquals(currency.getCreated(), currency.getModified());
+        assertEquals(currency.created(), currency.modified());
     }
 
     @Test
@@ -83,17 +83,17 @@ public class CurrencyDialogTest extends BaseTest {
 
         var currency = queue.take();
 
-        assertEquals(currency.getUuid(), CURRENCY.getUuid());
+        assertEquals(currency.uuid(), CURRENCY.uuid());
         assertCurrency(currency);
-        assertTrue(currency.getModified() > CURRENCY.getModified());
-        assertTrue(currency.getModified() > currency.getCreated());
+        assertTrue(currency.modified() > CURRENCY.modified());
+        assertTrue(currency.modified() > currency.created());
     }
 
     private static void assertCurrency(Currency currency) {
-        assertEquals(currency.getSymbol(), CURRENCY.getSymbol());
-        assertEquals(currency.getDescription(), CURRENCY.getDescription());
-        assertEquals(currency.getRate(), CURRENCY.getRate());
-        assertEquals(currency.getUseThousandSeparator(), CURRENCY.getUseThousandSeparator());
-        assertEquals(currency.getDef(), CURRENCY.getDef());
+        assertEquals(currency.symbol(), CURRENCY.symbol());
+        assertEquals(currency.description(), CURRENCY.description());
+        assertEquals(currency.rate(), CURRENCY.rate());
+        assertEquals(currency.useThousandSeparator(), CURRENCY.useThousandSeparator());
+        assertEquals(currency.def(), CURRENCY.def());
     }
 }

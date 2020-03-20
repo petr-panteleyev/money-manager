@@ -7,24 +7,14 @@ package org.panteleyev.ofx;
 
 import java.util.List;
 
-public class AccountStatementList {
-    private final List<AccountStatement> accountStatementList;
-
-    AccountStatementList(List<AccountStatement> accountStatementList) {
-        this.accountStatementList = accountStatementList;
-    }
-
-    public List<AccountStatement> getAccountStatementList() {
-        return accountStatementList;
-    }
-
+public record AccountStatementList(List<AccountStatement>accountStatementList) {
     public AccountInfo getAccountInfo() {
         return accountStatementList.isEmpty() ?
-            new AccountInfo() : accountStatementList.get(0).getBankAccountFrom();
+            new AccountInfo() : accountStatementList.get(0).bankAccountFrom();
     }
 
     public BankTransactionList getBankTransactionList() {
         return accountStatementList.isEmpty() ?
-            new BankTransactionList() : accountStatementList.get(0).getBankTransactionList();
+            new BankTransactionList() : accountStatementList.get(0).bankTransactionList();
     }
 }

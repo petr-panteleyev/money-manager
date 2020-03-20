@@ -32,6 +32,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 
 public class EditorPaneTest extends BaseTest {
+    private static final BigDecimal RATE = BigDecimal.ONE.setScale(6);
+
     private final Category category;
     private final Contact contact;
     private final Account acc_1;
@@ -72,7 +74,7 @@ public class EditorPaneTest extends BaseTest {
         category = new Category.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
-            .catTypeId(CategoryType.BANKS_AND_CASH.getId())
+            .type(CategoryType.BANKS_AND_CASH)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
@@ -85,9 +87,9 @@ public class EditorPaneTest extends BaseTest {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
-            .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getUuid())
-            .currencyUuid(curr_1.getUuid())
+            .type(CategoryType.BANKS_AND_CASH)
+            .categoryUuid(category.uuid())
+            .currencyUuid(curr_1.uuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -98,9 +100,9 @@ public class EditorPaneTest extends BaseTest {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
-            .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getUuid())
-            .currencyUuid(curr_2.getUuid())
+            .type(CategoryType.BANKS_AND_CASH)
+            .categoryUuid(category.uuid())
+            .currencyUuid(curr_2.uuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -111,9 +113,9 @@ public class EditorPaneTest extends BaseTest {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
-            .typeId(CategoryType.BANKS_AND_CASH.getId())
-            .categoryUuid(category.getUuid())
-            .currencyUuid(curr_1.getUuid())
+            .type(CategoryType.BANKS_AND_CASH)
+            .categoryUuid(category.uuid())
+            .currencyUuid(curr_1.uuid())
             .enabled(true)
             .guid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
@@ -121,10 +123,10 @@ public class EditorPaneTest extends BaseTest {
 
         cache = new DataCache() {
             {
-                currencyMap().putAll(Map.of(curr_1.getUuid(), curr_1, curr_2.getUuid(), curr_2));
-                categoriesMap().put(category.getUuid(), category);
-                contactsMap().put(contact.getUuid(), contact);
-                accountsMap().putAll(Map.of(acc_1.getUuid(), acc_1, acc_2.getUuid(), acc_2, acc_3.getUuid(), acc_3));
+                currencyMap().putAll(Map.of(curr_1.uuid(), curr_1, curr_2.uuid(), curr_2));
+                categoriesMap().put(category.uuid(), category);
+                contactsMap().put(contact.uuid(), contact);
+                accountsMap().putAll(Map.of(acc_1.uuid(), acc_1, acc_2.uuid(), acc_2, acc_3.uuid(), acc_3));
             }
         };
     }
@@ -146,25 +148,25 @@ public class EditorPaneTest extends BaseTest {
 
     private void setUserInput(TransactionEditorPane pane, Transaction t, String contactName) {
         // Transaction type
-        pane.getTypeEdit().setText(t.getTransactionType().getTypeName());
+        pane.getTypeEdit().setText(t.type().getTypeName());
 
         // Debited account
-        pane.getDebitedAccountEdit().setText(cache.getAccount(t.getAccountDebitedUuid())
-            .map(Account::getName)
+        pane.getDebitedAccountEdit().setText(cache.getAccount(t.accountDebitedUuid())
+            .map(Account::name)
             .orElse(""));
 
         // Credited account
-        pane.getCreditedAccountEdit().setText(cache.getAccount(t.getAccountCreditedUuid())
-            .map(Account::getName)
+        pane.getCreditedAccountEdit().setText(cache.getAccount(t.accountCreditedUuid())
+            .map(Account::name)
             .orElse(""));
 
-        pane.getCommentEdit().setText(t.getComment());
-        pane.getSumEdit().setText(t.getAmount().toString());
-        pane.getCheckedCheckBox().setSelected(t.getChecked());
+        pane.getCommentEdit().setText(t.comment());
+        pane.getSumEdit().setText(t.amount().toString());
+        pane.getCheckedCheckBox().setSelected(t.checked());
 
-        t.getContactUuid().ifPresent(uuid -> pane.getContactEdit().setText(cache
+        Optional.ofNullable(t.contactUuid()).ifPresent(uuid -> pane.getContactEdit().setText(cache
             .getContact(uuid)
-            .map(Contact::getName)
+            .map(Contact::name)
             .orElse("")));
         if (contactName != null) {
             pane.getContactEdit().setText(contactName);
@@ -197,13 +199,13 @@ public class EditorPaneTest extends BaseTest {
         var now = LocalDate.now();
         var builder = new Transaction.Builder()
             .guid(UUID.randomUUID())
-            .transactionType(TransactionType.CARD_PAYMENT)
-            .accountCreditedType(category.getType())
-            .accountDebitedType(category.getType())
-            .accountCreditedCategoryUuid(category.getUuid())
-            .accountDebitedCategoryUuid(category.getUuid())
-            .accountDebitedUuid(debit.getUuid())
-            .accountCreditedUuid(credit.getUuid())
+            .type(TransactionType.CARD_PAYMENT)
+            .accountCreditedType(category.type())
+            .accountDebitedType(category.type())
+            .accountCreditedCategoryUuid(category.uuid())
+            .accountDebitedCategoryUuid(category.uuid())
+            .accountDebitedUuid(debit.uuid())
+            .accountCreditedUuid(credit.uuid())
             .day(now.getDayOfMonth())
             .month(now.getMonthValue())
             .year(now.getYear())
@@ -211,14 +213,14 @@ public class EditorPaneTest extends BaseTest {
             .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
             .checked(RANDOM.nextBoolean());
 
-        if (Objects.equals(debit.getCurrencyUuid(), credit.getCurrencyUuid())) {
+        if (Objects.equals(debit.currencyUuid(), credit.currencyUuid())) {
             builder.rate(BigDecimal.ONE);
         } else {
             builder.rate(BigDecimal.valueOf(RANDOM.nextDouble()));
         }
 
         if (contact != null) {
-            builder.contactUuid(contact.getUuid());
+            builder.contactUuid(contact.uuid());
         }
 
         return builder.build();
@@ -232,28 +234,28 @@ public class EditorPaneTest extends BaseTest {
     }
 
     private void assertMainFields(Transaction r, Transaction t) {
-        Assert.assertEquals(r.getTransactionType(), t.getTransactionType(),
+        Assert.assertEquals(r.type(), t.type(),
             "Transaction type ID is invalid");
 
         // Debited account
-        Assert.assertEquals(r.getAccountDebitedUuid(), t.getAccountDebitedUuid(),
+        Assert.assertEquals(r.accountDebitedUuid(), t.accountDebitedUuid(),
             "Debited account UUID is invalid");
-        Assert.assertEquals(r.getAccountDebitedCategoryUuid(), t.getAccountDebitedCategoryUuid(),
+        Assert.assertEquals(r.accountDebitedCategoryUuid(), t.accountDebitedCategoryUuid(),
             "Debited account category UUID is invalid");
-        Assert.assertEquals(r.getAccountDebitedType(), t.getAccountDebitedType(),
+        Assert.assertEquals(r.accountDebitedType(), t.accountDebitedType(),
             "Debited account category type ID is invalid");
 
         // Credited account
-        Assert.assertEquals(r.getAccountCreditedUuid(), t.getAccountCreditedUuid(),
+        Assert.assertEquals(r.accountCreditedUuid(), t.accountCreditedUuid(),
             "Credited account UUID is invalid");
-        Assert.assertEquals(r.getAccountCreditedCategoryUuid(), t.getAccountCreditedCategoryUuid(),
+        Assert.assertEquals(r.accountCreditedCategoryUuid(), t.accountCreditedCategoryUuid(),
             "Credited account category UUID is invalid");
-        Assert.assertEquals(r.getAccountCreditedType(), t.getAccountCreditedType(),
+        Assert.assertEquals(r.accountCreditedType(), t.accountCreditedType(),
             "Credited account category type ID is invalid");
 
-        Assert.assertEquals(r.getDay(), t.getDay(), "Day is invalid");
-        Assert.assertEquals(r.getComment(), t.getComment(), "Comment is invalid");
-        Assert.assertEquals(r.getChecked(), t.getChecked(), "Checked status is invalid");
+        Assert.assertEquals(r.day(), t.day(), "Day is invalid");
+        Assert.assertEquals(r.comment(), t.comment(), "Comment is invalid");
+        Assert.assertEquals(r.checked(), t.checked(), "Checked status is invalid");
     }
 
     private void assertStatementRecord(TransactionEditorPane pane, StatementRecord record) {
@@ -293,10 +295,10 @@ public class EditorPaneTest extends BaseTest {
                 .year(now.getYear())
                 .build();
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
+            Assert.assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
                 "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
+            Assert.assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(),
                 "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
@@ -328,10 +330,10 @@ public class EditorPaneTest extends BaseTest {
                 .year(now.getYear())
                 .build();
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
+            Assert.assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
                 "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            Assert.assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -364,9 +366,9 @@ public class EditorPaneTest extends BaseTest {
                 .year(now.getYear())
                 .build();
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertTrue(resultedTransaction.getContactUuid().isEmpty(), "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            Assert.assertNull(resultedTransaction.contactUuid(), "Contact UUID is invalid");
+            Assert.assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -392,13 +394,13 @@ public class EditorPaneTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertNotEquals(resultedTransaction.getUuid(), transaction.getUuid());
+            Assert.assertNotEquals(resultedTransaction.uuid(), transaction.uuid());
 
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
+            Assert.assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
                 "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(), "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            Assert.assertEquals(resultedTransaction.rate(), transaction.rate(), "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
 
         }, this::failOnEmptyBuilder);
     }
@@ -425,14 +427,14 @@ public class EditorPaneTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertNotEquals(resultedTransaction.getUuid(), transaction.getUuid());
+            Assert.assertNotEquals(resultedTransaction.uuid(), transaction.uuid());
 
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
+            Assert.assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
                 "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), transaction.getRate(),
+            Assert.assertEquals(resultedTransaction.rate(), transaction.rate(),
                 "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(),
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(),
                 "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
@@ -459,13 +461,13 @@ public class EditorPaneTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             var resultedTransaction = builder.build();
-            Assert.assertEquals(resultedTransaction.getUuid(), transaction.getUuid());
+            Assert.assertEquals(resultedTransaction.uuid(), transaction.uuid());
 
             assertMainFields(resultedTransaction, transaction);
-            Assert.assertEquals(resultedTransaction.getContactUuid(), transaction.getContactUuid(),
+            Assert.assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
                 "Contact UUID is invalid");
-            Assert.assertEquals(resultedTransaction.getRate(), BigDecimal.ONE, "Rate is invalid");
-            Assert.assertEquals(resultedTransaction.getAmount(), transaction.getAmount(), "Amount is invalid");
+            Assert.assertEquals(resultedTransaction.rate(), BigDecimal.ONE.setScale(6), "Rate is invalid");
+            Assert.assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -486,7 +488,7 @@ public class EditorPaneTest extends BaseTest {
         });
 
         var resultedUuid = queue.take();
-        Assert.assertEquals(resultedUuid, transaction.getUuid());
+        Assert.assertEquals(resultedUuid, transaction.uuid());
     }
 
     @Test

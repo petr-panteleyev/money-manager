@@ -64,27 +64,27 @@ public class TestImportExport extends BaseTest implements XsdUtil {
         .detailed(true)
         .build();
     private final Transaction detail1 = new Transaction.Builder(newTransaction(acc2, acc1, con1))
-        .parentUuid(detailedTransaction.getUuid())
+        .parentUuid(detailedTransaction.uuid())
         .build();
     private final Transaction detail2 = new Transaction.Builder(newTransaction(acc2, acc3))
-        .parentUuid(detailedTransaction.getUuid())
+        .parentUuid(detailedTransaction.uuid())
         .build();
 
     private final DataCache mock = new DataCache() {
         {
-            iconsMap().putAll(Map.of(icon1.getUuid(), icon1, icon2.getUuid(), icon2, icon3.getUuid(), icon3));
-            categoriesMap().putAll(Map.of(cat1.getUuid(), cat1, cat2.getUuid(), cat2, cat3.getUuid(), cat3));
-            accountsMap().putAll(Map.of(acc1.getUuid(), acc1, acc2.getUuid(), acc2, acc3.getUuid(), acc3));
-            contactsMap().putAll(Map.of(con1.getUuid(), con1, con2.getUuid(), con2, con3.getUuid(), con3));
-            currencyMap().putAll(Map.of(curr1.getUuid(), curr1, curr2.getUuid(), curr2, curr3.getUuid(), curr3));
+            iconsMap().putAll(Map.of(icon1.uuid(), icon1, icon2.uuid(), icon2, icon3.uuid(), icon3));
+            categoriesMap().putAll(Map.of(cat1.uuid(), cat1, cat2.uuid(), cat2, cat3.uuid(), cat3));
+            accountsMap().putAll(Map.of(acc1.uuid(), acc1, acc2.uuid(), acc2, acc3.uuid(), acc3));
+            contactsMap().putAll(Map.of(con1.uuid(), con1, con2.uuid(), con2, con3.uuid(), con3));
+            currencyMap().putAll(Map.of(curr1.uuid(), curr1, curr2.uuid(), curr2, curr3.uuid(), curr3));
             transactionsMap().putAll(Map.of(
-                tr1.getUuid(), tr1,
-                tr2.getUuid(), tr2,
-                tr3.getUuid(), tr3,
-                tr4.getUuid(), tr4,
-                detailedTransaction.getUuid(), detailedTransaction,
-                detail1.getUuid(), detail1,
-                detail2.getUuid(), detail2
+                tr1.uuid(), tr1,
+                tr2.uuid(), tr2,
+                tr3.uuid(), tr3,
+                tr4.uuid(), tr4,
+                detailedTransaction.uuid(), detailedTransaction,
+                detail1.uuid(), detail1,
+                detail2.uuid(), detail2
             ));
         }
     };

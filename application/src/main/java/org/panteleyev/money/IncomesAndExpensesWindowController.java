@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -230,39 +231,39 @@ class IncomesAndExpensesWindowController extends BaseController {
         var accSum = new HashMap<UUID, BigDecimal>();
 
         Function<Transaction, UUID> catUuidFunc = type == CategoryType.EXPENSES ?
-            Transaction::getAccountCreditedCategoryUuid : Transaction::getAccountDebitedCategoryUuid;
+            Transaction::accountCreditedCategoryUuid : Transaction::accountDebitedCategoryUuid;
         Function<Transaction, UUID> accUuidFunc = type == CategoryType.EXPENSES ?
-            Transaction::getAccountCreditedUuid : Transaction::getAccountDebitedUuid;
+            Transaction::accountCreditedUuid : Transaction::accountDebitedUuid;
 
         cache().getTransactions().stream()
             .filter(filterBox.predicateProperty().get())
             .filter(t -> cache().getCategory(catUuidFunc.apply(t))
-                .map(Category::getType).orElseThrow() == type)
+                .map(Category::type).orElseThrow() == type)
             .peek(t -> {
                 // TODO: currency conversion rates
                 catSum.compute(catUuidFunc.apply(t),
-                    (x, sum) -> sum == null ? t.getAmount() : sum.add(t.getAmount()));
+                    (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
                 accSum.compute(accUuidFunc.apply(t),
-                    (x, sum) -> sum == null ? t.getAmount() : sum.add(t.getAmount()));
+                    (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
             })
             .collect(groupingBy(t -> cache().getCategory(catUuidFunc.apply(t)).orElseThrow(),
                 groupingBy(t -> cache().getAccount(accUuidFunc.apply(t)).orElseThrow(),
-                    groupingBy(t -> t.getContactUuid().flatMap(id -> cache().getContact(id))
-                        .map(Contact::getName).orElse("")))))
+                    groupingBy(t -> Optional.ofNullable(t.contactUuid()).flatMap(id -> cache().getContact(id))
+                        .map(Contact::name).orElse("")))))
             .entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().getName()))
+            .sorted(Comparator.comparing(e -> e.getKey().name()))
             .forEach(categoryMapEntry -> {
                 var category = categoryMapEntry.getKey();
                 var categoryRoot =
-                    newTreeItem(new TreeNode(category.getName(), catSum.get(category.getUuid())), true);
+                    newTreeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
                 root.getChildren().add(categoryRoot);
 
                 categoryMapEntry.getValue().entrySet().stream()
-                    .sorted(Comparator.comparing(accountMapEntry -> accountMapEntry.getKey().getName()))
+                    .sorted(Comparator.comparing(accountMapEntry -> accountMapEntry.getKey().name()))
                     .forEach(accountMapEntry -> {
                         var account = accountMapEntry.getKey();
                         var accountRoot =
-                            newTreeItem(new TreeNode(account.getName(), accSum.get(account.getUuid())), false);
+                            newTreeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
                         categoryRoot.getChildren().add(accountRoot);
 
                         accountMapEntry.getValue().entrySet().stream()
@@ -270,7 +271,7 @@ class IncomesAndExpensesWindowController extends BaseController {
                             .forEach(contactMapEntry -> {
                                 var name = contactMapEntry.getKey();
                                 var sum = contactMapEntry.getValue().stream()
-                                    .map(Transaction::getAmount)
+                                    .map(Transaction::amount)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                                 accountRoot.getChildren().add(newTreeItem(new TreeNode(name, sum), false));

@@ -15,19 +15,19 @@ public class TestAuthResponse {
     @DataProvider(name = "testAuthResponse")
     public Object[][] testAuthResponseDataProvider() {
         return new Object[][]{
-                {REDIRECT_URI + "?code=12345678", "12345678", null, null},
-                {REDIRECT_URI + "?error=invalid_request", null, "invalid_request", null},
-                {REDIRECT_URI + "?error=invalid_request&error_description=Error%20Description",
-                        null, "invalid_request", "Error Description"},
+            {REDIRECT_URI + "?code=12345678", "12345678", null, null},
+            {REDIRECT_URI + "?error=invalid_request", null, "invalid_request", null},
+            {REDIRECT_URI + "?error=invalid_request&error_description=Error%20Description",
+                null, "invalid_request", "Error Description"},
         };
     }
 
     @Test(dataProvider = "testAuthResponse")
     public void testCode(String uri, String code, String error, String errorDescription) {
-        AuthResponse authResponse = new AuthResponse(uri);
+        AuthResponse authResponse = AuthResponse.of(uri);
 
-        Assert.assertEquals(authResponse.getCode(), code);
-        Assert.assertEquals(authResponse.getError(), error);
-        Assert.assertEquals(authResponse.getErrorDescription(), errorDescription);
+        Assert.assertEquals(authResponse.code(), code);
+        Assert.assertEquals(authResponse.error(), error);
+        Assert.assertEquals(authResponse.errorDescription(), errorDescription);
     }
 }

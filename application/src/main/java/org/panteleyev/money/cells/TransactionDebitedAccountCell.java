@@ -22,8 +22,8 @@ public class TransactionDebitedAccountCell extends TableCell<Transaction, Transa
             return;
         }
 
-        cache().getAccount(transaction.getAccountDebitedUuid()).ifPresent(account -> {
-            setText(account.getName());
+        cache().getAccount(transaction.accountDebitedUuid()).ifPresent(account -> {
+            setText(account.name());
             setGraphic(IconManager.getAccountImageView(account));
         });
     }

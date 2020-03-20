@@ -24,7 +24,7 @@ public class ContactDialogTest extends BaseTest {
     private final static Contact CONTACT = new Contact.Builder()
         .guid(UUID.randomUUID())
         .name(randomString())
-        .typeId(randomContactType().getId())
+        .type(randomContactType())
         .phone(randomString())
         .mobile(randomString())
         .email(randomString())
@@ -44,17 +44,17 @@ public class ContactDialogTest extends BaseTest {
     }
 
     private void setupDialog(ContactDialog dialog) {
-        dialog.getNameField().setText(CONTACT.getName());
-        dialog.getPhoneField().setText(CONTACT.getPhone());
-        dialog.getMobileField().setText(CONTACT.getMobile());
-        dialog.getEmailField().setText(CONTACT.getEmail());
-        dialog.getWebField().setText(CONTACT.getWeb());
-        dialog.getCommentEdit().setText(CONTACT.getComment());
-        dialog.getStreetField().setText(CONTACT.getStreet());
-        dialog.getCityField().setText(CONTACT.getCity());
-        dialog.getCountryField().setText(CONTACT.getCountry());
-        dialog.getZipField().setText(CONTACT.getZip());
-        dialog.getTypeChoiceBox().getSelectionModel().select(CONTACT.getType());
+        dialog.getNameField().setText(CONTACT.name());
+        dialog.getPhoneField().setText(CONTACT.phone());
+        dialog.getMobileField().setText(CONTACT.mobile());
+        dialog.getEmailField().setText(CONTACT.email());
+        dialog.getWebField().setText(CONTACT.web());
+        dialog.getCommentEdit().setText(CONTACT.comment());
+        dialog.getStreetField().setText(CONTACT.street());
+        dialog.getCityField().setText(CONTACT.city());
+        dialog.getCountryField().setText(CONTACT.country());
+        dialog.getZipField().setText(CONTACT.zip());
+        dialog.getTypeChoiceBox().getSelectionModel().select(CONTACT.type());
     }
 
     @Test
@@ -70,9 +70,9 @@ public class ContactDialogTest extends BaseTest {
 
         var contact = queue.take();
 
-        assertNotNull(contact.getUuid());
+        assertNotNull(contact.uuid());
         assertContact(contact);
-        assertEquals(contact.getCreated(), contact.getModified());
+        assertEquals(contact.created(), contact.modified());
     }
 
     @Test
@@ -87,23 +87,23 @@ public class ContactDialogTest extends BaseTest {
 
         var contact = queue.take();
 
-        assertEquals(contact.getUuid(), CONTACT.getUuid());
+        assertEquals(contact.uuid(), CONTACT.uuid());
         assertContact(contact);
-        assertTrue(contact.getModified() > CONTACT.getModified());
-        assertTrue(contact.getModified() > contact.getCreated());
+        assertTrue(contact.modified() > CONTACT.modified());
+        assertTrue(contact.modified() > contact.created());
     }
 
     private static void assertContact(Contact contact) {
-        assertEquals(contact.getName(), CONTACT.getName());
-        assertEquals(contact.getPhone(), CONTACT.getPhone());
-        assertEquals(contact.getMobile(), CONTACT.getMobile());
-        assertEquals(contact.getEmail(), CONTACT.getEmail());
-        assertEquals(contact.getWeb(), CONTACT.getWeb());
-        assertEquals(contact.getComment(), CONTACT.getComment());
-        assertEquals(contact.getStreet(), CONTACT.getStreet());
-        assertEquals(contact.getCity(), CONTACT.getCity());
-        assertEquals(contact.getCountry(), CONTACT.getCountry());
-        assertEquals(contact.getZip(), CONTACT.getZip());
-        assertEquals(contact.getType(), CONTACT.getType());
+        assertEquals(contact.name(), CONTACT.name());
+        assertEquals(contact.phone(), CONTACT.phone());
+        assertEquals(contact.mobile(), CONTACT.mobile());
+        assertEquals(contact.email(), CONTACT.email());
+        assertEquals(contact.web(), CONTACT.web());
+        assertEquals(contact.comment(), CONTACT.comment());
+        assertEquals(contact.street(), CONTACT.street());
+        assertEquals(contact.city(), CONTACT.city());
+        assertEquals(contact.country(), CONTACT.country());
+        assertEquals(contact.zip(), CONTACT.zip());
+        assertEquals(contact.type(), CONTACT.type());
     }
 }

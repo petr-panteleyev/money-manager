@@ -5,6 +5,7 @@ package org.panteleyev.money;
  Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
 
+import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import java.time.LocalDate;
 import java.time.Month;
@@ -18,11 +19,11 @@ import static org.panteleyev.money.Bundles.TRANSACTION_PREDICATE_BUNDLE;
 public enum TransactionPredicate implements Predicate<Transaction> {
     ALL(it -> true),
 
-    CURRENT_YEAR(it -> it.getYear() == LocalDate.now().getYear()),
+    CURRENT_YEAR(it -> it.year() == LocalDate.now().getYear()),
 
     CURRENT_MONTH(it -> {
         var now = LocalDate.now();
-        return it.getYear() == now.getYear() && it.getMonth() == now.getMonthValue();
+        return it.year() == now.getYear() && it.month() == now.getMonthValue();
     }),
 
     CURRENT_WEEK(it -> {
@@ -73,7 +74,7 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     TransactionPredicate(Month month) {
         predicate = (t) -> {
             var now = LocalDate.now();
-            return t.getYear() == now.getYear() && t.getMonth() == month.getValue();
+            return t.year() == now.getYear() && t.month() == month.getValue();
         };
 
         description = month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault());
@@ -85,21 +86,21 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     }
 
     public static Predicate<Transaction> transactionByAccount(UUID uuid) {
-        return it -> Objects.equals(it.getAccountDebitedUuid(), uuid)
-            || Objects.equals(it.getAccountCreditedUuid(), uuid);
+        return it -> Objects.equals(it.accountDebitedUuid(), uuid)
+            || Objects.equals(it.accountCreditedUuid(), uuid);
     }
 
     public static Predicate<Transaction> transactionByCategory(UUID uuid) {
-        return it -> Objects.equals(it.getAccountDebitedCategoryUuid(), uuid)
-            || Objects.equals(it.getAccountCreditedCategoryUuid(), uuid);
+        return it -> Objects.equals(it.accountDebitedCategoryUuid(), uuid)
+            || Objects.equals(it.accountCreditedCategoryUuid(), uuid);
     }
 
-    public static Predicate<Transaction> transactionByCategoryType(int id) {
-        return it -> it.getAccountDebitedTypeId() == id || it.getAccountCreditedTypeId() == id;
+    public static Predicate<Transaction> transactionByCategoryType(CategoryType type) {
+        return it -> it.accountDebitedType() == type || it.accountCreditedType() == type;
     }
 
     public static Predicate<Transaction> transactionByYear(int year) {
-        return it -> it.getYear() == year;
+        return it -> it.year() == year;
     }
 
     public static Predicate<Transaction> transactionByDates(LocalDate from, LocalDate to) {
@@ -107,7 +108,7 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     }
 
     private static boolean checkRange(Transaction t, LocalDate from, LocalDate to) {
-        var date = LocalDate.of(t.getYear(), t.getMonth(), t.getDay());
+        var date = LocalDate.of(t.year(), t.month(), t.day());
         return date.compareTo(from) >= 0 && date.compareTo(to) <= 0;
     }
 

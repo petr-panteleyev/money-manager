@@ -44,7 +44,7 @@ public class TestAccount extends BaseTest {
             .openingBalance(opening)
             .accountLimit(limit)
             .currencyRate(rate)
-            .typeId(type.getId())
+            .type(type)
             .categoryUuid(categoryUuid)
             .currencyUuid(currencyUuid)
             .enabled(enabled)
@@ -65,7 +65,7 @@ public class TestAccount extends BaseTest {
             .openingBalance(opening)
             .accountLimit(limit)
             .currencyRate(rate)
-            .typeId(type.getId())
+            .type(type)
             .categoryUuid(categoryUuid)
             .currencyUuid(currencyUuid)
             .enabled(enabled)
@@ -97,14 +97,14 @@ public class TestAccount extends BaseTest {
     public void testAccountNumber(String accountNumber, String accountNumberNoSpaces) {
         var a = new Account.Builder()
             .accountNumber(accountNumber)
-            .typeId(CategoryType.DEBTS.getId())
+            .type(CategoryType.DEBTS)
             .categoryUuid(UUID.randomUUID())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
 
-        assertEquals(a.getAccountNumber(), accountNumber);
+        assertEquals(a.accountNumber(), accountNumber);
         assertEquals(a.getAccountNumberNoSpaces(), accountNumberNoSpaces);
     }
 
@@ -117,7 +117,7 @@ public class TestAccount extends BaseTest {
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .currencyRate(randomBigDecimal())
-            .typeId(randomCategoryType().getId())
+            .type(randomCategoryType())
             .categoryUuid(UUID.randomUUID())
             .currencyUuid(UUID.randomUUID())
             .enabled(RANDOM.nextBoolean())
@@ -135,24 +135,24 @@ public class TestAccount extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Account.Builder()
-            .name(original.getName())
-            .comment(original.getComment())
-            .accountNumber(original.getAccountNumber())
-            .openingBalance(original.getOpeningBalance())
-            .accountLimit(original.getAccountLimit())
-            .currencyRate(original.getCurrencyRate())
-            .typeId(original.getTypeId())
-            .categoryUuid(original.getCategoryUuid())
-            .currencyUuid(original.getCurrencyUuid().orElse(null))
-            .enabled(original.getEnabled())
-            .interest(original.getInterest())
-            .closingDate(original.getClosingDate().orElse(null))
-            .iconUuid(original.getIconUuid())
-            .cardType(original.getCardType())
-            .cardNumber(original.getCardNumber())
-            .guid(original.getUuid())
-            .created(original.getCreated())
-            .modified(original.getModified())
+            .name(original.name())
+            .comment(original.comment())
+            .accountNumber(original.accountNumber())
+            .openingBalance(original.openingBalance())
+            .accountLimit(original.accountLimit())
+            .currencyRate(original.currencyRate())
+            .type(original.type())
+            .categoryUuid(original.categoryUuid())
+            .currencyUuid(original.currencyUuid())
+            .enabled(original.enabled())
+            .interest(original.interest())
+            .closingDate(original.closingDate())
+            .iconUuid(original.iconUuid())
+            .cardType(original.cardType())
+            .cardNumber(original.cardNumber())
+            .guid(original.uuid())
+            .created(original.created())
+            .modified(original.modified())
             .build();
         assertEquals(manualCopy, original);
     }

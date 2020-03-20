@@ -100,19 +100,19 @@ final class ContactDialog extends BaseDialog<Contact> {
         });
 
         if (contact != null) {
-            typeChoiceBox.getSelectionModel().select(contact.getType());
+            typeChoiceBox.getSelectionModel().select(contact.type());
 
-            nameField.setText(contact.getName());
-            phoneField.setText(contact.getPhone());
-            mobileField.setText(contact.getMobile());
-            emailField.setText(contact.getEmail());
-            webField.setText(contact.getWeb());
-            commentEdit.setText(contact.getComment());
-            streetField.setText(contact.getStreet());
-            cityField.setText(contact.getCity());
-            countryField.setText(contact.getCountry());
-            zipField.setText(contact.getZip());
-            iconComboBox.getSelectionModel().select(cache().getIcon(contact.getIconUuid()).orElse(EMPTY_ICON));
+            nameField.setText(contact.name());
+            phoneField.setText(contact.phone());
+            mobileField.setText(contact.mobile());
+            emailField.setText(contact.email());
+            webField.setText(contact.web());
+            commentEdit.setText(contact.comment());
+            streetField.setText(contact.street());
+            cityField.setText(contact.city());
+            countryField.setText(contact.country());
+            zipField.setText(contact.zip());
+            iconComboBox.getSelectionModel().select(cache().getIcon(contact.iconUuid()).orElse(EMPTY_ICON));
         } else {
             typeChoiceBox.getSelectionModel().select(0);
             iconComboBox.getSelectionModel().select(EMPTY_ICON);
@@ -124,7 +124,7 @@ final class ContactDialog extends BaseDialog<Contact> {
 
                 var builder = new Contact.Builder(contact)
                     .name(nameField.getText())
-                    .typeId(typeChoiceBox.getSelectionModel().getSelectedItem().getId())
+                    .type(typeChoiceBox.getSelectionModel().getSelectedItem())
                     .phone(phoneField.getText())
                     .mobile(mobileField.getText())
                     .email(emailField.getText())
@@ -134,7 +134,7 @@ final class ContactDialog extends BaseDialog<Contact> {
                     .city(cityField.getText())
                     .country(countryField.getText())
                     .zip(zipField.getText())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().getUuid())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
                     .modified(now);
 
                 if (contact == null) {

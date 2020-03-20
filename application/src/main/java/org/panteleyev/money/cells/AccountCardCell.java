@@ -18,11 +18,11 @@ public class AccountCardCell extends TableCell<Account, Account> {
         setText("");
         setGraphic(null);
 
-        if (empty || account == null || account.getCardNumber().isBlank()) {
+        if (empty || account == null || account.cardNumber().isBlank()) {
             return;
         }
 
-        setText(account.getCardNumber());
-        setGraphic(new ImageView(getCardTypeIcon(account.getCardType())));
+        setText(account.cardNumber());
+        setGraphic(new ImageView(getCardTypeIcon(account.cardType())));
     }
 }

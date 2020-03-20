@@ -33,16 +33,14 @@ public class AccountClosingDateCell extends TableCell<Account, Account> {
         setText("");
         getStyleClass().remove(RED_TEXT);
 
-        if (empty || account == null) {
+        if (empty || account == null || account.closingDate() == null) {
             return;
         }
 
-        account.getClosingDate().ifPresent(date -> {
-            if (LocalDate.now().until(date, ChronoUnit.DAYS) < delta) {
-                getStyleClass().add(RED_TEXT);
-            }
-            var formatter = account.getCardNumber().isBlank()? FORMATTER : CARD_FORMATTER;
-            setText(LocalDate.EPOCH.equals(date) ? "" : formatter.format(date));
-        });
+        if (LocalDate.now().until(account.closingDate(), ChronoUnit.DAYS) < delta) {
+            getStyleClass().add(RED_TEXT);
+        }
+        var formatter = account.cardNumber().isBlank() ? FORMATTER : CARD_FORMATTER;
+        setText(LocalDate.EPOCH.equals(account.closingDate()) ? "" : formatter.format(account.closingDate()));
     }
 }

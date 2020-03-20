@@ -8,20 +8,8 @@ package org.panteleyev.money.ymoney;
 import com.google.gson.JsonObject;
 import java.math.BigDecimal;
 
-public class AccountInfo {
-    private final String id;
-    private final BigDecimal balance;
-
-    public AccountInfo(JsonObject json) {
-        id = json.get("account").getAsString();
-        balance = json.get("balance").getAsBigDecimal();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
+public record AccountInfo(String id, BigDecimal balance) {
+    public static AccountInfo of(JsonObject json) {
+        return new AccountInfo(json.get("account").getAsString(), json.get("balance").getAsBigDecimal());
     }
 }

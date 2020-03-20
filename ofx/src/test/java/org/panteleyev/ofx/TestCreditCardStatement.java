@@ -135,26 +135,26 @@ public class TestCreditCardStatement {
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.getCurrency(), STATEMENT_CURRENCY);
-            var accountInfo = statement.getCreditCardAccountFrom();
-            assertEquals(accountInfo.getAccountNumber(), ACCOUNT_NUMBER);
+            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            var accountInfo = statement.creditCardAccountFrom();
+            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
 
-            var bankTransactionList = statement.getBankTransactionList();
+            var bankTransactionList = statement.bankTransactionList();
             if (!bankTransactionList.isEmpty()) {
-                assertEquals(bankTransactionList.getDateStart(),
+                assertEquals(bankTransactionList.dateStart(),
                     LocalDateTime.of(2018, 12, 6, 12, 0));
-                assertEquals(bankTransactionList.getDateEnd(),
+                assertEquals(bankTransactionList.dateEnd(),
                     LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(bankTransactionList.getTransactions(), EXPECTED_TRANSACTIONS);
+                assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
             } else {
                 fail("No bank transaction list present");
             }
 
-            var pendingTransactionList = statement.getPendingTransactionList();
+            var pendingTransactionList = statement.pendingTransactionList();
             if (!pendingTransactionList.isEmpty()) {
-                assertEquals(pendingTransactionList.getDateAsOf(),
+                assertEquals(pendingTransactionList.dateAsOf(),
                     LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(pendingTransactionList.getTransactions(), EXPECTED_PENDING_TRANSACTIONS);
+                assertEquals(pendingTransactionList.transactions(), EXPECTED_PENDING_TRANSACTIONS);
             } else {
                 fail("No pending transaction list present");
             }
@@ -181,22 +181,22 @@ public class TestCreditCardStatement {
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.getCurrency(), STATEMENT_CURRENCY);
-            var accountInfo = statement.getCreditCardAccountFrom();
-            assertEquals(accountInfo.getAccountNumber(), ACCOUNT_NUMBER);
+            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            var accountInfo = statement.creditCardAccountFrom();
+            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
 
-            var bankTransactionList = statement.getBankTransactionList();
+            var bankTransactionList = statement.bankTransactionList();
             if (!bankTransactionList.isEmpty())  {
-                assertEquals(bankTransactionList.getDateStart(),
+                assertEquals(bankTransactionList.dateStart(),
                     LocalDateTime.of(2018, 12, 6, 12, 0));
-                assertEquals(bankTransactionList.getDateEnd(),
+                assertEquals(bankTransactionList.dateEnd(),
                     LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(bankTransactionList.getTransactions(), EXPECTED_TRANSACTIONS);
+                assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
             } else {
                 fail("No bank transaction list present");
             }
 
-            assertTrue(statement.getPendingTransactionList().isEmpty());
+            assertTrue(statement.pendingTransactionList().isEmpty());
         }
     }
 
@@ -220,17 +220,17 @@ public class TestCreditCardStatement {
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.getCurrency(), STATEMENT_CURRENCY);
-            var accountInfo = statement.getCreditCardAccountFrom();
-            assertEquals(accountInfo.getAccountNumber(), ACCOUNT_NUMBER);
+            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            var accountInfo = statement.creditCardAccountFrom();
+            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
 
-            assertTrue(statement.getBankTransactionList().isEmpty());
+            assertTrue(statement.bankTransactionList().isEmpty());
 
-            var pendingTransactionList = statement.getPendingTransactionList();
+            var pendingTransactionList = statement.pendingTransactionList();
             if (!pendingTransactionList.isEmpty()) {
-                assertEquals(pendingTransactionList.getDateAsOf(),
+                assertEquals(pendingTransactionList.dateAsOf(),
                     LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(pendingTransactionList.getTransactions(), EXPECTED_PENDING_TRANSACTIONS);
+                assertEquals(pendingTransactionList.transactions(), EXPECTED_PENDING_TRANSACTIONS);
             } else {
                 fail("No pending transaction list present");
             }

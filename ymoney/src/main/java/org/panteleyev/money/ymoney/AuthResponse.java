@@ -8,12 +8,8 @@ package org.panteleyev.money.ymoney;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public final class AuthResponse {
-    private final String code;
-    private final String error;
-    private final String errorDescription;
-
-    public AuthResponse(String uri) {
+public record AuthResponse(String code, String error, String errorDescription) {
+    public static AuthResponse of(String uri) {
         int index = uri.indexOf('?');
         if (index == -1) {
             throw new IllegalArgumentException("Invalid uri");
@@ -39,20 +35,6 @@ public final class AuthResponse {
             }
         }
 
-        code = sToken;
-        error = sError;
-        errorDescription = sErrorDescription;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getError() {
-        return error;
-    }
-
-    String getErrorDescription() {
-        return errorDescription;
+        return new AuthResponse(sToken, sError, sErrorDescription);
     }
 }

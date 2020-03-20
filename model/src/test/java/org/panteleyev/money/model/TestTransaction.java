@@ -28,13 +28,13 @@ public class TestTransaction extends BaseTest {
         var day = randomDay();
         var month = randomMonth();
         var year = randomYear();
-        var transactionTypeId = randomTransactionType().getId();
+        var type = randomTransactionType();
         var comment = UUID.randomUUID().toString();
         var checked = RANDOM.nextBoolean();
         var accountDebitedUuid = UUID.randomUUID();
         var accountCreditedUuid = UUID.randomUUID();
-        var accountDebitedTypeId = randomCategoryType().getId();
-        var accountCreditedTypeId = randomCategoryType().getId();
+        var accountDebitedType = randomCategoryType();
+        var accountCreditedType = randomCategoryType();
         var accountDebitedCategoryUuid = UUID.randomUUID();
         var accountCreditedCategoryUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
@@ -52,13 +52,13 @@ public class TestTransaction extends BaseTest {
             .day(day)
             .month(month)
             .year(year)
-            .transactionTypeId(transactionTypeId)
+            .type(type)
             .comment(comment)
             .checked(checked)
             .accountDebitedUuid(accountDebitedUuid)
             .accountCreditedUuid(accountCreditedUuid)
-            .accountDebitedTypeId(accountDebitedTypeId)
-            .accountCreditedTypeId(accountCreditedTypeId)
+            .accountDebitedType(accountDebitedType)
+            .accountCreditedType(accountCreditedType)
             .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
             .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
             .contactUuid(contactUuid)
@@ -77,13 +77,13 @@ public class TestTransaction extends BaseTest {
             .day(day)
             .month(month)
             .year(year)
-            .transactionTypeId(transactionTypeId)
+            .type(type)
             .comment(comment)
             .checked(checked)
             .accountDebitedUuid(accountDebitedUuid)
             .accountCreditedUuid(accountCreditedUuid)
-            .accountDebitedTypeId(accountDebitedTypeId)
-            .accountCreditedTypeId(accountCreditedTypeId)
+            .accountDebitedType(accountDebitedType)
+            .accountCreditedType(accountCreditedType)
             .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
             .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
             .contactUuid(contactUuid)
@@ -108,13 +108,13 @@ public class TestTransaction extends BaseTest {
             .day(randomDay())
             .month(randomMonth())
             .year(randomYear())
-            .transactionTypeId(randomTransactionType().getId())
+            .type(randomTransactionType())
             .comment(randomString())
             .checked(randomBoolean())
             .accountDebitedUuid(UUID.randomUUID())
             .accountCreditedUuid(UUID.randomUUID())
-            .accountDebitedTypeId(randomCategoryType().getId())
-            .accountCreditedTypeId(randomCategoryType().getId())
+            .accountDebitedType(randomCategoryType())
+            .accountCreditedType(randomCategoryType())
             .accountDebitedCategoryUuid(UUID.randomUUID())
             .accountCreditedCategoryUuid(UUID.randomUUID())
             .contactUuid(UUID.randomUUID())
@@ -128,27 +128,27 @@ public class TestTransaction extends BaseTest {
             .detailed(randomBoolean())
             .build();
 
-        var t2 = t1.check(!t1.getChecked());
+        var t2 = t1.check(!t1.checked());
 
-        assertEquals(t2.getAmount(), t1.getAmount());
-        assertEquals(t2.getDay(), t1.getDay());
-        assertEquals(t2.getMonth(), t1.getMonth());
-        assertEquals(t2.getYear(), t1.getYear());
-        assertEquals(t2.getTransactionTypeId(), t1.getTransactionTypeId());
-        assertEquals(t2.getComment(), t1.getComment());
-        assertEquals(t2.getChecked(), !t1.getChecked());
-        assertEquals(t2.getAccountDebitedUuid(), t1.getAccountDebitedUuid());
-        assertEquals(t2.getAccountCreditedUuid(), t1.getAccountCreditedUuid());
-        assertEquals(t2.getAccountDebitedType(), t1.getAccountDebitedType());
-        assertEquals(t2.getAccountCreditedType(), t1.getAccountCreditedType());
-        assertEquals(t2.getContactUuid(), t1.getContactUuid());
-        assertEquals(t2.getRate(), t1.getRate());
-        assertEquals(t2.getRateDirection(), t1.getRateDirection());
-        assertEquals(t2.getInvoiceNumber(), t1.getInvoiceNumber());
-        assertEquals(t2.getParentUuid(), t1.getParentUuid());
-        assertEquals(t2.getUuid(), t1.getUuid());
-        assertEquals(t1.getCreated(), t2.getCreated());
-        assertTrue(t2.getModified() >= t1.getModified());
+        assertEquals(t2.amount(), t1.amount());
+        assertEquals(t2.day(), t1.day());
+        assertEquals(t2.month(), t1.month());
+        assertEquals(t2.year(), t1.year());
+        assertEquals(t2.type(), t1.type());
+        assertEquals(t2.comment(), t1.comment());
+        assertEquals(t2.checked(), !t1.checked());
+        assertEquals(t2.accountDebitedUuid(), t1.accountDebitedUuid());
+        assertEquals(t2.accountCreditedUuid(), t1.accountCreditedUuid());
+        assertEquals(t2.accountDebitedType(), t1.accountDebitedType());
+        assertEquals(t2.accountCreditedType(), t1.accountCreditedType());
+        assertEquals(t2.contactUuid(), t1.contactUuid());
+        assertEquals(t2.rate(), t1.rate());
+        assertEquals(t2.rateDirection(), t1.rateDirection());
+        assertEquals(t2.invoiceNumber(), t1.invoiceNumber());
+        assertEquals(t2.parentUuid(), t1.parentUuid());
+        assertEquals(t2.uuid(), t1.uuid());
+        assertEquals(t1.created(), t2.created());
+        assertTrue(t2.modified() >= t1.modified());
     }
 
     @Test

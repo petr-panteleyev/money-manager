@@ -27,8 +27,8 @@ public class TransactionSumCell extends TableCell<Transaction, Transaction> {
             getStyleClass().removeAll(RED_TEXT, BLUE_TEXT, BLACK_TEXT);
 
             var s = BLACK_TEXT;
-            if (item.getAccountCreditedType() != item.getAccountDebitedType()) {
-                if (item.getAccountDebitedType() == CategoryType.INCOMES) {
+            if (item.accountCreditedType() != item.accountDebitedType()) {
+                if (item.accountDebitedType() == CategoryType.INCOMES) {
                     s = BLUE_TEXT;
                 } else {
                     s = RED_TEXT;

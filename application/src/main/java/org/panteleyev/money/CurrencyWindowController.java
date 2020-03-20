@@ -60,8 +60,8 @@ final class CurrencyWindowController extends BaseController {
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-            newTableColumn(RB, "column.Name", null, Currency::getSymbol, w.multiply(0.2)),
-            newTableColumn(RB, "Description", null, Currency::getDescription, w.multiply(0.8))
+            newTableColumn(RB, "column.Name", null, Currency::symbol, w.multiply(0.2)),
+            newTableColumn(RB, "Description", null, Currency::description, w.multiply(0.8))
         ));
 
         var root = new BorderPane();
@@ -100,7 +100,7 @@ final class CurrencyWindowController extends BaseController {
 
             // find if we have item with this id
             int index = currencyList.stream()
-                .filter(c -> Objects.equals(c.getUuid(), currency.getUuid()))
+                .filter(c -> Objects.equals(c.uuid(), currency.uuid()))
                 .findFirst()
                 .map(currencyList::indexOf)
                 .orElse(-1);

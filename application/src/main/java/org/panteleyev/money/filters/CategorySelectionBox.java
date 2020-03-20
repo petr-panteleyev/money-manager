@@ -75,8 +75,8 @@ public class CategorySelectionBox extends HBox {
         categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object object) {
-                if (object instanceof TypeListItem) {
-                    return ((TypeListItem) object).getText();
+                if (object instanceof TypeListItem item) {
+                    return item.getText();
                 } else {
                     return object != null ? object.toString() : "-";
                 }
@@ -86,7 +86,7 @@ public class CategorySelectionBox extends HBox {
         categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
             public String toString(Object obj) {
-                return obj instanceof Category ? ((Category) obj).getName() : obj.toString();
+                return obj instanceof Category category ? category.name() : obj.toString();
             }
         });
 
@@ -121,20 +121,20 @@ public class CategorySelectionBox extends HBox {
 
     private Optional<Category> getSelectedCategory() {
         var obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Category ? Optional.of((Category) obj) : Optional.empty();
+        return obj instanceof Category category ? Optional.of(category) : Optional.empty();
     }
 
     private Set<CategoryType> getSelectedCategoryTypes() {
         var obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
-        if (obj instanceof TypeListItem) {
-            return ((TypeListItem) obj).getTypes();
+        if (obj instanceof TypeListItem item) {
+            return item.getTypes();
         } else {
             return Set.of();
         }
     }
 
     private Predicate<Account> getAccountFilter() {
-        return getSelectedCategory().map(c -> accountByCategory(c.getUuid()))
+        return getSelectedCategory().map(c -> accountByCategory(c.uuid()))
             .orElseGet(() -> {
                 var selectedTypes = getSelectedCategoryTypes();
                 return selectedTypes.isEmpty() ? a -> false :
@@ -146,10 +146,9 @@ public class CategorySelectionBox extends HBox {
         categoryChoiceBox.setOnAction(x -> {});
         var object = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
 
-        if (!(object instanceof TypeListItem)) {
+        if (!(object instanceof TypeListItem typeListItem)) {
             return;
         }
-        var typeListItem = (TypeListItem) object;
 
         ObservableList<Object> items =
             FXCollections.observableArrayList(cache().getCategoriesByType(typeListItem.getTypes()));

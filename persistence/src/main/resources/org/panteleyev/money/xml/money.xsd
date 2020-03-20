@@ -123,7 +123,7 @@
             <xsd:element name="enabled" type="xsd:boolean"/>
             <xsd:element name="name" type="xsd:string"/>
             <xsd:element name="openingBalance" type="xsd:decimal"/>
-            <xsd:element name="typeId" type="CategoryType"/>
+            <xsd:element name="type" type="CategoryType"/>
             <xsd:element name="interest" type="xsd:decimal"/>
             <xsd:element name="closingDate" type="Timestamp"/>
             <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
@@ -138,7 +138,7 @@
     <xsd:complexType name="Category">
         <xsd:all>
             <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="catTypeId" type="CategoryType"/>
+            <xsd:element name="type" type="CategoryType"/>
             <xsd:element name="comment" type="xsd:string"/>
             <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="guid" type="UUID"/>
@@ -151,7 +151,7 @@
         <xsd:all>
             <xsd:element name="name" type="xsd:string"/>
             <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="typeId" type="ContactType"/>
+            <xsd:element name="type" type="ContactType"/>
             <xsd:element name="email" type="xsd:string"/>
             <xsd:element name="web" type="xsd:string"/>
             <xsd:element name="mobile" type="xsd:string"/>
@@ -188,10 +188,10 @@
         <xsd:all>
             <xsd:element name="accountCreditedCategoryUuid" type="UUID"/>
             <xsd:element name="accountCreditedUuid" type="UUID"/>
-            <xsd:element name="accountCreditedTypeId" type="CategoryType"/>
+            <xsd:element name="accountCreditedType" type="CategoryType"/>
             <xsd:element name="accountDebitedCategoryUuid" type="UUID"/>
             <xsd:element name="accountDebitedUuid" type="UUID"/>
-            <xsd:element name="accountDebitedTypeId" type="CategoryType"/>
+            <xsd:element name="accountDebitedType" type="CategoryType"/>
             <xsd:element name="amount" type="xsd:decimal"/>
             <xsd:element name="checked" type="xsd:boolean"/>
             <xsd:element name="comment" type="xsd:string"/>
@@ -201,7 +201,7 @@
             <xsd:element name="month" type="Month"/>
             <xsd:element name="rate" type="xsd:decimal"/>
             <xsd:element name="rateDirection" type="Switch"/>
-            <xsd:element name="transactionTypeId" type="TransactionType"/>
+            <xsd:element name="type" type="TransactionType"/>
             <xsd:element name="year" type="Year"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
@@ -246,37 +246,46 @@
     </xsd:simpleType>
 
     <xsd:simpleType name="CategoryType">
-        <xsd:restriction base="xsd:int">
-            <xsd:minInclusive value="1"/>
-            <xsd:maxInclusive value="7"/>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="BANKS_AND_CASH"/>
+            <xsd:enumeration value="INCOMES"/>
+            <xsd:enumeration value="EXPENSES"/>
+            <xsd:enumeration value="DEBTS"/>
+            <xsd:enumeration value="PORTFOLIO"/>
+            <xsd:enumeration value="ASSETS"/>
+            <xsd:enumeration value="STARTUP"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="ContactType">
-        <xsd:restriction base="xsd:int">
-            <xsd:minInclusive value="1"/>
-            <xsd:maxInclusive value="6"/>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="PERSONAL"/>
+            <xsd:enumeration value="CLIENT"/>
+            <xsd:enumeration value="SUPPLIER"/>
+            <xsd:enumeration value="EMPLOYEE"/>
+            <xsd:enumeration value="EMPLOYER"/>
+            <xsd:enumeration value="SERVICE"/>
         </xsd:restriction>
     </xsd:simpleType>
 
     <xsd:simpleType name="TransactionType">
-        <xsd:restriction base="xsd:int">
-            <xsd:enumeration value="1"/>
-            <xsd:enumeration value="2"/>
-            <xsd:enumeration value="3"/>
-            <xsd:enumeration value="5"/>
-            <xsd:enumeration value="6"/>
-            <xsd:enumeration value="7"/>
-            <xsd:enumeration value="8"/>
-            <xsd:enumeration value="10"/>
-            <xsd:enumeration value="11"/>
-            <xsd:enumeration value="13"/>
-            <xsd:enumeration value="14"/>
-            <xsd:enumeration value="15"/>
-            <xsd:enumeration value="17"/>
-            <xsd:enumeration value="18"/>
-            <xsd:enumeration value="20"/>
-            <xsd:enumeration value="21"/>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CARD_PAYMENT"/>
+            <xsd:enumeration value="CASH_PURCHASE"/>
+            <xsd:enumeration value="CHEQUE"/>
+            <xsd:enumeration value="WITHDRAWAL"/>
+            <xsd:enumeration value="CACHIER"/>
+            <xsd:enumeration value="DEPOSIT"/>
+            <xsd:enumeration value="TRANSFER"/>
+            <xsd:enumeration value="INTEREST"/>
+            <xsd:enumeration value="DIVIDEND"/>
+            <xsd:enumeration value="DIRECT_BILLING"/>
+            <xsd:enumeration value="CHARGE"/>
+            <xsd:enumeration value="FEE"/>
+            <xsd:enumeration value="INCOME"/>
+            <xsd:enumeration value="SALE"/>
+            <xsd:enumeration value="REFUND"/>
+            <xsd:enumeration value="UNDEFINED"/>
         </xsd:restriction>
     </xsd:simpleType>
 

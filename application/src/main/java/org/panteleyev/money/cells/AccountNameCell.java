@@ -18,8 +18,8 @@ public class AccountNameCell extends TableCell<Account, Account> {
             setText("");
             setGraphic(null);
         } else {
-            setText(account.getName());
-            setGraphic(IconManager.getImageView(account.getIconUuid()));
+            setText(account.name());
+            setGraphic(IconManager.getImageView(account.iconUuid()));
         }
     }
 }

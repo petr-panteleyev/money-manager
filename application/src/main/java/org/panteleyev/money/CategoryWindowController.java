@@ -86,9 +86,9 @@ final class CategoryWindowController extends BaseController {
         // Table
         var w = categoryTable.widthProperty().subtract(20);
         categoryTable.getColumns().setAll(List.of(
-            newTableColumn(RB, "Type", null, c -> c.getType().getTypeName(), w.multiply(0.2)),
+            newTableColumn(RB, "Type", null, c -> c.type().getTypeName(), w.multiply(0.2)),
             newTableColumn(RB, "column.Name", x -> new CategoryNameCell(), w.multiply(0.4)),
-            newTableColumn(RB, "Comment", null, Category::getComment, w.multiply(0.4))
+            newTableColumn(RB, "Comment", null, Category::comment, w.multiply(0.4))
         ));
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
@@ -112,7 +112,7 @@ final class CategoryWindowController extends BaseController {
 
         typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             public String toString(Object obj) {
-                return obj instanceof CategoryType ? ((CategoryType) obj).getTypeName() : obj.toString();
+                return obj instanceof CategoryType type ? type.getTypeName() : obj.toString();
             }
         });
 
@@ -148,13 +148,13 @@ final class CategoryWindowController extends BaseController {
         if (type instanceof String) {
             filter = x -> true;
         } else {
-            filter = x -> x.getType() == type;
+            filter = x -> x.type() == type;
         }
 
         // Name
         var search = searchField.getText().toLowerCase();
         if (!search.isEmpty()) {
-            filter = filter.and(x -> x.getName().toLowerCase().contains(search));
+            filter = filter.and(x -> x.name().toLowerCase().contains(search));
         }
 
         return filter;

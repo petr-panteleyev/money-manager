@@ -26,7 +26,7 @@ public class TestCategory extends BaseTest {
         var c1 = new Category.Builder()
             .name(name)
             .comment(comment)
-            .catTypeId(type.getId())
+            .type(type)
             .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
@@ -35,7 +35,7 @@ public class TestCategory extends BaseTest {
         var c2 = new Category.Builder()
             .name(name)
             .comment(comment)
-            .catTypeId(type.getId())
+            .type(type)
             .iconUuid(iconUuid)
             .guid(uuid)
             .created(created)
@@ -51,7 +51,7 @@ public class TestCategory extends BaseTest {
         var original = new Category.Builder()
             .name(randomString())
             .comment(randomString())
-            .catTypeId(randomCategoryType().getId())
+            .type(randomCategoryType())
             .iconUuid(UUID.randomUUID())
             .guid(UUID.randomUUID())
             .created(System.currentTimeMillis())
@@ -62,13 +62,13 @@ public class TestCategory extends BaseTest {
         assertEquals(copy, original);
 
         var manualCopy = new Category.Builder()
-            .name(original.getName())
-            .comment(original.getComment())
-            .catTypeId(original.getCatTypeId())
-            .iconUuid(original.getIconUuid())
-            .guid(original.getUuid())
-            .created(original.getCreated())
-            .modified(original.getModified())
+            .name(original.name())
+            .comment(original.comment())
+            .type(original.type())
+            .iconUuid(original.iconUuid())
+            .guid(original.uuid())
+            .created(original.created())
+            .modified(original.modified())
             .build();
         assertEquals(manualCopy, original);
     }

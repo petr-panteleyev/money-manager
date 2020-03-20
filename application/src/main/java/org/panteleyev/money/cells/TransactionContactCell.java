@@ -23,9 +23,9 @@ public class TransactionContactCell extends TableCell<Transaction, Transaction> 
             return;
         }
 
-        cache().getContact(transaction.getContactUuid().orElse(null)).ifPresent(contact -> {
-            setText(contact.getName());
-            setGraphic(IconManager.getImageView(contact.getIconUuid()));
+        cache().getContact(transaction.contactUuid()).ifPresent(contact -> {
+            setText(contact.name());
+            setGraphic(IconManager.getImageView(contact.iconUuid()));
         });
     }
 }

@@ -120,17 +120,17 @@ public final class StatementRecord {
         this.accountAmountDecimal = toBigDecimal(this.accountAmount);
 
         currencyUuid = cache().getCurrencies().stream()
-            .filter(c -> c.getDescription().equalsIgnoreCase(currency)
-                || c.getSymbol().equalsIgnoreCase(currency))
+            .filter(c -> c.description().equalsIgnoreCase(currency)
+                || c.symbol().equalsIgnoreCase(currency))
             .findAny()
-            .map(Currency::getUuid)
+            .map(Currency::uuid)
             .orElse(null);
 
         accountCurrencyUuid = cache().getCurrencies().stream()
-            .filter(c -> c.getDescription().equalsIgnoreCase(accountCurrency)
-                || c.getSymbol().equalsIgnoreCase(accountCurrency))
+            .filter(c -> c.description().equalsIgnoreCase(accountCurrency)
+                || c.symbol().equalsIgnoreCase(accountCurrency))
             .findAny()
-            .map(Currency::getUuid)
+            .map(Currency::uuid)
             .orElse(null);
     }
 
