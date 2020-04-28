@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-parent</artifactId>
-    <version>20.3.0</version>
+    <version>20.3.1</version>
     <packaging>pom</packaging>
     <name>Money Manager Parent</name>
 
@@ -23,7 +23,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <!-- dependencies -->
         <javaApiForMySqlVersion>1.2.0</javaApiForMySqlVersion>
-        <javaFxVersion>14</javaFxVersion>
+        <javaFxVersion>14.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.2.0</javaFxHelpersVersion>
         <controlsFxVersion>11.0.1</controlsFxVersion>
         <mysqlConnectorVersion>8.0.15</mysqlConnectorVersion>
@@ -207,48 +207,6 @@
                     <longModulepath>false</longModulepath>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>dist-win</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>
-                                ${java.home}/bin/jpackage
-                            </executable>
-                            <arguments>
-                                <argument>--module</argument>
-                                <argument>${appModule}/${appMainClass}</argument>
-                                <argument>--runtime-image</argument>
-                                <argument>${java.home}</argument>
-                                <argument>--dest</argument>
-                                <argument>target/dist</argument>
-                                <argument>-p</argument>
-                                <argument>target/jmods</argument>
-                                <argument>--java-options</argument>
-                                <argument>
-                                    --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-                                    -Dfile.encoding=UTF-8
-                                    --enable-preview
-                                </argument>
-                                <argument>--icon</argument>
-                                <argument>icons/icons.ico</argument>
-                                <argument>--name</argument>
-                                <argument>Money Manager</argument>
-                                <argument>--app-version</argument>
-                                <argument>${project.version}</argument>
-                                <argument>--vendor</argument>
-                                <argument>panteleyev.org</argument>
-                                <argument>--win-menu</argument>
-                                <argument>--win-dir-chooser</argument>
-                                <argument>--win-upgrade-uuid</argument>
-                                <argument>38dac4b6-91d2-4ca8-aacb-2e0cfd54127a</argument>
-                                <argument>--win-menu-group</argument>
-                                <argument>panteleyev.org</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>dist-mac</id>
                         <phase>none</phase>
