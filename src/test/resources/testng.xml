@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright (c) Petr Panteleyev. All rights reserved.
+  ~ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+  -->
+
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="Money Manager Application Unit Tests">
+    <test name="Dialogs">
+        <classes>
+            <class name="org.panteleyev.money.app.AccountDialogTest"/>
+            <class name="org.panteleyev.money.app.CategoryDialogTest"/>
+            <class name="org.panteleyev.money.app.ContactDialogTest"/>
+            <class name="org.panteleyev.money.app.CurrencyDialogTest"/>
+            <class name="org.panteleyev.money.app.TransactionDialogTest"/>
+        </classes>
+    </test>
+    <test name="Cells">
+        <classes>
+            <class name="org.panteleyev.money.app.cells.AccountClosingDateCellTest"/>
+        </classes>
+    </test>
+    <test name="Yandex Money">
+        <classes>
+            <class name="org.panteleyev.money.ymoney.TestAuthResponse"/>
+            <class name="org.panteleyev.money.ymoney.TestClientId"/>
+        </classes>
+    </test>
+    <test name="XML">
+        <classes>
+            <class name="org.panteleyev.money.xml.TestXsdNegative"/>
+            <class name="org.panteleyev.money.xml.TestImportExport"/>
+            <class name="org.panteleyev.money.xml.TestImportRecords"/>
+        </classes>
+    </test>
+    <test name="Persistence">
+        <classes>
+            <class name="org.panteleyev.money.persistence.TestFreshFile"/>
+            <class name="org.panteleyev.money.persistence.TestMoneyDAO"/>
+        </classes>
+    </test>
+    <test name="Model">
+        <classes>
+            <class name="org.panteleyev.money.model.TestAccount"/>
+            <class name="org.panteleyev.money.model.TestCategory"/>
+            <class name="org.panteleyev.money.model.TestContact"/>
+            <class name="org.panteleyev.money.model.TestCurrency"/>
+            <class name="org.panteleyev.money.model.TestTransaction"/>
+            <class name="org.panteleyev.money.model.TransactionDetailTest"/>
+        </classes>
+    </test>
+</suite>
