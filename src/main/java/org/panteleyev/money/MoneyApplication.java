@@ -11,7 +11,6 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.MainWindowController;
 import org.panteleyev.money.app.Options;
-import org.panteleyev.money.model.Account;
 import org.panteleyev.mysqlapi.MySqlClient;
 import java.io.File;
 import java.time.LocalDate;

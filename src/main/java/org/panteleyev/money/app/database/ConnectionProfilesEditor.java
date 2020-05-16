@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.database;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.database;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -47,8 +46,7 @@ import static org.panteleyev.money.app.Styles.GREEN_TEXT;
 import static org.panteleyev.money.app.Styles.RED_TEXT;
 
 class ConnectionProfilesEditor extends BaseDialog<Object> {
-//    private static final ResourceBundle RB =
-    //       ResourceBundle.getBundle("org.panteleyev.money.database.ConnectionProfilesEditor");
+    private final ValidationSupport validation = new ValidationSupport();
 
     private static int counter = 0;
 

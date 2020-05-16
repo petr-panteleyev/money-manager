@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -12,29 +11,35 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import java.util.List;
+import static org.panteleyev.fx.GridFactory.addRows;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.MainWindowController.RB;
 
 class OptionsDialog extends BaseDialog<ButtonType> {
-    private ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
-    private TextField accountClosingDayDeltaEdit = new TextField();
-    private PasswordField ymToken = new PasswordField();
+    private final ValidationSupport validation = new ValidationSupport();
+
+    private final ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
+    private final TextField accountClosingDayDeltaEdit = new TextField();
+    private final PasswordField ymToken = new PasswordField();
 
     OptionsDialog(Controller owner) {
         super(owner, MainWindowController.CSS_PATH);
 
         setTitle(RB.getString("options.Dialog.Title"));
-        createDefaultButtons(RB);
+        createDefaultButtons(RB, validation.invalidProperty());
 
-        var pane = new GridPane();
-        pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(0, newLabel(RB, "options.Dialog.Prefix.Length"), autoCompleteLength);
-        pane.addRow(1, newLabel(RB, "options.Dialog.closing.day.delta"), accountClosingDayDeltaEdit);
-        pane.addRow(2, newLabel(RB, "label.YandexMoneyToken"), ymToken);
+        var pane = newGridPane(Styles.GRID_PANE);
+        addRows(pane,
+            List.of(newLabel(RB, "options.Dialog.Prefix.Length"), autoCompleteLength),
+            List.of(newLabel(RB, "options.Dialog.closing.day.delta"), accountClosingDayDeltaEdit),
+            List.of(newLabel(RB, "label.YandexMoneyToken"), ymToken)
+        );
         getDialogPane().setContent(pane);
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));

@@ -16,7 +16,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
@@ -91,9 +90,6 @@ class TransactionTableView extends TableView<Transaction> {
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Category> categoryChangeLister = change -> Platform.runLater(this::redraw);
 
-    // Columns
-    private final TableColumn<Transaction, Transaction> dayColumn;
-
     // Transaction filter
     private final PredicateProperty<Transaction> transactionPredicateProperty = new PredicateProperty<>(x -> false);
 
@@ -124,7 +120,7 @@ class TransactionTableView extends TableView<Transaction> {
 
         var w = widthProperty().subtract(20);
 
-        dayColumn = newTableColumn(RB, "Day", x -> new TransactionDayCell(mode.isFullDate()),
+        var dayColumn = newTableColumn(RB, "Day", x -> new TransactionDayCell(mode.isFullDate()),
             mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY,
             w.multiply(0.05));
 
@@ -141,15 +137,7 @@ class TransactionTableView extends TableView<Transaction> {
             newTableColumn(RB, "Comment", null, Transaction::comment, w.multiply(0.35)),
             newTableColumn(RB, "Sum", x -> new TransactionSumCell(),
                 Comparator.comparing(Transaction::getSignedAmount), w.multiply(0.05)),
-            newTableColumn("", x -> {
-                var cell = new TransactionCheckCell();
-                cell.setOnMouseClicked(event -> {
-                    if (event.getClickCount() == 2) {
-                        toggleTransactionCheck();
-                    }
-                });
-                return cell;
-            }, w.multiply(0.05))
+            newTableColumn("", x -> new TransactionCheckCell(), w.multiply(0.05))
         ));
 
         getSortOrder().add(dayColumn);
@@ -166,10 +154,6 @@ class TransactionTableView extends TableView<Transaction> {
         var sortedList = filteredList.sorted();
         sortedList.comparatorProperty().bind(comparatorProperty());
         setItems(sortedList);
-    }
-
-    TableColumn<Transaction, Transaction> getDayColumn() {
-        return dayColumn;
     }
 
     ReadOnlyIntegerProperty listSizeProperty() {
@@ -301,10 +285,6 @@ class TransactionTableView extends TableView<Transaction> {
         });
     }
 
-    private void toggleTransactionCheck() {
-        getSelectedTransaction().ifPresent(t -> onCheckTransaction(List.of(t), !t.checked()));
-    }
-
     void onCheckTransactions(boolean check) {
         var process = getSelectionModel().getSelectedItems().stream()
             .filter(t -> t.checked() != check)
@@ -334,5 +314,9 @@ class TransactionTableView extends TableView<Transaction> {
                         getDao().deleteTransaction(transaction);
                     }
                 }));
+    }
+
+    boolean checkFocus() {
+        return isFocused();
     }
 }

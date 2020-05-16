@@ -14,11 +14,13 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -27,6 +29,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.panteleyev.money.app.cells.LocalDateCell;
+import org.panteleyev.money.app.cells.StatementRow;
+import org.panteleyev.money.app.cells.StatementSumCell;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
@@ -41,6 +46,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
@@ -50,9 +56,13 @@ import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.MenuFactory.newMenuBar;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.money.app.Constants.ELLIPSIS;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.fx.TableFactory.newTableColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
+import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.SHORTCUT_K;
+import static org.panteleyev.money.app.Constants.SHORTCUT_N;
+import static org.panteleyev.money.app.Constants.SHORTCUT_U;
+import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -69,7 +79,7 @@ class StatementWindowController extends BaseController {
         }
     }
 
-    private final StatementView statementTable = new StatementView();
+    private final TableView<StatementRecord> statementTable = createStatementTable();
     private final TransactionTableView transactionTable = new TransactionTableView(TransactionTableView.Mode.STATEMENT);
     private final Label ymAccountBalanceLabel = new Label();
 
@@ -163,7 +173,7 @@ class StatementWindowController extends BaseController {
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.setDividerPosition(0, 0.9);
 
-        transactionTable.setFocusTraversable(false);
+        //transactionTable.setFocusTraversable(false);
 
         accountComboBox.setConverter(new ReadOnlyNamedConverter<>());
 
@@ -179,18 +189,14 @@ class StatementWindowController extends BaseController {
         root.setTop(createMainMenu());
         root.setCenter(centerBox);
 
-        statementTable.setRecordSelectedCallback(record ->
-            transactionTable.setTransactionFilter(new StatementPredicate(accountComboBox.getValue(), record,
-                ignoreExecutionDate.isSelected())));
-
         transactionTable.setOnCheckTransaction((transactions, check) -> {
-            var selected = statementTable.getSelectedRecord();
+            var selected = getSelectedStatementRecord();
 
             for (Transaction t : transactions) {
                 getDao().updateTransaction(t.check(check));
             }
 
-            Platform.runLater(() -> selected.ifPresent(statementTable::setSelectedRecord));
+            Platform.runLater(() -> selected.ifPresent(record -> statementTable.getSelectionModel().select(record)));
         });
 
         cache().getAccounts().addListener(new WeakListChangeListener<>(accountListener));
@@ -199,17 +205,20 @@ class StatementWindowController extends BaseController {
         accountComboBox.getSelectionModel()
             .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
 
-        statementTable.setNewTransactionCallback(this::onNewTransaction);
-
         setupWindow(root);
         setupAccountComboBox();
         Options.loadStageDimensions(getClass(), getStage());
     }
 
-    private void onNewTransaction(StatementRecord statementRecord) {
+    void onNewTransaction(StatementRecord statementRecord) {
         var account = accountComboBox.getSelectionModel().getSelectedItem();
         new TransactionDialog(statementRecord, account, cache()).showAndWait()
             .ifPresent(builder -> getDao().insertTransaction(builder));
+    }
+
+    void onStatementRecordSelected(StatementRecord statementRecord) {
+        transactionTable.setTransactionFilter(
+            new StatementPredicate(accountComboBox.getValue(), statementRecord, ignoreExecutionDate.isSelected()));
     }
 
     @Override
@@ -227,6 +236,15 @@ class StatementWindowController extends BaseController {
                 newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
                 new SeparatorMenuItem(),
                 newMenuItem(RB, "Close", event -> onClose())),
+            newMenu(RB, "Edit",
+                newMenuItem(RB, "menu.Edit.Add", SHORTCUT_N,
+                    event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.item.check", SHORTCUT_K,
+                    event -> onCheckStatementRecord(true)),
+                newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U,
+                    event -> onCheckStatementRecord(false))
+            ),
             createWindowMenu(),
             createHelpMenu());
     }
@@ -290,30 +308,26 @@ class StatementWindowController extends BaseController {
 
     private void onLoad() {
         switch (getSourceType()) {
-            case FILE:
+            case FILE -> {
                 if (statementType.equals(Statement.StatementType.UNKNOWN)) {
                     return;
                 }
-
                 var file = new File(statementFileEdit.getText());
                 if (!file.exists()) {
                     return;
                 }
-
                 try (var in = new FileInputStream(file)) {
                     var statement = StatementParser.parse(statementType, in);
                     analyzeStatement(statement);
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }
-
-                break;
-
-            case YANDEX_MONEY:
+            }
+            case YANDEX_MONEY -> {
                 var statement = yandexMoneyClient.load(limitComboBox.getSelectionModel().getSelectedItem(),
                     ymFromPicker.getValue(), ymToPicker.getValue());
                 analyzeStatement(statement);
-                break;
+            }
         }
     }
 
@@ -329,7 +343,7 @@ class StatementWindowController extends BaseController {
     private void onClear() {
         statementFileEdit.setText("");
         statementType = Statement.StatementType.UNKNOWN;
-        statementTable.clear();
+        statementTable.getItems().clear();
     }
 
     private SourceType getSourceType() {
@@ -351,7 +365,10 @@ class StatementWindowController extends BaseController {
                 .collect(Collectors.toList()));
         }
 
-        Platform.runLater(() -> statementTable.setStatement(statement));
+        Platform.runLater(() -> {
+            statementTable.getItems().clear();
+            statementTable.getItems().addAll(statement.getRecords());
+        });
     }
 
     private void onReport() {
@@ -372,4 +389,53 @@ class StatementWindowController extends BaseController {
             throw new UncheckedIOException(ex);
         }
     }
+
+    private void onCheckStatementRecord(boolean check) {
+        if (statementTable.isFocused()) {
+            getSelectedStatementRecord().ifPresent(record -> onCheckStatementRecord(record, check));
+        } else if (transactionTable.checkFocus()) {
+            transactionTable.onCheckTransactions(check);
+        }
+    }
+
+    void onCheckStatementRecord(StatementRecord record, boolean check) {
+        for (Transaction t : record.getTransactions()) {
+            getDao().updateTransaction(t.check(check));
+        }
+        Platform.runLater(() -> statementTable.getSelectionModel().select(record));
+    }
+
+    private TableView<StatementRecord> createStatementTable() {
+        var tableView = new TableView<StatementRecord>();
+
+        tableView.setRowFactory(x -> new StatementRow());
+
+        var w = tableView.widthProperty().subtract(20);
+        tableView.getColumns().addAll(List.of(
+            newTableColumn(RB, "column.Date", x -> new LocalDateCell<>(),
+                StatementRecord::getActual, w.multiply(0.05)),
+            newTableColumn(RB, "column.ExecutionDate", x -> new LocalDateCell<>(),
+                StatementRecord::getExecution, w.multiply(0.05)),
+            newTableColumn(RB, "Description", null, StatementRecord::getDescription, w.multiply(0.5)),
+            newTableColumn(RB, "Counterparty", null, StatementRecord::getCounterParty, w.multiply(0.15)),
+            newTableColumn(RB, "column.Place", null, StatementRecord::getPlace, w.multiply(0.10)),
+            newTableColumn(RB, "Country", null, StatementRecord::getCountry, w.multiply(0.05)),
+            newTableColumn(RB, "column.Sum", x -> new StatementSumCell(), w.multiply(0.1))
+        ));
+
+        var menu = new ContextMenu();
+        menu.getItems().addAll(newMenuItem(RB, "menu.Edit.Add",
+            event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
+        tableView.setContextMenu(menu);
+
+        tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) ->
+            onStatementRecordSelected(newValue));
+
+        return tableView;
+    }
+
+    private Optional<StatementRecord> getSelectedStatementRecord() {
+        return Optional.ofNullable(statementTable.getSelectionModel().getSelectedItem());
+    }
+
 }

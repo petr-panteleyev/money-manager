@@ -1,35 +1,41 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.model.Currency;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static javafx.geometry.Pos.CENTER_LEFT;
+import static org.panteleyev.fx.BoxFactory.newHBox;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.GridFactory.EMPTY_NODE;
+import static org.panteleyev.fx.GridFactory.addRows;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final TextField nameEdit = new TextField();
     private final TextField descrEdit = new TextField();
     private final TextField rateEdit = new TextField();
@@ -45,20 +51,17 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setTitle(RB.getString("Currency"));
 
-        var gridPane = new GridPane();
-        gridPane.getStyleClass().add(Styles.GRID_PANE);
+        var gridPane = newGridPane(Styles.GRID_PANE);
+        addRows(gridPane,
+            List.of(newLabel(RB, "label.Symbol"), nameEdit),
+            List.of(newLabel(RB, "Description", COLON), descrEdit),
+            List.of(newLabel(RB, "Rate", COLON), rateEdit, rateDirectionChoice),
+            List.of(EMPTY_NODE, newHBox(CENTER_LEFT, showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice)),
+            List.of(EMPTY_NODE, thousandSeparatorCheck),
+            List.of(EMPTY_NODE, defaultCheck)
+        );
 
-        int index = 0;
-        gridPane.addRow(index++, newLabel(RB, "label.Symbol"), nameEdit);
-        gridPane.addRow(index++, newLabel(RB, "Description", COLON), descrEdit);
-        gridPane.addRow(index++, newLabel(RB, "Rate", COLON), rateEdit, rateDirectionChoice);
-
-        var hBox = new HBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
-        hBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
-        gridPane.add(hBox, 1, index++);
-        gridPane.add(thousandSeparatorCheck, 1, index++);
-        gridPane.add(defaultCheck, 1, index);
 
         getDialogPane().setContent(gridPane);
 
@@ -119,7 +122,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             }
         });
 
-        createDefaultButtons(RB);
+        createDefaultButtons(RB, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

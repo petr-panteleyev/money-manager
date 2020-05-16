@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -12,9 +11,9 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
@@ -23,6 +22,9 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
 import java.util.List;
 import java.util.UUID;
+import static org.panteleyev.fx.GridFactory.addRows;
+import static org.panteleyev.fx.GridFactory.colSpan;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -30,6 +32,8 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CategoryDialog extends BaseDialog<Category> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final ChoiceBox<CategoryType> typeComboBox = new ChoiceBox<>();
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();
@@ -40,16 +44,12 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         setTitle(RB.getString("Category"));
 
-        var pane = new GridPane();
-
-        int index = 0;
-        pane.getStyleClass().add(Styles.GRID_PANE);
-        pane.addRow(index++, newLabel(RB, "Type", COLON), typeComboBox, iconComboBox);
-        pane.addRow(index++, newLabel(RB, "label.Name"), nameEdit);
-        pane.addRow(index, newLabel(RB, "Comment", COLON), commentEdit);
-
-        GridPane.setColumnSpan(nameEdit, 2);
-        GridPane.setColumnSpan(commentEdit, 2);
+        var pane = newGridPane(Styles.GRID_PANE);
+        addRows(pane,
+            List.of(newLabel(RB, "Type", COLON), typeComboBox, iconComboBox),
+            List.of(newLabel(RB, "label.Name"), colSpan(nameEdit, 2)),
+            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2))
+        );
 
         nameEdit.setPrefColumnCount(20);
 
@@ -109,7 +109,7 @@ final class CategoryDialog extends BaseDialog<Category> {
         });
 
         getDialogPane().setContent(pane);
-        createDefaultButtons(RB);
+        createDefaultButtons(RB, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

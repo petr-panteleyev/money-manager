@@ -5,7 +5,6 @@ package org.panteleyev.money.app.database;
  * Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
 
-import javafx.application.Application;
 import javafx.scene.control.Dialog;
 import javax.sql.DataSource;
 import java.util.Collection;
@@ -25,12 +24,12 @@ public final class ConnectionProfileManager {
     private static final String PREF_DEFAULT_PROFILE_NAME = "default_profile_name";
     private static final String PREF_PROFILE_ROOT = "profile.";
 
-    private static final String CMD_LINE_PARAM = "profile";
+    private static final String MONEY_PROFILE_PROPERTY = "money.profile";
 
     private boolean autoConnect = false;
     private ConnectionProfile defaultProfile = null;
 
-    private Map<String, ConnectionProfile> profiles = new HashMap<>();
+    private final Map<String, ConnectionProfile> profiles = new HashMap<>();
 
     private final Function<ConnectionProfile, Exception> initDatabaseCallback;
     private final Function<ConnectionProfile, DataSource> buildDataSourceCallback;
@@ -189,10 +188,8 @@ public final class ConnectionProfileManager {
         return new ConnectionProfilesEditor(this, useEncryption);
     }
 
-    public Optional<ConnectionProfile> getProfileToOpen(Application application) {
-        Application.Parameters params = application.getParameters();
-
-        var profileName = params.getNamed().get(CMD_LINE_PARAM);
+    public Optional<ConnectionProfile> getProfileToOpen() {
+        var profileName = System.getProperty(MONEY_PROFILE_PROPERTY);
         if (profileName != null) {
             return Optional.ofNullable(get(profileName));
         }

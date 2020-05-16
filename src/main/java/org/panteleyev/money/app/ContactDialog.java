@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -15,9 +14,9 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
@@ -25,7 +24,11 @@ import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+import java.util.List;
 import java.util.UUID;
+import static org.panteleyev.fx.GridFactory.addRows;
+import static org.panteleyev.fx.GridFactory.colSpan;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -33,6 +36,8 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class ContactDialog extends BaseDialog<Contact> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final ChoiceBox<ContactType> typeChoiceBox = new ChoiceBox<>();
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
@@ -51,38 +56,26 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         setTitle(RB.getString("contact.Dialog.Title"));
 
-        var gridPane = new GridPane();
+        var gridPane = newGridPane(Styles.GRID_PANE);
+        addRows(gridPane,
+            List.of(newLabel(RB, "label.Type"), typeChoiceBox, iconComboBox),
+            List.of(newLabel(RB, "label.Name"), colSpan(nameField, 2)),
+            List.of(newLabel(RB, "Phone", COLON), colSpan(phoneField, 2)),
+            List.of(newLabel(RB, "label.Mobile"), colSpan(mobileField, 2)),
+            List.of(newLabel(RB, "Email", COLON), colSpan(emailField, 2)),
+            List.of(new Label("URL:"), colSpan(webField, 2)),
+            List.of(newLabel(RB, "label.Street"), colSpan(streetField, 2)),
+            List.of(newLabel(RB, "label.City"), colSpan(cityField, 2)),
+            List.of(newLabel(RB, "label.Country"), colSpan(countryField, 2)),
+            List.of(newLabel(RB, "label.ZIP"), colSpan(zipField, 2)),
+            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2))
+        );
 
-        gridPane.getStyleClass().add(Styles.GRID_PANE);
-
-        int index = 0;
-        gridPane.addRow(index++, newLabel(RB, "label.Type"), typeChoiceBox, iconComboBox);
-        gridPane.addRow(index++, newLabel(RB, "label.Name"), nameField);
-        gridPane.addRow(index++, newLabel(RB, "Phone", COLON), phoneField);
-        gridPane.addRow(index++, newLabel(RB, "label.Mobile"), mobileField);
-        gridPane.addRow(index++, newLabel(RB, "Email", COLON), emailField);
-        gridPane.addRow(index++, new Label("URL:"), webField);
-        gridPane.addRow(index++, newLabel(RB, "label.Street"), streetField);
-        gridPane.addRow(index++, newLabel(RB, "label.City"), cityField);
-        gridPane.addRow(index++, newLabel(RB, "label.Country"), countryField);
-        gridPane.addRow(index++, newLabel(RB, "label.ZIP"), zipField);
-        gridPane.addRow(index, newLabel(RB, "Comment", COLON), commentEdit);
-
-        GridPane.setColumnSpan(nameField, 2);
-        GridPane.setColumnSpan(phoneField, 2);
-        GridPane.setColumnSpan(mobileField, 2);
-        GridPane.setColumnSpan(emailField, 2);
-        GridPane.setColumnSpan(webField, 2);
-        GridPane.setColumnSpan(streetField, 2);
-        GridPane.setColumnSpan(cityField, 2);
-        GridPane.setColumnSpan(countryField, 2);
-        GridPane.setColumnSpan(zipField, 2);
-        GridPane.setColumnSpan(commentEdit, 2);
-
+        var rowConstraints = new RowConstraints();
         var topAlignmentConstraints = new RowConstraints();
         topAlignmentConstraints.setValignment(VPos.TOP);
-        for (int i = 0; i < index; i++) {
-            gridPane.getRowConstraints().add(new RowConstraints());
+        for (int i = 1; i < gridPane.getRowCount(); i++) {
+            gridPane.getRowConstraints().add(rowConstraints);
         }
         gridPane.getRowConstraints().add(topAlignmentConstraints);
 
@@ -148,7 +141,7 @@ final class ContactDialog extends BaseDialog<Contact> {
             }
         });
 
-        createDefaultButtons(RB);
+        createDefaultButtons(RB, validation.invalidProperty());
         Platform.runLater(this::createValidationSupport);
     }
 

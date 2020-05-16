@@ -15,6 +15,8 @@ open module org.panteleyev.money {
     requires org.panteleyev.ofx;
     requires org.panteleyev.mysqlapi;
 
+    requires org.controlsfx.controls;
+
     requires com.google.gson;
     requires freemarker;
     requires org.jsoup;

@@ -275,7 +275,7 @@ public class MainWindowController extends BaseController implements TransactionT
         getStage().setWidth(Options.getMainWindowWidth());
         getStage().setHeight(Options.getMainWindowHeight());
 
-        profileManager.getProfileToOpen(MoneyApplication.application).ifPresent(this::open);
+        profileManager.getProfileToOpen().ifPresent(this::open);
     }
 
     private void onIconWindow() {

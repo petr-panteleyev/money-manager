@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -22,7 +21,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
@@ -56,6 +54,9 @@ import static javafx.scene.input.KeyCode.UP;
 import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.SHIFT_DOWN;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
+import static javafx.scene.layout.Priority.ALWAYS;
+import static org.panteleyev.fx.BoxFactory.newHBox;
+import static org.panteleyev.fx.BoxFactory.setHGrow;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -170,21 +171,16 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             newLabel(RB, "column.Account.Debited"),
             new HBox(debitedAccountEdit, debitedMenuButton),
             debitedCategoryLabel);
-        HBox.setHgrow(debitedAccountEdit, Priority.ALWAYS);
 
         var creditedBox = new VBox(Styles.SMALL_SPACING,
             newLabel(RB, "column.Account.Credited"),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
-        HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var contactBox = new VBox(Styles.SMALL_SPACING,
             newLabel(RB, "Counterparty"),
             new HBox(contactEdit, contactMenuButton));
-        HBox.setHgrow(contactEdit, Priority.ALWAYS);
 
-        var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit, checkedCheckBox);
-        hBox1.setAlignment(Pos.CENTER_LEFT);
         var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Sum"), sumEdit);
 
         var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Comment"), commentEdit);
@@ -194,16 +190,14 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             new HBox(rate1Edit, rateDir1Combo),
             rateAmoutLabel);
 
-        var typeBox = new HBox(Styles.BIG_SPACING, typeEdit, typeMenuButton, checkedCheckBox);
-        typeBox.setAlignment(Pos.CENTER_LEFT);
-
         setupDatePicker();
         datePicker.setValue(lastSelectedDate);
 
         getDialogPane().setContent(new VBox(Styles.DOUBLE_SPACING,
             new HBox(Styles.BIG_SPACING,
                 new VBox(Styles.SMALL_SPACING, newLabel(RB, "Date"), datePicker),
-                new VBox(Styles.SMALL_SPACING, newLabel(RB, "Type"), typeBox)
+                new VBox(Styles.SMALL_SPACING, newLabel(RB, "Type"),
+                    newHBox(Styles.BIG_SPACING, Pos.CENTER_LEFT, typeEdit, typeMenuButton, checkedCheckBox))
             ),
             new HBox(Styles.BIG_SPACING, sumBox, rateBox),
             debitedBox,
@@ -213,10 +207,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             new VBox(2.0, newLabel(RB, "Invoice"), invoiceNumberEdit)
         ));
 
-        HBox.setHgrow(debitedBox, Priority.ALWAYS);
-        HBox.setHgrow(creditedBox, Priority.ALWAYS);
-        HBox.setHgrow(contactBox, Priority.ALWAYS);
-        HBox.setHgrow(commentBox, Priority.ALWAYS);
+        setHGrow(ALWAYS, debitedAccountEdit, creditedAccountEdit, contactEdit,
+            debitedBox, creditedBox, contactBox, commentBox);
 
         typeMenuButton.setFocusTraversable(false);
         checkedCheckBox.setFocusTraversable(false);

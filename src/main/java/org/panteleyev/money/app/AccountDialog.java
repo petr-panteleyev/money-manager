@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -13,8 +12,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.cells.CardTypeComboBoxCell;
@@ -34,6 +33,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.GridFactory.EMPTY_NODE;
+import static org.panteleyev.fx.GridFactory.addRows;
+import static org.panteleyev.fx.GridFactory.colSpan;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -41,6 +44,8 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 class AccountDialog extends BaseDialog<Account> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final TextField nameEdit = new TextField();
     private final TextField initialEdit = new TextField();
     private final TextField creditEdit = new TextField();
@@ -75,36 +80,22 @@ class AccountDialog extends BaseDialog<Account> {
 
         setTitle(RB.getString("account.Dialog.Title"));
 
-        var gridPane = new GridPane();
-        gridPane.getStyleClass().add(Styles.GRID_PANE);
-
-        int index = 0;
-        gridPane.addRow(index++, newLabel(RB, "label.Name"), nameEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.Type"), typeComboBox, iconComboBox);
-        gridPane.addRow(index++, newLabel(RB, "label.Category"), categoryComboBox);
-        gridPane.addRow(index++, newLabel(RB, "account.Dialog.InitialBalance"), initialEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.credit"), creditEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.Account.Number"), accountNumberEdit);
-        gridPane.addRow(index++, newLabel(RB, "Comment", COLON), commentEdit);
-        gridPane.addRow(index++, newLabel(RB, "Currency", COLON), currencyComboBox);
-        gridPane.addRow(index++, newLabel(RB, "label.interest"), interestEdit);
-        gridPane.addRow(index++, newLabel(RB, "label.closing.date"), closingDatePicker);
-        gridPane.addRow(index++, newLabel(RB, "label.card.type"), cardTypeComboBox);
-        gridPane.addRow(index++, newLabel(RB, "label.card.number"), cardNumberEdit);
-        gridPane.add(activeCheckBox, 1, index);
-
-        GridPane.setColumnSpan(nameEdit, 2);
-        GridPane.setColumnSpan(categoryComboBox, 2);
-        GridPane.setColumnSpan(initialEdit, 2);
-        GridPane.setColumnSpan(creditEdit, 2);
-        GridPane.setColumnSpan(accountNumberEdit, 2);
-        GridPane.setColumnSpan(commentEdit, 2);
-        GridPane.setColumnSpan(currencyComboBox, 2);
-        GridPane.setColumnSpan(interestEdit, 2);
-        GridPane.setColumnSpan(closingDatePicker, 2);
-        GridPane.setColumnSpan(cardTypeComboBox, 2);
-        GridPane.setColumnSpan(cardNumberEdit, 2);
-        GridPane.setColumnSpan(activeCheckBox, 2);
+        var gridPane = newGridPane(Styles.GRID_PANE);
+        addRows(gridPane,
+            List.of(newLabel(RB, "label.Name"), colSpan(nameEdit, 2)),
+            List.of(newLabel(RB, "label.Type"), typeComboBox, iconComboBox),
+            List.of(newLabel(RB, "label.Category"), colSpan(categoryComboBox, 2)),
+            List.of(newLabel(RB, "account.Dialog.InitialBalance"), colSpan(initialEdit, 2)),
+            List.of(newLabel(RB, "label.credit"), colSpan(creditEdit, 2)),
+            List.of(newLabel(RB, "label.Account.Number"), colSpan(accountNumberEdit, 2)),
+            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2)),
+            List.of(newLabel(RB, "Currency", COLON), colSpan(currencyComboBox, 2)),
+            List.of(newLabel(RB, "label.interest"), colSpan(interestEdit, 2)),
+            List.of(newLabel(RB, "label.closing.date"), colSpan(closingDatePicker, 2)),
+            List.of(newLabel(RB, "label.card.type"), colSpan(cardTypeComboBox, 2)),
+            List.of(newLabel(RB, "label.card.number"), colSpan(cardNumberEdit, 2)),
+            List.of(EMPTY_NODE, colSpan(activeCheckBox, 2))
+        );
 
         getDialogPane().setContent(gridPane);
 
@@ -218,7 +209,7 @@ class AccountDialog extends BaseDialog<Account> {
             }
         });
 
-        createDefaultButtons(RB);
+        createDefaultButtons(RB, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

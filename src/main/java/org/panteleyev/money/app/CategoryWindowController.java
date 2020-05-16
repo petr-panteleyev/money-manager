@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
@@ -34,6 +33,7 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.MenuFactory.newMenuBar;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_F;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
@@ -43,7 +43,7 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryWindowController extends BaseController {
     private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
-    private final TextField searchField = newSearchField(Images.SEARCH, s -> updatePredicate());
+    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
     private final SortedList<Category> sortedList = filteredList.sorted(

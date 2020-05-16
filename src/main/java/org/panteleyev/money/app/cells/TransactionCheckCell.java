@@ -9,7 +9,7 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
 
 public class TransactionCheckCell extends TableCell<Transaction, Transaction> {
-    private static final String CHECK_SYMBOL = "✔";
+    private static final String CHECK_SYMBOL = "\u2714";
 
     @Override
     public void updateItem(Transaction transaction, boolean empty) {

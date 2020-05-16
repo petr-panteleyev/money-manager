@@ -33,6 +33,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ```shell script
 $ mvn javafx:run
 ```
+To open specific profile add ```-Dmoney.profile=<profile>``` to the command line.
 
 ### Binary Packages
 
@@ -42,9 +43,9 @@ environment variable
 * Execute the following commands:
 ```shell script
 $ mvn clean package
-$ mvn exec:exec@dist-mac
+$ mvn jpackage:jpackage@mac
   or
-$ mvn exec:exec@dist-win
+$ mvn jpackage:jpackage@win
 ```
 
 Installation package will be found in ```target/dist``` directory.

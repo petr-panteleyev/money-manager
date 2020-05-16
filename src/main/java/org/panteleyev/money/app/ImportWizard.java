@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -20,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.controlsfx.validation.ValidationResult;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.xml.Import;
@@ -38,6 +38,8 @@ import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class ImportWizard extends BaseDialog<Object> {
+    private final ValidationSupport validation = new ValidationSupport();
+
     private final StartPage startPage = new StartPage();
     private final ProgressPage progressPage = new ProgressPage();
 
@@ -170,7 +172,6 @@ final class ImportWizard extends BaseDialog<Object> {
         setTitle(RB.getString("word.Import"));
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);
-
 
         getDialogPane().setContent(new StackPane(progressPage, startPage));
         progressPage.setVisible(false);

@@ -40,6 +40,8 @@ import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
+import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -150,12 +152,14 @@ class RequestWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 newMenuItem(RB, "Close", event -> onClose())),
             newMenu(RB, "menu.Edit",
-                newMenuItem(RB, "menu.item.details", x -> table.onTransactionDetails()),
+                newMenuItem(RB, "Edit", ELLIPSIS, SHORTCUT_E, event -> table.onEditTransaction()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.item.check", SHORTCUT_K,
-                    event -> table.onCheckTransactions(true)),
-                newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U,
-                    event -> table.onCheckTransactions(false))
+                newMenuItem(RB, "Delete", ELLIPSIS, SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.item.details", event -> table.onTransactionDetails()),
+                new SeparatorMenuItem(),
+                newMenuItem(RB, "menu.item.check", SHORTCUT_K, event -> table.onCheckTransactions(true)),
+                newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U, event -> table.onCheckTransactions(false))
             ),
             createWindowMenu(),
             createHelpMenu());
