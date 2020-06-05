@@ -1,9 +1,8 @@
-package org.panteleyev.money.persistence;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.persistence;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
@@ -371,7 +370,7 @@ public class MoneyDAO {
         dataSource.setDatabaseName(null);
 
         try (var conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
-            st.execute("CREATE DATABASE " + schema + " CHARACTER SET = utf8");
+            st.execute("CREATE DATABASE IF NOT EXISTS " + schema + " CHARACTER SET = utf8");
 
             dataSource.setDatabaseName(schema);
 

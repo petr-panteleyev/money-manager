@@ -96,7 +96,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         getButton(deleteButtonType).ifPresent(b -> {
             b.disableProperty().bind(profileListView.getSelectionModel().selectedItemProperty().isNull());
-            b.addEventFilter(ACTION, this::newDeleteButton);
+            b.addEventFilter(ACTION, this::onDeleteButton);
         });
 
         getButton(saveButtonType).ifPresent(b -> {
@@ -156,7 +156,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         return listView;
     }
 
-    private void newDeleteButton(ActionEvent event) {
+    private void onDeleteButton(ActionEvent event) {
         event.consume();
         getSelectedProfile().ifPresent(selected ->
             new Alert(CONFIRMATION, RB.getString("text.AreYouSure"), OK, CANCEL)
