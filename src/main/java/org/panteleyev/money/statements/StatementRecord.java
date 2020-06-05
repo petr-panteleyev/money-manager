@@ -1,9 +1,8 @@
-package org.panteleyev.money.statements;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.statements;
 
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
@@ -104,7 +103,8 @@ public final class StatementRecord {
 
     public StatementRecord(LocalDate actual, LocalDate execution, String description, String counterParty, String place,
                            String country, String currency, String amount, String accountCurrency,
-                           String accountAmount) {
+                           String accountAmount)
+    {
         this.actual = actual;
         this.execution = execution;
         this.description = description;
@@ -204,11 +204,9 @@ public final class StatementRecord {
             return true;
         }
 
-        if (!(o instanceof StatementRecord)) {
+        if (!(o instanceof StatementRecord that)) {
             return false;
         }
-
-        StatementRecord that = (StatementRecord) o;
 
         return Objects.equals(actual, that.actual)
             && Objects.equals(execution, that.execution)

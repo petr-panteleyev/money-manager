@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager</artifactId>
-    <version>20.5.0</version>
+    <version>20.5.1</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -40,7 +40,7 @@
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>0.0.1</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>0.0.2</jpackageMavenPluginVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
         <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>

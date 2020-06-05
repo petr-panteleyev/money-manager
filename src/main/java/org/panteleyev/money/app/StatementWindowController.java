@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -46,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -334,10 +334,10 @@ class StatementWindowController extends BaseController {
     private void analyzeStatement(Statement statement) {
         this.statement = statement;
         accountComboBox.getSelectionModel().clearSelection();
-        cache().getAccountByNumber(statement.getAccountNumber())
+        cache().getAccountByNumber(statement.accountNumber())
             .ifPresentOrElse(a -> accountComboBox.getSelectionModel().select(a),
                 () -> accountComboBox.getSelectionModel().selectFirst());
-        ymAccountBalanceLabel.setText(statement.getBalance().toString());
+        ymAccountBalanceLabel.setText(statement.balance().toString());
     }
 
     private void onClear() {
@@ -359,7 +359,7 @@ class StatementWindowController extends BaseController {
             return;
         }
 
-        for (var record : statement.getRecords()) {
+        for (var record : statement.records()) {
             record.setTransactions(cache().getTransactions().stream()
                 .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
                 .collect(Collectors.toList()));
@@ -367,7 +367,7 @@ class StatementWindowController extends BaseController {
 
         Platform.runLater(() -> {
             statementTable.getItems().clear();
-            statementTable.getItems().addAll(statement.getRecords());
+            statementTable.getItems().addAll(statement.records());
         });
     }
 
@@ -399,7 +399,8 @@ class StatementWindowController extends BaseController {
     }
 
     void onCheckStatementRecord(StatementRecord record, boolean check) {
-        for (Transaction t : record.getTransactions()) {
+        var transactions = new ArrayList<>(record.getTransactions());
+        for (var t : transactions) {
             getDao().updateTransaction(t.check(check));
         }
         Platform.runLater(() -> statementTable.getSelectionModel().select(record));

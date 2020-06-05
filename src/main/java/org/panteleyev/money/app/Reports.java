@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -99,7 +98,7 @@ class Reports {
             th(w, RB.getString("column.Description"));
             th(w, RB.getString("column.Sum"));
 
-            for (var r : statement.getRecords()) {
+            for (var r : statement.records()) {
                 w.println("<tr>");
                 td(w, r.getActual().toString());
                 td(w, r.getExecution().toString());
