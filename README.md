@@ -8,30 +8,17 @@ JDK 14 is required to build and run the application.
 
 ### Build
 
-Make sure Maven toolchain configuration ```toolchain.xml``` contains the following
-definition:
-```xml
-<toolchain>
-    <type>jdk</type>
-    <provides>
-        <version>14</version>
-    </provides>
-    <configuration>
-        <jdkHome>/path/to/jdk-14</jdkHome>
-    </configuration>
-</toolchain>
-```
 Execute the following:
 ```shell script
-$ mvn clean package
+$ ./gradlew clean build
 ```
 
-Application JAR and all dependencies will be placed in ```target/jmods```.
+Application JAR and all dependencies will be placed in ```build/jmods```.
 
 ### Run
 
 ```shell script
-$ mvn javafx:run
+$ ./gradlew run
 ```
 To open specific profile add ```-Dmoney.profile=<profile>``` to the command line.
 
@@ -42,13 +29,10 @@ To build binary installers perform the following steps:
 environment variable
 * Execute the following commands:
 ```shell script
-$ mvn clean package
-$ mvn jpackage:jpackage@mac
-  or
-$ mvn jpackage:jpackage@win
+$ ./gradlew clean jpackage
 ```
 
-Installation package will be found in ```target/dist``` directory.
+Installation package will be found in ```build/dist``` directory.
 
 ## Support
 
