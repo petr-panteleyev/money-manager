@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.database;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.database;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
@@ -82,7 +81,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
 
         cb.setConverter(new ToStringConverter<>() {
             public String toString(ConnectionProfile profile) {
-                return profile != null ? profile.getName() : "";
+                return profile != null ? profile.name() : "";
             }
         });
 

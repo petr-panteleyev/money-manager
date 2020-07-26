@@ -85,16 +85,12 @@ final class CategoryWindowController extends BaseController {
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
         var hBox = new HBox(5, searchField, typeChoiceBox);
-        var pane = new BorderPane();
-        pane.setTop(hBox);
-        pane.setCenter(categoryTable);
+        var pane = new BorderPane(categoryTable, hBox, null, null, null);
 
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
-        var self = new BorderPane();
+        var self = new BorderPane(pane, menuBar, null, null, null);
         self.setPrefSize(600.0, 400.0);
-        self.setTop(menuBar);
-        self.setCenter(pane);
 
         typeChoiceBox.getItems().add(RB.getString("All_Types"));
         typeChoiceBox.getItems().add(new Separator());

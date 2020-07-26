@@ -1,26 +1,21 @@
-package org.panteleyev.money.app.cells;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.cells;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.Transaction;
-import java.util.function.Predicate;
 import static org.panteleyev.money.app.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class AccountBalanceCell extends TableCell<Account, Account> {
     private final boolean total;
-    private final Predicate<Transaction> filter;
 
-    public AccountBalanceCell(boolean total, Predicate<Transaction> filter) {
+    public AccountBalanceCell(boolean total) {
         this.total = total;
-        this.filter = filter.and(t -> t.parentUuid() == null);
     }
 
     @Override
@@ -32,9 +27,8 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
         if (empty || account == null) {
             setText("");
         } else {
-            var sum = cache().calculateBalance(account, total, filter);
+            var sum = total ? account.getBalance() : account.totalWaiting();
 
-            // TODO: use flatMap
             setText(cache().getCurrency(account.currencyUuid())
                 .map(curr -> curr.formatValue(sum))
                 .orElse(Currency.defaultFormatValue(sum)));

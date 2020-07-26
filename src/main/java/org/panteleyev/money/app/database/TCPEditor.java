@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.database;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.database;
 
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -128,11 +127,11 @@ final class TCPEditor extends VBox {
 
     void setProfile(ConnectionProfile profile) {
         if (profile != null) {
-            setDataBaseHost(profile.getDataBaseHost());
-            setDataBasePort(profile.getDataBasePort());
-            setDataBaseUser(profile.getDataBaseUser());
-            setDataBasePassword(profile.getDataBasePassword());
-            setSchema(profile.getSchema());
+            setDataBaseHost(profile.dataBaseHost());
+            setDataBasePort(profile.dataBasePort());
+            setDataBaseUser(profile.dataBaseUser());
+            setDataBasePassword(profile.dataBasePassword());
+            setSchema(profile.schema());
         } else {
             setDataBaseHost("");
             setDataBasePort(3306);

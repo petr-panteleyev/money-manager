@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.database;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.database;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -47,7 +46,7 @@ final class EncryptionKeyEditor extends VBox {
     private void createValidationSupport() {
         Validator<String> v1 = (Control c, String value) -> {
             // Main password invalidates repeated password
-            String s = keyEdit2.getText();
+            var s = keyEdit2.getText();
             keyEdit2.setText(UUID.randomUUID().toString());
             keyEdit2.setText(s);
 
@@ -55,7 +54,7 @@ final class EncryptionKeyEditor extends VBox {
         };
 
         Validator<String> v2 = (Control c, String value) -> {
-            boolean equal = Objects.equals(keyEdit.getText(), keyEdit2.getText());
+            var equal = Objects.equals(keyEdit.getText(), keyEdit2.getText());
             return ValidationResult.fromErrorIf(c, null, !equal);
         };
 

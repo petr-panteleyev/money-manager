@@ -20,14 +20,17 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class MoneyDAO {
     private static final MoneyDAO MONEY_DAO = new MoneyDAO();
@@ -68,6 +71,7 @@ public class MoneyDAO {
 
     public static final Consumer<String> IGNORE_PROGRESS = x -> { };
 
+    @SuppressWarnings("rawtypes")
     private static final List<Class<? extends TableRecord>> TABLE_CLASSES = List.of(
         Icon.class,
         Category.class,
@@ -77,6 +81,7 @@ public class MoneyDAO {
         Transaction.class
     );
 
+    @SuppressWarnings("rawtypes")
     private static final List<Class<? extends TableRecord>> TABLE_CLASSES_REVERSED = List.of(
         Transaction.class,
         Account.class,
@@ -170,16 +175,40 @@ public class MoneyDAO {
     public void insertTransaction(Transaction transaction) {
         client.insert(transaction);
         cache.add(transaction);
+        updateAccounts(transaction);
     }
 
     public void updateTransaction(Transaction transaction) {
+        var oldTransaction = cache.getTransaction(transaction.uuid()).orElseThrow();
         client.update(transaction);
         cache.update(transaction);
+        updateAccounts(oldTransaction, transaction);
     }
 
     public void deleteTransaction(Transaction transaction) {
         client.delete(transaction.uuid(), Transaction.class);
         cache.remove(transaction);
+        updateAccounts(transaction);
+    }
+
+    /**
+     * This method recalculates total values for all involved accounts.
+     *
+     * @param transactions transactions that were added, updated or deleted.
+     */
+    private void updateAccounts(Transaction... transactions) {
+        Set.of(transactions).stream()
+            .map(t -> List.of(
+                cache().getAccount(t.accountDebitedUuid()).orElseThrow(),
+                cache().getAccount(t.accountCreditedUuid()).orElseThrow())
+            )
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet())
+            .forEach(account -> {
+                var total = cache().calculateBalance(account, false, t -> true);
+                var waiting = cache().calculateBalance(account, false, t -> !t.checked());
+                updateAccount(account.updateBalance(total, waiting));
+            });
     }
 
     public void createTables(Connection conn) {
@@ -245,10 +274,6 @@ public class MoneyDAO {
     public void initialize(DataSource ds) {
         client.setDataSource(ds);
         cache.clear();
-    }
-
-    public boolean isOpen() {
-        return client.getDataSource() != null;
     }
 
     public void importFullDump(Import imp, Consumer<String> progress) {

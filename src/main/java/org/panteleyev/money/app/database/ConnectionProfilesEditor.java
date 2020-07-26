@@ -137,7 +137,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             cell.setConverter(new ReadOnlyStringConverter<>() {
                 @Override
                 public String toString(ConnectionProfile profile) {
-                    return profile.getName() != null ? profile.getName() : "";
+                    return profile.name() != null ? profile.name() : "";
                 }
             });
             return cell;
@@ -218,7 +218,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         var profile = buildConnectionProfile();
 
-        var TEST_QUERY = "SHOW TABLES FROM " + profile.getSchema();
+        var TEST_QUERY = "SHOW TABLES FROM " + profile.schema();
 
         var ds = profileManager.getBuildDataSourceCallback().apply(profile);
 
@@ -250,8 +250,8 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         tcpEditor.setProfile(profile);
         if (profile != null) {
             profileNameEdit.setText("");               // enforce validation
-            profileNameEdit.setText(profile.getName());
-            encryptionKeyEditor.setEncryptionKey(profile.getEncryptionKey());
+            profileNameEdit.setText(profile.name());
+            encryptionKeyEditor.setEncryptionKey(profile.encryptionKey());
         } else {
             profileNameEdit.setText("");
             encryptionKeyEditor.setEncryptionKey("");
@@ -283,7 +283,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             var selected = getSelectedProfile().orElse(null);
 
             return ValidationResult.fromErrorIf(control, null,
-                profileListView.getItems().stream().anyMatch(p -> p != selected && p.getName().equals(value)));
+                profileListView.getItems().stream().anyMatch(p -> p != selected && p.name().equals(value)));
         });
 
         profileNameValidation.initInitialDecoration();

@@ -1,9 +1,8 @@
-package org.panteleyev.money.persistence;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.persistence;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import javax.sql.DataSource;
@@ -22,6 +21,7 @@ public class MySQLBuilder {
             var ds = new MysqlDataSource();
             ds.setCharacterEncoding("utf8");
             ds.setUseSSL(false);
+            ds.setAllowPublicKeyRetrieval(true);
             ds.setServerTimezone(TimeZone.getDefault().getID());
             ds.setPort(port);
             ds.setServerName(host);

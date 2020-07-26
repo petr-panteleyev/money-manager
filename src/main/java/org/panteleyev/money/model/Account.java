@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.ForeignKey;
@@ -54,13 +53,16 @@ public record Account(
     CardType cardType,
     @Column("card_number")
     String cardNumber,
+    @Column("total")
+    BigDecimal total,
+    @Column("total_waiting")
+    BigDecimal totalWaiting,
     @Column("created")
     long created,
     @Column("modified")
     long modified
 
 ) implements MoneyRecord, Named, Comparable<Account> {
-    public final static Predicate<Account> FILTER_ALL = x -> true;
     public final static Predicate<Account> FILTER_ENABLED = Account::enabled;
 
     public Account {
@@ -68,6 +70,8 @@ public record Account(
         this.accountLimit = MoneyRecord.normalize(accountLimit);
         this.currencyRate = MoneyRecord.normalize(currencyRate);
         this.interest = MoneyRecord.normalize(interest);
+        this.total = MoneyRecord.normalize(total);
+        this.totalWaiting = MoneyRecord.normalize(totalWaiting);
     }
 
     @Override
@@ -82,12 +86,24 @@ public record Account(
             .build();
     }
 
+    public Account updateBalance(BigDecimal total, BigDecimal totalWaiting) {
+        return new Builder(this)
+            .total(total)
+            .totalWaiting(totalWaiting)
+            .modified(System.currentTimeMillis())
+            .build();
+    }
+
     public String getAccountNumberNoSpaces() {
         return accountNumber().replaceAll(" ", "");
     }
 
     public String getCardNumberNoSpaces() {
         return cardNumber().replaceAll(" ", "");
+    }
+
+    public BigDecimal getBalance() {
+        return openingBalance.add(accountLimit).add(total);
     }
 
     public static final class Builder {
@@ -106,6 +122,8 @@ public record Account(
         private UUID iconUuid = null;
         private CardType cardType = CardType.NONE;
         private String cardNumber = "";
+        private BigDecimal total = BigDecimal.ZERO;
+        private BigDecimal totalWaiting = BigDecimal.ZERO;
         private UUID uuid = null;
         private long created = 0;
         private long modified = 0;
@@ -136,6 +154,8 @@ public record Account(
             uuid = account.uuid();
             created = account.created();
             modified = account.modified();
+            total = account.total();
+            totalWaiting = account.totalWaiting();
         }
 
         public UUID getUuid() {
@@ -158,7 +178,7 @@ public record Account(
             return new Account(uuid, name, comment, accountNumber, openingBalance,
                 accountLimit, currencyRate, type, categoryUuid,
                 currencyUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
-                created, modified);
+                total, totalWaiting, created, modified);
         }
 
         public Builder name(String name) {
@@ -236,6 +256,16 @@ public record Account(
 
         public Builder cardNumber(String cardNumber) {
             this.cardNumber = cardNumber == null ? "" : cardNumber;
+            return this;
+        }
+
+        public Builder total(BigDecimal total) {
+            this.total = total;
+            return this;
+        }
+
+        public Builder totalWaiting(BigDecimal totalWaiting) {
+            this.totalWaiting = totalWaiting;
             return this;
         }
 

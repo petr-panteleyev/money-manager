@@ -74,9 +74,6 @@ class ContactListWindowController extends BaseController {
             newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding))
         );
 
-        // Table
-        var pane = new BorderPane();
-
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
             newTableColumn(RB, "Name", x -> new ContactNameCell(), w.multiply(0.4)),
@@ -88,15 +85,13 @@ class ContactListWindowController extends BaseController {
 
         // Toolbox
         var hBox = new HBox(5, searchField, typeChoiceBox);
-        pane.setTop(hBox);
-        pane.setCenter(contactTable);
-
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
-        var self = new BorderPane();
+        var self = new BorderPane(
+            new BorderPane(contactTable, hBox, null, null, null),
+            menuBar, null, null, null
+        );
         self.setPrefSize(600.0, 400.0);
-        self.setTop(menuBar);
-        self.setCenter(pane);
 
         typeChoiceBox.getItems().add(RB.getString("All_Types"));
         typeChoiceBox.getItems().add(new Separator());

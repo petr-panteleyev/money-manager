@@ -23,6 +23,7 @@ public interface Constants {
     KeyCodeCombination SHORTCUT_H = new KeyCodeCombination(KeyCode.H, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_K = new KeyCodeCombination(KeyCode.K, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(KeyCode.N, SHORTCUT_DOWN);
+    KeyCodeCombination SHORTCUT_R = new KeyCodeCombination(KeyCode.R, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_T = new KeyCodeCombination(KeyCode.T, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(KeyCode.U, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_DELETE = new KeyCodeCombination(KeyCode.DELETE, SHORTCUT_DOWN);

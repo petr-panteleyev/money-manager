@@ -1,9 +1,8 @@
-package org.panteleyev.money.persistence;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -33,7 +32,7 @@ public class TestMoneyDAO extends BaseDaoTest {
             getDao().createTables();
             getDao().preload();
         } catch (Exception ex) {
-            throw new SkipException("Database not configured");
+            throw new SkipException(ex.getMessage());
         }
     }
 

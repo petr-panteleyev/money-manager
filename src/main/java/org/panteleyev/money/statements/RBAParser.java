@@ -33,11 +33,11 @@ class RBAParser {
 
         for (StatementTransaction tr : transactionList.transactions()) {
             var builder = new StatementRecord.Builder()
-                .amount(tr.getAmount().toString())
-                .counterParty(tr.getName())
-                .description(tr.getMemo())
-                .actual(tr.getDatePosted().toLocalDate())
-                .execution(tr.getDateAvailable().toLocalDate());
+                .amount(tr.amount().toString())
+                .counterParty(tr.name())
+                .description(tr.memo())
+                .actual(tr.datePosted().toLocalDate())
+                .execution(tr.dateAvailable().toLocalDate());
             records.add(builder.build());
         }
 

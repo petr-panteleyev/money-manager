@@ -129,6 +129,8 @@
             <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="cardType" type="xsd:string" minOccurs="0"/>
             <xsd:element name="cardNumber" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="total" type="xsd:decimal"/>
+            <xsd:element name="totalWaiting" type="xsd:decimal"/>
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>

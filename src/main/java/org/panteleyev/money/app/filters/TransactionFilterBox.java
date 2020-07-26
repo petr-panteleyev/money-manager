@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.filters;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.filters;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,8 +15,8 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
-import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.app.TransactionPredicate;
+import org.panteleyev.money.model.Transaction;
 import java.time.LocalDate;
 import java.util.function.Predicate;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByDates;
@@ -25,10 +24,10 @@ import static org.panteleyev.money.app.TransactionPredicate.transactionByYear;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class TransactionFilterBox extends HBox {
-    private ChoiceBox<Object> filterChoice = new ChoiceBox<>();
+    private final ChoiceBox<Object> filterChoice = new ChoiceBox<>();
 
-    private DatePicker fromPicker = new DatePicker(LocalDate.now());
-    private DatePicker toPicker = new DatePicker(LocalDate.now());
+    private final DatePicker fromPicker = new DatePicker(LocalDate.now());
+    private final DatePicker toPicker = new DatePicker(LocalDate.now());
 
     private final RadioButton periodRadio = new RadioButton();
 

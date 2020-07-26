@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.database;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.database;
 
 import javafx.scene.control.Dialog;
 import javax.sql.DataSource;
@@ -74,7 +73,7 @@ public final class ConnectionProfileManager {
 
     public void setProfiles(List<ConnectionProfile> profList) {
         profiles.clear();
-        profList.forEach(p -> profiles.put(p.getName(), p));
+        profList.forEach(p -> profiles.put(p.name(), p));
     }
 
     public void saveProfiles() {
@@ -87,7 +86,7 @@ public final class ConnectionProfileManager {
 
         root.putBoolean(PREF_AUTO_CONNECT, autoConnect);
         root.put(PREF_DEFAULT_PROFILE_NAME,
-            defaultProfile == null ? "" : defaultProfile.getName());
+            defaultProfile == null ? "" : defaultProfile.name());
         root.putInt(PREF_COUNT, profiles.size());
 
         var index = 0;
@@ -121,7 +120,7 @@ public final class ConnectionProfileManager {
             }
 
             var profile = loadProfile(root.node(nodeName));
-            profiles.put(profile.getName(), profile);
+            profiles.put(profile.name(), profile);
         }
 
         var defaultProfileName = root.get(PREF_DEFAULT_PROFILE_NAME, "");
@@ -147,7 +146,7 @@ public final class ConnectionProfileManager {
     }
 
     public void deleteProfile(ConnectionProfile profile) {
-        profiles.remove(profile.getName());
+        profiles.remove(profile.name());
         if (defaultProfile == profile) {
             defaultProfile = null;
             autoConnect = false;
@@ -155,13 +154,13 @@ public final class ConnectionProfileManager {
     }
 
     private static void saveProfile(ConnectionProfile profile, Preferences node) {
-        node.put("name", profile.getName());
-        node.put("database_host", profile.getDataBaseHost());
-        node.putInt("database_port", profile.getDataBasePort());
-        node.put("database_user", profile.getDataBaseUser());
-        node.put("database_password", profile.getDataBasePassword());
-        node.put("schema", profile.getSchema());
-        node.put("encryption_key", profile.getEncryptionKey());
+        node.put("name", profile.name());
+        node.put("database_host", profile.dataBaseHost());
+        node.putInt("database_port", profile.dataBasePort());
+        node.put("database_user", profile.dataBaseUser());
+        node.put("database_password", profile.dataBasePassword());
+        node.put("schema", profile.schema());
+        node.put("encryption_key", profile.encryptionKey());
     }
 
     private static ConnectionProfile loadProfile(Preferences node) {
@@ -177,11 +176,11 @@ public final class ConnectionProfileManager {
     }
 
     public String getDatabaseHost(ConnectionProfile profile) {
-        return profile.getDataBaseHost();
+        return profile.dataBaseHost();
     }
 
     public int getDatabasePort(ConnectionProfile profile) {
-        return profile.getDataBasePort();
+        return profile.dataBasePort();
     }
 
     public Dialog getEditor(boolean useEncryption) {

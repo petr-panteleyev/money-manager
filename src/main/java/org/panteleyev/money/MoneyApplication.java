@@ -1,9 +1,8 @@
-package org.panteleyev.money;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -52,7 +51,7 @@ public class MoneyApplication extends Application {
     public static void uncaughtException(Throwable e) {
         LOGGER.log(Level.SEVERE, "Uncaught exception", e);
         Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR, e.toString());
+            var alert = new Alert(Alert.AlertType.ERROR, e.toString());
             alert.showAndWait();
         });
     }

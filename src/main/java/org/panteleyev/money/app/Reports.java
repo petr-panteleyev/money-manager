@@ -79,7 +79,7 @@ class Reports {
                 td(w, formatAmount(a.interest()));
                 td(w, a.closingDate().toString());
                 td(w, a.comment());
-                td(w, "amount", cache().calculateBalance(a, true, t -> true).toString());
+                td(w, "amount", a.getBalance().toString());
                 w.println();
             }
 
@@ -135,23 +135,15 @@ class Reports {
         var result = new StringBuilder();
 
         for (var ch : s.toCharArray()) {
-            switch (ch) {
-                case '"':
-                    result.append("&quot;");
-                    break;
-                case '&':
-                    result.append("&amp;");
-                    break;
-                case '<':
-                    result.append("&lt;");
-                    break;
-                case '>':
-                    result.append("&gt;");
-                    break;
-                default:
-                    result.append(ch);
-                    break;
-            }
+            result.append(
+                switch (ch) {
+                    case '"' -> "&quot;";
+                    case '&' -> "&amp;";
+                    case '<' -> "&lt;";
+                    case '>' -> "&gt;";
+                    default -> ch;
+                }
+            );
         }
 
         return result.toString();

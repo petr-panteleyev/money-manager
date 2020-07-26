@@ -1,9 +1,8 @@
-package org.panteleyev.money.xml;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
@@ -46,7 +45,7 @@ class ImportParser extends DefaultHandler {
             this.parseMethod = parseMethod;
         }
 
-        private Function<Map<String, String>, MoneyRecord> parseMethod;
+        private final Function<Map<String, String>, MoneyRecord> parseMethod;
 
         Function<Map<String, String>, MoneyRecord> getParseMethod() {
             return parseMethod;
@@ -179,11 +178,13 @@ class ImportParser extends DefaultHandler {
             .categoryUuid(parseUuid(tags.get("categoryUuid")))
             .currencyUuid(parseUuid(tags.get("currencyUuid")))
             .enabled(parseBoolean(tags.get("enabled"), true))
-            .interest(parseBigDecimal(tags.get("interest"), BigDecimal.ZERO))
+            .interest(parseBigDecimal(tags.get("interest")))
             .closingDate(parseLocalDate(tags.get("closingDate"), null))
             .iconUuid(parseUuid(tags.get("iconUuid")))
             .cardType(parseCardType(tags.get("cardType")))
             .cardNumber(tags.get("cardNumber"))
+            .total(parseBigDecimal(tags.get("total")))
+            .totalWaiting(parseBigDecimal(tags.get("totalWaiting")))
             .guid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
@@ -264,8 +265,8 @@ class ImportParser extends DefaultHandler {
         return value == null ? null : UUID.fromString(value);
     }
 
-    private static BigDecimal parseBigDecimal(String rawValue, BigDecimal defaultValue) {
-        return rawValue == null ? defaultValue : new BigDecimal(rawValue);
+    private static BigDecimal parseBigDecimal(String rawValue) {
+        return rawValue == null ? BigDecimal.ZERO : new BigDecimal(rawValue);
     }
 
     private static LocalDate parseLocalDate(String rawValue, LocalDate defaultValue) {

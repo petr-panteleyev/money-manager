@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
@@ -315,7 +314,7 @@ public class MainWindowController extends BaseController implements TransactionT
         var loadResult = CompletableFuture
             .runAsync(() -> getDao().preload())
             .thenRun(() -> Platform.runLater(() -> {
-                setTitle(AboutDialog.APP_TITLE + " - " + profile.getName() + " - " + profile.getConnectionString());
+                setTitle(AboutDialog.APP_TITLE + " - " + profile.name() + " - " + profile.getConnectionString());
                 dbOpenProperty.set(true);
             }));
 
@@ -404,7 +403,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private Exception onInitDatabase(ConnectionProfile profile) {
         var ds = onBuildDatasource(profile);
-        return MoneyDAO.initDatabase(ds, profile.getSchema());
+        return MoneyDAO.initDatabase(ds, profile.schema());
     }
 
     private MysqlDataSource onBuildDatasource(ConnectionProfile profile) {
@@ -416,9 +415,9 @@ public class MainWindowController extends BaseController implements TransactionT
             ds.setServerTimezone(TimeZone.getDefault().getID());
             ds.setPort(profileManager.getDatabasePort(profile));
             ds.setServerName(profileManager.getDatabaseHost(profile));
-            ds.setUser(profile.getDataBaseUser());
-            ds.setPassword(profile.getDataBasePassword());
-            ds.setDatabaseName(profile.getSchema());
+            ds.setUser(profile.dataBaseUser());
+            ds.setPassword(profile.dataBasePassword());
+            ds.setDatabaseName(profile.schema());
             ds.setAllowPublicKeyRetrieval(true);
 
             return ds;

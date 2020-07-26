@@ -1,9 +1,8 @@
-package org.panteleyev.money.xml;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -81,7 +80,7 @@ public class Export {
                 .collect(Collectors.toList()));
 
             currencies = accounts.stream()
-                .map(a -> a.currencyUuid())
+                .map(Account::currencyUuid)
                 .distinct()
                 .map(cache::getCurrency)
                 .flatMap(Optional::stream)
@@ -232,6 +231,8 @@ public class Export {
         XMLUtils.appendTextNode(e, "iconUuid", account.iconUuid());
         XMLUtils.appendTextNode(e, "cardType", account.cardType());
         XMLUtils.appendTextNode(e, "cardNumber", account.cardNumber());
+        XMLUtils.appendTextNode(e, "total", account.total());
+        XMLUtils.appendTextNode(e, "totalWaiting", account.totalWaiting());
         XMLUtils.appendTextNode(e, "guid", account.uuid());
         XMLUtils.appendTextNode(e, "created", account.created());
         XMLUtils.appendTextNode(e, "modified", account.modified());

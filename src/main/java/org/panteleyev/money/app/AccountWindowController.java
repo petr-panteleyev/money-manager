@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
@@ -55,6 +54,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_F;
 import static org.panteleyev.money.app.Constants.SHORTCUT_H;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
+import static org.panteleyev.money.app.Constants.SHORTCUT_R;
 import static org.panteleyev.money.app.Constants.SHORTCUT_T;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
@@ -104,13 +104,10 @@ final class AccountWindowController extends BaseController {
         );
         hBox.setAlignment(Pos.CENTER_LEFT);
 
-        var centerBox = new BorderPane();
-        centerBox.setTop(hBox);
-        centerBox.setCenter(tableView);
-
-        var self = new BorderPane();
-        self.setTop(createMainMenu());
-        self.setCenter(centerBox);
+        var self = new BorderPane(
+            new BorderPane(tableView, hBox, null, null, null),
+            createMainMenu(), null, null, null
+        );
 
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
@@ -157,7 +154,10 @@ final class AccountWindowController extends BaseController {
                 event -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
             newMenuItem(RB, "Transactions", ELLIPSIS, SHORTCUT_T,
-                event -> onShowTransactions(), disableBinding)
+                event -> onShowTransactions(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "Recalculate_Balance", SHORTCUT_R,
+                event -> onUpdateBalance())
         );
 
         editMenu.setOnShowing(event -> getSelectedAccount()
@@ -198,8 +198,8 @@ final class AccountWindowController extends BaseController {
             newTableColumn(RB, "column.closing.date",
                 x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()), w.multiply(0.05)),
             newTableColumn(RB, "Comment", null, Account::comment, w.multiply(0.3)),
-            newTableColumn(RB, "Balance", x -> new AccountBalanceCell(true, t -> true), w.multiply(0.1)),
-            newTableColumn(RB, "Waiting", x -> new AccountBalanceCell(false, t -> !t.checked()), w.multiply(0.1))
+            newTableColumn(RB, "Balance", x -> new AccountBalanceCell(true), w.multiply(0.1)),
+            newTableColumn(RB, "Waiting", x -> new AccountBalanceCell(false), w.multiply(0.1))
         ));
     }
 
@@ -221,7 +221,9 @@ final class AccountWindowController extends BaseController {
             new SeparatorMenuItem(),
             newMenuItem(RB, "menu.Edit.Search", actionEvent -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Transactions", ELLIPSIS, event -> onShowTransactions(), disableBinding)
+            newMenuItem(RB, "Transactions", ELLIPSIS, event -> onShowTransactions(), disableBinding),
+            new SeparatorMenuItem(),
+            newMenuItem(RB, "Recalculate_Balance", event -> onUpdateBalance())
         );
 
         contextMenu.setOnShowing(event -> getSelectedAccount()
@@ -318,5 +320,13 @@ final class AccountWindowController extends BaseController {
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    private void onUpdateBalance() {
+        tableView.getItems().forEach(account -> {
+            var total = cache().calculateBalance(account, false, t -> true);
+            var waiting = cache().calculateBalance(account, false, t -> !t.checked());
+            getDao().updateAccount(account.updateBalance(total, waiting));
+        });
     }
 }

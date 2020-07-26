@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableView;
@@ -51,10 +50,7 @@ final class CurrencyWindowController extends BaseController {
             newTableColumn(RB, "Description", null, Currency::description, w.multiply(0.8))
         ));
 
-        var root = new BorderPane();
-        root.setTop(menuBar);
-        root.setCenter(table);
-
+        var root = new BorderPane(table, menuBar, null, null, null);
         setupWindow(root);
         Options.loadStageDimensions(getClass(), getStage());
     }
