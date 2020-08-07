@@ -1,9 +1,8 @@
-package org.panteleyev.money.statements;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.statements;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -107,9 +106,9 @@ class SberbankParser {
     }
 
     private static LocalDate parseDate(Element dateElement, Format format) {
-        Element iDate = dateElement.getElementsByClass(format.getString(Param.DATE_CLASS)).first();
+        var iDate = dateElement.getElementsByClass(format.getString(Param.DATE_CLASS)).first();
         if (iDate != null) {
-            String dateString = iDate.attributes().get(format.getString(Param.DATE_VALUE));
+            var dateString = iDate.attributes().get(format.getString(Param.DATE_VALUE));
             return LocalDate.parse(dateString, DATE_FORMATTER);
         } else {
             return null;
@@ -117,7 +116,7 @@ class SberbankParser {
     }
 
     static Statement parseCreditCardHtml(InputStream inputStream) {
-        List<StatementRecord> records = new ArrayList<>();
+        var records = new ArrayList<StatementRecord>();
 
         try {
             var document = Jsoup.parse(inputStream, StandardCharsets.UTF_8.name(), "");

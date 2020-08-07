@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.ButtonType;
@@ -49,10 +48,7 @@ final class AboutDialog extends BaseDialog {
         copyrightLabel.getStyleClass().add(Styles.ABOUT_LABEL);
 
         var vBox = new VBox(10, appLabel, copyrightLabel, grid);
-
-        var pane = new BorderPane();
-        pane.setLeft(icon);
-        pane.setCenter(vBox);
+        var pane = new BorderPane(vBox, null, null, null, icon);
 
         BorderPane.setMargin(vBox, new Insets(0.0, 0.0, 0.0, 10.0));
 

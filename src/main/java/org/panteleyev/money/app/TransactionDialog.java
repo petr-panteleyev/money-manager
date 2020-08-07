@@ -66,7 +66,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
         new ToStringConverter<>() {
             public String toString(TransactionType obj) {
-                return obj.getTypeName();
+                return obj.toString();
             }
         };
 
@@ -99,7 +99,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
 
         public String getElementString(TransactionType element) {
-            return element.getTypeName();
+            return element.toString();
         }
     }
 
@@ -287,7 +287,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         setTitle(RB.getString("Transaction") + ": " + uuid);
 
         // Type
-        typeEdit.setText(transaction.type().getTypeName());
+        typeEdit.setText(transaction.type().toString());
 
         // Accounts
         Optional<Account> accCredited = cache.getAccount(transaction.accountCreditedUuid());
@@ -473,7 +473,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void onTransactionTypeSelected(TransactionType type) {
-        typeEdit.setText(type.getTypeName());
+        typeEdit.setText(type.toString());
     }
 
     private boolean buildTransaction() {
@@ -595,7 +595,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private void handleTypeFocusLoss() {
         var type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions);
         if (type.isEmpty()) {
-            typeEdit.setText(TransactionType.UNDEFINED.getTypeName());
+            typeEdit.setText(TransactionType.UNDEFINED.toString());
         }
     }
 
@@ -654,7 +654,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
                 typeMenuButton.getItems().add(
-                    newMenuItem(x.getTypeName(), event -> onTransactionTypeSelected(x)));
+                    newMenuItem(x.toString(), event -> onTransactionTypeSelected(x)));
                 typeSuggestions.add(x);
             }
         });
@@ -757,7 +757,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
             var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
-            label.setText(account.type().getTypeName() + " | " + catName);
+            label.setText(account.type() + " | " + catName);
         } else {
             label.setText("");
         }

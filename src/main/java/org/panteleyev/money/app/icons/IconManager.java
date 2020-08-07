@@ -1,13 +1,13 @@
-package org.panteleyev.money.app.icons;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.icons;
 
 import javafx.collections.FXCollections;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.panteleyev.money.app.Images;
 import org.panteleyev.money.model.Account;
@@ -38,9 +38,12 @@ public class IconManager {
     private IconManager() {
     }
 
+    public static Image getImage(UUID uuid) {
+        return (uuid == null ? EMPTY_ICON : cache().getIcon(uuid).orElse(EMPTY_ICON)).getImage();
+    }
+
     public static ImageView getImageView(UUID uuid) {
-        var icon = uuid == null ? EMPTY_ICON : cache().getIcon(uuid).orElse(EMPTY_ICON);
-        return new ImageView(icon.getImage());
+        return new ImageView(getImage(uuid));
     }
 
     public static ImageView getAccountImageView(Account account) {

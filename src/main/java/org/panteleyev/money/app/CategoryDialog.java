@@ -5,21 +5,20 @@
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.TextField;
-import javafx.util.StringConverter;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import static org.panteleyev.fx.GridFactory.addRows;
@@ -34,7 +33,7 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 final class CategoryDialog extends BaseDialog<Category> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ChoiceBox<CategoryType> typeComboBox = new ChoiceBox<>();
+    private final ComboBox<CategoryType> typeComboBox = new ComboBoxBuilder<>(CategoryType.values()).build();
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
@@ -52,17 +51,12 @@ final class CategoryDialog extends BaseDialog<Category> {
         );
 
         nameEdit.setPrefColumnCount(20);
-
-        var list = List.of(CategoryType.values());
-        typeComboBox.setItems(FXCollections.observableArrayList(list));
-        if (!list.isEmpty()) {
-            typeComboBox.getSelectionModel().select(0);
-        }
+        typeComboBox.getSelectionModel().select(0);
 
         IconManager.setupComboBox(iconComboBox);
 
         if (category != null) {
-            list.stream()
+            Arrays.stream(CategoryType.values())
                 .filter(t -> t == category.type())
                 .findFirst()
                 .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
@@ -74,38 +68,26 @@ final class CategoryDialog extends BaseDialog<Category> {
             iconComboBox.getSelectionModel().select(EMPTY_ICON);
         }
 
-        typeComboBox.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(CategoryType type) {
-                return type.getTypeName();
-            }
-
-            @Override
-            public CategoryType fromString(String string) {
-                throw new UnsupportedOperationException("Not supported yet.");
-            }
-        });
-
         setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
-                long now = System.currentTimeMillis();
-
-                var builder = new Category.Builder(category)
-                    .name(nameEdit.getText())
-                    .comment(commentEdit.getText())
-                    .type(typeComboBox.getSelectionModel().getSelectedItem())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
-                    .modified(now);
-
-                if (category == null) {
-                    builder.guid(UUID.randomUUID())
-                        .created(now);
-                }
-
-                return builder.build();
-            } else {
+            if (b != ButtonType.OK) {
                 return null;
             }
+
+            long now = System.currentTimeMillis();
+
+            var builder = new Category.Builder(category)
+                .name(nameEdit.getText())
+                .comment(commentEdit.getText())
+                .type(typeComboBox.getSelectionModel().getSelectedItem())
+                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                .modified(now);
+
+            if (category == null) {
+                builder.guid(UUID.randomUUID())
+                    .created(now);
+            }
+
+            return builder.build();
         });
 
         getDialogPane().setContent(pane);
@@ -120,7 +102,7 @@ final class CategoryDialog extends BaseDialog<Category> {
         validation.initInitialDecoration();
     }
 
-    ChoiceBox<CategoryType> getTypeComboBox() {
+    ComboBox<CategoryType> getTypeComboBox() {
         return typeComboBox;
     }
 

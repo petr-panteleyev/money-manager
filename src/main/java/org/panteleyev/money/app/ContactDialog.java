@@ -5,10 +5,8 @@
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.geometry.VPos;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -18,12 +16,12 @@ import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.util.List;
 import java.util.UUID;
 import static org.panteleyev.fx.GridFactory.addRows;
@@ -38,7 +36,7 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 final class ContactDialog extends BaseDialog<Contact> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ChoiceBox<ContactType> typeChoiceBox = new ChoiceBox<>();
+    private final ComboBox<ContactType> typeBox = new ComboBoxBuilder<>(ContactType.values()).build();
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField mobileField = new TextField();
@@ -58,7 +56,7 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         var gridPane = newGridPane(Styles.GRID_PANE);
         addRows(gridPane,
-            List.of(newLabel(RB, "label.Type"), typeChoiceBox, iconComboBox),
+            List.of(newLabel(RB, "label.Type"), typeBox, iconComboBox),
             List.of(newLabel(RB, "label.Name"), colSpan(nameField, 2)),
             List.of(newLabel(RB, "Phone", COLON), colSpan(phoneField, 2)),
             List.of(newLabel(RB, "label.Mobile"), colSpan(mobileField, 2)),
@@ -85,15 +83,8 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         IconManager.setupComboBox(iconComboBox);
 
-        typeChoiceBox.setItems(FXCollections.observableArrayList(ContactType.values()));
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            public String toString(ContactType type) {
-                return type.getTypeName();
-            }
-        });
-
         if (contact != null) {
-            typeChoiceBox.getSelectionModel().select(contact.type());
+            typeBox.getSelectionModel().select(contact.type());
 
             nameField.setText(contact.name());
             phoneField.setText(contact.phone());
@@ -107,38 +98,38 @@ final class ContactDialog extends BaseDialog<Contact> {
             zipField.setText(contact.zip());
             iconComboBox.getSelectionModel().select(cache().getIcon(contact.iconUuid()).orElse(EMPTY_ICON));
         } else {
-            typeChoiceBox.getSelectionModel().select(0);
+            typeBox.getSelectionModel().select(0);
             iconComboBox.getSelectionModel().select(EMPTY_ICON);
         }
 
         setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
-                long now = System.currentTimeMillis();
-
-                var builder = new Contact.Builder(contact)
-                    .name(nameField.getText())
-                    .type(typeChoiceBox.getSelectionModel().getSelectedItem())
-                    .phone(phoneField.getText())
-                    .mobile(mobileField.getText())
-                    .email(emailField.getText())
-                    .web(webField.getText())
-                    .comment(commentEdit.getText())
-                    .street(streetField.getText())
-                    .city(cityField.getText())
-                    .country(countryField.getText())
-                    .zip(zipField.getText())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
-                    .modified(now);
-
-                if (contact == null) {
-                    builder.guid(UUID.randomUUID())
-                        .created(now);
-                }
-
-                return builder.build();
-            } else {
+            if (b != ButtonType.OK) {
                 return null;
             }
+
+            long now = System.currentTimeMillis();
+
+            var builder = new Contact.Builder(contact)
+                .name(nameField.getText())
+                .type(typeBox.getSelectionModel().getSelectedItem())
+                .phone(phoneField.getText())
+                .mobile(mobileField.getText())
+                .email(emailField.getText())
+                .web(webField.getText())
+                .comment(commentEdit.getText())
+                .street(streetField.getText())
+                .city(cityField.getText())
+                .country(countryField.getText())
+                .zip(zipField.getText())
+                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                .modified(now);
+
+            if (contact == null) {
+                builder.guid(UUID.randomUUID())
+                    .created(now);
+            }
+
+            return builder.build();
         });
 
         createDefaultButtons(RB, validation.invalidProperty());
@@ -152,8 +143,8 @@ final class ContactDialog extends BaseDialog<Contact> {
         validation.initInitialDecoration();
     }
 
-    ChoiceBox<ContactType> getTypeChoiceBox() {
-        return typeChoiceBox;
+    ComboBox<ContactType> getTypeBox() {
+        return typeBox;
     }
 
     TextField getNameField() {

@@ -4,36 +4,39 @@
  */
 package org.panteleyev.money.app;
 
+import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.control.ChoiceBox;
+import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.money.app.cells.CategoryNameCell;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.persistence.MoneyDAO;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import static org.panteleyev.fx.BoxFactory.newHBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.FxUtils.clearValueAndSelection;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.MenuFactory.newMenuBar;
 import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
+import static org.panteleyev.money.app.Constants.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_F;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
@@ -42,7 +45,9 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryWindowController extends BaseController {
-    private final ChoiceBox<Object> typeChoiceBox = new ChoiceBox<>();
+    private final ComboBox<CategoryType> typeBox = new ComboBoxBuilder<>(CategoryType.values())
+        .withDefaultString(ALL_TYPES_STRING)
+        .build();
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
@@ -66,6 +71,8 @@ final class CategoryWindowController extends BaseController {
                 newMenuItem(RB, "menu.Edit.Edit", SHORTCUT_E, editHandler, disableBinding),
                 new SeparatorMenuItem(),
                 newMenuItem(RB, "menu.Edit.Search", SHORTCUT_F, actionEvent -> searchField.requestFocus())),
+            newMenu(RB, "View",
+                newMenuItem(RB, "Reset_Filter", SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
 
@@ -77,14 +84,14 @@ final class CategoryWindowController extends BaseController {
         // Table
         var w = categoryTable.widthProperty().subtract(20);
         categoryTable.getColumns().setAll(List.of(
-            newTableColumn(RB, "Type", null, c -> c.type().getTypeName(), w.multiply(0.2)),
+            newTableColumn(RB, "Type", null, c -> c.type().toString(), w.multiply(0.2)),
             newTableColumn(RB, "column.Name", x -> new CategoryNameCell(), w.multiply(0.4)),
             newTableColumn(RB, "Comment", null, Category::comment, w.multiply(0.4))
         ));
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
-        var hBox = new HBox(5, searchField, typeChoiceBox);
+        var hBox = newHBox(5, Pos.CENTER_LEFT, searchField, typeBox);
         var pane = new BorderPane(categoryTable, hBox, null, null, null);
 
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
@@ -92,19 +99,10 @@ final class CategoryWindowController extends BaseController {
         var self = new BorderPane(pane, menuBar, null, null, null);
         self.setPrefSize(600.0, 400.0);
 
-        typeChoiceBox.getItems().add(RB.getString("All_Types"));
-        typeChoiceBox.getItems().add(new Separator());
-        typeChoiceBox.getItems().addAll(Arrays.asList(CategoryType.values()));
-        typeChoiceBox.getSelectionModel().select(0);
+        typeBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
 
-        typeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            public String toString(Object obj) {
-                return obj instanceof CategoryType type ? type.getTypeName() : obj.toString();
-            }
-        });
-
-        typeChoiceBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
         setupWindow(self);
+        Platform.runLater(this::resetFilter);
     }
 
     private Optional<Category> getSelectedCategory() {
@@ -117,15 +115,9 @@ final class CategoryWindowController extends BaseController {
     }
 
     private Predicate<Category> getPredicate() {
-        Predicate<Category> filter;
-
         // Type
-        var type = typeChoiceBox.getSelectionModel().getSelectedItem();
-        if (type instanceof String) {
-            filter = x -> true;
-        } else {
-            filter = x -> x.type() == type;
-        }
+        var type = typeBox.getSelectionModel().getSelectedItem();
+        Predicate<Category> filter = type == null ? x -> true : x -> x.type() == type;
 
         // Name
         var search = searchField.getText().toLowerCase();
@@ -154,5 +146,9 @@ final class CategoryWindowController extends BaseController {
 
     private void updatePredicate() {
         filteredList.setPredicate(getPredicate());
+    }
+
+    private void resetFilter() {
+        clearValueAndSelection(typeBox);
     }
 }

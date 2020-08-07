@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,16 +40,11 @@ public class ChartsWindowController extends BaseController {
         BorderPane.setMargin(topPanel, new Insets(5.0, 5.0, 5.0, 5.0));
         pieChart.legendVisibleProperty().set(false);
 
-        var centerPane = new BorderPane();
-        centerPane.setTop(topPanel);
-        centerPane.setCenter(pieChart);
+        var centerPane = new BorderPane(pieChart, topPanel, null, null, null);
 
-        var root = new BorderPane();
-        root.setTop(createMainMenu());
-        root.setCenter(centerPane);
+        var root = new BorderPane(centerPane, createMainMenu(), null, null, null);
 
         transactionFilterBox.setFilterYears();
-        selectionBox.setupCategoryTypesBox();
 
         setupWindow(root);
         Options.loadStageDimensions(getClass(), getStage());

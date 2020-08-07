@@ -1,19 +1,15 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.money.app.filters;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
-import javafx.collections.WeakListChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Separator;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
+import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.Predicates;
 import org.panteleyev.money.app.TransactionPredicate;
@@ -21,142 +17,109 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.Predicate;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.clearValueAndSelection;
+import static org.panteleyev.money.app.Constants.ACCOUNT_TO_IMAGE;
+import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
+import static org.panteleyev.money.app.Constants.CATEGORY_TO_IMAGE;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByUuid;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByCategory;
 import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.persistence.MoneyDAO.COMPARE_ACCOUNT_BY_NAME;
+import static org.panteleyev.money.persistence.MoneyDAO.COMPARE_CATEGORY_BY_NAME;
 
 public class AccountSelectionBox extends HBox {
-    private final ChoiceBox<Object> categoryTypeChoiceBox = new ChoiceBox<>();
-    private final ChoiceBox<Object> categoryChoiceBox = new ChoiceBox<>();
-    private final ChoiceBox<Object> accountChoiceBox = new ChoiceBox<>();
-
-    private final static String ALL_TYPES_STRING = RB.getString("All_Types");
     private final static String ALL_CATEGORIES_STRING = RB.getString("All_Categories");
     private final static String ALL_ACCOUNTS_STRING = RB.getString("text.All.Accounts");
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Category> categoryListener = change ->
-        Platform.runLater(() -> setupCategoryBox(getSelectedCategoryType()));
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Account> accountListener =
-        change -> Platform.runLater(() -> setupAccountBox(getSelectedCategory()));
-
+    private final ComboBox<CategoryType> categoryTypeBox = new ComboBoxBuilder<>(CategoryType.values())
+        .withDefaultString(ALL_TYPES_STRING)
+        .build();
+    private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
+    private final ComboBox<Category> categoryBox = new ComboBoxBuilder<>(filteredCategories.sorted(COMPARE_CATEGORY_BY_NAME))
+        .withDefaultString(ALL_CATEGORIES_STRING)
+        .withStringConverter(Category::name)
+        .withImageConverter(CATEGORY_TO_IMAGE)
+        .build();
+    private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
+    private final ComboBox<Account> accountBox = new ComboBoxBuilder<>(filteredAccounts.sorted(COMPARE_ACCOUNT_BY_NAME))
+        .withDefaultString(ALL_ACCOUNTS_STRING)
+        .withStringConverter(Account::name)
+        .withImageConverter(ACCOUNT_TO_IMAGE)
+        .build();
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
-
-    private final EventHandler<ActionEvent> categoryTypeHandler =
-        event -> setupCategoryBox(getSelectedCategoryType());
-    private final EventHandler<ActionEvent> categoryHandler =
-        event -> setupAccountBox(getSelectedCategory());
-    private final EventHandler<ActionEvent> accountHandler =
-        event -> predicateProperty.set(getTransactionFilter());
 
     public AccountSelectionBox() {
         super(5.0);
 
         setAlignment(Pos.CENTER_LEFT);
 
-        getChildren().addAll(newLabel(RB, "text.In.Semicolon"),
-            categoryTypeChoiceBox, categoryChoiceBox, accountChoiceBox);
+        getChildren().addAll(categoryTypeBox, categoryBox, accountBox);
 
-        categoryTypeChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(Object obj) {
-                return obj instanceof CategoryType type ? type.getTypeName() : obj.toString();
-            }
-        });
+        categoryBox.setVisibleRowCount(20);
+        accountBox.setVisibleRowCount(20);
 
-        categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(Object obj) {
-                return obj instanceof Category category ? category.name() : obj.toString();
-            }
-        });
+        categoryTypeBox.setOnAction(
+            event -> setupCategoryBox(getSelectedCategoryType().orElse(null))
+        );
+        categoryBox.setOnAction(
+            event -> setupAccountBox(getSelectedCategory().orElse(null))
+        );
+        accountBox.setOnAction(event -> updatePredicate());
 
-        accountChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(Object obj) {
-                return obj instanceof Account account ? account.name() : obj.toString();
-            }
-        });
-
-        categoryTypeChoiceBox.setOnAction(categoryTypeHandler);
-        categoryChoiceBox.setOnAction(categoryHandler);
-        accountChoiceBox.setOnAction(accountHandler);
-
-        cache().getCategories().addListener(new WeakListChangeListener<>(categoryListener));
-        cache().getAccounts().addListener(new WeakListChangeListener<>(accountListener));
+        Platform.runLater(this::reset);
     }
 
     public PredicateProperty<Transaction> predicateProperty() {
         return predicateProperty;
     }
 
-    public void setupCategoryTypesBox() {
-        categoryTypeChoiceBox.setOnAction(event -> {});
-        var items = categoryTypeChoiceBox.getItems();
-        items.setAll(ALL_TYPES_STRING, new Separator());
-        items.addAll(Arrays.asList(CategoryType.values()));
-
-        categoryTypeChoiceBox.setOnAction(categoryTypeHandler);
-        categoryTypeChoiceBox.getSelectionModel().selectFirst();
+    public void reset() {
+        clearValueAndSelection(categoryTypeBox, categoryBox, accountBox);
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void setupCategoryBox(Optional<CategoryType> categoryType) {
-        categoryChoiceBox.setOnAction(s -> {});
+    private void setupCategoryBox(CategoryType type) {
+        var selectedAccount = getSelectedAccount();
 
-        var items = categoryChoiceBox.getItems();
-        items.setAll(ALL_CATEGORIES_STRING);
+        filteredCategories.setPredicate(type == null ? c -> true : c -> c.type() == type);
 
-        categoryType.ifPresent(type -> items.addAll(cache().getCategoriesByType(type)));
+        categoryBox.setValue(null);
+        categoryBox.getSelectionModel().select(null);
 
-        if (items.size() > 1) {
-            items.add(1, new Separator());
+        if (selectedAccount.isEmpty()) {
+            updatePredicate();
         }
-
-        categoryChoiceBox.setOnAction(categoryHandler);
-        categoryChoiceBox.getSelectionModel().selectFirst();
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void setupAccountBox(Optional<Category> category) {
-        accountChoiceBox.setOnAction(event -> {});
+    private void setupAccountBox(Category category) {
+        var selectedAccount = getSelectedAccount();
 
-        var items = accountChoiceBox.getItems();
-        items.setAll(ALL_ACCOUNTS_STRING);
+        filteredAccounts.setPredicate(
+            category == null ? a -> true : a -> a.categoryUuid().equals(category.uuid())
+        );
 
-        category.ifPresent(cat -> items.addAll(cache().getAccountsByCategory(cat.uuid())));
+        accountBox.setValue(null);
+        accountBox.getSelectionModel().select(null);
 
-        if (items.size() > 1) {
-            items.add(1, new Separator());
+        if (selectedAccount.isEmpty()) {
+            updatePredicate();
         }
-
-        accountChoiceBox.setOnAction(accountHandler);
-        accountChoiceBox.getSelectionModel().selectFirst();
     }
 
     private Optional<Account> getSelectedAccount() {
-        var obj = accountChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Account account ? Optional.of(account) : Optional.empty();
+        return Optional.ofNullable(accountBox.getSelectionModel().getSelectedItem());
     }
 
     private Optional<Category> getSelectedCategory() {
-        var obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Category category ? Optional.of(category) : Optional.empty();
+        return Optional.ofNullable(categoryBox.getSelectionModel().getSelectedItem());
     }
 
     private Optional<CategoryType> getSelectedCategoryType() {
-        var obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof CategoryType type ? Optional.of(type) : Optional.empty();
+        return Optional.ofNullable(categoryTypeBox.getSelectionModel().getSelectedItem());
     }
 
     Predicate<Transaction> getTransactionFilter() {
@@ -173,12 +136,7 @@ public class AccountSelectionBox extends HBox {
                     .orElse(x -> true)));
     }
 
-    public void setAccount(Account account) {
-        var type = account.type();
-        var category = cache().getCategory(account.categoryUuid()).orElseThrow();
-
-        categoryTypeChoiceBox.getSelectionModel().select(type);
-        categoryChoiceBox.getSelectionModel().select(category);
-        accountChoiceBox.getSelectionModel().select(account);
+    private void updatePredicate() {
+        predicateProperty.set(getTransactionFilter());
     }
 }

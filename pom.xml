@@ -9,7 +9,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager</artifactId>
-    <version>20.6.0</version>
+    <version>20.6.1</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -23,12 +23,12 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <!-- dependencies -->
         <javaApiForMySqlVersion>1.3.0</javaApiForMySqlVersion>
-        <javaFxVersion>14.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.3.1</javaFxHelpersVersion>
+        <javaFxVersion>14.0.2.1</javaFxVersion>
+        <javaFxHelpersVersion>1.4.0</javaFxHelpersVersion>
         <ofxParserVersion>0.1.1</ofxParserVersion>
         <controlsFxVersion>11.0.2</controlsFxVersion>
         <mysqlConnectorVersion>8.0.21</mysqlConnectorVersion>
-        <jsoupVersion>1.12.1</jsoupVersion>
+        <jsoupVersion>1.13.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
         <testngVersion>6.14.3</testngVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>

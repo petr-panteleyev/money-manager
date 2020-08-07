@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -169,7 +168,7 @@ public class TransactionDialogTest extends BaseTest {
 
     private void setUserInput(TransactionDialog dialog, Transaction t, String contactName) {
         // Transaction type
-        dialog.getTypeEdit().setText(t.type().getTypeName());
+        dialog.getTypeEdit().setText(t.type().toString());
 
         // Debited account
         dialog.getDebitedAccountEdit().setText(cache.getAccount(t.accountDebitedUuid())

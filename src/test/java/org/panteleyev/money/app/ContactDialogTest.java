@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -54,7 +53,7 @@ public class ContactDialogTest extends BaseTest {
         dialog.getCityField().setText(CONTACT.city());
         dialog.getCountryField().setText(CONTACT.country());
         dialog.getZipField().setText(CONTACT.zip());
-        dialog.getTypeChoiceBox().getSelectionModel().select(CONTACT.type());
+        dialog.getTypeBox().getSelectionModel().select(CONTACT.type());
     }
 
     @Test

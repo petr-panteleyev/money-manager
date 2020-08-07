@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.filters;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.filters;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -111,7 +110,7 @@ public class CategorySelectionBox extends HBox {
         );
 
         for (var t : CategoryType.values()) {
-            categoryTypeChoiceBox.getItems().add(new TypeListItem(t.getTypeName(), t));
+            categoryTypeChoiceBox.getItems().add(new TypeListItem(t.toString(), t));
         }
 
         categoryTypeChoiceBox.setOnAction(categoryTypeHandler);

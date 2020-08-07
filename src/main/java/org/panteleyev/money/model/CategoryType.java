@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import static org.panteleyev.money.model.Bundles.CATEGORY_TYPE_BUNDLE;
 
@@ -24,7 +23,8 @@ public enum CategoryType {
         comment = CATEGORY_TYPE_BUNDLE.getString(name() + "_comment");
     }
 
-    public String getTypeName() {
+    @Override
+    public String toString() {
         return typeName;
     }
 

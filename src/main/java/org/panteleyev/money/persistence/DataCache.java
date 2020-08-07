@@ -1,9 +1,8 @@
-package org.panteleyev.money.persistence;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.persistence;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -326,7 +325,7 @@ public class DataCache {
             .filter(t -> t.parentUuid() == null)
             .filter(filter)
             .map(t -> {
-                BigDecimal amount = t.amount();
+                var amount = t.amount();
                 if (Objects.equals(account.uuid(), t.accountCreditedUuid())) {
                     // handle conversion rate
                     var rate = t.rate();

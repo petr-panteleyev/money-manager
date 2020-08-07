@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -11,8 +10,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.fx.PredicateProperty;
@@ -32,7 +29,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.ButtonFactory.newButton;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.MenuFactory.newMenuBar;
@@ -40,11 +36,13 @@ import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -57,10 +55,7 @@ class RequestWindowController extends BaseController {
     private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
     private final ContactFilterBox contactFilterBox = new ContactFilterBox();
 
-    private final PredicateProperty<Transaction> filterProperty =
-        PredicateProperty.and(List.of(accBox.predicateProperty(),
-            transactionFilterBox.predicateProperty(),
-            contactFilterBox.predicateProperty()));
+    private final PredicateProperty<Transaction> filterProperty;
 
     private final TreeSet<String> contactSuggestions = new TreeSet<>();
 
@@ -74,14 +69,14 @@ class RequestWindowController extends BaseController {
         }
     }
 
-    RequestWindowController() {
-        this(null);
-    }
-
     RequestWindowController(Account account) {
         this.account = account;
 
-        var fillBox = new Region();
+        filterProperty = PredicateProperty.and(List.of(
+            account == null ? accBox.predicateProperty() : new PredicateProperty<>(transactionByAccount(account.uuid())),
+            transactionFilterBox.predicateProperty(),
+            contactFilterBox.predicateProperty()
+        ));
 
         var filterBox = new HBox(5.0);
         if (account == null) {
@@ -90,12 +85,9 @@ class RequestWindowController extends BaseController {
         filterBox.getChildren().addAll(
             transactionFilterBox,
             newLabel(RB, "Counterparty", COLON),
-            contactFilterBox.getTextField(),
-            fillBox,
-            newButton(RB, "Reset_Filter", x -> onClearButton())
+            contactFilterBox.getTextField()
         );
 
-        HBox.setHgrow(fillBox, Priority.ALWAYS);
         filterBox.setAlignment(Pos.CENTER_LEFT);
         BorderPane.setMargin(filterBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
@@ -113,7 +105,6 @@ class RequestWindowController extends BaseController {
         root.setTop(createMenuBar());
         root.setCenter(centerBox);
 
-        accBox.setupCategoryTypesBox();
         transactionFilterBox.setFilterYears();
 
         TextFields.bindAutoCompletion(contactFilterBox.getTextField(), new CompletionProvider(contactSuggestions));
@@ -121,11 +112,6 @@ class RequestWindowController extends BaseController {
 
         setupWindow(root);
         Options.loadStageDimensions(getClass(), getStage());
-
-        if (account != null) {
-            accBox.setAccount(account);
-            onUpdateFilter();
-        }
     }
 
     Account getAccount() {
@@ -161,6 +147,8 @@ class RequestWindowController extends BaseController {
                 newMenuItem(RB, "menu.item.check", SHORTCUT_K, event -> table.onCheckTransactions(true)),
                 newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U, event -> table.onCheckTransactions(false))
             ),
+            newMenu(RB, "View",
+                newMenuItem(RB, "Reset_Filter", SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
     }
@@ -169,8 +157,8 @@ class RequestWindowController extends BaseController {
         table.setTransactionFilter(filterProperty.get());
     }
 
-    private void onClearButton() {
-        accBox.setupCategoryTypesBox();
+    private void resetFilter() {
+        accBox.reset();
         contactFilterBox.getTextField().clear();
         transactionFilterBox.setTransactionFilter(TransactionPredicate.CURRENT_MONTH);
     }

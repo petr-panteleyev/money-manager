@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 public enum CardType {
     NONE("-"),
@@ -12,7 +11,7 @@ public enum CardType {
     MIR("Мир"),
     AMEX("American Express");
 
-    private String typeName;
+    private final String typeName;
 
     CardType(String typeName) {
         this.typeName = typeName;

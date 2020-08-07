@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
@@ -14,7 +13,7 @@ public final class TemplateEngine {
     public enum Template {
         INCOMES_AND_EXPENSES("IncomesAndExpenses.ftl");
 
-        private String fileName;
+        private final String fileName;
 
         Template(String fileName) {
             this.fileName = fileName;

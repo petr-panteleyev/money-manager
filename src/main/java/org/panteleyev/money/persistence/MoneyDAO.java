@@ -47,7 +47,7 @@ public class MoneyDAO {
 
     public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
     public static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
-        (o1, o2) -> o1.type().getTypeName().compareToIgnoreCase(o2.type().getTypeName());
+        (o1, o2) -> o1.type().toString().compareToIgnoreCase(o2.type().toString());
 
     public final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::name);
     public final static Comparator<Account> COMPARE_ACCOUNT_BY_CATEGORY = (a1, a2) -> {

@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.PrimaryKey;
@@ -47,8 +46,8 @@ public record Currency(
     }
 
     public String formatValue(BigDecimal value) {
-        String sumString = value.abs().setScale(2, RoundingMode.HALF_UP).toString();
-        String signString = value.signum() < 0 ? "-" : "";
+        var sumString = value.abs().setScale(2, RoundingMode.HALF_UP).toString();
+        var signString = value.signum() < 0 ? "-" : "";
 
         sumString = formatSymbolPosition == 0 ?
             signString + formatSymbol + sumString :

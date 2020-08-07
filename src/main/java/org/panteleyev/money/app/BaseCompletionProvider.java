@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
@@ -14,8 +13,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding.ISuggestionRequest,
-    Collection<T>>
-{
+    Collection<T>> {
     private final Set<T> set;
     private final Supplier<Integer> minLengthSupplier;
 
@@ -28,22 +26,22 @@ public abstract class BaseCompletionProvider<T> implements Callback<AutoCompleti
 
     @Override
     public Collection<T> call(AutoCompletionBinding.ISuggestionRequest req) {
-        if (req.getUserText().length() >= minLengthSupplier.get()) {
-            var userText = req.getUserText();
-            var stripped = userText.stripLeading().toLowerCase();
-
-            var result = set.stream()
-                .filter(it -> getElementString(it).toLowerCase().contains(stripped))
-                .collect(Collectors.toList());
-
-            if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
-                /* If there is a single case sensitive match then no suggestions must be shown. */
-                return List.of();
-            } else {
-                return result;
-            }
-        } else {
+        if (req.getUserText().length() < minLengthSupplier.get()) {
             return List.of();
+        }
+
+        var userText = req.getUserText();
+        var stripped = userText.stripLeading().toLowerCase();
+
+        var result = set.stream()
+            .filter(it -> getElementString(it).toLowerCase().contains(stripped))
+            .collect(Collectors.toList());
+
+        if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
+            /* If there is a single case sensitive match then no suggestions must be shown. */
+            return List.of();
+        } else {
+            return result;
         }
     }
 }

@@ -15,8 +15,8 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.money.app.cells.CardTypeComboBoxCell;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
@@ -51,14 +51,20 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField creditEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
-    private final ComboBox<CategoryType> typeComboBox = new ComboBox<>();
+    private final ComboBox<CategoryType> typeComboBox = new ComboBoxBuilder<>(CategoryType.values())
+        .withHandler(event -> onCategoryTypeSelected())
+        .build();
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
     private final CheckBox activeCheckBox = newCheckBox(RB, "account.Dialog.Active");
     private final TextField interestEdit = new TextField();
     private final DatePicker closingDatePicker = new DatePicker();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
-    private final ComboBox<CardType> cardTypeComboBox = new ComboBox<>();
+    private final ComboBox<CardType> cardTypeComboBox = new ComboBoxBuilder<>(CardType.values())
+        .withDefaultString("-")
+        .withImageConverter(Images::getCardTypeIcon)
+        .withHandler(event -> onCardTypeSelected())
+        .build();
     private final TextField cardNumberEdit = new TextField();
 
     private final Collection<Category> categories;
@@ -103,12 +109,6 @@ class AccountDialog extends BaseDialog<Account> {
 
         categories = cache.getCategories();
 
-        typeComboBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(CategoryType object) {
-                return object.getTypeName();
-            }
-        });
         categoryComboBox.setConverter(new ReadOnlyNamedConverter<>());
         currencyComboBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
@@ -119,17 +119,9 @@ class AccountDialog extends BaseDialog<Account> {
 
         var currencyList = cache.getCurrencies();
         currencyComboBox.setItems(FXCollections.observableArrayList(currencyList));
-        typeComboBox.setItems(FXCollections.observableArrayList(CategoryType.values()));
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
 
         IconManager.setupComboBox(iconComboBox);
-        cardTypeComboBox.setItems(FXCollections.observableArrayList(CardType.values()));
-
-        typeComboBox.setOnAction(event -> onCategoryTypeSelected());
-
-        cardTypeComboBox.setButtonCell(new CardTypeComboBoxCell());
-        cardTypeComboBox.setCellFactory(p -> new CardTypeComboBoxCell());
-        cardTypeComboBox.setOnAction(event -> onCardTypeSelected());
 
         if (account == null) {
             nameEdit.setText("");
@@ -175,38 +167,38 @@ class AccountDialog extends BaseDialog<Account> {
         onCardTypeSelected();
 
         setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
-                // TODO: reconsider using null currency value
-                var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
-
-                long now = System.currentTimeMillis();
-
-                var builder = new Account.Builder(account)
-                    .name(nameEdit.getText())
-                    .comment(commentEdit.getText())
-                    .accountNumber(accountNumberEdit.getText())
-                    .openingBalance(new BigDecimal(initialEdit.getText()))
-                    .accountLimit(new BigDecimal(creditEdit.getText()))
-                    .type(typeComboBox.getSelectionModel().getSelectedItem())
-                    .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().uuid())
-                    .currencyUuid(selectedCurrency != null ? selectedCurrency.uuid() : null)
-                    .enabled(activeCheckBox.isSelected())
-                    .interest(new BigDecimal(interestEdit.getText()))
-                    .closingDate(closingDatePicker.getValue())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
-                    .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
-                    .cardNumber(cardNumberEdit.getText())
-                    .modified(now);
-
-                if (account == null) {
-                    builder.guid(UUID.randomUUID())
-                        .created(now);
-                }
-
-                return builder.build();
-            } else {
+            if (b != ButtonType.OK) {
                 return null;
             }
+
+            // TODO: reconsider using null currency value
+            var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
+
+            var now = System.currentTimeMillis();
+
+            var builder = new Account.Builder(account)
+                .name(nameEdit.getText())
+                .comment(commentEdit.getText())
+                .accountNumber(accountNumberEdit.getText())
+                .openingBalance(new BigDecimal(initialEdit.getText()))
+                .accountLimit(new BigDecimal(creditEdit.getText()))
+                .type(typeComboBox.getSelectionModel().getSelectedItem())
+                .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().uuid())
+                .currencyUuid(selectedCurrency != null ? selectedCurrency.uuid() : null)
+                .enabled(activeCheckBox.isSelected())
+                .interest(new BigDecimal(interestEdit.getText()))
+                .closingDate(closingDatePicker.getValue())
+                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
+                .cardNumber(cardNumberEdit.getText())
+                .modified(now);
+
+            if (account == null) {
+                builder.guid(UUID.randomUUID())
+                    .created(now);
+            }
+
+            return builder.build();
         });
 
         createDefaultButtons(RB, validation.invalidProperty());

@@ -10,14 +10,16 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.money.app.Images;
+import java.util.List;
 import java.util.function.Consumer;
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.GridFactory.colSpan;
+import static org.panteleyev.fx.GridFactory.newGridPane;
 import static org.panteleyev.fx.LabelFactory.newLabel;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -31,30 +33,24 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> createSchemaHanler) {
-        var mySqlGrid = new GridPane();
-        mySqlGrid.getStyleClass().add(GRID_PANE);
-
         var createSchemaButton = newButton(RB, "Create");
         createSchemaButton.setGraphic(new ImageView(Images.WARNING));
         createSchemaButton.disableProperty().bind(validation.invalidProperty());
         createSchemaButton.addEventFilter(ACTION, createSchemaHanler::accept);
 
-        mySqlGrid.addRow(0, newLabel(RB, "Server", COLON), dataBaseHostEdit,
-            newLabel(RB, "Port", COLON), dataBasePortEdit);
-        mySqlGrid.addRow(1, newLabel(RB, "Login", COLON), dataBaseUserEdit);
-        mySqlGrid.addRow(2, newLabel(RB, "Password", COLON), dataBasePasswordEdit);
-        mySqlGrid.addRow(3, newLabel(RB, "Schema", COLON), schemaEdit);
-        mySqlGrid.add(createSchemaButton, 3, 3);
+        var mySqlGrid = newGridPane(GRID_PANE,
+            List.of(newLabel(RB, "Server", COLON), dataBaseHostEdit,
+                newLabel(RB, "Port", COLON), dataBasePortEdit),
+            List.of(newLabel(RB, "Login", COLON), colSpan(dataBaseUserEdit, 3)),
+            List.of(newLabel(RB, "Password", COLON), colSpan(dataBasePasswordEdit, 3)),
+            List.of(newLabel(RB, "Schema", COLON), colSpan(schemaEdit, 2), createSchemaButton)
+        );
 
         mySqlGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
             newColumnConstraints(Priority.ALWAYS));
 
         getChildren().addAll(mySqlGrid);
         VBox.setMargin(mySqlGrid, new Insets(10.0, 10.0, 10.0, 10.0));
-
-        GridPane.setColumnSpan(dataBaseUserEdit, 3);
-        GridPane.setColumnSpan(dataBasePasswordEdit, 3);
-        GridPane.setColumnSpan(schemaEdit, 2);
     }
 
     TextField getSchemaEdit() {

@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.icons;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.icons;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -197,7 +196,7 @@ public final class IconWindowController extends BaseController {
 
     private Icon readIcon(File file, List<String> errors) {
         try (var inputStream = new FileInputStream(file)) {
-            byte[] bytes = inputStream.readAllBytes();
+            var bytes = inputStream.readAllBytes();
             if (bytes.length > Icon.ICON_BYTE_LENGTH) {
                 errors.add(file.getName() + RB.getString("string.tooBig"));
                 return null;

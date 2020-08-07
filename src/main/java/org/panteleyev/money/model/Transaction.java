@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import org.panteleyev.mysqlapi.annotations.Column;
 import org.panteleyev.mysqlapi.annotations.ForeignKey;
@@ -69,8 +68,7 @@ public record Transaction(
     @Column("modified")
     long modified
 
-) implements MoneyRecord
-{
+) implements MoneyRecord {
 
     public Transaction {
         this.amount = MoneyRecord.normalize(amount);
@@ -129,30 +127,32 @@ public record Transaction(
         }
 
         public Builder(Transaction t) {
-            if (t != null) {
-                this.amount = t.amount();
-                this.day = t.day();
-                this.month = t.month();
-                this.year = t.year();
-                this.type = t.type();
-                this.comment = t.comment();
-                this.checked = t.checked();
-                this.accountDebitedUuid = t.accountDebitedUuid();
-                this.accountCreditedUuid = t.accountCreditedUuid();
-                this.accountDebitedType = t.accountDebitedType();
-                this.accountCreditedType = t.accountCreditedType();
-                this.accountDebitedCategoryUuid = t.accountDebitedCategoryUuid();
-                this.accountCreditedCategoryUuid = t.accountCreditedCategoryUuid();
-                this.contactUuid = t.contactUuid();
-                this.rate = t.rate();
-                this.rateDirection = t.rateDirection();
-                this.invoiceNumber = t.invoiceNumber();
-                this.created = t.created();
-                this.modified = t.modified();
-                this.parentUuid = t.parentUuid();
-                this.detailed = t.detailed();
-                this.uuid = t.uuid();
+            if (t == null) {
+                return;
             }
+
+            this.amount = t.amount();
+            this.day = t.day();
+            this.month = t.month();
+            this.year = t.year();
+            this.type = t.type();
+            this.comment = t.comment();
+            this.checked = t.checked();
+            this.accountDebitedUuid = t.accountDebitedUuid();
+            this.accountCreditedUuid = t.accountCreditedUuid();
+            this.accountDebitedType = t.accountDebitedType();
+            this.accountCreditedType = t.accountCreditedType();
+            this.accountDebitedCategoryUuid = t.accountDebitedCategoryUuid();
+            this.accountCreditedCategoryUuid = t.accountCreditedCategoryUuid();
+            this.contactUuid = t.contactUuid();
+            this.rate = t.rate();
+            this.rateDirection = t.rateDirection();
+            this.invoiceNumber = t.invoiceNumber();
+            this.created = t.created();
+            this.modified = t.modified();
+            this.parentUuid = t.parentUuid();
+            this.detailed = t.detailed();
+            this.uuid = t.uuid();
         }
 
         public UUID getUuid() {
@@ -317,8 +317,7 @@ public record Transaction(
 
             if (this.uuid != null && this.accountDebitedUuid != null && this.accountCreditedUuid != null
                 && this.accountDebitedType != null && this.accountCreditedType != null
-                && this.accountDebitedCategoryUuid != null && this.accountCreditedCategoryUuid != null)
-            {
+                && this.accountDebitedCategoryUuid != null && this.accountCreditedCategoryUuid != null) {
                 return new Transaction(uuid, amount, day, month, year, type, comment,
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,

@@ -251,8 +251,8 @@ class StatementWindowController extends BaseController {
 
     private void setupAccountComboBox() {
         var accounts = cache().getAccounts().stream()
-            .filter(account -> account.type() == CategoryType.BANKS_AND_CASH || account.type() ==
-                CategoryType.DEBTS)
+            .filter(account -> account.type() == CategoryType.BANKS_AND_CASH
+                || account.type() == CategoryType.DEBTS)
             .filter(Account::enabled)
             .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
             .collect(Collectors.toList());

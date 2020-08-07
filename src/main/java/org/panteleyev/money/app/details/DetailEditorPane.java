@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.details;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.details;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -75,9 +74,6 @@ final class DetailEditorPane extends BorderPane {
             return element;
         }
     }
-
-//    private static final ResourceBundle RB = ResourceBundle.getBundle("org.panteleyev.money.res
-//    .TransactionEditorPane");
 
     private final DataCache cache;
 
@@ -259,7 +255,7 @@ final class DetailEditorPane extends BorderPane {
             newTransactionProperty.set(false);
 
             // Accounts
-            Optional<Account> accCredited = cache.getAccount(tr.accountCreditedUuid());
+            var accCredited = cache.getAccount(tr.accountCreditedUuid());
             creditedAccountEdit.setText(accCredited.map(Account::name).orElse(""));
 
             // Other fields
@@ -329,7 +325,7 @@ final class DetailEditorPane extends BorderPane {
         setupBanksAndCashMenuItems(creditedSuggestions);
 
         // Expenses to creditable accounts
-        List<Category> expenseCategories = cache.getCategoriesByType(CategoryType.EXPENSES);
+        var expenseCategories = cache.getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
             .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
             .forEach(x -> {
@@ -357,7 +353,7 @@ final class DetailEditorPane extends BorderPane {
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
             var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
-            label.setText(account.type().getTypeName() + " | " + catName);
+            label.setText(account.type() + " | " + catName);
         } else {
             label.setText("");
         }

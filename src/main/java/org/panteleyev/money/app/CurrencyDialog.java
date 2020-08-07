@@ -96,30 +96,30 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         }
 
         setResultConverter((ButtonType b) -> {
-            if (b == ButtonType.OK) {
-                long now = System.currentTimeMillis();
-
-                var builder = new Currency.Builder(currency)
-                    .symbol(nameEdit.getText())
-                    .description(descrEdit.getText())
-                    .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
-                    .formatSymbolPosition(formatSymbolPositionChoice.getSelectionModel().getSelectedIndex())
-                    .showFormatSymbol(showSymbolCheck.isSelected())
-                    .def(defaultCheck.isSelected())
-                    .rate(new BigDecimal(rateEdit.getText()))
-                    .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
-                    .useThousandSeparator(thousandSeparatorCheck.isSelected())
-                    .modified(now);
-
-                if (currency == null) {
-                    builder.guid(UUID.randomUUID())
-                        .created(now);
-                }
-
-                return builder.build();
-            } else {
+            if (b != ButtonType.OK) {
                 return null;
             }
+
+            long now = System.currentTimeMillis();
+
+            var builder = new Currency.Builder(currency)
+                .symbol(nameEdit.getText())
+                .description(descrEdit.getText())
+                .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
+                .formatSymbolPosition(formatSymbolPositionChoice.getSelectionModel().getSelectedIndex())
+                .showFormatSymbol(showSymbolCheck.isSelected())
+                .def(defaultCheck.isSelected())
+                .rate(new BigDecimal(rateEdit.getText()))
+                .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
+                .useThousandSeparator(thousandSeparatorCheck.isSelected())
+                .modified(now);
+
+            if (currency == null) {
+                builder.guid(UUID.randomUUID())
+                    .created(now);
+            }
+
+            return builder.build();
         });
 
         createDefaultButtons(RB, validation.invalidProperty());
