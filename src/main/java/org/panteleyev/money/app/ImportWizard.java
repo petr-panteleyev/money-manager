@@ -30,10 +30,11 @@ import java.util.function.Consumer;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NEXT;
-import static org.panteleyev.fx.ButtonFactory.newButton;
-import static org.panteleyev.fx.ButtonFactory.newRadioButton;
+import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.ButtonFactory.radioButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -45,7 +46,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
     private static class StartPage extends GridPane {
         private final ToggleGroup btnGroup = new ToggleGroup();
-        private final RadioButton fullDumpRadio = newRadioButton(RB, "label.FullDump", btnGroup);
+        private final RadioButton fullDumpRadio = radioButton(fxString(RB, "label.FullDump"), btnGroup);
         final TextField fileNameEdit = createFileNameEdit();
         final CheckBox warningCheck = createWarningCheckBox();
 
@@ -61,11 +62,11 @@ final class ImportWizard extends BaseDialog<Object> {
             getStyleClass().add(Styles.GRID_PANE);
 
 
-            var partialImportRadio = newRadioButton(RB, "label.PartialImport", btnGroup, true);
+            var partialImportRadio = radioButton(fxString(RB, "label.PartialImport"), btnGroup, true);
 
             var warningLabel = createWarningLabel();
 
-            addRow(0, fileNameEdit, newButton("...", x -> onBrowse()));
+            addRow(0, fileNameEdit, button("...", x -> onBrowse()));
             addRow(1, partialImportRadio);
             addRow(2, fullDumpRadio);
 
@@ -86,7 +87,7 @@ final class ImportWizard extends BaseDialog<Object> {
         }
 
         private Label createWarningLabel() {
-            var label = newLabel(RB, "label.FullDumpImportWarning");
+            var label = label(fxString(RB, "label.FullDumpImportWarning"));
             label.setWrapText(true);
             label.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return label;

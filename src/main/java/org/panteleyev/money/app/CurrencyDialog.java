@@ -23,14 +23,16 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static javafx.geometry.Pos.CENTER_LEFT;
-import static org.panteleyev.fx.BoxFactory.newHBox;
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.GridFactory.EMPTY_NODE;
-import static org.panteleyev.fx.GridFactory.addRows;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.SKIP;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
@@ -51,19 +53,22 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setTitle(RB.getString("Currency"));
 
-        var gridPane = newGridPane(Styles.GRID_PANE);
-        addRows(gridPane,
-            List.of(newLabel(RB, "label.Symbol"), nameEdit),
-            List.of(newLabel(RB, "Description", COLON), descrEdit),
-            List.of(newLabel(RB, "Rate", COLON), rateEdit, rateDirectionChoice),
-            List.of(EMPTY_NODE, newHBox(CENTER_LEFT, showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice)),
-            List.of(EMPTY_NODE, thousandSeparatorCheck),
-            List.of(EMPTY_NODE, defaultCheck)
+        getDialogPane().setContent(
+            gridPane(
+                List.of(
+                    gridRow(label(fxString(RB, "label.Symbol")), nameEdit),
+                    gridRow(label(fxString(RB, "Description", COLON)), descrEdit),
+                    gridRow(label(fxString(RB, "Rate", COLON)), rateEdit, rateDirectionChoice),
+                    gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice), hBox -> {
+                        hBox.setAlignment(CENTER_LEFT);
+                        HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
+                    })),
+                    gridRow(SKIP, thousandSeparatorCheck),
+                    gridRow(SKIP, defaultCheck)
+
+                ), b -> b.withStyle(GRID_PANE)
+            )
         );
-
-        HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
-
-        getDialogPane().setContent(gridPane);
 
         nameEdit.setPrefColumnCount(20);
         formatSymbolCombo.setEditable(true);

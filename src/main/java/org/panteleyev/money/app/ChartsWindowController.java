@@ -17,10 +17,11 @@ import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -36,7 +37,7 @@ public class ChartsWindowController extends BaseController {
 
         topPanel.getChildren().addAll(selectionBox,
             transactionFilterBox,
-            newButton(RB, "Refresh", x -> updateChart()));
+            button(fxString(RB, "Refresh"), x -> updateChart()));
         BorderPane.setMargin(topPanel, new Insets(5.0, 5.0, 5.0, 5.0));
         pieChart.legendVisibleProperty().set(false);
 
@@ -56,9 +57,9 @@ public class ChartsWindowController extends BaseController {
     }
 
     private MenuBar createMainMenu() {
-        return newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Close", event -> onClose())),
+        return menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
             createWindowMenu(),
             createHelpMenu());
     }

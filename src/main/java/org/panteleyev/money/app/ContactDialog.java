@@ -9,14 +9,11 @@ import javafx.geometry.VPos;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.RowConstraints;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Contact;
@@ -24,19 +21,22 @@ import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 import java.util.List;
 import java.util.UUID;
-import static org.panteleyev.fx.GridFactory.addRows;
-import static org.panteleyev.fx.GridFactory.colSpan;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.grid.GridBuilder.gridCell;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class ContactDialog extends BaseDialog<Contact> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ComboBox<ContactType> typeBox = new ComboBoxBuilder<>(ContactType.values()).build();
+    private final ComboBox<ContactType> typeBox = comboBox(ContactType.values());
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField mobileField = new TextField();
@@ -54,34 +54,27 @@ final class ContactDialog extends BaseDialog<Contact> {
 
         setTitle(RB.getString("contact.Dialog.Title"));
 
-        var gridPane = newGridPane(Styles.GRID_PANE);
-        addRows(gridPane,
-            List.of(newLabel(RB, "label.Type"), typeBox, iconComboBox),
-            List.of(newLabel(RB, "label.Name"), colSpan(nameField, 2)),
-            List.of(newLabel(RB, "Phone", COLON), colSpan(phoneField, 2)),
-            List.of(newLabel(RB, "label.Mobile"), colSpan(mobileField, 2)),
-            List.of(newLabel(RB, "Email", COLON), colSpan(emailField, 2)),
-            List.of(new Label("URL:"), colSpan(webField, 2)),
-            List.of(newLabel(RB, "label.Street"), colSpan(streetField, 2)),
-            List.of(newLabel(RB, "label.City"), colSpan(cityField, 2)),
-            List.of(newLabel(RB, "label.Country"), colSpan(countryField, 2)),
-            List.of(newLabel(RB, "label.ZIP"), colSpan(zipField, 2)),
-            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2))
-        );
-
-        var rowConstraints = new RowConstraints();
-        var topAlignmentConstraints = new RowConstraints();
-        topAlignmentConstraints.setValignment(VPos.TOP);
-        for (int i = 1; i < gridPane.getRowCount(); i++) {
-            gridPane.getRowConstraints().add(rowConstraints);
-        }
-        gridPane.getRowConstraints().add(topAlignmentConstraints);
-
-        getDialogPane().setContent(gridPane);
-
         nameField.setPrefColumnCount(20);
-
         IconManager.setupComboBox(iconComboBox);
+
+        getDialogPane().setContent(
+            gridPane(
+                List.of(
+                    gridRow(label(fxString(RB, "label.Type")), typeBox, iconComboBox),
+                    gridRow(label(fxString(RB, "label.Name")), gridCell(nameField, 2, 1)),
+                    gridRow(label(fxString(RB, "Phone", COLON)), gridCell(phoneField, 2, 1)),
+                    gridRow(label(fxString(RB, "label.Mobile")), gridCell(mobileField, 2, 1)),
+                    gridRow(label(fxString(RB, "Email", COLON)), gridCell(emailField, 2, 1)),
+                    gridRow(label("URL:"), gridCell(webField, 2, 1)),
+                    gridRow(label(fxString(RB, "label.Street")), gridCell(streetField, 2, 1)),
+                    gridRow(label(fxString(RB, "label.City")), gridCell(cityField, 2, 1)),
+                    gridRow(label(fxString(RB, "label.Country")), gridCell(countryField, 2, 1)),
+                    gridRow(label(fxString(RB, "label.ZIP")), gridCell(zipField, 2, 1)),
+                    gridRow(label(fxString(RB, "Comment", COLON)), gridCell(commentEdit, 2, 1))
+                        .withValignment(VPos.TOP)
+                ), b -> b.withStyle(GRID_PANE)
+            )
+        );
 
         if (contact != null) {
             typeBox.getSelectionModel().select(contact.type());

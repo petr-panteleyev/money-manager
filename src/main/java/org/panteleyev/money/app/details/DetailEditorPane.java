@@ -42,9 +42,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.ButtonFactory.newButton;
-import static org.panteleyev.fx.LabelFactory.newLabel;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
+import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 
@@ -110,36 +111,36 @@ final class DetailEditorPane extends BorderPane {
         commentEdit.setPrefColumnCount(30);
         sumEdit.setPrefColumnCount(8);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Credited_Account", COLON),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Credited_Account", COLON)),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Sum", COLON), hBox1);
+        var sumBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Sum", COLON)), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, newLabel(RB, "Comment", COLON), commentEdit);
+        var commentBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Comment", COLON)), commentEdit);
 
         var filler = new Region();
 
-        var clearButton = newButton(RB, "Clear", x -> clear());
+        var clearButton = button(fxString(RB, "Clear"), x -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = newButton(RB, "Add", x -> buildTransactionDetail()
+        var addButton = button(fxString(RB, "Add"), x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.addRecord(t);
                 clear();
             }));
 
-        var updateButton = newButton(RB, "Update", x -> buildTransactionDetail()
+        var updateButton = button(fxString(RB, "Update"), x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.updateRecord(t);
                 clear();
             })
         );
 
-        var deleteButton = newButton(RB, "Delete", x -> {
+        var deleteButton = button(fxString(RB, "Delete"), x -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();
@@ -188,7 +189,7 @@ final class DetailEditorPane extends BorderPane {
             .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
             .forEach(acc -> {
                 creditedMenuButton.getItems().add(
-                    newMenuItem('[' + acc.name() + ']',
+                    menuItem('[' + acc.name() + ']',
                         event -> onCreditedAccountSelected(acc)));
                 creditedSuggestions.add(acc);
             });
@@ -223,7 +224,7 @@ final class DetailEditorPane extends BorderPane {
                         .filter(Account::enabled)
                         .forEach(acc -> {
                             creditedMenuButton.getItems().add(
-                                newMenuItem("  " + prefix + ' ' + acc.name(),
+                                menuItem("  " + prefix + ' ' + acc.name(),
                                     event -> onCreditedAccountSelected(acc)));
                             creditedSuggestions.add(acc);
                         });
@@ -337,7 +338,7 @@ final class DetailEditorPane extends BorderPane {
                     accounts.forEach(acc -> {
                         creditedSuggestions.add(acc);
                         creditedMenuButton.getItems().add(
-                            newMenuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                            menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
                     });
                 }
             });

@@ -13,7 +13,8 @@ import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import java.time.LocalDate;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Bundles.BUILD_INFO_BUNDLE;
 
 final class AboutDialog extends BaseDialog {
@@ -32,19 +33,19 @@ final class AboutDialog extends BaseDialog {
 
         var grid = new GridPane();
         grid.getStyleClass().add(Styles.GRID_PANE);
-        grid.addRow(0, newLabel("Version:"), newLabel(BUILD_INFO_BUNDLE, "version"));
-        grid.addRow(1, newLabel("Build:"), newLabel(BUILD_INFO_BUNDLE, "timestamp"));
-        grid.addRow(2, newLabel("Java:"), newLabel(
+        grid.addRow(0, label("Version:"), label(fxString(BUILD_INFO_BUNDLE, "version")));
+        grid.addRow(1, label("Build:"), label(fxString(BUILD_INFO_BUNDLE, "timestamp")));
+        grid.addRow(2, label("Java:"), label(
             String.format("%s by %s",
                 System.getProperty("java.version"),
                 System.getProperty("java.vendor")
             ))
         );
 
-        var appLabel = newLabel(APP_TITLE);
+        var appLabel = label(APP_TITLE);
         appLabel.getStyleClass().add(Styles.ABOUT_APP_TITLE_LABEL);
 
-        var copyrightLabel = newLabel(COPYRIGHT);
+        var copyrightLabel = label(COPYRIGHT);
         copyrightLabel.getStyleClass().add(Styles.ABOUT_LABEL);
 
         var vBox = new VBox(10, appLabel, copyrightLabel, grid);

@@ -16,10 +16,12 @@ import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import java.util.List;
-import static org.panteleyev.fx.GridFactory.addRows;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.Styles.GRID_PANE;
 
 class OptionsDialog extends BaseDialog<ButtonType> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -34,13 +36,15 @@ class OptionsDialog extends BaseDialog<ButtonType> {
         setTitle(RB.getString("options.Dialog.Title"));
         createDefaultButtons(RB, validation.invalidProperty());
 
-        var pane = newGridPane(Styles.GRID_PANE);
-        addRows(pane,
-            List.of(newLabel(RB, "options.Dialog.Prefix.Length"), autoCompleteLength),
-            List.of(newLabel(RB, "options.Dialog.closing.day.delta"), accountClosingDayDeltaEdit),
-            List.of(newLabel(RB, "label.YandexMoneyToken"), ymToken)
+        getDialogPane().setContent(
+            gridPane(
+                List.of(
+                    gridRow(label(fxString(RB, "options.Dialog.Prefix.Length")), autoCompleteLength),
+                    gridRow(label(fxString(RB, "options.Dialog.closing.day.delta")), accountClosingDayDeltaEdit),
+                    gridRow(label(fxString(RB, "label.YandexMoneyToken")), ymToken)
+                ), b -> b.withStyle(GRID_PANE)
+            )
         );
-        getDialogPane().setContent(pane);
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
         accountClosingDayDeltaEdit.setText(Integer.toString(Options.getAccountClosingDayDelta()));

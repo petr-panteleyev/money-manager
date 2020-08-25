@@ -23,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.AccountBalanceCell;
 import org.panteleyev.money.app.cells.AccountCardCell;
 import org.panteleyev.money.app.cells.AccountCategoryCell;
@@ -39,14 +40,18 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.MenuFactory.newCheckMenuItem;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.Constants.SHORTCUT_C;
 import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
@@ -57,7 +62,6 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.Constants.SHORTCUT_R;
 import static org.panteleyev.money.app.Constants.SHORTCUT_T;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Predicates.activeAccount;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -132,31 +136,31 @@ final class AccountWindowController extends BaseController {
     private MenuBar createMainMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = newMenuItem(RB, "menu.edit.deactivate",
+        var activateAccountMenuItem = menuItem(fxString(RB, "menu.edit.deactivate"),
             event -> onActivateDeactivateAccount(),
             disableBinding);
 
-        var editMenu = newMenu(RB, "menu.Edit",
-            newMenuItem(RB, "Create", ELLIPSIS, SHORTCUT_N,
+        var editMenu = newMenu(fxString(RB, "menu.Edit"),
+            menuItem(fxString(RB, "Create", ELLIPSIS), SHORTCUT_N,
                 event -> onNewAccount()),
-            newMenuItem(RB, "menu.Edit.Edit", ELLIPSIS, SHORTCUT_E,
+            menuItem(fxString(RB, "menu.Edit.Edit", ELLIPSIS), SHORTCUT_E,
                 event -> onEditAccount(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Delete", ELLIPSIS, SHORTCUT_DELETE,
+            menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE,
                 event -> onDeleteAccount(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.CopyName", SHORTCUT_C,
+            menuItem(fxString(RB, "menu.CopyName"), SHORTCUT_C,
                 event -> onCopyName(), disableBinding),
-            newMenuItem(RB, "menu.edit.deactivate",
+            menuItem(fxString(RB, "menu.edit.deactivate"),
                 event -> onActivateDeactivateAccount(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.Edit.Search", SHORTCUT_F,
+            menuItem(fxString(RB, "menu.Edit.Search"), SHORTCUT_F,
                 event -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Transactions", ELLIPSIS, SHORTCUT_T,
+            menuItem(fxString(RB, "Transactions", ELLIPSIS), SHORTCUT_T,
                 event -> onShowTransactions(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Recalculate_Balance", SHORTCUT_R,
+            menuItem(fxString(RB, "Recalculate_Balance"), SHORTCUT_R,
                 event -> onUpdateBalance())
         );
 
@@ -166,14 +170,14 @@ final class AccountWindowController extends BaseController {
             ))
         );
 
-        return newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
+        return menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Close", event -> onClose())),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
             editMenu,
-            newMenu(RB, "menu.view",
-                newCheckMenuItem(RB, "check.showDeactivatedAccounts",
+            newMenu(fxString(RB, "menu.view"),
+                checkMenuItem(fxString(RB, "check.showDeactivatedAccounts"),
                     Options.getShowDeactivatedAccounts(), SHORTCUT_H,
                     event -> {
                         var selected = ((CheckMenuItem) event.getSource()).isSelected();
@@ -189,41 +193,53 @@ final class AccountWindowController extends BaseController {
     private void setupTableColumns() {
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().setAll(List.of(
-            newTableColumn(RB, "column.Name", x -> new AccountNameCell(), w.multiply(0.15)),
-            newTableColumn(RB, "Category", x -> new AccountCategoryCell(), w.multiply(0.1)),
-            newTableColumn(RB, "Currency", null, a -> cache().getCurrency(a.currencyUuid())
-                .map(Currency::symbol).orElse(""), w.multiply(0.05)),
-            newTableColumn(RB, "Card", x -> new AccountCardCell(), w.multiply(0.1)),
-            newTableColumn("%%", x -> new AccountInterestCell(), Account::interest, w.multiply(0.03)),
-            newTableColumn(RB, "column.closing.date",
-                x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()), w.multiply(0.05)),
-            newTableColumn(RB, "Comment", null, Account::comment, w.multiply(0.3)),
-            newTableColumn(RB, "Balance", x -> new AccountBalanceCell(true), w.multiply(0.1)),
-            newTableColumn(RB, "Waiting", x -> new AccountBalanceCell(false), w.multiply(0.1))
+            tableObjectColumn(fxString(RB, "column.Name"), b ->
+                b.withCellFactory(x -> new AccountNameCell()).withWidthBinding(w.multiply(0.15))),
+            tableObjectColumn(fxString(RB, "Category"), b ->
+                b.withCellFactory(x -> new AccountCategoryCell()).withWidthBinding(w.multiply(0.1))),
+            tableColumn(fxString(RB, "Currency"),
+                b -> b.withPropertyCallback(
+                    a -> cache().getCurrency(a.currencyUuid()).map(Currency::symbol).orElse("")
+                ).withWidthBinding(w.multiply(0.05))),
+            tableObjectColumn(fxString(RB, "Card"), b ->
+                b.withCellFactory(x -> new AccountCardCell()).withWidthBinding(w.multiply(0.1))),
+            tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
+                b.withCellFactory(x -> new AccountInterestCell())
+                    .withPropertyCallback(Account::interest)
+                    .withWidthBinding(w.multiply(0.03))),
+            tableObjectColumn(fxString(RB, "column.closing.date"), b ->
+                b.withCellFactory(x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()))
+                    .withWidthBinding(w.multiply(0.05))),
+            tableColumn(fxString(RB, "Comment"), b ->
+                b.withPropertyCallback(Account::comment).withWidthBinding(w.multiply(0.3))),
+            tableObjectColumn(fxString(RB, "Balance"), b ->
+                b.withCellFactory(x -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
+            tableObjectColumn(fxString(RB, "Waiting"), b ->
+                b.withCellFactory(x -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1)))
         ));
     }
 
     private void createContextMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = newMenuItem(RB, "menu.edit.deactivate",
+        var activateAccountMenuItem = menuItem(fxString(RB, "menu.edit.deactivate"),
             event -> onActivateDeactivateAccount(),
             disableBinding);
 
         var contextMenu = new ContextMenu(
-            newMenuItem(RB, "Create", ELLIPSIS, event -> onNewAccount()),
-            newMenuItem(RB, "menu.Edit.Edit", event -> onEditAccount(), disableBinding),
+            menuItem(fxString(RB, "Create", ELLIPSIS), event -> onNewAccount()),
+            menuItem(fxString(RB, "menu.Edit.Edit"), event -> onEditAccount(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Delete", ELLIPSIS, event -> onDeleteAccount(), disableBinding),
+            menuItem(fxString(RB, "Delete", ELLIPSIS), event -> onDeleteAccount(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.CopyName", event -> onCopyName(), disableBinding),
+            menuItem(fxString(RB, "menu.CopyName"), event -> onCopyName(), disableBinding),
             activateAccountMenuItem,
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.Edit.Search", actionEvent -> accountNameFilterBox.getTextField().requestFocus()),
+            menuItem(fxString(RB, "menu.Edit.Search"), actionEvent -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Transactions", ELLIPSIS, event -> onShowTransactions(), disableBinding),
+            menuItem(fxString(RB, "Transactions", ELLIPSIS), event -> onShowTransactions(), disableBinding),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Recalculate_Balance", event -> onUpdateBalance())
+            menuItem(fxString(RB, "Recalculate_Balance"), event -> onUpdateBalance())
         );
 
         contextMenu.setOnShowing(event -> getSelectedAccount()

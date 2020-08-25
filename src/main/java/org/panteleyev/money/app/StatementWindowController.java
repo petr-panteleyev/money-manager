@@ -28,6 +28,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
 import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
@@ -50,13 +51,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.ButtonFactory.newButton;
+import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
@@ -123,14 +126,14 @@ class StatementWindowController extends BaseController {
 
         // File load controls
         var fileLoadControls = new HBox(5.0, statementFileEdit,
-            newButton("...", x -> onBrowse()));
+            button("...", x -> onBrowse()));
         fileLoadControls.visibleProperty().bind(
             sourceTypeComboBox.getSelectionModel().selectedItemProperty().isEqualTo(SourceType.FILE));
         fileLoadControls.setAlignment(Pos.CENTER_LEFT);
         ////////////////////////////////////////////////////////
 
         // Yandex Money controls
-        var ymAuthButton = newButton("Authorize...", x -> yandexMoneyClient.authorize());
+        var ymAuthButton = button("Authorize...", x -> yandexMoneyClient.authorize());
 
         limitComboBox.getSelectionModel().selectFirst();
         var yandexMoneyControls = new HBox(5.0,
@@ -148,17 +151,17 @@ class StatementWindowController extends BaseController {
         var stackPane = new StackPane(fileLoadControls, yandexMoneyControls);
 
         var balanceBox = new HBox(5.0,
-            newLabel(RB, "label.StatementBalance"),
+            label(fxString(RB, "label.StatementBalance")),
             ymAccountBalanceLabel);
         balanceBox.setAlignment(Pos.CENTER_LEFT);
 
         var filler1 = new Region();
 
         var hBox = new HBox(5.0,
-            newLabel(RB, "label.Account"),
+            label(fxString(RB, "label.Account")),
             accountComboBox,
-            newButton(RB, "button.Load", x -> onLoad()),
-            newButton(RB, "button.Clear", x -> onClear()),
+            button(fxString(RB, "button.Load"), x -> onLoad()),
+            button(fxString(RB, "button.Clear"), x -> onClear()),
             ignoreExecutionDate,
             filler1,
             balanceBox
@@ -231,18 +234,18 @@ class StatementWindowController extends BaseController {
     }
 
     private MenuBar createMainMenu() {
-        return newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
+        return menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Close", event -> onClose())),
-            newMenu(RB, "Edit",
-                newMenuItem(RB, "menu.Edit.Add", SHORTCUT_N,
+                menuItem(fxString(RB, "Close"), event -> onClose())),
+            newMenu(fxString(RB, "Edit"),
+                menuItem(fxString(RB, "menu.Edit.Add"), SHORTCUT_N,
                     event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.item.check", SHORTCUT_K,
+                menuItem(fxString(RB, "menu.item.check"), SHORTCUT_K,
                     event -> onCheckStatementRecord(true)),
-                newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U,
+                menuItem(fxString(RB, "menu.item.uncheck"), SHORTCUT_U,
                     event -> onCheckStatementRecord(false))
             ),
             createWindowMenu(),
@@ -413,19 +416,28 @@ class StatementWindowController extends BaseController {
 
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().addAll(List.of(
-            newTableColumn(RB, "column.Date", x -> new LocalDateCell<>(),
-                StatementRecord::getActual, w.multiply(0.05)),
-            newTableColumn(RB, "column.ExecutionDate", x -> new LocalDateCell<>(),
-                StatementRecord::getExecution, w.multiply(0.05)),
-            newTableColumn(RB, "Description", null, StatementRecord::getDescription, w.multiply(0.5)),
-            newTableColumn(RB, "Counterparty", null, StatementRecord::getCounterParty, w.multiply(0.15)),
-            newTableColumn(RB, "column.Place", null, StatementRecord::getPlace, w.multiply(0.10)),
-            newTableColumn(RB, "Country", null, StatementRecord::getCountry, w.multiply(0.05)),
-            newTableColumn(RB, "column.Sum", x -> new StatementSumCell(), w.multiply(0.1))
+            tableColumn(fxString(RB, "column.Date"), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
+                b.withCellFactory(x -> new LocalDateCell<>())
+                    .withPropertyCallback(StatementRecord::getActual)
+                    .withWidthBinding(w.multiply(0.05))),
+            tableColumn(fxString(RB, "column.ExecutionDate"), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
+                b.withCellFactory(x -> new LocalDateCell<>())
+                    .withPropertyCallback(StatementRecord::getExecution)
+                    .withWidthBinding(w.multiply(0.05))),
+            tableColumn(fxString(RB, "Description"), b ->
+                b.withPropertyCallback(StatementRecord::getDescription).withWidthBinding(w.multiply(0.5))),
+            tableColumn(fxString(RB, "Counterparty"), b ->
+                b.withPropertyCallback(StatementRecord::getCounterParty).withWidthBinding(w.multiply(0.15))),
+            tableColumn(fxString(RB, "column.Place"), b ->
+                b.withPropertyCallback(StatementRecord::getPlace).withWidthBinding(w.multiply(0.10))),
+            tableColumn(fxString(RB, "Country"), b ->
+                b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
+            tableObjectColumn(fxString(RB, "column.Sum"), b ->
+                b.withCellFactory(x -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         var menu = new ContextMenu();
-        menu.getItems().addAll(newMenuItem(RB, "menu.Edit.Add",
+        menu.getItems().addAll(menuItem(fxString(RB, "menu.Edit.Add"),
             event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
         tableView.setContextMenu(menu);
 

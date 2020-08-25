@@ -21,7 +21,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 $ mvn javafx:run
 ```
 
-To open specific profile add ```-Dmoney.profile=<profile>``` to the command line.
+To open specific profile add ```-Dprofile=<profile>``` to the command line.
 
 ## Binary Packages
 

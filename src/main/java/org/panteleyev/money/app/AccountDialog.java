@@ -15,7 +15,6 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Account;
@@ -33,11 +32,13 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.GridFactory.EMPTY_NODE;
-import static org.panteleyev.fx.GridFactory.addRows;
-import static org.panteleyev.fx.GridFactory.colSpan;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.grid.GridBuilder.SKIP;
+import static org.panteleyev.fx.grid.GridBuilder.gridCell;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
@@ -51,20 +52,18 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField creditEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
-    private final ComboBox<CategoryType> typeComboBox = new ComboBoxBuilder<>(CategoryType.values())
-        .withHandler(event -> onCategoryTypeSelected())
-        .build();
+    private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values(),
+        b -> b.withHandler(event -> onCategoryTypeSelected()));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
     private final CheckBox activeCheckBox = newCheckBox(RB, "account.Dialog.Active");
     private final TextField interestEdit = new TextField();
     private final DatePicker closingDatePicker = new DatePicker();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
-    private final ComboBox<CardType> cardTypeComboBox = new ComboBoxBuilder<>(CardType.values())
-        .withDefaultString("-")
-        .withImageConverter(Images::getCardTypeIcon)
-        .withHandler(event -> onCardTypeSelected())
-        .build();
+    private final ComboBox<CardType> cardTypeComboBox = comboBox(CardType.values(),
+        b -> b.withDefaultString("-")
+            .withImageConverter(Images::getCardTypeIcon)
+            .withHandler(event -> onCardTypeSelected()));
     private final TextField cardNumberEdit = new TextField();
 
     private final Collection<Category> categories;
@@ -86,24 +85,23 @@ class AccountDialog extends BaseDialog<Account> {
 
         setTitle(RB.getString("account.Dialog.Title"));
 
-        var gridPane = newGridPane(Styles.GRID_PANE);
-        addRows(gridPane,
-            List.of(newLabel(RB, "label.Name"), colSpan(nameEdit, 2)),
-            List.of(newLabel(RB, "label.Type"), typeComboBox, iconComboBox),
-            List.of(newLabel(RB, "label.Category"), colSpan(categoryComboBox, 2)),
-            List.of(newLabel(RB, "account.Dialog.InitialBalance"), colSpan(initialEdit, 2)),
-            List.of(newLabel(RB, "label.credit"), colSpan(creditEdit, 2)),
-            List.of(newLabel(RB, "label.Account.Number"), colSpan(accountNumberEdit, 2)),
-            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2)),
-            List.of(newLabel(RB, "Currency", COLON), colSpan(currencyComboBox, 2)),
-            List.of(newLabel(RB, "label.interest"), colSpan(interestEdit, 2)),
-            List.of(newLabel(RB, "label.closing.date"), colSpan(closingDatePicker, 2)),
-            List.of(newLabel(RB, "label.card.type"), colSpan(cardTypeComboBox, 2)),
-            List.of(newLabel(RB, "label.card.number"), colSpan(cardNumberEdit, 2)),
-            List.of(EMPTY_NODE, colSpan(activeCheckBox, 2))
-        );
-
-        getDialogPane().setContent(gridPane);
+        getDialogPane().setContent(gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "label.Name")), gridCell(nameEdit, 2, 1)),
+                gridRow(label(fxString(RB, "label.Type")), typeComboBox, iconComboBox),
+                gridRow(label(fxString(RB, "label.Category")), gridCell(categoryComboBox, 2, 1)),
+                gridRow(label(fxString(RB, "account.Dialog.InitialBalance")), gridCell(initialEdit, 2, 1)),
+                gridRow(label(fxString(RB, "label.credit")), gridCell(creditEdit, 2, 1)),
+                gridRow(label(fxString(RB, "label.Account.Number")), gridCell(accountNumberEdit, 2, 1)),
+                gridRow(label(fxString(RB, "Comment", COLON)), gridCell(commentEdit, 2, 1)),
+                gridRow(label(fxString(RB, "Currency", COLON)), gridCell(currencyComboBox, 2, 1)),
+                gridRow(label(fxString(RB, "label.interest")), gridCell(interestEdit, 2, 1)),
+                gridRow(label(fxString(RB, "label.closing.date")), gridCell(closingDatePicker, 2, 1)),
+                gridRow(label(fxString(RB, "label.card.type")), gridCell(cardTypeComboBox, 2, 1)),
+                gridRow(label(fxString(RB, "label.card.number")), gridCell(cardNumberEdit, 2, 1)),
+                gridRow(SKIP, gridCell(activeCheckBox, 2, 1))
+            ), b -> b.withStyle(Styles.GRID_PANE)
+        ));
 
         nameEdit.setPrefColumnCount(20);
 

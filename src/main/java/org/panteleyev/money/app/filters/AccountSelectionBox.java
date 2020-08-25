@@ -9,7 +9,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
-import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.Predicates;
 import org.panteleyev.money.app.TransactionPredicate;
@@ -19,7 +18,8 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import java.util.Optional;
 import java.util.function.Predicate;
-import static org.panteleyev.fx.FxUtils.clearValueAndSelection;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ACCOUNT_TO_IMAGE;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.CATEGORY_TO_IMAGE;
@@ -36,21 +36,19 @@ public class AccountSelectionBox extends HBox {
     private final static String ALL_CATEGORIES_STRING = RB.getString("All_Categories");
     private final static String ALL_ACCOUNTS_STRING = RB.getString("text.All.Accounts");
 
-    private final ComboBox<CategoryType> categoryTypeBox = new ComboBoxBuilder<>(CategoryType.values())
-        .withDefaultString(ALL_TYPES_STRING)
-        .build();
+    private final ComboBox<CategoryType> categoryTypeBox =
+        comboBox(CategoryType.values(), b -> b.withDefaultString(ALL_TYPES_STRING));
+
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
-    private final ComboBox<Category> categoryBox = new ComboBoxBuilder<>(filteredCategories.sorted(COMPARE_CATEGORY_BY_NAME))
-        .withDefaultString(ALL_CATEGORIES_STRING)
-        .withStringConverter(Category::name)
-        .withImageConverter(CATEGORY_TO_IMAGE)
-        .build();
+    private final ComboBox<Category> categoryBox = comboBox(filteredCategories.sorted(COMPARE_CATEGORY_BY_NAME),
+        b -> b.withDefaultString(ALL_CATEGORIES_STRING)
+            .withStringConverter(Category::name)
+            .withImageConverter(CATEGORY_TO_IMAGE));
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
-    private final ComboBox<Account> accountBox = new ComboBoxBuilder<>(filteredAccounts.sorted(COMPARE_ACCOUNT_BY_NAME))
-        .withDefaultString(ALL_ACCOUNTS_STRING)
-        .withStringConverter(Account::name)
-        .withImageConverter(ACCOUNT_TO_IMAGE)
-        .build();
+    private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(COMPARE_ACCOUNT_BY_NAME),
+        b -> b.withDefaultString(ALL_ACCOUNTS_STRING)
+            .withStringConverter(Account::name)
+            .withImageConverter(ACCOUNT_TO_IMAGE));
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
 
     public AccountSelectionBox() {

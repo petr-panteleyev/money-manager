@@ -19,7 +19,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.money.app.cells.ContactNameCell;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
@@ -28,11 +27,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import static org.panteleyev.fx.FxFactory.newSearchField;
-import static org.panteleyev.fx.FxUtils.clearValueAndSelection;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.Constants.SHORTCUT_ALT_C;
@@ -44,9 +46,8 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class ContactListWindowController extends BaseController {
-    private final ComboBox<ContactType> typeBox = new ComboBoxBuilder<>(ContactType.values())
-        .withDefaultString(ALL_TYPES_STRING)
-        .build();
+    private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
+        b -> b.withDefaultString(ALL_TYPES_STRING));
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
     private final FilteredList<Contact> filteredList = cache().getContacts().filtered(x -> true);
@@ -60,32 +61,36 @@ class ContactListWindowController extends BaseController {
         var disableBinding = contactTable.getSelectionModel().selectedItemProperty().isNull();
 
         // Menu bar
-        var menuBar = newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Close", event -> onClose())),
-            newMenu(RB, "menu.Edit",
-                newMenuItem(RB, "Create", SHORTCUT_N, addHandler),
-                newMenuItem(RB, "menu.Edit.Edit", SHORTCUT_E, editHandler, disableBinding),
+        var menuBar = menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
+            newMenu(fxString(RB, "menu.Edit"),
+                menuItem(fxString(RB, "Create"), SHORTCUT_N, addHandler),
+                menuItem(fxString(RB, "menu.Edit.Edit"), SHORTCUT_E, editHandler, disableBinding),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.Edit.Search", SHORTCUT_F,
+                menuItem(fxString(RB, "menu.Edit.Search"), SHORTCUT_F,
                     event -> searchField.requestFocus())),
-            newMenu(RB, "View",
-                newMenuItem(RB, "Reset_Filter", SHORTCUT_ALT_C, event -> resetFilter())),
+            newMenu(fxString(RB, "View"),
+                menuItem(fxString(RB, "Reset_Filter"), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-            newMenuItem(RB, "Create", addHandler),
-            newMenuItem(RB, "menu.Edit.Edit", editHandler, disableBinding))
+            menuItem(fxString(RB, "Create"), addHandler),
+            menuItem(fxString(RB, "menu.Edit.Edit"), editHandler, disableBinding))
         );
 
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
-            newTableColumn(RB, "Name", x -> new ContactNameCell(), w.multiply(0.4)),
-            newTableColumn(RB, "Type", null, (Contact p) -> p.type().toString(), w.multiply(0.2)),
-            newTableColumn(RB, "Phone", null, Contact::phone, w.multiply(0.2)),
-            newTableColumn(RB, "Email", null, Contact::email, w.multiply(0.2))
+            tableObjectColumn(fxString(RB, "Name"), b ->
+                b.withCellFactory(x -> new ContactNameCell()).withWidthBinding(w.multiply(0.4))),
+            tableColumn(fxString(RB, "Type"), b ->
+                b.withPropertyCallback((Contact p) -> p.type().toString()).withWidthBinding(w.multiply(0.2))),
+            tableColumn(fxString(RB, "Phone"), b ->
+                b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
+            tableColumn(fxString(RB, "Email"), b ->
+                b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
         ));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 

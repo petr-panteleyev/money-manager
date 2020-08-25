@@ -36,9 +36,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -74,12 +75,12 @@ public final class IconWindowController extends BaseController {
     public IconWindowController() {
         super(new Stage(), MainWindowController.CSS_PATH.toString());
 
-        var menuBar = newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "menu.File.Upload", SHORTCUT_U,
+        var menuBar = menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "menu.File.Upload"), SHORTCUT_U,
                     event -> onUpload()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Close", event -> onClose())),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
             createHelpMenu()
         );
 

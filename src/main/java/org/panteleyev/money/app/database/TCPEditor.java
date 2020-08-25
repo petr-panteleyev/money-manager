@@ -9,7 +9,6 @@ import javafx.geometry.Insets;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.controlsfx.validation.ValidationSupport;
@@ -17,10 +16,13 @@ import org.panteleyev.money.app.Images;
 import java.util.List;
 import java.util.function.Consumer;
 import static javafx.event.ActionEvent.ACTION;
-import static org.panteleyev.fx.ButtonFactory.newButton;
-import static org.panteleyev.fx.GridFactory.colSpan;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.grid.GridBuilder.columnConstraints;
+import static org.panteleyev.fx.grid.GridBuilder.gridCell;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
@@ -33,24 +35,22 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> createSchemaHanler) {
-        var createSchemaButton = newButton(RB, "Create");
+        var createSchemaButton = button(fxString(RB, "Create"));
         createSchemaButton.setGraphic(new ImageView(Images.WARNING));
         createSchemaButton.disableProperty().bind(validation.invalidProperty());
         createSchemaButton.addEventFilter(ACTION, createSchemaHanler::accept);
 
-        var mySqlGrid = newGridPane(GRID_PANE,
-            List.of(newLabel(RB, "Server", COLON), dataBaseHostEdit,
-                newLabel(RB, "Port", COLON), dataBasePortEdit),
-            List.of(newLabel(RB, "Login", COLON), colSpan(dataBaseUserEdit, 3)),
-            List.of(newLabel(RB, "Password", COLON), colSpan(dataBasePasswordEdit, 3)),
-            List.of(newLabel(RB, "Schema", COLON), colSpan(schemaEdit, 2), createSchemaButton)
-        );
+        getChildren().addAll(gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "Server", COLON)), dataBaseHostEdit, label(fxString(RB, "Port", COLON)), dataBasePortEdit),
+                gridRow(label(fxString(RB, "Login", COLON)), gridCell(dataBaseUserEdit, 3, 1)),
+                gridRow(label(fxString(RB, "Password", COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
+                gridRow(label(fxString(RB, "Schema", COLON)), gridCell(schemaEdit, 2, 1), createSchemaButton)
+            ), b -> b.withStyle(GRID_PANE)
+                .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
+        ));
 
-        mySqlGrid.getColumnConstraints().addAll(newColumnConstraints(Priority.NEVER),
-            newColumnConstraints(Priority.ALWAYS));
-
-        getChildren().addAll(mySqlGrid);
-        VBox.setMargin(mySqlGrid, new Insets(10.0, 10.0, 10.0, 10.0));
+        VBox.setMargin(getChildren().get(0), new Insets(10.0, 10.0, 10.0, 10.0));
     }
 
     TextField getSchemaEdit() {
@@ -113,12 +113,6 @@ final class TCPEditor extends VBox {
         var schemaEdit = new TextField();
         schemaEdit.setMaxWidth(Double.MAX_VALUE);
         return schemaEdit;
-    }
-
-    private static ColumnConstraints newColumnConstraints(Priority hGrow) {
-        var constraints = new ColumnConstraints();
-        constraints.setHgrow(hGrow);
-        return constraints;
     }
 
     void setProfile(ConnectionProfile profile) {

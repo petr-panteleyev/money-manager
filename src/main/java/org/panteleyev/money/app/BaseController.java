@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.control.Menu;
@@ -16,8 +15,9 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.model.Account;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -43,28 +43,28 @@ public class BaseController extends Controller {
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = newMenuItem(RB, "Transactions", ELLIPSIS,
+        var transactionsMenuItem = menuItem(fxString(RB, "Transactions", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN),
             x -> getController(MainWindowController.class));
-        var accountsMenuItem = newMenuItem(RB, "Accounts", ELLIPSIS,
+        var accountsMenuItem = menuItem(fxString(RB, "Accounts", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN),
             x -> getController(AccountWindowController.class));
-        var statementMenuItem = newMenuItem(RB, "Statements", ELLIPSIS,
+        var statementMenuItem = menuItem(fxString(RB, "Statements", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN),
             x -> getController(StatementWindowController.class));
-        var requestsMenuItem = newMenuItem(RB, "Requests", ELLIPSIS,
+        var requestsMenuItem = menuItem(fxString(RB, "Requests", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN),
             x -> getRequestController());
-        var chartsMenuItem = newMenuItem(RB, "Incomes_and_Expenses", ELLIPSIS,
+        var chartsMenuItem = menuItem(fxString(RB, "Incomes_and_Expenses", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.SHORTCUT_DOWN),
             x -> getController(IncomesAndExpensesWindowController.class));
-        var currenciesMenuItem = newMenuItem(RB, "Currencies", ELLIPSIS,
+        var currenciesMenuItem = menuItem(fxString(RB, "Currencies", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.SHORTCUT_DOWN),
             x -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = newMenuItem(RB, "Categories", ELLIPSIS,
+        var categoriesMenuItem = menuItem(fxString(RB, "Categories", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.SHORTCUT_DOWN),
             x -> getController(CategoryWindowController.class));
-        var contactsMenuItem = newMenuItem(RB, "Contacts", ELLIPSIS,
+        var contactsMenuItem = menuItem(fxString(RB, "Contacts", ELLIPSIS),
             new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.SHORTCUT_DOWN),
             x -> getController(ContactListWindowController.class));
 
@@ -78,7 +78,7 @@ public class BaseController extends Controller {
             chartsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
-        var menu = newMenu(RB, "Window",
+        var menu = newMenu(fxString(RB, "Window"),
             transactionsMenuItem,
             new SeparatorMenuItem(),
             accountsMenuItem,
@@ -99,7 +99,7 @@ public class BaseController extends Controller {
             if (!accountControllers.isEmpty()) {
                 menu.getItems().add(new SeparatorMenuItem());
                 accountControllers.forEach(c ->
-                    menu.getItems().add(newMenuItem(c.getTitle(), x ->
+                    menu.getItems().add(menuItem(c.getTitle(), x ->
                         c.getStage().toFront())));
             }
         });
@@ -108,8 +108,8 @@ public class BaseController extends Controller {
     }
 
     protected Menu createHelpMenu() {
-        return newMenu(RB, "menu.Help",
-            newMenuItem(RB, "menu.Help.About", x -> new AboutDialog(this).showAndWait()));
+        return newMenu(fxString(RB, "menu.Help"),
+            menuItem(fxString(RB, "menu.Help.About"), x -> new AboutDialog(this).showAndWait()));
     }
 
     static <T extends BaseController> void getController(Class<T> clazz) {

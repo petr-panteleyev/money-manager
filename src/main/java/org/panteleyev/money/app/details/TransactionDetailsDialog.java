@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.details;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.details;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -26,8 +25,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.LabelFactory.newLabel;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -56,16 +57,18 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
-            newTableColumn(RB, "Credited_Account", null,
-                d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name)
-                    .orElse(""), w.multiply(0.3)),
-            newTableColumn(RB, "Comment", null, TransactionDetail::comment, w.multiply(0.6)),
-            newTableColumn(RB, "Sum", x -> new TransactionDetailSumCell(), w.multiply(0.1))
+            tableColumn(fxString(RB, "Credited_Account"), b ->
+                b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
+                    .withWidthBinding(w.multiply(0.3))),
+            tableColumn(fxString(RB, "Comment"), b ->
+                b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
+            tableObjectColumn(fxString(RB, "Sum"), b ->
+                b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         detailsTable.setItems(details);
 
-        var hBox = new HBox(Styles.BIG_SPACING, newLabel(RB, "Delta", COLON), deltaLabel);
+        var hBox = new HBox(Styles.BIG_SPACING, label(fxString(RB, "Delta", COLON)), deltaLabel);
         var vBox = new VBox(Styles.BIG_SPACING, hBox, detailEditor);
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
 

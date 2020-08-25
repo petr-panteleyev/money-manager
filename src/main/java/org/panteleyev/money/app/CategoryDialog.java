@@ -12,7 +12,6 @@ import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.fx.ComboBoxBuilder;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Category;
@@ -21,10 +20,12 @@ import org.panteleyev.money.model.Icon;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import static org.panteleyev.fx.GridFactory.addRows;
-import static org.panteleyev.fx.GridFactory.colSpan;
-import static org.panteleyev.fx.GridFactory.newGridPane;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.grid.GridBuilder.gridCell;
+import static org.panteleyev.fx.grid.GridBuilder.gridPane;
+import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
@@ -33,7 +34,7 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 final class CategoryDialog extends BaseDialog<Category> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ComboBox<CategoryType> typeComboBox = new ComboBoxBuilder<>(CategoryType.values()).build();
+    private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values());
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
@@ -43,11 +44,12 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         setTitle(RB.getString("Category"));
 
-        var pane = newGridPane(Styles.GRID_PANE);
-        addRows(pane,
-            List.of(newLabel(RB, "Type", COLON), typeComboBox, iconComboBox),
-            List.of(newLabel(RB, "label.Name"), colSpan(nameEdit, 2)),
-            List.of(newLabel(RB, "Comment", COLON), colSpan(commentEdit, 2))
+        getDialogPane().setContent(gridPane(
+            List.of(
+                gridRow(label(fxString(RB, "Type", COLON)), typeComboBox, iconComboBox),
+                gridRow(label(fxString(RB, "label.Name")), gridCell(nameEdit, 2, 1)),
+                gridRow(label(fxString(RB, "Comment", COLON)), gridCell(commentEdit, 2, 1))),
+            b -> b.withStyle(Styles.GRID_PANE))
         );
 
         nameEdit.setPrefColumnCount(20);
@@ -90,7 +92,6 @@ final class CategoryDialog extends BaseDialog<Category> {
             return builder.build();
         });
 
-        getDialogPane().setContent(pane);
         createDefaultButtons(RB, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);

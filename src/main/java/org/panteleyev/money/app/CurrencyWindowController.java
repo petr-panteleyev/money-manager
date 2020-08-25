@@ -10,10 +10,11 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.model.Currency;
 import java.util.List;
 import java.util.Optional;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -26,28 +27,30 @@ final class CurrencyWindowController extends BaseController {
     CurrencyWindowController() {
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
-        var menuBar = newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Close", event -> onClose())),
-            newMenu(RB, "menu.Edit",
-                newMenuItem(RB, "Create", SHORTCUT_N,
+        var menuBar = menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
+            newMenu(fxString(RB, "menu.Edit"),
+                menuItem(fxString(RB, "Create"), SHORTCUT_N,
                     event -> onAddCurrency()),
-                newMenuItem(RB, "menu.Edit.Edit", SHORTCUT_E,
+                menuItem(fxString(RB, "menu.Edit.Edit"), SHORTCUT_E,
                     event -> onEditCurrency(), disableBinding)),
             createWindowMenu(),
             createHelpMenu());
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-            newMenuItem(RB, "Create", event -> onAddCurrency()),
-            newMenuItem(RB, "menu.Edit.Edit", event -> onEditCurrency(), disableBinding))
+            menuItem(fxString(RB, "Create"), event -> onAddCurrency()),
+            menuItem(fxString(RB, "menu.Edit.Edit"), event -> onEditCurrency(), disableBinding))
         );
 
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-            newTableColumn(RB, "column.Name", null, Currency::symbol, w.multiply(0.2)),
-            newTableColumn(RB, "Description", null, Currency::description, w.multiply(0.8))
+            tableColumn(fxString(RB, "column.Name"), b ->
+                b.withPropertyCallback(Currency::symbol).withWidthBinding(w.multiply(0.2))),
+            tableColumn(fxString(RB, "Description"), b ->
+                b.withPropertyCallback(Currency::description).withWidthBinding(w.multiply(0.8)))
         ));
 
         var root = new BorderPane(table, menuBar, null, null, null);

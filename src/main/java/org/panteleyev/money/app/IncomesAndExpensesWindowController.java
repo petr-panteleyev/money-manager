@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -37,17 +36,18 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
-import static org.panteleyev.fx.ButtonFactory.newButton;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TreeTableFactory.newTreeItem;
-import static org.panteleyev.fx.TreeTableFactory.newTreeTableColumn;
+import static org.panteleyev.fx.TreeTableFactory.treeItem;
+import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Styles.GREEN_TEXT;
 import static org.panteleyev.money.app.Styles.RED_TEXT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
@@ -144,8 +144,8 @@ class IncomesAndExpensesWindowController extends BaseController {
     private final Label expenseValueText = new Label();
     private final Label balanceValueText = new Label();
 
-    private final TreeItem<TreeNode> expenseRoot = newTreeItem(true);
-    private final TreeItem<TreeNode> incomeRoot = newTreeItem(true);
+    private final TreeItem<TreeNode> expenseRoot = treeItem(true);
+    private final TreeItem<TreeNode> incomeRoot = treeItem(true);
 
     public IncomesAndExpensesWindowController() {
         setupReportTable();
@@ -155,7 +155,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var toolBar = new HBox(5.0,
             filterBox,
-            newButton(RB, "Reset_Filter", x -> filterBox.reset())
+            button(fxString(RB, "Reset_Filter"), x -> filterBox.reset())
         );
 
         var statusBar = createStatusBar();
@@ -182,11 +182,11 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
-        return newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
+        return menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Close", event -> onClose())),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
             createWindowMenu(),
             createHelpMenu()
         );
@@ -194,11 +194,11 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private Node createStatusBar() {
         return new HBox(5.0,
-            newLabel(RB, "Expenses", COLON),
+            label(fxString(RB, "Expenses", COLON)),
             expenseValueText,
-            newLabel(RB, "Incomes", COLON),
+            label(fxString(RB, "Incomes", COLON)),
             incomeValueText,
-            newLabel(RB, "Balance", COLON),
+            label(fxString(RB, "Balance", COLON)),
             balanceValueText);
     }
 
@@ -255,7 +255,7 @@ class IncomesAndExpensesWindowController extends BaseController {
             .forEach(categoryMapEntry -> {
                 var category = categoryMapEntry.getKey();
                 var categoryRoot =
-                    newTreeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
+                    treeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
                 root.getChildren().add(categoryRoot);
 
                 categoryMapEntry.getValue().entrySet().stream()
@@ -263,7 +263,7 @@ class IncomesAndExpensesWindowController extends BaseController {
                     .forEach(accountMapEntry -> {
                         var account = accountMapEntry.getKey();
                         var accountRoot =
-                            newTreeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
+                            treeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
                         categoryRoot.getChildren().add(accountRoot);
 
                         accountMapEntry.getValue().entrySet().stream()
@@ -274,7 +274,7 @@ class IncomesAndExpensesWindowController extends BaseController {
                                     .map(Transaction::amount)
                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                                accountRoot.getChildren().add(newTreeItem(new TreeNode(name, sum), false));
+                                accountRoot.getChildren().add(treeItem(new TreeNode(name, sum), false));
                             });
                     });
             });
@@ -288,8 +288,8 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var w = reportTable.widthProperty().subtract(20);
         reportTable.getColumns().addAll(List.of(
-            newTreeTableColumn("", x -> new NodeTextCell(), w.multiply(0.85)),
-            newTreeTableColumn("", x -> new NodeAmountCell(), w.multiply(0.15))
+            treeTableColumn("", x -> new NodeTextCell(), w.multiply(0.85)),
+            treeTableColumn("", x -> new NodeAmountCell(), w.multiply(0.15))
         ));
     }
 

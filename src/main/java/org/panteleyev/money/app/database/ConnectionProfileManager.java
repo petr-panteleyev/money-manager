@@ -23,7 +23,8 @@ public final class ConnectionProfileManager {
     private static final String PREF_DEFAULT_PROFILE_NAME = "default_profile_name";
     private static final String PREF_PROFILE_ROOT = "profile.";
 
-    private static final String MONEY_PROFILE_PROPERTY = "money.profile";
+    private static final String PROFILE_PROPERTY = "profile";
+    private static final String NO_AUTO_PROPERTY = "noauto";
 
     private boolean autoConnect = false;
     private ConnectionProfile defaultProfile = null;
@@ -188,7 +189,11 @@ public final class ConnectionProfileManager {
     }
 
     public Optional<ConnectionProfile> getProfileToOpen() {
-        var profileName = System.getProperty(MONEY_PROFILE_PROPERTY);
+        if ("true".equalsIgnoreCase(System.getProperty(NO_AUTO_PROPERTY))) {
+            return Optional.empty();
+        }
+
+        var profileName = System.getProperty(PROFILE_PROPERTY);
         if (profileName != null) {
             return Optional.ofNullable(get(profileName));
         }

@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -45,8 +44,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
-import static org.panteleyev.fx.TableFactory.newTableColumn;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
@@ -80,10 +81,6 @@ class TransactionTableView extends TableView<Transaction> {
     private final Consumer<Transaction> transactionAddedCallback;
     private final Consumer<Transaction> transactionUpdatedCallback;
 
-    // Month and year for ACCOUNT mode
-    private int month;
-    private int year;
-
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Contact> contactChangeLister = change -> Platform.runLater(this::redraw);
 
@@ -102,10 +99,6 @@ class TransactionTableView extends TableView<Transaction> {
         this(mode, null, x -> {}, x -> {});
     }
 
-    TransactionTableView(Mode mode, TransactionDetailsCallback transactionDetailsCallback) {
-        this(mode, transactionDetailsCallback, x -> {}, x -> {});
-    }
-
     TransactionTableView(Mode mode, TransactionDetailsCallback transactionDetailsCallback, Consumer<Transaction> transactionAddedCallback,
                          Consumer<Transaction> transactionUpdatedCallback)
     {
@@ -119,28 +112,38 @@ class TransactionTableView extends TableView<Transaction> {
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         var w = widthProperty().subtract(20);
-
-        var dayColumn = newTableColumn(RB, "Day", x -> new TransactionDayCell(mode.isFullDate()),
-            mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY,
-            w.multiply(0.05));
+        var dayComparator = mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY;
 
         getColumns().setAll(List.of(
-            dayColumn,
-            newTableColumn(RB, "Type", x -> new TransactionTypeCell(),
-                Comparator.comparingInt((Transaction t) -> t.type().ordinal())
-                    .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
-            newTableColumn(RB, "column.Account.Debited", x -> new TransactionDebitedAccountCell(),
-                Comparator.comparing(Transaction::accountDebitedUuid)
-                    .thenComparing(dayColumn.getComparator()), w.multiply(0.1)),
-            newTableColumn(RB, "column.Account.Credited", x -> new TransactionCreditedAccountCell(), w.multiply(0.1)),
-            newTableColumn(RB, "Counterparty", x -> new TransactionContactCell(), w.multiply(0.2)),
-            newTableColumn(RB, "Comment", null, Transaction::comment, w.multiply(0.35)),
-            newTableColumn(RB, "Sum", x -> new TransactionSumCell(),
-                Comparator.comparing(Transaction::getSignedAmount), w.multiply(0.05)),
-            newTableColumn("", x -> new TransactionCheckCell(), w.multiply(0.05))
+            tableObjectColumn(fxString(RB, "Day"), b ->
+                b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
+                    .withComparator(dayComparator)
+                    .withWidthBinding(w.multiply(0.05))),
+            tableObjectColumn(fxString(RB, "Type"), b ->
+                b.withCellFactory(x -> new TransactionTypeCell())
+                    .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
+                        .thenComparing(dayComparator))
+                    .withWidthBinding(w.multiply(0.1))),
+            tableObjectColumn(fxString(RB, "column.Account.Debited"), b ->
+                b.withCellFactory(x -> new TransactionDebitedAccountCell())
+                    .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
+                        .thenComparing(dayComparator))
+                    .withWidthBinding(w.multiply(0.1))),
+            tableObjectColumn(fxString(RB, "column.Account.Credited"), b ->
+                b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
+            tableObjectColumn(fxString(RB, "Counterparty"), b ->
+                b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
+            tableColumn(fxString(RB, "Comment"), b ->
+                b.withPropertyCallback(Transaction::comment).withWidthBinding(w.multiply(0.35))),
+            tableObjectColumn(fxString(RB, "Sum"), b ->
+                b.withCellFactory(x -> new TransactionSumCell())
+                    .withComparator(Comparator.comparing(Transaction::getSignedAmount))
+                    .withWidthBinding(w.multiply(0.05))),
+            tableObjectColumn("", b ->
+                b.withCellFactory(x -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.05)))
         ));
 
-        getSortOrder().add(dayColumn);
+        getSortOrder().add(getColumns().get(0));
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -160,19 +163,14 @@ class TransactionTableView extends TableView<Transaction> {
         return listSizeProperty;
     }
 
-    void setMonthAndYear(int month, int year) {
-        this.month = month;
-        this.year = year;
-    }
-
     private void createContextMenu() {
-        var newMenuItem = newMenuItem(RB, "Add", ELLIPSIS, event -> onNewTransaction());
-        var editMenuItem = newMenuItem(RB, "Edit", ELLIPSIS, event -> onEditTransaction());
-        var deleteMenuItem = newMenuItem(RB, "Delete", ELLIPSIS, event -> onDeleteTransaction());
-        var exportMenuItem = newMenuItem(RB, "menu.Context.Export", event -> onExportTransactions());
-        var detailsMenuItem = newMenuItem(RB, "menu.item.details", event -> onTransactionDetails());
-        var checkMenuItem = newMenuItem(RB, "menu.item.check", event -> onCheckTransactions(true));
-        var uncheckMenuItem = newMenuItem(RB, "menu.item.uncheck", event -> onCheckTransactions(false));
+        var newMenuItem = menuItem(fxString(RB, "Add", ELLIPSIS), event -> onNewTransaction());
+        var editMenuItem = menuItem(fxString(RB, "Edit", ELLIPSIS), event -> onEditTransaction());
+        var deleteMenuItem = menuItem(fxString(RB, "Delete", ELLIPSIS), event -> onDeleteTransaction());
+        var exportMenuItem = menuItem(fxString(RB, "menu.Context.Export"), event -> onExportTransactions());
+        var detailsMenuItem = menuItem(fxString(RB, "menu.item.details"), event -> onTransactionDetails());
+        var checkMenuItem = menuItem(fxString(RB, "menu.item.check"), event -> onCheckTransactions(true));
+        var uncheckMenuItem = menuItem(fxString(RB, "menu.item.uncheck"), event -> onCheckTransactions(false));
 
         editMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
         deleteMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());

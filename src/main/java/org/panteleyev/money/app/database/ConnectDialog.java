@@ -13,7 +13,8 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ToStringConverter;
 import java.util.Objects;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -40,7 +41,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
 
         var pane = new GridPane();
         pane.getStyleClass().add(GRID_PANE);
-        pane.addRow(0, newLabel(RB, "Profile", COLON), profileComboBox);
+        pane.addRow(0, label(fxString(RB, "Profile", COLON)), profileComboBox);
         pane.addRow(1, defaultCheck);
         pane.addRow(2, autoConnectCheck);
         getDialogPane().setContent(pane);

@@ -15,7 +15,6 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Spinner;
@@ -63,8 +62,9 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
@@ -134,16 +134,15 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = newMenuItem(RB, "Connection", ELLIPSIS, SHORTCUT_N,
+        var fileConnectMenuItem = menuItem(fxString(RB, "Connection", ELLIPSIS), SHORTCUT_N,
             event -> onOpenConnection());
-        var fileCloseMenuItem = newMenuItem(RB, "Close", event -> onClose());
-        var fileExitMenuItem = newMenuItem(RB, "Exit", event -> onExit());
-        var exportMenuItem = newMenuItem(RB, "menu.Tools.Export", event -> xmlDump());
-        var importMenuItem = new MenuItem(RB.getString("word.Import") + "...");
-        importMenuItem.setOnAction(event -> onImport());
-        var reportMenuItem = newMenuItem(RB, "Report", ELLIPSIS, event -> onReport());
+        var fileCloseMenuItem = menuItem(fxString(RB, "Close"), event -> onClose());
+        var fileExitMenuItem = menuItem(fxString(RB, "Exit"), event -> onExit());
+        var exportMenuItem = menuItem(fxString(RB, "menu.Tools.Export"), event -> xmlDump());
+        var importMenuItem = menuItem(fxString(RB, "word.Import", ELLIPSIS), event -> onImport());
+        var reportMenuItem = menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport());
 
-        var fileMenu = newMenu(RB, "File",
+        var fileMenu = newMenu(fxString(RB, "File"),
             fileConnectMenuItem,
             new SeparatorMenuItem(),
             importMenuItem,
@@ -155,46 +154,45 @@ public class MainWindowController extends BaseController implements TransactionT
             new SeparatorMenuItem(),
             fileExitMenuItem);
 
-        var editMenu = newMenu(RB, "menu.Edit",
-            newMenuItem(RB, "Add", ELLIPSIS, SHORTCUT_N,
+        var editMenu = newMenu(fxString(RB, "menu.Edit"),
+            menuItem(fxString(RB, "Add", ELLIPSIS), SHORTCUT_N,
                 event -> transactionTable.onNewTransaction()),
-            newMenuItem(RB, "Edit", ELLIPSIS, SHORTCUT_E,
+            menuItem(fxString(RB, "Edit", ELLIPSIS), SHORTCUT_E,
                 event -> transactionTable.onEditTransaction()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "Delete", ELLIPSIS, SHORTCUT_DELETE,
+            menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE,
                 event -> transactionTable.onDeleteTransaction()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.item.details", x -> transactionTable.onTransactionDetails()),
+            menuItem(fxString(RB, "menu.item.details"), x -> transactionTable.onTransactionDetails()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.item.check", SHORTCUT_K,
+            menuItem(fxString(RB, "menu.item.check"), SHORTCUT_K,
                 event -> transactionTable.onCheckTransactions(true)),
-            newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U,
+            menuItem(fxString(RB, "menu.item.uncheck"), SHORTCUT_U,
                 event -> transactionTable.onCheckTransactions(false))
         );
 
-        var viewMenu = newMenu(RB, "menu.view",
-            newMenuItem(RB, "menu.view.currentMonth",
+        var viewMenu = newMenu(fxString(RB, "menu.view"),
+            menuItem(fxString(RB, "menu.view.currentMonth"),
                 new KeyCodeCombination(KeyCode.UP, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onCurrentMonth()),
             new SeparatorMenuItem(),
-            newMenuItem(RB, "menu.view.nextMonth",
+            menuItem(fxString(RB, "menu.view.nextMonth"),
                 new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onNextMonth()),
-            newMenuItem(RB, "menu.view.prevMonth",
+            menuItem(fxString(RB, "menu.view.prevMonth"),
                 new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
                 x -> onPrevMonth())
         );
 
-        var profilesMenuItem = newMenuItem(RB, "menu.Tools.Profiles",
+        var profilesMenuItem = menuItem(fxString(RB, "menu.Tools.Profiles"),
             x -> profileManager.getEditor(false).showAndWait());
 
-        var optionsMenuItem = newMenuItem(RB, "menu.Tools.Options", x -> onOptions());
-        var importSettingsMenuItem = newMenuItem(RB, "menu.tools.import.settings", x -> onImportSettings());
-        var exportSettingsMenuItem = newMenuItem(RB, "menu.tool.export.settings", x -> onExportSettings());
-        var iconWindowMenuItem = new MenuItem(RB.getString("string.icons") + "...");
-        iconWindowMenuItem.setOnAction(a -> onIconWindow());
+        var optionsMenuItem = menuItem(fxString(RB, "menu.Tools.Options"), x -> onOptions());
+        var importSettingsMenuItem = menuItem(fxString(RB, "menu.tools.import.settings"), x -> onImportSettings());
+        var exportSettingsMenuItem = menuItem(fxString(RB, "menu.tool.export.settings"), x -> onExportSettings());
+        var iconWindowMenuItem = menuItem(fxString(RB.getString("string.icons"), ELLIPSIS), x -> onIconWindow());
 
-        var toolsMenu = newMenu(RB, "menu.Tools",
+        var toolsMenu = newMenu(fxString(RB, "menu.Tools"),
             profilesMenuItem,
             new SeparatorMenuItem(),
             iconWindowMenuItem,
@@ -511,8 +509,6 @@ public class MainWindowController extends BaseController implements TransactionT
 
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
-
-        transactionTable.setMonthAndYear(month, year);
 
         Predicate<Transaction> filter = t -> t.month() == month
             && t.year() == year;

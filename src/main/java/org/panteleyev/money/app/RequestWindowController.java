@@ -29,10 +29,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.MenuFactory.newMenuBar;
-import static org.panteleyev.fx.MenuFactory.newMenuItem;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
@@ -84,7 +85,7 @@ class RequestWindowController extends BaseController {
         }
         filterBox.getChildren().addAll(
             transactionFilterBox,
-            newLabel(RB, "Counterparty", COLON),
+            label(fxString(RB, "Counterparty", COLON)),
             contactFilterBox.getTextField()
         );
 
@@ -132,23 +133,23 @@ class RequestWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
-        return newMenuBar(
-            newMenu(RB, "File",
-                newMenuItem(RB, "Report", ELLIPSIS, event -> onReport()),
+        return menuBar(
+            newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Close", event -> onClose())),
-            newMenu(RB, "menu.Edit",
-                newMenuItem(RB, "Edit", ELLIPSIS, SHORTCUT_E, event -> table.onEditTransaction()),
+                menuItem(fxString(RB, "Close"), event -> onClose())),
+            newMenu(fxString(RB, "menu.Edit"),
+                menuItem(fxString(RB, "Edit", ELLIPSIS), SHORTCUT_E, event -> table.onEditTransaction()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "Delete", ELLIPSIS, SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
+                menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.item.details", event -> table.onTransactionDetails()),
+                menuItem(fxString(RB, "menu.item.details"), event -> table.onTransactionDetails()),
                 new SeparatorMenuItem(),
-                newMenuItem(RB, "menu.item.check", SHORTCUT_K, event -> table.onCheckTransactions(true)),
-                newMenuItem(RB, "menu.item.uncheck", SHORTCUT_U, event -> table.onCheckTransactions(false))
+                menuItem(fxString(RB, "menu.item.check"), SHORTCUT_K, event -> table.onCheckTransactions(true)),
+                menuItem(fxString(RB, "menu.item.uncheck"), SHORTCUT_U, event -> table.onCheckTransactions(false))
             ),
-            newMenu(RB, "View",
-                newMenuItem(RB, "Reset_Filter", SHORTCUT_ALT_C, event -> resetFilter())),
+            newMenu(fxString(RB, "View"),
+                menuItem(fxString(RB, "Reset_Filter"), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
     }

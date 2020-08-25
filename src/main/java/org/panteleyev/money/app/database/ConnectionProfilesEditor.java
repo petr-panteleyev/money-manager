@@ -37,8 +37,9 @@ import static javafx.scene.control.ButtonBar.ButtonData.SMALL_GAP;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.OK;
-import static org.panteleyev.fx.ButtonFactory.newButtonType;
-import static org.panteleyev.fx.LabelFactory.newLabel;
+import static org.panteleyev.fx.ButtonFactory.buttonType;
+import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
@@ -83,10 +84,10 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         setTitle(RB.getString("Profiles"));
 
-        var newButtonType = newButtonType(RB, "New", LEFT);
-        var deleteButtonType = newButtonType(RB, "Delete", LEFT);
-        var testButtonType = newButtonType(RB, "Test", BIG_GAP);
-        var saveButtonType = newButtonType(RB, "Save", SMALL_GAP);
+        var newButtonType = buttonType(fxString(RB, "New"), LEFT);
+        var deleteButtonType = buttonType(fxString(RB, "Delete"), LEFT);
+        var testButtonType = buttonType(fxString(RB, "Test"), BIG_GAP);
+        var saveButtonType = buttonType(fxString(RB, "Save"), SMALL_GAP);
 
         getDialogPane().getButtonTypes().addAll(
             newButtonType, deleteButtonType, testButtonType, saveButtonType, CLOSE
@@ -303,7 +304,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private VBox initCenterPane(boolean useEncryption) {
         var pane = new VBox();
 
-        var hBox = new HBox(newLabel(RB, "Profile_Name", COLON), profileNameEdit);
+        var hBox = new HBox(label(fxString(RB, "Profile_Name", COLON)), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         var titled = new TitledPane(RB.getString("Connection"), tcpEditor);
