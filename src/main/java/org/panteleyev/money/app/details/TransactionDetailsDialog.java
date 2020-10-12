@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.money.app.RecordEditorCallback;
@@ -25,6 +24,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
@@ -68,8 +69,8 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         detailsTable.setItems(details);
 
-        var hBox = new HBox(Styles.BIG_SPACING, label(fxString(RB, "Delta", COLON)), deltaLabel);
-        var vBox = new VBox(Styles.BIG_SPACING, hBox, detailEditor);
+        var hBox = hBox(Styles.BIG_SPACING, label(fxString(RB, "Delta", COLON)), deltaLabel);
+        var vBox = vBox(Styles.BIG_SPACING, hBox, detailEditor);
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
 
         var content = new BorderPane();

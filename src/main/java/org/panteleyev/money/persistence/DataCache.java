@@ -329,7 +329,7 @@ public class DataCache {
                 if (Objects.equals(account.uuid(), t.accountCreditedUuid())) {
                     // handle conversion rate
                     var rate = t.rate();
-                    if (rate.compareTo(BigDecimal.ZERO) != 0) {
+                    if (rate.compareTo(BigDecimal.ZERO) != 0 && rate.compareTo(BigDecimal.ONE) != 0) {
                         amount = t.rateDirection() == 0 ?
                             amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
                     }
@@ -340,5 +340,21 @@ public class DataCache {
             })
             .reduce(total ? account.openingBalance().add(account.accountLimit()) : BigDecimal.ZERO,
                 BigDecimal::add);
+    }
+
+    public BigDecimal calculateBalance(List<Transaction> transactions) {
+        return transactions.stream()
+            .filter(t -> t.parentUuid() == null)
+            .map(t -> {
+                var amount = t.amount();
+                // handle conversion rate
+                var rate = t.rate();
+                if (rate.compareTo(BigDecimal.ZERO) != 0 && rate.compareTo(BigDecimal.ONE) != 0) {
+                    amount = t.rateDirection() == 0 ?
+                        amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
+                }
+                return amount;
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

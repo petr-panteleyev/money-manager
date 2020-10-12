@@ -42,6 +42,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -116,11 +118,11 @@ final class DetailEditorPane extends BorderPane {
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
-        var hBox1 = new HBox(Styles.BIG_SPACING, sumEdit);
+        var hBox1 = hBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Sum", COLON)), hBox1);
+        var sumBox = vBox(Styles.SMALL_SPACING, label(fxString(RB, "Sum", COLON)), hBox1);
 
-        var commentBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Comment", COLON)), commentEdit);
+        var commentBox = vBox(Styles.SMALL_SPACING, label(fxString(RB, "Comment", COLON)), commentEdit);
 
         var filler = new Region();
 
@@ -147,14 +149,13 @@ final class DetailEditorPane extends BorderPane {
             }
         });
 
-        var row3 = new HBox(Styles.BIG_SPACING,
+        var row3 = hBox(Styles.BIG_SPACING,
             clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(new VBox(Styles.BIG_SPACING,
-            new HBox(Styles.BIG_SPACING,
+            hBox(Styles.BIG_SPACING,
                 creditedBox, commentBox, sumBox),
-            new HBox(Styles.BIG_SPACING),
             row3));
 
         HBox.setHgrow(creditedBox, Priority.ALWAYS);

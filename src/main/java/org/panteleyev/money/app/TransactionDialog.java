@@ -4,7 +4,6 @@
  */
 package org.panteleyev.money.app;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -47,6 +46,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import static javafx.application.Platform.runLater;
 import static javafx.scene.input.KeyCode.LEFT;
 import static javafx.scene.input.KeyCode.RIGHT;
 import static javafx.scene.input.KeyCode.UP;
@@ -279,8 +279,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         setupContactMenu();
         setupComments();
 
-        Platform.runLater(this::createValidationSupport);
-
         createDefaultButtons(RB);
 
         var okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
@@ -295,6 +293,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         });
 
         setResultConverter((ButtonType b) -> b == ButtonType.OK ? builder : null);
+
+        runLater(() -> {
+            createValidationSupport();
+            typeEdit.requestFocus();
+        });
     }
 
     TransactionDialog(Transaction transaction, DataCache cache) {
@@ -770,7 +773,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             total = amountValue.multiply(rateValue);
         }
 
-        Platform.runLater(() ->
+        runLater(() ->
             rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP).toString()));
     }
 

@@ -66,12 +66,12 @@ public record Account(
     public final static Predicate<Account> FILTER_ENABLED = Account::enabled;
 
     public Account {
-        this.openingBalance = MoneyRecord.normalize(openingBalance);
-        this.accountLimit = MoneyRecord.normalize(accountLimit);
-        this.currencyRate = MoneyRecord.normalize(currencyRate);
-        this.interest = MoneyRecord.normalize(interest);
-        this.total = MoneyRecord.normalize(total);
-        this.totalWaiting = MoneyRecord.normalize(totalWaiting);
+        openingBalance = MoneyRecord.normalize(openingBalance);
+        accountLimit = MoneyRecord.normalize(accountLimit);
+        currencyRate = MoneyRecord.normalize(currencyRate);
+        interest = MoneyRecord.normalize(interest);
+        total = MoneyRecord.normalize(total);
+        totalWaiting = MoneyRecord.normalize(totalWaiting);
     }
 
     @Override

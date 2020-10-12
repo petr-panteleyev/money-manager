@@ -20,7 +20,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.fx.TableColumnBuilder;
@@ -44,6 +43,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -102,7 +102,7 @@ final class AccountWindowController extends BaseController {
         createContextMenu();
 
         // Tool box
-        var hBox = new HBox(5.0,
+        var hBox = hBox(5.0,
             accountNameFilterBox.getTextField(),
             categorySelectionBox
         );

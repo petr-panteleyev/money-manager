@@ -184,10 +184,11 @@ public class TransactionDialogTest extends BaseTest {
         dialog.getSumEdit().setText(t.amount().toString());
         dialog.getCheckedCheckBox().setSelected(t.checked());
 
-        Optional.ofNullable(t.contactUuid()).ifPresent(uuid -> dialog.getContactEdit().setText(cache
-            .getContact(uuid)
-            .map(Contact::name)
-            .orElse("")));
+        var uuid = t.contactUuid();
+        if (uuid != null) {
+            dialog.getContactEdit().setText(cache.getContact(uuid).map(Contact::name).orElse(""));
+        }
+
         if (contactName != null) {
             dialog.getContactEdit().setText(contactName);
         }

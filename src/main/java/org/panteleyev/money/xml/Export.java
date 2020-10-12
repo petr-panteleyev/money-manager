@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 
 public class Export {
     private final DataCache cache;
@@ -190,11 +191,11 @@ public class Export {
     private static Element exportIcon(Document doc, Icon icon) {
         var e = doc.createElement("Icon");
 
-        XMLUtils.appendTextNode(e, "uuid", icon.uuid());
-        XMLUtils.appendTextNode(e, "name", icon.getName());
-        XMLUtils.appendTextNode(e, "bytes", icon.getBytes());
-        XMLUtils.appendTextNode(e, "created", icon.created());
-        XMLUtils.appendTextNode(e, "modified", icon.modified());
+        appendTextNode(e, "uuid", icon.uuid());
+        appendTextNode(e, "name", icon.getName());
+        appendTextNode(e, "bytes", icon.getBytes());
+        appendTextNode(e, "created", icon.created());
+        appendTextNode(e, "modified", icon.modified());
 
         return e;
     }
@@ -202,13 +203,13 @@ public class Export {
     private static Element exportCategory(Document doc, Category category) {
         var e = doc.createElement("Category");
 
-        XMLUtils.appendTextNode(e, "name", category.name());
-        XMLUtils.appendTextNode(e, "comment", category.comment());
-        XMLUtils.appendTextNode(e, "type", category.type());
-        XMLUtils.appendTextNode(e, "iconUuid", category.iconUuid());
-        XMLUtils.appendTextNode(e, "guid", category.uuid());
-        XMLUtils.appendTextNode(e, "created", category.created());
-        XMLUtils.appendTextNode(e, "modified", category.modified());
+        appendTextNode(e, "name", category.name());
+        appendTextNode(e, "comment", category.comment());
+        appendTextNode(e, "type", category.type());
+        appendTextNode(e, "iconUuid", category.iconUuid());
+        appendTextNode(e, "guid", category.uuid());
+        appendTextNode(e, "created", category.created());
+        appendTextNode(e, "modified", category.modified());
 
         return e;
     }
@@ -216,26 +217,26 @@ public class Export {
     private static Element exportAccount(Document doc, Account account) {
         var e = doc.createElement("Account");
 
-        XMLUtils.appendTextNode(e, "name", account.name());
-        XMLUtils.appendTextNode(e, "comment", account.comment());
-        XMLUtils.appendTextNode(e, "accountNumber", account.accountNumber());
-        XMLUtils.appendTextNode(e, "openingBalance", account.openingBalance());
-        XMLUtils.appendTextNode(e, "accountLimit", account.accountLimit());
-        XMLUtils.appendTextNode(e, "currencyRate", account.currencyRate());
-        XMLUtils.appendTextNode(e, "type", account.type());
-        XMLUtils.appendTextNode(e, "categoryUuid", account.categoryUuid());
-        Optional.ofNullable(account.currencyUuid()).ifPresent(uuid -> XMLUtils.appendTextNode(e, "currencyUuid", uuid));
-        XMLUtils.appendTextNode(e, "enabled", account.enabled());
-        XMLUtils.appendTextNode(e, "interest", account.interest());
-        Optional.ofNullable(account.closingDate()).ifPresent(closingDate -> XMLUtils.appendTextNode(e, "closingDate", closingDate));
-        XMLUtils.appendTextNode(e, "iconUuid", account.iconUuid());
-        XMLUtils.appendTextNode(e, "cardType", account.cardType());
-        XMLUtils.appendTextNode(e, "cardNumber", account.cardNumber());
-        XMLUtils.appendTextNode(e, "total", account.total());
-        XMLUtils.appendTextNode(e, "totalWaiting", account.totalWaiting());
-        XMLUtils.appendTextNode(e, "guid", account.uuid());
-        XMLUtils.appendTextNode(e, "created", account.created());
-        XMLUtils.appendTextNode(e, "modified", account.modified());
+        appendTextNode(e, "name", account.name());
+        appendTextNode(e, "comment", account.comment());
+        appendTextNode(e, "accountNumber", account.accountNumber());
+        appendTextNode(e, "openingBalance", account.openingBalance());
+        appendTextNode(e, "accountLimit", account.accountLimit());
+        appendTextNode(e, "currencyRate", account.currencyRate());
+        appendTextNode(e, "type", account.type());
+        appendTextNode(e, "categoryUuid", account.categoryUuid());
+        appendTextNode(e, "currencyUuid", account.currencyUuid());
+        appendTextNode(e, "enabled", account.enabled());
+        appendTextNode(e, "interest", account.interest());
+        appendTextNode(e, "closingDate", account.closingDate());
+        appendTextNode(e, "iconUuid", account.iconUuid());
+        appendTextNode(e, "cardType", account.cardType());
+        appendTextNode(e, "cardNumber", account.cardNumber());
+        appendTextNode(e, "total", account.total());
+        appendTextNode(e, "totalWaiting", account.totalWaiting());
+        appendTextNode(e, "guid", account.uuid());
+        appendTextNode(e, "created", account.created());
+        appendTextNode(e, "modified", account.modified());
 
         return e;
     }
@@ -243,21 +244,21 @@ public class Export {
     private static Element exportContact(Document doc, Contact contact) {
         var e = doc.createElement("Contact");
 
-        XMLUtils.appendTextNode(e, "name", contact.name());
-        XMLUtils.appendTextNode(e, "type", contact.type());
-        XMLUtils.appendTextNode(e, "phone", contact.phone());
-        XMLUtils.appendTextNode(e, "mobile", contact.mobile());
-        XMLUtils.appendTextNode(e, "email", contact.email());
-        XMLUtils.appendTextNode(e, "web", contact.web());
-        XMLUtils.appendTextNode(e, "comment", contact.comment());
-        XMLUtils.appendTextNode(e, "street", contact.street());
-        XMLUtils.appendTextNode(e, "city", contact.city());
-        XMLUtils.appendTextNode(e, "country", contact.country());
-        XMLUtils.appendTextNode(e, "zip", contact.zip());
-        XMLUtils.appendTextNode(e, "iconUuid", contact.iconUuid());
-        XMLUtils.appendTextNode(e, "guid", contact.uuid());
-        XMLUtils.appendTextNode(e, "created", contact.created());
-        XMLUtils.appendTextNode(e, "modified", contact.modified());
+        appendTextNode(e, "name", contact.name());
+        appendTextNode(e, "type", contact.type());
+        appendTextNode(e, "phone", contact.phone());
+        appendTextNode(e, "mobile", contact.mobile());
+        appendTextNode(e, "email", contact.email());
+        appendTextNode(e, "web", contact.web());
+        appendTextNode(e, "comment", contact.comment());
+        appendTextNode(e, "street", contact.street());
+        appendTextNode(e, "city", contact.city());
+        appendTextNode(e, "country", contact.country());
+        appendTextNode(e, "zip", contact.zip());
+        appendTextNode(e, "iconUuid", contact.iconUuid());
+        appendTextNode(e, "guid", contact.uuid());
+        appendTextNode(e, "created", contact.created());
+        appendTextNode(e, "modified", contact.modified());
 
         return e;
     }
@@ -265,18 +266,18 @@ public class Export {
     private static Element exportCurrency(Document doc, Currency currency) {
         var e = doc.createElement("Currency");
 
-        XMLUtils.appendTextNode(e, "symbol", currency.symbol());
-        XMLUtils.appendTextNode(e, "description", currency.description());
-        XMLUtils.appendTextNode(e, "formatSymbol", currency.formatSymbol());
-        XMLUtils.appendTextNode(e, "formatSymbolPosition", currency.formatSymbolPosition());
-        XMLUtils.appendTextNode(e, "showFormatSymbol", currency.showFormatSymbol());
-        XMLUtils.appendTextNode(e, "default", currency.def());
-        XMLUtils.appendTextNode(e, "rate", currency.rate().toString());
-        XMLUtils.appendTextNode(e, "direction", currency.direction());
-        XMLUtils.appendTextNode(e, "useThousandSeparator", currency.useThousandSeparator());
-        XMLUtils.appendTextNode(e, "guid", currency.uuid());
-        XMLUtils.appendTextNode(e, "created", currency.created());
-        XMLUtils.appendTextNode(e, "modified", currency.modified());
+        appendTextNode(e, "symbol", currency.symbol());
+        appendTextNode(e, "description", currency.description());
+        appendTextNode(e, "formatSymbol", currency.formatSymbol());
+        appendTextNode(e, "formatSymbolPosition", currency.formatSymbolPosition());
+        appendTextNode(e, "showFormatSymbol", currency.showFormatSymbol());
+        appendTextNode(e, "default", currency.def());
+        appendTextNode(e, "rate", currency.rate().toString());
+        appendTextNode(e, "direction", currency.direction());
+        appendTextNode(e, "useThousandSeparator", currency.useThousandSeparator());
+        appendTextNode(e, "guid", currency.uuid());
+        appendTextNode(e, "created", currency.created());
+        appendTextNode(e, "modified", currency.modified());
 
         return e;
     }
@@ -284,28 +285,28 @@ public class Export {
     private static Element exportTransaction(Document doc, Transaction t) {
         var e = doc.createElement("Transaction");
 
-        XMLUtils.appendTextNode(e, "amount", t.amount());
-        XMLUtils.appendTextNode(e, "day", t.day());
-        XMLUtils.appendTextNode(e, "month", t.month());
-        XMLUtils.appendTextNode(e, "year", t.year());
-        XMLUtils.appendTextNode(e, "type", t.type());
-        XMLUtils.appendTextNode(e, "comment", t.comment());
-        XMLUtils.appendTextNode(e, "checked", t.checked());
-        XMLUtils.appendTextNode(e, "accountDebitedUuid", t.accountDebitedUuid());
-        XMLUtils.appendTextNode(e, "accountCreditedUuid", t.accountCreditedUuid());
-        XMLUtils.appendTextNode(e, "accountDebitedType", t.accountDebitedType());
-        XMLUtils.appendTextNode(e, "accountCreditedType", t.accountCreditedType());
-        XMLUtils.appendTextNode(e, "accountDebitedCategoryUuid", t.accountDebitedCategoryUuid());
-        XMLUtils.appendTextNode(e, "accountCreditedCategoryUuid", t.accountCreditedCategoryUuid());
-        Optional.ofNullable(t.contactUuid()).ifPresent(uuid -> XMLUtils.appendTextNode(e, "contactUuid", uuid));
-        XMLUtils.appendTextNode(e, "rate", t.rate());
-        XMLUtils.appendTextNode(e, "rateDirection", t.rateDirection());
-        XMLUtils.appendTextNode(e, "invoiceNumber", t.invoiceNumber());
-        XMLUtils.appendTextNode(e, "guid", t.uuid());
-        XMLUtils.appendTextNode(e, "created", t.created());
-        XMLUtils.appendTextNode(e, "modified", t.modified());
-        Optional.ofNullable(t.parentUuid()).ifPresent(uuid -> XMLUtils.appendTextNode(e, "parentUuid", uuid));
-        XMLUtils.appendTextNode(e, "detailed", t.detailed());
+        appendTextNode(e, "amount", t.amount());
+        appendTextNode(e, "day", t.day());
+        appendTextNode(e, "month", t.month());
+        appendTextNode(e, "year", t.year());
+        appendTextNode(e, "type", t.type());
+        appendTextNode(e, "comment", t.comment());
+        appendTextNode(e, "checked", t.checked());
+        appendTextNode(e, "accountDebitedUuid", t.accountDebitedUuid());
+        appendTextNode(e, "accountCreditedUuid", t.accountCreditedUuid());
+        appendTextNode(e, "accountDebitedType", t.accountDebitedType());
+        appendTextNode(e, "accountCreditedType", t.accountCreditedType());
+        appendTextNode(e, "accountDebitedCategoryUuid", t.accountDebitedCategoryUuid());
+        appendTextNode(e, "accountCreditedCategoryUuid", t.accountCreditedCategoryUuid());
+        appendTextNode(e, "contactUuid", t.contactUuid());
+        appendTextNode(e, "rate", t.rate());
+        appendTextNode(e, "rateDirection", t.rateDirection());
+        appendTextNode(e, "invoiceNumber", t.invoiceNumber());
+        appendTextNode(e, "guid", t.uuid());
+        appendTextNode(e, "created", t.created());
+        appendTextNode(e, "modified", t.modified());
+        appendTextNode(e, "parentUuid", t.parentUuid());
+        appendTextNode(e, "detailed", t.detailed());
 
         return e;
     }

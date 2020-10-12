@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.stage.FileChooser;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.money.app.icons.IconManager;
@@ -46,4 +47,7 @@ public interface Constants {
 
     Function<Category, Image> CATEGORY_TO_IMAGE = category -> IconManager.getImage(category.iconUuid());
     Function<Account, Image> ACCOUNT_TO_IMAGE = account -> IconManager.getImage(account.iconUuid());
+
+    FileChooser.ExtensionFilter FILTER_XML_FILES = new FileChooser.ExtensionFilter(RB.getString("XML_Files"), "*.xml");
+    FileChooser.ExtensionFilter FILTER_ALL_FILES = new FileChooser.ExtensionFilter(RB.getString("All_Files"), "*.*");
 }

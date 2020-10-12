@@ -26,7 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
@@ -51,6 +50,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -125,8 +126,10 @@ class StatementWindowController extends BaseController {
         sourceTypeComboBox.getSelectionModel().select(0);
 
         // File load controls
-        var fileLoadControls = new HBox(5.0, statementFileEdit,
-            button("...", x -> onBrowse()));
+        var fileLoadControls = hBox(5.0,
+            statementFileEdit,
+            button("...", x -> onBrowse())
+        );
         fileLoadControls.visibleProperty().bind(
             sourceTypeComboBox.getSelectionModel().selectedItemProperty().isEqualTo(SourceType.FILE));
         fileLoadControls.setAlignment(Pos.CENTER_LEFT);
@@ -136,7 +139,7 @@ class StatementWindowController extends BaseController {
         var ymAuthButton = button("Authorize...", x -> yandexMoneyClient.authorize());
 
         limitComboBox.getSelectionModel().selectFirst();
-        var yandexMoneyControls = new HBox(5.0,
+        var yandexMoneyControls = hBox(5.0,
             ymAuthButton,
             ymFromPicker,
             new Label(" - "),
@@ -150,14 +153,14 @@ class StatementWindowController extends BaseController {
 
         var stackPane = new StackPane(fileLoadControls, yandexMoneyControls);
 
-        var balanceBox = new HBox(5.0,
+        var balanceBox = hBox(5.0,
             label(fxString(RB, "label.StatementBalance")),
             ymAccountBalanceLabel);
         balanceBox.setAlignment(Pos.CENTER_LEFT);
 
         var filler1 = new Region();
 
-        var hBox = new HBox(5.0,
+        var hBox = hBox(5.0,
             label(fxString(RB, "label.Account")),
             accountComboBox,
             button(fxString(RB, "button.Load"), x -> onLoad()),
@@ -180,9 +183,9 @@ class StatementWindowController extends BaseController {
 
         accountComboBox.setConverter(new ReadOnlyNamedConverter<>());
 
-        var lowerBox = new HBox(5.0, sourceTypeComboBox, stackPane);
+        var lowerBox = hBox(5.0, sourceTypeComboBox, stackPane);
 
-        var toolBar = new VBox(5.0, lowerBox, hBox);
+        var toolBar = vBox(5.0, lowerBox, hBox);
         BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
 
         var centerBox = new BorderPane();
@@ -253,6 +256,11 @@ class StatementWindowController extends BaseController {
     }
 
     private void setupAccountComboBox() {
+        var selectionModel = accountComboBox.getSelectionModel();
+
+        var selected = selectionModel.getSelectedItem();
+        var selectedUuid = selected == null ? null : selected.uuid();
+
         var accounts = cache().getAccounts().stream()
             .filter(account -> account.type() == CategoryType.BANKS_AND_CASH
                 || account.type() == CategoryType.DEBTS)
@@ -260,13 +268,18 @@ class StatementWindowController extends BaseController {
             .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
             .collect(Collectors.toList());
 
-        accountComboBox.getItems().clear();
-        accountComboBox.getItems().addAll(accounts);
-        if (!accountComboBox.getItems().isEmpty()) {
-            accountComboBox.getSelectionModel().select(0);
-        } else {
-            accountComboBox.getSelectionModel().select(null);
-        }
+        accountComboBox.getItems().setAll(accounts);
+
+        accounts.stream().filter(a -> a.uuid().equals(selectedUuid)).findAny().ifPresentOrElse(
+            selectionModel::select,
+            () -> {
+                if (accountComboBox.getItems().isEmpty()) {
+                    selectionModel.clearSelection();
+                } else {
+                    selectionModel.select(0);
+                }
+            }
+        );
     }
 
     private void onBrowse() {
@@ -369,8 +382,11 @@ class StatementWindowController extends BaseController {
         }
 
         Platform.runLater(() -> {
-            statementTable.getItems().clear();
-            statementTable.getItems().addAll(statement.records());
+            var selected = statementTable.getSelectionModel().getSelectedItem();
+            statementTable.getItems().setAll(statement.records());
+            if (statement.records().contains(selected)) {
+                statementTable.getSelectionModel().select(selected);
+            }
         });
     }
 
@@ -450,5 +466,4 @@ class StatementWindowController extends BaseController {
     private Optional<StatementRecord> getSelectedStatementRecord() {
         return Optional.ofNullable(statementTable.getSelectionModel().getSelectedItem());
     }
-
 }

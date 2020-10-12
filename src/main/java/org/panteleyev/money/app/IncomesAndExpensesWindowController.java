@@ -14,7 +14,6 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Category;
@@ -36,6 +35,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -153,7 +153,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         incomeValueText.getStyleClass().add(GREEN_TEXT);
         expenseValueText.getStyleClass().add(RED_TEXT);
 
-        var toolBar = new HBox(5.0,
+        var toolBar = hBox(5.0,
             filterBox,
             button(fxString(RB, "Reset_Filter"), x -> filterBox.reset())
         );
@@ -193,7 +193,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private Node createStatusBar() {
-        return new HBox(5.0,
+        return hBox(5.0,
             label(fxString(RB, "Expenses", COLON)),
             expenseValueText,
             label(fxString(RB, "Incomes", COLON)),

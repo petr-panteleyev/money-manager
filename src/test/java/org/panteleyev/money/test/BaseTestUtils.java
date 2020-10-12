@@ -1,9 +1,8 @@
-package org.panteleyev.money.test;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.test;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -46,11 +45,7 @@ public interface BaseTestUtils {
     }
 
     static BigDecimal randomBigDecimal() {
-        return new BigDecimal(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
-    }
-
-    static int randomPort() {
-        return RANDOM.nextInt(0xFFFF);
+        return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
     static CategoryType randomCategoryType() {

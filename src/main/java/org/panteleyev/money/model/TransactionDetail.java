@@ -1,16 +1,15 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public record TransactionDetail(UUID uuid, BigDecimal amount, UUID accountCreditedUuid, String comment, long modified) {
     public TransactionDetail {
-        this.amount = MoneyRecord.normalize(amount);
+        amount = MoneyRecord.normalize(amount);
     }
 
     public TransactionDetail(Transaction transaction) {

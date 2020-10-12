@@ -1,9 +1,8 @@
-package org.panteleyev.money.model;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.model;
 
 import javafx.scene.image.Image;
 import org.panteleyev.mysqlapi.annotations.Column;
@@ -18,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Table("icon")
-public class Icon implements MoneyRecord {
+public final class Icon implements MoneyRecord {
     public static final int ICON_SIZE = 16;
     public static final int ICON_BYTE_LENGTH = 8192;
 

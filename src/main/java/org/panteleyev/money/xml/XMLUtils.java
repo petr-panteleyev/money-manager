@@ -1,9 +1,8 @@
-package org.panteleyev.money.xml;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,6 +21,10 @@ import java.util.UUID;
 
 public interface XMLUtils {
     static void appendTextNode(Element e, String name, String value) {
+        if (value == null) {
+            return;
+        }
+
         var document = e.getOwnerDocument();
         var child = document.createElement(name);
         e.appendChild(child);
@@ -42,11 +45,15 @@ public interface XMLUtils {
     }
 
     static void appendTextNode(Element e, String name, BigDecimal value) {
-        appendTextNode(e, name, value.toString());
+        if (value != null) {
+            appendTextNode(e, name, value.toString());
+        }
     }
 
     static void appendTextNode(Element e, String name, LocalDate value) {
-        appendTextNode(e, name, value.toEpochDay());
+        if (value != null) {
+            appendTextNode(e, name, value.toEpochDay());
+        }
     }
 
     static void appendTextNode(Element e, String name, UUID value) {
@@ -56,11 +63,15 @@ public interface XMLUtils {
     }
 
     static void appendTextNode(Element e, String name, byte[] value) {
-        appendTextNode(e, name, Base64.getEncoder().encodeToString(value));
+        if (value != null) {
+            appendTextNode(e, name, Base64.getEncoder().encodeToString(value));
+        }
     }
 
     static void appendTextNode(Element e, String name, Enum<?> value) {
-        appendTextNode(e, name, value.name());
+        if (value != null) {
+            appendTextNode(e, name, value.name());
+        }
     }
 
     static Element appendElement(Element parent, String name) {

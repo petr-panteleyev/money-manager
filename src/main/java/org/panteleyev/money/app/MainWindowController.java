@@ -62,11 +62,17 @@ import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
+import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
+import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
@@ -85,7 +91,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private final BorderPane self = new BorderPane();
 
-    private final Label progressLabel = new Label();
+    private final Label progressLabel = label("");
     private final ProgressBar progressBar = new ProgressBar();
 
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
@@ -223,18 +229,16 @@ public class MainWindowController extends BaseController implements TransactionT
 
         monthFilterBox.setOnAction(event -> onMonthChanged());
 
-        var transactionCountLabel = new Label();
+        var transactionCountLabel = label("");
         transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
 
-        var f1 = new Region();
-        var hBox = new HBox(5.0,
+        var hBox = hBox(5.0,
             monthFilterBox,
             yearSpinner,
-            f1,
-            new Label("Transactions:"),
+            fxNode(new Region(), hBoxHGrow(Priority.ALWAYS)),
+            label("Transactions:"),
             transactionCountLabel
         );
-        HBox.setHgrow(f1, Priority.ALWAYS);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         transactionTab.setTop(hBox);
@@ -347,8 +351,7 @@ public class MainWindowController extends BaseController implements TransactionT
         fileChooser.setTitle("Export to file");
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName());
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-            new FileChooser.ExtensionFilter("All Files", "*.*"));
+        fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
         var selected = fileChooser.showSaveDialog(null);
         if (selected == null) {

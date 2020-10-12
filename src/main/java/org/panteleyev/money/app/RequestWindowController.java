@@ -4,14 +4,15 @@
  */
 package org.panteleyev.money.app;
 
+import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
-import org.controlsfx.control.textfield.TextFields;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
@@ -23,12 +24,19 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import static javafx.scene.layout.Priority.ALWAYS;
+import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
+import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
+import static org.panteleyev.fx.FxUtils.SKIP;
+import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -55,6 +63,7 @@ class RequestWindowController extends BaseController {
     private final AccountSelectionBox accBox = new AccountSelectionBox();
     private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
     private final ContactFilterBox contactFilterBox = new ContactFilterBox();
+    private final TextField sumField = new TextField();
 
     private final PredicateProperty<Transaction> filterProperty;
 
@@ -79,14 +88,14 @@ class RequestWindowController extends BaseController {
             contactFilterBox.predicateProperty()
         ));
 
-        var filterBox = new HBox(5.0);
-        if (account == null) {
-            filterBox.getChildren().add(accBox);
-        }
-        filterBox.getChildren().addAll(
+        var filterBox = hBox(5.0,
+            account == null ? accBox : SKIP,
             transactionFilterBox,
             label(fxString(RB, "Counterparty", COLON)),
-            contactFilterBox.getTextField()
+            contactFilterBox.getTextField(),
+            fxNode(new Region(), hBoxHGrow(ALWAYS)),
+            label(fxString(RB, "Sum", COLON)),
+            sumField
         );
 
         filterBox.setAlignment(Pos.CENTER_LEFT);
@@ -95,6 +104,9 @@ class RequestWindowController extends BaseController {
         var centerBox = new BorderPane();
         centerBox.setTop(filterBox);
         centerBox.setCenter(table);
+
+        sumField.setEditable(false);
+        sumField.setFocusTraversable(false);
 
         filterProperty.addListener((x, y, newValue) -> onUpdateFilter());
 
@@ -108,8 +120,13 @@ class RequestWindowController extends BaseController {
 
         transactionFilterBox.setFilterYears();
 
-        TextFields.bindAutoCompletion(contactFilterBox.getTextField(), new CompletionProvider(contactSuggestions));
+        bindAutoCompletion(contactFilterBox.getTextField(), new CompletionProvider(contactSuggestions));
         setupContactMenu();
+
+        table.selectedTransactions().addListener((ListChangeListener<Transaction>) change ->
+            sumField.setText(
+                cache().calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
+            ));
 
         setupWindow(root);
         Options.loadStageDimensions(getClass(), getStage());

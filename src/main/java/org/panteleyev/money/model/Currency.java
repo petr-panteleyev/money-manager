@@ -42,7 +42,7 @@ public record Currency(
 ) implements MoneyRecord {
 
     public Currency {
-        this.rate = MoneyRecord.normalize(rate);
+        rate = MoneyRecord.normalize(rate);
     }
 
     public String formatValue(BigDecimal value) {

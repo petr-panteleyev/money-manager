@@ -18,7 +18,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import org.panteleyev.money.app.cells.ContactNameCell;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
@@ -26,6 +25,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -95,7 +95,7 @@ class ContactListWindowController extends BaseController {
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox
-        var hBox = new HBox(5, searchField, typeBox);
+        var hBox = hBox(5, searchField, typeBox);
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
         var self = new BorderPane(

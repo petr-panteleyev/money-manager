@@ -35,6 +35,8 @@ import static org.panteleyev.fx.ButtonFactory.radioButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
+import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -104,10 +106,7 @@ final class ImportWizard extends BaseDialog<Object> {
             var chooser = new FileChooser();
             chooser.setTitle(RB.getString("word.Import"));
             Options.getLastExportDir().ifPresent(chooser::setInitialDirectory);
-            chooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
-            );
+            chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
             var selected = chooser.showOpenDialog(null);
 

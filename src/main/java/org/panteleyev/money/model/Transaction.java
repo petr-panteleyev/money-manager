@@ -71,8 +71,8 @@ public record Transaction(
 ) implements MoneyRecord {
 
     public Transaction {
-        this.amount = MoneyRecord.normalize(amount);
-        this.rate = MoneyRecord.normalize(rate);
+        amount = MoneyRecord.normalize(amount);
+        rate = MoneyRecord.normalize(rate);
     }
 
     public BigDecimal getSignedAmount() {

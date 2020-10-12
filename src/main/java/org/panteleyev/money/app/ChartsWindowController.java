@@ -10,13 +10,13 @@ import javafx.geometry.Insets;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.util.Pair;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -33,11 +33,11 @@ public class ChartsWindowController extends BaseController {
     private final PieChart pieChart = new PieChart();
 
     public ChartsWindowController() {
-        var topPanel = new HBox(5.0);
-
-        topPanel.getChildren().addAll(selectionBox,
+        var topPanel = hBox(5.0,
+            selectionBox,
             transactionFilterBox,
-            button(fxString(RB, "Refresh"), x -> updateChart()));
+            button(fxString(RB, "Refresh"), x -> updateChart())
+        );
         BorderPane.setMargin(topPanel, new Insets(5.0, 5.0, 5.0, 5.0));
         pieChart.legendVisibleProperty().set(false);
 

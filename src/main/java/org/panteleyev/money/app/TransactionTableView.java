@@ -8,6 +8,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.Alert;
@@ -35,10 +36,12 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -48,7 +51,9 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -144,8 +149,6 @@ class TransactionTableView extends TableView<Transaction> {
         ));
 
         getSortOrder().add(getColumns().get(0));
-
-        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         createContextMenu();
 
@@ -243,22 +246,22 @@ class TransactionTableView extends TableView<Transaction> {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("XML Files", "*.xml"),
-            new FileChooser.ExtensionFilter("All Files", "*.*")
-        );
+        fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
+
         var selected = fileChooser.showSaveDialog(null);
-        if (selected != null) {
-            CompletableFuture.runAsync(() -> {
-                try (var out = new FileOutputStream(selected)) {
-                    new Export().withTransactions(toExport, true)
-                        .doExport(out);
-                    Options.setLastExportDir(selected.getParent());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
+        if (selected == null) {
+            return;
         }
+
+        CompletableFuture.runAsync(() -> {
+            try (var out = new FileOutputStream(selected)) {
+                new Export().withTransactions(toExport, true)
+                    .doExport(out);
+                Options.setLastExportDir(selected.getParent());
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void redraw() {
@@ -284,11 +287,13 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     void onCheckTransactions(boolean check) {
+        var selection = getCurrentSelection();
         var process = getSelectionModel().getSelectedItems().stream()
             .filter(t -> t.checked() != check)
             .collect(Collectors.toList());
 
         onCheckTransaction(process, check);
+        restoreSelection(selection);
     }
 
     void onNewTransaction() {
@@ -298,9 +303,11 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     void onEditTransaction() {
+        var selection = getCurrentSelection();
         getSelectedTransaction()
             .flatMap(selected -> new TransactionDialog(selected, cache()).showAndWait())
             .ifPresent(builder -> transactionUpdatedCallback.accept(getDao().updateTransaction(builder)));
+        restoreSelection(selection);
     }
 
     void onDeleteTransaction() {
@@ -316,5 +323,30 @@ class TransactionTableView extends TableView<Transaction> {
 
     boolean checkFocus() {
         return isFocused();
+    }
+
+    public ObservableList<Transaction> selectedTransactions() {
+        return getSelectionModel().getSelectedItems();
+    }
+
+    private List<UUID> getCurrentSelection() {
+        return getSelectionModel().getSelectedItems().stream().map(Transaction::uuid).collect(Collectors.toList());
+    }
+
+    /**
+     * This method checks if table has any items with uuid from the list and selects all that exists.
+     *
+     * @param selection uuid of items to be selected
+     */
+    private void restoreSelection(List<UUID> selection) {
+        Platform.runLater(() -> {
+            getSelectionModel().clearSelection();
+            for (var uuid : selection) {
+                getItems().stream()
+                    .filter(t -> t.uuid().equals(uuid))
+                    .findAny()
+                    .ifPresent(t -> getSelectionModel().select(t));
+            }
+        });
     }
 }
