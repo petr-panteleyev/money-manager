@@ -10,6 +10,7 @@ import org.panteleyev.mysqlapi.annotations.ForeignKey;
 import org.panteleyev.mysqlapi.annotations.PrimaryKey;
 import org.panteleyev.mysqlapi.annotations.ReferenceOption;
 import org.panteleyev.mysqlapi.annotations.Table;
+import java.util.Comparator;
 import java.util.UUID;
 
 @Table("category")
@@ -32,6 +33,9 @@ public record Category(
     long modified
 
 ) implements MoneyRecord, Named {
+
+    public static final Comparator<Category> COMPARE_BY_NAME =
+        (c1, c2) -> c1.name().compareToIgnoreCase(c2.name());
 
     public static class Builder {
         private String name = "";

@@ -7,40 +7,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.panteleyev</groupId>
+        <artifactId>parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager</artifactId>
-    <version>20.7.0</version>
+    <version>20.7.1</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>15</maven.compiler.source>
-        <maven.compiler.target>15</maven.compiler.target>
         <appModule>org.panteleyev.money</appModule>
         <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
-        <!-- dependencies -->
-        <javaApiForMySqlVersion>1.4.0</javaApiForMySqlVersion>
-        <javaFxVersion>15</javaFxVersion>
-        <javaFxHelpersVersion>1.6.2</javaFxHelpersVersion>
-        <ofxParserVersion>0.2.0</ofxParserVersion>
-        <controlsFxVersion>11.0.2</controlsFxVersion>
-        <mysqlConnectorVersion>8.0.21</mysqlConnectorVersion>
-        <jsoupVersion>1.13.1</jsoupVersion>
-        <gsonVersion>2.8.6</gsonVersion>
-        <testngVersion>6.14.3</testngVersion>
-        <freemarkerVersion>2.3.29</freemarkerVersion>
-        <commonsCsvVersion>1.8</commonsCsvVersion>
-        <!-- plugins -->
-        <mavenToolchainPluginVersion>3.0.0</mavenToolchainPluginVersion>
-        <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M4</mavenSurefirePluginVersion>
-        <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
-        <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.4</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.2.0</jpackageMavenPluginVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
         <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>
@@ -52,82 +35,66 @@
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>java-api-for-mysql</artifactId>
-            <version>${javaApiForMySqlVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>java-fx-helpers</artifactId>
-            <version>${javaFxHelpersVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>ofx-parser</artifactId>
-            <version>${ofxParserVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
             <artifactId>controlsfx</artifactId>
-            <version>${controlsFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysqlConnectorVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
-            <version>${jsoupVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${gsonVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
-            <version>${javaFxVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>${commonsCsvVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>${freemarkerVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>${testngVersion}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -144,26 +111,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
-                <version>${mavenToolchainPluginVersion}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>toolchain</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <toolchains>
-                        <jdk>
-                            <version>${maven.compiler.target}</version>
-                        </jdk>
-                    </toolchains>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${mavenCompilerPluginVersion}</version>
                 <configuration>
                     <compilerArgs>
                         <arg>--enable-preview</arg>
@@ -173,7 +124,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>${mavenJarPluginVersion}</version>
                 <configuration>
                     <outputDirectory>target/jmods</outputDirectory>
                     <archive>
@@ -186,7 +136,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${mavenDependencyPluginVersion}</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -204,7 +153,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${mavenSurefirePluginVersion}</version>
                 <configuration>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
@@ -226,7 +174,6 @@
             <plugin>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>jpackage-maven-plugin</artifactId>
-                <version>${jpackageMavenPluginVersion}</version>
                 <configuration>
                     <name>Money Manager</name>
                     <appVersion>${project.version}</appVersion>
@@ -264,7 +211,6 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>${javaFxPluginVersion}</version>
                 <configuration>
                     <mainClass>${appModule}/${appMainClass}</mainClass>
                 </configuration>

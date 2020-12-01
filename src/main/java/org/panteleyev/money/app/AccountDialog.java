@@ -28,6 +28,7 @@ import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -105,7 +106,7 @@ class AccountDialog extends BaseDialog<Account> {
 
         nameEdit.setPrefColumnCount(20);
 
-        categories = cache.getCategories();
+        categories = cache.getCategories().sorted(Category.COMPARE_BY_NAME);
 
         categoryComboBox.setConverter(new ReadOnlyNamedConverter<>());
         currencyComboBox.setConverter(new ReadOnlyStringConverter<>() {

@@ -24,6 +24,8 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByCategoryType;
@@ -83,8 +85,12 @@ public class CategorySelectionBox extends HBox {
 
         categoryChoiceBox.setConverter(new ReadOnlyStringConverter<>() {
             @Override
-            public String toString(Object obj) {
-                return obj instanceof Category category ? category.name() : obj.toString();
+            public String toString(Object object) {
+                if (object instanceof Category category) {
+                    return category.name();
+                } else {
+                    return object != null ? object.toString() : "";
+                }
             }
         });
 
@@ -149,7 +155,11 @@ public class CategorySelectionBox extends HBox {
         }
 
         ObservableList<Object> items =
-            FXCollections.observableArrayList(cache().getCategoriesByType(typeListItem.getTypes()));
+            observableArrayList(
+                cache().getCategoriesByType(typeListItem.getTypes()).stream()
+                    .sorted(Category.COMPARE_BY_NAME)
+                    .collect(Collectors.toList())
+            );
 
         if (!items.isEmpty()) {
             items.add(0, new Separator());
