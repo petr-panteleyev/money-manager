@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -57,7 +56,7 @@ public class CurrencyDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Currency>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CurrencyDialog(null, null);
+            var dialog = new CurrencyDialog(null, null, null);
             setupDialog(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
@@ -75,7 +74,7 @@ public class CurrencyDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Currency>(1);
 
         Platform.runLater(() -> {
-            var dialog = new CurrencyDialog(null, CURRENCY);
+            var dialog = new CurrencyDialog(null, null, CURRENCY);
             setupDialogUpdate(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);

@@ -7,19 +7,19 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
 
-public class TransactionCheckCell extends TableCell<Transaction, Transaction> {
-    private static final String CHECK_SYMBOL = "\u2714";
+public class TransactionCommentCell extends TableCell<Transaction, Transaction> {
 
     @Override
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
 
+        setText("");
         setGraphic(null);
 
-        if (empty || transaction == null || !transaction.checked()) {
-            setText("");
+        if (empty || transaction == null) {
+            return;
         } else {
-            setText(CHECK_SYMBOL);
+            setText(transaction.comment());
         }
     }
 }

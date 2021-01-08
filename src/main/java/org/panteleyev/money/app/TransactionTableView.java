@@ -16,10 +16,15 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
+import javafx.util.Callback;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.cells.TransactionAccountRequestSumCell;
 import org.panteleyev.money.app.cells.TransactionCheckCell;
+import org.panteleyev.money.app.cells.TransactionCommentCell;
 import org.panteleyev.money.app.cells.TransactionContactCell;
 import org.panteleyev.money.app.cells.TransactionCreditedAccountCell;
 import org.panteleyev.money.app.cells.TransactionDayCell;
@@ -28,6 +33,8 @@ import org.panteleyev.money.app.cells.TransactionRow;
 import org.panteleyev.money.app.cells.TransactionSumCell;
 import org.panteleyev.money.app.cells.TransactionTypeCell;
 import org.panteleyev.money.app.details.TransactionDetailsDialog;
+import org.panteleyev.money.app.options.Options;
+import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
@@ -49,24 +56,25 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
+import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
-class TransactionTableView extends TableView<Transaction> {
+public class TransactionTableView extends TableView<Transaction> {
     public interface TransactionDetailsCallback {
         void handleTransactionDetails(Transaction transaction, List<TransactionDetail> details);
     }
 
     public enum Mode {
-        ACCOUNT(false),
+        SUMMARY(false),
         STATEMENT(true),
-        QUERY(true);
+        QUERY(true),
+        ACCOUNT(true);
 
         private final boolean fullDate;
 
@@ -80,6 +88,7 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     private final Mode mode;
+
     private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> { };
     private final TransactionDetailsCallback transactionDetailsCallback;
 
@@ -101,13 +110,31 @@ class TransactionTableView extends TableView<Transaction> {
     private final SimpleIntegerProperty listSizeProperty = new SimpleIntegerProperty(0);
 
     TransactionTableView(Mode mode) {
-        this(mode, null, x -> {}, x -> {});
+        this(mode, null, null, x -> {}, x -> {});
     }
 
-    TransactionTableView(Mode mode, TransactionDetailsCallback transactionDetailsCallback, Consumer<Transaction> transactionAddedCallback,
+    TransactionTableView(Account account) {
+        this(Mode.ACCOUNT, account, null, x -> {}, x -> {});
+    }
+
+    TransactionTableView(Mode mode,
+                         TransactionDetailsCallback transactionDetailsCallback,
+                         Consumer<Transaction> transactionAddedCallback,
+                         Consumer<Transaction> transactionUpdatedCallback)
+    {
+        this(mode, null, transactionDetailsCallback, transactionAddedCallback, transactionUpdatedCallback);
+    }
+
+    TransactionTableView(Mode mode, Account account,
+                         TransactionDetailsCallback transactionDetailsCallback,
+                         Consumer<Transaction> transactionAddedCallback,
                          Consumer<Transaction> transactionUpdatedCallback)
     {
         this.mode = mode;
+        if (mode == Mode.ACCOUNT && account == null) {
+            throw new IllegalArgumentException("Account cannot be null when mode = ACCOUNT");
+        }
+
         this.transactionDetailsCallback = transactionDetailsCallback;
         this.transactionAddedCallback = transactionAddedCallback;
         this.transactionUpdatedCallback = transactionUpdatedCallback;
@@ -118,6 +145,11 @@ class TransactionTableView extends TableView<Transaction> {
 
         var w = widthProperty().subtract(20);
         var dayComparator = mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY;
+
+        Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
+            mode == Mode.ACCOUNT ?
+                x -> new TransactionAccountRequestSumCell(account) :
+                x -> new TransactionSumCell();
 
         getColumns().setAll(List.of(
             tableObjectColumn(fxString(RB, "Day"), b ->
@@ -138,10 +170,10 @@ class TransactionTableView extends TableView<Transaction> {
                 b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
             tableObjectColumn(fxString(RB, "Counterparty"), b ->
                 b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(RB, "Comment"), b ->
-                b.withPropertyCallback(Transaction::comment).withWidthBinding(w.multiply(0.35))),
+            tableObjectColumn(fxString(RB, "Comment"), b ->
+                b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
             tableObjectColumn(fxString(RB, "Sum"), b ->
-                b.withCellFactory(x -> new TransactionSumCell())
+                b.withCellFactory(sumCellFactory)
                     .withComparator(Comparator.comparing(Transaction::getSignedAmount))
                     .withWidthBinding(w.multiply(0.05))),
             tableObjectColumn("", b ->
@@ -181,7 +213,7 @@ class TransactionTableView extends TableView<Transaction> {
 
         var ctxMenu = new ContextMenu();
 
-        if (mode == Mode.ACCOUNT) {
+        if (mode == Mode.SUMMARY) {
             ctxMenu.getItems().addAll(
                 newMenuItem
             );
@@ -192,7 +224,7 @@ class TransactionTableView extends TableView<Transaction> {
             new SeparatorMenuItem()
         );
 
-        if (mode == Mode.ACCOUNT || mode == Mode.QUERY) {
+        if (mode == Mode.SUMMARY || mode == Mode.QUERY || mode == Mode.ACCOUNT) {
             ctxMenu.getItems().addAll(
                 deleteMenuItem,
                 new SeparatorMenuItem()
@@ -273,7 +305,7 @@ class TransactionTableView extends TableView<Transaction> {
         getSelectedTransaction().ifPresent(t -> {
             var childTransactions = cache().getTransactionDetails(t);
 
-            if (mode == Mode.ACCOUNT) {
+            if (mode == Mode.SUMMARY) {
                 if (transactionDetailsCallback == null) {
                     return;
                 }
@@ -297,7 +329,7 @@ class TransactionTableView extends TableView<Transaction> {
     }
 
     void onNewTransaction() {
-        new TransactionDialog(cache()).showAndWait().ifPresent(
+        new TransactionDialog(null, options().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
             builder -> transactionAddedCallback.accept(getDao().insertTransaction(builder))
         );
     }
@@ -305,7 +337,7 @@ class TransactionTableView extends TableView<Transaction> {
     void onEditTransaction() {
         var selection = getCurrentSelection();
         getSelectedTransaction()
-            .flatMap(selected -> new TransactionDialog(selected, cache()).showAndWait())
+            .flatMap(selected -> new TransactionDialog(null, options().getDialogCssFileUrl(), selected, cache()).showAndWait())
             .ifPresent(builder -> transactionUpdatedCallback.accept(getDao().updateTransaction(builder)));
         restoreSelection(selection);
     }

@@ -7,6 +7,7 @@ package org.panteleyev.money.app;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -68,11 +70,15 @@ final class CurrencyWindowController extends BaseController {
     }
 
     private void onAddCurrency() {
-        new CurrencyDialog(this, null).showAndWait().ifPresent(c -> getDao().insertCurrency(c));
+        new CurrencyDialog(this, options().getDialogCssFileUrl(), null)
+            .showAndWait()
+            .ifPresent(c -> getDao().insertCurrency(c));
     }
 
     private void onEditCurrency() {
-        getSelectedCurrency().flatMap(selected ->
-            new CurrencyDialog(this, selected).showAndWait()).ifPresent(c -> getDao().updateCurrency(c));
+        getSelectedCurrency()
+            .flatMap(selected ->
+                new CurrencyDialog(this, options().getDialogCssFileUrl(), selected).showAndWait())
+            .ifPresent(c -> getDao().updateCurrency(c));
     }
 }

@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.cells;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.cells;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
@@ -21,7 +20,7 @@ public class AccountInterestCell extends TableCell<Account, BigDecimal> {
         if (empty || interest == null || interest.compareTo(BigDecimal.ZERO) == 0) {
             setText("");
         } else {
-            setText(interest.setScale(2, RoundingMode.HALF_UP).toString() + "%");
+            setText(interest.setScale(2, RoundingMode.HALF_UP) + "%");
         }
     }
 }

@@ -19,6 +19,7 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.model.Currency;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -48,8 +49,8 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
     private final CheckBox thousandSeparatorCheck = newCheckBox(RB, "currency.Dialog.ShowSeparator");
 
-    CurrencyDialog(Controller owner, Currency currency) {
-        super(owner, MainWindowController.CSS_PATH);
+    CurrencyDialog(Controller owner, URL css, Currency currency) {
+        super(owner, css);
 
         setTitle(RB.getString("Currency"));
 

@@ -27,10 +27,12 @@ import org.panteleyev.money.app.cells.AccountBalanceCell;
 import org.panteleyev.money.app.cells.AccountCardCell;
 import org.panteleyev.money.app.cells.AccountCategoryCell;
 import org.panteleyev.money.app.cells.AccountClosingDateCell;
+import org.panteleyev.money.app.cells.AccountCommentCell;
 import org.panteleyev.money.app.cells.AccountInterestCell;
 import org.panteleyev.money.app.cells.AccountNameCell;
 import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Currency;
@@ -62,6 +64,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.Constants.SHORTCUT_R;
 import static org.panteleyev.money.app.Constants.SHORTCUT_T;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Predicates.activeAccount;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -210,8 +213,8 @@ final class AccountWindowController extends BaseController {
             tableObjectColumn(fxString(RB, "column.closing.date"), b ->
                 b.withCellFactory(x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()))
                     .withWidthBinding(w.multiply(0.05))),
-            tableColumn(fxString(RB, "Comment"), b ->
-                b.withPropertyCallback(Account::comment).withWidthBinding(w.multiply(0.3))),
+            tableObjectColumn(fxString(RB, "Comment"), b ->
+                b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.3))),
             tableObjectColumn(fxString(RB, "Balance"), b ->
                 b.withCellFactory(x -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
             tableObjectColumn(fxString(RB, "Waiting"), b ->
@@ -260,7 +263,7 @@ final class AccountWindowController extends BaseController {
             .flatMap(account -> cache().getCategory(account.categoryUuid()))
             .orElse(null);
 
-        new AccountDialog(this, initialCategory)
+        new AccountDialog(this, options().getDialogCssFileUrl(), initialCategory)
             .showAndWait()
             .ifPresent(account -> {
                 getDao().insertAccount(account);
@@ -270,7 +273,7 @@ final class AccountWindowController extends BaseController {
     }
 
     private void onEditAccount() {
-        getSelectedAccount().flatMap(account -> new AccountDialog(this, account, null)
+        getSelectedAccount().flatMap(account -> new AccountDialog(this, options().getDialogCssFileUrl(), account, null)
             .showAndWait())
             .ifPresent(account -> {
                 getDao().updateAccount(account);

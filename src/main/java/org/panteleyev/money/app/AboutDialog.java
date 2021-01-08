@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Bundles.BUILD_INFO_BUNDLE;
+import static org.panteleyev.money.app.options.Options.options;
 
 final class AboutDialog extends BaseDialog {
     static final String APP_TITLE = "Money Manager";
@@ -23,7 +24,7 @@ final class AboutDialog extends BaseDialog {
         "Copyright © 2016, %d, Petr Panteleyev", LocalDate.now().getYear());
 
     AboutDialog(Controller owner) {
-        super(owner, MainWindowController.CSS_PATH);
+        super(owner, options().getDialogCssFileUrl());
 
         setTitle(APP_TITLE);
 

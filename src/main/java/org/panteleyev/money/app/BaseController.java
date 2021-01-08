@@ -13,20 +13,21 @@ import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
-import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 
 public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
 
     BaseController() {
-        super(CSS_PATH.toString());
+        super(options().getMainCssFilePath());
     }
 
     protected BaseController(Stage stage, String css) {

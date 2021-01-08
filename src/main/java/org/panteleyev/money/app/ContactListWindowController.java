@@ -42,6 +42,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_F;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -142,13 +143,15 @@ class ContactListWindowController extends BaseController {
     }
 
     private void onAddContact() {
-        new ContactDialog(this, null).showAndWait()
+        new ContactDialog(this, options().getDialogCssFileUrl(), null).showAndWait()
             .ifPresent(c -> getDao().insertContact(c));
     }
 
     private void onEditContact() {
-        getSelectedContact().flatMap(selected ->
-            new ContactDialog(this, selected).showAndWait()).ifPresent(c -> getDao().updateContact(c));
+        getSelectedContact()
+            .flatMap(selected ->
+                new ContactDialog(this, options().getDialogCssFileUrl(), selected).showAndWait())
+            .ifPresent(c -> getDao().updateContact(c));
     }
 
     private void onTableMouseClick(Event event) {

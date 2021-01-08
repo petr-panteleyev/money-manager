@@ -1,9 +1,8 @@
-package org.panteleyev.money.app.cells;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.cells;
 
 import javafx.embed.swing.JFXPanel;
 import org.panteleyev.money.model.Account;
@@ -12,7 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.time.LocalDate;
-import static org.panteleyev.money.app.Styles.RED_TEXT;
+import static org.panteleyev.money.app.Styles.EXPIRED;
 import static org.testng.Assert.assertEquals;
 
 public class AccountClosingDateCellTest {
@@ -48,6 +47,6 @@ public class AccountClosingDateCellTest {
             .build();
 
         cell.updateItem(account, false);
-        assertEquals(cell.getStyleClass().contains(RED_TEXT), hasRedColor);
+        assertEquals(cell.getStyleClass().contains(EXPIRED), hasRedColor);
     }
 }

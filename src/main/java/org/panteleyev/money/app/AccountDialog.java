@@ -27,8 +27,8 @@ import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -69,20 +69,20 @@ class AccountDialog extends BaseDialog<Account> {
 
     private final Collection<Category> categories;
 
-    AccountDialog(Controller owner, Category initialCategory) {
-        this(owner, null, initialCategory, cache());
+    AccountDialog(Controller owner, URL css, Category initialCategory) {
+        this(owner, css, null, initialCategory, cache());
     }
 
-    AccountDialog(Controller owner, Category initialCategory, DataCache cache) {
-        this(owner, null, initialCategory, cache);
+    AccountDialog(Controller owner, URL css, Category initialCategory, DataCache cache) {
+        this(owner, css, null, initialCategory, cache);
     }
 
-    AccountDialog(Controller owner, Account account, Category initialCategory) {
-        this(owner, account, initialCategory, cache());
+    AccountDialog(Controller owner, URL css, Account account, Category initialCategory) {
+        this(owner, css, account, initialCategory, cache());
     }
 
-    AccountDialog(Controller owner, Account account, Category initialCategory, DataCache cache) {
-        super(owner, MainWindowController.CSS_PATH);
+    AccountDialog(Controller owner, URL css, Account account, Category initialCategory, DataCache cache) {
+        super(owner, css);
 
         setTitle(RB.getString("account.Dialog.Title"));
 

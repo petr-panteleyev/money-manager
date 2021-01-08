@@ -17,6 +17,7 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
@@ -58,7 +59,7 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 class RequestWindowController extends BaseController {
     private final Account account;
 
-    private final TransactionTableView table = new TransactionTableView(TransactionTableView.Mode.QUERY);
+    private final TransactionTableView table;
 
     private final AccountSelectionBox accBox = new AccountSelectionBox();
     private final TransactionFilterBox transactionFilterBox = new TransactionFilterBox(true, true);
@@ -81,6 +82,10 @@ class RequestWindowController extends BaseController {
 
     RequestWindowController(Account account) {
         this.account = account;
+
+        table = account == null ?
+            new TransactionTableView(TransactionTableView.Mode.QUERY) :
+            new TransactionTableView(account);
 
         filterProperty = PredicateProperty.and(List.of(
             account == null ? accBox.predicateProperty() : new PredicateProperty<>(transactionByAccount(account.uuid())),

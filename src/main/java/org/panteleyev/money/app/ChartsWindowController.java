@@ -13,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;

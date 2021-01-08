@@ -6,9 +6,9 @@ package org.panteleyev.money.app.cells;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
+import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import static org.panteleyev.money.app.Styles.RED_TEXT;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class AccountBalanceCell extends TableCell<Account, Account> {
@@ -23,6 +23,7 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
         super.updateItem(account, empty);
 
         setAlignment(Pos.CENTER_RIGHT);
+        getStyleClass().removeAll(Styles.CREDIT, Styles.DEBIT);
 
         if (empty || account == null) {
             setText("");
@@ -33,10 +34,9 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
                 .map(curr -> curr.formatValue(sum))
                 .orElse(Currency.defaultFormatValue(sum)));
 
-            getStyleClass().remove(RED_TEXT);
-            if (sum.signum() < 0) {
-                getStyleClass().add(RED_TEXT);
-            }
+            getStyleClass().add(
+                sum.signum() < 0 ? Styles.DEBIT : Styles.CREDIT
+            );
         }
     }
 }

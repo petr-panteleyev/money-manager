@@ -16,6 +16,7 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -48,8 +49,8 @@ import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.Styles.GREEN_TEXT;
-import static org.panteleyev.money.app.Styles.RED_TEXT;
+import static org.panteleyev.money.app.Styles.CREDIT;
+import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
@@ -118,7 +119,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         @Override
         protected void updateItem(TreeNode treeNode, boolean empty) {
             super.updateItem(treeNode, empty);
-            getStyleClass().removeAll(RED_TEXT, GREEN_TEXT);
+            getStyleClass().removeAll(DEBIT, CREDIT);
             setAlignment(Pos.CENTER_RIGHT);
             setText("");
 
@@ -128,10 +129,10 @@ class IncomesAndExpensesWindowController extends BaseController {
 
             setText(treeNode.getAmount().setScale(2, RoundingMode.HALF_UP).toString());
             if (treeNode.isExpenseRootNode()) {
-                getStyleClass().add(RED_TEXT);
+                getStyleClass().add(DEBIT);
             }
             if (treeNode.isIncomeRootNode()) {
-                getStyleClass().add(GREEN_TEXT);
+                getStyleClass().add(CREDIT);
             }
         }
     }
@@ -150,8 +151,8 @@ class IncomesAndExpensesWindowController extends BaseController {
     public IncomesAndExpensesWindowController() {
         setupReportTable();
 
-        incomeValueText.getStyleClass().add(GREEN_TEXT);
-        expenseValueText.getStyleClass().add(RED_TEXT);
+        incomeValueText.getStyleClass().add(DEBIT);
+        expenseValueText.getStyleClass().add(CREDIT);
 
         var toolBar = hBox(5.0,
             filterBox,
@@ -215,11 +216,11 @@ class IncomesAndExpensesWindowController extends BaseController {
         incomeValueText.setText(incomeSum.setScale(2, RoundingMode.HALF_UP).toString());
 
         var balance = incomeSum.subtract(expenseSum);
-        balanceValueText.getStyleClass().removeAll(RED_TEXT, GREEN_TEXT);
+        balanceValueText.getStyleClass().removeAll(DEBIT, CREDIT);
         if (balance.signum() < 0) {
-            balanceValueText.getStyleClass().add(RED_TEXT);
+            balanceValueText.getStyleClass().add(DEBIT);
         } else {
-            balanceValueText.getStyleClass().add(GREEN_TEXT);
+            balanceValueText.getStyleClass().add(CREDIT);
         }
         balanceValueText.setText(balance.setScale(2, RoundingMode.HALF_UP).toString());
 

@@ -19,6 +19,7 @@ import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -49,8 +50,8 @@ final class ContactDialog extends BaseDialog<Contact> {
     private final TextField zipField = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
 
-    ContactDialog(Controller owner, Contact contact) {
-        super(owner, MainWindowController.CSS_PATH);
+    ContactDialog(Controller owner, URL css, Contact contact) {
+        super(owner, css);
 
         setTitle(RB.getString("contact.Dialog.Title"));
 

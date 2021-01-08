@@ -22,6 +22,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.money.MoneyApplication;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.xml.Import;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,6 +39,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class ImportWizard extends BaseDialog<Object> {
@@ -168,7 +170,7 @@ final class ImportWizard extends BaseDialog<Object> {
     }
 
     ImportWizard() {
-        super(MainWindowController.CSS_PATH);
+        super(options().getDialogCssFileUrl());
         setTitle(RB.getString("word.Import"));
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);

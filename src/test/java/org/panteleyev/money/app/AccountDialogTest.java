@@ -1,9 +1,8 @@
-package org.panteleyev.money.app;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
@@ -156,7 +155,7 @@ public class AccountDialogTest extends BaseTest {
         BlockingQueue<Account> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new AccountDialog(null, category, cache);
+            var dialog = new AccountDialog(null, null, category, cache);
             setUserInput(dialog);
             var account = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(account);
@@ -183,7 +182,7 @@ public class AccountDialogTest extends BaseTest {
         BlockingQueue<Account> queue = new ArrayBlockingQueue<>(1);
 
         Platform.runLater(() -> {
-            var dialog = new AccountDialog(null, acc_1, null, cache);
+            var dialog = new AccountDialog(null, null, acc_1, null, cache);
             setUserInput(dialog, acc_2);
             var account = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(account);

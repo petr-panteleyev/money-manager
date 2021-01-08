@@ -140,7 +140,7 @@ public class TransactionDialogTest extends BaseTest {
     }
 
     private TransactionDialog createDialog() {
-        var dialog = new TransactionDialog(cache);
+        var dialog = new TransactionDialog(null, null, cache);
         callPrivateMethod(dialog, "onChangedTransactionTypes");
         callPrivateMethod(dialog, "setupContactMenu");
         callPrivateMethod(dialog, "setupAccountMenus");
@@ -149,7 +149,7 @@ public class TransactionDialogTest extends BaseTest {
     }
 
     private TransactionDialog createDialog(Transaction transaction) {
-        var dialog = new TransactionDialog(transaction, cache);
+        var dialog = new TransactionDialog(null, null, transaction, cache);
         callPrivateMethod(dialog, "onChangedTransactionTypes");
         callPrivateMethod(dialog, "setupContactMenu");
         callPrivateMethod(dialog, "setupAccountMenus");
@@ -158,7 +158,7 @@ public class TransactionDialogTest extends BaseTest {
     }
 
     private TransactionDialog createDialog(StatementRecord record) {
-        var dialog = new TransactionDialog(record, null, cache);
+        var dialog = new TransactionDialog(null, null, record, null, cache);
         callPrivateMethod(dialog, "onChangedTransactionTypes");
         callPrivateMethod(dialog, "setupContactMenu");
         callPrivateMethod(dialog, "setupAccountMenus");

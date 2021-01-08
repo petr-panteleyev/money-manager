@@ -21,6 +21,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
@@ -41,10 +42,8 @@ import static org.panteleyev.fx.ButtonFactory.buttonType;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.COLON;
-import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.Styles.GREEN_TEXT;
-import static org.panteleyev.money.app.Styles.RED_TEXT;
+import static org.panteleyev.money.app.options.Options.options;
 
 class ConnectionProfilesEditor extends BaseDialog<Object> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -72,7 +71,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     };
 
     ConnectionProfilesEditor(ConnectionProfileManager profileManager, boolean useEncryption) {
-        super(CSS_PATH);
+        super(options().getDialogCssFileUrl());
 
         Objects.requireNonNull(profileManager);
 
@@ -234,16 +233,14 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void testSuccess() {
         Platform.runLater(() -> {
             testStatusLabel.setText("Success");
-            testStatusLabel.getStyleClass().remove(RED_TEXT);
-            testStatusLabel.getStyleClass().add(GREEN_TEXT);
+            testStatusLabel.textFillProperty().set(Color.GREEN);
         });
     }
 
     private void testFail(String txt) {
         Platform.runLater(() -> {
             testStatusLabel.setText(txt != null ? txt : "");
-            testStatusLabel.getStyleClass().remove(GREEN_TEXT);
-            testStatusLabel.getStyleClass().add(RED_TEXT);
+            testStatusLabel.textFillProperty().set(Color.RED);
         });
     }
 

@@ -31,6 +31,7 @@ import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
 import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
@@ -67,6 +68,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_K;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -218,7 +220,7 @@ class StatementWindowController extends BaseController {
 
     void onNewTransaction(StatementRecord statementRecord) {
         var account = accountComboBox.getSelectionModel().getSelectedItem();
-        new TransactionDialog(statementRecord, account, cache()).showAndWait()
+        new TransactionDialog(this, options().getDialogCssFileUrl(), statementRecord, account, cache()).showAndWait()
             .ifPresent(builder -> getDao().insertTransaction(builder));
     }
 

@@ -24,7 +24,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.app.BaseCompletionProvider;
-import org.panteleyev.money.app.Options;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.ToStringConverter;

@@ -16,8 +16,8 @@ import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.COLON;
-import static org.panteleyev.money.app.MainWindowController.CSS_PATH;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 
 public class ConnectDialog extends BaseDialog<ConnectionProfile> {
@@ -28,7 +28,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private final ConnectionProfileManager profileManager;
 
     public ConnectDialog(ConnectionProfileManager profileManager) {
-        super(CSS_PATH);
+        super(options().getDialogCssFileUrl());
         Objects.requireNonNull(profileManager);
 
         this.profileManager = profileManager;

@@ -61,7 +61,7 @@ public class ContactDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Contact>(1);
 
         Platform.runLater(() -> {
-            var dialog = new ContactDialog(null, null);
+            var dialog = new ContactDialog(null, null, null);
             setupDialog(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
@@ -79,7 +79,7 @@ public class ContactDialogTest extends BaseTest {
         var queue = new ArrayBlockingQueue<Contact>(1);
 
         Platform.runLater(() -> {
-            var dialog = new ContactDialog(null, CONTACT);
+            var dialog = new ContactDialog(null, null, CONTACT);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
         });

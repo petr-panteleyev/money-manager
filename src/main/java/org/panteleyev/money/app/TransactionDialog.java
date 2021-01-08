@@ -26,6 +26,8 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -38,6 +40,7 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.statements.StatementRecord;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -169,7 +172,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         return ValidationResult.fromErrorIf(control, null, invalid && !control.isDisabled());
     };
 
-    TransactionDialog(DataCache cache) {
+    TransactionDialog(Controller owner, URL css, DataCache cache) {
+        super(owner, css);
+
         this.cache = cache;
 
         setupDatePicker();
@@ -300,8 +305,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         });
     }
 
-    TransactionDialog(Transaction transaction, DataCache cache) {
-        this(cache);
+    TransactionDialog(Controller owner, URL css, Transaction transaction, DataCache cache) {
+        this(owner, css, cache);
 
         uuid = transaction.uuid();
 
@@ -357,8 +362,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         updateRateAmount();
     }
 
-    TransactionDialog(StatementRecord record, Account account, DataCache cache) {
-        this(cache);
+    TransactionDialog(Controller owner, URL css, StatementRecord record, Account account, DataCache cache) {
+        this(owner, css, cache);
 
         datePicker.setValue(record.getActual());
 

@@ -44,6 +44,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_F;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -147,12 +148,15 @@ final class CategoryWindowController extends BaseController {
     }
 
     private void onMenuEdit() {
-        getSelectedCategory().flatMap(category ->
-            new CategoryDialog(this, category).showAndWait()).ifPresent(c -> getDao().updateCategory(c));
+        getSelectedCategory()
+            .flatMap(category ->
+                new CategoryDialog(this, options().getDialogCssFileUrl(), category).showAndWait())
+            .ifPresent(c -> getDao().updateCategory(c));
     }
 
     private void onMenuAdd() {
-        new CategoryDialog(this, null).showAndWait().ifPresent(c -> getDao().insertCategory(c));
+        new CategoryDialog(this, options().getDialogCssFileUrl(), null).showAndWait()
+            .ifPresent(c -> getDao().insertCategory(c));
     }
 
     private void updatePredicate() {

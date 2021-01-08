@@ -9,15 +9,14 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.MainWindowController;
-import org.panteleyev.money.app.Options;
 import org.panteleyev.mysqlapi.MySqlClient;
-import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import static org.panteleyev.money.app.options.Options.options;
 
 public class MoneyApplication extends Application {
     private final static Logger LOGGER = Logger.getLogger(MoneyApplication.class.getName());
@@ -30,16 +29,19 @@ public class MoneyApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         MySqlClient.addReads(List.of(MoneyApplication.class.getModule()));
 
+        options().initialize();
+        options().loadFontOptions();
+        options().loadColorOptions();
+        options().generateCssFiles();
+
         application = this;
 
-        if (initLogDirectory()) {
-            var formatProperty = System.getProperty(FORMAT_PROP);
-            if (formatProperty == null) {
-                System.setProperty(FORMAT_PROP, FORMAT);
-            }
-            LogManager.getLogManager()
-                .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
+        var formatProperty = System.getProperty(FORMAT_PROP);
+        if (formatProperty == null) {
+            System.setProperty(FORMAT_PROP, FORMAT);
         }
+        LogManager.getLogManager()
+            .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 
@@ -56,13 +58,6 @@ public class MoneyApplication extends Application {
         });
     }
 
-    private static boolean initLogDirectory() {
-        var optionsDir = Options.getSettingsDirectory();
-        var logDir = new File(optionsDir, "logs");
-
-        return logDir.exists() ? logDir.isDirectory() : logDir.mkdir();
-    }
-
     public static void main(String[] args) {
         Application.launch(MoneyApplication.class, args);
     }
@@ -73,5 +68,9 @@ public class MoneyApplication extends Application {
 
     public static String generateFileName() {
         return generateFileName("Money");
+    }
+
+    public static void generateMainCssFile() {
+
     }
 }

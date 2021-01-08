@@ -36,6 +36,8 @@ import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
 import org.panteleyev.money.app.database.ConnectionProfileManager;
 import org.panteleyev.money.app.icons.IconWindowController;
+import org.panteleyev.money.app.options.Options;
+import org.panteleyev.money.app.options.OptionsDialog;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
@@ -46,7 +48,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
@@ -78,6 +79,7 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_E;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -85,7 +87,6 @@ public class MainWindowController extends BaseController implements TransactionT
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
     private static final String UI_BUNDLE_PATH = "org.panteleyev.money.app.res.ui";
-    public static final URL CSS_PATH = MainWindowController.class.getResource("/org/panteleyev/money/app/res/main.css");
 
     public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
 
@@ -105,7 +106,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final Spinner<Integer> yearSpinner = new Spinner<>();
 
     private final TransactionTableView transactionTable =
-        new TransactionTableView(TransactionTableView.Mode.ACCOUNT, this,
+        new TransactionTableView(TransactionTableView.Mode.SUMMARY, this,
             this::goToTransaction, this::goToTransaction);
 
     @SuppressWarnings("FieldCanBeLocal")
@@ -124,7 +125,7 @@ public class MainWindowController extends BaseController implements TransactionT
     };
 
     public MainWindowController(Stage stage) {
-        super(stage, CSS_PATH.toString());
+        super(stage, options().getMainCssFilePath());
 
         profileManager.loadProfiles();
 

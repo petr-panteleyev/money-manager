@@ -17,6 +17,7 @@ import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -39,8 +40,8 @@ final class CategoryDialog extends BaseDialog<Category> {
     private final TextField commentEdit = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
 
-    CategoryDialog(Controller owner, Category category) {
-        super(owner, MainWindowController.CSS_PATH);
+    CategoryDialog(Controller owner, URL css, Category category) {
+        super(owner, css);
 
         setTitle(RB.getString("Category"));
 

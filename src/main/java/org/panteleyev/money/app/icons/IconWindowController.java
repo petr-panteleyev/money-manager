@@ -24,7 +24,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.BaseController;
-import org.panteleyev.money.app.MainWindowController;
 import org.panteleyev.money.model.Icon;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -42,6 +41,7 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -73,7 +73,7 @@ public final class IconWindowController extends BaseController {
     private final SelectionModel<Icon> selectionModel = new IconSelectionModel();
 
     public IconWindowController() {
-        super(new Stage(), MainWindowController.CSS_PATH.toString());
+        super(new Stage(), options().getMainCssFilePath());
 
         var menuBar = menuBar(
             newMenu(fxString(RB, "File"),

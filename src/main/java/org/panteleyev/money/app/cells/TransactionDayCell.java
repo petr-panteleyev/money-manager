@@ -1,15 +1,14 @@
-package org.panteleyev.money.app.cells;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.app.cells;
 
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
 
 public class TransactionDayCell extends TableCell<Transaction, Transaction> {
-    private boolean fullDate;
+    private final boolean fullDate;
 
     public TransactionDayCell(boolean fullDate) {
         this.fullDate = fullDate;
