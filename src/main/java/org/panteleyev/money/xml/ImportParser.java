@@ -256,6 +256,7 @@ class ImportParser extends DefaultHandler {
             .parentUuid(parseUuid(tags.get("parentUuid")))
             .detailed(parseBoolean(tags.get("detailed"), false))
             .guid(UUID.fromString(tags.get("guid")))
+            .statementDate(parseLocalDate(tags.get("statementDate"), null))
             .created(created)
             .modified(modified)
             .build();

@@ -8,7 +8,7 @@ Personal finance manager. Work in progress.
 
 ## Build
 
-Configure [Maven toolchain](http://maven.apache.org/guides/mini/guide-using-toolchains.html) to provide ```jdk``` version ```15```.
+Make sure ```JAVA_HOME``` is set to JDK 15.
 
 ```shell script
 $ mvn clean package
@@ -32,10 +32,9 @@ environment variable
 * Execute the following commands:
 
 ```shell script
-$ mvn clean package
-$ mvn jpackage:jpackage@mac
+$ mvn clean package jpackage:jpackage@mac
   or
-$ mvn jpackage:jpackage@win
+$ mvn clean package jpackage:jpackage@win
 ```
 
 Installation package will be found in ```target/dist``` directory.

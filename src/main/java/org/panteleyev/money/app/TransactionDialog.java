@@ -142,6 +142,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private final Label rateAmoutLabel = new Label();
     private final Label debitedCategoryLabel = new Label();
     private final Label creditedCategoryLabel = new Label();
+    private final DatePicker statementDatePicker = new DatePicker();
 
     private final MenuButton typeMenuButton = new MenuButton();
     private final MenuButton debitedMenuButton = new MenuButton();
@@ -231,7 +232,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     vBox(SMALL_SPACING, label(fxString(RB, "Comment")), commentEdit),
                     hBoxHGrow(ALWAYS)
                 ),
-                vBox(SMALL_SPACING, label(fxString(RB, "Invoice")), invoiceNumberEdit)
+                vBox(SMALL_SPACING, label(fxString(RB, "Invoice")), invoiceNumberEdit),
+                vBox(SMALL_SPACING, label(fxString(RB, "Statement_Date")), statementDatePicker)
             )
         );
 
@@ -356,6 +358,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         // Day
         var trDate = LocalDate.of(transaction.year(), transaction.month(), transaction.day());
         datePicker.setValue(trDate);
+
+        statementDatePicker.setValue(transaction.statementDate());
 
         // Sum
         sumEdit.setText(transaction.amount().setScale(2, RoundingMode.HALF_UP).toString());
@@ -532,6 +536,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         builder.comment(commentEdit.getText());
         builder.checked(checkedCheckBox.isSelected());
         builder.invoiceNumber(invoiceNumberEdit.getText());
+        builder.statementDate(statementDatePicker.getValue());
 
         try {
             builder.day(datePicker.getValue().getDayOfMonth());

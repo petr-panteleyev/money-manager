@@ -125,7 +125,7 @@
             <xsd:element name="openingBalance" type="xsd:decimal"/>
             <xsd:element name="type" type="CategoryType"/>
             <xsd:element name="interest" type="xsd:decimal"/>
-            <xsd:element name="closingDate" type="Timestamp"/>
+            <xsd:element name="closingDate" type="xsd:long" minOccurs="0"/>
             <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="cardType" type="xsd:string" minOccurs="0"/>
             <xsd:element name="cardNumber" type="xsd:string" minOccurs="0"/>
@@ -210,6 +210,7 @@
             <xsd:element name="modified" type="Timestamp"/>
             <xsd:element name="parentUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="detailed" type="xsd:boolean"/>
+            <xsd:element name="statementDate" type="xsd:long"/>
         </xsd:all>
     </xsd:complexType>
 

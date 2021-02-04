@@ -307,6 +307,7 @@ public class Export {
         appendTextNode(e, "modified", t.modified());
         appendTextNode(e, "parentUuid", t.parentUuid());
         appendTextNode(e, "detailed", t.detailed());
+        appendTextNode(e, "statementDate", t.statementDate());
 
         return e;
     }

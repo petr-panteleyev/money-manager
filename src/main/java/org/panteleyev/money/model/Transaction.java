@@ -63,16 +63,23 @@ public record Transaction(
     UUID parentUuid,
     @Column("detailed")
     boolean detailed,
+    @Column("statement_date")
+    LocalDate statementDate,
     @Column("created")
     long created,
     @Column("modified")
     long modified
 
-) implements MoneyRecord {
+) implements MoneyRecord
+{
 
     public Transaction {
         amount = MoneyRecord.normalize(amount);
         rate = MoneyRecord.normalize(rate);
+
+        if (statementDate == null) {
+            statementDate = LocalDate.of(year, month, day);
+        }
     }
 
     public BigDecimal getSignedAmount() {
@@ -122,6 +129,7 @@ public record Transaction(
         private UUID parentUuid;
         private boolean detailed = false;
         private String newContactName;
+        private LocalDate statementDate;
 
         public Builder() {
         }
@@ -153,6 +161,7 @@ public record Transaction(
             this.parentUuid = t.parentUuid();
             this.detailed = t.detailed();
             this.uuid = t.uuid();
+            this.statementDate = t.statementDate();
         }
 
         public UUID getUuid() {
@@ -298,6 +307,11 @@ public record Transaction(
             return this;
         }
 
+        public Builder statementDate(LocalDate statementDate) {
+            this.statementDate = statementDate;
+            return this;
+        }
+
         public Transaction build() {
             if (this.type == null) {
                 this.type = TransactionType.UNDEFINED;
@@ -322,7 +336,7 @@ public record Transaction(
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    rate, rateDirection, invoiceNumber, parentUuid, detailed, created, modified);
+                    rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
             } else {
                 throw new IllegalStateException();
             }

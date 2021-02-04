@@ -1,9 +1,8 @@
-package org.panteleyev.money.statements;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.statements;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
@@ -43,9 +42,10 @@ public class StatementPredicate implements Predicate<Transaction> {
     }
 
     private boolean compareDate(LocalDate date, Transaction transaction) {
-        return transaction.day() == date.getDayOfMonth()
+        return (transaction.day() == date.getDayOfMonth()
             && transaction.month() == date.getMonthValue()
-            && transaction.year() == date.getYear();
+            && transaction.year() == date.getYear()
+        ) || Objects.equals(transaction.statementDate(), date);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
