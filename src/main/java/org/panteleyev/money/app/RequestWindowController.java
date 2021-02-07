@@ -7,6 +7,7 @@ package org.panteleyev.money.app;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
@@ -66,6 +67,7 @@ class RequestWindowController extends BaseController {
     private final ContactFilterBox contactFilterBox = new ContactFilterBox();
     private final TextField sumField = new TextField();
 
+    private final PredicateProperty<Transaction> uncheckedPredicate = new PredicateProperty<>();
     private final PredicateProperty<Transaction> filterProperty;
 
     private final TreeSet<String> contactSuggestions = new TreeSet<>();
@@ -87,10 +89,16 @@ class RequestWindowController extends BaseController {
             new TransactionTableView(TransactionTableView.Mode.QUERY) :
             new TransactionTableView(account);
 
+        var uncheckedOnlyCheckBox = new CheckBox(fxString(RB, "Unchecked_Only"));
+        uncheckedOnlyCheckBox.selectedProperty().addListener(
+            (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
+        );
+
         filterProperty = PredicateProperty.and(List.of(
             account == null ? accBox.predicateProperty() : new PredicateProperty<>(transactionByAccount(account.uuid())),
             transactionFilterBox.predicateProperty(),
-            contactFilterBox.predicateProperty()
+            contactFilterBox.predicateProperty(),
+            uncheckedPredicate
         ));
 
         var filterBox = hBox(5.0,
@@ -98,6 +106,7 @@ class RequestWindowController extends BaseController {
             transactionFilterBox,
             label(fxString(RB, "Counterparty", COLON)),
             contactFilterBox.getTextField(),
+            uncheckedOnlyCheckBox,
             fxNode(new Region(), hBoxHGrow(ALWAYS)),
             label(fxString(RB, "Sum", COLON)),
             sumField

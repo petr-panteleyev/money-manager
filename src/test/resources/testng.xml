@@ -15,12 +15,6 @@
             <class name="org.panteleyev.money.app.cells.AccountClosingDateCellTest"/>
         </classes>
     </test>
-    <test name="Yandex Money">
-        <classes>
-            <class name="org.panteleyev.money.ymoney.TestAuthResponse"/>
-            <class name="org.panteleyev.money.ymoney.TestClientId"/>
-        </classes>
-    </test>
     <test name="XML">
         <classes>
             <class name="org.panteleyev.money.xml.TestXsdNegative"/>

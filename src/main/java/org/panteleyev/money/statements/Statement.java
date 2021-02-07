@@ -11,10 +11,7 @@ public record Statement(StatementType type, String accountNumber, List<Statement
     public enum StatementType {
         UNKNOWN,
         RAIFFEISEN_OFX,
-        SBERBANK_HTML,
-        YANDEX_MONEY,
-        YANDEX_MONEY_CSV,
-        ALFA_BANK_CSV
+        SBERBANK_HTML
     }
 
     public Statement {

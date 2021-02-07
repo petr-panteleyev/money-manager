@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.2.0</version>
+    <version>21.3.0</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -38,7 +38,6 @@
         <jsoupVersion>1.13.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
-        <commonsCsvVersion>1.8</commonsCsvVersion>
         <testNgVersion>7.3.0</testNgVersion>
         <!-- Test properties -->
         <money.test.mysql.host>localhost</money.test.mysql.host>
@@ -124,11 +123,6 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-graphics</artifactId>
             <version>${javaFxVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>${commonsCsvVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.freemarker</groupId>

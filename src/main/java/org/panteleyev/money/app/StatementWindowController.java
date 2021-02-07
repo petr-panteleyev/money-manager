@@ -5,7 +5,6 @@
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
@@ -14,18 +13,15 @@ import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
@@ -49,10 +45,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -66,6 +60,7 @@ import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.Constants.SHORTCUT_K;
 import static org.panteleyev.money.app.Constants.SHORTCUT_N;
+import static org.panteleyev.money.app.Constants.SHORTCUT_O;
 import static org.panteleyev.money.app.Constants.SHORTCUT_U;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.options.Options.options;
@@ -73,35 +68,12 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class StatementWindowController extends BaseController {
-    private static final ResourceBundle SOURCE_TYPE_RB =
-        ResourceBundle.getBundle("org.panteleyev.money.app.res.SourceType");
-
-    private enum SourceType {
-        FILE,
-        YANDEX_MONEY;
-
-        public String toString() {
-            return SOURCE_TYPE_RB.getString(name());
-        }
-    }
-
     private final TableView<StatementRecord> statementTable = createStatementTable();
     private final TransactionTableView transactionTable = new TransactionTableView(TransactionTableView.Mode.STATEMENT);
     private final Label ymAccountBalanceLabel = new Label();
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();
-    private final TextField statementFileEdit = new TextField();
     private final CheckBox ignoreExecutionDate = newCheckBox(RB, "check.IgnoreExecutionDate");
-
-    private final YandexMoneyClient yandexMoneyClient = new YandexMoneyClient(Options.getYandexMoneyToken());
-
-    private final DatePicker ymFromPicker = new DatePicker(LocalDate.now().minusMonths(3));
-    private final DatePicker ymToPicker = new DatePicker(LocalDate.now());
-    private final ComboBox<Integer> limitComboBox =
-        new ComboBox<>(FXCollections.observableArrayList(100, 75, 50, 25));
-
-    private final ComboBox<SourceType> sourceTypeComboBox =
-        new ComboBox<>(FXCollections.observableArrayList(SourceType.values()));
 
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Account> accountListener = c -> Platform.runLater(this::setupAccountComboBox);
@@ -113,10 +85,6 @@ class StatementWindowController extends BaseController {
         new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
     private static final FileChooser.ExtensionFilter SBERBANK_HTML =
         new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
-    private static final FileChooser.ExtensionFilter YANDEX_CSV =
-        new FileChooser.ExtensionFilter("Yandex Money Statement", "*.csv");
-    private static final FileChooser.ExtensionFilter ALFA_CSV =
-        new FileChooser.ExtensionFilter("AlfaBank Statement", "*.csv");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
@@ -124,36 +92,6 @@ class StatementWindowController extends BaseController {
 
     StatementWindowController() {
         var root = new BorderPane();
-
-        sourceTypeComboBox.getSelectionModel().select(0);
-
-        // File load controls
-        var fileLoadControls = hBox(5.0,
-            statementFileEdit,
-            button("...", x -> onBrowse())
-        );
-        fileLoadControls.visibleProperty().bind(
-            sourceTypeComboBox.getSelectionModel().selectedItemProperty().isEqualTo(SourceType.FILE));
-        fileLoadControls.setAlignment(Pos.CENTER_LEFT);
-        ////////////////////////////////////////////////////////
-
-        // Yandex Money controls
-        var ymAuthButton = button("Authorize...", x -> yandexMoneyClient.authorize());
-
-        limitComboBox.getSelectionModel().selectFirst();
-        var yandexMoneyControls = hBox(5.0,
-            ymAuthButton,
-            ymFromPicker,
-            new Label(" - "),
-            ymToPicker,
-            limitComboBox);
-        yandexMoneyControls.setAlignment(Pos.CENTER_LEFT);
-
-        yandexMoneyControls.visibleProperty().bind(
-            sourceTypeComboBox.getSelectionModel().selectedItemProperty().isEqualTo(SourceType.YANDEX_MONEY));
-        ////////////////////////////////////////////////////////
-
-        var stackPane = new StackPane(fileLoadControls, yandexMoneyControls);
 
         var balanceBox = hBox(5.0,
             label(fxString(RB, "label.StatementBalance")),
@@ -165,7 +103,6 @@ class StatementWindowController extends BaseController {
         var hBox = hBox(5.0,
             label(fxString(RB, "label.Account")),
             accountComboBox,
-            button(fxString(RB, "button.Load"), x -> onLoad()),
             button(fxString(RB, "button.Clear"), x -> onClear()),
             ignoreExecutionDate,
             filler1,
@@ -173,7 +110,6 @@ class StatementWindowController extends BaseController {
         );
         HBox.setHgrow(filler1, Priority.ALWAYS);
 
-        statementFileEdit.setPrefColumnCount(40);
         hBox.setAlignment(Pos.CENTER_LEFT);
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
@@ -181,17 +117,10 @@ class StatementWindowController extends BaseController {
         splitPane.setOrientation(Orientation.VERTICAL);
         splitPane.setDividerPosition(0, 0.9);
 
-        //transactionTable.setFocusTraversable(false);
-
         accountComboBox.setConverter(new ReadOnlyNamedConverter<>());
 
-        var lowerBox = hBox(5.0, sourceTypeComboBox, stackPane);
-
-        var toolBar = vBox(5.0, lowerBox, hBox);
-        BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
-
         var centerBox = new BorderPane();
-        centerBox.setTop(toolBar);
+        centerBox.setTop(hBox);
         centerBox.setCenter(splitPane);
 
         root.setTop(createMainMenu());
@@ -241,6 +170,8 @@ class StatementWindowController extends BaseController {
     private MenuBar createMainMenu() {
         return menuBar(
             newMenu(fxString(RB, "File"),
+                menuItem(fxString(RB, "Open", ELLIPSIS), SHORTCUT_O, event -> onBrowse()),
+                new SeparatorMenuItem(),
                 menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
                 menuItem(fxString(RB, "Close"), event -> onClose())),
@@ -284,14 +215,16 @@ class StatementWindowController extends BaseController {
         );
     }
 
+    private void setTitle(String title) {
+        getStage().setTitle(title);
+    }
+
     private void onBrowse() {
         var chooser = new FileChooser();
         chooser.setTitle(RB.getString("Statement"));
         chooser.getExtensionFilters().addAll(
             OFX_EXTENSION,
-            SBERBANK_HTML,
-            YANDEX_CSV,
-            ALFA_CSV
+            SBERBANK_HTML
         );
 
         var lastDirString = Options.getLastStatementDir();
@@ -303,49 +236,33 @@ class StatementWindowController extends BaseController {
         }
 
         var selected = chooser.showOpenDialog(null);
-        if (selected != null) {
-            var filter = chooser.getSelectedExtensionFilter();
-            if (OFX_EXTENSION.equals(filter)) {
-                statementType = Statement.StatementType.RAIFFEISEN_OFX;
-            } else if (SBERBANK_HTML.equals(filter)) {
-                statementType = Statement.StatementType.SBERBANK_HTML;
-            } else if (YANDEX_CSV.equals(filter)) {
-                statementType = Statement.StatementType.YANDEX_MONEY_CSV;
-            } else if (ALFA_CSV.equals(filter)) {
-                statementType = Statement.StatementType.ALFA_BANK_CSV;
-            } else {
-                statementType = Statement.StatementType.UNKNOWN;
-            }
-
-            var dir = selected.getParentFile();
-            Options.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath());
+        if (selected == null || !selected.exists()) {
+            return;
         }
 
-        statementFileEdit.setText(selected != null ? selected.getAbsolutePath() : "");
-    }
+        var filter = chooser.getSelectedExtensionFilter();
+        if (OFX_EXTENSION.equals(filter)) {
+            statementType = Statement.StatementType.RAIFFEISEN_OFX;
+        } else if (SBERBANK_HTML.equals(filter)) {
+            statementType = Statement.StatementType.SBERBANK_HTML;
+        } else {
+            statementType = Statement.StatementType.UNKNOWN;
+        }
 
-    private void onLoad() {
-        switch (getSourceType()) {
-            case FILE -> {
-                if (statementType.equals(Statement.StatementType.UNKNOWN)) {
-                    return;
-                }
-                var file = new File(statementFileEdit.getText());
-                if (!file.exists()) {
-                    return;
-                }
-                try (var in = new FileInputStream(file)) {
-                    var statement = StatementParser.parse(statementType, in);
-                    analyzeStatement(statement);
-                } catch (IOException ex) {
-                    throw new UncheckedIOException(ex);
-                }
-            }
-            case YANDEX_MONEY -> {
-                var statement = yandexMoneyClient.load(limitComboBox.getSelectionModel().getSelectedItem(),
-                    ymFromPicker.getValue(), ymToPicker.getValue());
-                analyzeStatement(statement);
-            }
+        var dir = selected.getParentFile();
+        Options.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath());
+
+        setTitle(getTitle() + " - " + selected.getAbsolutePath());
+
+        if (statementType.equals(Statement.StatementType.UNKNOWN)) {
+            return;
+        }
+
+        try (var in = new FileInputStream(selected)) {
+            var statement = StatementParser.parse(statementType, in);
+            analyzeStatement(statement);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 
@@ -359,13 +276,9 @@ class StatementWindowController extends BaseController {
     }
 
     private void onClear() {
-        statementFileEdit.setText("");
+        setTitle(getTitle());
         statementType = Statement.StatementType.UNKNOWN;
         statementTable.getItems().clear();
-    }
-
-    private SourceType getSourceType() {
-        return sourceTypeComboBox.getSelectionModel().getSelectedItem();
     }
 
     private void calculateTransactions() {

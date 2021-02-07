@@ -11,8 +11,6 @@ public final class StatementParser {
         return switch (type) {
             case RAIFFEISEN_OFX -> RBAParser.parseOfx(inStream);
             case SBERBANK_HTML -> SberbankParser.parseCreditCardHtml(inStream);
-            case YANDEX_MONEY_CSV -> YandexMoneyCsvParser.parseYandexMoneyCsv(inStream);
-            case ALFA_BANK_CSV -> AlfaCsvParser.parseAlfaCsvStatement(inStream);
             default -> throw new IllegalArgumentException();
         };
     }

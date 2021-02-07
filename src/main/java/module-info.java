@@ -20,7 +20,6 @@ open module org.panteleyev.money {
     requires com.google.gson;
     requires freemarker;
     requires org.jsoup;
-    requires commons.csv;
 
     requires mysql.connector.java;
 }
