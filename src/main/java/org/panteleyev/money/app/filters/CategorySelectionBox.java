@@ -5,7 +5,6 @@
 package org.panteleyev.money.app.filters;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
@@ -24,7 +23,6 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
@@ -158,7 +156,7 @@ public class CategorySelectionBox extends HBox {
             observableArrayList(
                 cache().getCategoriesByType(typeListItem.getTypes()).stream()
                     .sorted(Category.COMPARE_BY_NAME)
-                    .collect(Collectors.toList())
+                    .toList()
             );
 
         if (!items.isEmpty()) {

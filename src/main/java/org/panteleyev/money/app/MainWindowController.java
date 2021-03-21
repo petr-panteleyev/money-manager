@@ -62,7 +62,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.fxNode;
@@ -291,7 +290,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void closeChildWindows() {
         WINDOW_MANAGER.getControllerStream()
             .filter(c -> c != this)
-            .collect(Collectors.toList())
+            .toList()
             .forEach(c -> ((BaseController) c).onClose());
     }
 
@@ -396,7 +395,7 @@ public class MainWindowController extends BaseController implements TransactionT
             var filter = transactionTable.getTransactionFilter();
             var transactions = cache().getTransactions(filter)
                 .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
-                .collect(Collectors.toList());
+                .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

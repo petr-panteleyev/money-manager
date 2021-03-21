@@ -56,7 +56,7 @@ public class Export {
                 .distinct()
                 .map(cache::getIcon)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
+                .toList());
         }
 
         return this;
@@ -71,21 +71,21 @@ public class Export {
                 .distinct()
                 .map(cache::getCategory)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()), true);
+                .toList(), true);
 
             icons.addAll(accounts.stream()
                 .map(Account::iconUuid)
                 .distinct()
                 .map(cache::getIcon)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
+                .toList());
 
             currencies = accounts.stream()
                 .map(Account::currencyUuid)
                 .distinct()
                 .map(cache::getCurrency)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList());
+                .toList();
         }
 
         return this;
@@ -100,7 +100,7 @@ public class Export {
                 .distinct()
                 .map(cache::getIcon)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()));
+                .toList());
         }
 
         return this;
@@ -121,7 +121,7 @@ public class Export {
                 .filter(Transaction::detailed)
                 .map(cache::getTransactionDetails)
                 .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+                .toList();
             transactions.addAll(details);
 
             withContacts(toExport.stream()
@@ -129,7 +129,7 @@ public class Export {
                 .distinct()
                 .map(cache::getContact)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()), true);
+                .toList(), true);
 
             var accIdList = new HashSet<UUID>();
             for (var t : transactions) {
@@ -139,7 +139,7 @@ public class Export {
             withAccounts(accIdList.stream()
                 .map(cache::getAccount)
                 .flatMap(Optional::stream)
-                .collect(Collectors.toList()), true);
+                .toList(), true);
         } else {
             transactions = toExport;
         }

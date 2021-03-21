@@ -44,7 +44,6 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
@@ -64,8 +63,8 @@ import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.Constants.SHORTCUT_R;
 import static org.panteleyev.money.app.Constants.SHORTCUT_T;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Predicates.activeAccount;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -334,7 +333,7 @@ final class AccountWindowController extends BaseController {
         try (var outputStream = new FileOutputStream(selected)) {
             var accounts = cache().getAccounts(filterProperty.get())
                 .sorted(MoneyDAO.COMPARE_ACCOUNT_BY_CATEGORY.thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME))
-                .collect(Collectors.toList());
+                .toList();
             Reports.reportAccounts(accounts, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

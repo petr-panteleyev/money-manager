@@ -16,7 +16,6 @@ import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -77,7 +76,7 @@ public class ChartsWindowController extends BaseController {
             .map(a -> new Pair<>(a.name(), cache().calculateBalance(a, true, transactionFilter).abs()))
             .filter(p -> BigDecimal.ZERO.compareTo(p.getValue()) != 0)
             .sorted((o1, o2) -> o2.getValue().compareTo(o1.getValue()))
-            .collect(Collectors.toList());
+            .toList();
 
         list.stream().limit(PIE_CHART_SIZE)
             .forEach(p -> data.add(new PieChart.Data(p.getKey(), p.getValue().doubleValue())));

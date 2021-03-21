@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public abstract class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding.ISuggestionRequest,
     Collection<T>> {
@@ -35,7 +34,7 @@ public abstract class BaseCompletionProvider<T> implements Callback<AutoCompleti
 
         var result = set.stream()
             .filter(it -> getElementString(it).toLowerCase().contains(stripped))
-            .collect(Collectors.toList());
+            .toList();
 
         if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
             /* If there is a single case sensitive match then no suggestions must be shown. */

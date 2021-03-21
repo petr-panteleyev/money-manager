@@ -1,14 +1,14 @@
 # Money Manager
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-15-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
-[![JavaFX](https://img.shields.io/badge/JavaFX-15-orange?logo=java)](https://openjfx.io/)
+[![Java](https://img.shields.io/badge/Java-16-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
+[![JavaFX](https://img.shields.io/badge/JavaFX-16-orange?logo=java)](https://openjfx.io/)
 
 Personal finance manager. Work in progress.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 15.
+Make sure ```JAVA_HOME``` is set to JDK 16.
 
 ```shell script
 $ mvn clean package

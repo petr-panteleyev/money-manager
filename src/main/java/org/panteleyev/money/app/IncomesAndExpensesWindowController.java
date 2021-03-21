@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.groupingBy;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
@@ -313,12 +312,12 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         dataModel.put("expenses", expenseRoot.getChildren().stream()
             .map(IncomesAndExpensesWindowController::getItemModel)
-            .collect(Collectors.toList())
+            .toList()
         );
 
         dataModel.put("incomes", incomeRoot.getChildren().stream()
             .map(IncomesAndExpensesWindowController::getItemModel)
-            .collect(Collectors.toList())
+            .toList()
         );
 
         try (var w = new FileWriter(selected)) {
@@ -336,7 +335,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var items = item.getChildren().stream()
             .map(IncomesAndExpensesWindowController::getItemModel)
-            .collect(Collectors.toList());
+            .toList();
 
         if (!items.isEmpty()) {
             map.put("items", items);

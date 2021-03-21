@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import static java.lang.Integer.parseInt;
 
 class ImportParser extends DefaultHandler {
@@ -62,7 +61,7 @@ class ImportParser extends DefaultHandler {
 
     private static final List<String> NAMES = Arrays.stream(Tag.values())
         .map(Tag::name)
-        .collect(Collectors.toList());
+        .toList();
 
     private final List<Icon> icons = new ArrayList<>();
     private final List<Category> categories = new ArrayList<>();

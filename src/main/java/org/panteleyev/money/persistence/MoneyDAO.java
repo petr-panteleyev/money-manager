@@ -306,9 +306,9 @@ public class MoneyDAO {
 
             progress.accept("    transactions... ");
             client.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.parentUuid() == null).collect(Collectors.toList()));
+                imp.getTransactions().stream().filter(t -> t.parentUuid() == null).toList());
             client.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.parentUuid() != null).collect(Collectors.toList()));
+                imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
             progress.accept("done\n");
 
             progress.accept("done\n");

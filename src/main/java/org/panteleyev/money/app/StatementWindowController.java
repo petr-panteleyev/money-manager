@@ -45,7 +45,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
@@ -199,7 +198,7 @@ class StatementWindowController extends BaseController {
                 || account.type() == CategoryType.DEBTS)
             .filter(Account::enabled)
             .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
-            .collect(Collectors.toList());
+            .toList();
 
         accountComboBox.getItems().setAll(accounts);
 
@@ -293,7 +292,7 @@ class StatementWindowController extends BaseController {
         for (var record : statement.records()) {
             record.setTransactions(cache().getTransactions().stream()
                 .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
-                .collect(Collectors.toList()));
+                .toList());
         }
 
         Platform.runLater(() -> {

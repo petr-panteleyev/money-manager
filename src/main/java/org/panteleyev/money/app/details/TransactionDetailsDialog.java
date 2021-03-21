@@ -23,7 +23,6 @@ import org.panteleyev.money.model.TransactionDetail;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -50,7 +49,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         details.addAll(transactions.stream()
             .map(TransactionDetail::new)
-            .collect(Collectors.toList()));
+            .toList());
 
         calculateDelta();
 

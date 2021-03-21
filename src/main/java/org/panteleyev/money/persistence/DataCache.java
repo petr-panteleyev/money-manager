@@ -114,13 +114,13 @@ public class DataCache {
 
         return getCategories().stream()
             .filter(category -> typeList.contains(category.type()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Category> getCategoriesByType(EnumSet<CategoryType> types) {
         return getCategories().stream()
             .filter(category -> types.contains(category.type()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public void add(Category category) {
@@ -194,13 +194,13 @@ public class DataCache {
     public List<Account> getAccountsByType(CategoryType type) {
         return getAccounts().stream()
             .filter(account -> account.type() == type)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Account> getAccountsByCategory(UUID uuid) {
         return getAccounts().stream()
             .filter(account -> account.categoryUuid().equals(uuid))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Account> getAccountsByCategoryId(UUID... ids) {
@@ -208,7 +208,7 @@ public class DataCache {
 
         return getAccounts().stream()
             .filter(account -> catIDs.contains(account.categoryUuid()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Optional<Account> getAccountByNumber(String accountNumber) {
@@ -244,23 +244,23 @@ public class DataCache {
     public List<Transaction> getTransactions(Collection<Account> accounts) {
         var ids = accounts.stream()
             .map(Account::uuid)
-            .collect(Collectors.toList());
+            .toList();
 
         return getTransactions().stream()
             .filter(tr -> ids.contains(tr.accountDebitedUuid()) || ids.contains(tr.accountCreditedUuid()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return getTransactions().stream()
             .filter(t -> Objects.equals(t.parentUuid(), parent.uuid()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Transaction> getTransactions(int month, int year) {
         return getTransactions().stream()
             .filter(tr -> tr.month() == month && tr.year() == year)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Transaction> getTransactions(Account account) {
@@ -268,18 +268,18 @@ public class DataCache {
         return getTransactions().stream()
             .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
                 || Objects.equals(tr.accountCreditedUuid(), uuid))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
         var uuids = categories.stream()
             .map(Category::uuid)
-            .collect(Collectors.toList());
+            .toList();
 
         return getTransactions().stream()
             .filter(tr -> uuids.contains(tr.accountDebitedCategoryUuid())
                 || uuids.contains(tr.accountCreditedCategoryUuid()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     public Set<String> getUniqueTransactionComments() {

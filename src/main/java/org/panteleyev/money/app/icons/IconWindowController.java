@@ -34,7 +34,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -133,7 +132,7 @@ public final class IconWindowController extends BaseController {
         iconFlow.getChildren().setAll(
             sortedList.stream()
                 .map(icon -> new IconCell(icon, this))
-                .collect(Collectors.toList())
+                .toList()
         );
     }
 

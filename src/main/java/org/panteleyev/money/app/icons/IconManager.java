@@ -15,7 +15,6 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Icon;
 import java.util.Comparator;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class IconManager {
@@ -63,7 +62,7 @@ public class IconManager {
         comboBox.getItems().add(EMPTY_ICON);
         comboBox.getItems().addAll(FXCollections.observableArrayList(cache().getIcons().stream()
             .sorted(Comparator.comparing(Icon::getName))
-            .collect(Collectors.toList()))
-        );
+            .toList()
+        ));
     }
 }

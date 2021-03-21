@@ -10,13 +10,13 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.3.0</version>
+    <version>21.4.0</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>15</maven.compiler.release>
+        <maven.compiler.release>16</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>org.panteleyev.money</appModule>
         <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
@@ -30,11 +30,11 @@
         <jpackageMavenPluginVersion>1.4.0</jpackageMavenPluginVersion>
         <mysqlConnectorVersion>8.0.23</mysqlConnectorVersion>
         <!-- Dependencies -->
-        <javaFxVersion>15.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.7.0</javaFxHelpersVersion>
+        <javaFxVersion>16</javaFxVersion>
+        <javaFxHelpersVersion>1.8.0</javaFxHelpersVersion>
         <controlsFxVersion>11.0.3</controlsFxVersion>
-        <javaApiForMySqlVersion>1.4.0</javaApiForMySqlVersion>
-        <ofxParserVersion>0.2.0</ofxParserVersion>
+        <javaApiForMySqlVersion>1.5.0</javaApiForMySqlVersion>
+        <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.13.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>

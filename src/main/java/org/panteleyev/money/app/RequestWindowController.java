@@ -32,7 +32,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import static javafx.scene.layout.Priority.ALWAYS;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
 import static org.panteleyev.fx.BoxFactory.hBox;
@@ -216,7 +215,7 @@ class RequestWindowController extends BaseController {
         try (var outputStream = new FileOutputStream(selected)) {
             var transactions = cache().getTransactions(getTransactionFilter())
                 .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
-                .collect(Collectors.toList());
+                .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

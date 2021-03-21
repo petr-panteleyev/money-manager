@@ -53,7 +53,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
@@ -322,7 +321,7 @@ public class TransactionTableView extends TableView<Transaction> {
         var selection = getCurrentSelection();
         var process = getSelectionModel().getSelectedItems().stream()
             .filter(t -> t.checked() != check)
-            .collect(Collectors.toList());
+            .toList();
 
         onCheckTransaction(process, check);
         restoreSelection(selection);
@@ -362,7 +361,9 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private List<UUID> getCurrentSelection() {
-        return getSelectionModel().getSelectedItems().stream().map(Transaction::uuid).collect(Collectors.toList());
+        return getSelectionModel().getSelectedItems().stream()
+            .map(Transaction::uuid)
+            .toList();
     }
 
     /**

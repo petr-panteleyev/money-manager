@@ -24,10 +24,10 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.app.BaseCompletionProvider;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.ToStringConverter;
+import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
@@ -184,7 +183,7 @@ final class DetailEditorPane extends BorderPane {
     private void setupBanksAndCashMenuItems(Set<Account> creditedSuggestions) {
         var banksAndCash = cache.getAccountsByType(CategoryType.BANKS_AND_CASH).stream()
             .filter(Account::enabled)
-            .collect(Collectors.toList());
+            .toList();
 
         banksAndCash.stream()
             .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))

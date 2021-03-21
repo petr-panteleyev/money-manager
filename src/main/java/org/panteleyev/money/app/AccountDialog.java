@@ -31,7 +31,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -208,9 +207,9 @@ class AccountDialog extends BaseDialog<Account> {
     private void onCategoryTypeSelected() {
         var type = typeComboBox.getSelectionModel().getSelectedItem();
 
-        List<Category> filtered = categories.stream()
+        var filtered = categories.stream()
             .filter(c -> c.type().equals(type))
-            .collect(Collectors.toList());
+            .toList();
 
         categoryComboBox.setItems(FXCollections.observableArrayList(filtered));
 

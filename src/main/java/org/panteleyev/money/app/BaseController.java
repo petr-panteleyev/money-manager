@@ -96,7 +96,7 @@ public class BaseController extends Controller {
             menu.getItems().remove(lastIndex + 1, menu.getItems().size());
 
             var accountControllers = WINDOW_MANAGER.getControllerStream(RequestWindowController.class)
-                .filter(c -> ((RequestWindowController) c).getAccount() != null).collect(Collectors.toList());
+                .filter(c -> ((RequestWindowController) c).getAccount() != null).toList();
             if (!accountControllers.isEmpty()) {
                 menu.getItems().add(new SeparatorMenuItem());
                 accountControllers.forEach(c ->
