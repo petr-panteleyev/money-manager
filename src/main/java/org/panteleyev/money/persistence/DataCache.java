@@ -213,6 +213,7 @@ public class DataCache {
 
     public Optional<Account> getAccountByNumber(String accountNumber) {
         return getAccounts().stream()
+            .filter(Account::enabled)
             .filter(a -> Objects.equals(a.getAccountNumberNoSpaces(), accountNumber))
             .findFirst();
     }
