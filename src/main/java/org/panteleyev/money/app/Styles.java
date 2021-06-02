@@ -24,8 +24,7 @@ public interface Styles {
     String GRID_PANE = "gridPane";
 
     // About Dialog
-    String ABOUT_APP_TITLE_LABEL = "aboutAppNameLabel";
-    String ABOUT_LABEL = "aboutLabel";
+    String STYLE_ABOUT_LABEL = "aboutLabel";
 
     // Transaction Editor
     String RATE_LABEL = "rateLabel";

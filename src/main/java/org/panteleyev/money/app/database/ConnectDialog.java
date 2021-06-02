@@ -13,12 +13,12 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ToStringConverter;
 import java.util.Objects;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
+import static org.panteleyev.money.app.options.Options.options;
 
 public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private final ComboBox<ConnectionProfile> profileComboBox;

@@ -19,9 +19,6 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -64,20 +61,23 @@ import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
-import static org.panteleyev.money.app.Constants.SHORTCUT_DELETE;
-import static org.panteleyev.money.app.Constants.SHORTCUT_E;
-import static org.panteleyev.money.app.Constants.SHORTCUT_K;
-import static org.panteleyev.money.app.Constants.SHORTCUT_N;
-import static org.panteleyev.money.app.Constants.SHORTCUT_U;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
@@ -178,16 +178,10 @@ public class MainWindowController extends BaseController implements TransactionT
         );
 
         var viewMenu = newMenu(fxString(RB, "menu.view"),
-            menuItem(fxString(RB, "menu.view.currentMonth"),
-                new KeyCodeCombination(KeyCode.UP, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
-                x -> onCurrentMonth()),
+            menuItem(fxString(RB, "menu.view.currentMonth"), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.view.nextMonth"),
-                new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
-                x -> onNextMonth()),
-            menuItem(fxString(RB, "menu.view.prevMonth"),
-                new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHORTCUT_DOWN, KeyCombination.ALT_DOWN),
-                x -> onPrevMonth())
+            menuItem(fxString(RB, "menu.view.nextMonth"), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
+            menuItem(fxString(RB, "menu.view.prevMonth"), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
         var profilesMenuItem = menuItem(fxString(RB, "menu.Tools.Profiles"),

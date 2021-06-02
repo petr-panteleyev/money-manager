@@ -39,13 +39,13 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
-import static org.panteleyev.money.app.Constants.SHORTCUT_ALT_C;
-import static org.panteleyev.money.app.Constants.SHORTCUT_E;
-import static org.panteleyev.money.app.Constants.SHORTCUT_F;
-import static org.panteleyev.money.app.Constants.SHORTCUT_N;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 

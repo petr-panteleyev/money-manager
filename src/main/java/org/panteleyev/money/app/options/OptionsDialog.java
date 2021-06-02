@@ -24,15 +24,14 @@ import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newTab;
+import static org.panteleyev.fx.FxUtils.COLON;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.Constants.COLON;
-import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.RB;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
@@ -43,6 +42,7 @@ import static org.panteleyev.money.app.options.ColorOption.STATEMENT_CHECKED;
 import static org.panteleyev.money.app.options.ColorOption.STATEMENT_MISSING;
 import static org.panteleyev.money.app.options.ColorOption.STATEMENT_UNCHECKED;
 import static org.panteleyev.money.app.options.ColorOption.TRANSFER;
+import static org.panteleyev.money.app.options.Options.options;
 
 public class OptionsDialog extends BaseDialog<ButtonType> {
     private final ValidationSupport validation = new ValidationSupport();

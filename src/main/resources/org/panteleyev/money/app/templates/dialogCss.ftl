@@ -42,14 +42,3 @@
     -fx-hgap: 5;
     -fx-vgap: 5;
 }
-
-.aboutAppNameLabel {
-    -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize + 4};
-    -fx-font-weight: bold;
-}
-
-.aboutLabel {
-    -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize + 2};
-}

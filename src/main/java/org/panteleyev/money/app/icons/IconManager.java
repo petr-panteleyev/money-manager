@@ -15,9 +15,13 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Icon;
 import java.util.Comparator;
 import java.util.UUID;
+import java.util.function.Function;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class IconManager {
+    public static final Function<Category, Image> CATEGORY_TO_IMAGE = category -> IconManager.getImage(category.iconUuid());
+    public static final Function<Account, Image> ACCOUNT_TO_IMAGE = account -> IconManager.getImage(account.iconUuid());
+
     final static class IconListCell extends ListCell<Icon> {
         @Override
         public void updateItem(Icon item, boolean empty) {

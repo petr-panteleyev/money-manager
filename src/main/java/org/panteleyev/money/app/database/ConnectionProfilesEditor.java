@@ -39,9 +39,9 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.ButtonFactory.buttonType;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.options.Options.options;
 

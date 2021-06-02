@@ -8,9 +8,6 @@ open module org.panteleyev.money {
 
     requires jdk.crypto.cryptoki;
 
-    requires javafx.web;
-    requires javafx.swing;          // for tests
-
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
     requires org.panteleyev.mysqlapi;

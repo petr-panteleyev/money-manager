@@ -18,7 +18,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
@@ -50,12 +49,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import static javafx.application.Platform.runLater;
-import static javafx.scene.input.KeyCode.LEFT;
-import static javafx.scene.input.KeyCode.RIGHT;
-import static javafx.scene.input.KeyCode.UP;
-import static javafx.scene.input.KeyCombination.ALT_DOWN;
-import static javafx.scene.input.KeyCombination.SHIFT_DOWN;
-import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 import static javafx.scene.layout.Priority.ALWAYS;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
@@ -65,6 +58,11 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_SHIFT_LEFT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_SHIFT_RIGHT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
@@ -383,11 +381,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void setupDatePicker() {
-        var tomorrowKey = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN);
-        var yesterdayKey = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN);
-        var todayKey = new KeyCodeCombination(UP, SHORTCUT_DOWN, ALT_DOWN);
-        var nextMonthKey = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
-        var prevMonthKey = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
+        var tomorrowKey = SHORTCUT_ALT_RIGHT;
+        var yesterdayKey = SHORTCUT_ALT_LEFT;
+        var todayKey = SHORTCUT_ALT_UP;
+        var nextMonthKey = SHORTCUT_ALT_SHIFT_RIGHT;
+        var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
 
         var tooltipText = String.format(RB.getString("datePicker.tooltip"),
             tomorrowKey.getDisplayText(),

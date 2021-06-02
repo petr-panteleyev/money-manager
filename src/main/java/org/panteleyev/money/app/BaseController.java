@@ -7,20 +7,24 @@ package org.panteleyev.money.app;
 import javafx.beans.property.BooleanProperty;
 import javafx.scene.control.Menu;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
-import java.util.stream.Collectors;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.money.app.Constants.ELLIPSIS;
 import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_2;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_3;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_4;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.options.Options.options;
 
 public class BaseController extends Controller {
@@ -44,29 +48,21 @@ public class BaseController extends Controller {
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = menuItem(fxString(RB, "Transactions", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.SHORTCUT_DOWN),
+        var transactionsMenuItem = menuItem(fxString(RB, "Transactions", ELLIPSIS), SHORTCUT_0,
             x -> getController(MainWindowController.class));
-        var accountsMenuItem = menuItem(fxString(RB, "Accounts", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.SHORTCUT_DOWN),
+        var accountsMenuItem = menuItem(fxString(RB, "Accounts", ELLIPSIS), SHORTCUT_1,
             x -> getController(AccountWindowController.class));
-        var statementMenuItem = menuItem(fxString(RB, "Statements", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.SHORTCUT_DOWN),
+        var statementMenuItem = menuItem(fxString(RB, "Statements", ELLIPSIS), SHORTCUT_2,
             x -> getController(StatementWindowController.class));
-        var requestsMenuItem = menuItem(fxString(RB, "Requests", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.SHORTCUT_DOWN),
+        var requestsMenuItem = menuItem(fxString(RB, "Requests", ELLIPSIS), SHORTCUT_3,
             x -> getRequestController());
-        var chartsMenuItem = menuItem(fxString(RB, "Incomes_and_Expenses", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.SHORTCUT_DOWN),
+        var chartsMenuItem = menuItem(fxString(RB, "Incomes_and_Expenses", ELLIPSIS), SHORTCUT_4,
             x -> getController(IncomesAndExpensesWindowController.class));
-        var currenciesMenuItem = menuItem(fxString(RB, "Currencies", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.SHORTCUT_DOWN),
+        var currenciesMenuItem = menuItem(fxString(RB, "Currencies", ELLIPSIS), SHORTCUT_5,
             x -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = menuItem(fxString(RB, "Categories", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.SHORTCUT_DOWN),
+        var categoriesMenuItem = menuItem(fxString(RB, "Categories", ELLIPSIS), SHORTCUT_6,
             x -> getController(CategoryWindowController.class));
-        var contactsMenuItem = menuItem(fxString(RB, "Contacts", ELLIPSIS),
-            new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.SHORTCUT_DOWN),
+        var contactsMenuItem = menuItem(fxString(RB, "Contacts", ELLIPSIS), SHORTCUT_7,
             x -> getController(ContactListWindowController.class));
 
         if (dbOpenProperty != null) {

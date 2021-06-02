@@ -13,7 +13,8 @@ public final class TemplateEngine {
     public enum Template {
         INCOMES_AND_EXPENSES("IncomesAndExpenses.ftl"),
         MAIN_CSS("mainCss.ftl"),
-        DIALOG_CSS("dialogCss.ftl");
+        DIALOG_CSS("dialogCss.ftl"),
+        ABOUT_DIALOG_CSS("aboutDialogCss.ftl");
 
         private final String fileName;
 

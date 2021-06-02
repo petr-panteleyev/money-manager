@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.ButtonFactory.button;
+import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.columnConstraints;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.Constants.COLON;
 import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 

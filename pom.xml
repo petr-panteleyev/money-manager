@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.1</version>
+    <version>21.4.2</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -27,12 +27,12 @@
         <mavenSurefirePluginVersion>3.0.0-M5</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.4.0</jpackageMavenPluginVersion>
-        <mysqlConnectorVersion>8.0.23</mysqlConnectorVersion>
+        <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
+        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
         <!-- Dependencies -->
         <javaFxVersion>16</javaFxVersion>
-        <javaFxHelpersVersion>1.8.0</javaFxHelpersVersion>
-        <controlsFxVersion>11.0.3</controlsFxVersion>
+        <javaFxHelpersVersion>1.8.3</javaFxHelpersVersion>
+        <controlsFxVersion>11.1.0</controlsFxVersion>
         <javaApiForMySqlVersion>1.5.0</javaApiForMySqlVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.13.1</jsoupVersion>
@@ -106,16 +106,6 @@
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>${javaFxVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-swing</artifactId>
-            <version>${javaFxVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>${javaFxVersion}</version>
         </dependency>
@@ -128,6 +118,13 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>${freemarkerVersion}</version>
+        </dependency>
+        <!-- Test -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javaFxVersion}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -150,11 +147,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${mavenCompilerPluginVersion}</version>
-                <configuration>
-                    <compilerArgs>
-                        <arg>--enable-preview</arg>
-                    </compilerArgs>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -196,10 +188,12 @@
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
                     <argLine>
-                        --enable-preview
                         --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
                         --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
                         --add-reads org.panteleyev.mysqlapi=org.panteleyev.money
+                        --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED
+                        --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
+                        --add-exports javafx.graphics/com.sun.javafx.embed=ALL-UNNAMED
                     </argLine>
                     <systemPropertyVariables>
                         <mysql.host>${money.test.mysql.host}</mysql.host>
@@ -224,7 +218,6 @@
                     </modulePaths>
                     <destination>target/dist</destination>
                     <javaOptions>
-                        <option>--enable-preview</option>
                         <option>-Dfile.encoding=UTF-8</option>
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
@@ -267,7 +260,6 @@
                         <id>default-cli</id>
                         <configuration>
                             <options>
-                                <option>--enable-preview</option>
                                 <option>-Dfile.encoding=UTF-8</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
@@ -280,7 +272,6 @@
                         <id>debug</id>
                         <configuration>
                             <options>
-                                <option>--enable-preview</option>
                                 <option>-Dfile.encoding=UTF-8</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>

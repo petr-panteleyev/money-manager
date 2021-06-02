@@ -9,8 +9,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
-public sealed interface MoneyRecord extends TableRecord<UUID>
-    permits Account, Category, Contact, Currency, Icon, Transaction {
+public interface MoneyRecord extends TableRecord<UUID> {
 
     UUID uuid();
 
