@@ -21,7 +21,7 @@ import static org.testng.Assert.assertTrue;
 
 public class ContactDialogTest extends BaseTest {
     private final static Contact CONTACT = new Contact.Builder()
-        .guid(UUID.randomUUID())
+        .uuid(UUID.randomUUID())
         .name(randomString())
         .type(randomContactType())
         .phone(randomString())

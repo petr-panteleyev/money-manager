@@ -34,18 +34,18 @@ final class TCPEditor extends VBox {
     private final TextField dataBaseUserEdit = new TextField();
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
-    TCPEditor(ValidationSupport validation, Consumer<ActionEvent> createSchemaHanler) {
-        var createSchemaButton = button(fxString(RB, "Create"));
-        createSchemaButton.setGraphic(new ImageView(Images.WARNING));
-        createSchemaButton.disableProperty().bind(validation.invalidProperty());
-        createSchemaButton.addEventFilter(ACTION, createSchemaHanler::accept);
+    TCPEditor(ValidationSupport validation, Consumer<ActionEvent> resetSchemaHandler) {
+        var resetSchemaButton = button(fxString(RB, "Reset"));
+        resetSchemaButton.setGraphic(new ImageView(Images.WARNING));
+        resetSchemaButton.disableProperty().bind(validation.invalidProperty());
+        resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
 
         getChildren().addAll(gridPane(
             List.of(
                 gridRow(label(fxString(RB, "Server", COLON)), dataBaseHostEdit, label(fxString(RB, "Port", COLON)), dataBasePortEdit),
                 gridRow(label(fxString(RB, "Login", COLON)), gridCell(dataBaseUserEdit, 3, 1)),
                 gridRow(label(fxString(RB, "Password", COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
-                gridRow(label(fxString(RB, "Schema", COLON)), gridCell(schemaEdit, 2, 1), createSchemaButton)
+                gridRow(label(fxString(RB, "Schema", COLON)), gridCell(schemaEdit, 2, 1), resetSchemaButton)
             ), b -> b.withStyle(GRID_PANE)
                 .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
         ));

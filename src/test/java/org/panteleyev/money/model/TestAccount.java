@@ -1,21 +1,102 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.money.model;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
-import org.panteleyev.money.test.BaseTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
+import static org.panteleyev.money.test.BaseTestUtils.randomCardType;
 import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
+import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
-public class TestAccount extends BaseTest {
+public class TestAccount extends ModelTestBase {
+
+    @DataProvider
+    @Override
+    public Object[][] testBuildDataProvider() {
+        var uuid = UUID.randomUUID();
+        var name = randomString();
+        var comment = randomString();
+        var accountNumber = randomString();
+        var openingBalance = randomBigDecimal();
+        var accountLimit = randomBigDecimal();
+        var currencyRate = randomBigDecimal();
+        var type = randomCategoryType();
+        var categoryUuid = UUID.randomUUID();
+        var currencyUuid = UUID.randomUUID();
+        var enabled = randomBoolean();
+        var interest = randomBigDecimal();
+        var closingDate = LocalDate.now();
+        var iconUuid = UUID.randomUUID();
+        var cardType = randomCardType();
+        var cardNumber = randomString();
+        var total = randomBigDecimal();
+        var totalWaiting = randomBigDecimal();
+        var created = System.currentTimeMillis();
+        var modified = created + 1000;
+
+        return new Object[][]{
+            {
+                new Account.Builder()
+                    .uuid(uuid)
+                    .name(name)
+                    .comment(comment)
+                    .accountNumber(accountNumber)
+                    .openingBalance(openingBalance)
+                    .accountLimit(accountLimit)
+                    .currencyRate(currencyRate)
+                    .type(type)
+                    .categoryUuid(categoryUuid)
+                    .currencyUuid(currencyUuid)
+                    .enabled(enabled)
+                    .interest(interest)
+                    .closingDate(closingDate)
+                    .iconUuid(iconUuid)
+                    .cardType(cardType)
+                    .cardNumber(cardNumber)
+                    .total(total)
+                    .totalWaiting(totalWaiting)
+                    .created(created)
+                    .modified(modified)
+                    .build(),
+                new Account(
+                    uuid, name, comment, accountNumber, openingBalance,
+                    accountLimit, currencyRate, type, categoryUuid, currencyUuid,
+                    enabled, interest, closingDate, iconUuid, cardType,
+                    cardNumber, total, totalWaiting, created, modified
+                )
+            },
+            {
+                new Account(
+                    uuid, name, null, null, null,
+                    null, null, type, categoryUuid, null,
+                    enabled, null, null, null, cardType,
+                    cardNumber, null, null, created, modified
+                ),
+                new Account(
+                    uuid, name, "", "", BigDecimal.ZERO,
+                    BigDecimal.ZERO, BigDecimal.ONE, type, categoryUuid, null,
+                    enabled, BigDecimal.ZERO, null, null, cardType,
+                    cardNumber, BigDecimal.ZERO, BigDecimal.ZERO, created, modified
+                )
+            }
+        };
+    }
+
+
+    @Test(dataProvider = "testBuildDataProvider")
+    public void testBuild(Account actual, Account expected) {
+        assertEquals(actual, expected);
+    }
+
     @Test
     public void testEquals() {
         var name = UUID.randomUUID().toString();
@@ -53,7 +134,7 @@ public class TestAccount extends BaseTest {
             .iconUuid(iconUuid)
             .cardType(cardType)
             .cardNumber(cardNumber)
-            .guid(uuid)
+            .uuid(uuid)
             .created(created)
             .modified(modified)
             .build();
@@ -74,7 +155,7 @@ public class TestAccount extends BaseTest {
             .iconUuid(iconUuid)
             .cardType(cardType)
             .cardNumber(cardNumber)
-            .guid(uuid)
+            .uuid(uuid)
             .created(created)
             .modified(modified)
             .build();
@@ -96,10 +177,11 @@ public class TestAccount extends BaseTest {
     @Test(dataProvider = "testAccountNumberDataProvider")
     public void testAccountNumber(String accountNumber, String accountNumberNoSpaces) {
         var a = new Account.Builder()
+            .name(randomString())
             .accountNumber(accountNumber)
             .type(CategoryType.DEBTS)
             .categoryUuid(UUID.randomUUID())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
@@ -109,7 +191,7 @@ public class TestAccount extends BaseTest {
     }
 
     @Test
-    public void testBuilder() {
+    public void testCopy() {
         var original = new Account.Builder()
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
@@ -126,7 +208,7 @@ public class TestAccount extends BaseTest {
             .iconUuid(UUID.randomUUID())
             .cardType(CardType.VISA)
             .cardNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
@@ -150,7 +232,7 @@ public class TestAccount extends BaseTest {
             .iconUuid(original.iconUuid())
             .cardType(original.cardType())
             .cardNumber(original.cardNumber())
-            .guid(original.uuid())
+            .uuid(original.uuid())
             .created(original.created())
             .modified(original.modified())
             .build();

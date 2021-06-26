@@ -1,790 +1,205 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Money>
+    <Icons/>
     <Accounts>
-        <Account id="11">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>6</categoryId>
-            <comment></comment>
-            <accountNumber></accountNumber>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e6219be-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Cash</name>
-            <openingBalance>-137373.710000</openingBalance>
-            <typeId>1</typeId>
-        </Account>
-        <Account id="46">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>9</categoryId>
-            <comment>Updated account</comment>
-            <accountNumber>12345 678 9 33334444</accountNumber>
-            <currencyId>0</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e624826-7470-11e7-857e-389c6424842b</guid>
-            <created>2000</created>
-            <modified>2000</modified>
-            <name>Tips</name>
+        <Account>
+            <name>Bank Account 2</name>
+            <comment/>
+            <accountNumber/>
             <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
-        </Account>
-        <Account id="10">
-            <accountLimit>207000.000000</accountLimit>
-            <categoryId>5</categoryId>
-            <comment>Super Bank</comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e621946-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>7777 8888 9999 0000</name>
-            <openingBalance>-1451.200000</openingBalance>
-            <typeId>4</typeId>
-        </Account>
-        <Account id="39">
             <accountLimit>0.000000</accountLimit>
-            <categoryId>8</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
+            <currencyRate>1.000000</currencyRate>
+            <type>BANKS_AND_CASH</type>
+            <categoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</categoryUuid>
             <enabled>true</enabled>
-            <guid>3e624614-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Dinner</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
+            <interest>0.000000</interest>
+            <cardType>MASTERCARD</cardType>
+            <cardNumber>12344567</cardNumber>
+            <total>10000.000000</total>
+            <totalWaiting>10000.000000</totalWaiting>
+            <guid>8b603f86-ec8a-43ce-86cf-12151e99b549</guid>
+            <created>1624647791352</created>
+            <modified>1624647820817</modified>
         </Account>
-        <Account id="36">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>8</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e62452e-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Grocery</name>
+        <Account>
+            <name>Bank Account 1</name>
+            <comment/>
+            <accountNumber/>
             <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
+            <accountLimit>0.000000</accountLimit>
+            <currencyRate>1.000000</currencyRate>
+            <type>BANKS_AND_CASH</type>
+            <categoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</categoryUuid>
+            <currencyUuid>15f706da-a8ca-40c6-a324-8ac780b98524</currencyUuid>
+            <enabled>true</enabled>
+            <interest>0.000000</interest>
+            <cardType>NONE</cardType>
+            <cardNumber/>
+            <total>-22345.000000</total>
+            <totalWaiting>-22345.000000</totalWaiting>
+            <guid>d484f445-0f5a-454e-9655-4a52d5a43a9f</guid>
+            <created>1624647775106</created>
+            <modified>1624648017090</modified>
         </Account>
-        <Account id="189">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>2</categoryId>
-            <comment>Account number</comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e6277c4-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>1234 5678 3456 6789</name>
+        <Account>
+            <name>Expense account 3</name>
+            <comment/>
+            <accountNumber/>
             <openingBalance>0.000000</openingBalance>
-            <typeId>1</typeId>
-        </Account>
-        <Account id="117">
             <accountLimit>0.000000</accountLimit>
-            <categoryId>29</categoryId>
-            <comment>1234456789</comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
+            <currencyRate>1.000000</currencyRate>
+            <type>BANKS_AND_CASH</type>
+            <categoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</categoryUuid>
+            <currencyUuid>44cea285-5117-479e-8ad1-4d49358bc9ba</currencyUuid>
             <enabled>true</enabled>
-            <guid>3e625d84-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>No.Money</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>1</typeId>
-        </Account>
-        <Account id="168">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>9</categoryId>
-            <comment></comment>
-            <currencyId>0</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e6270da-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Computer games</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
-        </Account>
-        <Account id="245">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>8</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e628f20-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Coffee</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
-        </Account>
-        <Account id="253">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>1</categoryId>
-            <comment>VISA</comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e62934e-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>2222 3333 4444 5555</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>1</typeId>
-        </Account>
-        <Account id="3">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>4</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>3e6213c4-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Electricity Bills</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
-        </Account>
-        <Account id="254">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>4</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>fd93e156-748d-11e7-8cf7-a6006ad3dba0</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>New Account</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
-        </Account>
-        <Account id="255">
-            <accountLimit>0.000000</accountLimit>
-            <categoryId>4</categoryId>
-            <comment></comment>
-            <currencyId>2</currencyId>
-            <currencyRate>0.000000</currencyRate>
-            <enabled>true</enabled>
-            <guid>0fd97204-748e-11e7-8cf7-a6006ad3dba0</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>New Account 2</name>
-            <openingBalance>0.000000</openingBalance>
-            <typeId>3</typeId>
+            <interest>0.000000</interest>
+            <cardType>NONE</cardType>
+            <cardNumber/>
+            <total>12345.000000</total>
+            <totalWaiting>12345.000000</totalWaiting>
+            <guid>575ee047-8f2d-4364-9766-a48e002668ce</guid>
+            <created>1624647978367</created>
+            <modified>1624648017085</modified>
         </Account>
     </Accounts>
     <Categories>
-        <Category id="6">
-            <catTypeId>1</catTypeId>
-            <comment></comment>
-            <expanded>false</expanded>
-            <guid>3e6886fa-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Cash</name>
+        <Category>
+            <name>Bank Category 1</name>
+            <comment/>
+            <type>BANKS_AND_CASH</type>
+            <guid>36d486f1-f50a-41e7-8000-98af4b22c17f</guid>
+            <created>1624647711832</created>
+            <modified>1624647711832</modified>
         </Category>
-        <Category id="9">
-            <catTypeId>3</catTypeId>
-            <comment></comment>
-            <expanded>false</expanded>
-            <guid>3e68883a-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Misc</name>
+        <Category>
+            <name>Income category</name>
+            <comment/>
+            <type>INCOMES</type>
+            <guid>49491023-d162-48cc-beaa-50c41c482b15</guid>
+            <created>1624647722782</created>
+            <modified>1624647722782</modified>
         </Category>
-        <Category id="5">
-            <catTypeId>4</catTypeId>
-            <comment></comment>
-            <expanded>true</expanded>
-            <guid>3e68868c-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Credit cards</name>
-        </Category>
-        <Category id="8">
-            <catTypeId>3</catTypeId>
-            <comment></comment>
-            <expanded>false</expanded>
-            <guid>3e6887cc-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Food</name>
-        </Category>
-        <Category id="2">
-            <catTypeId>1</catTypeId>
-            <comment></comment>
-            <expanded>true</expanded>
-            <guid>3e6884fc-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Bank2</name>
-        </Category>
-        <Category id="29">
-            <catTypeId>1</catTypeId>
-            <comment></comment>
-            <expanded>false</expanded>
-            <guid>3e68903c-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Fictional Money</name>
-        </Category>
-        <Category id="1">
-            <catTypeId>1</catTypeId>
-            <comment></comment>
-            <expanded>true</expanded>
-            <guid>3e688326-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Bank1</name>
-        </Category>
-        <Category id="4">
-            <catTypeId>3</catTypeId>
-            <comment></comment>
-            <expanded>false</expanded>
-            <guid>3e68861e-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Accounts</name>
+        <Category>
+            <name>Expense category</name>
+            <comment>Expense category comment</comment>
+            <type>EXPENSES</type>
+            <guid>98ff9ce8-da86-4d8e-8c9c-140e01105262</guid>
+            <created>1624647743358</created>
+            <modified>1624647743358</modified>
         </Category>
     </Categories>
     <Contacts>
-        <Contact id="92">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6ede06-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Las Torres</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
+        <Contact>
+            <name>Contact 1</name>
+            <type>PERSONAL</type>
+            <phone/>
+            <mobile/>
+            <email/>
+            <web/>
+            <comment/>
+            <street/>
+            <city/>
+            <country/>
+            <zip/>
+            <guid>9ba18a90-fd12-4cc1-becc-1308f20b6129</guid>
+            <created>1624647820804</created>
+            <modified>1624647820804</modified>
         </Contact>
-        <Contact id="322">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6f5282-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Cantina</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
-        </Contact>
-        <Contact id="59">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6ed4ba-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Store</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
-        </Contact>
-        <Contact id="235">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6f322a-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Train Station</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
-        </Contact>
-        <Contact id="323">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6f52d2-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Bar</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
-        </Contact>
-        <Contact id="230">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6f2d98-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Starbucks</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
-        </Contact>
-        <Contact id="10">
-            <city></city>
-            <comment></comment>
-            <country></country>
-            <email></email>
-            <guid>3e6ea3e6-7470-11e7-857e-389c6424842b</guid>
-            <mobile></mobile>
-            <created>1000</created>
-            <modified>1000</modified>
-            <name>Power Station</name>
-            <phone></phone>
-            <street></street>
-            <typeId>1</typeId>
-            <web></web>
-            <zip></zip>
+        <Contact>
+            <name>Shop</name>
+            <type>PERSONAL</type>
+            <phone/>
+            <mobile/>
+            <email/>
+            <web/>
+            <comment/>
+            <street/>
+            <city/>
+            <country/>
+            <zip/>
+            <guid>dc665582-25e5-4d96-9f12-7f3015add0e9</guid>
+            <created>1624648017069</created>
+            <modified>1624648017069</modified>
         </Contact>
     </Contacts>
     <Currencies>
-        <Currency id="2">
-            <default>true</default>
-            <description>Russia, Rubles</description>
-            <direction>0</direction>
-            <formatSymbol></formatSymbol>
+        <Currency>
+            <symbol>USD</symbol>
+            <description>Dollar</description>
+            <formatSymbol/>
             <formatSymbolPosition>0</formatSymbolPosition>
-            <guid>3e75c388-7470-11e7-857e-389c6424842b</guid>
-            <created>1000</created>
-            <modified>1000</modified>
-            <rate>1.000000</rate>
             <showFormatSymbol>false</showFormatSymbol>
-            <symbol>RUB</symbol>
-            <useThousandSeparator>true</useThousandSeparator>
+            <default>false</default>
+            <rate>1.000000</rate>
+            <direction>0</direction>
+            <useThousandSeparator>false</useThousandSeparator>
+            <guid>15f706da-a8ca-40c6-a324-8ac780b98524</guid>
+            <created>1624647684057</created>
+            <modified>1624647684057</modified>
+        </Currency>
+        <Currency>
+            <symbol>EUR</symbol>
+            <description>Euro</description>
+            <formatSymbol/>
+            <formatSymbolPosition>0</formatSymbolPosition>
+            <showFormatSymbol>false</showFormatSymbol>
+            <default>false</default>
+            <rate>1.000000</rate>
+            <direction>0</direction>
+            <useThousandSeparator>false</useThousandSeparator>
+            <guid>44cea285-5117-479e-8ad1-4d49358bc9ba</guid>
+            <created>1624647693858</created>
+            <modified>1624647693858</modified>
         </Currency>
     </Currencies>
-    <TransactionGroups/>
     <Transactions>
-        <Transaction id="7128">
-            <accountCreditedCategoryId>9</accountCreditedCategoryId>
-            <accountCreditedId>46</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>6</accountDebitedCategoryId>
-            <accountDebitedId>11</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>500.000000</amount>
-            <checked>true</checked>
-            <comment></comment>
-            <contactId>92</contactId>
-            <day>23</day>
-            <groupId>0</groupId>
-            <guid>3e96ae72-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>0</rateDirection>
-            <transactionTypeId>2</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7129">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>39</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>185.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>322</contactId>
-            <day>24</day>
-            <groupId>0</groupId>
-            <guid>3e96b020-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7130">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>36</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>143.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>59</contactId>
-            <day>24</day>
-            <groupId>0</groupId>
-            <guid>3e96b066-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7140">
-            <accountCreditedCategoryId>29</accountCreditedCategoryId>
-            <accountCreditedId>117</accountCreditedId>
-            <accountCreditedTypeId>1</accountCreditedTypeId>
-            <accountDebitedCategoryId>2</accountDebitedCategoryId>
-            <accountDebitedId>189</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>1000.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>0</contactId>
-            <day>24</day>
-            <groupId>0</groupId>
-            <guid>3e96bef8-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>8</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7141">
-            <accountCreditedCategoryId>9</accountCreditedCategoryId>
-            <accountCreditedId>168</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>29</accountDebitedCategoryId>
-            <accountDebitedId>117</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>1000.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>235</contactId>
-            <day>24</day>
-            <groupId>0</groupId>
-            <guid>3e96c3bc-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>0</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7131">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>39</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>360.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>323</contactId>
+        <Transaction>
+            <amount>10000.000000</amount>
             <day>25</day>
-            <groupId>0</groupId>
-            <guid>3e96b12e-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7132">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>39</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>185.000000</amount>
+            <month>6</month>
+            <year>2021</year>
+            <type>TRANSFER</type>
+            <comment>Transaction comment</comment>
             <checked>false</checked>
-            <comment></comment>
-            <contactId>322</contactId>
-            <day>26</day>
-            <groupId>0</groupId>
-            <guid>3e96b232-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
+            <accountDebitedUuid>d484f445-0f5a-454e-9655-4a52d5a43a9f</accountDebitedUuid>
+            <accountCreditedUuid>8b603f86-ec8a-43ce-86cf-12151e99b549</accountCreditedUuid>
+            <accountDebitedType>BANKS_AND_CASH</accountDebitedType>
+            <accountCreditedType>BANKS_AND_CASH</accountCreditedType>
+            <accountDebitedCategoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</accountDebitedCategoryUuid>
+            <accountCreditedCategoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</accountCreditedCategoryUuid>
+            <contactUuid>9ba18a90-fd12-4cc1-becc-1308f20b6129</contactUuid>
             <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7133">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>36</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>143.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>59</contactId>
-            <day>26</day>
-            <groupId>0</groupId>
-            <guid>3e96b462-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7134">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>39</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>185.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>322</contactId>
-            <day>27</day>
-            <groupId>0</groupId>
-            <guid>3e96b520-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7135">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>36</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>109.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>59</contactId>
-            <day>27</day>
-            <groupId>0</groupId>
-            <guid>3e96b5de-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7136">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>39</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>185.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>322</contactId>
-            <day>28</day>
-            <groupId>0</groupId>
-            <guid>3e96b836-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7137">
-            <accountCreditedCategoryId>8</accountCreditedCategoryId>
-            <accountCreditedId>245</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>5</accountDebitedCategoryId>
-            <accountDebitedId>10</accountDebitedId>
-            <accountDebitedTypeId>4</accountDebitedTypeId>
-            <amount>1160.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>230</contactId>
-            <day>28</day>
-            <groupId>0</groupId>
-            <guid>3e96b8f4-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7138">
-            <accountCreditedCategoryId>29</accountCreditedCategoryId>
-            <accountCreditedId>117</accountCreditedId>
-            <accountCreditedTypeId>1</accountCreditedTypeId>
-            <accountDebitedCategoryId>1</accountDebitedCategoryId>
-            <accountDebitedId>253</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>700.000000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>0</contactId>
-            <day>29</day>
-            <groupId>0</groupId>
-            <guid>3e96baca-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>8</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7139">
-            <accountCreditedCategoryId>4</accountCreditedCategoryId>
-            <accountCreditedId>3</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>29</accountDebitedCategoryId>
-            <accountDebitedId>117</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>702.780000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>10</contactId>
-            <day>29</day>
-            <groupId>0</groupId>
-            <guid>3e96bca0-7470-11e7-857e-389c6424842b</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7142">
-            <accountCreditedCategoryId>4</accountCreditedCategoryId>
-            <accountCreditedId>3</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>29</accountDebitedCategoryId>
-            <accountDebitedId>117</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>702.780000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>10</contactId>
-            <day>29</day>
-            <groupId>0</groupId>
-            <guid>a270a6e0-7485-11e7-8cf7-a6006ad3dba0</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-        </Transaction>
-        <Transaction id="7143">
-            <accountCreditedCategoryId>4</accountCreditedCategoryId>
-            <accountCreditedId>254</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>29</accountDebitedCategoryId>
-            <accountDebitedId>255</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>702.780000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>10</contactId>
-            <day>29</day>
-            <groupId>0</groupId>
-            <guid>251e8da2-748e-11e7-8cf7-a6006ad3dba0</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
-            <detailed>true</detailed>
-        </Transaction>
-        <Transaction id="7144">
-            <accountCreditedCategoryId>4</accountCreditedCategoryId>
-            <accountCreditedId>254</accountCreditedId>
-            <accountCreditedTypeId>3</accountCreditedTypeId>
-            <accountDebitedCategoryId>29</accountDebitedCategoryId>
-            <accountDebitedId>255</accountDebitedId>
-            <accountDebitedTypeId>1</accountDebitedTypeId>
-            <amount>505.980000</amount>
-            <checked>false</checked>
-            <comment></comment>
-            <contactId>10</contactId>
-            <day>29</day>
-            <groupId>0</groupId>
-            <guid>251e8da2-748e-11e7-8cf7-a6006ad3dba1</guid>
-            <invoiceNumber></invoiceNumber>
-            <created>1000</created>
-            <modified>1000</modified>
-            <month>7</month>
-            <rate>1.000000</rate>
-            <rateDirection>1</rateDirection>
-            <transactionTypeId>1</transactionTypeId>
-            <year>2017</year>
+            <rateDirection>0</rateDirection>
+            <invoiceNumber/>
+            <guid>e1c1bfc2-2789-4d62-9c4d-1071a2dce573</guid>
+            <created>1624647820810</created>
+            <modified>1624647820810</modified>
             <detailed>false</detailed>
-            <parentId>7143</parentId>
+            <statementDate>18803</statementDate>
+        </Transaction>
+        <Transaction>
+            <amount>12345.000000</amount>
+            <day>25</day>
+            <month>6</month>
+            <year>2021</year>
+            <type>CARD_PAYMENT</type>
+            <comment/>
+            <checked>false</checked>
+            <accountDebitedUuid>d484f445-0f5a-454e-9655-4a52d5a43a9f</accountDebitedUuid>
+            <accountCreditedUuid>575ee047-8f2d-4364-9766-a48e002668ce</accountCreditedUuid>
+            <accountDebitedType>BANKS_AND_CASH</accountDebitedType>
+            <accountCreditedType>BANKS_AND_CASH</accountCreditedType>
+            <accountDebitedCategoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</accountDebitedCategoryUuid>
+            <accountCreditedCategoryUuid>36d486f1-f50a-41e7-8000-98af4b22c17f</accountCreditedCategoryUuid>
+            <contactUuid>dc665582-25e5-4d96-9f12-7f3015add0e9</contactUuid>
+            <rate>1.000000</rate>
+            <rateDirection>0</rateDirection>
+            <invoiceNumber/>
+            <guid>7853cbc8-4d64-4a75-a96b-e1eaab93fdfc</guid>
+            <created>1624648017076</created>
+            <modified>1624648017076</modified>
+            <detailed>false</detailed>
+            <statementDate>18803</statementDate>
         </Transaction>
     </Transactions>
 </Money>

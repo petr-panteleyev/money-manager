@@ -5,46 +5,30 @@
 package org.panteleyev.money.model;
 
 import javafx.scene.image.Image;
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.RecordBuilder;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+import static java.util.Objects.requireNonNull;
 
-@Table("icon")
 public final class Icon implements MoneyRecord {
     public static final int ICON_SIZE = 16;
     public static final int ICON_BYTE_LENGTH = 8192;
 
-    @PrimaryKey
-    @Column("uuid")
     private final UUID uuid;
-    @Column("name")
     private final String name;
-    @Column(value = "bytes", length = ICON_BYTE_LENGTH)
     private final byte[] bytes;
-    @Column("created")
     private final long created;
-    @Column("modified")
     private final long modified;
 
     private final Image image;
 
-    @RecordBuilder
-    public Icon(@Column("uuid") UUID uuid,
-                @Column("name") String name,
-                @Column("bytes") byte[] bytes,
-                @Column("created") long created,
-                @Column("modified") long modified)
-    {
-        this.uuid = uuid;
-        this.name = name;
-        this.bytes = bytes;
+    public Icon(UUID uuid, String name, byte[] bytes, long created, long modified) {
+        this.uuid = requireNonNull(uuid, "Icon id cannot be null");
+        this.name = requireNonNull(name, "Icon name cannot be null");
+        this.bytes = requireNonNull(bytes, "Icon bytes cannot be null");
         this.created = created;
         this.modified = modified;
 
@@ -111,7 +95,7 @@ public final class Icon implements MoneyRecord {
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, name, bytes, created, modified);
+        return Objects.hash(uuid, name, Arrays.hashCode(bytes), created, modified);
     }
 
     @Override

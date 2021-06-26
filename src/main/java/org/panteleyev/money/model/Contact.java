@@ -1,53 +1,64 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.money.model;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.ForeignKey;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.ReferenceOption;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.util.UUID;
 
-@Table("contact")
 public record Contact(
-    @PrimaryKey
-    @Column("uuid")
     UUID uuid,
-    @Column("name")
     String name,
-    @Column("type")
     ContactType type,
-    @Column("phone")
     String phone,
-    @Column("mobile")
     String mobile,
-    @Column("email")
     String email,
-    @Column("web")
     String web,
-    @Column("comment")
     String comment,
-    @Column("street")
     String street,
-    @Column("city")
     String city,
-    @Column("country")
     String country,
-    @Column("zip")
     String zip,
-    @Column("icon_uuid")
-    @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
     UUID iconUuid,
-    @Column("created")
     long created,
-    @Column("modified")
     long modified
-
 ) implements MoneyRecord, Named, Comparable<Contact> {
+
+    public Contact {
+        if (uuid == null) {
+            throw new IllegalStateException("Contact id cannot be null");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalStateException("Contact name cannot be null or empty");
+        }
+        if (type == null) {
+            throw new IllegalStateException("Contact type cannot be null");
+        }
+        if (created == 0) {
+            created = System.currentTimeMillis();
+        }
+        if (modified == 0) {
+            modified = System.currentTimeMillis();
+        }
+
+        phone = MoneyRecord.normalize(phone);
+        mobile = MoneyRecord.normalize(mobile);
+        email = MoneyRecord.normalize(email);
+        web = MoneyRecord.normalize(web);
+        comment = MoneyRecord.normalize(comment);
+        street = MoneyRecord.normalize(street);
+        city = MoneyRecord.normalize(city);
+        country = MoneyRecord.normalize(country);
+        zip = MoneyRecord.normalize(zip);
+
+        long now = System.currentTimeMillis();
+        if (created == 0) {
+            created = now;
+        }
+        if (modified == 0) {
+            modified = now;
+        }
+    }
 
     @Override
     public int compareTo(Contact other) {
@@ -101,30 +112,11 @@ public record Contact(
         }
 
         public Contact build() {
-            if (name.isBlank()) {
-                throw new IllegalStateException("Name must not be empty");
-            }
-
-            if (uuid == null) {
-                uuid = UUID.randomUUID();
-            }
-
-            long now = System.currentTimeMillis();
-            if (created == 0) {
-                created = now;
-            }
-            if (modified == 0) {
-                modified = now;
-            }
-
             return new Contact(uuid, name, type, phone, mobile, email, web, comment, street, city, country, zip,
                 iconUuid, created, modified);
         }
 
         public Builder name(String name) {
-            if (name == null || name.isBlank()) {
-                throw new IllegalArgumentException("Contact name must not be empty");
-            }
             this.name = name;
             return this;
         }
@@ -135,47 +127,47 @@ public record Contact(
         }
 
         public Builder phone(String phone) {
-            this.phone = phone == null ? "" : phone;
+            this.phone = phone;
             return this;
         }
 
         public Builder mobile(String mobile) {
-            this.mobile = mobile == null ? "" : mobile;
+            this.mobile = mobile;
             return this;
         }
 
         public Builder email(String email) {
-            this.email = email == null ? "" : email;
+            this.email = email;
             return this;
         }
 
         public Builder web(String web) {
-            this.web = web == null ? "" : web;
+            this.web = web;
             return this;
         }
 
         public Builder comment(String comment) {
-            this.comment = comment == null ? "" : comment;
+            this.comment = comment;
             return this;
         }
 
         public Builder street(String street) {
-            this.street = street == null ? "" : street;
+            this.street = street;
             return this;
         }
 
         public Builder city(String city) {
-            this.city = city == null ? "" : city;
+            this.city = city;
             return this;
         }
 
         public Builder country(String country) {
-            this.country = country == null ? "" : country;
+            this.country = country;
             return this;
         }
 
         public Builder zip(String zip) {
-            this.zip = zip == null ? "" : zip;
+            this.zip = zip;
             return this;
         }
 
@@ -184,8 +176,8 @@ public record Contact(
             return this;
         }
 
-        public Builder guid(UUID guid) {
-            this.uuid = guid;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 

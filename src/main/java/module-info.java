@@ -10,7 +10,6 @@ open module org.panteleyev.money {
 
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
-    requires org.panteleyev.mysqlapi;
 
     requires org.controlsfx.controls;
 
@@ -19,4 +18,5 @@ open module org.panteleyev.money {
     requires org.jsoup;
 
     requires mysql.connector.java;
+    requires liquibase.core;
 }

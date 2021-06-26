@@ -30,7 +30,7 @@ public class CategoryDialogTest extends BaseTest {
         .name(UUID.randomUUID().toString())
         .comment(UUID.randomUUID().toString())
         .type(CategoryType.BANKS_AND_CASH)
-        .guid(UUID.randomUUID())
+        .uuid(UUID.randomUUID())
         .modified(System.currentTimeMillis())
         .build();
 

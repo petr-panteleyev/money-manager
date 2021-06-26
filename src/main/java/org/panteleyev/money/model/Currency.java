@@ -4,45 +4,44 @@
  */
 package org.panteleyev.money.model;
 
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
-@Table("currency")
 public record Currency(
-    @PrimaryKey
-    @Column("uuid")
     UUID uuid,
-    @Column("symbol")
     String symbol,
-    @Column("description")
     String description,
-    @Column("format_symbol")
     String formatSymbol,
-    @Column("format_symbol_pos")
     int formatSymbolPosition,
-    @Column("show_format_symbol")
     boolean showFormatSymbol,
-    @Column("def")
     boolean def,
-    @Column("rate")
     BigDecimal rate,
-    @Column("rate_direction")
     int direction,
-    @Column("use_th_separator")
     boolean useThousandSeparator,
-    @Column("created")
     long created,
-    @Column("modified")
     long modified
-
 ) implements MoneyRecord {
 
     public Currency {
-        rate = MoneyRecord.normalize(rate);
+        if (uuid == null) {
+            throw new IllegalStateException("Currency id cannot be null");
+        }
+        if (symbol == null || symbol.isBlank()) {
+            throw new IllegalStateException("Currency symbol cannot be blank");
+        }
+
+        description = MoneyRecord.normalize(description);
+        formatSymbol = MoneyRecord.normalize(formatSymbol);
+        rate = MoneyRecord.normalize(rate, BigDecimal.ONE);
+
+        long now = System.currentTimeMillis();
+        if (created == 0) {
+            created = now;
+        }
+        if (modified == 0) {
+            modified = now;
+        }
     }
 
     public String formatValue(BigDecimal value) {
@@ -97,34 +96,24 @@ public record Currency(
         }
 
         public Currency build() {
-            if (uuid == null) {
-                uuid = UUID.randomUUID();
-            }
 
-            long now = System.currentTimeMillis();
-            if (created == 0) {
-                created = now;
-            }
-            if (modified == 0) {
-                modified = now;
-            }
 
             return new Currency(uuid, symbol, description, formatSymbol, formatSymbolPosition,
                 showFormatSymbol, def, rate, direction, useThousandSeparator, created, modified);
         }
 
         public Builder symbol(String symbol) {
-            this.symbol = symbol == null ? "" : symbol;
+            this.symbol = symbol;
             return this;
         }
 
         public Builder description(String description) {
-            this.description = description == null ? "" : description;
+            this.description = description;
             return this;
         }
 
         public Builder formatSymbol(String formatSymbol) {
-            this.formatSymbol = formatSymbol == null ? "" : formatSymbol;
+            this.formatSymbol = formatSymbol;
             return this;
         }
 
@@ -158,8 +147,8 @@ public record Currency(
             return this;
         }
 
-        public Builder guid(UUID guid) {
-            this.uuid = guid;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 

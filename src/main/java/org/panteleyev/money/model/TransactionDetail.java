@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record TransactionDetail(UUID uuid, BigDecimal amount, UUID accountCreditedUuid, String comment, long modified) {
     public TransactionDetail {
-        amount = MoneyRecord.normalize(amount);
+        amount = MoneyRecord.normalize(amount, BigDecimal.ZERO);
     }
 
     public TransactionDetail(Transaction transaction) {

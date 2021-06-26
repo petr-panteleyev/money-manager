@@ -32,12 +32,15 @@ import java.util.Objects;
 import java.util.Optional;
 import static javafx.event.ActionEvent.ACTION;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
+import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonBar.ButtonData.BIG_GAP;
 import static javafx.scene.control.ButtonBar.ButtonData.LEFT;
 import static javafx.scene.control.ButtonBar.ButtonData.SMALL_GAP;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
+import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
+import static javafx.scene.control.ButtonType.YES;
 import static org.panteleyev.fx.ButtonFactory.buttonType;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -79,7 +82,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         profileListView = initProfileListView();
 
-        tcpEditor = new TCPEditor(validation, this::onInitButton);
+        tcpEditor = new TCPEditor(validation, this::onResetButton);
 
         setTitle(RB.getString("Profiles"));
 
@@ -195,16 +198,19 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         );
     }
 
-    private void onInitButton(ActionEvent event) {
+    private void onResetButton(ActionEvent event) {
         event.consume();
 
-        new Alert(CONFIRMATION, RB.getString("text.AreYouSure"), OK, CANCEL)
-            .showAndWait()
-            .filter(response -> response == OK)
+        var alert = new Alert(WARNING, RB.getString("Schema_Reset_Text"), YES, NO);
+        alert.setHeaderText(fxString(RB, "Schema_Reset_Header"));
+        alert.setTitle(fxString(RB, "Schema_Reset"));
+
+        alert.showAndWait()
+            .filter(response -> response == YES)
             .ifPresent(b -> {
                 var profile = buildConnectionProfile();
 
-                var ex = profileManager.getInitDatabaseCallback().apply(profile);
+                var ex = profileManager.getResetDatabaseCallback().apply(profile);
                 if (ex != null) {
                     testFail(ex.getMessage());
                 } else {

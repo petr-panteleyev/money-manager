@@ -11,6 +11,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -59,6 +60,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
 import java.util.prefs.Preferences;
+import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.WARNING;
+import static javafx.scene.control.ButtonType.CANCEL;
+import static javafx.scene.control.ButtonType.NO;
+import static javafx.scene.control.ButtonType.OK;
+import static javafx.scene.control.ButtonType.YES;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -85,9 +92,7 @@ import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
-    private static final String UI_BUNDLE_PATH = "org.panteleyev.money.app.res.ui";
-
-    public static final ResourceBundle RB = ResourceBundle.getBundle(UI_BUNDLE_PATH);
+    public static final ResourceBundle RB = ResourceBundle.getBundle("org.panteleyev.money.app.res.ui");
 
     private final BorderPane self = new BorderPane();
 
@@ -97,7 +102,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
     private final ConnectionProfileManager profileManager =
-        new ConnectionProfileManager(this::onInitDatabase, this::onBuildDatasource,
+        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource,
             PREFERENCES);
 
     // Transaction view box
@@ -307,6 +312,29 @@ public class MainWindowController extends BaseController implements TransactionT
 
         getDao().initialize(ds);
 
+        var schemaStatus = getDao().checkSchemaUpdateStatus();
+        switch (schemaStatus) {
+            case UPDATE_REQUIRED -> {
+                var alert = new Alert(WARNING, RB.getString("Schema_Update_Text"), YES, NO);
+                alert.setHeaderText(fxString(RB, "Schema_Reset_Header"));
+                alert.setTitle(fxString(RB, "Schema Update"));
+
+                var confirmed = alert.showAndWait()
+                    .filter(response -> response == YES)
+                    .isPresent();
+
+                if (confirmed) {
+                    getDao().updateSchema();
+                } else {
+                    System.exit(0);
+                }
+            }
+            case INCOMPATIBLE -> {
+                new Alert(ERROR, fxString(RB, "Incomatible_Schema_Text"), OK).showAndWait();
+                System.exit(-1);
+            }
+        }
+
         var loadResult = CompletableFuture
             .runAsync(() -> getDao().preload())
             .thenRun(() -> Platform.runLater(() -> {
@@ -396,9 +424,9 @@ public class MainWindowController extends BaseController implements TransactionT
         }
     }
 
-    private Exception onInitDatabase(ConnectionProfile profile) {
+    private Exception onResetDatabase(ConnectionProfile profile) {
         var ds = onBuildDatasource(profile);
-        return MoneyDAO.initDatabase(ds, profile.schema());
+        return MoneyDAO.resetDatabase(ds, profile.schema());
     }
 
     private MysqlDataSource onBuildDatasource(ConnectionProfile profile) {
@@ -554,7 +582,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     .accountCreditedUuid(transactionDetail.accountCreditedUuid())
                     .amount(transactionDetail.amount())
                     .comment(transactionDetail.comment())
-                    .guid(UUID.randomUUID())
+                    .uuid(UUID.randomUUID())
                     .parentUuid(transaction.uuid())
                     .detailed(false)
                     .timestamp()

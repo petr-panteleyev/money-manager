@@ -4,74 +4,67 @@
  */
 package org.panteleyev.money.model;
 
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.ForeignKey;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.ReferenceOption;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-@Table("account")
 public record Account(
-    @PrimaryKey
-    @Column("uuid")
     UUID uuid,
-    @Column("name")
     String name,
-    @Column("comment")
     String comment,
-    @Column("number")
     String accountNumber,
-    @Column("opening")
     BigDecimal openingBalance,
-    @Column("account_limit")
     BigDecimal accountLimit,
-    @Column("rate")
     BigDecimal currencyRate,
-    @Column("type")
     CategoryType type,
-    @Column(value = "category_uuid")
-    @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID categoryUuid,
-    @Column("currency_uuid")
-    @ForeignKey(table = Currency.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID currencyUuid,
-    @Column("enabled")
     boolean enabled,
-    @Column("interest")
     BigDecimal interest,
-    @Column("closing_date")
     LocalDate closingDate,
-    @Column("icon_uuid")
-    @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
     UUID iconUuid,
-    @Column("card_type")
     CardType cardType,
-    @Column("card_number")
     String cardNumber,
-    @Column("total")
     BigDecimal total,
-    @Column("total_waiting")
     BigDecimal totalWaiting,
-    @Column("created")
     long created,
-    @Column("modified")
     long modified
-
 ) implements MoneyRecord, Named, Comparable<Account> {
     public final static Predicate<Account> FILTER_ENABLED = Account::enabled;
 
     public Account {
-        openingBalance = MoneyRecord.normalize(openingBalance);
-        accountLimit = MoneyRecord.normalize(accountLimit);
-        currencyRate = MoneyRecord.normalize(currencyRate);
-        interest = MoneyRecord.normalize(interest);
-        total = MoneyRecord.normalize(total);
-        totalWaiting = MoneyRecord.normalize(totalWaiting);
+        if (uuid == null) {
+            throw new IllegalStateException("Account id cannot be null");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalStateException("Account name cannot be null or blank");
+        }
+        if (type == null) {
+            throw new IllegalStateException("Account type cannot be null");
+        }
+        if (categoryUuid == null) {
+            throw new IllegalStateException("Account category cannot be null");
+        }
+
+        long now = System.currentTimeMillis();
+        if (created == 0) {
+            created = now;
+        }
+        if (modified == 0) {
+            modified = now;
+        }
+
+        comment = MoneyRecord.normalize(comment);
+        accountNumber = MoneyRecord.normalize(accountNumber);
+        cardNumber = MoneyRecord.normalize(cardNumber);
+
+        openingBalance = MoneyRecord.normalize(openingBalance, BigDecimal.ZERO);
+        accountLimit = MoneyRecord.normalize(accountLimit, BigDecimal.ZERO);
+        currencyRate = MoneyRecord.normalize(currencyRate, BigDecimal.ONE);
+        interest = MoneyRecord.normalize(interest, BigDecimal.ZERO);
+        total = MoneyRecord.normalize(total, BigDecimal.ZERO);
+        totalWaiting = MoneyRecord.normalize(totalWaiting, BigDecimal.ZERO);
     }
 
     @Override
@@ -163,18 +156,6 @@ public record Account(
         }
 
         public Account build() {
-            if (uuid == null) {
-                uuid = UUID.randomUUID();
-            }
-
-            long now = System.currentTimeMillis();
-            if (created == 0) {
-                created = now;
-            }
-            if (modified == 0) {
-                modified = now;
-            }
-
             return new Account(uuid, name, comment, accountNumber, openingBalance,
                 accountLimit, currencyRate, type, categoryUuid,
                 currencyUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
@@ -182,20 +163,17 @@ public record Account(
         }
 
         public Builder name(String name) {
-            if (name == null || name.isBlank()) {
-                throw new IllegalArgumentException("Account name must not be empty");
-            }
             this.name = name;
             return this;
         }
 
         public Builder comment(String comment) {
-            this.comment = comment == null ? "" : comment;
+            this.comment = comment;
             return this;
         }
 
         public Builder accountNumber(String accountNumber) {
-            this.accountNumber = accountNumber == null ? "" : accountNumber;
+            this.accountNumber = accountNumber;
             return this;
         }
 
@@ -255,7 +233,7 @@ public record Account(
         }
 
         public Builder cardNumber(String cardNumber) {
-            this.cardNumber = cardNumber == null ? "" : cardNumber;
+            this.cardNumber = cardNumber;
             return this;
         }
 
@@ -269,9 +247,8 @@ public record Account(
             return this;
         }
 
-        public Builder guid(UUID guid) {
-            Objects.requireNonNull(guid);
-            this.uuid = guid;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 

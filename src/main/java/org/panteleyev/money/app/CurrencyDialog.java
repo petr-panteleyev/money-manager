@@ -121,7 +121,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
                 .modified(now);
 
             if (currency == null) {
-                builder.guid(UUID.randomUUID())
+                builder.uuid(UUID.randomUUID())
                     .created(now);
             }
 

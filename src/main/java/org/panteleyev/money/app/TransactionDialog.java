@@ -568,7 +568,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         builder.modified(System.currentTimeMillis());
         if (uuid != null) {
-            builder.guid(uuid);
+            builder.uuid(uuid);
         }
         return true;
     }

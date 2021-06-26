@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.2</version>
+    <version>21.4.3</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -28,30 +28,22 @@
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
-        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
+        <liquibasePluginVersion>4.4.0</liquibasePluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>16</javaFxVersion>
         <javaFxHelpersVersion>1.8.3</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
-        <javaApiForMySqlVersion>1.5.0</javaApiForMySqlVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.13.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
+        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.3.0</testNgVersion>
-        <!-- Test properties -->
-        <money.test.mysql.host>localhost</money.test.mysql.host>
-        <money.test.mysql.database>MoneyTestDB</money.test.mysql.database>
-        <money.test.mysql.user>__define_mysql_user__</money.test.mysql.user>
-        <money.test.mysql.password>__define_mysql_password__</money.test.mysql.password>
+        <h2Version>1.4.194</h2Version>
+        <liquibaseVersion>4.4.0</liquibaseVersion>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.panteleyev</groupId>
-            <artifactId>java-api-for-mysql</artifactId>
-            <version>${javaApiForMySqlVersion}</version>
-        </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>java-fx-helpers</artifactId>
@@ -119,6 +111,11 @@
             <artifactId>freemarker</artifactId>
             <version>${freemarkerVersion}</version>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibaseVersion}</version>
+        </dependency>
         <!-- Test -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -130,6 +127,12 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>${testNgVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2Version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -190,17 +193,10 @@
                     <argLine>
                         --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
                         --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-                        --add-reads org.panteleyev.mysqlapi=org.panteleyev.money
                         --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED
                         --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
                         --add-exports javafx.graphics/com.sun.javafx.embed=ALL-UNNAMED
                     </argLine>
-                    <systemPropertyVariables>
-                        <mysql.host>${money.test.mysql.host}</mysql.host>
-                        <mysql.user>${money.test.mysql.user}</mysql.user>
-                        <mysql.password>${money.test.mysql.password}</mysql.password>
-                        <mysql.database>${money.test.mysql.database}</mysql.database>
-                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -282,6 +278,21 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-maven-plugin</artifactId>
+                <version>${liquibasePluginVersion}</version>
+                <configuration>
+                    <changeLogFile>src/main/resources/database/masterChangelog.xml</changeLogFile>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysqlConnectorVersion}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

@@ -31,7 +31,7 @@ public final class ConnectionProfileManager {
 
     private final Map<String, ConnectionProfile> profiles = new HashMap<>();
 
-    private final Function<ConnectionProfile, Exception> initDatabaseCallback;
+    private final Function<ConnectionProfile, Exception> resetDatabaseCallback;
     private final Function<ConnectionProfile, DataSource> buildDataSourceCallback;
     private final Preferences preferencesParent;
 
@@ -43,7 +43,7 @@ public final class ConnectionProfileManager {
         Objects.requireNonNull(buildDataSourceCallback);
         Objects.requireNonNull(preferencesParent);
 
-        this.initDatabaseCallback = initDatabaseCallback;
+        this.resetDatabaseCallback = initDatabaseCallback;
         this.buildDataSourceCallback = buildDataSourceCallback;
         this.preferencesParent = preferencesParent;
     }
@@ -56,8 +56,8 @@ public final class ConnectionProfileManager {
         autoConnect = b;
     }
 
-    public Function<ConnectionProfile, Exception> getInitDatabaseCallback() {
-        return initDatabaseCallback;
+    public Function<ConnectionProfile, Exception> getResetDatabaseCallback() {
+        return resetDatabaseCallback;
     }
 
     public Function<ConnectionProfile, DataSource> getBuildDataSourceCallback() {

@@ -25,6 +25,7 @@
     <test name="Persistence">
         <classes>
             <class name="org.panteleyev.money.persistence.TestFreshFile"/>
+            <class name="org.panteleyev.money.persistence.TestRepositories"/>
             <class name="org.panteleyev.money.persistence.TestMoneyDAO"/>
         </classes>
     </test>

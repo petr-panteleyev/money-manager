@@ -1,41 +1,43 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.money.model;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.ForeignKey;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.ReferenceOption;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.util.Comparator;
 import java.util.UUID;
 
-@Table("category")
 public record Category(
-    @PrimaryKey
-    @Column("uuid")
     UUID uuid,
-    @Column("name")
     String name,
-    @Column("comment")
     String comment,
-    @Column("type")
     CategoryType type,
-    @Column("icon_uuid")
-    @ForeignKey(table = Icon.class, column = "uuid", onDelete = ReferenceOption.SET_NULL)
     UUID iconUuid,
-    @Column("created")
     long created,
-    @Column("modified")
     long modified
-
 ) implements MoneyRecord, Named {
 
     public static final Comparator<Category> COMPARE_BY_NAME =
         (c1, c2) -> c1.name().compareToIgnoreCase(c2.name());
+
+    public Category {
+        if (uuid == null) {
+            throw new IllegalStateException("Category id cannot be null");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalStateException("Category name cannot be null or blank");
+        }
+        if (type == null) {
+            throw new IllegalStateException("Category type cannot be null");
+        }
+        if (created <= 0) {
+            created = System.currentTimeMillis();
+        }
+        if (modified <= 0) {
+            modified = System.currentTimeMillis();
+        }
+        comment = MoneyRecord.normalize(comment);
+    }
 
     public static class Builder {
         private String name = "";
@@ -68,31 +70,16 @@ public record Category(
         }
 
         public Category build() {
-            if (uuid == null) {
-                uuid = UUID.randomUUID();
-            }
-
-            long now = System.currentTimeMillis();
-            if (created == 0) {
-                created = now;
-            }
-            if (modified == 0) {
-                modified = now;
-            }
-
             return new Category(uuid, name, comment, type, iconUuid, created, modified);
         }
 
         public Builder name(String name) {
-            if (name == null || name.isBlank()) {
-                throw new IllegalArgumentException("Category name must not be empty");
-            }
             this.name = name;
             return this;
         }
 
         public Builder comment(String comment) {
-            this.comment = comment == null ? "" : comment;
+            this.comment = comment;
             return this;
         }
 
@@ -106,8 +93,8 @@ public record Category(
             return this;
         }
 
-        public Builder guid(UUID guid) {
-            this.uuid = guid;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 

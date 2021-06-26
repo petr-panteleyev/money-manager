@@ -192,7 +192,7 @@ class AccountDialog extends BaseDialog<Account> {
                 .modified(now);
 
             if (account == null) {
-                builder.guid(UUID.randomUUID())
+                builder.uuid(UUID.randomUUID())
                     .created(now);
             }
 

@@ -5,6 +5,7 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -44,6 +45,10 @@ public interface BaseTestUtils {
         return RANDOM.nextBoolean();
     }
 
+    static int randomInt() {
+        return RANDOM.nextInt();
+    }
+
     static BigDecimal randomBigDecimal() {
         return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
@@ -51,6 +56,11 @@ public interface BaseTestUtils {
     static CategoryType randomCategoryType() {
         int index = RANDOM.nextInt(CategoryType.values().length);
         return CategoryType.values()[index];
+    }
+
+    static CardType randomCardType() {
+        int index = RANDOM.nextInt(CardType.values().length);
+        return CardType.values()[index];
     }
 
     static ContactType randomContactType() {
@@ -82,7 +92,9 @@ public interface BaseTestUtils {
             .enabled(RANDOM.nextBoolean())
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
-            .guid(UUID.randomUUID())
+            .cardType(randomCardType())
+            .cardNumber(randomString())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }
@@ -102,7 +114,9 @@ public interface BaseTestUtils {
             .interest(randomBigDecimal())
             .closingDate(LocalDate.now())
             .iconUuid(icon.uuid())
-            .guid(UUID.randomUUID())
+            .cardType(randomCardType())
+            .cardNumber(randomString())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }
@@ -133,7 +147,7 @@ public interface BaseTestUtils {
             .comment(UUID.randomUUID().toString())
             .type(type)
             .iconUuid(iconUuid)
-            .guid(uuid)
+            .uuid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
@@ -153,7 +167,7 @@ public interface BaseTestUtils {
             .rate(randomBigDecimal())
             .direction(RANDOM.nextInt(2))
             .useThousandSeparator(RANDOM.nextBoolean())
-            .guid(uuid)
+            .uuid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
@@ -180,7 +194,7 @@ public interface BaseTestUtils {
             .country(UUID.randomUUID().toString())
             .zip(UUID.randomUUID().toString())
             .iconUuid(iconUuid)
-            .guid(uuid)
+            .uuid(uuid)
             .modified(System.currentTimeMillis())
             .build();
     }
@@ -198,7 +212,7 @@ public interface BaseTestUtils {
             .city(UUID.randomUUID().toString())
             .country(UUID.randomUUID().toString())
             .zip(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .created(System.currentTimeMillis())
             .modified(System.currentTimeMillis())
             .build();
@@ -210,7 +224,7 @@ public interface BaseTestUtils {
 
     static Transaction newTransaction(UUID uuid) {
         return new Transaction.Builder()
-            .guid(uuid)
+            .uuid(uuid)
             .amount(randomBigDecimal())
             .day(randomDay())
             .month(randomMonth())
@@ -251,7 +265,7 @@ public interface BaseTestUtils {
             .rate(randomBigDecimal())
             .rateDirection(RANDOM.nextInt(2))
             .invoiceNumber(UUID.randomUUID().toString())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
     }

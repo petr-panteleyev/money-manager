@@ -4,81 +4,82 @@
  */
 package org.panteleyev.money.model;
 
-import org.panteleyev.mysqlapi.annotations.Column;
-import org.panteleyev.mysqlapi.annotations.ForeignKey;
-import org.panteleyev.mysqlapi.annotations.PrimaryKey;
-import org.panteleyev.mysqlapi.annotations.ReferenceOption;
-import org.panteleyev.mysqlapi.annotations.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 
-@Table("transaction")
 public record Transaction(
-    @PrimaryKey
-    @Column("uuid")
     UUID uuid,
-    @Column("amount")
     BigDecimal amount,
-    @Column("day")
     int day,
-    @Column("month")
     int month,
-    @Column("year")
     int year,
-    @Column("type")
     TransactionType type,
-    @Column("comment")
     String comment,
-    @Column("checked")
     boolean checked,
-    @Column(value = "acc_debited_uuid")
-    @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID accountDebitedUuid,
-    @Column(value = "acc_credited_uuid")
-    @ForeignKey(table = Account.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID accountCreditedUuid,
-    @Column("acc_debited_type")
     CategoryType accountDebitedType,
-    @Column("acc_credited_type")
     CategoryType accountCreditedType,
-    @Column(value = "acc_debited_category_uuid")
-    @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID accountDebitedCategoryUuid,
-    @Column(value = "acc_credited_category_uuid")
-    @ForeignKey(table = Category.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID accountCreditedCategoryUuid,
-    @Column("contact_uuid")
-    @ForeignKey(table = Contact.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID contactUuid,
-    @Column("rate")
     BigDecimal rate,
-    @Column("rate_direction")
     int rateDirection,
-    @Column("invoice_number")
     String invoiceNumber,
-    @Column("parent_uuid")
-    @ForeignKey(table = Transaction.class, column = "uuid", onDelete = ReferenceOption.RESTRICT)
     UUID parentUuid,
-    @Column("detailed")
     boolean detailed,
-    @Column("statement_date")
     LocalDate statementDate,
-    @Column("created")
     long created,
-    @Column("modified")
     long modified
-
-) implements MoneyRecord
-{
+) implements MoneyRecord {
 
     public Transaction {
-        amount = MoneyRecord.normalize(amount);
-        rate = MoneyRecord.normalize(rate);
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+        if (amount == null) {
+            throw new IllegalStateException("Transaction amount cannot be null");
+        }
+        if (accountDebitedUuid == null) {
+            throw new IllegalStateException("Debited account id cannot be null");
+        }
+        if (accountCreditedUuid == null) {
+            throw new IllegalStateException("Credited account id cannot be null");
+        }
+        if (accountDebitedType == null) {
+            throw new IllegalStateException("Debited account type cannot be null");
+        }
+        if (accountCreditedType == null) {
+            throw new IllegalStateException("Credited account type cannot be null");
+        }
+        if (accountDebitedCategoryUuid == null) {
+            throw new IllegalStateException("Debited account category id cannot be null");
+        }
+        if (accountCreditedCategoryUuid == null) {
+            throw new IllegalStateException("Credited account category id cannot be null");
+        }
+
+        if (type == null) {
+            type = TransactionType.UNDEFINED;
+        }
+
+        comment = MoneyRecord.normalize(comment);
+        invoiceNumber = MoneyRecord.normalize(invoiceNumber);
+
+        amount = MoneyRecord.normalize(amount, BigDecimal.ZERO);
+        rate = MoneyRecord.normalize(rate, BigDecimal.ONE);
 
         if (statementDate == null) {
             statementDate = LocalDate.of(year, month, day);
+        }
+
+        long now = System.currentTimeMillis();
+        if (created == 0) {
+            created = now;
+        }
+        if (modified == 0) {
+            modified = now;
         }
     }
 
@@ -110,7 +111,7 @@ public record Transaction(
         private int day;
         private int month;
         private int year;
-        private TransactionType type;
+        private TransactionType type = TransactionType.UNDEFINED;
         private String comment = "";
         private boolean checked;
         private UUID accountDebitedUuid;
@@ -181,7 +182,6 @@ public record Transaction(
         }
 
         public Builder amount(BigDecimal amount) {
-            Objects.requireNonNull(amount);
             this.amount = amount;
             return this;
         }
@@ -196,20 +196,17 @@ public record Transaction(
             return this;
         }
 
-
         public Builder year(int year) {
             this.year = year;
             return this;
         }
 
         public Builder type(TransactionType type) {
-            Objects.requireNonNull(type);
             this.type = type;
             return this;
         }
 
         public Builder comment(String comment) {
-            Objects.requireNonNull(comment);
             this.comment = comment;
             return this;
         }
@@ -255,8 +252,7 @@ public record Transaction(
         }
 
         public Builder rate(BigDecimal rate) {
-            Objects.requireNonNull(rate);
-            this.rate = rate;
+            this.rate = rate == null ? BigDecimal.ONE : rate;
             return this;
         }
 
@@ -266,14 +262,12 @@ public record Transaction(
         }
 
         public Builder invoiceNumber(String invoiceNumber) {
-            Objects.requireNonNull(invoiceNumber);
             this.invoiceNumber = invoiceNumber;
             return this;
         }
 
-        public Builder guid(UUID guid) {
-            Objects.requireNonNull(guid);
-            this.uuid = guid;
+        public Builder uuid(UUID uuid) {
+            this.uuid = uuid;
             return this;
         }
 
@@ -313,33 +307,11 @@ public record Transaction(
         }
 
         public Transaction build() {
-            if (this.type == null) {
-                this.type = TransactionType.UNDEFINED;
-            }
-
-            if (uuid == null) {
-                uuid = UUID.randomUUID();
-            }
-
-            long now = System.currentTimeMillis();
-            if (created == 0) {
-                created = now;
-            }
-            if (modified == 0) {
-                modified = now;
-            }
-
-            if (this.uuid != null && this.accountDebitedUuid != null && this.accountCreditedUuid != null
-                && this.accountDebitedType != null && this.accountCreditedType != null
-                && this.accountDebitedCategoryUuid != null && this.accountCreditedCategoryUuid != null) {
-                return new Transaction(uuid, amount, day, month, year, type, comment,
-                    checked, accountDebitedUuid, accountCreditedUuid,
-                    accountDebitedType, accountCreditedType,
-                    accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
-            } else {
-                throw new IllegalStateException();
-            }
+            return new Transaction(uuid, amount, day, month, year, type, comment,
+                checked, accountDebitedUuid, accountCreditedUuid,
+                accountDebitedType, accountCreditedType,
+                accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
+                rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
         }
     }
 }

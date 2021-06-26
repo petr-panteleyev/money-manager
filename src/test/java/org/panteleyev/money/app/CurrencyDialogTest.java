@@ -21,7 +21,7 @@ import static org.testng.Assert.assertTrue;
 
 public class CurrencyDialogTest extends BaseTest {
     private final static Currency CURRENCY = new Currency.Builder()
-        .guid(UUID.randomUUID())
+        .uuid(UUID.randomUUID())
         .symbol(UUID.randomUUID().toString())
         .description(UUID.randomUUID().toString())
         .formatSymbol(UUID.randomUUID().toString())

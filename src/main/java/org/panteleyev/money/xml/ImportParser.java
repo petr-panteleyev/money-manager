@@ -157,7 +157,7 @@ class ImportParser extends DefaultHandler {
             .comment(tags.get("comment"))
             .type(parseCategoryType(tags.get("type")))
             .iconUuid(parseUuid(tags.get("iconUuid")))
-            .guid(UUID.fromString(tags.get("guid")))
+            .uuid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
             .build();
@@ -184,7 +184,7 @@ class ImportParser extends DefaultHandler {
             .cardNumber(tags.get("cardNumber"))
             .total(parseBigDecimal(tags.get("total")))
             .totalWaiting(parseBigDecimal(tags.get("totalWaiting")))
-            .guid(UUID.fromString(tags.get("guid")))
+            .uuid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
             .build();
@@ -203,7 +203,7 @@ class ImportParser extends DefaultHandler {
             .rate(new BigDecimal(tags.get("rate")))
             .direction(parseInt(tags.get("direction")))
             .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator"), false))
-            .guid(UUID.fromString(tags.get("guid")))
+            .uuid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
             .build();
@@ -225,7 +225,7 @@ class ImportParser extends DefaultHandler {
             .country(tags.get("country"))
             .zip(tags.get("zip"))
             .iconUuid(parseUuid(tags.get("iconUuid")))
-            .guid(UUID.fromString(tags.get("guid")))
+            .uuid(UUID.fromString(tags.get("guid")))
             .created(created)
             .modified(modified)
             .build();
@@ -254,7 +254,7 @@ class ImportParser extends DefaultHandler {
             .invoiceNumber(tags.get("invoiceNumber"))
             .parentUuid(parseUuid(tags.get("parentUuid")))
             .detailed(parseBoolean(tags.get("detailed"), false))
-            .guid(UUID.fromString(tags.get("guid")))
+            .uuid(UUID.fromString(tags.get("guid")))
             .statementDate(parseLocalDate(tags.get("statementDate"), null))
             .created(created)
             .modified(modified)

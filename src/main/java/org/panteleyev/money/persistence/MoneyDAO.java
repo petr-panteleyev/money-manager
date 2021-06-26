@@ -14,8 +14,6 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.xml.Import;
-import org.panteleyev.mysqlapi.MySqlClient;
-import org.panteleyev.mysqlapi.TableRecord;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -35,14 +33,19 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 public class MoneyDAO {
     private static final MoneyDAO MONEY_DAO = new MoneyDAO();
 
+    private DataSource dataSource;
+    // Repositories
+    private CategoryRepository categoryRepository;
+    private AccountRepository accountRepository;
+    private ContactRepository contactRepository;
+    private CurrencyRepository currencyRepository;
+    private TransactionRepository transactionRepository;
+    private IconRepository iconRepository;
+
     private static final DataCache cache = DataCache.cache();
 
     public static MoneyDAO getDao() {
         return MONEY_DAO;
-    }
-
-    public static MySqlClient getClient() {
-        return MONEY_DAO.client;
     }
 
     public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
@@ -71,39 +74,42 @@ public class MoneyDAO {
 
     public static final Consumer<String> IGNORE_PROGRESS = x -> { };
 
-    @SuppressWarnings("rawtypes")
-    private static final List<Class<? extends TableRecord>> TABLE_CLASSES = List.of(
-        Icon.class,
-        Category.class,
-        Contact.class,
-        Currency.class,
-        Account.class,
-        Transaction.class
-    );
+    // Repositories
+    public CategoryRepository getCategoryRepository() {
+        return categoryRepository;
+    }
 
-    @SuppressWarnings("rawtypes")
-    private static final List<Class<? extends TableRecord>> TABLE_CLASSES_REVERSED = List.of(
-        Transaction.class,
-        Account.class,
-        Currency.class,
-        Contact.class,
-        Category.class,
-        Icon.class
-    );
+    public AccountRepository getAccountRepository() {
+        return accountRepository;
+    }
 
-    private final MySqlClient client = new MySqlClient();
+    public ContactRepository getContactRepository() {
+        return contactRepository;
+    }
+
+    public CurrencyRepository getCurrencyRepository() {
+        return currencyRepository;
+    }
+
+    public TransactionRepository getTransactionRepository() {
+        return transactionRepository;
+    }
+
+    public IconRepository getIconRepository() {
+        return iconRepository;
+    }
 
     ////////////////////////////////////////////////////////////////////////////
     // Icons
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertIcon(Icon icon) {
-        client.insert(icon);
+        iconRepository.insert(icon);
         cache.add(icon);
     }
 
     public void updateIcon(Icon icon) {
-        client.update(icon);
+        iconRepository.update(icon);
         cache.update(icon);
     }
 
@@ -112,12 +118,12 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertCategory(Category category) {
-        client.insert(category);
+        categoryRepository.insert(category);
         cache.add(category);
     }
 
     public void updateCategory(Category category) {
-        client.update(category);
+        categoryRepository.update(category);
         cache.update(category);
     }
 
@@ -126,12 +132,12 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertCurrency(Currency currency) {
-        client.insert(currency);
+        currencyRepository.insert(currency);
         cache.add(currency);
     }
 
     public void updateCurrency(Currency currency) {
-        client.update(currency);
+        currencyRepository.update(currency);
         cache.update(currency);
     }
 
@@ -140,12 +146,12 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertContact(Contact contact) {
-        client.insert(contact);
+        contactRepository.insert(contact);
         cache.add(contact);
     }
 
     public void updateContact(Contact contact) {
-        client.update(contact);
+        contactRepository.update(contact);
         cache.update(contact);
     }
 
@@ -154,18 +160,18 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertAccount(Account account) {
-        client.insert(account);
+        accountRepository.insert(account);
         cache.add(account);
     }
 
     public void updateAccount(Account account) {
-        client.update(account);
+        accountRepository.update(account);
         cache.update(account);
     }
 
     public void deleteAccount(Account account) {
         cache.remove(account);
-        client.delete(account);
+        accountRepository.delete(account);
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -173,20 +179,20 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertTransaction(Transaction transaction) {
-        client.insert(transaction);
+        transactionRepository.insert(transaction);
         cache.add(transaction);
         updateAccounts(transaction);
     }
 
     public void updateTransaction(Transaction transaction) {
         var oldTransaction = cache.getTransaction(transaction.uuid()).orElseThrow();
-        client.update(transaction);
+        transactionRepository.update(transaction);
         cache.update(transaction);
         updateAccounts(oldTransaction, transaction);
     }
 
     public void deleteTransaction(Transaction transaction) {
-        client.delete(transaction.uuid(), Transaction.class);
+        transactionRepository.delete(transaction);
         cache.remove(transaction);
         updateAccounts(transaction);
     }
@@ -211,16 +217,12 @@ public class MoneyDAO {
             });
     }
 
-    public void createTables(Connection conn) {
-        client.createTables(conn, TABLE_CLASSES);
-    }
-
     public void createTables() {
-        client.createTables(TABLE_CLASSES);
-    }
-
-    public void dropTables() {
-        client.dropTables(TABLE_CLASSES_REVERSED);
+        try (var conn = dataSource.getConnection()) {
+            new LiquibaseUtil(conn).dropAndUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public void preload() {
@@ -228,34 +230,30 @@ public class MoneyDAO {
     }
 
     public void preload(Consumer<String> progress) {
-        progress.accept("Preloading primary keys... ");
-        client.preload(TABLE_CLASSES);
-        progress.accept(" done\n");
-
         progress.accept("Preloading data...\n");
 
         progress.accept("    icons... ");
-        var iconList = client.getAll(Icon.class);
+        var iconList = iconRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("    categories... ");
-        var categoryList = client.getAll(Category.class);
+        var categoryList = categoryRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("    contacts... ");
-        var contactList = client.getAll(Contact.class);
+        var contactList = contactRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("    currencies... ");
-        var currencyList = client.getAll(Currency.class);
+        var currencyList = currencyRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("    accounts... ");
-        var accountList = client.getAll(Account.class);
+        var accountList = accountRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("    transactions... ");
-        var transactionList = client.getAll(Transaction.class);
+        var transactionList = transactionRepository.getAll();
         progress.accept("done\n");
 
         progress.accept("done\n");
@@ -272,42 +270,50 @@ public class MoneyDAO {
     }
 
     public void initialize(DataSource ds) {
-        client.setDataSource(ds);
+        dataSource = ds;
+
+        categoryRepository = new CategoryRepository(ds);
+        accountRepository = new AccountRepository(ds);
+        contactRepository = new ContactRepository(ds);
+        currencyRepository = new CurrencyRepository(ds);
+        transactionRepository = new TransactionRepository(ds);
+        iconRepository = new IconRepository(ds);
+
         cache.clear();
     }
 
     public void importFullDump(Import imp, Consumer<String> progress) {
-        try (var conn = client.getDataSource().getConnection()) {
-            progress.accept("Recreating tables... ");
-            createTables(conn);
-            progress.accept(" done\n");
+        progress.accept("Recreating tables... ");
+        createTables();
+        progress.accept(" done\n");
 
+        try (var conn = dataSource.getConnection()) {
             progress.accept("Importing data...\n");
 
             progress.accept("    icons... ");
-            client.insert(conn, BATCH_SIZE, imp.getIcons());
+            iconRepository.insert(conn, BATCH_SIZE, imp.getIcons());
             progress.accept("done\n");
 
             progress.accept("    categories... ");
-            client.insert(conn, BATCH_SIZE, imp.getCategories());
+            categoryRepository.insert(conn, BATCH_SIZE, imp.getCategories());
             progress.accept("done\n");
 
             progress.accept("    currencies... ");
-            client.insert(conn, BATCH_SIZE, imp.getCurrencies());
+            currencyRepository.insert(conn, BATCH_SIZE, imp.getCurrencies());
             progress.accept("done\n");
 
             progress.accept("    accounts... ");
-            client.insert(conn, BATCH_SIZE, imp.getAccounts());
+            accountRepository.insert(conn, BATCH_SIZE, imp.getAccounts());
             progress.accept("done\n");
 
             progress.accept("    contacts... ");
-            client.insert(conn, BATCH_SIZE, imp.getContacts());
+            contactRepository.insert(conn, BATCH_SIZE, imp.getContacts());
             progress.accept("done\n");
 
             progress.accept("    transactions... ");
-            client.insert(conn, BATCH_SIZE,
+            transactionRepository.insert(conn, BATCH_SIZE,
                 imp.getTransactions().stream().filter(t -> t.parentUuid() == null).toList());
-            client.insert(conn, BATCH_SIZE,
+            transactionRepository.insert(conn, BATCH_SIZE,
                 imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
             progress.accept("done\n");
 
@@ -335,7 +341,8 @@ public class MoneyDAO {
         }
     }
 
-    private <T extends MoneyRecord> void importTable(Connection conn,
+    private <T extends MoneyRecord> void importTable(Repository<T> repository,
+                                                     Connection conn,
                                                      List<? extends T> toImport,
                                                      Map<UUID, ImportAction> importActions)
     {
@@ -345,11 +352,11 @@ public class MoneyDAO {
                     continue;
 
                 case INSERT:
-                    client.insert(conn, item);
+                    repository.insert(conn, item);
                     break;
 
                 case UPDATE:
-                    client.update(conn, item);
+                    repository.update(conn, item);
                     break;
             }
         }
@@ -370,16 +377,16 @@ public class MoneyDAO {
         calculateActions(accountActions, cache.getAccounts(), imp.getAccounts());
         calculateActions(transactionActions, cache.getTransactions(), imp.getTransactions());
 
-        try (var conn = client.getDataSource().getConnection()) {
+        try (var conn = dataSource.getConnection()) {
             try {
                 conn.setAutoCommit(false);
 
-                importTable(conn, imp.getIcons(), iconActions);
-                importTable(conn, imp.getCategories(), categoryActions);
-                importTable(conn, imp.getCurrencies(), currencyActions);
-                importTable(conn, imp.getContacts(), contactActions);
-                importTable(conn, imp.getAccounts(), accountActions);
-                importTable(conn, imp.getTransactions(), transactionActions);
+                importTable(iconRepository, conn, imp.getIcons(), iconActions);
+                importTable(categoryRepository, conn, imp.getCategories(), categoryActions);
+                importTable(currencyRepository, conn, imp.getCurrencies(), currencyActions);
+                importTable(contactRepository, conn, imp.getContacts(), contactActions);
+                importTable(accountRepository, conn, imp.getAccounts(), accountActions);
+                importTable(transactionRepository, conn, imp.getTransactions(), transactionActions);
 
                 conn.commit();
             } catch (Exception ex) {
@@ -391,16 +398,15 @@ public class MoneyDAO {
         }
     }
 
-    public static Exception initDatabase(MysqlDataSource dataSource, String schema) {
+    public static Exception resetDatabase(MysqlDataSource dataSource, String schema) {
         dataSource.setDatabaseName(null);
 
         try (var conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
-            st.execute("CREATE DATABASE IF NOT EXISTS " + schema + " CHARACTER SET = utf8");
-
             dataSource.setDatabaseName(schema);
 
-            var dao = new MySqlClient(dataSource);
-            dao.createTables(TABLE_CLASSES);
+            try (var liquibaseConn = dataSource.getConnection()) {
+                new LiquibaseUtil(liquibaseConn).dropAndUpdate();
+            }
 
             return null;
         } catch (SQLException ex) {
@@ -441,11 +447,27 @@ public class MoneyDAO {
 
     private Contact createContact(String name) {
         var contact = new Contact.Builder()
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .name(name)
             .build();
 
         getDao().insertContact(contact);
         return contact;
+    }
+
+    public LiquibaseUtil.SchemaStatus checkSchemaUpdateStatus() {
+        try (var conn = dataSource.getConnection()) {
+            return new LiquibaseUtil(conn).checkSchemaUpdateStatus();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void updateSchema() {
+        try (var conn = dataSource.getConnection()) {
+            new LiquibaseUtil(conn).update();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

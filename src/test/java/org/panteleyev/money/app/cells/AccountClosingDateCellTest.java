@@ -11,6 +11,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.time.LocalDate;
+import java.util.UUID;
 import static org.panteleyev.money.app.Styles.EXPIRED;
 import static org.testng.Assert.assertEquals;
 
@@ -42,6 +43,9 @@ public class AccountClosingDateCellTest {
 
         var today = LocalDate.now();
         var account = new Account.Builder()
+            .uuid(UUID.randomUUID())
+            .name(UUID.randomUUID().toString())
+            .categoryUuid(UUID.randomUUID())
             .type(CategoryType.BANKS_AND_CASH)
             .closingDate(today.plusDays(delta))
             .build();

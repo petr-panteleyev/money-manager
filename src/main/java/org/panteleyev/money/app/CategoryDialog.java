@@ -86,7 +86,7 @@ final class CategoryDialog extends BaseDialog<Category> {
                 .modified(now);
 
             if (category == null) {
-                builder.guid(UUID.randomUUID())
+                builder.uuid(UUID.randomUUID())
                     .created(now);
             }
 

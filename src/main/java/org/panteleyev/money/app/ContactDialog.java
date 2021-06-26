@@ -119,7 +119,7 @@ final class ContactDialog extends BaseDialog<Contact> {
                 .modified(now);
 
             if (contact == null) {
-                builder.guid(UUID.randomUUID())
+                builder.uuid(UUID.randomUUID())
                     .created(now);
             }
 

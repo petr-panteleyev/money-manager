@@ -9,10 +9,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.MainWindowController;
-import org.panteleyev.mysqlapi.MySqlClient;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -27,8 +25,6 @@ public class MoneyApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        MySqlClient.addReads(List.of(MoneyApplication.class.getModule()));
-
         options().initialize();
         options().loadFontOptions();
         options().loadColorOptions();

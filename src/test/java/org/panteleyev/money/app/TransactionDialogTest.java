@@ -56,7 +56,7 @@ public class TransactionDialogTest extends BaseTest {
             .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -70,7 +70,7 @@ public class TransactionDialogTest extends BaseTest {
             .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -78,11 +78,12 @@ public class TransactionDialogTest extends BaseTest {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .type(CategoryType.BANKS_AND_CASH)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
         contact = new Contact.Builder()
+            .uuid(UUID.randomUUID())
             .name(UUID.randomUUID().toString())
             .build();
 
@@ -94,7 +95,7 @@ public class TransactionDialogTest extends BaseTest {
             .categoryUuid(category.uuid())
             .currencyUuid(currency1.uuid())
             .enabled(true)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -107,7 +108,7 @@ public class TransactionDialogTest extends BaseTest {
             .categoryUuid(category.uuid())
             .currencyUuid(currency2.uuid())
             .enabled(true)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -120,7 +121,7 @@ public class TransactionDialogTest extends BaseTest {
             .categoryUuid(category.uuid())
             .currencyUuid(currency1.uuid())
             .enabled(true)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -213,7 +214,7 @@ public class TransactionDialogTest extends BaseTest {
     private Transaction createTestTransaction(Account debit, Account credit, Contact contact) {
         var now = LocalDate.now();
         var builder = new Transaction.Builder()
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .type(TransactionType.CARD_PAYMENT)
             .accountCreditedType(category.type())
             .accountDebitedType(category.type())

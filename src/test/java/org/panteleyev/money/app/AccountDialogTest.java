@@ -56,7 +56,7 @@ public class AccountDialogTest extends BaseTest {
             .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -70,7 +70,7 @@ public class AccountDialogTest extends BaseTest {
             .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
             .direction(1)
             .useThousandSeparator(false)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -78,7 +78,7 @@ public class AccountDialogTest extends BaseTest {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .type(CategoryType.BANKS_AND_CASH)
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -93,7 +93,7 @@ public class AccountDialogTest extends BaseTest {
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .closingDate(LocalDate.now())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
@@ -108,7 +108,7 @@ public class AccountDialogTest extends BaseTest {
             .openingBalance(randomBigDecimal())
             .accountLimit(randomBigDecimal())
             .closingDate(LocalDate.now())
-            .guid(UUID.randomUUID())
+            .uuid(UUID.randomUUID())
             .modified(System.currentTimeMillis())
             .build();
 
