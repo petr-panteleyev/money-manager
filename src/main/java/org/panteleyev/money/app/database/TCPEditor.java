@@ -24,8 +24,14 @@ import static org.panteleyev.fx.grid.GridBuilder.columnConstraints;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_LOGIN;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PASSWORD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RESET;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SCHEMA;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SERVER;
 
 final class TCPEditor extends VBox {
     private final TextField schemaEdit = initSchemaEdit();
@@ -35,17 +41,18 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> resetSchemaHandler) {
-        var resetSchemaButton = button(fxString(RB, "Reset"));
+        var resetSchemaButton = button(fxString(UI, I18N_WORD_RESET));
         resetSchemaButton.setGraphic(new ImageView(Images.WARNING));
         resetSchemaButton.disableProperty().bind(validation.invalidProperty());
         resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
 
         getChildren().addAll(gridPane(
             List.of(
-                gridRow(label(fxString(RB, "Server", COLON)), dataBaseHostEdit, label(fxString(RB, "Port", COLON)), dataBasePortEdit),
-                gridRow(label(fxString(RB, "Login", COLON)), gridCell(dataBaseUserEdit, 3, 1)),
-                gridRow(label(fxString(RB, "Password", COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
-                gridRow(label(fxString(RB, "Schema", COLON)), gridCell(schemaEdit, 2, 1), resetSchemaButton)
+                gridRow(label(fxString(UI, I18N_WORD_SERVER, COLON)), dataBaseHostEdit,
+                    label(fxString(UI, I18N_WORD_PORT, COLON)), dataBasePortEdit),
+                gridRow(label(fxString(UI, I18N_WORD_LOGIN, COLON)), gridCell(dataBaseUserEdit, 3, 1)),
+                gridRow(label(fxString(UI, I18N_WORD_PASSWORD, COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
+                gridRow(label(fxString(UI, I18N_WORD_SCHEMA, COLON)), gridCell(schemaEdit, 2, 1), resetSchemaButton)
             ), b -> b.withStyle(GRID_PANE)
                 .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
         ));

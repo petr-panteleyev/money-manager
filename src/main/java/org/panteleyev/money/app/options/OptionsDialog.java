@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Control;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Font;
@@ -31,7 +30,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
@@ -43,13 +42,31 @@ import static org.panteleyev.money.app.options.ColorOption.STATEMENT_MISSING;
 import static org.panteleyev.money.app.options.ColorOption.STATEMENT_UNCHECKED;
 import static org.panteleyev.money.app.options.ColorOption.TRANSFER;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_CLOSING;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_NOT_FOUND;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COLORS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONFIRMED;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTROLS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CREDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DEBIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DIALOGS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_FONTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_GENERAL;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_MENU;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_OPTIONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TABLES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TEXT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSFER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNCONFIRMED;
 
 public class OptionsDialog extends BaseDialog<ButtonType> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(FXCollections.observableArrayList(2, 3, 4, 5));
     private final TextField accountClosingDayDeltaEdit = new TextField();
-    private final PasswordField ymToken = new PasswordField();
 
     // Font text fields
     private final TextField controlsFontField = new TextField();
@@ -68,8 +85,8 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
     public OptionsDialog(Controller owner) {
         super(owner, options().getDialogCssFileUrl());
 
-        setTitle(RB.getString("options.Dialog.Title"));
-        createDefaultButtons(RB, validation.invalidProperty());
+        setTitle(fxString(UI, I18N_WORD_OPTIONS));
+        createDefaultButtons(UI, validation.invalidProperty());
 
         controlsFontField.setEditable(false);
         controlsFontField.setPrefColumnCount(20);
@@ -86,30 +103,29 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
         loadFont(FontOption.DIALOG_LABEL_FONT, dialogLabelFontField);
 
         var tabPane = new TabPane(
-            newTab(RB, "General", false, gridPane(
+            newTab(UI, I18N_WORD_GENERAL, false, gridPane(
                 List.of(
-                    gridRow(label(fxString(RB, "options.Dialog.Prefix.Length")), autoCompleteLength),
-                    gridRow(label(fxString(RB, "options.Dialog.closing.day.delta")), accountClosingDayDeltaEdit),
-                    gridRow(label(fxString(RB, "label.YandexMoneyToken")), ymToken)
+                    gridRow(label(fxString(UI, I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, COLON)), autoCompleteLength),
+                    gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING)), accountClosingDayDeltaEdit)
                 ), b -> b.withStyle(GRID_PANE))
             ),
-            newTab(RB, "Fonts", false,
+            newTab(UI, I18N_WORD_FONTS, false,
                 vBox(10,
-                    titledPane(fxString(RB, "Controls"),
+                    titledPane(fxString(UI, I18N_WORD_CONTROLS),
                         gridPane(List.of(
-                            gridRow(label(fxString(RB, "Text", COLON)), controlsFontField,
+                            gridRow(label(fxString(UI, I18N_WORD_TEXT, COLON)), controlsFontField,
                                 button(ELLIPSIS, actionEvent -> onFontSelected(controlsFontField))),
-                            gridRow(label(fxString(RB, "Menu", COLON)), menuFontField,
+                            gridRow(label(fxString(UI, I18N_WORD_MENU, COLON)), menuFontField,
                                 button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
                         ), b -> b.withStyle(GRID_PANE))
                     ),
-                    titledPane(fxString(RB, "Tables"),
+                    titledPane(fxString(UI, I18N_WORD_TABLES),
                         vBox(BIG_SPACING,
                             hBox(SMALL_SPACING, cellFontField, button(ELLIPSIS,
                                 actionEvent -> onFontSelected(cellFontField)))
                         )
                     ),
-                    titledPane(fxString(RB, "Dialogs"),
+                    titledPane(fxString(UI, I18N_WORD_DIALOGS),
                         gridPane(List.of(
                             gridRow(dialogLabelFontField,
                                 button(ELLIPSIS, actionEvent -> onFontSelected(dialogLabelFontField)))
@@ -118,21 +134,21 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
                     )
                 )
             ),
-            newTab(RB, "Colors", false,
+            newTab(UI, I18N_WORD_COLORS, false,
                 vBox(DOUBLE_SPACING,
-                    titledPane(fxString(RB, "Transactions"),
+                    titledPane(fxString(UI, I18N_WORD_TRANSACTIONS),
                         gridPane(List.of(
-                            gridRow(label(fxString(RB, "Debit", COLON)), debitColorPicker),
-                            gridRow(label(fxString(RB, "Credit", COLON)), creditColorPicker),
-                            gridRow(label(fxString(RB, "Transfer", COLON)), transferColorPicker)
+                            gridRow(label(fxString(UI, I18N_WORD_DEBIT, COLON)), debitColorPicker),
+                            gridRow(label(fxString(UI, I18N_WORD_CREDIT, COLON)), creditColorPicker),
+                            gridRow(label(fxString(UI, I18N_WORD_TRANSFER, COLON)), transferColorPicker)
                             ), b -> b.withStyle(GRID_PANE)
                         )
                     ),
-                    titledPane(fxString(RB, "Statements"),
+                    titledPane(fxString(UI, I18N_WORD_STATEMENTS),
                         gridPane(List.of(
-                            gridRow(label(fxString(RB, "Confirmed", COLON)), statementCheckedColorPicker),
-                            gridRow(label(fxString(RB, "Unconfirmed", COLON)), statementUncheckedColorPicker),
-                            gridRow(label(fxString(RB, "Not_found", COLON)), statementMissingColorPicker)
+                            gridRow(label(fxString(UI, I18N_WORD_CONFIRMED, COLON)), statementCheckedColorPicker),
+                            gridRow(label(fxString(UI, I18N_WORD_UNCONFIRMED, COLON)), statementUncheckedColorPicker),
+                            gridRow(label(fxString(UI, I18N_MISC_NOT_FOUND, COLON)), statementMissingColorPicker)
                             ), b -> b.withStyle(GRID_PANE)
                         )
                     )
@@ -143,14 +159,11 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
         accountClosingDayDeltaEdit.setText(Integer.toString(Options.getAccountClosingDayDelta()));
-        ymToken.setText(Options.getYandexMoneyToken());
-        ymToken.setPrefColumnCount(10);
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
                 Options.setAutoCompleteLength(autoCompleteLength.getValue());
                 Options.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
-                Options.setYandexMoneyToken(ymToken.getText());
                 // Fonts
                 Options.setFont(FontOption.CONTROLS_FONT, (Font) controlsFontField.getUserData());
                 Options.setFont(FontOption.MENU_FONT, (Font) menuFontField.getUserData());

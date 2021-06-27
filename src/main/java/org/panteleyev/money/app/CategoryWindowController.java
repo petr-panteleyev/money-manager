@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -39,13 +40,25 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_SEARCH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORIES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -68,31 +81,31 @@ final class CategoryWindowController extends BaseController {
         var disableBinding = categoryTable.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
-            newMenu(fxString(RB, "menu.Edit"),
-                menuItem(fxString(RB, "Create"), SHORTCUT_N, addHandler),
-                menuItem(fxString(RB, "menu.Edit.Edit"), SHORTCUT_E, editHandler, disableBinding),
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+            newMenu(fxString(UI, I18N_MENU_EDIT),
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.Edit.Search"), SHORTCUT_F, actionEvent -> searchField.requestFocus())),
-            newMenu(fxString(RB, "View"),
-                menuItem(fxString(RB, "Reset_Filter"), SHORTCUT_ALT_C, event -> resetFilter())),
+                menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F, actionEvent -> searchField.requestFocus())),
+            newMenu(fxString(UI, I18N_MENU_VIEW),
+                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
 
         // Context Menu
         categoryTable.setContextMenu(new ContextMenu(
-            menuItem(fxString(RB, "Create"), addHandler),
-            menuItem(fxString(RB, "menu.Edit.Edit"), editHandler, disableBinding)));
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD), addHandler),
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding)));
 
         // Table
         var w = categoryTable.widthProperty().subtract(20);
         categoryTable.getColumns().setAll(List.of(
-            tableColumn(fxString(RB, "Type"),
+            tableColumn(fxString(UI, I18N_WORD_TYPE),
                 b -> b.withPropertyCallback(c -> c.type().toString()).withWidthBinding(w.multiply(0.2))),
-            tableObjectColumn(fxString(RB, "column.Name"),
+            tableObjectColumn(fxString(UI, I18N_WORD_ENTITY_NAME),
                 b -> b.withCellFactory(x -> new CategoryNameCell()).withWidthBinding(w.multiply(0.4))),
-            tableColumn(fxString(RB, "Comment"),
+            tableColumn(fxString(UI, I18N_WORD_COMMENT),
                 b -> b.withPropertyCallback(Category::comment).withWidthBinding(w.multiply(0.4)))
         ));
 
@@ -123,7 +136,7 @@ final class CategoryWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("Categories");
+        return UI.getString(I18N_WORD_CATEGORIES);
     }
 
     private Predicate<Category> getPredicate() {

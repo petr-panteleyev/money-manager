@@ -16,9 +16,13 @@ import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CONNECT_AT_STARTUP;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEFAULT_PROFILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PROFILE;
 
 public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private final ComboBox<ConnectionProfile> profileComboBox;
@@ -37,11 +41,11 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
         defaultCheck = initDefaultCheck();
         autoConnectCheck = initAutoConnectCheck();
 
-        setTitle(RB.getString("Connection"));
+        setTitle(fxString(UI, I18N_WORD_CONNECTION));
 
         var pane = new GridPane();
         pane.getStyleClass().add(GRID_PANE);
-        pane.addRow(0, label(fxString(RB, "Profile", COLON)), profileComboBox);
+        pane.addRow(0, label(fxString(UI, I18N_WORD_PROFILE, COLON)), profileComboBox);
         pane.addRow(1, defaultCheck);
         pane.addRow(2, autoConnectCheck);
         getDialogPane().setContent(pane);
@@ -51,7 +55,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
 
         profileComboBox.setMaxWidth(Double.MAX_VALUE);
 
-        createDefaultButtons(RB);
+        createDefaultButtons(UI);
 
         setResultConverter(b -> {
             if (b == ButtonType.OK) {
@@ -95,14 +99,14 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     }
 
     private CheckBox initDefaultCheck() {
-        var check = newCheckBox(RB, "Default_Profile");
+        var check = newCheckBox(UI, I18N_MISC_DEFAULT_PROFILE);
         check.setSelected(Objects.equals(profileManager.getDefaultProfile().orElse(null),
             profileComboBox.getSelectionModel().getSelectedItem()));
         return check;
     }
 
     private CheckBox initAutoConnectCheck() {
-        var check = newCheckBox(RB, "Connect_at_startup");
+        var check = newCheckBox(UI, I18N_MISC_CONNECT_AT_STARTUP);
         check.disableProperty().bind(defaultCheck.selectedProperty().not());
         check.setSelected(defaultCheck.isSelected() && profileManager.getAutoConnect());
         return check;

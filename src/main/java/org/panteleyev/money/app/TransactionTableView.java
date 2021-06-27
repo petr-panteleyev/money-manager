@@ -59,8 +59,22 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -151,27 +165,27 @@ public class TransactionTableView extends TableView<Transaction> {
                 x -> new TransactionSumCell();
 
         getColumns().setAll(List.of(
-            tableObjectColumn(fxString(RB, "Day"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_DAY), b ->
                 b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
                     .withComparator(dayComparator)
                     .withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn(fxString(RB, "Type"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_TYPE), b ->
                 b.withCellFactory(x -> new TransactionTypeCell())
                     .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
                         .thenComparing(dayComparator))
                     .withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(RB, "column.Account.Debited"), b ->
+            tableObjectColumn(fxString(UI, I18N_MISC_DEBITED_ACCOUNT), b ->
                 b.withCellFactory(x -> new TransactionDebitedAccountCell())
                     .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
                         .thenComparing(dayComparator))
                     .withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(RB, "column.Account.Credited"), b ->
+            tableObjectColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
                 b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(RB, "Counterparty"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
                 b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
-            tableObjectColumn(fxString(RB, "Comment"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
                 b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
-            tableObjectColumn(fxString(RB, "Sum"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
                 b.withCellFactory(sumCellFactory)
                     .withComparator(Comparator.comparing(Transaction::getSignedAmount))
                     .withWidthBinding(w.multiply(0.05))),
@@ -198,13 +212,13 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void createContextMenu() {
-        var newMenuItem = menuItem(fxString(RB, "Add", ELLIPSIS), event -> onNewTransaction());
-        var editMenuItem = menuItem(fxString(RB, "Edit", ELLIPSIS), event -> onEditTransaction());
-        var deleteMenuItem = menuItem(fxString(RB, "Delete", ELLIPSIS), event -> onDeleteTransaction());
-        var exportMenuItem = menuItem(fxString(RB, "menu.Context.Export"), event -> onExportTransactions());
-        var detailsMenuItem = menuItem(fxString(RB, "menu.item.details"), event -> onTransactionDetails());
-        var checkMenuItem = menuItem(fxString(RB, "menu.item.check"), event -> onCheckTransactions(true));
-        var uncheckMenuItem = menuItem(fxString(RB, "menu.item.uncheck"), event -> onCheckTransactions(false));
+        var newMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onNewTransaction());
+        var editMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditTransaction());
+        var deleteMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), event -> onDeleteTransaction());
+        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), event -> onExportTransactions());
+        var detailsMenuItem = menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> onTransactionDetails());
+        var checkMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), event -> onCheckTransactions(true));
+        var uncheckMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), event -> onCheckTransactions(false));
 
         editMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
         deleteMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());

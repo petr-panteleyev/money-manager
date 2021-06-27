@@ -14,7 +14,7 @@ import java.io.InputStream;
 public interface XsdUtil {
     default void validateXML(InputStream input) throws Exception {
         SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = schemaFactory.newSchema(getClass().getResource("/org/panteleyev/money/xml/money.xsd"));
+        Schema schema = schemaFactory.newSchema(getClass().getResource("/org/panteleyev/money/xsd/money.xsd"));
         Validator validator = schema.newValidator();
         validator.validate(new StreamSource(input));
     }

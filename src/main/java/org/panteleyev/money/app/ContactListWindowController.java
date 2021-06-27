@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -37,12 +38,24 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.app.MainWindowController.RB;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_SEARCH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTACTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PHONE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -63,34 +76,34 @@ class ContactListWindowController extends BaseController {
 
         // Menu bar
         var menuBar = menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
-            newMenu(fxString(RB, "menu.Edit"),
-                menuItem(fxString(RB, "Create"), SHORTCUT_N, addHandler),
-                menuItem(fxString(RB, "menu.Edit.Edit"), SHORTCUT_E, editHandler, disableBinding),
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+            newMenu(fxString(UI, I18N_MENU_EDIT),
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.Edit.Search"), SHORTCUT_F,
+                menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
                     event -> searchField.requestFocus())),
-            newMenu(fxString(RB, "View"),
-                menuItem(fxString(RB, "Reset_Filter"), SHORTCUT_ALT_C, event -> resetFilter())),
+            newMenu(fxString(UI, I18N_MENU_VIEW),
+                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-            menuItem(fxString(RB, "Create"), addHandler),
-            menuItem(fxString(RB, "menu.Edit.Edit"), editHandler, disableBinding))
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), addHandler),
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding))
         );
 
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
-            tableObjectColumn(fxString(RB, "Name"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_NAME), b ->
                 b.withCellFactory(x -> new ContactNameCell()).withWidthBinding(w.multiply(0.4))),
-            tableColumn(fxString(RB, "Type"), b ->
+            tableColumn(fxString(UI, I18N_WORD_TYPE), b ->
                 b.withPropertyCallback((Contact p) -> p.type().toString()).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(RB, "Phone"), b ->
+            tableColumn(fxString(UI, I18N_WORD_PHONE), b ->
                 b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(RB, "Email"), b ->
+            tableColumn("E-Mail", b ->
                 b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
         ));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
@@ -121,7 +134,7 @@ class ContactListWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("Contacts");
+        return UI.getString(I18N_WORD_CONTACTS);
     }
 
     private void reloadContacts() {

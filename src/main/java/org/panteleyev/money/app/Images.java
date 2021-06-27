@@ -9,17 +9,17 @@ import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Icon;
 
 public interface Images {
-    Image APP_ICON = new Image("org/panteleyev/money/app/res/icon48.png");
-    Image WARNING = new Image("org/panteleyev/money/app/res/warning-16.png");
-    Image EMPTY = new Image("org/panteleyev/money/app/res/empty.png");
-    Image SEARCH = new Image("org/panteleyev/money/app/res/search.png");
-    Image VISA = new Image("org/panteleyev/money/app/res/visa.png",
+    Image APP_ICON = new Image("org/panteleyev/money/images/icon48.png");
+    Image WARNING = new Image("org/panteleyev/money/images/warning-16.png");
+    Image EMPTY = new Image("org/panteleyev/money/images/empty.png");
+    Image SEARCH = new Image("org/panteleyev/money/images/search.png");
+    Image VISA = new Image("org/panteleyev/money/images/visa.png",
         Icon.ICON_SIZE, Icon.ICON_SIZE, true, true);
-    Image MASTERCARD = new Image("org/panteleyev/money/app/res/mastercard.png",
+    Image MASTERCARD = new Image("org/panteleyev/money/images/mastercard.png",
         Icon.ICON_SIZE, Icon.ICON_SIZE, true, true);
-    Image AMEX = new Image("org/panteleyev/money/app/res/amex.png",
+    Image AMEX = new Image("org/panteleyev/money/images/amex.png",
         Icon.ICON_SIZE, Icon.ICON_SIZE, true, true);
-    Image MIR = new Image("org/panteleyev/money/app/res/mir.png",
+    Image MIR = new Image("org/panteleyev/money/images/mir.png",
         Icon.ICON_SIZE, Icon.ICON_SIZE, true, true);
 
     static Image getCardTypeIcon(CardType cardType) {

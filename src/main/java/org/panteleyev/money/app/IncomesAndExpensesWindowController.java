@@ -47,10 +47,19 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.CREDIT;
 import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
+import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BALANCE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_EXPENSES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INCOMES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 class IncomesAndExpensesWindowController extends BaseController {
@@ -155,7 +164,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var toolBar = hBox(5.0,
             filterBox,
-            button(fxString(RB, "Reset_Filter"), x -> filterBox.reset())
+            button(fxString(UI, I18N_MISC_RESET_FILTER), x -> filterBox.reset())
         );
 
         var statusBar = createStatusBar();
@@ -178,15 +187,15 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("Incomes_and_Expenses");
+        return fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES);
     }
 
     private MenuBar createMenuBar() {
         return menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
+                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
             createWindowMenu(),
             createHelpMenu()
         );
@@ -194,22 +203,22 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private Node createStatusBar() {
         return hBox(5.0,
-            label(fxString(RB, "Expenses", COLON)),
+            label(fxString(UI, I18N_WORD_EXPENSES, COLON)),
             expenseValueText,
-            label(fxString(RB, "Incomes", COLON)),
+            label(fxString(UI, I18N_WORD_INCOMES, COLON)),
             incomeValueText,
-            label(fxString(RB, "Balance", COLON)),
+            label(fxString(UI, I18N_WORD_BALANCE, COLON)),
             balanceValueText);
     }
 
     private void onRefresh() {
         expenseRoot.getChildren().clear();
         var expenseSum = calculateTotal(CategoryType.EXPENSES, expenseRoot);
-        expenseRoot.setValue(new ExpenseRootNode(RB.getString("Expenses"), expenseSum));
+        expenseRoot.setValue(new ExpenseRootNode(UI.getString(I18N_WORD_EXPENSES), expenseSum));
 
         incomeRoot.getChildren().clear();
         var incomeSum = calculateTotal(CategoryType.INCOMES, incomeRoot);
-        incomeRoot.setValue(new IncomeRootNode(RB.getString("Incomes"), incomeSum));
+        incomeRoot.setValue(new IncomeRootNode(UI.getString(I18N_WORD_INCOMES), incomeSum));
 
         expenseValueText.setText(expenseSum.setScale(2, RoundingMode.HALF_UP).toString());
         incomeValueText.setText(incomeSum.setScale(2, RoundingMode.HALF_UP).toString());
@@ -295,7 +304,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(RB.getString("Report"));
+        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("IncomesAndExpenses"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));

@@ -45,8 +45,20 @@ import static org.panteleyev.fx.ButtonFactory.buttonType;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ARE_YOU_SURE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PROFILE_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_RESET;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_RESET_TEXT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PROFILES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SAVE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TEST;
 
 class ConnectionProfilesEditor extends BaseDialog<Object> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -73,7 +85,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         return ValidationResult.fromErrorIf(control, null, invalid);
     };
 
-    ConnectionProfilesEditor(ConnectionProfileManager profileManager, boolean useEncryption) {
+    ConnectionProfilesEditor(ConnectionProfileManager profileManager) {
         super(options().getDialogCssFileUrl());
 
         Objects.requireNonNull(profileManager);
@@ -84,12 +96,12 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         tcpEditor = new TCPEditor(validation, this::onResetButton);
 
-        setTitle(RB.getString("Profiles"));
+        setTitle(fxString(UI, I18N_WORD_PROFILES));
 
-        var newButtonType = buttonType(fxString(RB, "New"), LEFT);
-        var deleteButtonType = buttonType(fxString(RB, "Delete"), LEFT);
-        var testButtonType = buttonType(fxString(RB, "Test"), BIG_GAP);
-        var saveButtonType = buttonType(fxString(RB, "Save"), SMALL_GAP);
+        var newButtonType = buttonType(fxString(UI, I18N_WORD_ADD), LEFT);
+        var deleteButtonType = buttonType(fxString(UI, I18N_WORD_DELETE), LEFT);
+        var testButtonType = buttonType(fxString(UI, I18N_WORD_TEST), BIG_GAP);
+        var saveButtonType = buttonType(fxString(UI, I18N_WORD_SAVE), SMALL_GAP);
 
         getDialogPane().getButtonTypes().addAll(
             newButtonType, deleteButtonType, testButtonType, saveButtonType, CLOSE
@@ -115,11 +127,11 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             b.addEventFilter(ACTION, this::onTestButton);
         });
 
-        getButton(CLOSE).ifPresent(b -> b.setText(RB.getString("Close")));
+        getButton(CLOSE).ifPresent(b -> b.setText(fxString(UI, I18N_WORD_CLOSE)));
 
         var root = new BorderPane();
         root.setLeft(initLeftPane());
-        root.setCenter(initCenterPane(useEncryption));
+        root.setCenter(initCenterPane());
 
         BorderPane.setMargin(root.getCenter(), new Insets(0.0, 0.0, 5.0, 10.0));
 
@@ -162,7 +174,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onDeleteButton(ActionEvent event) {
         event.consume();
         getSelectedProfile().ifPresent(selected ->
-            new Alert(CONFIRMATION, RB.getString("text.AreYouSure"), OK, CANCEL)
+            new Alert(CONFIRMATION, fxString(UI, I18N_MISC_ARE_YOU_SURE), OK, CANCEL)
                 .showAndWait()
                 .filter(response -> response == OK)
                 .ifPresent(b -> {
@@ -201,9 +213,9 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onResetButton(ActionEvent event) {
         event.consume();
 
-        var alert = new Alert(WARNING, RB.getString("Schema_Reset_Text"), YES, NO);
-        alert.setHeaderText(fxString(RB, "Schema_Reset_Header"));
-        alert.setTitle(fxString(RB, "Schema_Reset"));
+        var alert = new Alert(WARNING, UI.getString(I18N_MISC_SCHEMA_RESET_TEXT), YES, NO);
+        alert.setHeaderText(fxString(UI, I18M_MISC_SCHEMA_RESET_HEADER));
+        alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_RESET));
 
         alert.showAndWait()
             .filter(response -> response == YES)
@@ -296,7 +308,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private BorderPane initLeftPane() {
         var pane = new BorderPane();
 
-        var titled = new TitledPane(RB.getString("Profiles"), profileListView);
+        var titled = new TitledPane(fxString(UI, I18N_WORD_PROFILES), profileListView);
         titled.setCollapsible(false);
         titled.setMaxHeight(Double.MAX_VALUE);
 
@@ -304,23 +316,17 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         return pane;
     }
 
-    private VBox initCenterPane(boolean useEncryption) {
+    private VBox initCenterPane() {
         var pane = new VBox();
 
-        var hBox = new HBox(label(fxString(RB, "Profile_Name", COLON)), profileNameEdit);
+        var hBox = new HBox(label(fxString(UI, I18N_MISC_PROFILE_NAME, COLON)), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
-        var titled = new TitledPane(RB.getString("Connection"), tcpEditor);
+        var titled = new TitledPane(UI.getString(I18N_WORD_CONNECTION), tcpEditor);
         titled.setCollapsible(false);
 
 
         pane.getChildren().addAll(hBox, titled);
-        if (useEncryption) {
-            var encryptionPane = new TitledPane(RB.getString("Encryption_Key"), encryptionKeyEditor);
-            encryptionPane.setCollapsible(false);
-            pane.getChildren().add(encryptionPane);
-            VBox.setMargin(encryptionPane, new Insets(0.0, 0.0, 10.0, 0.0));
-        }
         pane.getChildren().add(testStatusLabel);
 
         HBox.setHgrow(profileNameEdit, Priority.ALWAYS);

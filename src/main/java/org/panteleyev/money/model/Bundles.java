@@ -1,19 +1,17 @@
+/*
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ */
 package org.panteleyev.money.model;
 
-/*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
- */
-
+import org.panteleyev.money.bundles.CategoryTypeBundle;
+import org.panteleyev.money.bundles.ContactTypeBundle;
+import org.panteleyev.money.bundles.TransactionTypeBundle;
 import java.util.ResourceBundle;
+import static java.util.ResourceBundle.getBundle;
 
 interface Bundles {
-    ResourceBundle CATEGORY_TYPE_BUNDLE =
-        ResourceBundle.getBundle("org.panteleyev.money.model.CategoryType");
-
-    ResourceBundle CONTACT_TYPE_BUNDLE =
-        ResourceBundle.getBundle("org.panteleyev.money.model.ContactType");
-
-    ResourceBundle TRANSACTION_TYPE_BUNDLE =
-        ResourceBundle.getBundle("org.panteleyev.money.model.TransactionType");
+    ResourceBundle CATEGORY_TYPE_BUNDLE = getBundle(CategoryTypeBundle.class.getCanonicalName());
+    ResourceBundle CONTACT_TYPE_BUNDLE = getBundle(ContactTypeBundle.class.getCanonicalName());
+    ResourceBundle TRANSACTION_TYPE_BUNDLE = getBundle(TransactionTypeBundle.class.getCanonicalName());
 }

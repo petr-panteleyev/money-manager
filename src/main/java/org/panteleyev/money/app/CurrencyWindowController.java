@@ -11,15 +11,24 @@ import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Currency;
 import java.util.List;
 import java.util.Optional;
+import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCIES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -30,28 +39,28 @@ final class CurrencyWindowController extends BaseController {
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
-            newMenu(fxString(RB, "menu.Edit"),
-                menuItem(fxString(RB, "Create"), SHORTCUT_N,
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+            newMenu(fxString(UI, I18N_MENU_EDIT),
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
                     event -> onAddCurrency()),
-                menuItem(fxString(RB, "menu.Edit.Edit"), SHORTCUT_E,
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
                     event -> onEditCurrency(), disableBinding)),
             createWindowMenu(),
             createHelpMenu());
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-            menuItem(fxString(RB, "Create"), event -> onAddCurrency()),
-            menuItem(fxString(RB, "menu.Edit.Edit"), event -> onEditCurrency(), disableBinding))
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onAddCurrency()),
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditCurrency(), disableBinding))
         );
 
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-            tableColumn(fxString(RB, "column.Name"), b ->
+            tableColumn(fxString(UI, I18N_WORD_ENTITY_NAME), b ->
                 b.withPropertyCallback(Currency::symbol).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(RB, "Description"), b ->
+            tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
                 b.withPropertyCallback(Currency::description).withWidthBinding(w.multiply(0.8)))
         ));
 
@@ -62,7 +71,7 @@ final class CurrencyWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("Currencies");
+        return UI.getString(I18N_WORD_CURRENCIES);
     }
 
     private Optional<Currency> getSelectedCurrency() {

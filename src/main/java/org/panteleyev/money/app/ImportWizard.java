@@ -38,8 +38,14 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_CHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_WARNING;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_IMPORT_FILE_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PARTIAL_IMPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_IMPORT;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class ImportWizard extends BaseDialog<Object> {
@@ -50,7 +56,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
     private static class StartPage extends GridPane {
         private final ToggleGroup btnGroup = new ToggleGroup();
-        private final RadioButton fullDumpRadio = radioButton(fxString(RB, "label.FullDump"), btnGroup);
+        private final RadioButton fullDumpRadio = radioButton(fxString(UI, I18N_MISC_FULL_DUMP), btnGroup);
         final TextField fileNameEdit = createFileNameEdit();
         final CheckBox warningCheck = createWarningCheckBox();
 
@@ -66,7 +72,7 @@ final class ImportWizard extends BaseDialog<Object> {
             getStyleClass().add(Styles.GRID_PANE);
 
 
-            var partialImportRadio = radioButton(fxString(RB, "label.PartialImport"), btnGroup, true);
+            var partialImportRadio = radioButton(fxString(UI, I18N_MISC_PARTIAL_IMPORT), btnGroup, true);
 
             var warningLabel = createWarningLabel();
 
@@ -85,20 +91,20 @@ final class ImportWizard extends BaseDialog<Object> {
 
         private TextField createFileNameEdit() {
             var field = new TextField();
-            field.setPromptText(RB.getString("prompt.ImportFileName"));
+            field.setPromptText(fxString(UI, I18N_MISC_IMPORT_FILE_NAME));
             field.setPrefColumnCount(40);
             return field;
         }
 
         private Label createWarningLabel() {
-            var label = label(fxString(RB, "label.FullDumpImportWarning"));
+            var label = label(fxString(UI, I18N_MISC_FULL_DUMP_IMPORT_WARNING));
             label.setWrapText(true);
             label.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return label;
         }
 
         private CheckBox createWarningCheckBox() {
-            var checkBox = newCheckBox(RB, "check.FullDumpImport");
+            var checkBox = newCheckBox(UI, I18N_MISC_FULL_DUMP_IMPORT_CHECK);
             checkBox.getStyleClass().add(Styles.BOLD_TEXT);
             checkBox.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return checkBox;
@@ -106,7 +112,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
         private void onBrowse() {
             var chooser = new FileChooser();
-            chooser.setTitle(RB.getString("word.Import"));
+            chooser.setTitle(fxString(UI, I18N_WORD_IMPORT));
             Options.getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
@@ -171,7 +177,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
     ImportWizard() {
         super(options().getDialogCssFileUrl());
-        setTitle(RB.getString("word.Import"));
+        setTitle(fxString(UI, I18N_WORD_IMPORT));
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);
 
@@ -179,7 +185,7 @@ final class ImportWizard extends BaseDialog<Object> {
         progressPage.setVisible(false);
 
         getButton(NEXT).ifPresent(nextButton -> {
-            nextButton.setText(RB.getString("word.Import"));
+            nextButton.setText(fxString(UI, I18N_WORD_IMPORT));
             nextButton.addEventFilter(ActionEvent.ACTION, event -> {
                 event.consume();
 

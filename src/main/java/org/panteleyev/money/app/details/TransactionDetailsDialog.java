@@ -30,7 +30,12 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_TRANSACTION_DETAILS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELTA;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public final class TransactionDetailsDialog extends BaseDialog<List<TransactionDetail>> implements RecordEditorCallback<TransactionDetail> {
@@ -42,7 +47,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     private final TableView<TransactionDetail> detailsTable = new TableView<>();
 
     public TransactionDetailsDialog(List<Transaction> transactions, BigDecimal totalAmount, boolean readOnly) {
-        setTitle(RB.getString("DetailsDialog_title"));
+        setTitle(fxString(UI, I18N_MISC_TRANSACTION_DETAILS));
 
         this.totalAmount = totalAmount;
         detailEditor = new DetailEditorPane(this, cache());
@@ -57,18 +62,18 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
-            tableColumn(fxString(RB, "Credited_Account"), b ->
+            tableColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
                 b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
                     .withWidthBinding(w.multiply(0.3))),
-            tableColumn(fxString(RB, "Comment"), b ->
+            tableColumn(fxString(UI, I18N_WORD_COMMENT), b ->
                 b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
-            tableObjectColumn(fxString(RB, "Sum"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
                 b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         detailsTable.setItems(details);
 
-        var hBox = hBox(Styles.BIG_SPACING, label(fxString(RB, "Delta", COLON)), deltaLabel);
+        var hBox = hBox(Styles.BIG_SPACING, label(fxString(UI, I18N_WORD_DELTA, COLON)), deltaLabel);
         var vBox = vBox(Styles.BIG_SPACING, hBox, detailEditor);
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
 

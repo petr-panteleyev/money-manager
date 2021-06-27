@@ -57,7 +57,7 @@ import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_SHIFT_LEFT;
@@ -66,6 +66,18 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_BY_STATEMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_PICKER_TOOLTIP;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INVOICE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 
 public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
@@ -183,9 +195,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             vBox(
                 DOUBLE_SPACING,
                 hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING, label(fxString(RB, "Date")), datePicker),
+                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)), datePicker),
                     vBox(SMALL_SPACING,
-                        label(fxString(RB, "Type")),
+                        label(fxString(UI, I18N_WORD_TYPE)),
                         hBox(List.of(typeEdit, typeMenuButton, checkedCheckBox), hBox -> {
                             hBox.setSpacing(BIG_SPACING);
                             hBox.setAlignment(Pos.CENTER);
@@ -193,15 +205,15 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     )
                 ),
                 hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING, label(fxString(RB, "Sum")), sumEdit),
+                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM)), sumEdit),
                     vBox(SMALL_SPACING,
-                        label(fxString(RB, "Rate")),
+                        label(fxString(UI, I18N_WORD_RATE)),
                         new HBox(rate1Edit, rateDir1Combo),
                         rateAmoutLabel)
                 ),
                 fxNode(
                     vBox(SMALL_SPACING,
-                        label(fxString(RB, "column.Account.Debited")),
+                        label(fxString(UI, I18N_MISC_DEBITED_ACCOUNT)),
                         hBox(0,
                             fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
                             debitedMenuButton),
@@ -210,7 +222,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 ),
                 fxNode(
                     vBox(SMALL_SPACING,
-                        label(fxString(RB, "column.Account.Credited")),
+                        label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT)),
                         hBox(0,
                             fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)),
                             creditedMenuButton
@@ -220,18 +232,18 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 ),
                 fxNode(
                     vBox(SMALL_SPACING,
-                        label(fxString(RB, "Counterparty")),
+                        label(fxString(UI, I18N_WORD_COUNTERPARTY)),
                         hBox(0,
                             fxNode(contactEdit, hBoxHGrow(ALWAYS)),
                             contactMenuButton)),
                     hBoxHGrow(ALWAYS)
                 ),
                 fxNode(
-                    vBox(SMALL_SPACING, label(fxString(RB, "Comment")), commentEdit),
+                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT)), commentEdit),
                     hBoxHGrow(ALWAYS)
                 ),
-                vBox(SMALL_SPACING, label(fxString(RB, "Invoice")), invoiceNumberEdit),
-                vBox(SMALL_SPACING, label(fxString(RB, "Statement_Date")), statementDatePicker)
+                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_INVOICE)), invoiceNumberEdit),
+                vBox(SMALL_SPACING, label(fxString(UI, I18N_MISC_DATE_BY_STATEMENT)), statementDatePicker)
             )
         );
 
@@ -284,7 +296,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         setupContactMenu();
         setupComments();
 
-        createDefaultButtons(RB);
+        createDefaultButtons(UI);
 
         var okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         okButton.addEventFilter(ActionEvent.ACTION, event -> {
@@ -312,7 +324,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         builder = new Transaction.Builder(transaction);
 
-        setTitle(RB.getString("Transaction") + ": " + uuid);
+        setTitle(UI.getString(I18N_WORD_TRANSACTION) + ": " + uuid);
 
         // Type
         typeEdit.setText(transaction.type().toString());
@@ -387,7 +399,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var nextMonthKey = SHORTCUT_ALT_SHIFT_RIGHT;
         var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
 
-        var tooltipText = String.format(RB.getString("datePicker.tooltip"),
+        var tooltipText = String.format(UI.getString(I18N_MISC_DATE_PICKER_TOOLTIP),
             tomorrowKey.getDisplayText(),
             yesterdayKey.getDisplayText(),
             nextMonthKey.getDisplayText(),
@@ -408,7 +420,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void clearTitle() {
-        setTitle(RB.getString("Transaction"));
+        setTitle(fxString(UI, I18N_WORD_TRANSACTION));
     }
 
     private void setupBanksAndCashMenuItems() {

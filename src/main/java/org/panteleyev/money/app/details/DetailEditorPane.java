@@ -48,7 +48,14 @@ import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLEAR;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UPDATE;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -112,36 +119,36 @@ final class DetailEditorPane extends BorderPane {
         commentEdit.setPrefColumnCount(30);
         sumEdit.setPrefColumnCount(8);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, label(fxString(RB, "Credited_Account", COLON)),
+        var creditedBox = new VBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT, COLON)),
             new HBox(creditedAccountEdit, creditedMenuButton),
             creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = hBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = vBox(Styles.SMALL_SPACING, label(fxString(RB, "Sum", COLON)), hBox1);
+        var sumBox = vBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM, COLON)), hBox1);
 
-        var commentBox = vBox(Styles.SMALL_SPACING, label(fxString(RB, "Comment", COLON)), commentEdit);
+        var commentBox = vBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT, COLON)), commentEdit);
 
         var filler = new Region();
 
-        var clearButton = button(fxString(RB, "Clear"), x -> clear());
+        var clearButton = button(fxString(UI, I18N_WORD_CLEAR), x -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = button(fxString(RB, "Add"), x -> buildTransactionDetail()
+        var addButton = button(fxString(UI, I18N_WORD_ADD), x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.addRecord(t);
                 clear();
             }));
 
-        var updateButton = button(fxString(RB, "Update"), x -> buildTransactionDetail()
+        var updateButton = button(fxString(UI, I18N_WORD_UPDATE), x -> buildTransactionDetail()
             .ifPresent(t -> {
                 parent.updateRecord(t);
                 clear();
             })
         );
 
-        var deleteButton = button(fxString(RB, "Delete"), x -> {
+        var deleteButton = button(fxString(UI, I18N_WORD_DELETE), x -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();

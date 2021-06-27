@@ -36,6 +36,7 @@ import org.panteleyev.money.app.database.ConnectionProfileManager;
 import org.panteleyev.money.app.icons.IconWindowController;
 import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.app.options.OptionsDialog;
+import org.panteleyev.money.bundles.UiBundle;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
@@ -62,7 +63,6 @@ import java.util.function.Predicate;
 import java.util.prefs.Preferences;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
-import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
@@ -86,13 +86,43 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CURRENT_MONTH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT_SETTINGS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ICONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_IMPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_IMPORT_SETTINGS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_NEXT_MONTH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_OPTIONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PREVIOUS_MONTH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PROFILES;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_TOOLS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INCOMPATIBLE_SCHEMA;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INITIAL_BALANCE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE_TEXT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
 
-    public static final ResourceBundle RB = ResourceBundle.getBundle("org.panteleyev.money.app.res.ui");
+    public static final ResourceBundle UI = ResourceBundle.getBundle(UiBundle.class.getCanonicalName());
 
     private final BorderPane self = new BorderPane();
 
@@ -145,15 +175,15 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = menuItem(fxString(RB, "Connection", ELLIPSIS), SHORTCUT_N,
+        var fileConnectMenuItem = menuItem(fxString(UI, I18N_WORD_CONNECTION, ELLIPSIS), SHORTCUT_N,
             event -> onOpenConnection());
-        var fileCloseMenuItem = menuItem(fxString(RB, "Close"), event -> onClose());
-        var fileExitMenuItem = menuItem(fxString(RB, "Exit"), event -> onExit());
-        var exportMenuItem = menuItem(fxString(RB, "menu.Tools.Export"), event -> xmlDump());
-        var importMenuItem = menuItem(fxString(RB, "word.Import", ELLIPSIS), event -> onImport());
-        var reportMenuItem = menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport());
+        var fileCloseMenuItem = menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose());
+        var fileExitMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXIT), event -> onExit());
+        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), event -> xmlDump());
+        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), event -> onImport());
+        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport());
 
-        var fileMenu = newMenu(fxString(RB, "File"),
+        var fileMenu = newMenu(fxString(UI, I18N_MENU_FILE),
             fileConnectMenuItem,
             new SeparatorMenuItem(),
             importMenuItem,
@@ -165,39 +195,43 @@ public class MainWindowController extends BaseController implements TransactionT
             new SeparatorMenuItem(),
             fileExitMenuItem);
 
-        var editMenu = newMenu(fxString(RB, "menu.Edit"),
-            menuItem(fxString(RB, "Add", ELLIPSIS), SHORTCUT_N,
+        var editMenu = newMenu(fxString(UI, I18N_MENU_EDIT),
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
                 event -> transactionTable.onNewTransaction()),
-            menuItem(fxString(RB, "Edit", ELLIPSIS), SHORTCUT_E,
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
                 event -> transactionTable.onEditTransaction()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE,
+            menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
                 event -> transactionTable.onDeleteTransaction()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.item.details"), x -> transactionTable.onTransactionDetails()),
+            menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), x -> transactionTable.onTransactionDetails()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.item.check"), SHORTCUT_K,
+            menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
                 event -> transactionTable.onCheckTransactions(true)),
-            menuItem(fxString(RB, "menu.item.uncheck"), SHORTCUT_U,
+            menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
                 event -> transactionTable.onCheckTransactions(false))
         );
 
-        var viewMenu = newMenu(fxString(RB, "menu.view"),
-            menuItem(fxString(RB, "menu.view.currentMonth"), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
+        var viewMenu = newMenu(fxString(UI, I18N_MENU_VIEW),
+            menuItem(fxString(UI, I18N_MENU_ITEM_CURRENT_MONTH), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.view.nextMonth"), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
-            menuItem(fxString(RB, "menu.view.prevMonth"), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
+            menuItem(fxString(UI, I18N_MENU_ITEM_NEXT_MONTH), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
+            menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
-        var profilesMenuItem = menuItem(fxString(RB, "menu.Tools.Profiles"),
-            x -> profileManager.getEditor(false).showAndWait());
+        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS),
+            x -> profileManager.getEditor().showAndWait());
 
-        var optionsMenuItem = menuItem(fxString(RB, "menu.Tools.Options"), x -> onOptions());
-        var importSettingsMenuItem = menuItem(fxString(RB, "menu.tools.import.settings"), x -> onImportSettings());
-        var exportSettingsMenuItem = menuItem(fxString(RB, "menu.tool.export.settings"), x -> onExportSettings());
-        var iconWindowMenuItem = menuItem(fxString(RB.getString("string.icons"), ELLIPSIS), x -> onIconWindow());
+        var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
+            x -> onOptions());
+        var importSettingsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT_SETTINGS, ELLIPSIS),
+            x -> onImportSettings());
+        var exportSettingsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT_SETTINGS, ELLIPSIS),
+            x -> onExportSettings());
+        var iconWindowMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ICONS, ELLIPSIS),
+            x -> onIconWindow());
 
-        var toolsMenu = newMenu(fxString(RB, "menu.Tools"),
+        var toolsMenu = newMenu(fxString(UI, I18N_MENU_TOOLS),
             profilesMenuItem,
             new SeparatorMenuItem(),
             iconWindowMenuItem,
@@ -315,9 +349,9 @@ public class MainWindowController extends BaseController implements TransactionT
         var schemaStatus = getDao().checkSchemaUpdateStatus();
         switch (schemaStatus) {
             case UPDATE_REQUIRED -> {
-                var alert = new Alert(WARNING, RB.getString("Schema_Update_Text"), YES, NO);
-                alert.setHeaderText(fxString(RB, "Schema_Reset_Header"));
-                alert.setTitle(fxString(RB, "Schema Update"));
+                var alert = new Alert(WARNING, fxString(UI, I18N_MISC_SCHEMA_UPDATE_TEXT), YES, NO);
+                alert.setHeaderText(fxString(UI, I18M_MISC_SCHEMA_RESET_HEADER));
+                alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_UPDATE));
 
                 var confirmed = alert.showAndWait()
                     .filter(response -> response == YES)
@@ -330,7 +364,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 }
             }
             case INCOMPATIBLE -> {
-                new Alert(ERROR, fxString(RB, "Incomatible_Schema_Text"), OK).showAndWait();
+                new Alert(ERROR, fxString(UI, I18N_MISC_INCOMPATIBLE_SCHEMA), OK).showAndWait();
                 System.exit(-1);
             }
         }
@@ -403,7 +437,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(RB.getString("Report"));
+        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));

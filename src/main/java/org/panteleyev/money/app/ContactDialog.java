@@ -29,9 +29,19 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CITY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTACT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTRY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_MOBILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PHONE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STREET;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ZIP;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class ContactDialog extends BaseDialog<Contact> {
@@ -53,7 +63,7 @@ final class ContactDialog extends BaseDialog<Contact> {
     ContactDialog(Controller owner, URL css, Contact contact) {
         super(owner, css);
 
-        setTitle(RB.getString("contact.Dialog.Title"));
+        setTitle(fxString(UI, I18N_WORD_CONTACT));
 
         nameField.setPrefColumnCount(20);
         IconManager.setupComboBox(iconComboBox);
@@ -61,17 +71,17 @@ final class ContactDialog extends BaseDialog<Contact> {
         getDialogPane().setContent(
             gridPane(
                 List.of(
-                    gridRow(label(fxString(RB, "label.Type")), typeBox, iconComboBox),
-                    gridRow(label(fxString(RB, "label.Name")), gridCell(nameField, 2, 1)),
-                    gridRow(label(fxString(RB, "Phone", COLON)), gridCell(phoneField, 2, 1)),
-                    gridRow(label(fxString(RB, "label.Mobile")), gridCell(mobileField, 2, 1)),
-                    gridRow(label(fxString(RB, "Email", COLON)), gridCell(emailField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeBox, iconComboBox),
+                    gridRow(label(fxString(UI, I18N_WORD_NAME, COLON)), gridCell(nameField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_PHONE, COLON)), gridCell(phoneField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_MOBILE, COLON)), gridCell(mobileField, 2, 1)),
+                    gridRow(label("E-Mail:"), gridCell(emailField, 2, 1)),
                     gridRow(label("URL:"), gridCell(webField, 2, 1)),
-                    gridRow(label(fxString(RB, "label.Street")), gridCell(streetField, 2, 1)),
-                    gridRow(label(fxString(RB, "label.City")), gridCell(cityField, 2, 1)),
-                    gridRow(label(fxString(RB, "label.Country")), gridCell(countryField, 2, 1)),
-                    gridRow(label(fxString(RB, "label.ZIP")), gridCell(zipField, 2, 1)),
-                    gridRow(label(fxString(RB, "Comment", COLON)), gridCell(commentEdit, 2, 1))
+                    gridRow(label(fxString(UI, I18N_WORD_STREET, COLON)), gridCell(streetField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_CITY, COLON)), gridCell(cityField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_COUNTRY, COLON)), gridCell(countryField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_ZIP, COLON)), gridCell(zipField, 2, 1)),
+                    gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))
                         .withValignment(VPos.TOP)
                 ), b -> b.withStyle(GRID_PANE)
             )
@@ -126,7 +136,7 @@ final class ContactDialog extends BaseDialog<Contact> {
             return builder.build();
         });
 
-        createDefaultButtons(RB, validation.invalidProperty());
+        createDefaultButtons(UI, validation.invalidProperty());
         Platform.runLater(this::createValidationSupport);
     }
 

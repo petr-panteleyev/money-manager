@@ -149,7 +149,6 @@ public final class Options {
         MAIN_WINDOW_WIDTH,
         MAIN_WINDOW_HEIGHT,
         AUTO_COMPLETE_LENGTH,
-        YM_TOKEN,
         ACCOUNT_CLOSING_DAY_DELTA,
         LAST_STATEMENT_DIR,
         LAST_EXPORT_DIR,
@@ -231,14 +230,6 @@ public final class Options {
 
     public static String getLastStatementDir() {
         return PREFS.get(Option.LAST_STATEMENT_DIR.toString(), "");
-    }
-
-    public static void setYandexMoneyToken(String token) {
-        PREFS.put(Option.YM_TOKEN.toString(), token);
-    }
-
-    public static String getYandexMoneyToken() {
-        return PREFS.get(Option.YM_TOKEN.toString(), "");
     }
 
     public static Optional<File> getLastExportDir() {

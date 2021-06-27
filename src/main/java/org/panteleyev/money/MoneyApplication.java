@@ -65,8 +65,4 @@ public class MoneyApplication extends Application {
     public static String generateFileName() {
         return generateFileName("Money");
     }
-
-    public static void generateMainCssFile() {
-
-    }
 }

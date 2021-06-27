@@ -54,7 +54,7 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.activeAccount;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
@@ -65,6 +65,32 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ACTIVATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_COPY_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DEACTIVATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_SEARCH;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ARE_YOU_SURE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RECALCULATE_BALANCE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SHOW_DEACTIVATED_ACCOUNTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BALANCE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CARD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNTIL;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_WAITING;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -132,54 +158,54 @@ final class AccountWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("Accounts");
+        return UI.getString(I18N_WORD_ACCOUNTS);
     }
 
     private MenuBar createMainMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = menuItem(fxString(RB, "menu.edit.deactivate"),
+        var activateAccountMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_DEACTIVATE),
             event -> onActivateDeactivateAccount(),
             disableBinding);
 
-        var editMenu = newMenu(fxString(RB, "menu.Edit"),
-            menuItem(fxString(RB, "Create", ELLIPSIS), SHORTCUT_N,
+        var editMenu = newMenu(fxString(UI, I18N_MENU_EDIT),
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
                 event -> onNewAccount()),
-            menuItem(fxString(RB, "menu.Edit.Edit", ELLIPSIS), SHORTCUT_E,
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
                 event -> onEditAccount(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE,
+            menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
                 event -> onDeleteAccount(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.CopyName"), SHORTCUT_C,
+            menuItem(fxString(UI, I18N_MENU_ITEM_COPY_NAME), SHORTCUT_C,
                 event -> onCopyName(), disableBinding),
-            menuItem(fxString(RB, "menu.edit.deactivate"),
+            menuItem(fxString(UI, I18N_MENU_ITEM_DEACTIVATE),
                 event -> onActivateDeactivateAccount(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.Edit.Search"), SHORTCUT_F,
+            menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
                 event -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Transactions", ELLIPSIS), SHORTCUT_T,
+            menuItem(fxString(UI, I18N_WORD_TRANSACTIONS, ELLIPSIS), SHORTCUT_T,
                 event -> onShowTransactions(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Recalculate_Balance"), SHORTCUT_R,
+            menuItem(fxString(UI, I18N_MISC_RECALCULATE_BALANCE), SHORTCUT_R,
                 event -> onUpdateBalance())
         );
 
         editMenu.setOnShowing(event -> getSelectedAccount()
-            .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
-                account.enabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+            .ifPresent(account -> activateAccountMenuItem.setText(UI.getString(
+                account.enabled() ? I18N_MENU_ITEM_DEACTIVATE : I18N_MENU_ITEM_ACTIVATE)
             ))
         );
 
         return menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
+                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
             editMenu,
-            newMenu(fxString(RB, "menu.view"),
-                checkMenuItem(fxString(RB, "check.showDeactivatedAccounts"),
+            newMenu(fxString(UI, I18N_MENU_VIEW),
+                checkMenuItem(fxString(UI, I18N_MISC_SHOW_DEACTIVATED_ACCOUNTS),
                     Options.getShowDeactivatedAccounts(), SHORTCUT_H,
                     event -> {
                         var selected = ((CheckMenuItem) event.getSource()).isSelected();
@@ -195,28 +221,28 @@ final class AccountWindowController extends BaseController {
     private void setupTableColumns() {
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().setAll(List.of(
-            tableObjectColumn(fxString(RB, "column.Name"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_ENTITY_NAME), b ->
                 b.withCellFactory(x -> new AccountNameCell()).withWidthBinding(w.multiply(0.15))),
-            tableObjectColumn(fxString(RB, "Category"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_CATEGORY), b ->
                 b.withCellFactory(x -> new AccountCategoryCell()).withWidthBinding(w.multiply(0.1))),
-            tableColumn(fxString(RB, "Currency"),
+            tableColumn(fxString(UI, I18N_WORD_CURRENCY),
                 b -> b.withPropertyCallback(
                     a -> cache().getCurrency(a.currencyUuid()).map(Currency::symbol).orElse("")
                 ).withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn(fxString(RB, "Card"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_CARD), b ->
                 b.withCellFactory(x -> new AccountCardCell()).withWidthBinding(w.multiply(0.1))),
             tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
                 b.withCellFactory(x -> new AccountInterestCell())
                     .withPropertyCallback(Account::interest)
                     .withWidthBinding(w.multiply(0.03))),
-            tableObjectColumn(fxString(RB, "column.closing.date"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_UNTIL), b ->
                 b.withCellFactory(x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()))
                     .withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn(fxString(RB, "Comment"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
                 b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.3))),
-            tableObjectColumn(fxString(RB, "Balance"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_BALANCE), b ->
                 b.withCellFactory(x -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(RB, "Waiting"), b ->
+            tableObjectColumn(fxString(UI, I18N_WORD_WAITING), b ->
                 b.withCellFactory(x -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1)))
         ));
     }
@@ -224,29 +250,29 @@ final class AccountWindowController extends BaseController {
     private void createContextMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = menuItem(fxString(RB, "menu.edit.deactivate"),
+        var activateAccountMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_DEACTIVATE),
             event -> onActivateDeactivateAccount(),
             disableBinding);
 
         var contextMenu = new ContextMenu(
-            menuItem(fxString(RB, "Create", ELLIPSIS), event -> onNewAccount()),
-            menuItem(fxString(RB, "menu.Edit.Edit"), event -> onEditAccount(), disableBinding),
+            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onNewAccount()),
+            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditAccount(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Delete", ELLIPSIS), event -> onDeleteAccount(), disableBinding),
+            menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), event -> onDeleteAccount(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.CopyName"), event -> onCopyName(), disableBinding),
+            menuItem(fxString(UI, I18N_MENU_ITEM_COPY_NAME), event -> onCopyName(), disableBinding),
             activateAccountMenuItem,
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "menu.Edit.Search"), actionEvent -> accountNameFilterBox.getTextField().requestFocus()),
+            menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), actionEvent -> accountNameFilterBox.getTextField().requestFocus()),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Transactions", ELLIPSIS), event -> onShowTransactions(), disableBinding),
+            menuItem(fxString(UI, I18N_WORD_TRANSACTIONS, ELLIPSIS), event -> onShowTransactions(), disableBinding),
             new SeparatorMenuItem(),
-            menuItem(fxString(RB, "Recalculate_Balance"), event -> onUpdateBalance())
+            menuItem(fxString(UI, I18N_MISC_RECALCULATE_BALANCE), event -> onUpdateBalance())
         );
 
         contextMenu.setOnShowing(event -> getSelectedAccount()
-            .ifPresent(account -> activateAccountMenuItem.setText(RB.getString(
-                account.enabled() ? "menu.edit.deactivate" : "menu.edit.activate")
+            .ifPresent(account -> activateAccountMenuItem.setText(UI.getString(
+                account.enabled() ? I18N_MENU_ITEM_DEACTIVATE : I18N_MENU_ITEM_ACTIVATE)
             ))
         );
 
@@ -289,7 +315,7 @@ final class AccountWindowController extends BaseController {
                     "Unable to delete account\nwith " + count + " associated transactions",
                     ButtonType.CLOSE).showAndWait();
             } else {
-                new Alert(Alert.AlertType.CONFIRMATION, RB.getString("text.AreYouSure"), ButtonType.OK,
+                new Alert(Alert.AlertType.CONFIRMATION, fxString(UI, I18N_MISC_ARE_YOU_SURE), ButtonType.OK,
                     ButtonType.CANCEL)
                     .showAndWait()
                     .filter(response -> response == ButtonType.OK)
@@ -320,7 +346,7 @@ final class AccountWindowController extends BaseController {
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(RB.getString("Report"));
+        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("accounts"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));

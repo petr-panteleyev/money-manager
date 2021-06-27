@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.3</version>
+    <version>21.4.5-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -221,7 +221,7 @@
                     <launchers>
                         <launcher>
                             <name>Money Manager (noauto)</name>
-                            <file>src/main/resources/noauto.properties</file>
+                            <file>extras/noauto.properties</file>
                         </launcher>
                     </launchers>
                 </configuration>
@@ -284,7 +284,7 @@
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>${liquibasePluginVersion}</version>
                 <configuration>
-                    <changeLogFile>src/main/resources/database/masterChangelog.xml</changeLogFile>
+                    <changeLogFile>src/main/resources/org/panteleyev/money/liquibase/masterChangelog.xml</changeLogFile>
                 </configuration>
                 <dependencies>
                     <dependency>

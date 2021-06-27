@@ -27,7 +27,7 @@ public final class TemplateEngine {
         }
     }
 
-    private static final String TEMPLATE_PATH  = "/org/panteleyev/money/app/templates";
+    private static final String TEMPLATE_PATH  = "/org/panteleyev/money/templates";
     private static final TemplateEngine ENGINE = new TemplateEngine();
 
     private final Configuration configuration;

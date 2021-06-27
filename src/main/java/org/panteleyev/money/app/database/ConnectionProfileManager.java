@@ -184,8 +184,8 @@ public final class ConnectionProfileManager {
         return profile.dataBasePort();
     }
 
-    public Dialog getEditor(boolean useEncryption) {
-        return new ConnectionProfilesEditor(this, useEncryption);
+    public Dialog getEditor() {
+        return new ConnectionProfilesEditor(this);
     }
 
     public Optional<ConnectionProfile> getProfileToOpen() {

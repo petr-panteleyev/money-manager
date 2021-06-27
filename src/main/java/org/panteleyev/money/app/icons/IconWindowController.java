@@ -38,9 +38,17 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UPLOAD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_DIPLICATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_FILES_SKIPPED;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_TOO_BIG;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ICONS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UPLOAD;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -75,11 +83,11 @@ public final class IconWindowController extends BaseController {
         super(new Stage(), options().getMainCssFilePath());
 
         var menuBar = menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "menu.File.Upload"), SHORTCUT_U,
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_MENU_ITEM_UPLOAD), SHORTCUT_U,
                     event -> onUpload()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
+                menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
             createHelpMenu()
         );
 
@@ -121,7 +129,7 @@ public final class IconWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return RB.getString("string.icons");
+        return fxString(UI, I18N_WORD_ICONS);
     }
 
     private SelectionModel<Icon> getSelectionModel() {
@@ -180,13 +188,13 @@ public final class IconWindowController extends BaseController {
                 getDao().insertIcon(icon);
                 iconList.add(icon);
             } else {
-                errors.add(icon.getName() + RB.getString("string.duplicate"));
+                errors.add(icon.getName() + UI.getString(I18N_MISC_UPLOAD_DIPLICATE));
             }
         }
 
         if (!errors.isEmpty()) {
             var content = String.join("\n", errors);
-            new DuplicateAlert(RB.getString("string.filesIgnored") + "\n\n" + content).showAndWait();
+            new DuplicateAlert(UI.getString(I18N_MISC_UPLOAD_FILES_SKIPPED) + "\n\n" + content).showAndWait();
         }
     }
 
@@ -198,7 +206,7 @@ public final class IconWindowController extends BaseController {
         try (var inputStream = new FileInputStream(file)) {
             var bytes = inputStream.readAllBytes();
             if (bytes.length > Icon.ICON_BYTE_LENGTH) {
-                errors.add(file.getName() + RB.getString("string.tooBig"));
+                errors.add(file.getName() + UI.getString(I18N_MISC_UPLOAD_TOO_BIG));
                 return null;
             }
 
@@ -219,7 +227,7 @@ public final class IconWindowController extends BaseController {
 
     private void onUpload() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(RB.getString("string.upload"));
+        fileChooser.setTitle(fxString(UI, I18N_WORD_UPLOAD));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG images", "*.png"),
             new FileChooser.ExtensionFilter("GIF images", "*.gif"));
 

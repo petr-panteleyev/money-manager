@@ -46,13 +46,29 @@ import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UNCHECKED_ONLY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REQUESTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
@@ -88,7 +104,7 @@ class RequestWindowController extends BaseController {
             new TransactionTableView(TransactionTableView.Mode.QUERY) :
             new TransactionTableView(account);
 
-        var uncheckedOnlyCheckBox = new CheckBox(fxString(RB, "Unchecked_Only"));
+        var uncheckedOnlyCheckBox = new CheckBox(fxString(UI, I18N_MISC_UNCHECKED_ONLY));
         uncheckedOnlyCheckBox.selectedProperty().addListener(
             (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
         );
@@ -103,11 +119,11 @@ class RequestWindowController extends BaseController {
         var filterBox = hBox(5.0,
             account == null ? accBox : SKIP,
             transactionFilterBox,
-            label(fxString(RB, "Counterparty", COLON)),
+            label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
             contactFilterBox.getTextField(),
             uncheckedOnlyCheckBox,
             fxNode(new Region(), hBoxHGrow(ALWAYS)),
-            label(fxString(RB, "Sum", COLON)),
+            label(fxString(UI, I18N_WORD_SUM, COLON)),
             sumField
         );
 
@@ -151,7 +167,7 @@ class RequestWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return account == null ? RB.getString("Requests") : account.name();
+        return account == null ? UI.getString(I18N_WORD_REQUESTS) : account.name();
     }
 
     boolean thisAccount(Account account) {
@@ -164,22 +180,22 @@ class RequestWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         return menuBar(
-            newMenu(fxString(RB, "File"),
-                menuItem(fxString(RB, "Report", ELLIPSIS), event -> onReport()),
+            newMenu(fxString(UI, I18N_MENU_FILE),
+                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Close"), event -> onClose())),
-            newMenu(fxString(RB, "menu.Edit"),
-                menuItem(fxString(RB, "Edit", ELLIPSIS), SHORTCUT_E, event -> table.onEditTransaction()),
+                menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
+            newMenu(fxString(UI, I18N_MENU_EDIT),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, event -> table.onEditTransaction()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "Delete", ELLIPSIS), SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
+                menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.item.details"), event -> table.onTransactionDetails()),
+                menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> table.onTransactionDetails()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(RB, "menu.item.check"), SHORTCUT_K, event -> table.onCheckTransactions(true)),
-                menuItem(fxString(RB, "menu.item.uncheck"), SHORTCUT_U, event -> table.onCheckTransactions(false))
+                menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K, event -> table.onCheckTransactions(true)),
+                menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U, event -> table.onCheckTransactions(false))
             ),
-            newMenu(fxString(RB, "View"),
-                menuItem(fxString(RB, "Reset_Filter"), SHORTCUT_ALT_C, event -> resetFilter())),
+            newMenu(fxString(UI, I18N_MENU_VIEW),
+                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
             createHelpMenu());
     }
@@ -202,7 +218,7 @@ class RequestWindowController extends BaseController {
 
     private void onReport() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(RB.getString("Report"));
+        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
         Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));

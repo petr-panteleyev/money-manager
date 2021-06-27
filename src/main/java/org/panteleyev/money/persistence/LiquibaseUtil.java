@@ -20,7 +20,7 @@ public class LiquibaseUtil {
         INCOMPATIBLE
     }
 
-    private static final String CHANGELOG_XML = "database/masterChangelog.xml";
+    private static final String CHANGELOG_XML = "/org/panteleyev/money/liquibase/masterChangelog.xml";
 
     private final Liquibase liquibase;
 

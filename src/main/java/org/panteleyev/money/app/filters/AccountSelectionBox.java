@@ -21,20 +21,22 @@ import java.util.function.Predicate;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByUuid;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByCategory;
 import static org.panteleyev.money.app.icons.IconManager.ACCOUNT_TO_IMAGE;
 import static org.panteleyev.money.app.icons.IconManager.CATEGORY_TO_IMAGE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_ACCOUNTS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CATEGORIES;
 import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.COMPARE_ACCOUNT_BY_NAME;
 import static org.panteleyev.money.persistence.MoneyDAO.COMPARE_CATEGORY_BY_NAME;
 
 public class AccountSelectionBox extends HBox {
-    private final static String ALL_CATEGORIES_STRING = RB.getString("All_Categories");
-    private final static String ALL_ACCOUNTS_STRING = RB.getString("text.All.Accounts");
+    private final static String ALL_CATEGORIES_STRING = UI.getString(I18N_MISC_ALL_CATEGORIES);
+    private final static String ALL_ACCOUNTS_STRING = UI.getString(I18N_MISC_ALL_ACCOUNTS);
 
     private final ComboBox<CategoryType> categoryTypeBox =
         comboBox(CategoryType.values(), b -> b.withDefaultString(ALL_TYPES_STRING));

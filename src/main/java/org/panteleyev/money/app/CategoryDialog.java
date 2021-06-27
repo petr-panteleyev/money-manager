@@ -28,8 +28,12 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CategoryDialog extends BaseDialog<Category> {
@@ -43,13 +47,13 @@ final class CategoryDialog extends BaseDialog<Category> {
     CategoryDialog(Controller owner, URL css, Category category) {
         super(owner, css);
 
-        setTitle(RB.getString("Category"));
+        setTitle(fxString(UI, I18N_WORD_CATEGORY));
 
         getDialogPane().setContent(gridPane(
             List.of(
-                gridRow(label(fxString(RB, "Type", COLON)), typeComboBox, iconComboBox),
-                gridRow(label(fxString(RB, "label.Name")), gridCell(nameEdit, 2, 1)),
-                gridRow(label(fxString(RB, "Comment", COLON)), gridCell(commentEdit, 2, 1))),
+                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeComboBox, iconComboBox),
+                gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), gridCell(nameEdit, 2, 1)),
+                gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))),
             b -> b.withStyle(Styles.GRID_PANE))
         );
 
@@ -93,7 +97,7 @@ final class CategoryDialog extends BaseDialog<Category> {
             return builder.build();
         });
 
-        createDefaultButtons(RB, validation.invalidProperty());
+        createDefaultButtons(UI, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

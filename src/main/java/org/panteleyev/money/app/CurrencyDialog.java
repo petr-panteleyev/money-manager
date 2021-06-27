@@ -32,8 +32,16 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.SKIP;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.RB;
+import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEFAULT_CURRENCY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SHOW_THOUSAND_SEPARATOR;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_AFTER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BEFORE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RATE;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SYMBOL;
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
@@ -43,23 +51,23 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     private final TextField descrEdit = new TextField();
     private final TextField rateEdit = new TextField();
     private final ChoiceBox<String> rateDirectionChoice = new ChoiceBox<>();
-    private final CheckBox defaultCheck = newCheckBox(RB, "currency.Dialog.Default");
+    private final CheckBox defaultCheck = newCheckBox(UI, I18N_MISC_DEFAULT_CURRENCY);
     private final CheckBox showSymbolCheck = new CheckBox();
     private final ComboBox<String> formatSymbolCombo = new ComboBox<>();
     private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
-    private final CheckBox thousandSeparatorCheck = newCheckBox(RB, "currency.Dialog.ShowSeparator");
+    private final CheckBox thousandSeparatorCheck = newCheckBox(UI, I18N_MISC_SHOW_THOUSAND_SEPARATOR);
 
     CurrencyDialog(Controller owner, URL css, Currency currency) {
         super(owner, css);
 
-        setTitle(RB.getString("Currency"));
+        setTitle(fxString(UI, I18N_WORD_CURRENCY));
 
         getDialogPane().setContent(
             gridPane(
                 List.of(
-                    gridRow(label(fxString(RB, "label.Symbol")), nameEdit),
-                    gridRow(label(fxString(RB, "Description", COLON)), descrEdit),
-                    gridRow(label(fxString(RB, "Rate", COLON)), rateEdit, rateDirectionChoice),
+                    gridRow(label(fxString(UI, I18N_WORD_SYMBOL, COLON)), nameEdit),
+                    gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)), descrEdit),
+                    gridRow(label(fxString(UI, I18N_WORD_RATE, COLON)), rateEdit, rateDirectionChoice),
                     gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice), hBox -> {
                         hBox.setAlignment(CENTER_LEFT);
                         HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
@@ -77,8 +85,8 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         rateDirectionChoice.getItems().setAll("/", "*");
 
         formatSymbolPositionChoice.getItems().setAll(
-            RB.getString("currency.Dialog.Before"),
-            RB.getString("currency.Dialog.After"));
+            UI.getString(I18N_WORD_BEFORE),
+            UI.getString(I18N_WORD_AFTER));
 
         formatSymbolCombo.getItems().setAll(cache().getCurrencies().stream()
             .map(Currency::formatSymbol)
@@ -128,7 +136,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             return builder.build();
         });
 
-        createDefaultButtons(RB, validation.invalidProperty());
+        createDefaultButtons(UI, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
     }

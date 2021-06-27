@@ -1,9 +1,8 @@
-package org.panteleyev.money.xml;
-
 /*
- * Copyright (c) Petr Panteleyev. All rights reserved.
- * Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) Petr Panteleyev. All rights reserved.
+ Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
+package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -19,7 +18,7 @@ import java.io.InputStream;
 import java.util.List;
 
 public class Import {
-    private static final String SCHEMA = "/org/panteleyev/money/xml/money.xsd";
+    private static final String SCHEMA = "/org/panteleyev/money/xsd/money.xsd";
 
     private final List<Icon> icons;
     private final List<Category> categories;
