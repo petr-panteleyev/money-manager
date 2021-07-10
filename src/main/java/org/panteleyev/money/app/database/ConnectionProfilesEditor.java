@@ -70,7 +70,6 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private final ListView<ConnectionProfile> profileListView;
     private final TextField profileNameEdit = new TextField();
     private final TCPEditor tcpEditor;
-    private final EncryptionKeyEditor encryptionKeyEditor = new EncryptionKeyEditor();
     private final Label testStatusLabel = new Label();
 
     private final ConnectionProfileManager profileManager;
@@ -116,7 +115,6 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         getButton(saveButtonType).ifPresent(b -> {
             b.disableProperty().bind(profileNameValidation.invalidProperty()
-                .or(encryptionKeyEditor.getValidation().invalidProperty())
                 .or(profileListView.getSelectionModel().selectedItemProperty().isNull())
             );
             b.addEventFilter(ACTION, this::onSaveButton);
@@ -205,8 +203,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             tcpEditor.getDataBasePort(),
             tcpEditor.getDataBaseUser(),
             tcpEditor.getDataBasePassword(),
-            tcpEditor.getSchema(),
-            encryptionKeyEditor.getEncryptionKey()
+            tcpEditor.getSchema()
         );
     }
 
@@ -267,10 +264,8 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         if (profile != null) {
             profileNameEdit.setText("");               // enforce validation
             profileNameEdit.setText(profile.name());
-            encryptionKeyEditor.setEncryptionKey(profile.encryptionKey());
         } else {
             profileNameEdit.setText("");
-            encryptionKeyEditor.setEncryptionKey("");
         }
     }
 

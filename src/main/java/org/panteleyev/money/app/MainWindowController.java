@@ -109,7 +109,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_U
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_TOOLS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INCOMPATIBLE_SCHEMA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INITIAL_BALANCE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE_TEXT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
@@ -132,8 +131,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
     private final ConnectionProfileManager profileManager =
-        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource,
-            PREFERENCES);
+        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource);
 
     // Transaction view box
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();

@@ -6,6 +6,7 @@ package org.panteleyev.money.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -13,6 +14,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -95,13 +97,39 @@ public interface XMLUtils {
         }
     }
 
+    static Element readDocument(InputStream in) {
+        try {
+            var docFactory = DocumentBuilderFactory.newInstance();
+            var docBuilder = docFactory.newDocumentBuilder();
+            var doc = docBuilder.parse(in);
+            return doc.getDocumentElement();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     static void writeDocument(Document document, OutputStream outputStream) {
         try {
             var transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(new DOMSource(document), new StreamResult(outputStream));
         } catch (TransformerException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    static String getAttribute(Element element, String name, String defValue) {
+        var value = element.getAttribute(name);
+        return value.isEmpty() ? defValue : value;
+    }
+
+    static int getAttribute(Element element, String name, int defValue) {
+        var value = element.getAttribute(name);
+        if (value.isBlank()) {
+            return defValue;
+        } else {
+            return Integer.parseInt(value);
         }
     }
 }

@@ -38,6 +38,8 @@ public final class Options {
     private File dialogCssFile;
     private File aboutDialogCssFile;
 
+    private File profilesFile;
+
     private static final Options OPTIONS = new Options();
 
     public static Options options() {
@@ -61,6 +63,7 @@ public final class Options {
         mainCssFile = new File(settingsDirectory, "main.css");
         dialogCssFile = new File(settingsDirectory, "dialog.css");
         aboutDialogCssFile = new File(settingsDirectory, "about-dialog.css");
+        profilesFile = new File(settingsDirectory, "profiles.xml");
     }
 
     private static File initDirectory(File dir, String name) {
@@ -142,6 +145,10 @@ public final class Options {
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    public File getProfilesFile() {
+        return profilesFile;
     }
 
     private enum Option {
