@@ -84,7 +84,12 @@ public final class ConnectionProfileManager {
     }
 
     public void loadProfiles() {
-        try (var in = new FileInputStream(options().getProfilesFile())) {
+        var settingsFile = options().getProfilesFile();
+        if (!settingsFile.exists()) {
+            return;
+        }
+
+        try (var in = new FileInputStream(settingsFile)) {
             var settings = ProfileSettings.load(in);
             autoConnect = settings.autoConnect();
             profiles.clear();

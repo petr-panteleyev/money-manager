@@ -5,6 +5,7 @@
 package org.panteleyev.money.app.options;
 
 import javafx.scene.paint.Color;
+import java.util.Optional;
 
 public enum ColorOption {
     // Transactions
@@ -51,6 +52,14 @@ public enum ColorOption {
             return "0" + s;
         } else {
             return s;
+        }
+    }
+
+    public static Optional<ColorOption> of(String str) {
+        try {
+            return Optional.of(valueOf(str));
+        } catch (Exception ex) {
+            return Optional.empty();
         }
     }
 }

@@ -5,6 +5,7 @@
 package org.panteleyev.money.app.options;
 
 import javafx.scene.text.Font;
+import java.util.Optional;
 
 public enum FontOption {
     CONTROLS_FONT,
@@ -25,5 +26,13 @@ public enum FontOption {
 
     public void setFont(Font font) {
         this.font = font;
+    }
+
+    public static Optional<FontOption> of(String str) {
+        try {
+            return Optional.of(valueOf(str));
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 }

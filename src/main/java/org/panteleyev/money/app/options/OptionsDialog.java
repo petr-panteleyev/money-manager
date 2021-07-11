@@ -177,6 +177,7 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
                 Options.setColor(STATEMENT_UNCHECKED, statementUncheckedColorPicker.getValue());
                 Options.setColor(STATEMENT_MISSING, statementMissingColorPicker.getValue());
 
+                options().saveSettings();
                 options().generateCssFiles();
                 options().reloadCssFile();
             }

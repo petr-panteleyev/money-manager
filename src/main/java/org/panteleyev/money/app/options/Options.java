@@ -12,7 +12,10 @@ import javafx.stage.Stage;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.app.TemplateEngine;
+import org.w3c.dom.Element;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -23,8 +26,26 @@ import java.util.prefs.Preferences;
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
+import static org.panteleyev.money.xml.XMLUtils.appendElement;
+import static org.panteleyev.money.xml.XMLUtils.createDocument;
+import static org.panteleyev.money.xml.XMLUtils.getAttribute;
+import static org.panteleyev.money.xml.XMLUtils.readDocument;
+import static org.panteleyev.money.xml.XMLUtils.writeDocument;
 
 public final class Options {
+    // XML
+    private static final String ROOT = "settings";
+    // Colors
+    private static final String COLOR_ELEMENT = "color";
+    private static final String COLOR_ATTR_NAME = "name";
+    private static final String COLOR_ATTR_VALUE = "value";
+    // Fonts
+    private static final String FONT_ELEMENT = "font";
+    private static final String FONT_ATTR_NAME = "name";
+    private static final String FONT_ATTR_FAMILY = "family";
+    private static final String FONT_ATTR_STYLE = "style";
+    private static final String FONT_ATTR_SIZE = "size";
+
     private static final double DEFAULT_WIDTH = 1024.0;
     private static final double DEFAULT_HEIGHT = 768.0;
     private static final int AUTO_COMPLETE_LENGTH = 3;
@@ -39,6 +60,7 @@ public final class Options {
     private File aboutDialogCssFile;
 
     private File profilesFile;
+    private File settingsFile;
 
     private static final Options OPTIONS = new Options();
 
@@ -64,6 +86,7 @@ public final class Options {
         dialogCssFile = new File(settingsDirectory, "dialog.css");
         aboutDialogCssFile = new File(settingsDirectory, "about-dialog.css");
         profilesFile = new File(settingsDirectory, "profiles.xml");
+        settingsFile = new File(settingsDirectory, "settings.xml");
     }
 
     private static File initDirectory(File dir, String name) {
@@ -169,34 +192,9 @@ public final class Options {
     }
 
     private static final Preferences PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
-    private static final Preferences FONT_PREFS = PREFS.node(Option.FONTS.toString());
-    private static final Preferences COLOR_PREFS = PREFS.node(Option.COLORS.toString());
 
     // Cached values
     private static int autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
-
-    public void loadFontOptions() {
-        for (var option : FontOption.values()) {
-            var prefs = FONT_PREFS.node(option.toString());
-
-            var style = prefs.get("style", DEFAULT_FONT_STYLE);
-            var font = Font.font(prefs.get("family", DEFAULT_FONT_FAMILY),
-                style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
-                style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
-                prefs.getDouble("size", DEFAULT_FONT_SIZE));
-
-            option.setFont(font);
-        }
-    }
-
-    public void loadColorOptions() {
-        for (var option : ColorOption.values()) {
-            var colorString = COLOR_PREFS.get(option.toString(), null);
-            if (colorString != null) {
-                option.setColor(Color.valueOf(colorString));
-            }
-        }
-    }
 
     public static boolean getShowDeactivatedAccounts() {
         return PREFS.getBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), false);
@@ -261,11 +259,6 @@ public final class Options {
             return;
         }
 
-        var prefs = FONT_PREFS.node(option.toString());
-        prefs.put("family", font.getFamily());
-        prefs.put("style", font.getStyle());
-        prefs.putDouble("size", font.getSize());
-
         option.setFont(font);
     }
 
@@ -274,7 +267,6 @@ public final class Options {
             return;
         }
 
-        COLOR_PREFS.put(option.toString(), color.toString());
         option.setColor(color);
     }
 
@@ -299,5 +291,80 @@ public final class Options {
         stage.setY(Double.parseDouble(parts[1]));
         stage.setWidth(Double.parseDouble(parts[2]));
         stage.setHeight(Double.parseDouble(parts[3]));
+    }
+
+    public void saveSettings() {
+        try (var out = new FileOutputStream(settingsFile)) {
+            var root = createDocument(ROOT);
+            serializeColors(root);
+            serializeFonts(root);
+            writeDocument(root.getOwnerDocument(), out);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    private void serializeColors(Element parent) {
+        var colorRoot = appendElement(parent, "colors");
+        for (var opt : ColorOption.values()) {
+            var e = appendElement(colorRoot, COLOR_ELEMENT);
+            e.setAttribute(COLOR_ATTR_NAME, opt.toString());
+            e.setAttribute(COLOR_ATTR_VALUE, opt.getWebString());
+        }
+    }
+
+    private void serializeFonts(Element parent) {
+        var fontRoot = appendElement(parent, "fonts");
+        for (var opt: FontOption.values()) {
+            var e = appendElement(fontRoot, FONT_ELEMENT);
+            var font = opt.getFont();
+            e.setAttribute(FONT_ATTR_NAME, opt.toString());
+            e.setAttribute(FONT_ATTR_FAMILY, font.getFamily());
+            e.setAttribute(FONT_ATTR_STYLE, font.getStyle());
+            e.setAttribute(FONT_ATTR_SIZE, Double.toString(font.getSize()));
+        }
+    }
+
+    public void loadSettings() {
+        if (!settingsFile.exists()) {
+            return;
+        }
+
+        try (var in = new FileInputStream(settingsFile)) {
+            var rootElement = readDocument(in);
+
+            deserializeColors(rootElement);
+            deserializeFonts(rootElement);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    private void deserializeColors(Element root) {
+        var colorNodes = root.getElementsByTagName(COLOR_ELEMENT);
+        for (int i = 0; i < colorNodes.getLength(); i++) {
+            var colorElement = (Element)colorNodes.item(i);
+            ColorOption.of(colorElement.getAttribute(COLOR_ATTR_NAME).toUpperCase())
+                .ifPresent(option -> option.setColor(Color.valueOf(colorElement.getAttribute(COLOR_ATTR_VALUE))));
+        }
+    }
+
+    private void deserializeFonts(Element root) {
+        var fontNodes = root.getElementsByTagName(FONT_ELEMENT);
+        for (int i = 0; i < fontNodes.getLength(); i++) {
+            var fontElement = (Element)fontNodes.item(i);
+            FontOption.of(fontElement.getAttribute(FONT_ATTR_NAME).toUpperCase()).ifPresent(option -> {
+                var family = getAttribute(fontElement, FONT_ATTR_FAMILY, DEFAULT_FONT_FAMILY);
+                var style = getAttribute(fontElement, FONT_ATTR_STYLE, DEFAULT_FONT_STYLE);
+                var size = getAttribute(fontElement, FONT_ATTR_SIZE, DEFAULT_FONT_SIZE);
+
+                var font = Font.font(family,
+                    style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
+                    style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                    size);
+
+                option.setFont(font);
+            });
+        }
     }
 }

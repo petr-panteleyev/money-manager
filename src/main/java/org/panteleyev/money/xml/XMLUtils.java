@@ -132,4 +132,13 @@ public interface XMLUtils {
             return Integer.parseInt(value);
         }
     }
+
+    static double getAttribute(Element element, String name, double defValue) {
+        var value = element.getAttribute(name);
+        if (value.isBlank()) {
+            return defValue;
+        } else {
+            return Double.parseDouble(value);
+        }
+    }
 }

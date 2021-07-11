@@ -26,8 +26,7 @@ public class MoneyApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         options().initialize();
-        options().loadFontOptions();
-        options().loadColorOptions();
+        options().loadSettings();
         options().generateCssFiles();
 
         application = this;
