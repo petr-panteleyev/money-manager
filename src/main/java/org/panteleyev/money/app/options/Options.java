@@ -27,14 +27,23 @@ import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
+import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.getAttribute;
+import static org.panteleyev.money.xml.XMLUtils.getBooleanNodeValue;
+import static org.panteleyev.money.xml.XMLUtils.getIntNodeValue;
+import static org.panteleyev.money.xml.XMLUtils.getStringNodeValue;
 import static org.panteleyev.money.xml.XMLUtils.readDocument;
 import static org.panteleyev.money.xml.XMLUtils.writeDocument;
 
 public final class Options {
     // XML
     private static final String ROOT = "settings";
+    private static final String AUTO_COMPLETE_LENGTH_ELEMENT = "autoCompleteLength";
+    private static final String ACCOUNT_CLOSING_DAY_DELTA_ELEMENT = "accountClosingDayDelta";
+    private static final String SHOW_DEACTIVATED_ACCOUNTS_ELEMENT = "showDeactivatedAccounts";
+    private static final String LAST_STATEMENT_DIR_ELEMENT = "lastStatementDir";
+    private static final String LAST_EXPORT_DIR_ELEMENT = "lastExportDir";
     // Colors
     private static final String COLOR_ELEMENT = "color";
     private static final String COLOR_ATTR_NAME = "name";
@@ -48,12 +57,20 @@ public final class Options {
 
     private static final double DEFAULT_WIDTH = 1024.0;
     private static final double DEFAULT_HEIGHT = 768.0;
-    private static final int AUTO_COMPLETE_LENGTH = 3;
+    private static final int DEFAULT_AUTO_COMPLETE_LENGTH = 3;
+    private static final int DEFAULT_ACCOUNT_CLOSING_DAY_DELTA = 10;
     private static final String OPTIONS_DIRECTORY = ".money-manager";
 
     private static final String DEFAULT_FONT_FAMILY = "System";
     private static final String DEFAULT_FONT_STYLE = "Normal Regular";
     private static final double DEFAULT_FONT_SIZE = 12;
+
+    // Settings values
+    private int autoCompleteLength = DEFAULT_AUTO_COMPLETE_LENGTH;
+    private int accountClosingDayDelta = DEFAULT_ACCOUNT_CLOSING_DAY_DELTA;
+    private boolean showDeactivatedAccounts = false;
+    private String lastStatementDir = "";
+    private String lastExportDir = "";
 
     private File mainCssFile;
     private File dialogCssFile;
@@ -175,15 +192,8 @@ public final class Options {
     }
 
     private enum Option {
-        SHOW_DEACTIVATED_ACCOUNTS,
         MAIN_WINDOW_WIDTH,
-        MAIN_WINDOW_HEIGHT,
-        AUTO_COMPLETE_LENGTH,
-        ACCOUNT_CLOSING_DAY_DELTA,
-        LAST_STATEMENT_DIR,
-        LAST_EXPORT_DIR,
-        FONTS,
-        COLORS;
+        MAIN_WINDOW_HEIGHT;
 
         @Override
         public String toString() {
@@ -193,15 +203,12 @@ public final class Options {
 
     private static final Preferences PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
 
-    // Cached values
-    private static int autoCompleteLength = PREFS.getInt(Option.AUTO_COMPLETE_LENGTH.toString(), AUTO_COMPLETE_LENGTH);
-
-    public static boolean getShowDeactivatedAccounts() {
-        return PREFS.getBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), false);
+    public boolean getShowDeactivatedAccounts() {
+        return showDeactivatedAccounts;
     }
 
-    public static void setShowDeactivatedAccounts(boolean show) {
-        PREFS.putBoolean(Option.SHOW_DEACTIVATED_ACCOUNTS.toString(), show);
+    public void setShowDeactivatedAccounts(boolean show) {
+        showDeactivatedAccounts = show;
     }
 
     public static double getMainWindowWidth() {
@@ -220,38 +227,37 @@ public final class Options {
         PREFS.putDouble(Option.MAIN_WINDOW_HEIGHT.toString(), x);
     }
 
-    public static int getAutoCompleteLength() {
+    public int getAutoCompleteLength() {
         return autoCompleteLength;
     }
 
-    static void setAutoCompleteLength(int x) {
+    public void setAutoCompleteLength(int x) {
         autoCompleteLength = x;
-        PREFS.putInt(Option.AUTO_COMPLETE_LENGTH.toString(), x);
     }
 
-    public static void setLastStatementDir(String dir) {
-        PREFS.put(Option.LAST_STATEMENT_DIR.toString(), dir);
+    public void setLastStatementDir(String dir) {
+        lastStatementDir = dir;
     }
 
-    public static String getLastStatementDir() {
-        return PREFS.get(Option.LAST_STATEMENT_DIR.toString(), "");
+    public String getLastStatementDir() {
+        return lastStatementDir;
     }
 
-    public static Optional<File> getLastExportDir() {
-        var dir = PREFS.get(Option.LAST_EXPORT_DIR.toString(), null);
-        return dir == null || dir.isEmpty() ? Optional.empty() : Optional.of(new File(dir));
+    public Optional<File> getLastExportDir() {
+        return lastExportDir == null || lastExportDir.isEmpty() ?
+            Optional.empty() : Optional.of(new File(lastExportDir));
     }
 
-    public static void setLastExportDir(String dir) {
-        PREFS.put(Option.LAST_EXPORT_DIR.toString(), dir);
+    public void setLastExportDir(String dir) {
+        lastExportDir = dir;
     }
 
-    public static int getAccountClosingDayDelta() {
-        return PREFS.getInt(Option.ACCOUNT_CLOSING_DAY_DELTA.toString(), 10);
+    public int getAccountClosingDayDelta() {
+        return accountClosingDayDelta;
     }
 
-    public static void setAccountClosingDayDelta(int delta) {
-        PREFS.putInt(Option.ACCOUNT_CLOSING_DAY_DELTA.toString(), delta);
+    public void setAccountClosingDayDelta(int delta) {
+        accountClosingDayDelta = delta;
     }
 
     public static void setFont(FontOption option, Font font) {
@@ -296,6 +302,11 @@ public final class Options {
     public void saveSettings() {
         try (var out = new FileOutputStream(settingsFile)) {
             var root = createDocument(ROOT);
+            appendTextNode(root, AUTO_COMPLETE_LENGTH_ELEMENT, autoCompleteLength);
+            appendTextNode(root, ACCOUNT_CLOSING_DAY_DELTA_ELEMENT, accountClosingDayDelta);
+            appendTextNode(root, SHOW_DEACTIVATED_ACCOUNTS_ELEMENT, showDeactivatedAccounts);
+            appendTextNode(root, LAST_STATEMENT_DIR_ELEMENT, lastStatementDir);
+            appendTextNode(root, LAST_EXPORT_DIR_ELEMENT, lastExportDir);
             serializeColors(root);
             serializeFonts(root);
             writeDocument(root.getOwnerDocument(), out);
@@ -332,7 +343,21 @@ public final class Options {
 
         try (var in = new FileInputStream(settingsFile)) {
             var rootElement = readDocument(in);
-
+            getIntNodeValue(rootElement, AUTO_COMPLETE_LENGTH_ELEMENT).ifPresent(
+                value -> autoCompleteLength = value
+            );
+            getIntNodeValue(rootElement, ACCOUNT_CLOSING_DAY_DELTA_ELEMENT).ifPresent(
+                value -> accountClosingDayDelta = value
+            );
+            getBooleanNodeValue(rootElement, SHOW_DEACTIVATED_ACCOUNTS_ELEMENT).ifPresent(
+                value -> showDeactivatedAccounts = value
+            );
+            getStringNodeValue(rootElement, LAST_STATEMENT_DIR_ELEMENT).ifPresent(
+                value -> lastStatementDir = value
+            );
+            getStringNodeValue(rootElement, LAST_EXPORT_DIR_ELEMENT).ifPresent(
+                value -> lastExportDir = value
+            );
             deserializeColors(rootElement);
             deserializeFonts(rootElement);
         } catch (IOException ex) {

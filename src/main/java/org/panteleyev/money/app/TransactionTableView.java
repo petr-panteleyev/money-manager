@@ -33,7 +33,6 @@ import org.panteleyev.money.app.cells.TransactionRow;
 import org.panteleyev.money.app.cells.TransactionSumCell;
 import org.panteleyev.money.app.cells.TransactionTypeCell;
 import org.panteleyev.money.app.details.TransactionDetailsDialog;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -290,7 +289,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
         var selected = fileChooser.showSaveDialog(null);
@@ -302,7 +301,8 @@ public class TransactionTableView extends TableView<Transaction> {
             try (var out = new FileOutputStream(selected)) {
                 new Export().withTransactions(toExport, true)
                     .doExport(out);
-                Options.setLastExportDir(selected.getParent());
+                options().setLastExportDir(selected.getParent());
+                options().saveSettings();
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }

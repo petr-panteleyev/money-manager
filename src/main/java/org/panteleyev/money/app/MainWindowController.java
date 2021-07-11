@@ -403,7 +403,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void xmlDump() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
@@ -422,7 +422,8 @@ public class MainWindowController extends BaseController implements TransactionT
                     .withContacts(cache().getContacts(), false)
                     .withTransactions(cache().getTransactions(), false)
                     .doExport(outputStream);
-                Options.setLastExportDir(selected.getParent());
+                options().setLastExportDir(selected.getParent());
+                options().saveSettings();
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }
@@ -436,7 +437,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

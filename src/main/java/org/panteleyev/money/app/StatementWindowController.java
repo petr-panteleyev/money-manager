@@ -249,7 +249,7 @@ class StatementWindowController extends BaseController {
             SBERBANK_HTML
         );
 
-        var lastDirString = Options.getLastStatementDir();
+        var lastDirString = options().getLastStatementDir();
         if (!lastDirString.isEmpty()) {
             var lastDir = new File(lastDirString);
             if (lastDir.exists() && lastDir.isDirectory()) {
@@ -272,7 +272,8 @@ class StatementWindowController extends BaseController {
         }
 
         var dir = selected.getParentFile();
-        Options.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath());
+        options().setLastStatementDir(dir == null ? "" : dir.getAbsolutePath());
+        options().saveSettings();
 
         setTitle(getTitle() + " - " + selected.getAbsolutePath());
 
@@ -330,7 +331,7 @@ class StatementWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("statement"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

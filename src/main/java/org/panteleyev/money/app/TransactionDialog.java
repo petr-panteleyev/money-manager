@@ -26,7 +26,6 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -66,6 +65,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_BY_STATEMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_PICKER_TOOLTIP;
@@ -102,7 +102,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
-            super(set, Options::getAutoCompleteLength);
+            super(set, () -> options().getAutoCompleteLength());
         }
 
         public String getElementString(T element) {
@@ -112,7 +112,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
-            super(set, Options::getAutoCompleteLength);
+            super(set, () -> options().getAutoCompleteLength());
         }
 
 
@@ -123,7 +123,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
-            super(set, Options::getAutoCompleteLength);
+            super(set, () -> options().getAutoCompleteLength());
         }
 
         public String getElementString(String element) {

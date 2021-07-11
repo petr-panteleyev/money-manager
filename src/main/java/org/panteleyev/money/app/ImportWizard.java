@@ -22,7 +22,6 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.money.MoneyApplication;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.xml.Import;
 import java.io.File;
 import java.io.FileInputStream;
@@ -113,7 +112,7 @@ final class ImportWizard extends BaseDialog<Object> {
         private void onBrowse() {
             var chooser = new FileChooser();
             chooser.setTitle(fxString(UI, I18N_WORD_IMPORT));
-            Options.getLastExportDir().ifPresent(chooser::setInitialDirectory);
+            options().getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
             var selected = chooser.showOpenDialog(null);

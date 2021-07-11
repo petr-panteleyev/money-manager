@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface XMLUtils {
@@ -140,5 +141,26 @@ public interface XMLUtils {
         } else {
             return Double.parseDouble(value);
         }
+    }
+
+    static Optional<String> getStringNodeValue(Element parent, String tagName) {
+        var nodes = parent.getChildNodes();
+        for (int i = 0; i < nodes.getLength(); i++) {
+            var node = nodes.item(i);
+            if (node instanceof Element element && element.getTagName().equals(tagName)) {
+                return Optional.of(element.getTextContent());
+            }
+        }
+        return Optional.empty();
+    }
+
+    static Optional<Integer> getIntNodeValue(Element parent, String tagName) {
+        return getStringNodeValue(parent, tagName)
+            .map(Integer::parseInt);
+    }
+
+    static Optional<Boolean> getBooleanNodeValue(Element parent, String tagName) {
+        return getStringNodeValue(parent, tagName)
+            .map(Boolean::parseBoolean);
     }
 }

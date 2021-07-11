@@ -157,13 +157,13 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
         );
         getDialogPane().setContent(tabPane);
 
-        autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
-        accountClosingDayDeltaEdit.setText(Integer.toString(Options.getAccountClosingDayDelta()));
+        autoCompleteLength.getSelectionModel().select(Integer.valueOf(options().getAutoCompleteLength()));
+        accountClosingDayDeltaEdit.setText(Integer.toString(options().getAccountClosingDayDelta()));
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
-                Options.setAutoCompleteLength(autoCompleteLength.getValue());
-                Options.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
+                options().setAutoCompleteLength(autoCompleteLength.getValue());
+                options().setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
                 // Fonts
                 Options.setFont(FontOption.CONTROLS_FONT, (Font) controlsFontField.getUserData());
                 Options.setFont(FontOption.MENU_FONT, (Font) menuFontField.getUserData());
