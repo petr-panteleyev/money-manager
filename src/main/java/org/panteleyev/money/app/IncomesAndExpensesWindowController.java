@@ -181,7 +181,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         filterBox.reset();
 
         setupWindow(root);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
 
 //        onRefresh();
     }

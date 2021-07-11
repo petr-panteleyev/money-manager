@@ -8,9 +8,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
-import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.app.TemplateEngine;
 import org.w3c.dom.Element;
 import java.io.File;
@@ -22,7 +21,6 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
-import java.util.prefs.Preferences;
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
@@ -55,8 +53,6 @@ public final class Options {
     private static final String FONT_ATTR_STYLE = "style";
     private static final String FONT_ATTR_SIZE = "size";
 
-    private static final double DEFAULT_WIDTH = 1024.0;
-    private static final double DEFAULT_HEIGHT = 768.0;
     private static final int DEFAULT_AUTO_COMPLETE_LENGTH = 3;
     private static final int DEFAULT_ACCOUNT_CLOSING_DAY_DELTA = 10;
     private static final String OPTIONS_DIRECTORY = ".money-manager";
@@ -71,6 +67,8 @@ public final class Options {
     private boolean showDeactivatedAccounts = false;
     private String lastStatementDir = "";
     private String lastExportDir = "";
+    // Windows
+    private final WindowsSettings windowsSettings = new WindowsSettings();
 
     private File mainCssFile;
     private File dialogCssFile;
@@ -78,6 +76,7 @@ public final class Options {
 
     private File profilesFile;
     private File settingsFile;
+    private File windowsFile;
 
     private static final Options OPTIONS = new Options();
 
@@ -104,6 +103,7 @@ public final class Options {
         aboutDialogCssFile = new File(settingsDirectory, "about-dialog.css");
         profilesFile = new File(settingsDirectory, "profiles.xml");
         settingsFile = new File(settingsDirectory, "settings.xml");
+        windowsFile = new File(settingsDirectory, "windows.xml");
     }
 
     private static File initDirectory(File dir, String name) {
@@ -191,40 +191,12 @@ public final class Options {
         return profilesFile;
     }
 
-    private enum Option {
-        MAIN_WINDOW_WIDTH,
-        MAIN_WINDOW_HEIGHT;
-
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-    }
-
-    private static final Preferences PREFS = Preferences.userNodeForPackage(MoneyApplication.class);
-
     public boolean getShowDeactivatedAccounts() {
         return showDeactivatedAccounts;
     }
 
     public void setShowDeactivatedAccounts(boolean show) {
         showDeactivatedAccounts = show;
-    }
-
-    public static double getMainWindowWidth() {
-        return PREFS.getDouble(Option.MAIN_WINDOW_WIDTH.toString(), DEFAULT_WIDTH);
-    }
-
-    public static void setMainWindowWidth(double x) {
-        PREFS.putDouble(Option.MAIN_WINDOW_WIDTH.toString(), x);
-    }
-
-    public static double getMainWindowHeight() {
-        return PREFS.getDouble(Option.MAIN_WINDOW_HEIGHT.toString(), DEFAULT_HEIGHT);
-    }
-
-    public static void setMainWindowHeight(double x) {
-        PREFS.putDouble(Option.MAIN_WINDOW_HEIGHT.toString(), x);
     }
 
     public int getAutoCompleteLength() {
@@ -276,27 +248,12 @@ public final class Options {
         option.setColor(color);
     }
 
-    public static void saveStageDimensions(Class<?> parentClass, Stage stage) {
-        var key = parentClass.getSimpleName().toLowerCase() + "_size";
-        var value = String.format("%d;%d;%d;%d",
-            (int) stage.getX(),
-            (int) stage.getY(),
-            (int) stage.getWidth(),
-            (int) stage.getHeight());
-        PREFS.put(key, value);
+    public void saveStageDimensions(Controller controller) {
+        windowsSettings.storeWindowDimensions(controller);
     }
 
-    public static void loadStageDimensions(Class<?> parentClass, Stage stage) {
-        var key = parentClass.getSimpleName().toLowerCase() + "_size";
-        var parts = PREFS.get(key, "").split(";");
-        if (parts.length != 4) {
-            return;
-        }
-
-        stage.setX(Double.parseDouble(parts[0]));
-        stage.setY(Double.parseDouble(parts[1]));
-        stage.setWidth(Double.parseDouble(parts[2]));
-        stage.setHeight(Double.parseDouble(parts[3]));
+    public void loadStageDimensions(Controller controller) {
+        windowsSettings.restoreWindowDimensions(controller);
     }
 
     public void saveSettings() {
@@ -313,6 +270,10 @@ public final class Options {
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    public void saveWindowsSettings() {
+        windowsSettings.saveWindowsSettings(windowsFile);
     }
 
     private void serializeColors(Element parent) {
@@ -337,6 +298,8 @@ public final class Options {
     }
 
     public void loadSettings() {
+        windowsSettings.loadWindowsSettings(windowsFile);
+
         if (!settingsFile.exists()) {
             return;
         }

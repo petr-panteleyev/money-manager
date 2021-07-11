@@ -32,7 +32,6 @@ import org.panteleyev.money.app.cells.AccountInterestCell;
 import org.panteleyev.money.app.cells.AccountNameCell;
 import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Currency;
@@ -153,7 +152,7 @@ final class AccountWindowController extends BaseController {
         cache().getTransactions().addListener(new WeakListChangeListener<>(transactionListener));
 
         setupWindow(self);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     @Override

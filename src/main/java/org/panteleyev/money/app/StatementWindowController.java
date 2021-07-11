@@ -27,7 +27,6 @@ import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
 import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
@@ -166,7 +165,7 @@ class StatementWindowController extends BaseController {
 
         setupWindow(root);
         setupAccountComboBox();
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     void onNewTransaction(StatementRecord statementRecord) {

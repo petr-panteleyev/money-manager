@@ -18,7 +18,6 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
@@ -159,7 +158,7 @@ class RequestWindowController extends BaseController {
             ));
 
         setupWindow(root);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     Account getAccount() {

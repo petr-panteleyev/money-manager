@@ -143,6 +143,15 @@ public interface XMLUtils {
         }
     }
 
+    static boolean getAttribute(Element element, String name, boolean defValue) {
+        var value = element.getAttribute(name);
+        if (value.isBlank()) {
+            return defValue;
+        } else {
+            return Boolean.parseBoolean(value);
+        }
+    }
+
     static Optional<String> getStringNodeValue(Element parent, String tagName) {
         var nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
