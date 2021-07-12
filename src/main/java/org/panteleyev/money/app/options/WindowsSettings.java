@@ -20,7 +20,7 @@ import static org.panteleyev.money.xml.XMLUtils.getAttribute;
 import static org.panteleyev.money.xml.XMLUtils.readDocument;
 import static org.panteleyev.money.xml.XMLUtils.writeDocument;
 
-class WindowsSettings {
+final class WindowsSettings {
     private static final double DEFAULT_WIDTH = 1024.0;
     private static final double DEFAULT_HEIGHT = 768.0;
 
@@ -57,7 +57,7 @@ class WindowsSettings {
         }
     }
 
-    void saveWindowsSettings(File file) {
+    void save(File file) {
         WindowManager.newInstance().getControllerStream().forEach(this::storeWindowDimensions);
 
         try (var out = new FileOutputStream(file)) {
@@ -79,7 +79,7 @@ class WindowsSettings {
         }
     }
 
-    void loadWindowsSettings(File file) {
+    void load(File file) {
         windowMap.clear();
 
         if (!file.exists()) {
