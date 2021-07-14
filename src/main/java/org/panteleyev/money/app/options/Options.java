@@ -48,7 +48,7 @@ public final class Options {
     private boolean showDeactivatedAccounts = false;
     private String lastStatementDir = "";
     private String lastExportDir = "";
-    // Windows
+
     private final WindowsSettings windowsSettings = new WindowsSettings();
     private final ColorSettings colorSettings = new ColorSettings();
     private final FontSettings fontSettings = new FontSettings();

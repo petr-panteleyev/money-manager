@@ -16,7 +16,7 @@ import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.readDocument;
 import static org.panteleyev.money.xml.XMLUtils.writeDocument;
 
-public record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultProfile, boolean autoConnect) {
+record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultProfile, boolean autoConnect) {
     private static final String ROOT = "settings";
     private static final String AUTO_CONNECT = "autoConnect";
     private static final String DEFAULT_PROFILE = "defaultProfile";

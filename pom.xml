@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.5-SNAPSHOT</version>
+    <version>21.4.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
