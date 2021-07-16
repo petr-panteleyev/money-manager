@@ -124,6 +124,7 @@ class ContactListWindowController extends BaseController {
 
         reloadContacts();
         setupWindow(self);
+        options().loadStageDimensions(this);
 
         Platform.runLater(this::resetFilter);
     }

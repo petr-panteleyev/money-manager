@@ -18,7 +18,6 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
@@ -53,6 +52,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
@@ -89,7 +89,7 @@ class RequestWindowController extends BaseController {
 
     private static class CompletionProvider extends BaseCompletionProvider<String> {
         CompletionProvider(Set<String> set) {
-            super(set, Options::getAutoCompleteLength);
+            super(set, () -> options().getAutoCompleteLength());
         }
 
         public String getElementString(String element) {
@@ -158,7 +158,7 @@ class RequestWindowController extends BaseController {
             ));
 
         setupWindow(root);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     Account getAccount() {
@@ -219,7 +219,7 @@ class RequestWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

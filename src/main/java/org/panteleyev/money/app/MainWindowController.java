@@ -34,7 +34,6 @@ import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
 import org.panteleyev.money.app.database.ConnectionProfileManager;
 import org.panteleyev.money.app.icons.IconWindowController;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.app.options.OptionsDialog;
 import org.panteleyev.money.bundles.UiBundle;
 import org.panteleyev.money.model.Account;
@@ -42,7 +41,6 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -60,7 +58,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
-import java.util.prefs.Preferences;
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
@@ -96,10 +93,8 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_D
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT_SETTINGS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ICONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_IMPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_IMPORT_SETTINGS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_NEXT_MONTH;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_OPTIONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PREVIOUS_MONTH;
@@ -109,7 +104,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_U
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_TOOLS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INCOMPATIBLE_SCHEMA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INITIAL_BALANCE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE_TEXT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
@@ -120,8 +114,6 @@ import static org.panteleyev.money.persistence.DataCache.cache;
 import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
-    private static final Preferences PREFERENCES = Preferences.userNodeForPackage(MainWindowController.class);
-
     public static final ResourceBundle UI = ResourceBundle.getBundle(UiBundle.class.getCanonicalName());
 
     private final BorderPane self = new BorderPane();
@@ -132,8 +124,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
     private final ConnectionProfileManager profileManager =
-        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource,
-            PREFERENCES);
+        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource);
 
     // Transaction view box
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
@@ -224,10 +215,6 @@ public class MainWindowController extends BaseController implements TransactionT
 
         var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
             x -> onOptions());
-        var importSettingsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT_SETTINGS, ELLIPSIS),
-            x -> onImportSettings());
-        var exportSettingsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT_SETTINGS, ELLIPSIS),
-            x -> onExportSettings());
         var iconWindowMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ICONS, ELLIPSIS),
             x -> onIconWindow());
 
@@ -236,9 +223,7 @@ public class MainWindowController extends BaseController implements TransactionT
             new SeparatorMenuItem(),
             iconWindowMenuItem,
             new SeparatorMenuItem(),
-            optionsMenuItem,
-            importSettingsMenuItem,
-            exportSettingsMenuItem
+            optionsMenuItem
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
@@ -304,10 +289,7 @@ public class MainWindowController extends BaseController implements TransactionT
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
 
-        getStage().setOnHiding(event -> onWindowClosing());
-
-        getStage().setWidth(Options.getMainWindowWidth());
-        getStage().setHeight(Options.getMainWindowHeight());
+        options().loadStageDimensions(this);
 
         profileManager.getProfileToOpen().ifPresent(this::open);
     }
@@ -395,17 +377,17 @@ public class MainWindowController extends BaseController implements TransactionT
         getStage().setTitle(title);
     }
 
-    private void onWindowClosing() {
+    @Override
+    protected void onWindowHiding() {
+        super.onWindowHiding();
         closeChildWindows();
-
-        Options.setMainWindowWidth(getStage().widthProperty().doubleValue());
-        Options.setMainWindowHeight(getStage().heightProperty().doubleValue());
+        options().saveWindowsSettings();
     }
 
     private void xmlDump() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
@@ -424,7 +406,8 @@ public class MainWindowController extends BaseController implements TransactionT
                     .withContacts(cache().getContacts(), false)
                     .withTransactions(cache().getTransactions(), false)
                     .doExport(outputStream);
-                Options.setLastExportDir(selected.getParent());
+                options().setLastExportDir(selected.getParent());
+                options().saveSettings();
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }
@@ -438,7 +421,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
@@ -480,39 +463,6 @@ public class MainWindowController extends BaseController implements TransactionT
             return ds;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    private void onImportSettings() {
-        var d = new FileChooser();
-        d.setTitle("Import Settings");
-        d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Settings", "*.xml")
-        );
-        var file = d.showOpenDialog(null);
-        if (file != null) {
-            try (var in = new FileInputStream(file)) {
-                Preferences.importPreferences(in);
-                profileManager.loadProfiles();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
-    private void onExportSettings() {
-        var d = new FileChooser();
-        d.setTitle("Export Settings");
-        d.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Settings", "*.xml")
-        );
-        var file = d.showSaveDialog(null);
-        if (file != null) {
-            try (var out = new FileOutputStream(file)) {
-                PREFERENCES.exportSubtree(out);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
         }
     }
 

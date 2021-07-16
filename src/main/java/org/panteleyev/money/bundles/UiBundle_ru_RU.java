@@ -108,8 +108,6 @@ public class UiBundle_ru_RU extends ListResourceBundle {
             {I18N_MENU_ITEM_COPY_NAME, "Копировать название"},
             {I18N_MENU_ITEM_CURRENT_MONTH, "Текущий месяц"},
             {I18N_MENU_ITEM_DEACTIVATE, "Деактивировать"},
-            {I18N_MENU_ITEM_EXPORT_SETTINGS, "Экспорт настроек"},
-            {I18N_MENU_ITEM_IMPORT_SETTINGS, "Импорт настроек"},
             {I18N_MENU_ITEM_NEXT_MONTH, "Следующий месяц"},
             {I18N_MENU_ITEM_PREVIOUS_MONTH, "Предыдущий месяц"},
             {I18N_MENU_ITEM_SEARCH, "Поиск"},

@@ -51,6 +51,7 @@ import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.CREDIT;
 import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
+import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
@@ -180,7 +181,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         filterBox.reset();
 
         setupWindow(root);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
 
 //        onRefresh();
     }
@@ -305,7 +306,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("IncomesAndExpenses"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

@@ -7,7 +7,6 @@ package org.panteleyev.money.app;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Currency;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +65,7 @@ final class CurrencyWindowController extends BaseController {
 
         var root = new BorderPane(table, menuBar, null, null, null);
         setupWindow(root);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     @Override

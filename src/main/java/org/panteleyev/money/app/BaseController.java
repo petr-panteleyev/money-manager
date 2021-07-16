@@ -50,8 +50,12 @@ public class BaseController extends Controller {
     }
 
     public void onClose() {
-        Options.saveStageDimensions(getClass(), getStage());
         getStage().close();
+    }
+
+    @Override
+    protected void onWindowHiding() {
+        options().saveStageDimensions(this);
     }
 
     Menu createWindowMenu() {

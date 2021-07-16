@@ -6,6 +6,10 @@ package org.panteleyev.money.app.database;
 
 import javafx.scene.control.Dialog;
 import javax.sql.DataSource;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -13,16 +17,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import static org.panteleyev.money.app.options.Options.options;
 
 public final class ConnectionProfileManager {
-    private static final String PREF_ROOT = "database_connection_profiles";
-    private static final String PREF_COUNT = "count";
-    private static final String PREF_AUTO_CONNECT = "auto_connect";
-    private static final String PREF_DEFAULT_PROFILE_NAME = "default_profile_name";
-    private static final String PREF_PROFILE_ROOT = "profile.";
-
     private static final String PROFILE_PROPERTY = "profile";
     private static final String NO_AUTO_PROPERTY = "noauto";
 
@@ -33,19 +31,15 @@ public final class ConnectionProfileManager {
 
     private final Function<ConnectionProfile, Exception> resetDatabaseCallback;
     private final Function<ConnectionProfile, DataSource> buildDataSourceCallback;
-    private final Preferences preferencesParent;
 
     public ConnectionProfileManager(Function<ConnectionProfile, Exception> initDatabaseCallback,
-                                    Function<ConnectionProfile, DataSource> buildDataSourceCallback,
-                                    Preferences preferencesParent)
+                                    Function<ConnectionProfile, DataSource> buildDataSourceCallback)
     {
         Objects.requireNonNull(initDatabaseCallback);
         Objects.requireNonNull(buildDataSourceCallback);
-        Objects.requireNonNull(preferencesParent);
 
         this.resetDatabaseCallback = initDatabaseCallback;
         this.buildDataSourceCallback = buildDataSourceCallback;
-        this.preferencesParent = preferencesParent;
     }
 
     public boolean getAutoConnect() {
@@ -78,55 +72,38 @@ public final class ConnectionProfileManager {
     }
 
     public void saveProfiles() {
-        saveProfiles(preferencesParent);
-    }
-
-    private void saveProfiles(Preferences parent) {
-        parent.remove(PREF_ROOT);
-        var root = parent.node(PREF_ROOT);
-
-        root.putBoolean(PREF_AUTO_CONNECT, autoConnect);
-        root.put(PREF_DEFAULT_PROFILE_NAME,
-            defaultProfile == null ? "" : defaultProfile.name());
-        root.putInt(PREF_COUNT, profiles.size());
-
-        var index = 0;
-        for (var profile : profiles.values()) {
-            var node = root.node(PREF_PROFILE_ROOT + index);
-            saveProfile(profile, node);
-            index++;
+        try (var out = new FileOutputStream(options().getProfilesFile())) {
+            new ProfileSettings(
+                profiles.values(),
+                defaultProfile == null ? "" : defaultProfile.name(),
+                autoConnect
+            ).save(out);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 
     public void loadProfiles() {
-        loadProfiles(preferencesParent);
-    }
-
-    private void loadProfiles(Preferences parent) {
-        var root = parent.node(PREF_ROOT);
-
-        autoConnect = root.getBoolean(PREF_AUTO_CONNECT, false);
-
-        profiles.clear();
-
-        var count = root.getInt(PREF_COUNT, 0);
-        for (int index = 0; index < count; index++) {
-            var nodeName = PREF_PROFILE_ROOT + index;
-            try {
-                if (!root.nodeExists(nodeName)) {
-                    break;
-                }
-            } catch (BackingStoreException ex) {
-                break;
-            }
-
-            var profile = loadProfile(root.node(nodeName));
-            profiles.put(profile.name(), profile);
+        var settingsFile = options().getProfilesFile();
+        if (!settingsFile.exists()) {
+            return;
         }
 
-        var defaultProfileName = root.get(PREF_DEFAULT_PROFILE_NAME, "");
-        if (!defaultProfileName.isEmpty()) {
-            defaultProfile = profiles.get(defaultProfileName);
+        try (var in = new FileInputStream(settingsFile)) {
+            var settings = ProfileSettings.load(in);
+            autoConnect = settings.autoConnect();
+            profiles.clear();
+            profiles.putAll(settings.profiles().stream()
+                .collect(Collectors.toMap(ConnectionProfile::name, Function.identity())));
+            var defaultProfileName = settings.defaultProfile();
+            if (defaultProfileName != null && !defaultProfileName.isBlank()) {
+                defaultProfile = profiles.get(defaultProfileName);
+            } else {
+                defaultProfile = null;
+            }
+
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 
@@ -154,28 +131,6 @@ public final class ConnectionProfileManager {
         }
     }
 
-    private static void saveProfile(ConnectionProfile profile, Preferences node) {
-        node.put("name", profile.name());
-        node.put("database_host", profile.dataBaseHost());
-        node.putInt("database_port", profile.dataBasePort());
-        node.put("database_user", profile.dataBaseUser());
-        node.put("database_password", profile.dataBasePassword());
-        node.put("schema", profile.schema());
-        node.put("encryption_key", profile.encryptionKey());
-    }
-
-    private static ConnectionProfile loadProfile(Preferences node) {
-        return new ConnectionProfile(
-            node.get("name", ""),
-            node.get("database_host", "localhost"),
-            node.getInt("database_port", 3306),
-            node.get("database_user", ""),
-            node.get("database_password", ""),
-            node.get("schema", ""),
-            node.get("encryption_key", "")
-        );
-    }
-
     public String getDatabaseHost(ConnectionProfile profile) {
         return profile.dataBaseHost();
     }
@@ -184,7 +139,7 @@ public final class ConnectionProfileManager {
         return profile.dataBasePort();
     }
 
-    public Dialog getEditor() {
+    public Dialog<?> getEditor() {
         return new ConnectionProfilesEditor(this);
     }
 

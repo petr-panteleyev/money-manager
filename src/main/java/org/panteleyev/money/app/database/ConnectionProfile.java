@@ -8,11 +8,10 @@ package org.panteleyev.money.app.database;
  * Profile for a typical database connection.
  */
 public record ConnectionProfile(String name, String dataBaseHost, int dataBasePort,
-                                String dataBaseUser, String dataBasePassword, String schema,
-                                String encryptionKey
+                                String dataBaseUser, String dataBasePassword, String schema
 ) {
     ConnectionProfile(String name, String schema) {
-        this(name, "localhost", 3306, "", "", schema, "");
+        this(name, "localhost", 3306, "", "", schema);
     }
 
     public String getConnectionString() {

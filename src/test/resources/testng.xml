@@ -39,4 +39,9 @@
             <class name="org.panteleyev.money.model.TransactionDetailTest"/>
         </classes>
     </test>
+    <test name="Options">
+        <classes>
+            <class name="org.panteleyev.money.app.database.ProfileSettingsTest"/>
+        </classes>
+    </test>
 </suite>

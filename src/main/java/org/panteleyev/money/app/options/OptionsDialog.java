@@ -72,13 +72,13 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
     private final TextField controlsFontField = new TextField();
     private final TextField menuFontField = new TextField();
     private final TextField cellFontField = new TextField();
-    private final ColorPicker debitColorPicker = new ColorPicker(DEBIT.getColor());
-    private final ColorPicker creditColorPicker = new ColorPicker(CREDIT.getColor());
-    private final ColorPicker transferColorPicker = new ColorPicker(TRANSFER.getColor());
+    private final ColorPicker debitColorPicker = new ColorPicker(options().getColor(DEBIT));
+    private final ColorPicker creditColorPicker = new ColorPicker(options().getColor(CREDIT));
+    private final ColorPicker transferColorPicker = new ColorPicker(options().getColor(TRANSFER));
     // Statement background colors
-    private final ColorPicker statementCheckedColorPicker = new ColorPicker(STATEMENT_CHECKED.getColor());
-    private final ColorPicker statementUncheckedColorPicker = new ColorPicker(STATEMENT_UNCHECKED.getColor());
-    private final ColorPicker statementMissingColorPicker = new ColorPicker(STATEMENT_MISSING.getColor());
+    private final ColorPicker statementCheckedColorPicker = new ColorPicker(options().getColor(STATEMENT_CHECKED));
+    private final ColorPicker statementUncheckedColorPicker = new ColorPicker(options().getColor(STATEMENT_UNCHECKED));
+    private final ColorPicker statementMissingColorPicker = new ColorPicker(options().getColor(STATEMENT_MISSING));
 
     private final TextField dialogLabelFontField = new TextField();
 
@@ -157,26 +157,27 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
         );
         getDialogPane().setContent(tabPane);
 
-        autoCompleteLength.getSelectionModel().select(Integer.valueOf(Options.getAutoCompleteLength()));
-        accountClosingDayDeltaEdit.setText(Integer.toString(Options.getAccountClosingDayDelta()));
+        autoCompleteLength.getSelectionModel().select(Integer.valueOf(options().getAutoCompleteLength()));
+        accountClosingDayDeltaEdit.setText(Integer.toString(options().getAccountClosingDayDelta()));
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
-                Options.setAutoCompleteLength(autoCompleteLength.getValue());
-                Options.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
+                options().setAutoCompleteLength(autoCompleteLength.getValue());
+                options().setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
                 // Fonts
-                Options.setFont(FontOption.CONTROLS_FONT, (Font) controlsFontField.getUserData());
-                Options.setFont(FontOption.MENU_FONT, (Font) menuFontField.getUserData());
-                Options.setFont(FontOption.TABLE_CELL_FONT, (Font) cellFontField.getUserData());
-                Options.setFont(FontOption.DIALOG_LABEL_FONT, (Font) dialogLabelFontField.getUserData());
+                options().setFont(FontOption.CONTROLS_FONT, (Font) controlsFontField.getUserData());
+                options().setFont(FontOption.MENU_FONT, (Font) menuFontField.getUserData());
+                options().setFont(FontOption.TABLE_CELL_FONT, (Font) cellFontField.getUserData());
+                options().setFont(FontOption.DIALOG_LABEL_FONT, (Font) dialogLabelFontField.getUserData());
                 // Colors
-                Options.setColor(DEBIT, debitColorPicker.getValue());
-                Options.setColor(CREDIT, creditColorPicker.getValue());
-                Options.setColor(TRANSFER, transferColorPicker.getValue());
-                Options.setColor(STATEMENT_CHECKED, statementCheckedColorPicker.getValue());
-                Options.setColor(STATEMENT_UNCHECKED, statementUncheckedColorPicker.getValue());
-                Options.setColor(STATEMENT_MISSING, statementMissingColorPicker.getValue());
+                options().setColor(DEBIT, debitColorPicker.getValue());
+                options().setColor(CREDIT, creditColorPicker.getValue());
+                options().setColor(TRANSFER, transferColorPicker.getValue());
+                options().setColor(STATEMENT_CHECKED, statementCheckedColorPicker.getValue());
+                options().setColor(STATEMENT_UNCHECKED, statementUncheckedColorPicker.getValue());
+                options().setColor(STATEMENT_MISSING, statementMissingColorPicker.getValue());
 
+                options().saveSettings();
                 options().generateCssFiles();
                 options().reloadCssFile();
             }
@@ -210,7 +211,7 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
     }
 
     private void loadFont(FontOption option, TextField field) {
-        setupFontField(field, option.getFont());
+        setupFontField(field, options().getFont(option));
     }
 
     private void setupFontField(TextField field, Font font) {

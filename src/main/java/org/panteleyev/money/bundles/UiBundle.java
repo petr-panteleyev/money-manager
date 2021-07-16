@@ -107,8 +107,6 @@ public class UiBundle extends ListResourceBundle {
             {I18N_MENU_ITEM_COPY_NAME, "Copy Name"},
             {I18N_MENU_ITEM_CURRENT_MONTH, "Current Month"},
             {I18N_MENU_ITEM_DEACTIVATE, "Deactivate"},
-            {I18N_MENU_ITEM_EXPORT_SETTINGS, "Export Settings"},
-            {I18N_MENU_ITEM_IMPORT_SETTINGS, "Import Settings"},
             {I18N_MENU_ITEM_NEXT_MONTH, "Next Month"},
             {I18N_MENU_ITEM_PREVIOUS_MONTH, "Previous Month"},
             {I18N_MENU_ITEM_SEARCH, "Search"},

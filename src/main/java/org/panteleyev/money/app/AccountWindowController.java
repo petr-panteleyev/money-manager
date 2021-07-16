@@ -32,7 +32,6 @@ import org.panteleyev.money.app.cells.AccountInterestCell;
 import org.panteleyev.money.app.cells.AccountNameCell;
 import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Currency;
@@ -99,7 +98,7 @@ final class AccountWindowController extends BaseController {
     private final CategorySelectionBox categorySelectionBox = new CategorySelectionBox();
     private final AccountNameFilterBox accountNameFilterBox = new AccountNameFilterBox();
     private final PredicateProperty<Account> showDeactivatedAccounts =
-        new PredicateProperty<>(Options.getShowDeactivatedAccounts() ? a -> true : activeAccount(true));
+        new PredicateProperty<>(options().getShowDeactivatedAccounts() ? a -> true : activeAccount(true));
 
     private final PredicateProperty<Account> filterProperty =
         PredicateProperty.and(List.of(
@@ -153,7 +152,7 @@ final class AccountWindowController extends BaseController {
         cache().getTransactions().addListener(new WeakListChangeListener<>(transactionListener));
 
         setupWindow(self);
-        Options.loadStageDimensions(getClass(), getStage());
+        options().loadStageDimensions(this);
     }
 
     @Override
@@ -206,10 +205,11 @@ final class AccountWindowController extends BaseController {
             editMenu,
             newMenu(fxString(UI, I18N_MENU_VIEW),
                 checkMenuItem(fxString(UI, I18N_MISC_SHOW_DEACTIVATED_ACCOUNTS),
-                    Options.getShowDeactivatedAccounts(), SHORTCUT_H,
+                    options().getShowDeactivatedAccounts(), SHORTCUT_H,
                     event -> {
                         var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                        Options.setShowDeactivatedAccounts(selected);
+                        options().setShowDeactivatedAccounts(selected);
+                        options().saveSettings();
                         showDeactivatedAccounts.set(selected ? a -> true : activeAccount(true));
                     }
                 )
@@ -236,7 +236,7 @@ final class AccountWindowController extends BaseController {
                     .withPropertyCallback(Account::interest)
                     .withWidthBinding(w.multiply(0.03))),
             tableObjectColumn(fxString(UI, I18N_WORD_UNTIL), b ->
-                b.withCellFactory(x -> new AccountClosingDateCell(Options.getAccountClosingDayDelta()))
+                b.withCellFactory(x -> new AccountClosingDateCell(options().getAccountClosingDayDelta()))
                     .withWidthBinding(w.multiply(0.05))),
             tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
                 b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.3))),
@@ -347,7 +347,7 @@ final class AccountWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        Options.getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("accounts"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

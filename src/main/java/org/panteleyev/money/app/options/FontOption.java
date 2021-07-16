@@ -4,7 +4,7 @@
  */
 package org.panteleyev.money.app.options;
 
-import javafx.scene.text.Font;
+import java.util.Optional;
 
 public enum FontOption {
     CONTROLS_FONT,
@@ -12,18 +12,11 @@ public enum FontOption {
     TABLE_CELL_FONT,
     DIALOG_LABEL_FONT;
 
-    private Font font;
-
-    @Override
-    public String toString() {
-        return name().toLowerCase();
-    }
-
-    public Font getFont() {
-        return font;
-    }
-
-    public void setFont(Font font) {
-        this.font = font;
+    public static Optional<FontOption> of(String str) {
+        try {
+            return Optional.of(valueOf(str));
+        } catch (Exception ex) {
+            return Optional.empty();
+        }
     }
 }

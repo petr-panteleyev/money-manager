@@ -127,6 +127,7 @@ final class CategoryWindowController extends BaseController {
         typeBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
 
         setupWindow(self);
+
         Platform.runLater(this::resetFilter);
     }
 

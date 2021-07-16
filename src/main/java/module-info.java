@@ -1,6 +1,5 @@
 open module org.panteleyev.money {
     requires java.base;
-    requires java.prefs;
     requires java.sql;
     requires java.naming;
     requires java.net.http;
