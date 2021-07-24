@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
-import static org.panteleyev.money.app.Bundles.TRANSACTION_PREDICATE_BUNDLE;
+import static org.panteleyev.money.app.Constants.TRANSACTION_PREDICATE_BUNDLE;
 
 public enum TransactionPredicate implements Predicate<Transaction> {
     ALL(it -> true),

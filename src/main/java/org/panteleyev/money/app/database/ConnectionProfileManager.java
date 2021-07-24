@@ -5,11 +5,8 @@
 package org.panteleyev.money.app.database;
 
 import javafx.scene.control.Dialog;
+import org.panteleyev.money.app.ApplicationFiles;
 import javax.sql.DataSource;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.app.options.Options.options;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 
 public final class ConnectionProfileManager {
     private static final String PROFILE_PROPERTY = "profile";
@@ -72,24 +69,15 @@ public final class ConnectionProfileManager {
     }
 
     public void saveProfiles() {
-        try (var out = new FileOutputStream(options().getProfilesFile())) {
-            new ProfileSettings(
-                profiles.values(),
-                defaultProfile == null ? "" : defaultProfile.name(),
-                autoConnect
-            ).save(out);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        files().write(ApplicationFiles.AppFile.PROFILES, out -> new ProfileSettings(
+            profiles.values(),
+            defaultProfile == null ? "" : defaultProfile.name(),
+            autoConnect
+        ).save(out));
     }
 
     public void loadProfiles() {
-        var settingsFile = options().getProfilesFile();
-        if (!settingsFile.exists()) {
-            return;
-        }
-
-        try (var in = new FileInputStream(settingsFile)) {
+        files().read(ApplicationFiles.AppFile.PROFILES, in -> {
             var settings = ProfileSettings.load(in);
             autoConnect = settings.autoConnect();
             profiles.clear();
@@ -101,10 +89,7 @@ public final class ConnectionProfileManager {
             } else {
                 defaultProfile = null;
             }
-
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
     public Collection<ConnectionProfile> getAll() {

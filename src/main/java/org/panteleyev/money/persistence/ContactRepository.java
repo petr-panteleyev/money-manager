@@ -20,9 +20,9 @@ final class ContactRepository extends Repository<Contact> {
     protected String getInsertSql() {
         return """
             INSERT INTO contact (
-                uuid, name, type, phone, mobile,
-                email, web, comment, street, city,
-                country, zip, icon_uuid, created, modified
+                name, type, phone, mobile, email, 
+                web, comment, street, city, country, 
+                zip, icon_uuid, created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
@@ -72,11 +72,8 @@ final class ContactRepository extends Repository<Contact> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Contact contact, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Contact contact) throws SQLException {
         var index = 1;
-        if (!update) {
-            st.setString(index++, contact.uuid().toString());
-        }
         st.setString(index++, contact.name());
         st.setString(index++, contact.type().name());
         st.setString(index++, contact.phone());
@@ -91,8 +88,6 @@ final class ContactRepository extends Repository<Contact> {
         setUuid(st, index++, contact.iconUuid());
         st.setLong(index++, contact.created());
         st.setLong(index++, contact.modified());
-        if (update) {
-            st.setString(index, contact.uuid().toString());
-        }
+        st.setString(index, contact.uuid().toString());
     }
 }

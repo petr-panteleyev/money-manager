@@ -19,7 +19,7 @@ final class IconRepository extends Repository<Icon> {
     protected String getInsertSql() {
         return """
             INSERT INTO icon (
-                uuid, name, bytes, created, modified
+                name, bytes, created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?
             )
@@ -50,17 +50,12 @@ final class IconRepository extends Repository<Icon> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Icon icon, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Icon icon) throws SQLException {
         var index = 1;
-        if (!update) {
-            setUuid(st, index++, icon.uuid());
-        }
         st.setString(index++, icon.getName());
         st.setBytes(index++, icon.getBytes());
         st.setLong(index++, icon.created());
         st.setLong(index++, icon.modified());
-        if (update) {
-            setUuid(st, index, icon.uuid());
-        }
+        setUuid(st, index, icon.uuid());
     }
 }

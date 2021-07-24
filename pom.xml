@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.4</version>
+    <version>21.4.5</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -31,7 +31,7 @@
         <liquibasePluginVersion>4.4.0</liquibasePluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>16</javaFxVersion>
-        <javaFxHelpersVersion>1.8.4</javaFxHelpersVersion>
+        <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.13.1</jsoupVersion>

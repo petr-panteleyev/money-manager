@@ -230,43 +230,47 @@ public class MoneyDAO {
     }
 
     public void preload(Consumer<String> progress) {
-        progress.accept("Preloading data...\n");
+        try (var conn = dataSource.getConnection()) {
+            progress.accept("Preloading data...\n");
 
-        progress.accept("    icons... ");
-        var iconList = iconRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    icons... ");
+            var iconList = iconRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("    categories... ");
-        var categoryList = categoryRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    categories... ");
+            var categoryList = categoryRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("    contacts... ");
-        var contactList = contactRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    contacts... ");
+            var contactList = contactRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("    currencies... ");
-        var currencyList = currencyRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    currencies... ");
+            var currencyList = currencyRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("    accounts... ");
-        var accountList = accountRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    accounts... ");
+            var accountList = accountRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("    transactions... ");
-        var transactionList = transactionRepository.getAll();
-        progress.accept("done\n");
+            progress.accept("    transactions... ");
+            var transactionList = transactionRepository.getAll(conn);
+            progress.accept("done\n");
 
-        progress.accept("done\n");
+            progress.accept("done\n");
 
-        CompletableFuture.supplyAsync(() -> {
-            cache.getIcons().setAll(iconList);
-            cache.getCategories().setAll(categoryList);
-            cache.getContacts().setAll(contactList);
-            cache.getCurrencies().setAll(currencyList);
-            cache.getAccounts().setAll(accountList);
-            cache.getTransactions().setAll(transactionList);
-            return null;
-        }, Platform::runLater);
+            CompletableFuture.supplyAsync(() -> {
+                cache.getIcons().setAll(iconList);
+                cache.getCategories().setAll(categoryList);
+                cache.getContacts().setAll(contactList);
+                cache.getCurrencies().setAll(currencyList);
+                cache.getAccounts().setAll(accountList);
+                cache.getTransactions().setAll(transactionList);
+                return null;
+            }, Platform::runLater);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public void initialize(DataSource ds) {

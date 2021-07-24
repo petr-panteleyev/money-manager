@@ -208,8 +208,7 @@ final class AccountWindowController extends BaseController {
                     options().getShowDeactivatedAccounts(), SHORTCUT_H,
                     event -> {
                         var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                        options().setShowDeactivatedAccounts(selected);
-                        options().saveSettings();
+                        options().update(opt -> opt.setShowDeactivatedAccounts(selected));
                         showDeactivatedAccounts.set(selected ? a -> true : activeAccount(true));
                     }
                 )

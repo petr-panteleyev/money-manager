@@ -271,8 +271,7 @@ class StatementWindowController extends BaseController {
         }
 
         var dir = selected.getParentFile();
-        options().setLastStatementDir(dir == null ? "" : dir.getAbsolutePath());
-        options().saveSettings();
+        options().update(opt -> opt.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath()));
 
         setTitle(getTitle() + " - " + selected.getAbsolutePath());
 

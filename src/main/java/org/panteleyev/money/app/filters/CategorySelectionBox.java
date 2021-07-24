@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import static javafx.collections.FXCollections.observableArrayList;
+import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByCategoryType;
@@ -33,21 +34,10 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CA
 import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class CategorySelectionBox extends HBox {
-    private static class TypeListItem {
-        private final String text;
-        private final EnumSet<CategoryType> types;
 
-        TypeListItem(String text, CategoryType type, CategoryType... types) {
-            this.text = text;
-            this.types = EnumSet.of(type, types);
-        }
-
-        String getText() {
-            return text;
-        }
-
-        EnumSet<CategoryType> getTypes() {
-            return types;
+    private static record TypeListItem(String text, EnumSet<CategoryType> types) {
+        static TypeListItem of(String text, CategoryType type, CategoryType... types) {
+            return new TypeListItem(text, EnumSet.of(type, types));
         }
     }
 
@@ -77,7 +67,7 @@ public class CategorySelectionBox extends HBox {
             @Override
             public String toString(Object object) {
                 if (object instanceof TypeListItem item) {
-                    return item.getText();
+                    return item.text();
                 } else {
                     return object != null ? object.toString() : "-";
                 }
@@ -109,15 +99,15 @@ public class CategorySelectionBox extends HBox {
         categoryTypeChoiceBox.setOnAction(event -> {});
 
         categoryTypeChoiceBox.getItems().setAll(
-            new TypeListItem(UI.getString(I18N_MISC_ACCOUNTS_CASH_CARDS),
+            TypeListItem.of(fxString(UI, I18N_MISC_ACCOUNTS_CASH_CARDS),
                 CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
-            new TypeListItem(UI.getString(I18M_MISC_INCOMES_AND_EXPENSES),
+            TypeListItem.of(fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES),
                 CategoryType.INCOMES, CategoryType.EXPENSES),
             new Separator()
         );
 
         for (var t : CategoryType.values()) {
-            categoryTypeChoiceBox.getItems().add(new TypeListItem(t.toString(), t));
+            categoryTypeChoiceBox.getItems().add(TypeListItem.of(t.toString(), t));
         }
 
         categoryTypeChoiceBox.setOnAction(categoryTypeHandler);
@@ -125,17 +115,13 @@ public class CategorySelectionBox extends HBox {
     }
 
     private Optional<Category> getSelectedCategory() {
-        var obj = categoryChoiceBox.getSelectionModel().getSelectedItem();
-        return obj instanceof Category category ? Optional.of(category) : Optional.empty();
+        return categoryChoiceBox.getSelectionModel().getSelectedItem() instanceof Category category ?
+            Optional.of(category) : Optional.empty();
     }
 
     private Set<CategoryType> getSelectedCategoryTypes() {
-        var obj = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
-        if (obj instanceof TypeListItem item) {
-            return item.getTypes();
-        } else {
-            return Set.of();
-        }
+        return categoryTypeChoiceBox.getSelectionModel().getSelectedItem() instanceof TypeListItem item ?
+            item.types() : Set.of();
     }
 
     private Predicate<Account> getAccountFilter() {
@@ -149,15 +135,14 @@ public class CategorySelectionBox extends HBox {
 
     private void onTypeChanged() {
         categoryChoiceBox.setOnAction(x -> {});
-        var object = categoryTypeChoiceBox.getSelectionModel().getSelectedItem();
 
-        if (!(object instanceof TypeListItem typeListItem)) {
+        if (!(categoryTypeChoiceBox.getSelectionModel().getSelectedItem() instanceof TypeListItem typeListItem)) {
             return;
         }
 
         ObservableList<Object> items =
             observableArrayList(
-                cache().getCategoriesByType(typeListItem.getTypes()).stream()
+                cache().getCategoriesByType(typeListItem.types()).stream()
                     .sorted(Category.COMPARE_BY_NAME)
                     .toList()
             );
@@ -166,7 +151,7 @@ public class CategorySelectionBox extends HBox {
             items.add(0, new Separator());
         }
 
-        items.add(0, UI.getString(I18N_MISC_ALL_CATEGORIES));
+        items.add(0, fxString(UI, I18N_MISC_ALL_CATEGORIES));
 
         categoryChoiceBox.setItems(items);
         categoryChoiceBox.getSelectionModel().selectFirst();

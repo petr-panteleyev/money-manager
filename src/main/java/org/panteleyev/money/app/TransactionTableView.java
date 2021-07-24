@@ -301,8 +301,7 @@ public class TransactionTableView extends TableView<Transaction> {
             try (var out = new FileOutputStream(selected)) {
                 new Export().withTransactions(toExport, true)
                     .doExport(out);
-                options().setLastExportDir(selected.getParent());
-                options().saveSettings();
+                options().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }

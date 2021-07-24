@@ -5,15 +5,13 @@
 package org.panteleyev.money.app.options;
 
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.StagePositionAndSize;
 import org.panteleyev.fx.WindowManager;
+import org.panteleyev.money.app.ApplicationFiles;
 import org.w3c.dom.Element;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.getAttribute;
@@ -33,43 +31,22 @@ final class WindowsSettings {
     private static final String HEIGHT_ATTR = "height";
     private static final String MAXIMIZED_ATTR = "maximized";
 
-    private static record WindowPositionAndSize(
-        double x, double y,
-        double width, double height, boolean maximized
-    ) {
-    }
-
-    private final Map<String, WindowPositionAndSize> windowMap = new ConcurrentHashMap<>();
+    private final Map<String, StagePositionAndSize> windowMap = new ConcurrentHashMap<>();
 
     void storeWindowDimensions(Controller controller) {
-        var stage = controller.getStage();
-        windowMap.put(controller.getClass().getSimpleName(), new WindowPositionAndSize(
-            stage.getX(), stage.getY(),
-            stage.getWidth(), stage.getHeight(), stage.isMaximized()
-        ));
+        windowMap.put(controller.getClass().getSimpleName(), controller.getStagePositionAndSize());
     }
 
     void restoreWindowDimensions(Controller controller) {
-        var dimensions = windowMap.get(controller.getClass().getSimpleName());
-        if (dimensions == null) {
-            return;
-        }
-
-        var stage = controller.getStage();
-        if (dimensions.maximized()) {
-            stage.setMaximized(true);
-        } else {
-            stage.setX(dimensions.x());
-            stage.setY(dimensions.y());
-            stage.setWidth(dimensions.width());
-            stage.setHeight(dimensions.height());
-        }
+        controller.setStagePositionAndSize(
+            windowMap.get(controller.getClass().getSimpleName())
+        );
     }
 
-    void save(File file) {
+    void save() {
         WindowManager.newInstance().getControllerStream().forEach(this::storeWindowDimensions);
 
-        try (var out = new FileOutputStream(file)) {
+        files().write(ApplicationFiles.AppFile.WINDOWS, out -> {
             var root = createDocument(ROOT_ELEMENT);
 
             for (var entry : windowMap.entrySet()) {
@@ -83,19 +60,12 @@ final class WindowsSettings {
             }
 
             writeDocument(root.getOwnerDocument(), out);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
-    void load(File file) {
-        windowMap.clear();
-
-        if (!file.exists()) {
-            return;
-        }
-
-        try (var in = new FileInputStream(file)) {
+    void load() {
+        files().read(ApplicationFiles.AppFile.WINDOWS, in -> {
+            windowMap.clear();
             var root = readDocument(in);
             var windowNodes = root.getElementsByTagName(WINDOW_ELEMENT);
             for (int i = 0; i < windowNodes.getLength(); i++) {
@@ -106,14 +76,11 @@ final class WindowsSettings {
                     var width = getAttribute(windowElement, WIDTH_ATTR, DEFAULT_WIDTH);
                     var height = getAttribute(windowElement, HEIGHT_ATTR, DEFAULT_HEIGHT);
                     var maximized = getAttribute(windowElement, MAXIMIZED_ATTR, false);
-                    windowMap.put(className, new WindowPositionAndSize(
+                    windowMap.put(className, new StagePositionAndSize(
                         x, y, width, height, maximized
                     ));
                 }
             }
-
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 }

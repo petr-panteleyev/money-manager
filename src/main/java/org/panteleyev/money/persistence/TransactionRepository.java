@@ -22,11 +22,11 @@ final class TransactionRepository extends Repository<Transaction> {
     protected String getInsertSql() {
         return """
             INSERT INTO transaction (
-                uuid, amount, day, month, year,
-                type, comment, checked, acc_debited_uuid, acc_credited_uuid,
-                acc_debited_type, acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
+                amount, day, month, year, type,
+                comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
+                acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                 rate, rate_direction, invoice_number, parent_uuid, detailed,
-                statement_date, created, modified
+                statement_date, created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
@@ -97,11 +97,8 @@ final class TransactionRepository extends Repository<Transaction> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Transaction transaction, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Transaction transaction) throws SQLException {
         var index = 1;
-        if (!update) {
-            setUuid(st, index++, transaction.uuid());
-        }
         st.setBigDecimal(index++, transaction.amount());
         st.setInt(index++, transaction.day());
         st.setInt(index++, transaction.month());
@@ -124,8 +121,6 @@ final class TransactionRepository extends Repository<Transaction> {
         setLocalDate(st, index++, transaction.statementDate());
         st.setLong(index++, transaction.created());
         st.setLong(index++, transaction.modified());
-        if (update) {
-            setUuid(st, index, transaction.uuid());
-        }
+        setUuid(st, index, transaction.uuid());
     }
 }

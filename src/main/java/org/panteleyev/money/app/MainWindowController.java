@@ -370,7 +370,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onOptions() {
-        new OptionsDialog(this).showAndWait();
+        new OptionsDialog(this, options()).showAndWait();
     }
 
     private void setTitle(String title) {
@@ -406,8 +406,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     .withContacts(cache().getContacts(), false)
                     .withTransactions(cache().getTransactions(), false)
                     .doExport(outputStream);
-                options().setLastExportDir(selected.getParent());
-                options().saveSettings();
+                options().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }

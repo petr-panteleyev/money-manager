@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 import static org.panteleyev.money.app.options.Options.options;
 
 public class MoneyApplication extends Application {
@@ -25,9 +26,9 @@ public class MoneyApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        options().initialize();
-        options().loadSettings();
-        options().generateCssFiles();
+        files().initialize();
+
+        options().load();
 
         application = this;
 

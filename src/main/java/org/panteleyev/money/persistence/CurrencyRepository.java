@@ -19,9 +19,9 @@ final class CurrencyRepository extends Repository<Currency> {
     protected String getInsertSql() {
         return """
             INSERT INTO currency (
-                uuid, symbol, description, format_symbol, format_symbol_pos,
+                symbol, description, format_symbol, format_symbol_pos,
                 show_format_symbol, def, rate, rate_direction, use_th_separator,
-                created, modified
+                created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
             )
@@ -65,11 +65,8 @@ final class CurrencyRepository extends Repository<Currency> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Currency currency, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Currency currency) throws SQLException {
         var index = 1;
-        if (!update) {
-            st.setString(index++, currency.uuid().toString());
-        }
         st.setString(index++, currency.symbol());
         st.setString(index++, currency.description());
         st.setString(index++, currency.formatSymbol());
@@ -81,8 +78,6 @@ final class CurrencyRepository extends Repository<Currency> {
         setBoolean(st, index++, currency.useThousandSeparator());
         st.setLong(index++, currency.created());
         st.setLong(index++, currency.modified());
-        if (update) {
-            st.setString(index, currency.uuid().toString());
-        }
+        st.setString(index, currency.uuid().toString());
     }
 }

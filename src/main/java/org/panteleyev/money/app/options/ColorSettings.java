@@ -5,15 +5,12 @@
 package org.panteleyev.money.app.options;
 
 import javafx.scene.paint.Color;
+import org.panteleyev.money.app.ApplicationFiles;
 import org.w3c.dom.Element;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.requireNonNull;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.readDocument;
@@ -46,8 +43,8 @@ final class ColorSettings {
         );
     }
 
-    void save(File file) {
-        try (var out = new FileOutputStream(file)) {
+    void save() {
+        files().write(ApplicationFiles.AppFile.COLORS, out -> {
             var root = createDocument(ROOT_ELEMENT);
 
             for (var opt : ColorOption.values()) {
@@ -57,30 +54,20 @@ final class ColorSettings {
             }
 
             writeDocument(root.getOwnerDocument(), out);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
-    void load(File file) {
-        if (!file.exists()) {
-            return;
-        }
-
-        colorMap.clear();
-
-        try (var in = new FileInputStream(file)) {
+    void load() {
+        files().read(ApplicationFiles.AppFile.COLORS, in -> {
+            colorMap.clear();
             var root = readDocument(in);
-
             var colorNodes = root.getElementsByTagName(COLOR_ELEMENT);
             for (int i = 0; i < colorNodes.getLength(); i++) {
                 var colorElement = (Element)colorNodes.item(i);
                 ColorOption.of(colorElement.getAttribute(COLOR_ATTR_NAME).toUpperCase())
                     .ifPresent(option -> colorMap.put(option, Color.valueOf(colorElement.getAttribute(COLOR_ATTR_VALUE))));
             }
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
     private static String colorToHex(double c) {

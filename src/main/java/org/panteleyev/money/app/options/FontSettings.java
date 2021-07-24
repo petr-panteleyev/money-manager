@@ -7,15 +7,12 @@ package org.panteleyev.money.app.options;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
+import org.panteleyev.money.app.ApplicationFiles;
 import org.w3c.dom.Element;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Objects.requireNonNull;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.getAttribute;
@@ -45,8 +42,8 @@ final class FontSettings {
         fontMap.put(requireNonNull(fontOption), requireNonNull(font));
     }
 
-    void save(File file) {
-        try (var out = new FileOutputStream(file)) {
+    void save() {
+        files().write(ApplicationFiles.AppFile.FONTS, out -> {
             var root = createDocument(ROOT_ELEMENT);
 
             for (var entry : fontMap.entrySet()) {
@@ -59,19 +56,12 @@ final class FontSettings {
             }
 
             writeDocument(root.getOwnerDocument(), out);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
-    void load(File file) {
-        if (!file.exists()) {
-            return;
-        }
-
-        fontMap.clear();
-
-        try (var in = new FileInputStream(file)) {
+    void load() {
+        files().read(ApplicationFiles.AppFile.FONTS, in -> {
+            fontMap.clear();
             var root = readDocument(in);
 
             var fontNodes = root.getElementsByTagName(FONT_ELEMENT);
@@ -90,8 +80,6 @@ final class FontSettings {
                     fontMap.put(option, font);
                 });
             }
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 }

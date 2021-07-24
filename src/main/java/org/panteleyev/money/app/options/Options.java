@@ -8,18 +8,17 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
+import org.panteleyev.money.app.ApplicationFiles;
 import org.panteleyev.money.app.TemplateEngine;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
+import static org.panteleyev.money.app.ApplicationFiles.files;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
 import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
@@ -40,7 +39,6 @@ public final class Options {
 
     private static final int DEFAULT_AUTO_COMPLETE_LENGTH = 3;
     private static final int DEFAULT_ACCOUNT_CLOSING_DAY_DELTA = 10;
-    private static final String OPTIONS_DIRECTORY = ".money-manager";
 
     // Settings values
     private int autoCompleteLength = DEFAULT_AUTO_COMPLETE_LENGTH;
@@ -53,16 +51,6 @@ public final class Options {
     private final ColorSettings colorSettings = new ColorSettings();
     private final FontSettings fontSettings = new FontSettings();
 
-    private File mainCssFile;
-    private File dialogCssFile;
-    private File aboutDialogCssFile;
-
-    private File profilesFile;
-    private File settingsFile;
-    private File windowsFile;
-    private File colorsFile;
-    private File fontsFile;
-
     private static final Options OPTIONS = new Options();
 
     public static Options options() {
@@ -72,41 +60,14 @@ public final class Options {
     private Options() {
     }
 
-    public void initialize() {
-        var settingsDirectory = initDirectory(
-            new File(System.getProperty("user.home") + File.separator + OPTIONS_DIRECTORY),
-            "Options"
-        );
-
-        initDirectory(
-            new File(settingsDirectory, "logs"),
-            "Logs"
-        );
-
-        mainCssFile = new File(settingsDirectory, "main.css");
-        dialogCssFile = new File(settingsDirectory, "dialog.css");
-        aboutDialogCssFile = new File(settingsDirectory, "about-dialog.css");
-        profilesFile = new File(settingsDirectory, "profiles.xml");
-        settingsFile = new File(settingsDirectory, "settings.xml");
-        windowsFile = new File(settingsDirectory, "windows.xml");
-        colorsFile = new File(settingsDirectory, "colors.xml");
-        fontsFile = new File(settingsDirectory, "fonts.xml");
+    public void update(Consumer<Options> block) {
+        block.accept(this);
+        save();
+        generateCssFiles();
+        reloadCssFile();
     }
 
-    private static File initDirectory(File dir, String name) {
-        if (!dir.exists()) {
-            if (!dir.mkdir()) {
-                throw new RuntimeException(name + " directory cannot be opened/created");
-            }
-        } else {
-            if (!dir.isDirectory()) {
-                throw new RuntimeException(name + " directory cannot be opened/created");
-            }
-        }
-        return dir;
-    }
-
-    public void generateCssFiles() {
+    private void generateCssFiles() {
         var dataModel = Map.ofEntries(
             entry("debitColor", colorSettings.getWebString(ColorOption.DEBIT)),
             entry("creditColor", colorSettings.getWebString(ColorOption.CREDIT)),
@@ -125,57 +86,35 @@ public final class Options {
             entry("dialogLabelFontSize", (int) fontSettings.getFont(FontOption.DIALOG_LABEL_FONT).getSize())
         );
 
-        try (var w = new FileWriter(mainCssFile)) {
-            templateEngine().process(TemplateEngine.Template.MAIN_CSS, dataModel, w);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        files().write(ApplicationFiles.AppFile.MAIN_CSS, out -> templateEngine().process(
+            TemplateEngine.Template.MAIN_CSS, dataModel, new OutputStreamWriter(out)
+        ));
 
-        try (var w = new FileWriter(dialogCssFile)) {
-            templateEngine().process(TemplateEngine.Template.DIALOG_CSS, dataModel, w);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        files().write(ApplicationFiles.AppFile.DIALOG_CSS, out -> templateEngine().process(
+            TemplateEngine.Template.DIALOG_CSS, dataModel, new OutputStreamWriter(out)
+        ));
 
-        try (var w = new FileWriter(aboutDialogCssFile)) {
-            templateEngine().process(TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, w);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        files().write(ApplicationFiles.AppFile.ABOUT_DIALOG_CSS, out -> templateEngine().process(
+            TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, new OutputStreamWriter(out)
+        ));
     }
 
-    public void reloadCssFile() {
+    private void reloadCssFile() {
         WindowManager.newInstance().getControllers().forEach(
             c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
         );
     }
 
     public String getMainCssFilePath() {
-        try {
-            return mainCssFile.toURI().toURL().toExternalForm();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        return files().getUrl(ApplicationFiles.AppFile.MAIN_CSS).toExternalForm();
     }
 
     public URL getDialogCssFileUrl() {
-        try {
-            return dialogCssFile.toURI().toURL();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        return files().getUrl(ApplicationFiles.AppFile.DIALOG_CSS);
     }
 
     public URL getAboutDialogCssFileUrl() {
-        try {
-            return aboutDialogCssFile.toURI().toURL();
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-    }
-
-    public File getProfilesFile() {
-        return profilesFile;
+        return files().getUrl(ApplicationFiles.AppFile.ABOUT_DIALOG_CSS);
     }
 
     public boolean getShowDeactivatedAccounts() {
@@ -243,11 +182,11 @@ public final class Options {
         windowsSettings.restoreWindowDimensions(controller);
     }
 
-    public void saveSettings() {
-        colorSettings.save(colorsFile);
-        fontSettings.save(fontsFile);
+    private void save() {
+        colorSettings.save();
+        fontSettings.save();
 
-        try (var out = new FileOutputStream(settingsFile)) {
+        files().write(ApplicationFiles.AppFile.SETTINGS, out -> {
             var root = createDocument(ROOT);
             appendTextNode(root, AUTO_COMPLETE_LENGTH_ELEMENT, autoCompleteLength);
             appendTextNode(root, ACCOUNT_CLOSING_DAY_DELTA_ELEMENT, accountClosingDayDelta);
@@ -255,25 +194,20 @@ public final class Options {
             appendTextNode(root, LAST_STATEMENT_DIR_ELEMENT, lastStatementDir);
             appendTextNode(root, LAST_EXPORT_DIR_ELEMENT, lastExportDir);
             writeDocument(root.getOwnerDocument(), out);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 
     public void saveWindowsSettings() {
-        windowsSettings.save(windowsFile);
+        windowsSettings.save();
     }
 
-    public void loadSettings() {
-        windowsSettings.load(windowsFile);
-        colorSettings.load(colorsFile);
-        fontSettings.load(fontsFile);
+    public void load() {
+        windowsSettings.load();
+        colorSettings.load();
+        fontSettings.load();
+        generateCssFiles();
 
-        if (!settingsFile.exists()) {
-            return;
-        }
-
-        try (var in = new FileInputStream(settingsFile)) {
+        files().read(ApplicationFiles.AppFile.SETTINGS, in -> {
             var rootElement = readDocument(in);
             getIntNodeValue(rootElement, AUTO_COMPLETE_LENGTH_ELEMENT).ifPresent(
                 value -> autoCompleteLength = value
@@ -290,8 +224,6 @@ public final class Options {
             getStringNodeValue(rootElement, LAST_EXPORT_DIR_ELEMENT).ifPresent(
                 value -> lastExportDir = value
             );
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        });
     }
 }

@@ -22,10 +22,10 @@ final class AccountRepository extends Repository<Account> {
     protected String getInsertSql() {
         return """
             INSERT INTO account (
-                uuid, name, comment, number, opening,
+                name, comment, number, opening,
                 account_limit, rate, type, category_uuid, currency_uuid,
                 enabled, interest, closing_date, icon_uuid, card_type,
-                card_number, total, total_waiting, created, modified
+                card_number, total, total_waiting, created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?,
                 ?, ?, ?, ?, ?,
@@ -89,11 +89,8 @@ final class AccountRepository extends Repository<Account> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Account account, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Account account) throws SQLException {
         var index = 1;
-        if (!update) {
-            setUuid(st, index++, account.uuid());
-        }
         st.setString(index++, account.name());
         st.setString(index++, account.comment());
         st.setString(index++, account.accountNumber());
@@ -113,8 +110,6 @@ final class AccountRepository extends Repository<Account> {
         st.setBigDecimal(index++, account.totalWaiting());
         st.setLong(index++, account.created());
         st.setLong(index++, account.modified());
-        if (update) {
-            setUuid(st, index, account.uuid());
-        }
+        setUuid(st, index, account.uuid());
     }
 }

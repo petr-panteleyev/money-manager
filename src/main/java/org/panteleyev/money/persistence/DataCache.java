@@ -203,14 +203,6 @@ public class DataCache {
             .toList();
     }
 
-    public List<Account> getAccountsByCategoryId(UUID... ids) {
-        var catIDs = List.of(ids);
-
-        return getAccounts().stream()
-            .filter(account -> catIDs.contains(account.categoryUuid()))
-            .toList();
-    }
-
     public Optional<Account> getAccountByNumber(String accountNumber) {
         return getAccounts().stream()
             .filter(Account::enabled)
@@ -269,17 +261,6 @@ public class DataCache {
         return getTransactions().stream()
             .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
                 || Objects.equals(tr.accountCreditedUuid(), uuid))
-            .toList();
-    }
-
-    public List<Transaction> getTransactionsByCategories(Collection<Category> categories) {
-        var uuids = categories.stream()
-            .map(Category::uuid)
-            .toList();
-
-        return getTransactions().stream()
-            .filter(tr -> uuids.contains(tr.accountDebitedCategoryUuid())
-                || uuids.contains(tr.accountCreditedCategoryUuid()))
             .toList();
     }
 

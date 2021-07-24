@@ -6,7 +6,6 @@ package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.MoneyRecord;
 import javax.sql.DataSource;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -27,26 +26,20 @@ abstract class Repository<T extends MoneyRecord> {
         this.dataSource = dataSource;
     }
 
-    protected String getTableName() {
-        return tableName;
-    }
-
     protected DataSource getDataSource() {
         return dataSource;
     }
 
     abstract protected T fromResultSet(ResultSet rs) throws SQLException;
 
-    abstract protected void toStatement(PreparedStatement st, T object, boolean update) throws SQLException;
+    abstract protected void toStatement(PreparedStatement st, T object) throws SQLException;
 
     abstract protected String getInsertSql();
 
     abstract protected String getUpdateSql();
 
-    public List<T> getAll() {
-        try (var conn = dataSource.getConnection(); var st = conn.prepareStatement(
-            "SELECT * FROM " + tableName
-        )) {
+    public List<T> getAll(Connection conn) {
+        try (var st = conn.prepareStatement("SELECT * FROM " + tableName)) {
             var result = new ArrayList<T>();
             try (var rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -73,11 +66,8 @@ abstract class Repository<T extends MoneyRecord> {
     }
 
     public boolean insert(T object) {
-        try (var conn = getDataSource().getConnection();
-             var st = conn.prepareStatement(getInsertSql())
-        ) {
-            toStatement(st, object, false);
-            return st.execute();
+        try (var conn = getDataSource().getConnection()) {
+            return insert(conn, object);
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -85,7 +75,7 @@ abstract class Repository<T extends MoneyRecord> {
 
     public boolean insert(Connection conn, T object) {
         try (var st = conn.prepareStatement(getInsertSql())) {
-            toStatement(st, object, false);
+            toStatement(st, object);
             return st.execute();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -104,7 +94,7 @@ abstract class Repository<T extends MoneyRecord> {
                 int count = 0;
 
                 for (T r : records) {
-                    toStatement(st, r, false);
+                    toStatement(st, r);
                     st.addBatch();
 
                     if (++count % batchSize == 0) {
@@ -120,11 +110,8 @@ abstract class Repository<T extends MoneyRecord> {
     }
 
     public boolean update(T object) {
-        try (var conn = dataSource.getConnection();
-             var st = conn.prepareStatement(getUpdateSql())
-        ) {
-            toStatement(st, object, true);
-            return st.execute();
+        try (var conn = dataSource.getConnection()) {
+            return update(conn, object);
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -132,7 +119,7 @@ abstract class Repository<T extends MoneyRecord> {
 
     public boolean update(Connection conn, T object) {
         try (var st = conn.prepareStatement(getUpdateSql())) {
-            toStatement(st, object, true);
+            toStatement(st, object);
             return st.execute();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -141,7 +128,7 @@ abstract class Repository<T extends MoneyRecord> {
 
     public int delete(T object) {
         try (var conn = dataSource.getConnection();
-             var st = conn.prepareStatement("DELETE FROM " + getTableName() + " WHERE uuid = ?")
+             var st = conn.prepareStatement("DELETE FROM " + tableName + " WHERE uuid = ?")
         ) {
             st.setString(1, object.uuid().toString());
             return st.executeUpdate();
@@ -156,7 +143,7 @@ abstract class Repository<T extends MoneyRecord> {
     }
 
     static void setUuid(PreparedStatement st, int index, UUID uuid) throws SQLException {
-        st.setString(index, uuid == null? null : uuid.toString());
+        st.setString(index, uuid == null ? null : uuid.toString());
     }
 
     static <E extends Enum<E>> E getEnum(ResultSet set, String columnLabel, Class<E> eClass) throws SQLException {

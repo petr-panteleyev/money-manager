@@ -20,8 +20,7 @@ final class CategoryRepository extends Repository<Category> {
     protected String getInsertSql() {
         return """
             INSERT INTO category (
-                uuid, name, comment, type, icon_uuid,
-                created, modified
+                name, comment, type, icon_uuid, created, modified, uuid
             ) VALUES (
                 ?, ?, ?, ?, ?, ?, ?
             )
@@ -56,19 +55,14 @@ final class CategoryRepository extends Repository<Category> {
     }
 
     @Override
-    protected void toStatement(PreparedStatement st, Category category, boolean update) throws SQLException {
+    protected void toStatement(PreparedStatement st, Category category) throws SQLException {
         var index = 1;
-        if (!update) {
-            setUuid(st, index++, category.uuid());
-        }
         st.setString(index++, category.name());
         st.setString(index++, category.comment());
         st.setString(index++, category.type().name());
         setUuid(st, index++, category.iconUuid());
         st.setLong(index++, category.created());
         st.setLong(index++, category.modified());
-        if (update) {
-            setUuid(st, index, category.uuid());
-        }
+        setUuid(st, index, category.uuid());
     }
 }
