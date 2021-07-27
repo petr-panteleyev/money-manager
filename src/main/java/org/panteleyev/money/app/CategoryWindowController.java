@@ -22,7 +22,6 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.app.cells.CategoryNameCell;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.persistence.MoneyDAO;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -40,13 +39,15 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
@@ -59,8 +60,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CategoryWindowController extends BaseController {
     private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.values(),
@@ -69,7 +68,8 @@ final class CategoryWindowController extends BaseController {
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
     private final SortedList<Category> sortedList = filteredList.sorted(
-        MoneyDAO.COMPARE_CATEGORY_BY_TYPE.thenComparing(MoneyDAO.COMPARE_CATEGORY_BY_NAME)
+        cache().getCategoryByTypeComparator()
+            .thenComparing(cache().getCategoryByNameComparator())
     );
     private final TableView<Category> categoryTable = new TableView<>(sortedList);
 
@@ -164,13 +164,13 @@ final class CategoryWindowController extends BaseController {
     private void onMenuEdit() {
         getSelectedCategory()
             .flatMap(category ->
-                new CategoryDialog(this, options().getDialogCssFileUrl(), category).showAndWait())
-            .ifPresent(c -> getDao().updateCategory(c));
+                new CategoryDialog(this, settings().getDialogCssFileUrl(), category).showAndWait())
+            .ifPresent(c -> dao().updateCategory(c));
     }
 
     private void onMenuAdd() {
-        new CategoryDialog(this, options().getDialogCssFileUrl(), null).showAndWait()
-            .ifPresent(c -> getDao().insertCategory(c));
+        new CategoryDialog(this, settings().getDialogCssFileUrl(), null).showAndWait()
+            .ifPresent(c -> dao().insertCategory(c));
     }
 
     private void updatePredicate() {

@@ -6,14 +6,13 @@ package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class CategoryRepository extends Repository<Category> {
-    CategoryRepository(DataSource dataSource) {
-        super("category", dataSource);
+    CategoryRepository() {
+        super("category");
     }
 
     @Override

@@ -21,7 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 
 public class Export {

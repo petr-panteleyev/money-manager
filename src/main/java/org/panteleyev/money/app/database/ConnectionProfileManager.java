@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.app.ApplicationFiles.files;
+import static org.panteleyev.money.app.GlobalContext.files;
 
 public final class ConnectionProfileManager {
     private static final String PROFILE_PROPERTY = "profile";
@@ -32,11 +32,8 @@ public final class ConnectionProfileManager {
     public ConnectionProfileManager(Function<ConnectionProfile, Exception> initDatabaseCallback,
                                     Function<ConnectionProfile, DataSource> buildDataSourceCallback)
     {
-        Objects.requireNonNull(initDatabaseCallback);
-        Objects.requireNonNull(buildDataSourceCallback);
-
-        this.resetDatabaseCallback = initDatabaseCallback;
-        this.buildDataSourceCallback = buildDataSourceCallback;
+        this.resetDatabaseCallback = Objects.requireNonNull(initDatabaseCallback);
+        this.buildDataSourceCallback = Objects.requireNonNull(buildDataSourceCallback);
     }
 
     public boolean getAutoConnect() {

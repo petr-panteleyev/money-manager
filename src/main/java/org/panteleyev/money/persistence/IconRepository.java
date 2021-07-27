@@ -11,8 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class IconRepository extends Repository<Icon> {
-    public IconRepository(DataSource dataSource) {
-        super("icon", dataSource);
+    public IconRepository() {
+        super("icon");
     }
 
     @Override

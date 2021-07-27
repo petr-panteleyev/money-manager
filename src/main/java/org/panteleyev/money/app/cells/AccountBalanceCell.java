@@ -9,7 +9,7 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class AccountBalanceCell extends TableCell<Account, Account> {
     private final boolean total;

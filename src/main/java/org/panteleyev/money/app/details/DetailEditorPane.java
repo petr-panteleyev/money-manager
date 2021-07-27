@@ -47,8 +47,8 @@ import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ADD;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLEAR;
@@ -66,7 +66,7 @@ final class DetailEditorPane extends BorderPane {
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
         public String getElementString(T element) {
@@ -76,7 +76,7 @@ final class DetailEditorPane extends BorderPane {
 
     private static class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
         public String getElementString(String element) {

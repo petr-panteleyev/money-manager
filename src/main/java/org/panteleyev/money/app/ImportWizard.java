@@ -37,15 +37,15 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_CHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_WARNING;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_IMPORT_FILE_NAME;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PARTIAL_IMPORT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_IMPORT;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class ImportWizard extends BaseDialog<Object> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -112,7 +112,7 @@ final class ImportWizard extends BaseDialog<Object> {
         private void onBrowse() {
             var chooser = new FileChooser();
             chooser.setTitle(fxString(UI, I18N_WORD_IMPORT));
-            options().getLastExportDir().ifPresent(chooser::setInitialDirectory);
+            settings().getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
             var selected = chooser.showOpenDialog(null);
@@ -154,12 +154,12 @@ final class ImportWizard extends BaseDialog<Object> {
                     progress.accept("done\n\n");
 
                     if (fullDump) {
-                        getDao().importFullDump(imp, progress);
+                        dao().importFullDump(imp, progress);
                     } else {
-                        getDao().importRecords(imp, progress);
+                        dao().importRecords(imp, progress);
                     }
                     progress.accept("\n");
-                    getDao().preload(progress);
+                    dao().preload(progress);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
@@ -175,7 +175,7 @@ final class ImportWizard extends BaseDialog<Object> {
     }
 
     ImportWizard() {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
         setTitle(fxString(UI, I18N_WORD_IMPORT));
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);

@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.5</version>
+    <version>21.4.6</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -36,7 +36,7 @@
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.13.1</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
-        <mysqlConnectorVersion>8.0.25</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.26</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.3.0</testNgVersion>
         <h2Version>1.4.194</h2Version>
@@ -255,26 +255,26 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <options>
+                            <settings>
                                 <option>-Dfile.encoding=UTF-8</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                                 <option>-Dprofile=${profile}</option>
                                 <option>-Dnoauto=${noauto}</option>
-                            </options>
+                            </settings>
                         </configuration>
                     </execution>
                     <execution>
                         <id>debug</id>
                         <configuration>
-                            <options>
+                            <settings>
                                 <option>-Dfile.encoding=UTF-8</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>
                                 <option>-Dprofile=${profile}</option>
                                 <option>-Dnoauto=${noauto}</option>
-                            </options>
+                            </settings>
                         </configuration>
                     </execution>
                 </executions>

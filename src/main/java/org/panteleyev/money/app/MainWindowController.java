@@ -34,7 +34,7 @@ import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
 import org.panteleyev.money.app.database.ConnectionProfileManager;
 import org.panteleyev.money.app.icons.IconWindowController;
-import org.panteleyev.money.app.options.OptionsDialog;
+import org.panteleyev.money.app.settings.SettingsDialog;
 import org.panteleyev.money.bundles.UiBundle;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
@@ -74,6 +74,9 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
@@ -82,7 +85,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
@@ -110,8 +112,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     public static final ResourceBundle UI = ResourceBundle.getBundle(UiBundle.class.getCanonicalName());
@@ -150,7 +150,7 @@ public class MainWindowController extends BaseController implements TransactionT
     };
 
     public MainWindowController(Stage stage) {
-        super(stage, options().getMainCssFilePath());
+        super(stage, settings().getMainCssFilePath());
 
         profileManager.loadProfiles();
 
@@ -289,7 +289,7 @@ public class MainWindowController extends BaseController implements TransactionT
         progressLabel.setVisible(false);
         progressBar.setVisible(false);
 
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
 
         profileManager.getProfileToOpen().ifPresent(this::open);
     }
@@ -314,7 +314,7 @@ public class MainWindowController extends BaseController implements TransactionT
         closeChildWindows();
 
         setTitle(AboutDialog.APP_TITLE);
-        getDao().initialize(null);
+        dao().initialize(null);
         dbOpenProperty.set(false);
     }
 
@@ -326,9 +326,9 @@ public class MainWindowController extends BaseController implements TransactionT
     private void open(ConnectionProfile profile) {
         var ds = onBuildDatasource(profile);
 
-        getDao().initialize(ds);
+        dao().initialize(ds);
 
-        var schemaStatus = getDao().checkSchemaUpdateStatus();
+        var schemaStatus = dao().checkSchemaUpdateStatus();
         switch (schemaStatus) {
             case UPDATE_REQUIRED -> {
                 var alert = new Alert(WARNING, fxString(UI, I18N_MISC_SCHEMA_UPDATE_TEXT), YES, NO);
@@ -340,7 +340,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     .isPresent();
 
                 if (confirmed) {
-                    getDao().updateSchema();
+                    dao().updateSchema();
                 } else {
                     System.exit(0);
                 }
@@ -352,7 +352,7 @@ public class MainWindowController extends BaseController implements TransactionT
         }
 
         var loadResult = CompletableFuture
-            .runAsync(() -> getDao().preload())
+            .runAsync(() -> dao().preload())
             .thenRun(() -> Platform.runLater(() -> {
                 setTitle(AboutDialog.APP_TITLE + " - " + profile.name() + " - " + profile.getConnectionString());
                 dbOpenProperty.set(true);
@@ -370,7 +370,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onOptions() {
-        new OptionsDialog(this, options()).showAndWait();
+        new SettingsDialog(this, settings()).showAndWait();
     }
 
     private void setTitle(String title) {
@@ -381,13 +381,13 @@ public class MainWindowController extends BaseController implements TransactionT
     protected void onWindowHiding() {
         super.onWindowHiding();
         closeChildWindows();
-        options().saveWindowsSettings();
+        settings().saveWindowsSettings();
     }
 
     private void xmlDump() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
@@ -406,7 +406,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     .withContacts(cache().getContacts(), false)
                     .withTransactions(cache().getTransactions(), false)
                     .doExport(outputStream);
-                options().update(opt -> opt.setLastExportDir(selected.getParent()));
+                settings().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }
@@ -420,7 +420,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
@@ -432,7 +432,7 @@ public class MainWindowController extends BaseController implements TransactionT
         try (var outputStream = new FileOutputStream(selected)) {
             var filter = transactionTable.getTransactionFilter();
             var transactions = cache().getTransactions(filter)
-                .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
+                .sorted(cache().getTransactionByDateComparator())
                 .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
@@ -531,7 +531,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
         for (var t : transactions) {
-            getDao().updateTransaction(t.check(check));
+            dao().updateTransaction(t.check(check));
         }
     }
 
@@ -542,22 +542,22 @@ public class MainWindowController extends BaseController implements TransactionT
         if (details.isEmpty()) {
             if (!childTransactions.isEmpty()) {
                 for (Transaction child : childTransactions) {
-                    getDao().deleteTransaction(child);
+                    dao().deleteTransaction(child);
                 }
                 var noChildren = new Transaction.Builder(transaction)
                     .detailed(false)
                     .timestamp()
                     .build();
-                getDao().updateTransaction(noChildren);
+                dao().updateTransaction(noChildren);
             }
         } else {
-            getDao().updateTransaction(new Transaction.Builder(transaction)
+            dao().updateTransaction(new Transaction.Builder(transaction)
                 .detailed(true)
                 .timestamp()
                 .build());
 
             for (Transaction ch : childTransactions) {
-                getDao().deleteTransaction(ch);
+                dao().deleteTransaction(ch);
             }
 
             for (var transactionDetail : details) {
@@ -570,7 +570,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     .detailed(false)
                     .timestamp()
                     .build();
-                getDao().insertTransaction(newDetail);
+                dao().insertTransaction(newDetail);
             }
         }
     }

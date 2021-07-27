@@ -57,12 +57,14 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
@@ -85,8 +87,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
@@ -151,7 +151,7 @@ class StatementWindowController extends BaseController {
             var selected = getSelectedStatementRecord();
 
             for (Transaction t : transactions) {
-                getDao().updateTransaction(t.check(check));
+                dao().updateTransaction(t.check(check));
             }
 
             Platform.runLater(() -> selected.ifPresent(record -> statementTable.getSelectionModel().select(record)));
@@ -165,13 +165,13 @@ class StatementWindowController extends BaseController {
 
         setupWindow(root);
         setupAccountComboBox();
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
     }
 
     void onNewTransaction(StatementRecord statementRecord) {
         var account = accountComboBox.getSelectionModel().getSelectedItem();
-        new TransactionDialog(this, options().getDialogCssFileUrl(), statementRecord, account, cache()).showAndWait()
-            .ifPresent(builder -> getDao().insertTransaction(builder));
+        new TransactionDialog(this, settings().getDialogCssFileUrl(), statementRecord, account, cache()).showAndWait()
+            .ifPresent(builder -> dao().insertTransaction(builder));
     }
 
     void onStatementRecordSelected(StatementRecord statementRecord) {
@@ -248,7 +248,7 @@ class StatementWindowController extends BaseController {
             SBERBANK_HTML
         );
 
-        var lastDirString = options().getLastStatementDir();
+        var lastDirString = settings().getLastStatementDir();
         if (!lastDirString.isEmpty()) {
             var lastDir = new File(lastDirString);
             if (lastDir.exists() && lastDir.isDirectory()) {
@@ -271,7 +271,7 @@ class StatementWindowController extends BaseController {
         }
 
         var dir = selected.getParentFile();
-        options().update(opt -> opt.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath()));
+        settings().update(opt -> opt.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath()));
 
         setTitle(getTitle() + " - " + selected.getAbsolutePath());
 
@@ -329,7 +329,7 @@ class StatementWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("statement"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
@@ -356,7 +356,7 @@ class StatementWindowController extends BaseController {
     void onCheckStatementRecord(StatementRecord record, boolean check) {
         var transactions = new ArrayList<>(record.getTransactions());
         for (var t : transactions) {
-            getDao().updateTransaction(t.check(check));
+            dao().updateTransaction(t.check(check));
         }
         Platform.runLater(() -> statementTable.getSelectionModel().select(record));
     }

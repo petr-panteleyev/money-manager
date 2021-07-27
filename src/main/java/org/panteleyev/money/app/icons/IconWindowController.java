@@ -38,9 +38,11 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UPLOAD;
@@ -49,8 +51,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_TOO_BIG;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ICONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UPLOAD;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public final class IconWindowController extends BaseController {
 
@@ -80,7 +80,7 @@ public final class IconWindowController extends BaseController {
     private final SelectionModel<Icon> selectionModel = new IconSelectionModel();
 
     public IconWindowController() {
-        super(new Stage(), options().getMainCssFilePath());
+        super(new Stage(), settings().getMainCssFilePath());
 
         var menuBar = menuBar(
             newMenu(fxString(UI, I18N_MENU_FILE),
@@ -185,7 +185,7 @@ public final class IconWindowController extends BaseController {
             }
 
             if (isUnique(icon)) {
-                getDao().insertIcon(icon);
+                dao().insertIcon(icon);
                 iconList.add(icon);
             } else {
                 errors.add(icon.getName() + UI.getString(I18N_MISC_UPLOAD_DIPLICATE));

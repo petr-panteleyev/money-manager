@@ -7,7 +7,7 @@ package org.panteleyev.money.persistence;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.testng.Assert.assertTrue;
 
 public class TestFreshFile extends BaseDaoTest {

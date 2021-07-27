@@ -25,13 +25,13 @@ import java.util.Set;
 import java.util.function.Predicate;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByCategoryType;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ACCOUNTS_CASH_CARDS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CATEGORIES;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class CategorySelectionBox extends HBox {
 

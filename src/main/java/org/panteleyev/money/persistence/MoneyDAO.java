@@ -17,56 +17,28 @@ import org.panteleyev.money.xml.Import;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class MoneyDAO {
-    private static final MoneyDAO MONEY_DAO = new MoneyDAO();
-
-    private DataSource dataSource;
+    private final DataCache cache;
+    private final AtomicReference<DataSource> dataSource = new AtomicReference<>();
     // Repositories
-    private CategoryRepository categoryRepository;
-    private AccountRepository accountRepository;
-    private ContactRepository contactRepository;
-    private CurrencyRepository currencyRepository;
-    private TransactionRepository transactionRepository;
-    private IconRepository iconRepository;
-
-    private static final DataCache cache = DataCache.cache();
-
-    public static MoneyDAO getDao() {
-        return MONEY_DAO;
-    }
-
-    public static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
-    public static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
-        (o1, o2) -> o1.type().toString().compareToIgnoreCase(o2.type().toString());
-
-    public final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::name);
-    public final static Comparator<Account> COMPARE_ACCOUNT_BY_CATEGORY = (a1, a2) -> {
-        var c1 = cache.getCategory(a1.categoryUuid()).map(Category::name).orElse("");
-        var c2 = cache.getCategory(a2.categoryUuid()).map(Category::name).orElse("");
-        return c1.compareTo(c2);
-    };
-
-    public static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DATE =
-        Comparator.comparing(Transaction::year)
-            .thenComparing(Transaction::month)
-            .thenComparing(Transaction::day)
-            .thenComparingLong(Transaction::created);
-
-    public static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DAY =
-        Comparator.comparingInt(Transaction::day).thenComparingLong(Transaction::created);
+    private final CategoryRepository categoryRepository = new CategoryRepository();
+    private final AccountRepository accountRepository = new AccountRepository();
+    private final ContactRepository contactRepository = new ContactRepository();
+    private final CurrencyRepository currencyRepository = new CurrencyRepository();
+    private final TransactionRepository transactionRepository = new TransactionRepository();
+    private final IconRepository iconRepository = new IconRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -74,29 +46,42 @@ public class MoneyDAO {
 
     public static final Consumer<String> IGNORE_PROGRESS = x -> { };
 
-    // Repositories
-    public CategoryRepository getCategoryRepository() {
-        return categoryRepository;
+    public MoneyDAO(DataCache cache) {
+        this.cache = cache;
     }
 
-    public AccountRepository getAccountRepository() {
-        return accountRepository;
+    ////////////////////////////////////////////////////////////////////////////
+    // Generic methods
+    ////////////////////////////////////////////////////////////////////////////
+    public void withNewConnection(Consumer<Connection> consumer) {
+        try (var connection = dataSource.get().getConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                consumer.accept(connection);
+                connection.commit();
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw new RuntimeException(ex);
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
-    public ContactRepository getContactRepository() {
-        return contactRepository;
-    }
-
-    public CurrencyRepository getCurrencyRepository() {
-        return currencyRepository;
-    }
-
-    public TransactionRepository getTransactionRepository() {
-        return transactionRepository;
-    }
-
-    public IconRepository getIconRepository() {
-        return iconRepository;
+    public <R> R withNewConnection(Function<Connection, R> function) {
+        try (var connection = dataSource.get().getConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                R result = function.apply(connection);
+                connection.commit();
+                return result;
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw new RuntimeException(ex);
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -104,13 +89,17 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertIcon(Icon icon) {
-        iconRepository.insert(icon);
-        cache.add(icon);
+        withNewConnection(conn -> {
+            iconRepository.insert(conn, icon);
+            cache.add(icon);
+        });
     }
 
     public void updateIcon(Icon icon) {
-        iconRepository.update(icon);
-        cache.update(icon);
+        withNewConnection(conn -> {
+            iconRepository.update(conn, icon);
+            cache.update(icon);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -118,13 +107,17 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertCategory(Category category) {
-        categoryRepository.insert(category);
-        cache.add(category);
+        withNewConnection(conn -> {
+            categoryRepository.insert(conn, category);
+            cache.add(category);
+        });
     }
 
     public void updateCategory(Category category) {
-        categoryRepository.update(category);
-        cache.update(category);
+        withNewConnection(conn -> {
+            categoryRepository.update(conn, category);
+            cache.update(category);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -132,13 +125,17 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertCurrency(Currency currency) {
-        currencyRepository.insert(currency);
-        cache.add(currency);
+        withNewConnection(conn -> {
+            currencyRepository.insert(conn, currency);
+            cache.add(currency);
+        });
     }
 
     public void updateCurrency(Currency currency) {
-        currencyRepository.update(currency);
-        cache.update(currency);
+        withNewConnection(conn -> {
+            currencyRepository.update(conn, currency);
+            cache.update(currency);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -146,13 +143,17 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertContact(Contact contact) {
-        contactRepository.insert(contact);
-        cache.add(contact);
+        withNewConnection(conn -> {
+            contactRepository.insert(conn, contact);
+            cache.add(contact);
+        });
     }
 
     public void updateContact(Contact contact) {
-        contactRepository.update(contact);
-        cache.update(contact);
+        withNewConnection(conn -> {
+            contactRepository.update(conn, contact);
+            cache.update(contact);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -160,18 +161,28 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertAccount(Account account) {
-        accountRepository.insert(account);
-        cache.add(account);
+        withNewConnection(conn -> {
+            accountRepository.insert(conn, account);
+            cache.add(account);
+        });
     }
 
     public void updateAccount(Account account) {
-        accountRepository.update(account);
+        withNewConnection(conn ->  {
+            updateAccount(conn, account);
+        });
+    }
+
+    public void updateAccount(Connection conn, Account account) {
+        accountRepository.update(conn, account);
         cache.update(account);
     }
 
     public void deleteAccount(Account account) {
-        cache.remove(account);
-        accountRepository.delete(account);
+        withNewConnection(conn -> {
+            cache.remove(account);
+            accountRepository.delete(conn, account);
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -179,22 +190,28 @@ public class MoneyDAO {
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertTransaction(Transaction transaction) {
-        transactionRepository.insert(transaction);
-        cache.add(transaction);
-        updateAccounts(transaction);
+        withNewConnection(conn -> {
+            transactionRepository.insert(conn, transaction);
+            cache.add(transaction);
+            updateAccounts(conn, transaction);
+        });
     }
 
     public void updateTransaction(Transaction transaction) {
-        var oldTransaction = cache.getTransaction(transaction.uuid()).orElseThrow();
-        transactionRepository.update(transaction);
-        cache.update(transaction);
-        updateAccounts(oldTransaction, transaction);
+        withNewConnection(conn -> {
+            var oldTransaction = cache.getTransaction(transaction.uuid()).orElseThrow();
+            transactionRepository.update(conn, transaction);
+            cache.update(transaction);
+            updateAccounts(conn, oldTransaction, transaction);
+        });
     }
 
     public void deleteTransaction(Transaction transaction) {
-        transactionRepository.delete(transaction);
-        cache.remove(transaction);
-        updateAccounts(transaction);
+        withNewConnection(conn -> {
+            transactionRepository.delete(conn, transaction);
+            cache.remove(transaction);
+            updateAccounts(conn, transaction);
+        });
     }
 
     /**
@@ -202,27 +219,25 @@ public class MoneyDAO {
      *
      * @param transactions transactions that were added, updated or deleted.
      */
-    private void updateAccounts(Transaction... transactions) {
+    private void updateAccounts(Connection conn, Transaction... transactions) {
         Set.of(transactions).stream()
             .map(t -> List.of(
-                cache().getAccount(t.accountDebitedUuid()).orElseThrow(),
-                cache().getAccount(t.accountCreditedUuid()).orElseThrow())
+                cache.getAccount(t.accountDebitedUuid()).orElseThrow(),
+                cache.getAccount(t.accountCreditedUuid()).orElseThrow())
             )
             .flatMap(Collection::stream)
             .collect(Collectors.toSet())
             .forEach(account -> {
-                var total = cache().calculateBalance(account, false, t -> true);
-                var waiting = cache().calculateBalance(account, false, t -> !t.checked());
-                updateAccount(account.updateBalance(total, waiting));
+                var total = cache.calculateBalance(account, false, t -> true);
+                var waiting = cache.calculateBalance(account, false, t -> !t.checked());
+                updateAccount(conn, account.updateBalance(total, waiting));
             });
     }
 
     public void createTables() {
-        try (var conn = dataSource.getConnection()) {
+        withNewConnection(conn -> {
             new LiquibaseUtil(conn).dropAndUpdate();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        });
     }
 
     public void preload() {
@@ -230,7 +245,7 @@ public class MoneyDAO {
     }
 
     public void preload(Consumer<String> progress) {
-        try (var conn = dataSource.getConnection()) {
+        withNewConnection(conn -> {
             progress.accept("Preloading data...\n");
 
             progress.accept("    icons... ");
@@ -268,21 +283,11 @@ public class MoneyDAO {
                 cache.getTransactions().setAll(transactionList);
                 return null;
             }, Platform::runLater);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        });
     }
 
     public void initialize(DataSource ds) {
-        dataSource = ds;
-
-        categoryRepository = new CategoryRepository(ds);
-        accountRepository = new AccountRepository(ds);
-        contactRepository = new ContactRepository(ds);
-        currencyRepository = new CurrencyRepository(ds);
-        transactionRepository = new TransactionRepository(ds);
-        iconRepository = new IconRepository(ds);
-
+        dataSource.set(ds);
         cache.clear();
     }
 
@@ -291,7 +296,7 @@ public class MoneyDAO {
         createTables();
         progress.accept(" done\n");
 
-        try (var conn = dataSource.getConnection()) {
+        withNewConnection(conn -> {
             progress.accept("Importing data...\n");
 
             progress.accept("    icons... ");
@@ -322,9 +327,7 @@ public class MoneyDAO {
             progress.accept("done\n");
 
             progress.accept("done\n");
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        });
     }
 
     private void calculateActions(Map<UUID, ImportAction> idMap,
@@ -381,31 +384,18 @@ public class MoneyDAO {
         calculateActions(accountActions, cache.getAccounts(), imp.getAccounts());
         calculateActions(transactionActions, cache.getTransactions(), imp.getTransactions());
 
-        try (var conn = dataSource.getConnection()) {
-            try {
-                conn.setAutoCommit(false);
-
-                importTable(iconRepository, conn, imp.getIcons(), iconActions);
-                importTable(categoryRepository, conn, imp.getCategories(), categoryActions);
-                importTable(currencyRepository, conn, imp.getCurrencies(), currencyActions);
-                importTable(contactRepository, conn, imp.getContacts(), contactActions);
-                importTable(accountRepository, conn, imp.getAccounts(), accountActions);
-                importTable(transactionRepository, conn, imp.getTransactions(), transactionActions);
-
-                conn.commit();
-            } catch (Exception ex) {
-                conn.rollback();
-                throw ex;
-            }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        withNewConnection(conn -> {
+            importTable(iconRepository, conn, imp.getIcons(), iconActions);
+            importTable(categoryRepository, conn, imp.getCategories(), categoryActions);
+            importTable(currencyRepository, conn, imp.getCurrencies(), currencyActions);
+            importTable(contactRepository, conn, imp.getContacts(), contactActions);
+            importTable(accountRepository, conn, imp.getAccounts(), accountActions);
+            importTable(transactionRepository, conn, imp.getTransactions(), transactionActions);
+        });
     }
 
     public static Exception resetDatabase(MysqlDataSource dataSource, String schema) {
-        dataSource.setDatabaseName(null);
-
-        try (var conn = dataSource.getConnection(); Statement st = conn.createStatement()) {
+        try {
             dataSource.setDatabaseName(schema);
 
             try (var liquibaseConn = dataSource.getConnection()) {
@@ -430,7 +420,7 @@ public class MoneyDAO {
             .created(0)
             .build();
 
-        getDao().insertTransaction(transaction);
+        insertTransaction(transaction);
         return transaction;
     }
 
@@ -445,7 +435,7 @@ public class MoneyDAO {
             .modified(0)
             .build();
 
-        getDao().updateTransaction(transaction);
+        updateTransaction(transaction);
         return transaction;
     }
 
@@ -455,23 +445,19 @@ public class MoneyDAO {
             .name(name)
             .build();
 
-        getDao().insertContact(contact);
+        insertContact(contact);
         return contact;
     }
 
     public LiquibaseUtil.SchemaStatus checkSchemaUpdateStatus() {
-        try (var conn = dataSource.getConnection()) {
+        return withNewConnection(conn -> {
             return new LiquibaseUtil(conn).checkSchemaUpdateStatus();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        });
     }
 
     public void updateSchema() {
-        try (var conn = dataSource.getConnection()) {
+        withNewConnection(conn -> {
             new LiquibaseUtil(conn).update();
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        });
     }
 }

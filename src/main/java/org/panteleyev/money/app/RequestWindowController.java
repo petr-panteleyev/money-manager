@@ -21,7 +21,6 @@ import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.persistence.MoneyDAO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -45,6 +44,9 @@ import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
@@ -52,7 +54,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
@@ -69,8 +70,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAIL
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REQUESTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class RequestWindowController extends BaseController {
     private final Account account;
@@ -89,7 +88,7 @@ class RequestWindowController extends BaseController {
 
     private static class CompletionProvider extends BaseCompletionProvider<String> {
         CompletionProvider(Set<String> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
         public String getElementString(String element) {
@@ -158,7 +157,7 @@ class RequestWindowController extends BaseController {
             ));
 
         setupWindow(root);
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
     }
 
     Account getAccount() {
@@ -212,14 +211,14 @@ class RequestWindowController extends BaseController {
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
         for (Transaction t : transactions) {
-            getDao().updateTransaction(t.check(check));
+            dao().updateTransaction(t.check(check));
         }
     }
 
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
@@ -230,7 +229,7 @@ class RequestWindowController extends BaseController {
 
         try (var outputStream = new FileOutputStream(selected)) {
             var transactions = cache().getTransactions(getTransactionFilter())
-                .sorted(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
+                .sorted(cache().getTransactionByDateComparator())
                 .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {

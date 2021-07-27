@@ -34,7 +34,6 @@ import org.panteleyev.money.model.Named;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.persistence.DataCache;
-import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.statements.StatementRecord;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -56,6 +55,8 @@ import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
@@ -65,7 +66,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_BY_STATEMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_PICKER_TOOLTIP;
@@ -102,7 +102,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
         public String getElementString(T element) {
@@ -112,7 +112,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
 
@@ -123,7 +123,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static class StringCompletionProvider extends BaseCompletionProvider<String> {
         StringCompletionProvider(Set<String> set) {
-            super(set, () -> options().getAutoCompleteLength());
+            super(set, () -> settings().getAutoCompleteLength());
         }
 
         public String getElementString(String element) {
@@ -814,7 +814,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             cache.getTransactions().stream()
                 .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
                     && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
-                .max(MoneyDAO.COMPARE_TRANSACTION_BY_DATE)
+                .max(cache().getTransactionByDateComparator())
                 .ifPresent(it -> {
                     if (commentEdit.getText().isEmpty()) {
                         commentEdit.setText(it.comment());

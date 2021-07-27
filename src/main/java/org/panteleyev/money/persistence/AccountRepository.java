@@ -7,15 +7,14 @@ package org.panteleyev.money.persistence;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.CategoryType;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class AccountRepository extends Repository<Account> {
 
-    AccountRepository(DataSource dataSource) {
-        super("account", dataSource);
+    AccountRepository() {
+        super("account");
     }
 
     @Override

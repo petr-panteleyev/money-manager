@@ -1,21 +1,21 @@
 .label {
     -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize}
+    -fx-font-size: ${dialogLabelFontSize};
 }
 
 .button {
     -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize}
+    -fx-font-size: ${dialogLabelFontSize};
 }
 
 .list-cell {
     -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize}
+    -fx-font-size: ${dialogLabelFontSize};
 }
 
 .text-field {
     -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize}
+    -fx-font-size: ${dialogLabelFontSize};
 }
 
 .check-box {
@@ -25,7 +25,7 @@
 
 .rateLabel {
     -fx-font-family: "${dialogLabelFontFamily}";
-    -fx-font-size: ${dialogLabelFontSize - 2}
+    -fx-font-size: ${dialogLabelFontSize - 2};
     -fx-text-fill: #051aff;
 }
 

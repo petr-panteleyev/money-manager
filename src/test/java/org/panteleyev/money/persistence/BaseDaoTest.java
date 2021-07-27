@@ -7,7 +7,12 @@ package org.panteleyev.money.persistence;
 import javafx.embed.swing.JFXPanel;
 import org.h2.jdbcx.JdbcDataSource;
 import org.panteleyev.money.test.BaseTest;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import static org.panteleyev.money.app.GlobalContext.dao;
 
 public class BaseDaoTest extends BaseTest {
     public static final String ICON_DOLLAR = "dollar.png";
@@ -20,12 +25,18 @@ public class BaseDaoTest extends BaseTest {
         try (var conn = dataSource.getConnection()) {
             new LiquibaseUtil(conn).update();
         }
-        getDao().initialize(dataSource);
+        dao().initialize(dataSource);
         new JFXPanel();
     }
 
     protected void initializeEmptyMoneyFile() {
-        getDao().createTables();
-        getDao().preload(t -> { });
+        dao().createTables();
+        dao().preload(t -> { });
+    }
+
+    protected Optional<?> get(Repository<?> repository, UUID uuid) {
+        return dao().withNewConnection(connection -> {
+            return repository.get(connection, uuid);
+        });
     }
 }

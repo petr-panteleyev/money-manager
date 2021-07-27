@@ -30,13 +30,13 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_TRANSACTION_DETAILS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELTA;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 public final class TransactionDetailsDialog extends BaseDialog<List<TransactionDetail>> implements RecordEditorCallback<TransactionDetail> {
     private final ObservableList<TransactionDetail> details = FXCollections.observableArrayList();

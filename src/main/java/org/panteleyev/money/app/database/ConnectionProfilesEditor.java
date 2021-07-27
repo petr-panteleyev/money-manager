@@ -45,8 +45,8 @@ import static org.panteleyev.fx.ButtonFactory.buttonType;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ARE_YOU_SURE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PROFILE_NAME;
@@ -85,7 +85,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     };
 
     ConnectionProfilesEditor(ConnectionProfileManager profileManager) {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
 
         Objects.requireNonNull(profileManager);
 

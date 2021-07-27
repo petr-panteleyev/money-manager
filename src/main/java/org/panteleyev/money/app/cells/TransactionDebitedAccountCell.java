@@ -7,7 +7,7 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Transaction;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class TransactionDebitedAccountCell extends TableCell<Transaction, Transaction> {
     @Override

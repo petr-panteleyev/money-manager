@@ -11,9 +11,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileInputStream;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.persistence.MoneyDAO.IGNORE_PROGRESS;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -29,8 +29,8 @@ public class TestImportRecords extends BaseDaoTest {
     public void setupAndSkip() throws Exception {
         try {
             super.setupAndSkip();
-            getDao().createTables();
-            getDao().preload(t -> { });
+            dao().createTables();
+            dao().preload(t -> { });
         } catch (Exception ex) {
             throw new SkipException("Database not configured");
         }
@@ -42,20 +42,20 @@ public class TestImportRecords extends BaseDaoTest {
         assertTrue(initial.exists());
 
         try (var inputStream = new FileInputStream(initial)) {
-            getDao().importFullDump(Import.doImport(inputStream), IGNORE_PROGRESS);
+            dao().importFullDump(Import.doImport(inputStream), IGNORE_PROGRESS);
         }
 
-        getDao().preload();
+        dao().preload();
         compareDatabase(INITIAL);
 
         var update = new File(UPDATE);
         assertTrue(update.exists());
 
         try (var inputStream = new FileInputStream(update)) {
-            getDao().importRecords(Import.doImport(inputStream), IGNORE_PROGRESS);
+            dao().importRecords(Import.doImport(inputStream), IGNORE_PROGRESS);
         }
 
-        getDao().preload();
+        dao().preload();
         compareDatabase(EXPECTED);
     }
 

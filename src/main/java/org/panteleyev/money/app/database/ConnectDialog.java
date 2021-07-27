@@ -16,9 +16,9 @@ import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CONNECT_AT_STARTUP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEFAULT_PROFILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
@@ -32,7 +32,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private final ConnectionProfileManager profileManager;
 
     public ConnectDialog(ConnectionProfileManager profileManager) {
-        super(options().getDialogCssFileUrl());
+        super(settings().getDialogCssFileUrl());
         Objects.requireNonNull(profileManager);
 
         this.profileManager = profileManager;

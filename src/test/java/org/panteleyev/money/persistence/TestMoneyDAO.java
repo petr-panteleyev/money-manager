@@ -14,8 +14,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.time.LocalDate;
 import java.util.UUID;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
@@ -32,102 +32,102 @@ public class TestMoneyDAO extends BaseDaoTest {
 
     @Test
     public void testIcon() {
-        var repo = getDao().getIconRepository();
+        var repo = new IconRepository();
 
         var uuid = UUID.randomUUID();
         var icon = BaseTestUtils.newIcon(uuid, ICON_DOLLAR);
 
-        getDao().insertIcon(icon);
+        dao().insertIcon(icon);
         assertEquals(cache().getIcon(uuid).orElseThrow(), icon);
-        var retrieved = repo.get(uuid);
+        var retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), icon);
 
         var update = BaseTestUtils.newIcon(uuid, ICON_EURO);
-        getDao().updateIcon(update);
+        dao().updateIcon(update);
         assertEquals(cache().getIcon(uuid).orElseThrow(), update);
-        retrieved = repo.get(uuid);
+        retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testCategory() {
-        var repo = getDao().getCategoryRepository();
+        var repo = new CategoryRepository();
 
         var iconUuid = UUID.randomUUID();
         var icon = BaseTestUtils.newIcon(iconUuid, ICON_DOLLAR);
-        getDao().insertIcon(icon);
+        dao().insertIcon(icon);
 
         var uuid = UUID.randomUUID();
         var category = BaseTestUtils.newCategory(uuid, iconUuid);
 
-        getDao().insertCategory(category);
+        dao().insertCategory(category);
         assertEquals(cache().getCategory(uuid).orElseThrow(), category);
-        var retrieved = repo.get(uuid);
+        var retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), category);
 
         var update = BaseTestUtils.newCategory(uuid);
-        getDao().updateCategory(update);
+        dao().updateCategory(update);
         assertEquals(cache().getCategory(uuid).orElseThrow(), update);
-        retrieved = repo.get(uuid);
+        retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testCurrency() {
-        var repo = getDao().getCurrencyRepository();
+        var repo = new CurrencyRepository();
 
         var uuid = UUID.randomUUID();
         var category = BaseTestUtils.newCurrency(uuid);
 
-        getDao().insertCurrency(category);
+        dao().insertCurrency(category);
         assertEquals(cache().getCurrency(uuid).orElseThrow(), category);
-        var retrieved = repo.get(uuid);
+        var retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), category);
 
         var update = BaseTestUtils.newCurrency(uuid);
-        getDao().updateCurrency(update);
+        dao().updateCurrency(update);
         assertEquals(cache().getCurrency(uuid).orElseThrow(), update);
-        retrieved = repo.get(uuid);
+        retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testContact() {
-        var repo = getDao().getContactRepository();
+        var repo = new ContactRepository();
 
         var iconUuid = UUID.randomUUID();
         var icon = BaseTestUtils.newIcon(iconUuid, ICON_DOLLAR);
-        getDao().insertIcon(icon);
+        dao().insertIcon(icon);
 
         var uuid = UUID.randomUUID();
         var contact = BaseTestUtils.newContact(uuid, iconUuid);
 
-        getDao().insertContact(contact);
+        dao().insertContact(contact);
         assertEquals(cache().getContact(uuid).orElseThrow(), contact);
-        var retrieved = repo.get(uuid);
+        var retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), contact);
 
         var update = BaseTestUtils.newContact(uuid);
-        getDao().updateContact(update);
+        dao().updateContact(update);
         assertEquals(cache().getContact(uuid).orElseThrow(), update);
-        retrieved = repo.get(uuid);
+        retrieved = get(repo, uuid);
         assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testAccount() {
-        var repo = getDao().getAccountRepository();
+        var repo = new AccountRepository();
 
         var iconUuid = UUID.randomUUID();
         var icon = BaseTestUtils.newIcon(iconUuid, ICON_DOLLAR);
-        getDao().insertIcon(icon);
+        dao().insertIcon(icon);
 
         var category = new Category.Builder()
             .name(randomString())
             .type(CategoryType.BANKS_AND_CASH)
             .uuid(UUID.randomUUID())
             .build();
-        getDao().insertCategory(category);
+        dao().insertCategory(category);
 
         var accountId = UUID.randomUUID();
 
@@ -139,32 +139,32 @@ public class TestMoneyDAO extends BaseDaoTest {
             .accountNumber("123456")
             .iconUuid(iconUuid)
             .build();
-        getDao().insertAccount(account);
+        dao().insertAccount(account);
 
         assertEquals(cache().getAccount(accountId).orElseThrow(), account);
-        var retrieved = repo.get(accountId);
+        var retrieved = get(repo, accountId);
         assertEquals(retrieved.orElseThrow(), account);
 
         var update = new Account.Builder(account)
             .accountNumber(UUID.randomUUID().toString())
             .build();
 
-        getDao().updateAccount(update);
+        dao().updateAccount(update);
         assertEquals(cache().getAccount(accountId).orElseThrow(), update);
-        retrieved = repo.get(accountId);
+        retrieved = get(repo, accountId);
         assertEquals(retrieved.orElseThrow(), update);
     }
 
     @Test
     public void testTransaction() {
-        var repo = getDao().getTransactionRepository();
+        var repo = new TransactionRepository();
 
         var category = new Category.Builder()
             .name(randomString())
             .type(CategoryType.BANKS_AND_CASH)
             .uuid(UUID.randomUUID())
             .build();
-        getDao().insertCategory(category);
+        dao().insertCategory(category);
 
         var account = new Account.Builder()
             .uuid(UUID.randomUUID())
@@ -173,7 +173,7 @@ public class TestMoneyDAO extends BaseDaoTest {
             .categoryUuid(category.uuid())
             .accountNumber("123456")
             .build();
-        getDao().insertAccount(account);
+        dao().insertAccount(account);
 
         var id = UUID.randomUUID();
 
@@ -193,18 +193,18 @@ public class TestMoneyDAO extends BaseDaoTest {
             .build();
 
 
-        getDao().insertTransaction(transaction);
+        dao().insertTransaction(transaction);
         assertEquals(cache().getTransaction(id).orElseThrow(), transaction);
-        var retrieved = repo.get(id);
+        var retrieved = get(repo, id);
         assertEquals(retrieved.orElseThrow(), transaction);
 
         var update = new Transaction.Builder(transaction)
             .comment(UUID.randomUUID().toString())
             .build();
 
-        getDao().updateTransaction(update);
+        dao().updateTransaction(update);
         assertEquals(cache().getTransaction(id).orElseThrow(), update);
-        retrieved = repo.get(id);
+        retrieved = get(repo, id);
         assertEquals(retrieved.orElseThrow(), update);
     }
 }

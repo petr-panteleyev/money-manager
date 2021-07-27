@@ -2,7 +2,7 @@
  Copyright (c) Petr Panteleyev. All rights reserved.
  Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
-package org.panteleyev.money.app.options;
+package org.panteleyev.money.app.settings;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
@@ -32,16 +32,16 @@ import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
-import static org.panteleyev.money.app.options.ColorOption.CREDIT;
-import static org.panteleyev.money.app.options.ColorOption.DEBIT;
-import static org.panteleyev.money.app.options.ColorOption.STATEMENT_CHECKED;
-import static org.panteleyev.money.app.options.ColorOption.STATEMENT_MISSING;
-import static org.panteleyev.money.app.options.ColorOption.STATEMENT_UNCHECKED;
-import static org.panteleyev.money.app.options.ColorOption.TRANSFER;
-import static org.panteleyev.money.app.options.FontOption.CONTROLS_FONT;
-import static org.panteleyev.money.app.options.FontOption.DIALOG_LABEL_FONT;
-import static org.panteleyev.money.app.options.FontOption.MENU_FONT;
-import static org.panteleyev.money.app.options.FontOption.TABLE_CELL_FONT;
+import static org.panteleyev.money.app.settings.ColorName.CREDIT;
+import static org.panteleyev.money.app.settings.ColorName.DEBIT;
+import static org.panteleyev.money.app.settings.ColorName.STATEMENT_CHECKED;
+import static org.panteleyev.money.app.settings.ColorName.STATEMENT_MISSING;
+import static org.panteleyev.money.app.settings.ColorName.STATEMENT_UNCHECKED;
+import static org.panteleyev.money.app.settings.ColorName.TRANSFER;
+import static org.panteleyev.money.app.settings.FontName.CONTROLS_FONT;
+import static org.panteleyev.money.app.settings.FontName.DIALOG_LABEL_FONT;
+import static org.panteleyev.money.app.settings.FontName.MENU_FONT;
+import static org.panteleyev.money.app.settings.FontName.TABLE_CELL_FONT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_CLOSING;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_NOT_FOUND;
@@ -62,7 +62,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSA
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSFER;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNCONFIRMED;
 
-public class OptionsDialog extends BaseDialog<ButtonType> {
+public class SettingsDialog extends BaseDialog<ButtonType> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(observableArrayList(2, 3, 4, 5));
@@ -80,8 +80,8 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
 
     private final TextField dialogLabelFontField = new TextField();
 
-    public OptionsDialog(Controller owner, Options options) {
-        super(owner, options.getDialogCssFileUrl());
+    public SettingsDialog(Controller owner, Settings settings) {
+        super(owner, settings.getDialogCssFileUrl());
 
         setTitle(fxString(UI, I18N_WORD_OPTIONS));
         createDefaultButtons(UI, validation.invalidProperty());
@@ -95,17 +95,17 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
         dialogLabelFontField.setEditable(false);
         dialogLabelFontField.setPrefColumnCount(20);
 
-        debitColorPicker.setValue(options.getColor(DEBIT));
-        creditColorPicker.setValue(options.getColor(CREDIT));
-        transferColorPicker.setValue(options.getColor(TRANSFER));
-        statementCheckedColorPicker.setValue(options.getColor(STATEMENT_CHECKED));
-        statementUncheckedColorPicker.setValue(options.getColor(STATEMENT_UNCHECKED));
-        statementMissingColorPicker.setValue(options.getColor(STATEMENT_MISSING));
+        debitColorPicker.setValue(settings.getColor(DEBIT));
+        creditColorPicker.setValue(settings.getColor(CREDIT));
+        transferColorPicker.setValue(settings.getColor(TRANSFER));
+        statementCheckedColorPicker.setValue(settings.getColor(STATEMENT_CHECKED));
+        statementUncheckedColorPicker.setValue(settings.getColor(STATEMENT_UNCHECKED));
+        statementMissingColorPicker.setValue(settings.getColor(STATEMENT_MISSING));
 
-        setupFontField(controlsFontField, options.getFont(CONTROLS_FONT));
-        setupFontField(menuFontField, options.getFont(MENU_FONT));
-        setupFontField(cellFontField, options.getFont(TABLE_CELL_FONT));
-        setupFontField(dialogLabelFontField, options.getFont(DIALOG_LABEL_FONT));
+        setupFontField(controlsFontField, settings.getFont(CONTROLS_FONT));
+        setupFontField(menuFontField, settings.getFont(MENU_FONT));
+        setupFontField(cellFontField, settings.getFont(TABLE_CELL_FONT));
+        setupFontField(dialogLabelFontField, settings.getFont(DIALOG_LABEL_FONT));
 
         var tabPane = new TabPane(
             newTab(UI, I18N_WORD_GENERAL, false, gridPane(
@@ -163,12 +163,12 @@ public class OptionsDialog extends BaseDialog<ButtonType> {
         );
         getDialogPane().setContent(tabPane);
 
-        autoCompleteLength.getSelectionModel().select(Integer.valueOf(options.getAutoCompleteLength()));
-        accountClosingDayDeltaEdit.setText(Integer.toString(options.getAccountClosingDayDelta()));
+        autoCompleteLength.getSelectionModel().select(Integer.valueOf(settings.getAutoCompleteLength()));
+        accountClosingDayDeltaEdit.setText(Integer.toString(settings.getAccountClosingDayDelta()));
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
-                options.update(opt -> {
+                settings.update(opt -> {
                     opt.setAutoCompleteLength(autoCompleteLength.getValue());
                     opt.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
                     // Fonts

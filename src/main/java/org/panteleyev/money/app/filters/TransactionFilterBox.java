@@ -19,9 +19,9 @@ import org.panteleyev.money.app.TransactionPredicate;
 import org.panteleyev.money.model.Transaction;
 import java.time.LocalDate;
 import java.util.function.Predicate;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByDates;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByYear;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class TransactionFilterBox extends HBox {
     private final ChoiceBox<Object> filterChoice = new ChoiceBox<>();

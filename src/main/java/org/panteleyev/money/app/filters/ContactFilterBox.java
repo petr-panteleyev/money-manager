@@ -10,8 +10,8 @@ import org.panteleyev.money.model.Transaction;
 import java.util.Optional;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.Predicates.contactByName;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 public class ContactFilterBox {
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();

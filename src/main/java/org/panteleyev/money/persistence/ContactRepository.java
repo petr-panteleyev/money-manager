@@ -6,14 +6,13 @@ package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class ContactRepository extends Repository<Contact> {
-    ContactRepository(DataSource dataSource) {
-        super("contact", dataSource);
+    ContactRepository() {
+        super("contact");
     }
 
     @Override

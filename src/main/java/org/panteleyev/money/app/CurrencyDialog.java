@@ -32,6 +32,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.SKIP;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEFAULT_CURRENCY;
@@ -42,7 +43,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURREN
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SYMBOL;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
     private final ValidationSupport validation = new ValidationSupport();

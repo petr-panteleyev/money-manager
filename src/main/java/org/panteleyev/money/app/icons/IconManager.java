@@ -16,7 +16,7 @@ import org.panteleyev.money.model.Icon;
 import java.util.Comparator;
 import java.util.UUID;
 import java.util.function.Function;
-import static org.panteleyev.money.persistence.DataCache.cache;
+import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class IconManager {
     public static final Function<Category, Image> CATEGORY_TO_IMAGE = category -> IconManager.getImage(category.iconUuid());

@@ -16,10 +16,12 @@ import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
@@ -28,8 +30,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCIES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class CurrencyWindowController extends BaseController {
     private final TableView<Currency> table = new TableView<>(cache().getCurrencies());
@@ -65,7 +65,7 @@ final class CurrencyWindowController extends BaseController {
 
         var root = new BorderPane(table, menuBar, null, null, null);
         setupWindow(root);
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
     }
 
     @Override
@@ -78,15 +78,15 @@ final class CurrencyWindowController extends BaseController {
     }
 
     private void onAddCurrency() {
-        new CurrencyDialog(this, options().getDialogCssFileUrl(), null)
+        new CurrencyDialog(this, settings().getDialogCssFileUrl(), null)
             .showAndWait()
-            .ifPresent(c -> getDao().insertCurrency(c));
+            .ifPresent(c -> dao().insertCurrency(c));
     }
 
     private void onEditCurrency() {
         getSelectedCurrency()
             .flatMap(selected ->
-                new CurrencyDialog(this, options().getDialogCssFileUrl(), selected).showAndWait())
-            .ifPresent(c -> getDao().updateCurrency(c));
+                new CurrencyDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
+            .ifPresent(c -> dao().updateCurrency(c));
     }
 }

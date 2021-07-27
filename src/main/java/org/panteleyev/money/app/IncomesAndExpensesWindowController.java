@@ -16,7 +16,6 @@ import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -47,11 +46,12 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.CREDIT;
 import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
@@ -61,7 +61,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INCOMES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 class IncomesAndExpensesWindowController extends BaseController {
     private static class TreeNode {
@@ -181,7 +180,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         filterBox.reset();
 
         setupWindow(root);
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
 
 //        onRefresh();
     }
@@ -306,7 +305,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("IncomesAndExpenses"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 

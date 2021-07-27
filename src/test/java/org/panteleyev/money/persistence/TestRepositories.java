@@ -15,7 +15,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import java.time.LocalDate;
 import java.util.UUID;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
+import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.test.BaseTestUtils.newIcon;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
@@ -53,7 +53,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test
     public void testIcon() {
-        var repository = getDao().getIconRepository();
+        var repository = new IconRepository();
         var insert = newIcon(ICON_UUID, ICON_DOLLAR);
         var update = newIcon(ICON_UUID, ICON_EURO);
         insertAndUpdate(repository, insert, update);
@@ -61,7 +61,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test(dependsOnMethods = "testIcon")
     public void testCategory() {
-        var repository = getDao().getCategoryRepository();
+        var repository = new CategoryRepository();
 
         var insert = new Category(
             CATEGORY_UUID,
@@ -88,7 +88,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test
     public void testCurrency() {
-        var repository = getDao().getCurrencyRepository();
+        var repository = new CurrencyRepository();
 
         var insert = new Currency(
             CURRENCY_UUID,
@@ -125,7 +125,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test(dependsOnMethods = "testIcon")
     public void testContact() {
-        var repository = getDao().getContactRepository();
+        var repository = new ContactRepository();
 
         var insert = new Contact(
             CONTACT_UUID,
@@ -168,7 +168,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test(dependsOnMethods = {"testIcon", "testCategory", "testCurrency"})
     public void testAccount() {
-        var repository = getDao().getAccountRepository();
+        var repository = new AccountRepository();
 
         var insert = new Account(
             ACCOUNT_UUID,
@@ -221,7 +221,7 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test(dependsOnMethods = {"testCategory", "testAccount", "testContact"})
     public void testTransaction() {
-        var repository = getDao().getTransactionRepository();
+        var repository = new TransactionRepository();
 
         var insert = new Transaction(
             TRANSACTION_UUID,
@@ -279,12 +279,14 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     private static <T extends MoneyRecord> void insertAndUpdate(Repository<T> repository, T insert, T update) {
-        var uuid = insert.uuid();
+        dao().withNewConnection(conn -> {
+            var uuid = insert.uuid();
 
-        repository.insert(insert);
-        assertEquals(repository.get(uuid).orElseThrow(), insert);
+            repository.insert(conn, insert);
+            assertEquals(repository.get(conn, uuid).orElseThrow(), insert);
 
-        repository.update(update);
-        assertEquals(repository.get(uuid).orElseThrow(), update);
+            repository.update(conn, update);
+            assertEquals(repository.get(conn, uuid).orElseThrow(), update);
+        });
     }
 }

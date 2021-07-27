@@ -2,12 +2,12 @@
  Copyright (c) Petr Panteleyev. All rights reserved.
  Licensed under the BSD license. See LICENSE file in the project root for full license information.
  */
-package org.panteleyev.money.app.options;
+package org.panteleyev.money.app.settings;
 
 import javafx.scene.paint.Color;
 import java.util.Optional;
 
-public enum ColorOption {
+public enum ColorName {
     // Transactions
     DEBIT(Color.RED),
     CREDIT(Color.GREEN),
@@ -19,7 +19,7 @@ public enum ColorOption {
 
     private final Color defaultColor;
 
-    ColorOption(Color defaultColor) {
+    ColorName(Color defaultColor) {
         this.defaultColor = defaultColor;
     }
 
@@ -27,7 +27,7 @@ public enum ColorOption {
         return defaultColor;
     }
 
-    public static Optional<ColorOption> of(String str) {
+    public static Optional<ColorName> of(String str) {
         try {
             return Optional.of(valueOf(str));
         } catch (Exception ex) {

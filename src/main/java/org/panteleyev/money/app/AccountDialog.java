@@ -40,6 +40,7 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ACCOUNT_NUMBER;
@@ -56,7 +57,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURREN
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INTEREST;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 class AccountDialog extends BaseDialog<Account> {
     private final ValidationSupport validation = new ValidationSupport();

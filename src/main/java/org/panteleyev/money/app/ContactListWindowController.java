@@ -38,12 +38,14 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
@@ -56,8 +58,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTAC
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_NAME;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PHONE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 class ContactListWindowController extends BaseController {
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
@@ -124,7 +124,7 @@ class ContactListWindowController extends BaseController {
 
         reloadContacts();
         setupWindow(self);
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
 
         Platform.runLater(this::resetFilter);
     }
@@ -157,15 +157,15 @@ class ContactListWindowController extends BaseController {
     }
 
     private void onAddContact() {
-        new ContactDialog(this, options().getDialogCssFileUrl(), null).showAndWait()
-            .ifPresent(c -> getDao().insertContact(c));
+        new ContactDialog(this, settings().getDialogCssFileUrl(), null).showAndWait()
+            .ifPresent(c -> dao().insertContact(c));
     }
 
     private void onEditContact() {
         getSelectedContact()
             .flatMap(selected ->
-                new ContactDialog(this, options().getDialogCssFileUrl(), selected).showAndWait())
-            .ifPresent(c -> getDao().updateContact(c));
+                new ContactDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
+            .ifPresent(c -> dao().updateContact(c));
     }
 
     private void onTableMouseClick(Event event) {

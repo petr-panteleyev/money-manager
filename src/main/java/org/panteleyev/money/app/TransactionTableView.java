@@ -38,7 +38,6 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
-import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -58,8 +57,10 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
@@ -74,8 +75,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 public class TransactionTableView extends TableView<Transaction> {
     public interface TransactionDetailsCallback {
@@ -156,7 +155,8 @@ public class TransactionTableView extends TableView<Transaction> {
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         var w = widthProperty().subtract(20);
-        var dayComparator = mode.isFullDate() ? MoneyDAO.COMPARE_TRANSACTION_BY_DATE : MoneyDAO.COMPARE_TRANSACTION_BY_DAY;
+        var dayComparator = mode.isFullDate() ?
+            cache().getTransactionByDateComparator() : cache().getTransactionByDayComparator();
 
         Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
             mode == Mode.ACCOUNT ?
@@ -289,7 +289,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
         var selected = fileChooser.showSaveDialog(null);
@@ -301,7 +301,7 @@ public class TransactionTableView extends TableView<Transaction> {
             try (var out = new FileOutputStream(selected)) {
                 new Export().withTransactions(toExport, true)
                     .doExport(out);
-                options().update(opt -> opt.setLastExportDir(selected.getParent()));
+                settings().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
             }
@@ -341,16 +341,16 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     void onNewTransaction() {
-        new TransactionDialog(null, options().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
-            builder -> transactionAddedCallback.accept(getDao().insertTransaction(builder))
+        new TransactionDialog(null, settings().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
+            builder -> transactionAddedCallback.accept(dao().insertTransaction(builder))
         );
     }
 
     void onEditTransaction() {
         var selection = getCurrentSelection();
         getSelectedTransaction()
-            .flatMap(selected -> new TransactionDialog(null, options().getDialogCssFileUrl(), selected, cache()).showAndWait())
-            .ifPresent(builder -> transactionUpdatedCallback.accept(getDao().updateTransaction(builder)));
+            .flatMap(selected -> new TransactionDialog(null, settings().getDialogCssFileUrl(), selected, cache()).showAndWait())
+            .ifPresent(builder -> transactionUpdatedCallback.accept(dao().updateTransaction(builder)));
         restoreSelection(selection);
     }
 
@@ -360,7 +360,7 @@ public class TransactionTableView extends TableView<Transaction> {
                 .showAndWait()
                 .ifPresent(r -> {
                     if (r == ButtonType.OK) {
-                        getDao().deleteTransaction(transaction);
+                        dao().deleteTransaction(transaction);
                     }
                 }));
     }

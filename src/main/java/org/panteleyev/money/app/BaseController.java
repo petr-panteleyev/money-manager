@@ -10,12 +10,12 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.Stage;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
-import org.panteleyev.money.app.options.Options;
 import org.panteleyev.money.model.Account;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
@@ -25,7 +25,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_4;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_HELP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ABOUT;
@@ -42,7 +41,7 @@ public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
 
     BaseController() {
-        super(options().getMainCssFilePath());
+        super(settings().getMainCssFilePath());
     }
 
     protected BaseController(Stage stage, String css) {
@@ -55,7 +54,7 @@ public class BaseController extends Controller {
 
     @Override
     protected void onWindowHiding() {
-        options().saveStageDimensions(this);
+        settings().saveStageDimensions(this);
     }
 
     Menu createWindowMenu() {

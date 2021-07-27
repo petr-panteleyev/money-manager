@@ -36,7 +36,6 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.persistence.MoneyDAO;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -53,6 +52,9 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
+import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.activeAccount;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
@@ -63,7 +65,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
-import static org.panteleyev.money.app.options.Options.options;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ACTIVATE;
@@ -90,15 +91,13 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNTIL;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_WAITING;
-import static org.panteleyev.money.persistence.DataCache.cache;
-import static org.panteleyev.money.persistence.MoneyDAO.getDao;
 
 final class AccountWindowController extends BaseController {
     // Filters
     private final CategorySelectionBox categorySelectionBox = new CategorySelectionBox();
     private final AccountNameFilterBox accountNameFilterBox = new AccountNameFilterBox();
     private final PredicateProperty<Account> showDeactivatedAccounts =
-        new PredicateProperty<>(options().getShowDeactivatedAccounts() ? a -> true : activeAccount(true));
+        new PredicateProperty<>(settings().getShowDeactivatedAccounts() ? a -> true : activeAccount(true));
 
     private final PredicateProperty<Account> filterProperty =
         PredicateProperty.and(List.of(
@@ -111,7 +110,8 @@ final class AccountWindowController extends BaseController {
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(filterProperty.get());
     private final TableView<Account> tableView = new TableView<>(
         filteredAccounts.sorted(
-            MoneyDAO.COMPARE_ACCOUNT_BY_CATEGORY.thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME)
+            cache().getAccountByCategoryComparator()
+                .thenComparing(cache().getAccountByNameComparator())
         )
     );
 
@@ -152,7 +152,7 @@ final class AccountWindowController extends BaseController {
         cache().getTransactions().addListener(new WeakListChangeListener<>(transactionListener));
 
         setupWindow(self);
-        options().loadStageDimensions(this);
+        settings().loadStageDimensions(this);
     }
 
     @Override
@@ -205,10 +205,10 @@ final class AccountWindowController extends BaseController {
             editMenu,
             newMenu(fxString(UI, I18N_MENU_VIEW),
                 checkMenuItem(fxString(UI, I18N_MISC_SHOW_DEACTIVATED_ACCOUNTS),
-                    options().getShowDeactivatedAccounts(), SHORTCUT_H,
+                    settings().getShowDeactivatedAccounts(), SHORTCUT_H,
                     event -> {
                         var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                        options().update(opt -> opt.setShowDeactivatedAccounts(selected));
+                        settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
                         showDeactivatedAccounts.set(selected ? a -> true : activeAccount(true));
                     }
                 )
@@ -235,7 +235,7 @@ final class AccountWindowController extends BaseController {
                     .withPropertyCallback(Account::interest)
                     .withWidthBinding(w.multiply(0.03))),
             tableObjectColumn(fxString(UI, I18N_WORD_UNTIL), b ->
-                b.withCellFactory(x -> new AccountClosingDateCell(options().getAccountClosingDayDelta()))
+                b.withCellFactory(x -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()))
                     .withWidthBinding(w.multiply(0.05))),
             tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
                 b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.3))),
@@ -287,20 +287,20 @@ final class AccountWindowController extends BaseController {
             .flatMap(account -> cache().getCategory(account.categoryUuid()))
             .orElse(null);
 
-        new AccountDialog(this, options().getDialogCssFileUrl(), initialCategory)
+        new AccountDialog(this, settings().getDialogCssFileUrl(), initialCategory)
             .showAndWait()
             .ifPresent(account -> {
-                getDao().insertAccount(account);
+                dao().insertAccount(account);
                 tableView.scrollTo(account);
                 tableView.getSelectionModel().select(account);
             });
     }
 
     private void onEditAccount() {
-        getSelectedAccount().flatMap(account -> new AccountDialog(this, options().getDialogCssFileUrl(), account, null)
+        getSelectedAccount().flatMap(account -> new AccountDialog(this, settings().getDialogCssFileUrl(), account, null)
             .showAndWait())
             .ifPresent(account -> {
-                getDao().updateAccount(account);
+                dao().updateAccount(account);
                 tableView.scrollTo(account);
                 tableView.getSelectionModel().select(account);
             });
@@ -318,7 +318,7 @@ final class AccountWindowController extends BaseController {
                     ButtonType.CANCEL)
                     .showAndWait()
                     .filter(response -> response == ButtonType.OK)
-                    .ifPresent(b -> getDao().deleteAccount(account));
+                    .ifPresent(b -> dao().deleteAccount(account));
             }
         });
     }
@@ -326,7 +326,7 @@ final class AccountWindowController extends BaseController {
     private void onActivateDeactivateAccount() {
         getSelectedAccount().ifPresent(account -> {
             boolean enabled = account.enabled();
-            getDao().updateAccount(account.enable(!enabled));
+            dao().updateAccount(account.enable(!enabled));
         });
     }
 
@@ -346,7 +346,7 @@ final class AccountWindowController extends BaseController {
     private void onReport() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        options().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.setInitialFileName(generateFileName("accounts"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
@@ -357,7 +357,8 @@ final class AccountWindowController extends BaseController {
 
         try (var outputStream = new FileOutputStream(selected)) {
             var accounts = cache().getAccounts(filterProperty.get())
-                .sorted(MoneyDAO.COMPARE_ACCOUNT_BY_CATEGORY.thenComparing(MoneyDAO.COMPARE_ACCOUNT_BY_NAME))
+                .sorted(cache().getAccountByCategoryComparator()
+                    .thenComparing(cache().getAccountByNameComparator()))
                 .toList();
             Reports.reportAccounts(accounts, outputStream);
         } catch (IOException ex) {
@@ -369,7 +370,7 @@ final class AccountWindowController extends BaseController {
         tableView.getItems().forEach(account -> {
             var total = cache().calculateBalance(account, false, t -> true);
             var waiting = cache().calculateBalance(account, false, t -> !t.checked());
-            getDao().updateAccount(account.updateBalance(total, waiting));
+            dao().updateAccount(account.updateBalance(total, waiting));
         });
     }
 }

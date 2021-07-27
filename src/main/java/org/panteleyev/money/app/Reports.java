@@ -21,6 +21,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 import static org.panteleyev.fx.FxUtils.fxString;
+import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
@@ -39,7 +40,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEM
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNTIL;
-import static org.panteleyev.money.persistence.DataCache.cache;
 
 class Reports {
     private static final String CSS_PATH = "/org/panteleyev/money/report.css";

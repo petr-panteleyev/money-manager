@@ -19,15 +19,9 @@ import java.util.UUID;
 
 abstract class Repository<T extends MoneyRecord> {
     private final String tableName;
-    private final DataSource dataSource;
 
-    public Repository(String tableName, DataSource dataSource) {
+    public Repository(String tableName) {
         this.tableName = tableName;
-        this.dataSource = dataSource;
-    }
-
-    protected DataSource getDataSource() {
-        return dataSource;
     }
 
     abstract protected T fromResultSet(ResultSet rs) throws SQLException;
@@ -52,22 +46,12 @@ abstract class Repository<T extends MoneyRecord> {
         }
     }
 
-    public Optional<T> get(UUID uuid) {
-        try (var conn = getDataSource().getConnection(); var st = conn.prepareStatement(
-            "SELECT * FROM " + tableName + " WHERE uuid = ?"
-        )) {
+    public Optional<T> get(Connection conn, UUID uuid) {
+        try (var st = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE uuid = ?")) {
             st.setString(1, uuid.toString());
             try (var rs = st.executeQuery()) {
                 return rs.next() ? Optional.of(fromResultSet(rs)) : Optional.empty();
             }
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public boolean insert(T object) {
-        try (var conn = getDataSource().getConnection()) {
-            return insert(conn, object);
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
@@ -109,14 +93,6 @@ abstract class Repository<T extends MoneyRecord> {
         }
     }
 
-    public boolean update(T object) {
-        try (var conn = dataSource.getConnection()) {
-            return update(conn, object);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     public boolean update(Connection conn, T object) {
         try (var st = conn.prepareStatement(getUpdateSql())) {
             toStatement(st, object);
@@ -126,10 +102,8 @@ abstract class Repository<T extends MoneyRecord> {
         }
     }
 
-    public int delete(T object) {
-        try (var conn = dataSource.getConnection();
-             var st = conn.prepareStatement("DELETE FROM " + tableName + " WHERE uuid = ?")
-        ) {
+    public int delete(Connection conn, T object) {
+        try (var st = conn.prepareStatement("DELETE FROM " + tableName + " WHERE uuid = ?")) {
             st.setString(1, object.uuid().toString());
             return st.executeUpdate();
         } catch (SQLException ex) {

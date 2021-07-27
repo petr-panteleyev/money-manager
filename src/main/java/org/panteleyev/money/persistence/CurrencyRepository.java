@@ -5,14 +5,13 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Currency;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class CurrencyRepository extends Repository<Currency> {
-    CurrencyRepository(DataSource dataSource) {
-        super("currency", dataSource);
+    CurrencyRepository() {
+        super("currency");
     }
 
     @Override

@@ -37,7 +37,6 @@ public final class ApplicationFiles {
     }
 
     private static final String APPLICATION_DIRECTORY = ".money-manager";
-    private static final ApplicationFiles INSTANCE = new ApplicationFiles();
 
     private final File applicationDirectory =
         new File(System.getProperty("user.home") + File.separator + APPLICATION_DIRECTORY);
@@ -46,11 +45,7 @@ public final class ApplicationFiles {
 
     private final Map<AppFile, File> fileMap = new EnumMap<>(AppFile.class);
 
-    public static ApplicationFiles files() {
-        return INSTANCE;
-    }
-
-    private ApplicationFiles() {
+    public ApplicationFiles() {
         for (var appFile : AppFile.values()) {
             fileMap.put(appFile, new File(applicationDirectory, appFile.getFileName()));
         }

@@ -13,10 +13,10 @@ import java.util.ResourceBundle;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
 import static org.panteleyev.money.app.Styles.STYLE_ABOUT_LABEL;
-import static org.panteleyev.money.app.options.Options.options;
 
 final class AboutDialog extends BaseDialog<Object> {
 
@@ -37,7 +37,7 @@ final class AboutDialog extends BaseDialog<Object> {
     private static final BuildInformation BUILD = BuildInformation.load();
 
     AboutDialog(Controller owner) {
-        super(owner, options().getAboutDialogCssFileUrl());
+        super(owner, settings().getAboutDialogCssFileUrl());
 
         setHeaderText(APP_TITLE);
         setGraphic(new ImageView(Images.APP_ICON));

@@ -7,15 +7,14 @@ package org.panteleyev.money.persistence;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 final class TransactionRepository extends Repository<Transaction> {
 
-    TransactionRepository(DataSource dataSource) {
-        super("transaction", dataSource);
+    TransactionRepository() {
+        super("transaction");
     }
 
     @Override
