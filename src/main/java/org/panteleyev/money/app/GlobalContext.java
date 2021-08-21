@@ -5,6 +5,7 @@
 package org.panteleyev.money.app;
 
 import org.panteleyev.money.app.settings.Settings;
+import org.panteleyev.money.messaging.MessageQueue;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 
@@ -13,6 +14,7 @@ public final class GlobalContext {
     private static final MoneyDAO DAO = new MoneyDAO(CACHE);
     private static final ApplicationFiles FILES = new ApplicationFiles();
     private static final Settings SETTINGS = new Settings(FILES);
+    private static final MessageQueue QUEUE = new MessageQueue();
 
     private GlobalContext() {
     }
@@ -31,5 +33,9 @@ public final class GlobalContext {
 
     public static ApplicationFiles files() {
         return FILES;
+    }
+
+    public static MessageQueue queue() {
+        return QUEUE;
     }
 }

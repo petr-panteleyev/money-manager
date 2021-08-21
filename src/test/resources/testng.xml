@@ -44,4 +44,9 @@
             <class name="org.panteleyev.money.app.database.ProfileSettingsTest"/>
         </classes>
     </test>
+    <test name="Messaging">
+        <classes>
+            <class name="org.panteleyev.money.messaging.TestMessageQueue"/>
+        </classes>
+    </test>
 </suite>

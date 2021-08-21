@@ -18,7 +18,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
@@ -195,10 +194,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             vBox(
                 DOUBLE_SPACING,
                 hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)), datePicker),
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_WORD_TYPE)),
-                        hBox(List.of(typeEdit, typeMenuButton, checkedCheckBox), hBox -> {
+                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)),
+                        hBox(List.of(datePicker, checkedCheckBox), hBox -> {
                             hBox.setSpacing(BIG_SPACING);
                             hBox.setAlignment(Pos.CENTER);
                         })
@@ -208,8 +205,20 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM)), sumEdit),
                     vBox(SMALL_SPACING,
                         label(fxString(UI, I18N_WORD_RATE)),
-                        new HBox(rate1Edit, rateDir1Combo),
-                        rateAmoutLabel)
+                        hBox(List.of(rate1Edit, rateDir1Combo, rateAmoutLabel), hBox -> {
+                            hBox.setSpacing(SMALL_SPACING);
+                            hBox.setAlignment(Pos.CENTER);
+                        })
+                    )
+                ),
+                hBox(BIG_SPACING,
+                    vBox(SMALL_SPACING,
+                        label(fxString(UI, I18N_WORD_TYPE)),
+                        hBox(List.of(typeEdit, typeMenuButton), hBox -> {
+                            hBox.setSpacing(BIG_SPACING);
+                            hBox.setAlignment(Pos.CENTER);
+                        })
+                    )
                 ),
                 fxNode(
                     vBox(SMALL_SPACING,
@@ -313,7 +322,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         runLater(() -> {
             createValidationSupport();
-            typeEdit.requestFocus();
+            sumEdit.requestFocus();
         });
     }
 
@@ -794,7 +803,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         }
 
         runLater(() ->
-            rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP).toString()));
+            rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private void updateCategoryLabel(Label label, Account account) {
@@ -810,26 +819,28 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var accDebitedUuid = builder.getAccountDebitedUuid();
         var accCreditedUuid = builder.getAccountCreditedUuid();
 
-        if (accDebitedUuid != null && accCreditedUuid != null) {
-            cache.getTransactions().stream()
-                .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
-                    && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
-                .max(cache().getTransactionByDateComparator())
-                .ifPresent(it -> {
-                    if (commentEdit.getText().isEmpty()) {
-                        commentEdit.setText(it.comment());
-                    }
-                    if (sumEdit.getText().isEmpty()) {
-                        sumEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
-                    }
-
-                    cache.getContact(it.contactUuid()).ifPresent(contact -> {
-                        if (contactEdit.getText().isEmpty()) {
-                            contactEdit.setText(contact.name());
-                        }
-                    });
-                });
+        if (accDebitedUuid == null || accCreditedUuid == null) {
+            return;
         }
+
+        cache.getTransactions().stream()
+            .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
+                && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
+            .max(cache().getTransactionByDateComparator())
+            .ifPresent(it -> {
+                if (commentEdit.getText().isEmpty()) {
+                    commentEdit.setText(it.comment());
+                }
+                if (sumEdit.getText().isEmpty()) {
+                    sumEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
+                }
+
+                cache.getContact(it.contactUuid()).ifPresent(contact -> {
+                    if (contactEdit.getText().isEmpty()) {
+                        contactEdit.setText(contact.name());
+                    }
+                });
+            });
     }
 
     private void today() {
