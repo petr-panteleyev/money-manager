@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev</groupId>
     <artifactId>money-manager</artifactId>
-    <version>21.4.7</version>
+    <version>21.4.8</version>
     <packaging>jar</packaging>
     <name>Money Manager</name>
 
@@ -34,7 +34,7 @@
         <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
-        <jsoupVersion>1.13.1</jsoupVersion>
+        <jsoupVersion>1.14.2</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
         <mysqlConnectorVersion>8.0.26</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>

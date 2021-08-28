@@ -5,6 +5,7 @@
 package org.panteleyev.money.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -104,6 +105,24 @@ public record Transaction(
 
     public LocalDate getDate() {
         return LocalDate.of(year, month, day);
+    }
+
+    /**
+     * Returns amount with conversion rate applied to it.
+     *
+     * @return converted amount
+     */
+    public BigDecimal getConvertedAmount() {
+        if (rate.compareTo(BigDecimal.ZERO) == 0 || rate.compareTo(BigDecimal.ONE) == 0) {
+            return amount;
+        }
+        return rateDirection == 0 ?
+            amount.divide(rate, RoundingMode.HALF_UP) :
+            amount.multiply(rate);
+    }
+
+    public BigDecimal getNegatedAmount() {
+        return amount.negate();
     }
 
     public static final class Builder {

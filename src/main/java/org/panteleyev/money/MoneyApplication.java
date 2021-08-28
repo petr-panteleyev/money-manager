@@ -26,7 +26,6 @@ public class MoneyApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         files().initialize();
         settings().load();
-        //queue().start();
 
         var formatProperty = System.getProperty(FORMAT_PROP);
         if (formatProperty == null) {

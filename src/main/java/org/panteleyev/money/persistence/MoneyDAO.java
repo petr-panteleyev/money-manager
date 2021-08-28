@@ -17,19 +17,22 @@ import org.panteleyev.money.xml.Import;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 public class MoneyDAO {
+    private final static Logger LOGGER = Logger.getLogger(MoneyDAO.class.getName());
+
     private final DataCache cache;
     private final AtomicReference<DataSource> dataSource = new AtomicReference<>();
     // Repositories
@@ -44,7 +47,7 @@ public class MoneyDAO {
 
     private static final int BATCH_SIZE = 1000;
 
-    public static final Consumer<String> IGNORE_PROGRESS = x -> { };
+    public static final Consumer<String> IGNORE_PROGRESS = x -> {};
 
     public MoneyDAO(DataCache cache) {
         this.cache = cache;
@@ -168,7 +171,7 @@ public class MoneyDAO {
     }
 
     public void updateAccount(Account account) {
-        withNewConnection(conn ->  {
+        withNewConnection(conn -> {
             updateAccount(conn, account);
         });
     }
@@ -193,25 +196,48 @@ public class MoneyDAO {
         withNewConnection(conn -> {
             transactionRepository.insert(conn, transaction);
             cache.add(transaction);
-            updateAccounts(conn, transaction);
+            updateAccounts(conn, List.of(transaction));
         });
     }
 
     public void updateTransaction(Transaction transaction) {
+        updateTransactions(List.of(transaction));
+    }
+
+    public void updateTransactions(Collection<Transaction> transactions) {
         withNewConnection(conn -> {
-            var oldTransaction = cache.getTransaction(transaction.uuid()).orElseThrow();
-            transactionRepository.update(conn, transaction);
-            cache.update(transaction);
-            updateAccounts(conn, oldTransaction, transaction);
+            var oldAndUpdatedTransactions = new ArrayList<Transaction>(transactions.size() * 2);
+            for (var t : transactions) {
+                oldAndUpdatedTransactions.add(t);
+                oldAndUpdatedTransactions.add(cache.getTransaction(t.uuid()).orElseThrow());
+                transactionRepository.update(conn, t);
+                cache.update(t);
+            }
+            updateAccounts(conn, oldAndUpdatedTransactions);
         });
     }
 
     public void deleteTransaction(Transaction transaction) {
+        deleteTransactions(List.of(transaction));
+    }
+
+    public void deleteTransactions(Collection<Transaction> transactions) {
         withNewConnection(conn -> {
-            transactionRepository.delete(conn, transaction);
-            cache.remove(transaction);
-            updateAccounts(conn, transaction);
+            for (var t : transactions) {
+                transactionRepository.delete(conn, t);
+                cache.remove(t);
+            }
+            updateAccounts(conn, transactions);
         });
+    }
+
+    public void checkTransactions(Collection<Transaction> transactions, boolean check) {
+        updateTransactions(
+            transactions.stream()
+                .filter(t -> t.checked() != check)
+                .map(t -> t.check(check))
+                .toList()
+        );
     }
 
     /**
@@ -219,19 +245,19 @@ public class MoneyDAO {
      *
      * @param transactions transactions that were added, updated or deleted.
      */
-    private void updateAccounts(Connection conn, Transaction... transactions) {
-        Set.of(transactions).stream()
-            .map(t -> List.of(
-                cache.getAccount(t.accountDebitedUuid()).orElseThrow(),
-                cache.getAccount(t.accountCreditedUuid()).orElseThrow())
-            )
-            .flatMap(Collection::stream)
-            .collect(Collectors.toSet())
-            .forEach(account -> {
+    private void updateAccounts(Connection conn, Collection<Transaction> transactions) {
+        var uniqueAccountIds = new HashSet<UUID>();
+        for (var t : transactions) {
+            uniqueAccountIds.add(t.accountDebitedUuid());
+            uniqueAccountIds.add(t.accountCreditedUuid());
+        }
+        for (var uuid : uniqueAccountIds) {
+            cache.getAccount(uuid).ifPresent(account -> {
                 var total = cache.calculateBalance(account, false, t -> true);
                 var waiting = cache.calculateBalance(account, false, t -> !t.checked());
                 updateAccount(conn, account.updateBalance(total, waiting));
             });
+        }
     }
 
     public void createTables() {

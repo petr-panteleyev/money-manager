@@ -149,11 +149,7 @@ class StatementWindowController extends BaseController {
 
         transactionTable.setOnCheckTransaction((transactions, check) -> {
             var selected = getSelectedStatementRecord();
-
-            for (Transaction t : transactions) {
-                dao().updateTransaction(t.check(check));
-            }
-
+            dao().checkTransactions(transactions, check);
             Platform.runLater(() -> selected.ifPresent(record -> statementTable.getSelectionModel().select(record)));
         });
 
@@ -355,9 +351,7 @@ class StatementWindowController extends BaseController {
 
     void onCheckStatementRecord(StatementRecord record, boolean check) {
         var transactions = new ArrayList<>(record.getTransactions());
-        for (var t : transactions) {
-            dao().updateTransaction(t.check(check));
-        }
+        dao().checkTransactions(transactions, check);
         Platform.runLater(() -> statementTable.getSelectionModel().select(record));
     }
 

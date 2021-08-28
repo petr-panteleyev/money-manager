@@ -11,7 +11,7 @@ Personal finance manager. Work in progress.
 Make sure ```JAVA_HOME``` is set to JDK 16.
 
 ```shell script
-$ mvn clean package
+mvn clean package
 ```
 
 Application JAR and all dependencies will be placed in ```target/jmods```.
@@ -19,7 +19,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ## Run
 
 ```shell script
-$ mvn javafx:run
+mvn javafx:run
 ```
 
 To open specific profile add ```-Dprofile=<profile>``` to the command line.
@@ -32,9 +32,13 @@ environment variable
 * Execute the following commands:
 
 ```shell script
-$ mvn clean package jpackage:jpackage@mac
+mvn clean package jpackage:jpackage@mac
+```
+
   or
-$ mvn clean package jpackage:jpackage@win
+
+```
+mvn clean package jpackage:jpackage@win
 ```
 
 Installation package will be found in ```target/dist``` directory.

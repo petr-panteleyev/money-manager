@@ -21,6 +21,7 @@ import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.persistence.DataCache;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -153,7 +154,7 @@ class RequestWindowController extends BaseController {
 
         table.selectedTransactions().addListener((ListChangeListener<Transaction>) change ->
             sumField.setText(
-                cache().calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
+                DataCache.calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
             ));
 
         setupWindow(root);
@@ -210,9 +211,7 @@ class RequestWindowController extends BaseController {
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
-        for (Transaction t : transactions) {
-            dao().updateTransaction(t.check(check));
-        }
+        dao().checkTransactions(transactions, check);
     }
 
     private void onReport() {

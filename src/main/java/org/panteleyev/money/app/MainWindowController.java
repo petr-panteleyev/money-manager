@@ -76,7 +76,6 @@ import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
 import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
-import static org.panteleyev.money.app.GlobalContext.queue;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
@@ -300,7 +299,6 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onExit() {
-        queue().stop();
         getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
@@ -532,9 +530,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onCheckTransaction(List<Transaction> transactions, boolean check) {
-        for (var t : transactions) {
-            dao().updateTransaction(t.check(check));
-        }
+        dao().checkTransactions(transactions, check);
     }
 
     @Override
@@ -543,9 +539,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
         if (details.isEmpty()) {
             if (!childTransactions.isEmpty()) {
-                for (Transaction child : childTransactions) {
-                    dao().deleteTransaction(child);
-                }
+                dao().deleteTransactions(childTransactions);
                 var noChildren = new Transaction.Builder(transaction)
                     .detailed(false)
                     .timestamp()
@@ -558,9 +552,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 .timestamp()
                 .build());
 
-            for (Transaction ch : childTransactions) {
-                dao().deleteTransaction(ch);
-            }
+            dao().deleteTransactions(childTransactions);
 
             for (var transactionDetail : details) {
                 var newDetail = new Transaction.Builder(transaction)

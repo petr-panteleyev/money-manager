@@ -15,7 +15,6 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -341,40 +340,23 @@ public class DataCache {
      * @return account balance
      */
     public BigDecimal calculateBalance(Account account, boolean total, Predicate<Transaction> filter) {
+        var initialBalance = total ?
+            account.openingBalance().add(account.accountLimit()) :
+            BigDecimal.ZERO;
+
         return getTransactions(account).stream()
-            .filter(t -> t.parentUuid() == null)
             .filter(filter)
-            .map(t -> {
-                var amount = t.amount();
-                if (Objects.equals(account.uuid(), t.accountCreditedUuid())) {
-                    // handle conversion rate
-                    var rate = t.rate();
-                    if (rate.compareTo(BigDecimal.ZERO) != 0 && rate.compareTo(BigDecimal.ONE) != 0) {
-                        amount = t.rateDirection() == 0 ?
-                            amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
-                    }
-                } else {
-                    amount = amount.negate();
-                }
-                return amount;
-            })
-            .reduce(total ? account.openingBalance().add(account.accountLimit()) : BigDecimal.ZERO,
-                BigDecimal::add);
+            .filter(t -> t.parentUuid() == null)
+            .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
+                t.getConvertedAmount() :
+                t.getNegatedAmount())
+            .reduce(initialBalance, BigDecimal::add);
     }
 
-    public BigDecimal calculateBalance(List<Transaction> transactions) {
+    public static BigDecimal calculateBalance(List<Transaction> transactions) {
         return transactions.stream()
             .filter(t -> t.parentUuid() == null)
-            .map(t -> {
-                var amount = t.amount();
-                // handle conversion rate
-                var rate = t.rate();
-                if (rate.compareTo(BigDecimal.ZERO) != 0 && rate.compareTo(BigDecimal.ONE) != 0) {
-                    amount = t.rateDirection() == 0 ?
-                        amount.divide(rate, RoundingMode.HALF_UP) : amount.multiply(rate);
-                }
-                return amount;
-            })
+            .map(Transaction::getConvertedAmount)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
