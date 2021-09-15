@@ -77,15 +77,11 @@ public interface XMLUtils {
     }
 
     static void appendObjectTextNode(Element e, String name, Object value) {
-        // TODO: reimplement with swith pattern matching when available
-        if (value instanceof Integer intValue) {
-            appendTextNode(e, name, intValue);
-        } else if (value instanceof String stringValue) {
-            appendTextNode(e, name, stringValue);
-        } else if (value instanceof Boolean booleanValue) {
-            appendTextNode(e, name, booleanValue);
-        } else {
-            throw new IllegalArgumentException("Unsupported value type");
+        switch (value) {
+            case Integer intValue -> appendTextNode(e, name, intValue);
+            case String stringValue -> appendTextNode(e, name, stringValue);
+            case Boolean booleanValue -> appendTextNode(e, name, booleanValue);
+            default -> throw new IllegalArgumentException("Unsupported value type");
         }
     }
 

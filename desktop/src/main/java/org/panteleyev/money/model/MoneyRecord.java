@@ -8,7 +8,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
-public interface MoneyRecord {
+public sealed interface MoneyRecord
+    permits Account, Category, Contact, Currency, Icon, Transaction {
+
     UUID uuid();
 
     long created();

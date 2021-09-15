@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) Petr Panteleyev. All rights reserved.
+  Licensed under the BSD license. See LICENSE file in the project root for full license information.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.panteleyev.money</groupId>
+    <artifactId>dependencies</artifactId>
+    <packaging>pom</packaging>
+    <version>21.4.9</version>
+    <name>Money Manager Dependencies</name>
+
+    <properties>
+        <javaFxVersion>16</javaFxVersion>
+        <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
+        <controlsFxVersion>11.1.0</controlsFxVersion>
+        <ofxParserVersion>0.3.0</ofxParserVersion>
+        <jsoupVersion>1.14.2</jsoupVersion>
+        <gsonVersion>2.8.6</gsonVersion>
+        <mysqlConnectorVersion>8.0.26</mysqlConnectorVersion>
+        <freemarkerVersion>2.3.29</freemarkerVersion>
+        <testNgVersion>7.3.0</testNgVersion>
+        <h2Version>1.4.194</h2Version>
+        <liquibaseVersion>4.4.0</liquibaseVersion>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>java-fx-helpers</artifactId>
+                <version>${javaFxHelpersVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.openjfx</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>ofx-parser</artifactId>
+                <version>${ofxParserVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.controlsfx</groupId>
+                <artifactId>controlsfx</artifactId>
+                <version>${controlsFxVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.openjfx</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysqlConnectorVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoupVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gsonVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>${freemarkerVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibaseVersion}</version>
+            </dependency>
+            <!-- Java FX -->
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-base</artifactId>
+                <version>${javaFxVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-controls</artifactId>
+                <version>${javaFxVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-media</artifactId>
+                <version>${javaFxVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-graphics</artifactId>
+                <version>${javaFxVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-swing</artifactId>
+                <version>${javaFxVersion}</version>
+            </dependency>
+            <!-- Test -->
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>${testNgVersion}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2Version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

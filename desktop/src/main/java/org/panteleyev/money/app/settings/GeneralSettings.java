@@ -68,15 +68,12 @@ final class GeneralSettings {
         var rootElement = readDocument(in);
 
         for (var key : Setting.values()) {
-            // TODO: reimplement with switch pattern matching when available
-            Optional<?> value = Optional.empty();
-            if (key.getDefaultValue() instanceof Integer) {
-                value = getIntNodeValue(rootElement, key.getElementName());
-            } else if (key.getDefaultValue() instanceof String) {
-                value = getStringNodeValue(rootElement, key.getElementName());
-            } else if (key.getDefaultValue() instanceof Boolean) {
-                value = getBooleanNodeValue(rootElement, key.getElementName());
-            }
+            var value = switch (key.getDefaultValue()) {
+                case Integer i -> getIntNodeValue(rootElement, key.getElementName());
+                case String s -> getStringNodeValue(rootElement, key.getElementName());
+                case Boolean b -> getBooleanNodeValue(rootElement, key.getElementName());
+                default -> Optional.empty();
+            };
             value.ifPresent(x -> settings.put(key, x));
         }
     }
