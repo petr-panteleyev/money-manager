@@ -5,13 +5,12 @@
 package org.panteleyev.money.model;
 
 import org.testng.annotations.Test;
-import static org.panteleyev.money.test.BaseTestUtils.newTransaction;
 import static org.testng.Assert.assertEquals;
 
 public class TransactionDetailTest {
     @Test
     public void testInstantiation() {
-        var transaction = newTransaction();
+        var transaction = BaseTestUtils.newTransaction();
 
         var detail = new TransactionDetail(transaction);
 

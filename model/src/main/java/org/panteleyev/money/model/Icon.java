@@ -103,6 +103,8 @@ public final class Icon implements MoneyRecord {
         return "Icon ["
             + "uuid:" + uuid
             + " name:" + name
+            + " created:" + created
+            + " modified:" + modified
             + "]";
     }
 }

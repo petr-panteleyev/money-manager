@@ -4,9 +4,9 @@
  */
 package org.panteleyev.money.model;
 
-import org.panteleyev.money.bundles.CategoryTypeBundle;
-import org.panteleyev.money.bundles.ContactTypeBundle;
-import org.panteleyev.money.bundles.TransactionTypeBundle;
+import org.panteleyev.money.model.bundles.CategoryTypeBundle;
+import org.panteleyev.money.model.bundles.ContactTypeBundle;
+import org.panteleyev.money.model.bundles.TransactionTypeBundle;
 import java.util.ResourceBundle;
 import static java.util.ResourceBundle.getBundle;
 

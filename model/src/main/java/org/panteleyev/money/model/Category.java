@@ -22,7 +22,7 @@ public record Category(
 
     public Category {
         if (uuid == null) {
-            throw new IllegalStateException("Category id cannot be null");
+            uuid = UUID.randomUUID();
         }
         if (name == null || name.isBlank()) {
             throw new IllegalStateException("Category name cannot be null or blank");

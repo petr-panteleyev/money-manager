@@ -8,12 +8,6 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.util.UUID;
-import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
-import static org.panteleyev.money.test.BaseTestUtils.newCurrency;
-import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
-import static org.panteleyev.money.test.BaseTestUtils.randomInt;
-import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestCurrency extends ModelTestBase {
@@ -22,15 +16,15 @@ public class TestCurrency extends ModelTestBase {
     @Override
     public Object[][] testBuildDataProvider() {
         UUID uuid = UUID.randomUUID();
-        String symbol = randomString();
-        String description = randomString();
-        String formatSymbol = randomString();
-        int formatSymbolPosition = randomInt();
-        boolean showFormatSymbol = randomBoolean();
-        boolean def = randomBoolean();
-        BigDecimal rate = randomBigDecimal();
-        int direction = randomInt();
-        boolean useThousandSeparator = randomBoolean();
+        String symbol = BaseTestUtils.randomString();
+        String description = BaseTestUtils.randomString();
+        String formatSymbol = BaseTestUtils.randomString();
+        int formatSymbolPosition = BaseTestUtils.randomInt();
+        boolean showFormatSymbol = BaseTestUtils.randomBoolean();
+        boolean def = BaseTestUtils.randomBoolean();
+        BigDecimal rate = BaseTestUtils.randomBigDecimal();
+        int direction = BaseTestUtils.randomInt();
+        boolean useThousandSeparator = BaseTestUtils.randomBoolean();
         long created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -76,12 +70,12 @@ public class TestCurrency extends ModelTestBase {
         var symbol = UUID.randomUUID().toString();
         var description = UUID.randomUUID().toString();
         var formatSymbol = UUID.randomUUID().toString();
-        var formatSymbolPosition = RANDOM.nextInt();
-        var showFormatSymbol = RANDOM.nextBoolean();
-        var def = RANDOM.nextBoolean();
-        var rate = randomBigDecimal();
-        var direction = RANDOM.nextInt();
-        var useSeparator = RANDOM.nextBoolean();
+        var formatSymbolPosition = BaseTestUtils.RANDOM.nextInt();
+        var showFormatSymbol = BaseTestUtils.RANDOM.nextBoolean();
+        var def = BaseTestUtils.RANDOM.nextBoolean();
+        var rate = BaseTestUtils.randomBigDecimal();
+        var direction = BaseTestUtils.RANDOM.nextInt();
+        var useSeparator = BaseTestUtils.RANDOM.nextBoolean();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -122,7 +116,7 @@ public class TestCurrency extends ModelTestBase {
 
     @Test
     public void testCopy() {
-        var original = newCurrency();
+        var original = BaseTestUtils.newCurrency();
 
         var copy = new Currency.Builder(original).build();
         assertEquals(copy, original);

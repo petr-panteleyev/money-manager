@@ -10,12 +10,13 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>parent</artifactId>
-    <version>21.4.9</version>
+    <version>21.4.10</version>
     <packaging>pom</packaging>
     <name>Money Manager Root Project</name>
 
     <modules>
         <module>./dependencies.xml</module>
+        <module>model</module>
         <module>desktop</module>
     </modules>
 </project>

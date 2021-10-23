@@ -10,11 +10,11 @@
     <groupId>org.panteleyev.money</groupId>
     <artifactId>dependencies</artifactId>
     <packaging>pom</packaging>
-    <version>21.4.9</version>
+    <version>21.4.10</version>
     <name>Money Manager Dependencies</name>
 
     <properties>
-        <javaFxVersion>16</javaFxVersion>
+        <javaFxVersion>17.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>

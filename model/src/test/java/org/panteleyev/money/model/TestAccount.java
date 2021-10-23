@@ -9,12 +9,6 @@ import org.testng.annotations.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
-import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
-import static org.panteleyev.money.test.BaseTestUtils.randomCardType;
-import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestAccount extends ModelTestBase {
@@ -23,23 +17,23 @@ public class TestAccount extends ModelTestBase {
     @Override
     public Object[][] testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var name = randomString();
-        var comment = randomString();
-        var accountNumber = randomString();
-        var openingBalance = randomBigDecimal();
-        var accountLimit = randomBigDecimal();
-        var currencyRate = randomBigDecimal();
-        var type = randomCategoryType();
+        var name = BaseTestUtils.randomString();
+        var comment = BaseTestUtils.randomString();
+        var accountNumber = BaseTestUtils.randomString();
+        var openingBalance = BaseTestUtils.randomBigDecimal();
+        var accountLimit = BaseTestUtils.randomBigDecimal();
+        var currencyRate = BaseTestUtils.randomBigDecimal();
+        var type = BaseTestUtils.randomCategoryType();
         var categoryUuid = UUID.randomUUID();
         var currencyUuid = UUID.randomUUID();
-        var enabled = randomBoolean();
-        var interest = randomBigDecimal();
+        var enabled = BaseTestUtils.randomBoolean();
+        var interest = BaseTestUtils.randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
-        var cardType = randomCardType();
-        var cardNumber = randomString();
-        var total = randomBigDecimal();
-        var totalWaiting = randomBigDecimal();
+        var cardType = BaseTestUtils.randomCardType();
+        var cardNumber = BaseTestUtils.randomString();
+        var total = BaseTestUtils.randomBigDecimal();
+        var totalWaiting = BaseTestUtils.randomBigDecimal();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -102,14 +96,14 @@ public class TestAccount extends ModelTestBase {
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
         var accountNumber = UUID.randomUUID().toString();
-        var opening = randomBigDecimal();
-        var limit = randomBigDecimal();
-        var rate = randomBigDecimal();
-        var type = randomCategoryType();
+        var opening = BaseTestUtils.randomBigDecimal();
+        var limit = BaseTestUtils.randomBigDecimal();
+        var rate = BaseTestUtils.randomBigDecimal();
+        var type = BaseTestUtils.randomCategoryType();
         var categoryUuid = UUID.randomUUID();
         var currencyUuid = UUID.randomUUID();
-        var enabled = RANDOM.nextBoolean();
-        var interest = randomBigDecimal();
+        var enabled = BaseTestUtils.RANDOM.nextBoolean();
+        var interest = BaseTestUtils.randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
         var cardType = CardType.MASTERCARD;
@@ -177,7 +171,7 @@ public class TestAccount extends ModelTestBase {
     @Test(dataProvider = "testAccountNumberDataProvider")
     public void testAccountNumber(String accountNumber, String accountNumberNoSpaces) {
         var a = new Account.Builder()
-            .name(randomString())
+            .name(BaseTestUtils.randomString())
             .accountNumber(accountNumber)
             .type(CategoryType.DEBTS)
             .categoryUuid(UUID.randomUUID())
@@ -196,14 +190,14 @@ public class TestAccount extends ModelTestBase {
             .name(UUID.randomUUID().toString())
             .comment(UUID.randomUUID().toString())
             .accountNumber(UUID.randomUUID().toString())
-            .openingBalance(randomBigDecimal())
-            .accountLimit(randomBigDecimal())
-            .currencyRate(randomBigDecimal())
-            .type(randomCategoryType())
+            .openingBalance(BaseTestUtils.randomBigDecimal())
+            .accountLimit(BaseTestUtils.randomBigDecimal())
+            .currencyRate(BaseTestUtils.randomBigDecimal())
+            .type(BaseTestUtils.randomCategoryType())
             .categoryUuid(UUID.randomUUID())
             .currencyUuid(UUID.randomUUID())
-            .enabled(RANDOM.nextBoolean())
-            .interest(randomBigDecimal())
+            .enabled(BaseTestUtils.RANDOM.nextBoolean())
+            .interest(BaseTestUtils.randomBigDecimal())
             .closingDate(LocalDate.now())
             .iconUuid(UUID.randomUUID())
             .cardType(CardType.VISA)

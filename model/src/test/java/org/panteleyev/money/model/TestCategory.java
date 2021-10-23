@@ -7,8 +7,6 @@ package org.panteleyev.money.model;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.UUID;
-import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestCategory extends ModelTestBase {
@@ -17,9 +15,9 @@ public class TestCategory extends ModelTestBase {
     @Override
     public Object[][] testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var name = randomString();
-        var comment = randomString();
-        var type = randomCategoryType();
+        var name = BaseTestUtils.randomString();
+        var comment = BaseTestUtils.randomString();
+        var type = BaseTestUtils.randomCategoryType();
         var iconUuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
@@ -48,7 +46,7 @@ public class TestCategory extends ModelTestBase {
     public void testEquals() {
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
-        var type = randomCategoryType();
+        var type = BaseTestUtils.randomCategoryType();
         var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
@@ -80,9 +78,9 @@ public class TestCategory extends ModelTestBase {
     @Test
     public void testCopy() {
         var original = new Category.Builder()
-            .name(randomString())
-            .comment(randomString())
-            .type(randomCategoryType())
+            .name(BaseTestUtils.randomString())
+            .comment(BaseTestUtils.randomString())
+            .type(BaseTestUtils.randomCategoryType())
             .iconUuid(UUID.randomUUID())
             .uuid(UUID.randomUUID())
             .created(System.currentTimeMillis())

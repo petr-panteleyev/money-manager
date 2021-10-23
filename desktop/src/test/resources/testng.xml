@@ -29,16 +29,6 @@
             <class name="org.panteleyev.money.persistence.TestMoneyDAO"/>
         </classes>
     </test>
-    <test name="Model">
-        <classes>
-            <class name="org.panteleyev.money.model.TestAccount"/>
-            <class name="org.panteleyev.money.model.TestCategory"/>
-            <class name="org.panteleyev.money.model.TestContact"/>
-            <class name="org.panteleyev.money.model.TestCurrency"/>
-            <class name="org.panteleyev.money.model.TestTransaction"/>
-            <class name="org.panteleyev.money.model.TransactionDetailTest"/>
-        </classes>
-    </test>
     <test name="Options">
         <classes>
             <class name="org.panteleyev.money.app.database.ProfileSettingsTest"/>

@@ -11,11 +11,11 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>parent</artifactId>
-        <version>21.4.9</version>
+        <version>21.4.10</version>
     </parent>
 
-    <artifactId>desktop</artifactId>
-    <version>21.4.9</version>
+    <artifactId>money-manager-desktop</artifactId>
+    <version>21.4.10</version>
     <packaging>jar</packaging>
     <name>Money Manager Desktop</name>
 
@@ -49,6 +49,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.panteleyev.money</groupId>
+            <artifactId>money-manager-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
             <artifactId>java-fx-helpers</artifactId>

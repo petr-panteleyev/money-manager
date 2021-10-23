@@ -35,7 +35,7 @@ public record Account(
 
     public Account {
         if (uuid == null) {
-            throw new IllegalStateException("Account id cannot be null");
+            uuid = UUID.randomUUID();
         }
         if (name == null || name.isBlank()) {
             throw new IllegalStateException("Account name cannot be null or blank");

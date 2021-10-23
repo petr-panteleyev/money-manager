@@ -7,6 +7,7 @@ open module org.panteleyev.money {
 
     requires jdk.crypto.cryptoki;
 
+    requires org.panteleyev.money.model;
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
 

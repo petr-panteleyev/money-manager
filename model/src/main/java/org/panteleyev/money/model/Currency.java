@@ -25,7 +25,7 @@ public record Currency(
 
     public Currency {
         if (uuid == null) {
-            throw new IllegalStateException("Currency id cannot be null");
+            uuid = UUID.randomUUID();
         }
         if (symbol == null || symbol.isBlank()) {
             throw new IllegalStateException("Currency symbol cannot be blank");

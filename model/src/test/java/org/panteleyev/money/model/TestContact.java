@@ -7,8 +7,6 @@ package org.panteleyev.money.model;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import java.util.UUID;
-import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
-import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
 
 public class TestContact extends ModelTestBase {
@@ -17,17 +15,17 @@ public class TestContact extends ModelTestBase {
     @Override
     public Object[][] testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var name = randomString();
-        var type = randomContactType();
-        var phone = randomString();
-        var mobile = randomString();
-        var email = randomString();
-        var web = randomString();
-        var comment = randomString();
-        var street = randomString();
-        var city = randomString();
-        var country = randomString();
-        var zip = randomString();
+        var name = BaseTestUtils.randomString();
+        var type = BaseTestUtils.randomContactType();
+        var phone = BaseTestUtils.randomString();
+        var mobile = BaseTestUtils.randomString();
+        var email = BaseTestUtils.randomString();
+        var web = BaseTestUtils.randomString();
+        var comment = BaseTestUtils.randomString();
+        var street = BaseTestUtils.randomString();
+        var city = BaseTestUtils.randomString();
+        var country = BaseTestUtils.randomString();
+        var zip = BaseTestUtils.randomString();
         var iconUuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -74,17 +72,17 @@ public class TestContact extends ModelTestBase {
 
     @Test
     public void testEquals() {
-        var name = randomString();
-        var type = randomContactType();
-        var phone = randomString();
-        var mobile = randomString();
-        var email = randomString();
-        var web = randomString();
-        var comment = randomString();
-        var street = randomString();
-        var city = randomString();
-        var country = randomString();
-        var zip = randomString();
+        var name = BaseTestUtils.randomString();
+        var type = BaseTestUtils.randomContactType();
+        var phone = BaseTestUtils.randomString();
+        var mobile = BaseTestUtils.randomString();
+        var email = BaseTestUtils.randomString();
+        var web = BaseTestUtils.randomString();
+        var comment = BaseTestUtils.randomString();
+        var street = BaseTestUtils.randomString();
+        var city = BaseTestUtils.randomString();
+        var country = BaseTestUtils.randomString();
+        var zip = BaseTestUtils.randomString();
         var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
@@ -133,17 +131,17 @@ public class TestContact extends ModelTestBase {
     @Test
     public void testCopy() {
         var original = new Contact.Builder()
-            .name(randomString())
-            .type(randomContactType())
-            .phone(randomString())
-            .mobile(randomString())
-            .email(randomString())
-            .web(randomString())
-            .comment(randomString())
-            .street(randomString())
-            .city(randomString())
-            .country(randomString())
-            .zip(randomString())
+            .name(BaseTestUtils.randomString())
+            .type(BaseTestUtils.randomContactType())
+            .phone(BaseTestUtils.randomString())
+            .mobile(BaseTestUtils.randomString())
+            .email(BaseTestUtils.randomString())
+            .web(BaseTestUtils.randomString())
+            .comment(BaseTestUtils.randomString())
+            .street(BaseTestUtils.randomString())
+            .city(BaseTestUtils.randomString())
+            .country(BaseTestUtils.randomString())
+            .zip(BaseTestUtils.randomString())
             .iconUuid(UUID.randomUUID())
             .uuid(UUID.randomUUID())
             .created(System.currentTimeMillis())

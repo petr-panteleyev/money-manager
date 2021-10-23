@@ -4,10 +4,9 @@
  */
 package org.panteleyev.money.model;
 
-import org.panteleyev.money.test.BaseTest;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public abstract class ModelTestBase extends BaseTest {
 
@@ -16,7 +15,7 @@ public abstract class ModelTestBase extends BaseTest {
     @Test(dataProvider = "testBuildDataProvider")
     public void testBuild(MoneyRecord actual, MoneyRecord expected) {
         assertEquals(actual, expected);
-        assertTrue(actual.created() > 0);
-        assertTrue(actual.modified() >= actual.created());
+        Assert.assertTrue(actual.created() > 0);
+        Assert.assertTrue(actual.modified() >= actual.created());
     }
 }
