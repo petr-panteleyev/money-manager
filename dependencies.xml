@@ -10,7 +10,7 @@
     <groupId>org.panteleyev.money</groupId>
     <artifactId>dependencies</artifactId>
     <packaging>pom</packaging>
-    <version>21.4.10</version>
+    <version>21.4.11</version>
     <name>Money Manager Dependencies</name>
 
     <properties>

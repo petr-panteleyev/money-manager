@@ -90,7 +90,8 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
 class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
-    private final TransactionTableView transactionTable = new TransactionTableView(TransactionTableView.Mode.STATEMENT);
+    private final TransactionTableView transactionTable
+        = new TransactionTableView(this, TransactionTableView.Mode.STATEMENT);
     private final Label ymAccountBalanceLabel = new Label();
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();

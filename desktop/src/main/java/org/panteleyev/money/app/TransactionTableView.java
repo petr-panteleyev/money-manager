@@ -21,6 +21,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.cells.TransactionAccountRequestSumCell;
 import org.panteleyev.money.app.cells.TransactionCheckCell;
@@ -98,6 +99,7 @@ public class TransactionTableView extends TableView<Transaction> {
         }
     }
 
+    private final Controller owner;
     private final Mode mode;
 
     private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> { };
@@ -120,27 +122,31 @@ public class TransactionTableView extends TableView<Transaction> {
     // List size property
     private final SimpleIntegerProperty listSizeProperty = new SimpleIntegerProperty(0);
 
-    TransactionTableView(Mode mode) {
-        this(mode, null, null, x -> {}, x -> {});
+    TransactionTableView(Controller owner, Mode mode) {
+        this(owner, mode, null, null, x -> {}, x -> {});
     }
 
-    TransactionTableView(Account account) {
-        this(Mode.ACCOUNT, account, null, x -> {}, x -> {});
+    TransactionTableView(Controller owner, Account account) {
+        this(owner, Mode.ACCOUNT, account, null, x -> {}, x -> {});
     }
 
-    TransactionTableView(Mode mode,
+    TransactionTableView(Controller owner,
+                         Mode mode,
                          TransactionDetailsCallback transactionDetailsCallback,
                          Consumer<Transaction> transactionAddedCallback,
                          Consumer<Transaction> transactionUpdatedCallback)
     {
-        this(mode, null, transactionDetailsCallback, transactionAddedCallback, transactionUpdatedCallback);
+        this(owner, mode, null, transactionDetailsCallback, transactionAddedCallback, transactionUpdatedCallback);
     }
 
-    TransactionTableView(Mode mode, Account account,
+    TransactionTableView(Controller owner,
+                         Mode mode,
+                         Account account,
                          TransactionDetailsCallback transactionDetailsCallback,
                          Consumer<Transaction> transactionAddedCallback,
                          Consumer<Transaction> transactionUpdatedCallback)
     {
+        this.owner = owner;
         this.mode = mode;
         if (mode == Mode.ACCOUNT && account == null) {
             throw new IllegalArgumentException("Account cannot be null when mode = ACCOUNT");
@@ -341,7 +347,7 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     void onNewTransaction() {
-        new TransactionDialog(null, settings().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
+        new TransactionDialog(owner, settings().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
             builder -> transactionAddedCallback.accept(dao().insertTransaction(builder))
         );
     }

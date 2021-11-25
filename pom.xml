@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>parent</artifactId>
-    <version>21.4.10</version>
+    <version>21.4.11</version>
     <packaging>pom</packaging>
     <name>Money Manager Root Project</name>
 

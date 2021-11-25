@@ -101,8 +101,8 @@ class RequestWindowController extends BaseController {
         this.account = account;
 
         table = account == null ?
-            new TransactionTableView(TransactionTableView.Mode.QUERY) :
-            new TransactionTableView(account);
+            new TransactionTableView(this, TransactionTableView.Mode.QUERY) :
+            new TransactionTableView(this, account);
 
         var uncheckedOnlyCheckBox = new CheckBox(fxString(UI, I18N_MISC_UNCHECKED_ONLY));
         uncheckedOnlyCheckBox.selectedProperty().addListener(

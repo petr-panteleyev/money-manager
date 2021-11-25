@@ -11,11 +11,11 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>parent</artifactId>
-        <version>21.4.10</version>
+        <version>21.4.11</version>
     </parent>
 
     <artifactId>money-manager-model</artifactId>
-    <version>21.4.10</version>
+    <version>21.4.11</version>
     <packaging>jar</packaging>
     <name>Money Manager Data Model</name>
 

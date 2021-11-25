@@ -131,7 +131,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final Spinner<Integer> yearSpinner = new Spinner<>();
 
     private final TransactionTableView transactionTable =
-        new TransactionTableView(TransactionTableView.Mode.SUMMARY, this,
+        new TransactionTableView(this, TransactionTableView.Mode.SUMMARY, this,
             this::goToTransaction, this::goToTransaction);
 
     @SuppressWarnings("FieldCanBeLocal")
