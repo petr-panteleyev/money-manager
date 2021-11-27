@@ -19,7 +19,7 @@ Application JAR and all dependencies will be placed in ```target/jmods```.
 ## Run
 
 ```shell script
-mvn -pl desktop javafx:run
+mvn javafx:run
 ```
 
 To open specific profile add ```-Dprofile=<profile>``` to the command line.
@@ -37,7 +37,7 @@ mvn clean package jpackage:jpackage@mac
 
   or
 
-```
+```shell script
 mvn clean package jpackage:jpackage@win
 ```
 
