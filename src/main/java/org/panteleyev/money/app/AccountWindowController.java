@@ -197,7 +197,7 @@ final class AccountWindowController extends BaseController {
             ))
         );
 
-        return menuBar(
+        var menuBar = menuBar(
             newMenu(fxString(UI, I18N_MENU_FILE),
                 menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
@@ -214,7 +214,10 @@ final class AccountWindowController extends BaseController {
                 )
             ),
             createWindowMenu(),
-            createHelpMenu());
+            createHelpMenu()
+        );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
+        return menuBar;
     }
 
     private void setupTableColumns() {

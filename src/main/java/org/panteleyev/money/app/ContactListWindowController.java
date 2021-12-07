@@ -90,7 +90,9 @@ class ContactListWindowController extends BaseController {
             newMenu(fxString(UI, I18N_MENU_VIEW),
                 menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
-            createHelpMenu());
+            createHelpMenu()
+        );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(

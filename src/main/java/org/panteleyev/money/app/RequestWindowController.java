@@ -179,7 +179,7 @@ class RequestWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
-        return menuBar(
+        var menuBar = menuBar(
             newMenu(fxString(UI, I18N_MENU_FILE),
                 menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
                 new SeparatorMenuItem(),
@@ -197,7 +197,10 @@ class RequestWindowController extends BaseController {
             newMenu(fxString(UI, I18N_MENU_VIEW),
                 menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
             createWindowMenu(),
-            createHelpMenu());
+            createHelpMenu()
+        );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
+        return menuBar;
     }
 
     private void onUpdateFilter() {

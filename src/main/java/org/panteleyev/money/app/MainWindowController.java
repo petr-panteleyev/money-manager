@@ -230,6 +230,7 @@ public class MainWindowController extends BaseController implements TransactionT
             createWindowMenu(dbOpenProperty), createHelpMenu());
 
         menuBar.setUseSystemMenuBar(true);
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         iconWindowMenuItem.disableProperty().bind(dbOpenProperty.not());
 

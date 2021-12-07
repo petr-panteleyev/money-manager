@@ -186,7 +186,7 @@ class StatementWindowController extends BaseController {
     }
 
     private MenuBar createMainMenu() {
-        return menuBar(
+        var menuBar = menuBar(
             newMenu(fxString(UI, I18N_MENU_FILE),
                 menuItem(fxString(UI, I18N_MENU_ITEM_OPEN, ELLIPSIS), SHORTCUT_O, event -> onBrowse()),
                 new SeparatorMenuItem(),
@@ -203,7 +203,10 @@ class StatementWindowController extends BaseController {
                     event -> onCheckStatementRecord(false))
             ),
             createWindowMenu(),
-            createHelpMenu());
+            createHelpMenu()
+        );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
+        return menuBar;
     }
 
     private void setupAccountComboBox() {

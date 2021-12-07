@@ -46,7 +46,9 @@ final class CurrencyWindowController extends BaseController {
                 menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
                     event -> onEditCurrency(), disableBinding)),
             createWindowMenu(),
-            createHelpMenu());
+            createHelpMenu()
+        );
+        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
