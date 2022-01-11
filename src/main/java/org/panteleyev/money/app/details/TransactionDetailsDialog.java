@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.cells.TransactionDetailSumCell;
@@ -46,7 +47,9 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     private final BigDecimal totalAmount;
     private final TableView<TransactionDetail> detailsTable = new TableView<>();
 
-    public TransactionDetailsDialog(List<Transaction> transactions, BigDecimal totalAmount, boolean readOnly) {
+    public TransactionDetailsDialog(Controller owner, List<Transaction> transactions, BigDecimal totalAmount, boolean readOnly) {
+        super(owner);
+
         setTitle(fxString(UI, I18N_MISC_TRANSACTION_DETAILS));
 
         this.totalAmount = totalAmount;

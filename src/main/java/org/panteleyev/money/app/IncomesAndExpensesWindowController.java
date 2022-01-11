@@ -311,7 +311,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         fileChooser.setInitialFileName(generateFileName("IncomesAndExpenses"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }

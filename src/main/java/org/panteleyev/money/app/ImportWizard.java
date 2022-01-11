@@ -18,9 +18,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.fx.Controller;
 import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.xml.Import;
 import java.io.File;
@@ -50,10 +52,11 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_IMPORT
 final class ImportWizard extends BaseDialog<Object> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final StartPage startPage = new StartPage();
+    private final StartPage startPage = new StartPage(getOwner());
     private final ProgressPage progressPage = new ProgressPage();
 
     private static class StartPage extends GridPane {
+        private final Window owner;
         private final ToggleGroup btnGroup = new ToggleGroup();
         private final RadioButton fullDumpRadio = radioButton(fxString(UI, I18N_MISC_FULL_DUMP), btnGroup);
         final TextField fileNameEdit = createFileNameEdit();
@@ -67,7 +70,9 @@ final class ImportWizard extends BaseDialog<Object> {
             return fullDumpRadio.isSelected();
         }
 
-        StartPage() {
+        StartPage(Window owner) {
+            this.owner = owner;
+
             getStyleClass().add(Styles.GRID_PANE);
 
 
@@ -115,7 +120,7 @@ final class ImportWizard extends BaseDialog<Object> {
             settings().getLastExportDir().ifPresent(chooser::setInitialDirectory);
             chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
-            var selected = chooser.showOpenDialog(null);
+            var selected = chooser.showOpenDialog(owner);
 
             fileNameEdit.setText(selected != null ? selected.getAbsolutePath() : "");
         }
@@ -174,8 +179,8 @@ final class ImportWizard extends BaseDialog<Object> {
         }
     }
 
-    ImportWizard() {
-        super(settings().getDialogCssFileUrl());
+    ImportWizard(Controller owner) {
+        super(owner, settings().getDialogCssFileUrl());
         setTitle(fxString(UI, I18N_WORD_IMPORT));
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);

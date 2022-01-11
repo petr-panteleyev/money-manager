@@ -298,7 +298,7 @@ public class TransactionTableView extends TableView<Transaction> {
         settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(owner.getStage());
         if (selected == null) {
             return;
         }
@@ -327,11 +327,11 @@ public class TransactionTableView extends TableView<Transaction> {
                 if (transactionDetailsCallback == null) {
                     return;
                 }
-                new TransactionDetailsDialog(childTransactions, t.amount(), false)
+                new TransactionDetailsDialog(owner, childTransactions, t.amount(), false)
                     .showAndWait()
                     .ifPresent(list -> transactionDetailsCallback.handleTransactionDetails(t, list));
             } else {
-                new TransactionDetailsDialog(childTransactions, BigDecimal.ZERO, true).showAndWait();
+                new TransactionDetailsDialog(owner, childTransactions, BigDecimal.ZERO, true).showAndWait();
             }
         });
     }
@@ -355,7 +355,7 @@ public class TransactionTableView extends TableView<Transaction> {
     void onEditTransaction() {
         var selection = getCurrentSelection();
         getSelectedTransaction()
-            .flatMap(selected -> new TransactionDialog(null, settings().getDialogCssFileUrl(), selected, cache()).showAndWait())
+            .flatMap(selected -> new TransactionDialog(owner, settings().getDialogCssFileUrl(), selected, cache()).showAndWait())
             .ifPresent(builder -> transactionUpdatedCallback.accept(dao().updateTransaction(builder)));
         restoreSelection(selection);
     }

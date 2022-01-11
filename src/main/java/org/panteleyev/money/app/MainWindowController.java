@@ -392,7 +392,7 @@ public class MainWindowController extends BaseController implements TransactionT
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }
@@ -415,7 +415,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onImport() {
-        new ImportWizard().showAndWait();
+        new ImportWizard(this).showAndWait();
     }
 
     private void onReport() {
@@ -425,7 +425,7 @@ public class MainWindowController extends BaseController implements TransactionT
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }

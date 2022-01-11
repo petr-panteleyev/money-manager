@@ -224,7 +224,7 @@ class RequestWindowController extends BaseController {
         fileChooser.setInitialFileName(generateFileName("transactions"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }

@@ -256,7 +256,7 @@ class StatementWindowController extends BaseController {
             }
         }
 
-        var selected = chooser.showOpenDialog(null);
+        var selected = chooser.showOpenDialog(getStage());
         if (selected == null || !selected.exists()) {
             return;
         }
@@ -333,7 +333,7 @@ class StatementWindowController extends BaseController {
         fileChooser.setInitialFileName(generateFileName("statement"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }

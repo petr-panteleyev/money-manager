@@ -353,7 +353,7 @@ final class AccountWindowController extends BaseController {
         fileChooser.setInitialFileName(generateFileName("accounts"));
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
 
-        var selected = fileChooser.showSaveDialog(null);
+        var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
             return;
         }

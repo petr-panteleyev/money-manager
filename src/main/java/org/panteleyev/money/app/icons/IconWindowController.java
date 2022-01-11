@@ -227,7 +227,7 @@ public final class IconWindowController extends BaseController {
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG images", "*.png"),
             new FileChooser.ExtensionFilter("GIF images", "*.gif"));
 
-        var selected = fileChooser.showOpenMultipleDialog(null);
+        var selected = fileChooser.showOpenMultipleDialog(getStage());
         if (selected != null) {
             uploadIcons(selected);
         }
