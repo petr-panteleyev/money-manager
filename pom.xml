@@ -230,18 +230,18 @@
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                     </javaOptions>
-                    <launchers>
-                        <launcher>
-                            <name>Money Manager (noauto)</name>
-                            <file>extras/noauto.properties</file>
-                        </launcher>
-                    </launchers>
                 </configuration>
                 <executions>
                     <execution>
                         <id>mac</id>
                         <configuration>
                             <icon>icons/icons.icns</icon>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>linux</id>
+                        <configuration>
+                            <icon>icons/icon48.png</icon>
                         </configuration>
                     </execution>
                     <execution>
