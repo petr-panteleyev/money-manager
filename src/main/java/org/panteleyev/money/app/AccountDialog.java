@@ -67,7 +67,8 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
     private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values(),
-        b -> b.withHandler(event -> onCategoryTypeSelected()));
+        b -> b.withHandler(event -> onCategoryTypeSelected())
+            .withStringConverter(Bundles::translate));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
     private final CheckBox activeCheckBox = newCheckBox(UI, I18N_WORD_ACTIVE);
@@ -188,6 +189,10 @@ class AccountDialog extends BaseDialog<Account> {
 
             var now = System.currentTimeMillis();
 
+            // Check for empty icon
+            var icon = iconComboBox.getSelectionModel().getSelectedItem();
+            var uconUuid = icon == EMPTY_ICON ? null : icon.uuid();
+
             var builder = new Account.Builder(account)
                 .name(nameEdit.getText())
                 .comment(commentEdit.getText())
@@ -200,7 +205,7 @@ class AccountDialog extends BaseDialog<Account> {
                 .enabled(activeCheckBox.isSelected())
                 .interest(new BigDecimal(interestEdit.getText()))
                 .closingDate(closingDatePicker.getValue())
-                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                .iconUuid(uconUuid)
                 .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
                 .cardNumber(cardNumberEdit.getText())
                 .modified(now);

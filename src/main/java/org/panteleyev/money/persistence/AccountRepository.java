@@ -97,7 +97,7 @@ final class AccountRepository extends Repository<Account> {
         st.setBigDecimal(index++, account.accountLimit());
         st.setBigDecimal(index++, account.currencyRate());
         st.setString(index++, account.type().name());
-        st.setString(index++, account.categoryUuid().toString());
+        setUuid(st, index++, account.categoryUuid());
         setUuid(st, index++, account.currencyUuid());
         setBoolean(st, index++, account.enabled());
         st.setBigDecimal(index++, account.interest());
