@@ -15,6 +15,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -35,7 +36,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CA
 
 public class CategorySelectionBox extends HBox {
 
-    private static record TypeListItem(String text, EnumSet<CategoryType> types) {
+    private record TypeListItem(String text, EnumSet<CategoryType> types) {
         static TypeListItem of(String text, CategoryType type, CategoryType... types) {
             return new TypeListItem(text, EnumSet.of(type, types));
         }
@@ -107,7 +108,7 @@ public class CategorySelectionBox extends HBox {
         );
 
         for (var t : CategoryType.values()) {
-            categoryTypeChoiceBox.getItems().add(TypeListItem.of(t.toString(), t));
+            categoryTypeChoiceBox.getItems().add(TypeListItem.of(Bundles.translate(t), t));
         }
 
         categoryTypeChoiceBox.setOnAction(categoryTypeHandler);

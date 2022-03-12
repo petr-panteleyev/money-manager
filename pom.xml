@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-desktop</artifactId>
-    <version>22.0.2</version>
+    <version>22.1.0</version>
     <packaging>jar</packaging>
     <name>Money Manager Desktop</name>
 
@@ -28,7 +28,6 @@
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
-        <liquibasePluginVersion>4.4.0</liquibasePluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>17.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
@@ -39,8 +38,8 @@
         <mysqlConnectorVersion>8.0.26</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.4.0</testNgVersion>
-        <h2Version>1.4.200</h2Version>
-        <liquibaseVersion>4.4.0</liquibaseVersion>
+        <h2Version>2.1.210</h2Version>
+        <liquibaseVersion>4.8.0</liquibaseVersion>
     </properties>
 
     <dependencies>

@@ -21,7 +21,7 @@ final class TransactionRepository extends Repository<Transaction> {
     protected String getInsertSql() {
         return """
             INSERT INTO transaction (
-                amount, day, month, year, type,
+                amount, date_day, date_month, date_year, type,
                 comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
                 acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                 rate, rate_direction, invoice_number, parent_uuid, detailed,
@@ -41,9 +41,9 @@ final class TransactionRepository extends Repository<Transaction> {
         return """
             UPDATE transaction SET
                 amount = ?,
-                day = ?,
-                month = ?,
-                year = ?,
+                date_day = ?,
+                date_month = ?,
+                date_year = ?,
                 type = ?,
                 comment = ?,
                 checked = ?,
@@ -71,9 +71,9 @@ final class TransactionRepository extends Repository<Transaction> {
         return new Transaction(
             getUuid(rs, "uuid"),
             rs.getBigDecimal("amount"),
-            rs.getInt("day"),
-            rs.getInt("month"),
-            rs.getInt("year"),
+            rs.getInt("date_day"),
+            rs.getInt("date_month"),
+            rs.getInt("date_year"),
             getEnum(rs, "type", TransactionType.class),
             rs.getString("comment"),
             getBoolean(rs, "checked"),

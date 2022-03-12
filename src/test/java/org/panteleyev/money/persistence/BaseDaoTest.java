@@ -20,6 +20,7 @@ public class BaseDaoTest extends BaseTest {
     public static final String ICON_JAVA = "java.png";
 
     public void setupAndSkip() throws Exception {
+        try {
         var dataSource = new JdbcDataSource();
         dataSource.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
         try (var conn = dataSource.getConnection()) {
@@ -27,6 +28,10 @@ public class BaseDaoTest extends BaseTest {
         }
         dao().initialize(dataSource);
         new JFXPanel();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
     }
 
     protected void initializeEmptyMoneyFile() {
