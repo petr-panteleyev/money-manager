@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-desktop</artifactId>
-    <version>22.1.0</version>
+    <version>22.2.0</version>
     <packaging>jar</packaging>
     <name>Money Manager Desktop</name>
 
@@ -29,7 +29,7 @@
         <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>17.0.1</javaFxVersion>
+        <javaFxVersion>18</javaFxVersion>
         <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
         <controlsFxVersion>11.1.0</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>

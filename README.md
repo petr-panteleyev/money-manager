@@ -1,8 +1,8 @@
 # Money Manager
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://www.oracle.com/java/technologies/javase-downloads.html)
-[![JavaFX](https://img.shields.io/badge/JavaFX-16-orange?logo=java)](https://openjfx.io/)
+[![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://jdk.java.net/17/)
+[![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
 
 Personal finance manager. Work in progress.
 
@@ -29,16 +29,18 @@ To open specific profile add ```-Dprofile=<profile>``` to the command line.
 To build binary installers perform the following steps:
 * On Microsoft Windows: install [WiX Toolset](https://wixtoolset.org/releases/), add its binary directory to ```PATH``` 
 environment variable
-* Execute the following commands:
+* Execute one of the following commands:
 
 ```shell script
 mvn clean package jpackage:jpackage@mac
 ```
 
-  or
-
 ```shell script
 mvn clean package jpackage:jpackage@win
+```
+
+```shell script
+mvn clean package jpackage:jpackage@linux
 ```
 
 Installation package will be found in ```target/dist``` directory.

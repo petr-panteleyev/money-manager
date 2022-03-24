@@ -10,6 +10,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.Predicates;
 import org.panteleyev.money.app.TransactionPredicate;
 import org.panteleyev.money.model.Account;
@@ -37,7 +38,10 @@ public class AccountSelectionBox extends HBox {
     private final static String ALL_ACCOUNTS_STRING = UI.getString(I18N_MISC_ALL_ACCOUNTS);
 
     private final ComboBox<CategoryType> categoryTypeBox =
-        comboBox(CategoryType.values(), b -> b.withDefaultString(ALL_TYPES_STRING));
+        comboBox(CategoryType.values(),
+            b -> b.withDefaultString(ALL_TYPES_STRING)
+                .withStringConverter(Bundles::translate)
+        );
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
     private final ComboBox<Category> categoryBox = comboBox(
