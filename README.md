@@ -1,14 +1,14 @@
 # Money Manager
 
 [![BSD-2 license](https://img.shields.io/badge/License-BSD--2-informational.svg)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-17-orange?logo=java)](https://jdk.java.net/17/)
+[![Java](https://img.shields.io/badge/Java-18-orange?logo=java)](https://jdk.java.net/18/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
 
 Personal finance manager. Work in progress.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 17.
+Make sure ```JAVA_HOME``` is set to JDK 18.
 
 ```shell script
 mvn clean package
