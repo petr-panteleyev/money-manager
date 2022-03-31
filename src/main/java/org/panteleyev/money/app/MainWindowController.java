@@ -29,6 +29,10 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.Validator;
+import org.panteleyev.freedesktop.Utility;
+import org.panteleyev.freedesktop.entry.DesktopEntryBuilder;
+import org.panteleyev.freedesktop.entry.DesktopEntryType;
+import org.panteleyev.freedesktop.menu.Category;
 import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
@@ -41,6 +45,8 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -58,11 +64,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
+
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
+import static org.panteleyev.freedesktop.entry.LocaleString.localeString;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -86,6 +94,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
+import static org.panteleyev.money.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
@@ -124,19 +133,19 @@ public class MainWindowController extends BaseController implements TransactionT
     private final SimpleBooleanProperty dbOpenProperty = new SimpleBooleanProperty(false);
 
     private final ConnectionProfileManager profileManager =
-        new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource);
+            new ConnectionProfileManager(this::onResetDatabase, this::onBuildDatasource);
 
     // Transaction view box
     private final ChoiceBox<String> monthFilterBox = new ChoiceBox<>();
     private final Spinner<Integer> yearSpinner = new Spinner<>();
 
     private final TransactionTableView transactionTable =
-        new TransactionTableView(this, TransactionTableView.Mode.SUMMARY, this,
-            this::goToTransaction, this::goToTransaction);
+            new TransactionTableView(this, TransactionTableView.Mode.SUMMARY, this,
+                    this::goToTransaction, this::goToTransaction);
 
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Account> accountListener =
-        change -> Platform.runLater(this::reloadTransactions);
+            change -> Platform.runLater(this::reloadTransactions);
 
     static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -167,7 +176,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private MenuBar createMainMenu() {
         // Main menu
         var fileConnectMenuItem = menuItem(fxString(UI, I18N_WORD_CONNECTION, ELLIPSIS), SHORTCUT_N,
-            event -> onOpenConnection());
+                event -> onOpenConnection());
         var fileCloseMenuItem = menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose());
         var fileExitMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXIT), event -> onExit());
         var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), event -> xmlDump());
@@ -175,59 +184,61 @@ public class MainWindowController extends BaseController implements TransactionT
         var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport());
 
         var fileMenu = newMenu(fxString(UI, I18N_MENU_FILE),
-            fileConnectMenuItem,
-            new SeparatorMenuItem(),
-            importMenuItem,
-            exportMenuItem,
-            new SeparatorMenuItem(),
-            reportMenuItem,
-            new SeparatorMenuItem(),
-            fileCloseMenuItem,
-            new SeparatorMenuItem(),
-            fileExitMenuItem);
+                fileConnectMenuItem,
+                new SeparatorMenuItem(),
+                importMenuItem,
+                exportMenuItem,
+                new SeparatorMenuItem(),
+                reportMenuItem,
+                new SeparatorMenuItem(),
+                fileCloseMenuItem,
+                new SeparatorMenuItem(),
+                fileExitMenuItem);
 
         var editMenu = newMenu(fxString(UI, I18N_MENU_EDIT),
-            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                event -> transactionTable.onNewTransaction()),
-            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                event -> transactionTable.onEditTransaction()),
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
-                event -> transactionTable.onDeleteTransaction()),
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), x -> transactionTable.onTransactionDetails()),
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
-                event -> transactionTable.onCheckTransactions(true)),
-            menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
-                event -> transactionTable.onCheckTransactions(false))
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
+                        event -> transactionTable.onNewTransaction()),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
+                        event -> transactionTable.onEditTransaction()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
+                        event -> transactionTable.onDeleteTransaction()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), x -> transactionTable.onTransactionDetails()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
+                        event -> transactionTable.onCheckTransactions(true)),
+                menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
+                        event -> transactionTable.onCheckTransactions(false))
         );
 
         var viewMenu = newMenu(fxString(UI, I18N_MENU_VIEW),
-            menuItem(fxString(UI, I18N_MENU_ITEM_CURRENT_MONTH), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
-            new SeparatorMenuItem(),
-            menuItem(fxString(UI, I18N_MENU_ITEM_NEXT_MONTH), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
-            menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
+                menuItem(fxString(UI, I18N_MENU_ITEM_CURRENT_MONTH), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_MENU_ITEM_NEXT_MONTH), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
+                menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
         var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS),
-            x -> profileManager.getEditor().showAndWait());
+                x -> profileManager.getEditor().showAndWait());
 
         var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
-            x -> onOptions());
+                x -> onOptions());
         var iconWindowMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ICONS, ELLIPSIS),
-            x -> onIconWindow());
+                x -> onIconWindow());
 
         var toolsMenu = newMenu(fxString(UI, I18N_MENU_TOOLS),
-            profilesMenuItem,
-            new SeparatorMenuItem(),
-            iconWindowMenuItem,
-            new SeparatorMenuItem(),
-            optionsMenuItem
+                profilesMenuItem,
+                new SeparatorMenuItem(),
+                iconWindowMenuItem,
+                new SeparatorMenuItem(),
+                optionsMenuItem,
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_CREATE_DESKTOP_ENTRY), a -> onCreateDesktopEntry())
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
-            createWindowMenu(dbOpenProperty), createHelpMenu());
+                createWindowMenu(dbOpenProperty), createHelpMenu());
 
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
@@ -252,11 +263,11 @@ public class MainWindowController extends BaseController implements TransactionT
         transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
 
         var hBox = hBox(5.0,
-            monthFilterBox,
-            yearSpinner,
-            fxNode(new Region(), hBoxHGrow(Priority.ALWAYS)),
-            label("Transactions:"),
-            transactionCountLabel
+                monthFilterBox,
+                yearSpinner,
+                fxNode(new Region(), hBoxHGrow(Priority.ALWAYS)),
+                label("Transactions:"),
+                transactionCountLabel
         );
         hBox.setAlignment(Pos.CENTER_LEFT);
 
@@ -267,11 +278,11 @@ public class MainWindowController extends BaseController implements TransactionT
 
         for (int i = 1; i <= 12; i++) {
             monthFilterBox.getItems()
-                .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
+                    .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
         }
 
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
-            .IntegerSpinnerValueFactory(1970, 2050);
+                .IntegerSpinnerValueFactory(1970, 2050);
         yearSpinner.setValueFactory(valueFactory);
         yearSpinner.valueProperty().addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
 
@@ -305,9 +316,9 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void closeChildWindows() {
         WINDOW_MANAGER.getControllerStream()
-            .filter(c -> c != this)
-            .toList()
-            .forEach(c -> ((BaseController) c).onClose());
+                .filter(c -> c != this)
+                .toList()
+                .forEach(c -> ((BaseController) c).onClose());
     }
 
     @Override
@@ -321,7 +332,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void onOpenConnection() {
         new ConnectDialog(profileManager).showAndWait()
-            .ifPresent(this::open);
+                .ifPresent(this::open);
     }
 
     private void open(ConnectionProfile profile) {
@@ -337,8 +348,8 @@ public class MainWindowController extends BaseController implements TransactionT
                 alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_UPDATE));
 
                 var confirmed = alert.showAndWait()
-                    .filter(response -> response == YES)
-                    .isPresent();
+                        .filter(response -> response == YES)
+                        .isPresent();
 
                 if (confirmed) {
                     dao().updateSchema();
@@ -353,11 +364,11 @@ public class MainWindowController extends BaseController implements TransactionT
         }
 
         var loadResult = CompletableFuture
-            .runAsync(() -> dao().preload())
-            .thenRun(() -> Platform.runLater(() -> {
-                setTitle(AboutDialog.APP_TITLE + " - " + profile.name() + " - " + profile.getConnectionString());
-                dbOpenProperty.set(true);
-            }));
+                .runAsync(() -> dao().preload())
+                .thenRun(() -> Platform.runLater(() -> {
+                    setTitle(AboutDialog.APP_TITLE + " - " + profile.name() + " - " + profile.getConnectionString());
+                    dbOpenProperty.set(true);
+                }));
 
         checkFutureException(loadResult);
     }
@@ -400,13 +411,13 @@ public class MainWindowController extends BaseController implements TransactionT
         CompletableFuture.runAsync(() -> {
             try (var outputStream = new FileOutputStream(selected)) {
                 new Export()
-                    .withIcons(cache().getIcons())
-                    .withCategories(cache().getCategories(), false)
-                    .withAccounts(cache().getAccounts(), false)
-                    .withCurrencies(cache().getCurrencies())
-                    .withContacts(cache().getContacts(), false)
-                    .withTransactions(cache().getTransactions(), false)
-                    .doExport(outputStream);
+                        .withIcons(cache().getIcons())
+                        .withCategories(cache().getCategories(), false)
+                        .withAccounts(cache().getAccounts(), false)
+                        .withCurrencies(cache().getCurrencies())
+                        .withContacts(cache().getContacts(), false)
+                        .withTransactions(cache().getTransactions(), false)
+                        .doExport(outputStream);
                 settings().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
@@ -433,8 +444,8 @@ public class MainWindowController extends BaseController implements TransactionT
         try (var outputStream = new FileOutputStream(selected)) {
             var filter = transactionTable.getTransactionFilter();
             var transactions = cache().getTransactions(filter)
-                .sorted(cache().getTransactionByDateComparator())
-                .toList();
+                    .sorted(cache().getTransactionByDateComparator())
+                    .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
@@ -474,7 +485,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void goToTransaction(Transaction transaction) {
         transactionTable.getSelectionModel().clearSelection();
-        var date = transaction.getDate();
+        var date = Transaction.getDate(transaction);
         monthFilterBox.getSelectionModel().select(date.getMonth().getValue() - 1);
         yearSpinner.getValueFactory().setValue(date.getYear());
         transactionTable.getSelectionModel().select(transaction);
@@ -520,7 +531,7 @@ public class MainWindowController extends BaseController implements TransactionT
         int year = yearSpinner.getValue();
 
         Predicate<Transaction> filter = t -> t.month() == month
-            && t.year() == year;
+                && t.year() == year;
 //            && t.getParentId() == 0;
 
         transactionTable.setTransactionFilter(filter);
@@ -542,31 +553,53 @@ public class MainWindowController extends BaseController implements TransactionT
             if (!childTransactions.isEmpty()) {
                 dao().deleteTransactions(childTransactions);
                 var noChildren = new Transaction.Builder(transaction)
-                    .detailed(false)
-                    .timestamp()
-                    .build();
+                        .detailed(false)
+                        .timestamp()
+                        .build();
                 dao().updateTransaction(noChildren);
             }
         } else {
             dao().updateTransaction(new Transaction.Builder(transaction)
-                .detailed(true)
-                .timestamp()
-                .build());
+                    .detailed(true)
+                    .timestamp()
+                    .build());
 
             dao().deleteTransactions(childTransactions);
 
             for (var transactionDetail : details) {
                 var newDetail = new Transaction.Builder(transaction)
-                    .accountCreditedUuid(transactionDetail.accountCreditedUuid())
-                    .amount(transactionDetail.amount())
-                    .comment(transactionDetail.comment())
-                    .uuid(UUID.randomUUID())
-                    .parentUuid(transaction.uuid())
-                    .detailed(false)
-                    .timestamp()
-                    .build();
+                        .accountCreditedUuid(transactionDetail.accountCreditedUuid())
+                        .amount(transactionDetail.amount())
+                        .comment(transactionDetail.comment())
+                        .uuid(UUID.randomUUID())
+                        .parentUuid(transaction.uuid())
+                        .detailed(false)
+                        .timestamp()
+                        .build();
                 dao().insertTransaction(newDetail);
             }
         }
+    }
+
+    private void onCreateDesktopEntry() {
+        if (!Utility.isLinux()) {
+            return;
+        }
+        Utility.getExecutablePath().ifPresent(command -> {
+            var execFile = new File(command);
+            var rootDir = execFile.getParentFile().getParentFile().getAbsolutePath();
+
+            var desktopEntry = new DesktopEntryBuilder(DesktopEntryType.APPLICATION)
+                    .version(DesktopEntryBuilder.VERSION_1_0)
+                    .name(localeString("Money Manager"))
+                    .name(localeString("Менеджер финансов", "ru_RU"))
+                    .categories(List.of(Category.OFFICE, Category.FINANCE, Category.JAVA))
+                    .comment(localeString("Application to manage personal finances"))
+                    .comment(localeString("Программа для управления личными финансами", "ru_RU"))
+                    .exec("\"" + command + "\"")
+                    .icon(localeString(rootDir + "/lib/Money Manager.png"))
+                    .build();
+            desktopEntry.write("money-manager");
+        });
     }
 }

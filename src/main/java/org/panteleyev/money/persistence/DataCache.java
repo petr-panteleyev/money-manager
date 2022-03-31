@@ -223,7 +223,7 @@ public class DataCache {
     public Optional<Account> getAccountByNumber(String accountNumber) {
         return getAccounts().stream()
             .filter(Account::enabled)
-            .filter(a -> Objects.equals(a.getAccountNumberNoSpaces(), accountNumber))
+            .filter(a -> Objects.equals(Account.getAccountNumberNoSpaces(a), accountNumber))
             .findFirst();
     }
 
@@ -348,8 +348,8 @@ public class DataCache {
             .filter(filter)
             .filter(t -> t.parentUuid() == null)
             .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
-                t.getConvertedAmount() :
-                t.getNegatedAmount())
+                Transaction.getConvertedAmount(t) :
+                Transaction.getNegatedAmount(t))
             .reduce(initialBalance, BigDecimal::add);
     }
 

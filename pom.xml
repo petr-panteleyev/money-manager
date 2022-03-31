@@ -10,7 +10,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-desktop</artifactId>
-    <version>22.2.1</version>
+    <version>22.3.0</version>
     <packaging>jar</packaging>
     <name>Money Manager Desktop</name>
 
@@ -24,21 +24,23 @@
         <!-- Plugins -->
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M5</mavenSurefirePluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M6</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.6</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.5.1</jpackageMavenPluginVersion>
+        <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
+        <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
+        <moneyManagerModelVersion>1.1.0</moneyManagerModelVersion>
         <javaFxVersion>18</javaFxVersion>
         <javaFxHelpersVersion>1.9.0</javaFxHelpersVersion>
-        <controlsFxVersion>11.1.0</controlsFxVersion>
+        <javaFreeDesktopVersion>0.1.0</javaFreeDesktopVersion>
+        <controlsFxVersion>11.1.1</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.14.2</jsoupVersion>
         <gsonVersion>2.8.6</gsonVersion>
-        <mysqlConnectorVersion>8.0.26</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.27</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.4.0</testNgVersion>
-        <h2Version>2.1.210</h2Version>
+        <h2Version>2.1.212</h2Version>
         <liquibaseVersion>4.8.0</liquibaseVersion>
     </properties>
 
@@ -46,7 +48,7 @@
         <dependency>
             <groupId>org.panteleyev.money</groupId>
             <artifactId>money-manager-model</artifactId>
-            <version>1.0.0</version>
+            <version>${moneyManagerModelVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
@@ -58,6 +60,11 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>freedesktop</artifactId>
+            <version>${javaFreeDesktopVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.panteleyev</groupId>
@@ -90,6 +97,7 @@
             <artifactId>gson</artifactId>
             <version>${gsonVersion}</version>
         </dependency>
+        <!-- JavaFX Start -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
@@ -110,6 +118,7 @@
             <artifactId>javafx-graphics</artifactId>
             <version>${javaFxVersion}</version>
         </dependency>
+        <!-- JavaFX End -->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
@@ -232,6 +241,7 @@
                     <execution>
                         <id>linux</id>
                         <configuration>
+                            <type>APP_IMAGE</type>
                             <icon>icons/icon48.png</icon>
                         </configuration>
                     </execution>

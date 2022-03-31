@@ -28,7 +28,7 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
         if (empty || account == null) {
             setText("");
         } else {
-            var sum = total ? account.getBalance() : account.totalWaiting();
+            var sum = total ? Account.getBalance(account) : account.totalWaiting();
 
             setText(cache().getCurrency(account.currencyUuid())
                 .map(curr -> curr.formatValue(sum))

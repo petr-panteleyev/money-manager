@@ -10,6 +10,7 @@ open module org.panteleyev.money {
     requires org.panteleyev.money.model;
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
+    requires org.panteleyev.freedesktop;
 
     requires org.controlsfx.controls;
 

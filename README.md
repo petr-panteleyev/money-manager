@@ -11,10 +11,8 @@ Personal finance manager. Work in progress.
 Make sure ```JAVA_HOME``` is set to JDK 18.
 
 ```shell script
-mvn clean package
+mvn clean verify
 ```
-
-Application JAR and all dependencies will be placed in ```target/jmods```.
 
 ## Run
 

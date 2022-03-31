@@ -65,7 +65,7 @@ class Reports {
                 td(w, cache().getAccount(t.accountCreditedUuid()).map(Account::name).orElse(""));
                 td(w, cache().getContact(t.contactUuid()).map(Contact::name).orElse(""));
                 td(w, t.comment());
-                td(w, "amount", formatAmount(t.getSignedAmount()));
+                td(w, "amount", formatAmount(Transaction.getSignedAmount(t)));
                 w.println();
             }
 
@@ -97,7 +97,7 @@ class Reports {
                 td(w, formatAmount(a.interest()));
                 td(w, a.closingDate().toString());
                 td(w, a.comment());
-                td(w, "amount", a.getBalance().toString());
+                td(w, "amount", Account.getBalance(a).toString());
                 w.println();
             }
 
