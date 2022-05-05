@@ -399,7 +399,11 @@ public class MainWindowController extends BaseController implements TransactionT
     private void xmlDump() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("Export to file");
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
+        settings().getLastExportDir().ifPresent(dir -> {
+            if (dir.exists() && dir.isDirectory()) {
+                fileChooser.setInitialDirectory(dir);
+            }
+        });
         fileChooser.setInitialFileName(generateFileName());
         fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
 
