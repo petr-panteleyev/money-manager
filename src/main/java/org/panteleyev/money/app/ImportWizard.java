@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.app;
 
@@ -10,7 +20,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -25,10 +34,13 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.xml.Import;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.zip.ZipInputStream;
+
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NEXT;
@@ -37,12 +49,10 @@ import static org.panteleyev.fx.ButtonFactory.radioButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
-import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
+import static org.panteleyev.money.app.Constants.FILTER_ZIP_FILES;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_CHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_WARNING;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_IMPORT_FILE_NAME;
@@ -58,16 +68,11 @@ final class ImportWizard extends BaseDialog<Object> {
     private static class StartPage extends GridPane {
         private final Window owner;
         private final ToggleGroup btnGroup = new ToggleGroup();
-        private final RadioButton fullDumpRadio = radioButton(fxString(UI, I18N_MISC_FULL_DUMP), btnGroup);
         final TextField fileNameEdit = createFileNameEdit();
         final CheckBox warningCheck = createWarningCheckBox();
 
         String getFileName() {
             return fileNameEdit.getText();
-        }
-
-        boolean getFullDump() {
-            return fullDumpRadio.isSelected();
         }
 
         StartPage(Window owner) {
@@ -81,14 +86,11 @@ final class ImportWizard extends BaseDialog<Object> {
             var warningLabel = createWarningLabel();
 
             addRow(0, fileNameEdit, button("...", x -> onBrowse()));
-            addRow(1, partialImportRadio);
-            addRow(2, fullDumpRadio);
 
             addRow(3, warningLabel);
             addRow(4, warningCheck);
 
             GridPane.setColumnSpan(partialImportRadio, 2);
-            GridPane.setColumnSpan(fullDumpRadio, 2);
             GridPane.setColumnSpan(warningLabel, 2);
             GridPane.setColumnSpan(warningCheck, 2);
         }
@@ -103,22 +105,24 @@ final class ImportWizard extends BaseDialog<Object> {
         private Label createWarningLabel() {
             var label = label(fxString(UI, I18N_MISC_FULL_DUMP_IMPORT_WARNING));
             label.setWrapText(true);
-            label.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return label;
         }
 
         private CheckBox createWarningCheckBox() {
             var checkBox = newCheckBox(UI, I18N_MISC_FULL_DUMP_IMPORT_CHECK);
             checkBox.getStyleClass().add(Styles.BOLD_TEXT);
-            checkBox.visibleProperty().bind(fullDumpRadio.selectedProperty());
             return checkBox;
         }
 
         private void onBrowse() {
             var chooser = new FileChooser();
             chooser.setTitle(fxString(UI, I18N_WORD_IMPORT));
-            settings().getLastExportDir().ifPresent(chooser::setInitialDirectory);
-            chooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
+            settings().getLastExportDir().ifPresent(dir -> {
+                if (dir.exists() && dir.isDirectory()) {
+                    chooser.setInitialDirectory(dir);
+                }
+            });
+            chooser.getExtensionFilters().addAll(FILTER_ZIP_FILES);
 
             var selected = chooser.showOpenDialog(owner);
 
@@ -146,7 +150,7 @@ final class ImportWizard extends BaseDialog<Object> {
             return textArea;
         }
 
-        void start(String fileName, boolean fullDump) {
+        void start(String fileName) {
             CompletableFuture.runAsync(() -> {
                 var file = new File(fileName);
                 if (!file.exists()) {
@@ -154,15 +158,10 @@ final class ImportWizard extends BaseDialog<Object> {
                 }
 
                 progress.accept("Reading file... ");
-                try (var input = new FileInputStream(file)) {
+                try (var input = new ZipInputStream(new FileInputStream(file))) {
                     var imp = Import.doImport(input);
                     progress.accept("done\n\n");
-
-                    if (fullDump) {
-                        dao().importFullDump(imp, progress);
-                    } else {
-                        dao().importRecords(imp, progress);
-                    }
+                    dao().importFullDump(imp, progress);
                     progress.accept("\n");
                     dao().preload(progress);
                 } catch (Exception ex) {
@@ -201,9 +200,9 @@ final class ImportWizard extends BaseDialog<Object> {
                 getDialogPane().getButtonTypes().add(CLOSE);
 
                 getButton(CLOSE).ifPresent(b ->
-                    b.disableProperty().bind(progressPage.inProgressProperty));
+                        b.disableProperty().bind(progressPage.inProgressProperty));
 
-                progressPage.start(startPage.getFileName(), startPage.getFullDump());
+                progressPage.start(startPage.getFileName());
             });
             nextButton.disableProperty().bind(validation.invalidProperty());
         });
@@ -217,7 +216,7 @@ final class ImportWizard extends BaseDialog<Object> {
             return ValidationResult.fromErrorIf(control, null, invalid);
         });
         validation.registerValidator(startPage.warningCheck, (Control control, Boolean value) ->
-            ValidationResult.fromErrorIf(control, null, startPage.getFullDump() && !value));
+                ValidationResult.fromErrorIf(control, null, !value));
         validation.initInitialDecoration();
     }
 }

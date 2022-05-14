@@ -1,10 +1,21 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.app;
 
 import javafx.scene.input.KeyCodeCombination;
+
 import static javafx.scene.input.KeyCode.C;
 import static javafx.scene.input.KeyCode.DELETE;
 import static javafx.scene.input.KeyCode.DIGIT0;
@@ -24,6 +35,7 @@ import static javafx.scene.input.KeyCode.N;
 import static javafx.scene.input.KeyCode.O;
 import static javafx.scene.input.KeyCode.R;
 import static javafx.scene.input.KeyCode.RIGHT;
+import static javafx.scene.input.KeyCode.S;
 import static javafx.scene.input.KeyCode.T;
 import static javafx.scene.input.KeyCode.U;
 import static javafx.scene.input.KeyCode.UP;
@@ -55,6 +67,7 @@ public interface Shortcuts {
     KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(N, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_O = new KeyCodeCombination(O, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_R = new KeyCodeCombination(R, SHORTCUT_DOWN);
+    KeyCodeCombination SHORTCUT_S = new KeyCodeCombination(S, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_T = new KeyCodeCombination(T, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(U, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_DELETE = new KeyCodeCombination(DELETE, SHORTCUT_DOWN);

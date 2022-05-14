@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.persistence;
 
@@ -12,8 +22,10 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
+
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Comparator;
@@ -29,21 +41,22 @@ import java.util.stream.Stream;
 
 public class DataCache {
     private static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DATE =
-        Comparator.comparing(Transaction::year)
-            .thenComparing(Transaction::month)
-            .thenComparing(Transaction::day)
-            .thenComparingLong(Transaction::created);
+            Comparator.comparing(Transaction::year)
+                    .thenComparing(Transaction::month)
+                    .thenComparing(Transaction::day)
+                    .thenComparingLong(Transaction::created);
 
     private static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DAY =
-        Comparator.comparingInt(Transaction::day).thenComparingLong(Transaction::created);
+            Comparator.comparingInt(Transaction::day).thenComparingLong(Transaction::created);
 
     private static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
     private static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
-        (o1, o2) -> o1.type().toString().compareToIgnoreCase(o2.type().toString());
+            (o1, o2) -> o1.type().toString().compareToIgnoreCase(o2.type().toString());
 
     private final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::name);
 
     private final ObservableList<Icon> icons = FXCollections.observableArrayList();
+    private final ObservableList<MoneyDocument> documents = FXCollections.observableArrayList();
     private final ObservableList<Category> categories = FXCollections.observableArrayList();
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
     private final ObservableList<Currency> currencies = FXCollections.observableArrayList();
@@ -52,6 +65,7 @@ public class DataCache {
 
     public void clear() {
         icons.clear();
+        documents.clear();
         categories.clear();
         contacts.clear();
         currencies.clear();
@@ -107,6 +121,32 @@ public class DataCache {
     }
 
     ////////////////////////////////////////////////////////////////////////////
+    // Documents
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<MoneyDocument> getDocument(UUID uuid) {
+        return getRecord(documents, uuid);
+    }
+
+    public ObservableList<MoneyDocument> getDocuments() {
+        return documents;
+    }
+
+    public void add(MoneyDocument document) {
+        documents.add(document);
+    }
+
+    public void update(MoneyDocument document) {
+        updateRecord(documents, document);
+    }
+
+    public long getDocumentCount(MoneyRecord owner) {
+        return documents.stream()
+                .filter(doc -> doc.ownerUuid().equals(owner.uuid()))
+                .count();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
     // Categories
     ////////////////////////////////////////////////////////////////////////////
 
@@ -122,14 +162,14 @@ public class DataCache {
         var typeList = List.of(types);
 
         return getCategories().stream()
-            .filter(category -> typeList.contains(category.type()))
-            .toList();
+                .filter(category -> typeList.contains(category.type()))
+                .toList();
     }
 
     public List<Category> getCategoriesByType(EnumSet<CategoryType> types) {
         return getCategories().stream()
-            .filter(category -> types.contains(category.type()))
-            .toList();
+                .filter(category -> types.contains(category.type()))
+                .toList();
     }
 
     public void add(Category category) {
@@ -210,21 +250,21 @@ public class DataCache {
 
     public List<Account> getAccountsByType(CategoryType type) {
         return getAccounts().stream()
-            .filter(account -> account.type() == type)
-            .toList();
+                .filter(account -> account.type() == type)
+                .toList();
     }
 
     public List<Account> getAccountsByCategory(UUID uuid) {
         return getAccounts().stream()
-            .filter(account -> account.categoryUuid().equals(uuid))
-            .toList();
+                .filter(account -> account.categoryUuid().equals(uuid))
+                .toList();
     }
 
     public Optional<Account> getAccountByNumber(String accountNumber) {
         return getAccounts().stream()
-            .filter(Account::enabled)
-            .filter(a -> Objects.equals(Account.getAccountNumberNoSpaces(a), accountNumber))
-            .findFirst();
+                .filter(Account::enabled)
+                .filter(a -> Objects.equals(Account.getAccountNumberNoSpaces(a), accountNumber))
+                .findFirst();
     }
 
     public void add(Account account) {
@@ -265,48 +305,48 @@ public class DataCache {
 
     public List<Transaction> getTransactions(Collection<Account> accounts) {
         var ids = accounts.stream()
-            .map(Account::uuid)
-            .toList();
+                .map(Account::uuid)
+                .toList();
 
         return getTransactions().stream()
-            .filter(tr -> ids.contains(tr.accountDebitedUuid()) || ids.contains(tr.accountCreditedUuid()))
-            .toList();
+                .filter(tr -> ids.contains(tr.accountDebitedUuid()) || ids.contains(tr.accountCreditedUuid()))
+                .toList();
     }
 
     public List<Transaction> getTransactionDetails(Transaction parent) {
         return getTransactions().stream()
-            .filter(t -> Objects.equals(t.parentUuid(), parent.uuid()))
-            .toList();
+                .filter(t -> Objects.equals(t.parentUuid(), parent.uuid()))
+                .toList();
     }
 
     public List<Transaction> getTransactions(int month, int year) {
         return getTransactions().stream()
-            .filter(tr -> tr.month() == month && tr.year() == year)
-            .toList();
+                .filter(tr -> tr.month() == month && tr.year() == year)
+                .toList();
     }
 
     public List<Transaction> getTransactions(Account account) {
         var uuid = account.uuid();
         return getTransactions().stream()
-            .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
-                || Objects.equals(tr.accountCreditedUuid(), uuid))
-            .toList();
+                .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
+                        || Objects.equals(tr.accountCreditedUuid(), uuid))
+                .toList();
     }
 
     public Set<String> getUniqueTransactionComments() {
         return getTransactions().stream()
-            .map(Transaction::comment)
-            .filter(c -> !c.isEmpty())
-            .collect(Collectors.toSet());
+                .map(Transaction::comment)
+                .filter(c -> !c.isEmpty())
+                .collect(Collectors.toSet());
     }
 
     public long getTransactionCount(Account account) {
         var uuid = account.uuid();
 
         return getTransactions().stream()
-            .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
-                || Objects.equals(tr.accountCreditedUuid(), uuid))
-            .count();
+                .filter(tr -> Objects.equals(tr.accountDebitedUuid(), uuid)
+                        || Objects.equals(tr.accountCreditedUuid(), uuid))
+                .count();
     }
 
     public Stream<Transaction> getTransactions(Predicate<Transaction> filter) {
@@ -341,22 +381,22 @@ public class DataCache {
      */
     public BigDecimal calculateBalance(Account account, boolean total, Predicate<Transaction> filter) {
         var initialBalance = total ?
-            account.openingBalance().add(account.accountLimit()) :
-            BigDecimal.ZERO;
+                account.openingBalance().add(account.accountLimit()) :
+                BigDecimal.ZERO;
 
         return getTransactions(account).stream()
-            .filter(filter)
-            .filter(t -> t.parentUuid() == null)
-            .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
-                Transaction.getConvertedAmount(t) :
-                Transaction.getNegatedAmount(t))
-            .reduce(initialBalance, BigDecimal::add);
+                .filter(filter)
+                .filter(t -> t.parentUuid() == null)
+                .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
+                        Transaction.getConvertedAmount(t) :
+                        Transaction.getNegatedAmount(t))
+                .reduce(initialBalance, BigDecimal::add);
     }
 
     public static BigDecimal calculateBalance(List<Transaction> transactions) {
         return transactions.stream()
-            .filter(t -> t.parentUuid() == null)
-            .map(Transaction::getConvertedAmount)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .filter(t -> t.parentUuid() == null)
+                .map(Transaction::getConvertedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.bundles;
 
@@ -46,10 +56,13 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_DESCRIPTION, "Description"},
                 {I18N_WORD_DETAILS, "Details"},
                 {I18N_WORD_DIALOGS, "Dialogs"},
+                {I18N_WORD_DOCUMENT, "Document"},
+                {I18N_WORD_DOCUMENTS, "Documents"},
                 {I18N_WORD_EDIT, "Edit"},
                 {I18M_WORD_EXIT, "Exit"},
                 {I18N_WORD_EXPENSES, "Expenses"},
                 {I18N_WORD_EXPORT, "Export"},
+                {I18N_WORD_FILE, "File"},
                 {I18N_WORD_FONTS, "Fonts"},
                 {I18N_WORD_GENERAL, "General"},
                 {I18N_WORD_ICONS, "Icons"},
@@ -76,6 +89,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_SAVE, "Save"},
                 {I18N_WORD_SCHEMA, "Schema"},
                 {I18N_WORD_SERVER, "Server"},
+                {I18N_WORD_SIZE, "Size"},
                 {I18N_WORD_STATEMENT, "Statement"},
                 {I18N_WORD_STATEMENTS, "Statements"},
                 {I18N_WORD_STREET, "Street"},
@@ -95,7 +109,6 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_WAITING, "Waiting"},
                 {I18N_WORD_ZIP, "ZIP"},
                 // Menu
-                {I18N_MENU_FILE, "File"},
                 {I18N_MENU_EDIT, "Edit"},
                 {I18N_MENU_VIEW, "View"},
                 {I18N_MENU_TOOLS, "Tools"},
@@ -136,7 +149,6 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_DEFAULT_PROFILE, "Default Profile"},
                 {I18N_WORD_ENTITY_NAME, "Name"},
                 {I18N_MISC_EXECUTION_DATE_SHORT, "Exec. Date"},
-                {I18N_MISC_FULL_DUMP, "Full dump"},
                 {I18N_MISC_FULL_DUMP_IMPORT_CHECK, "Yes, I'm sure!"},
                 {I18N_MISC_FULL_DUMP_IMPORT_WARNING, "Warning!\nImporting full dump will complete erase all\nexisting" +
                         " records."},
@@ -165,6 +177,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_UPLOAD_FILES_SKIPPED, "Files skipped:"},
                 {I18N_MISC_UPLOAD_TOO_BIG, ": too big"},
                 {I18N_MISC_XML_FILES, "XML Files"},
+                {I18N_MISC_ZIP_FILES, "ZIP Files"},
                 {I18N_CREATE_DESKTOP_ENTRY, "Create Desktop Entry (Linux)"},
                 //
                 {"button.Cancel", "Cancel"},

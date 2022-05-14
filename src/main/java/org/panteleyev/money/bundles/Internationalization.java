@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.bundles;
 
@@ -39,10 +49,13 @@ public interface Internationalization {
     String I18N_WORD_DESCRIPTION = "I18N_WORD_DESCRIPTION";
     String I18N_WORD_DETAILS = "I18N_WORD_DETAILS";
     String I18N_WORD_DIALOGS = "I18N_WORD_DIALOGS";
+    String I18N_WORD_DOCUMENT = "I18N_WORD_DOCUMENT";
+    String I18N_WORD_DOCUMENTS = "I18N_WORD_DOCUMENTS";
     String I18N_WORD_EDIT = "I18N_WORD_EDIT";
     String I18M_WORD_EXIT = "I18M_WORD_EXIT";
     String I18N_WORD_EXPENSES = "I18N_WORD_EXPENSES";
     String I18N_WORD_EXPORT = "I18N_WORD_EXPORT";
+    String I18N_WORD_FILE = "I18N_WORD_FILE";
     String I18N_WORD_FONTS = "I18N_WORD_FONTS";
     String I18N_WORD_GENERAL = "I18N_WORD_GENERAL";
     String I18N_WORD_ICONS = "I18N_WORD_ICONS";
@@ -69,6 +82,7 @@ public interface Internationalization {
     String I18N_WORD_SAVE = "I18N_WORD_SAVE";
     String I18N_WORD_SCHEMA = "I18N_WORD_SCHEMA";
     String I18N_WORD_SERVER = "I18N_WORD_SERVER";
+    String I18N_WORD_SIZE = "I18N_WORD_SIZE";
     String I18N_WORD_STATEMENT = "I18N_WORD_STATEMENT";
     String I18N_WORD_STATEMENTS = "I18N_WORD_STATEMENTS";
     String I18N_WORD_STREET = "I18N_WORD_STREET";
@@ -88,7 +102,7 @@ public interface Internationalization {
     String I18N_WORD_WAITING = "I18N_WORD_WAITING";
     String I18N_WORD_ZIP = "I18N_WORD_ZIP";
     // Menu
-    String I18N_MENU_FILE = "I18N_MENU_FILE";
+    String I18N_MENU_FILE = I18N_WORD_FILE;
     String I18N_MENU_EDIT = "I18N_MENU_EDIT";
     String I18N_MENU_VIEW = "I18N_MENU_VIEW";
     String I18N_MENU_TOOLS = "I18N_MENU_TOOLS";
@@ -140,7 +154,6 @@ public interface Internationalization {
     String I18N_MISC_DEFAULT_PROFILE = "I18N_MISC_DEFAULT_PROFILE";
     String I18N_WORD_ENTITY_NAME = "I18N_WORD_ENTITY_NAME";
     String I18N_MISC_EXECUTION_DATE_SHORT = "I18N_MISC_EXECUTION_DATE_SHORT";
-    String I18N_MISC_FULL_DUMP = "I18N_MISC_FULL_DUMP";
     String I18N_MISC_FULL_DUMP_IMPORT_CHECK = "I18N_MISC_FULL_DUMP_IMPORT_CHECK";
     String I18N_MISC_FULL_DUMP_IMPORT_WARNING = "I18N_MISC_FULL_DUMP_IMPORT_WARNING";
     String I18N_MISC_IGNORE_EXECUTION_DATE = "I18N_MISC_IGNORE_EXECUTION_DATE";
@@ -167,5 +180,6 @@ public interface Internationalization {
     String I18N_MISC_UPLOAD_FILES_SKIPPED = "I18N_MISC_UPLOAD_FILES_IGNORED";
     String I18N_MISC_UPLOAD_TOO_BIG = "I18N_MISC_UPLOAD_TOO_BIG";
     String I18N_MISC_XML_FILES = "I18N_MISC_XML_FILES";
+    String I18N_MISC_ZIP_FILES = "I18N_MISC_ZIP_FILES";
     String I18N_CREATE_DESKTOP_ENTRY = "I18N_CREATE_DESKTOP_ENTRY";
 }

@@ -1,13 +1,23 @@
 <!--
-  ~ Copyright (c) Petr Panteleyev. All rights reserved.
-  ~ Licensed under the BSD license. See LICENSE file in the project root for full license information.
+  Copyright (c) 2017-2022, Petr Panteleyev
+
+  This program is free software: you can redistribute it and/or modify it under the
+  terms of the GNU General Public License as published by the Free Software
+  Foundation, either version 3 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License along with this
+  program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <xsd:annotation>
         <xsd:documentation xml:lang="en">
             Money Database export file schema.
-            Copyright (c) 2017, 2019, Petr Panteleyev
+            Copyright (c) 2017, 2022, Petr Panteleyev
         </xsd:documentation>
     </xsd:annotation>
 
@@ -96,6 +106,20 @@
                     <xsd:unique name="TransactionUniqueUUID">
                         <xsd:selector xpath="Transaction"/>
                         <xsd:field xpath="./guid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Documents">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Document"
+                                         type="Document"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="DocumentUniqueUUID">
+                        <xsd:selector xpath="Document"/>
+                        <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
             </xsd:sequence>
@@ -214,6 +238,22 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="Document">
+        <xsd:all>
+            <xsd:element name="uuid" type="UUID"/>
+            <xsd:element name="ownerUuid" type="UUID"/>
+            <xsd:element name="contactUuid" type="UUID"/>
+            <xsd:element name="type" type="DocumentType"/>
+            <xsd:element name="fileName" type="xsd:string"/>
+            <xsd:element name="date" type="xsd:long"/>
+            <xsd:element name="size" type="xsd:int"/>
+            <xsd:element name="mimeType" type="xsd:string"/>
+            <xsd:element name="description" type="xsd:string"/>
+            <xsd:element name="created" type="Timestamp"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:simpleType name="UUID">
         <xsd:restriction base="xsd:string">
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
@@ -289,6 +329,15 @@
             <xsd:enumeration value="SALE"/>
             <xsd:enumeration value="REFUND"/>
             <xsd:enumeration value="UNDEFINED"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="DocumentType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="BILL"/>
+            <xsd:enumeration value="CONTRACT"/>
+            <xsd:enumeration value="RECEIPT"/>
+            <xsd:enumeration value="OTHER"/>
         </xsd:restriction>
     </xsd:simpleType>
 

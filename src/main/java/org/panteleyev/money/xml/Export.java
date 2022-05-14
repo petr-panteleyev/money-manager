@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.xml;
 
@@ -9,182 +19,102 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.persistence.DataCache;
+import org.panteleyev.money.persistence.MoneyDAO;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 
 public class Export {
-    private final DataCache cache;
+    static final String DOCUMENTS_ZIP_DIRECTORY = "documents/";
 
-    private final Collection<Icon> icons = new LinkedHashSet<>();
-    private final Collection<Category> categories = new ArrayList<>();
-    private Collection<Account> accounts = new ArrayList<>();
-    private Collection<Contact> contacts = new ArrayList<>();
-    private Collection<Currency> currencies = new ArrayList<>();
-    private Collection<Transaction> transactions = new ArrayList<>();
+    private final DataCache cache;
+    private final MoneyDAO dao;
 
     public Export() {
-        this(cache());
+        this(cache(), dao());
     }
 
-    public Export(DataCache cache) {
+    public Export(DataCache cache, MoneyDAO dao) {
         this.cache = cache;
+        this.dao = dao;
     }
 
-    public Export withIcons(Collection<Icon> icons) {
-        this.icons.addAll(icons);
-        return this;
-    }
-
-    public Export withCategories(Collection<Category> categories, boolean withDeps) {
-        this.categories.addAll(categories);
-
-        if (withDeps) {
-            icons.addAll(categories.stream()
-                .map(Category::iconUuid)
-                .distinct()
-                .map(cache::getIcon)
-                .flatMap(Optional::stream)
-                .toList());
-        }
-
-        return this;
-    }
-
-    public Export withAccounts(Collection<Account> accounts, boolean withDeps) {
-        this.accounts = accounts;
-
-        if (withDeps) {
-            withCategories(accounts.stream()
-                .map(Account::categoryUuid)
-                .distinct()
-                .map(cache::getCategory)
-                .flatMap(Optional::stream)
-                .toList(), true);
-
-            icons.addAll(accounts.stream()
-                .map(Account::iconUuid)
-                .distinct()
-                .map(cache::getIcon)
-                .flatMap(Optional::stream)
-                .toList());
-
-            currencies = accounts.stream()
-                .map(Account::currencyUuid)
-                .distinct()
-                .map(cache::getCurrency)
-                .flatMap(Optional::stream)
-                .toList();
-        }
-
-        return this;
-    }
-
-    public Export withContacts(Collection<Contact> contacts, boolean withDeps) {
-        this.contacts = contacts;
-
-        if (withDeps) {
-            icons.addAll(contacts.stream()
-                .map(Contact::iconUuid)
-                .distinct()
-                .map(cache::getIcon)
-                .flatMap(Optional::stream)
-                .toList());
-        }
-
-        return this;
-    }
-
-    public Export withCurrencies(Collection<Currency> currencies) {
-        this.currencies = currencies;
-        return this;
-    }
-
-    public Export withTransactions(Collection<Transaction> toExport, boolean withDeps) {
-        if (withDeps) {
-            transactions = toExport.stream()
-                .filter(t -> t.parentUuid() == null)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-            var details = toExport.stream()
-                .filter(Transaction::detailed)
-                .map(cache::getTransactionDetails)
-                .flatMap(Collection::stream)
-                .toList();
-            transactions.addAll(details);
-
-            withContacts(toExport.stream()
-                .map(Transaction::contactUuid)
-                .distinct()
-                .map(cache::getContact)
-                .flatMap(Optional::stream)
-                .toList(), true);
-
-            var accIdList = new HashSet<UUID>();
-            for (var t : transactions) {
-                accIdList.add(t.accountDebitedUuid());
-                accIdList.add(t.accountCreditedUuid());
-            }
-            withAccounts(accIdList.stream()
-                .map(cache::getAccount)
-                .flatMap(Optional::stream)
-                .toList(), true);
-        } else {
-            transactions = toExport;
-        }
-
-        return this;
-    }
-
-    public void doExport(OutputStream out) {
+    public void doExport(ZipOutputStream out) {
         try {
-            var rootElement = XMLUtils.createDocument("Money");
-            var doc = rootElement.getOwnerDocument();
+            exportMainEntry(out);
+            exportDocuments(out);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
 
-            var iconRoot = XMLUtils.appendElement(rootElement, "Icons");
-            for (var icon : icons) {
-                iconRoot.appendChild(exportIcon(doc, icon));
-            }
+    private void exportMainEntry(ZipOutputStream out) throws IOException {
+        var entryName = generateFileName() + ".xml";
+        out.putNextEntry(new ZipEntry(entryName));
 
-            var accountRoot = XMLUtils.appendElement(rootElement, "Accounts");
-            for (var account : accounts) {
-                accountRoot.appendChild(exportAccount(doc, account));
-            }
+        var rootElement = XMLUtils.createDocument("Money");
+        var doc = rootElement.getOwnerDocument();
 
-            var categoryRoot = XMLUtils.appendElement(rootElement, "Categories");
-            for (var category : categories) {
-                categoryRoot.appendChild(exportCategory(doc, category));
-            }
+        var iconRoot = XMLUtils.appendElement(rootElement, "Icons");
+        for (var icon : cache.getIcons()) {
+            iconRoot.appendChild(exportIcon(doc, icon));
+        }
 
-            var contactRoot = XMLUtils.appendElement(rootElement, "Contacts");
-            for (var contact : contacts) {
-                contactRoot.appendChild(exportContact(doc, contact));
-            }
+        var accountRoot = XMLUtils.appendElement(rootElement, "Accounts");
+        for (var account : cache.getAccounts()) {
+            accountRoot.appendChild(exportAccount(doc, account));
+        }
 
-            var currencyRoot = XMLUtils.appendElement(rootElement, "Currencies");
-            for (var currency : currencies) {
-                currencyRoot.appendChild(exportCurrency(doc, currency));
-            }
+        var categoryRoot = XMLUtils.appendElement(rootElement, "Categories");
+        for (var category : cache.getCategories()) {
+            categoryRoot.appendChild(exportCategory(doc, category));
+        }
 
-            var transactionRoot = XMLUtils.appendElement(rootElement, "Transactions");
-            for (var transaction : transactions) {
-                transactionRoot.appendChild(exportTransaction(doc, transaction));
-            }
+        var contactRoot = XMLUtils.appendElement(rootElement, "Contacts");
+        for (var contact : cache.getContacts()) {
+            contactRoot.appendChild(exportContact(doc, contact));
+        }
 
-            XMLUtils.writeDocument(doc, out);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        var currencyRoot = XMLUtils.appendElement(rootElement, "Currencies");
+        for (var currency : cache.getCurrencies()) {
+            currencyRoot.appendChild(exportCurrency(doc, currency));
+        }
+
+        var transactionRoot = XMLUtils.appendElement(rootElement, "Transactions");
+        for (var transaction : cache.getTransactions()) {
+            transactionRoot.appendChild(exportTransaction(doc, transaction));
+        }
+
+        var documentRoot = XMLUtils.appendElement(rootElement, "Documents");
+        for (var document : cache.getDocuments()) {
+            documentRoot.appendChild(exportDocument(doc, document));
+        }
+
+        XMLUtils.writeDocument(doc, out);
+        out.closeEntry();
+    }
+
+    private void exportDocuments(ZipOutputStream out) throws IOException {
+        out.putNextEntry(new ZipEntry(DOCUMENTS_ZIP_DIRECTORY));
+        out.closeEntry();
+
+        for (var document : cache.getDocuments()) {
+            out.putNextEntry(new ZipEntry(DOCUMENTS_ZIP_DIRECTORY + document.uuid()));
+            var bytes = dao.getDocumentBytes(document);
+            out.write(bytes);
+            out.closeEntry();
         }
     }
 
@@ -308,6 +238,24 @@ public class Export {
         appendTextNode(e, "parentUuid", t.parentUuid());
         appendTextNode(e, "detailed", t.detailed());
         appendTextNode(e, "statementDate", t.statementDate());
+
+        return e;
+    }
+
+    private static Element exportDocument(Document doc, MoneyDocument moneyDocument) {
+        var e = doc.createElement("Document");
+
+        appendTextNode(e, "uuid", moneyDocument.uuid());
+        appendTextNode(e, "ownerUuid", moneyDocument.ownerUuid());
+        appendTextNode(e, "contactUuid", moneyDocument.contactUuid());
+        appendTextNode(e, "type", moneyDocument.documentType());
+        appendTextNode(e, "fileName", moneyDocument.fileName());
+        appendTextNode(e, "date", moneyDocument.date());
+        appendTextNode(e, "size", moneyDocument.size());
+        appendTextNode(e, "mimeType", moneyDocument.mimeType());
+        appendTextNode(e, "description", moneyDocument.description());
+        appendTextNode(e, "created", moneyDocument.created());
+        appendTextNode(e, "modified", moneyDocument.modified());
 
         return e;
     }

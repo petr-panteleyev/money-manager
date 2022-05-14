@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.persistence;
 
@@ -11,18 +21,18 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +52,7 @@ public class MoneyDAO {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();
     private final TransactionRepository transactionRepository = new TransactionRepository();
     private final IconRepository iconRepository = new IconRepository();
+    private final DocumentRepository documentRepository = new DocumentRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -62,7 +73,7 @@ public class MoneyDAO {
                 connection.setAutoCommit(false);
                 consumer.accept(connection);
                 connection.commit();
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 connection.rollback();
                 throw new RuntimeException(ex);
             }
@@ -78,7 +89,7 @@ public class MoneyDAO {
                 R result = function.apply(connection);
                 connection.commit();
                 return result;
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
                 connection.rollback();
                 throw new RuntimeException(ex);
             }
@@ -103,6 +114,36 @@ public class MoneyDAO {
             iconRepository.update(conn, icon);
             cache.update(icon);
         });
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Documents
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertDocument(MoneyDocument document, byte[] bytes) {
+        withNewConnection(conn -> {
+            documentRepository.insert(conn, document);
+            if (bytes != null) {
+                documentRepository.insertBytes(conn, document.uuid(), bytes);
+            }
+            cache.add(document);
+        });
+    }
+
+    public void updateDocument(MoneyDocument document) {
+        withNewConnection(conn -> {
+            documentRepository.update(conn, document);
+            cache.update(document);
+        });
+    }
+
+    public byte[] getDocumentBytes(MoneyDocument document) {
+        try (var conn = dataSource.get().getConnection()) {
+            return documentRepository.getBytes(conn, document.uuid())
+                    .orElseThrow(() -> new IllegalStateException("Document content not found"));
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -233,10 +274,10 @@ public class MoneyDAO {
 
     public void checkTransactions(Collection<Transaction> transactions, boolean check) {
         updateTransactions(
-            transactions.stream()
-                .filter(t -> t.checked() != check)
-                .map(t -> t.check(check))
-                .toList()
+                transactions.stream()
+                        .filter(t -> t.checked() != check)
+                        .map(t -> t.check(check))
+                        .toList()
         );
     }
 
@@ -298,10 +339,15 @@ public class MoneyDAO {
             var transactionList = transactionRepository.getAll(conn);
             progress.accept("done\n");
 
+            progress.accept("    documents...");
+            var documentList = documentRepository.getAll(conn);
+            progress.accept("done\n");
+
             progress.accept("done\n");
 
             CompletableFuture.supplyAsync(() -> {
                 cache.getIcons().setAll(iconList);
+                cache.getDocuments().setAll(documentList);
                 cache.getCategories().setAll(categoryList);
                 cache.getContacts().setAll(contactList);
                 cache.getCurrencies().setAll(currencyList);
@@ -320,7 +366,7 @@ public class MoneyDAO {
     public void importFullDump(Import imp, Consumer<String> progress) {
         progress.accept("Recreating tables... ");
         createTables();
-        progress.accept(" done\n");
+        progress.accept("done\n");
 
         withNewConnection(conn -> {
             progress.accept("Importing data...\n");
@@ -347,76 +393,25 @@ public class MoneyDAO {
 
             progress.accept("    transactions... ");
             transactionRepository.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.parentUuid() == null).toList());
+                    imp.getTransactions().stream().filter(t -> t.parentUuid() == null).toList());
             transactionRepository.insert(conn, BATCH_SIZE,
-                imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
+                    imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
+            progress.accept("done\n");
+
+            progress.accept("    documents...");
+            documentRepository.insert(conn, BATCH_SIZE, imp.getDocuments());
             progress.accept("done\n");
 
             progress.accept("done\n");
-        });
-    }
 
-    private void calculateActions(Map<UUID, ImportAction> idMap,
-                                  List<? extends MoneyRecord> existing,
-                                  List<? extends MoneyRecord> toImport)
-    {
-        for (MoneyRecord record : toImport) {
-            var found = DataCache.getRecord(existing, record.uuid());
-            if (found.isEmpty()) {
-                idMap.put(record.uuid(), ImportAction.INSERT);
-            } else {
-                if (record.modified() > found.get().modified()) {
-                    idMap.put(record.uuid(), ImportAction.UPDATE);
-                } else {
-                    idMap.put(record.uuid(), ImportAction.IGNORE);
+            progress.accept("Importing blobs...");
+            BlobContent blobContent;
+            while ((blobContent = imp.getNextBlobContent()) != null) {
+                if (blobContent.type() == BlobContent.BlobType.DOCUMENT) {
+                    documentRepository.insertBytes(conn, blobContent.uuid(), blobContent.bytes());
                 }
             }
-        }
-    }
-
-    private <T extends MoneyRecord> void importTable(Repository<T> repository,
-                                                     Connection conn,
-                                                     List<? extends T> toImport,
-                                                     Map<UUID, ImportAction> importActions)
-    {
-        for (T item : toImport) {
-            switch (importActions.get(item.uuid())) {
-                case IGNORE:
-                    continue;
-
-                case INSERT:
-                    repository.insert(conn, item);
-                    break;
-
-                case UPDATE:
-                    repository.update(conn, item);
-                    break;
-            }
-        }
-    }
-
-    public void importRecords(Import imp, Consumer<String> progress) {
-        var iconActions = new HashMap<UUID, ImportAction>();
-        var categoryActions = new HashMap<UUID, ImportAction>();
-        var currencyActions = new HashMap<UUID, ImportAction>();
-        var contactActions = new HashMap<UUID, ImportAction>();
-        var accountActions = new HashMap<UUID, ImportAction>();
-        var transactionActions = new HashMap<UUID, ImportAction>();
-
-        calculateActions(iconActions, cache.getIcons(), imp.getIcons());
-        calculateActions(currencyActions, cache.getCurrencies(), imp.getCurrencies());
-        calculateActions(categoryActions, cache.getCategories(), imp.getCategories());
-        calculateActions(contactActions, cache.getContacts(), imp.getContacts());
-        calculateActions(accountActions, cache.getAccounts(), imp.getAccounts());
-        calculateActions(transactionActions, cache.getTransactions(), imp.getTransactions());
-
-        withNewConnection(conn -> {
-            importTable(iconRepository, conn, imp.getIcons(), iconActions);
-            importTable(categoryRepository, conn, imp.getCategories(), categoryActions);
-            importTable(currencyRepository, conn, imp.getCurrencies(), currencyActions);
-            importTable(contactRepository, conn, imp.getContacts(), contactActions);
-            importTable(accountRepository, conn, imp.getAccounts(), accountActions);
-            importTable(transactionRepository, conn, imp.getTransactions(), transactionActions);
+            progress.accept("done\n");
         });
     }
 
@@ -442,9 +437,9 @@ public class MoneyDAO {
         }
 
         var transaction = builder
-            .modified(0)
-            .created(0)
-            .build();
+                .modified(0)
+                .created(0)
+                .build();
 
         insertTransaction(transaction);
         return transaction;
@@ -458,8 +453,8 @@ public class MoneyDAO {
         }
 
         var transaction = builder
-            .modified(0)
-            .build();
+                .modified(0)
+                .build();
 
         updateTransaction(transaction);
         return transaction;
@@ -467,9 +462,9 @@ public class MoneyDAO {
 
     private Contact createContact(String name) {
         var contact = new Contact.Builder()
-            .uuid(UUID.randomUUID())
-            .name(name)
-            .build();
+                .uuid(UUID.randomUUID())
+                .name(name)
+                .build();
 
         insertContact(contact);
         return contact;

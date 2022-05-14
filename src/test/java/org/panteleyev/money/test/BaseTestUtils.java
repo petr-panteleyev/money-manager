@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.test;
 
@@ -11,7 +21,9 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import java.io.IOException;
@@ -286,5 +298,20 @@ public interface BaseTestUtils {
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    static MoneyDocument newDocument(DocumentType type) {
+        return new MoneyDocument.Builder()
+                .uuid(UUID.randomUUID())
+                .ownerUuid(UUID.randomUUID())
+                .contactUuid(UUID.randomUUID())
+                .documentType(type)
+                .fileName(randomString())
+                .mimeType(randomString())
+                .description(randomString())
+                .date(LocalDate.now())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
     }
 }

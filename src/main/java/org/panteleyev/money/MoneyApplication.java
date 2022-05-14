@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money;
 
@@ -21,6 +31,12 @@ public class MoneyApplication extends Application {
     private final static Logger LOGGER = Logger.getLogger(MoneyApplication.class.getName());
     private final static String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
     private final static String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+
+    private static MoneyApplication application;
+
+    public MoneyApplication() {
+        application = this;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -59,5 +75,11 @@ public class MoneyApplication extends Application {
 
     public static String generateFileName() {
         return generateFileName("Money");
+    }
+
+    public static void showDocument(String uri) {
+        if (application != null) {
+            application.getHostServices().showDocument(uri);
+        }
     }
 }

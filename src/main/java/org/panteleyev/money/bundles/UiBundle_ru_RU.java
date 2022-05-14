@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.bundles;
 
@@ -47,10 +57,13 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_DESCRIPTION, "Описание"},
                 {I18N_WORD_DETAILS, "Детали"},
                 {I18N_WORD_DIALOGS, "Диалоги"},
+                {I18N_WORD_DOCUMENT, "Документ"},
+                {I18N_WORD_DOCUMENTS, "Документы"},
                 {I18N_WORD_EDIT, "Редактировать"},
                 {I18M_WORD_EXIT, "Выход"},
                 {I18N_WORD_EXPENSES, "Расходы"},
                 {I18N_WORD_EXPORT, "Экспорт"},
+                {I18N_WORD_FILE, "Файл"},
                 {I18N_WORD_FONTS, "Шрифты"},
                 {I18N_WORD_GENERAL, "Общие"},
                 {I18N_WORD_ICONS, "Значки"},
@@ -77,6 +90,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_SAVE, "Сохранить"},
                 {I18N_WORD_SCHEMA, "Схема"},
                 {I18N_WORD_SERVER, "Сервер"},
+                {I18N_WORD_SIZE, "Размер"},
                 {I18N_WORD_STATEMENT, "Выписка"},
                 {I18N_WORD_STATEMENTS, "Выписки"},
                 {I18N_WORD_STREET, "Улица"},
@@ -96,7 +110,6 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_WAITING, "Ожидает"},
                 {I18N_WORD_ZIP, "Индекс"},
                 // Menu
-                {I18N_MENU_FILE, "Файл"},
                 {I18N_MENU_EDIT, "Правка"},
                 {I18N_MENU_VIEW, "Вид"},
                 {I18N_MENU_TOOLS, "Сервис"},
@@ -137,7 +150,6 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_DEFAULT_PROFILE, "Профиль по умолчанию"},
                 {I18N_WORD_ENTITY_NAME, "Название"},
                 {I18N_MISC_EXECUTION_DATE_SHORT, "Дата исп."},
-                {I18N_MISC_FULL_DUMP, "Полный дамп"},
                 {I18N_MISC_FULL_DUMP_IMPORT_CHECK, "Да, я уверен!"},
                 {I18N_MISC_FULL_DUMP_IMPORT_WARNING, "Внимание!\nИмпортирование полного дампа полностью уничтожит\n" +
                         "все существующие записи в базе."},
@@ -156,7 +168,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_SCHEMA_RESET_TEXT, "Все данные будут уничтожены. Проверьте, есть ли резервная копия базы. " +
                         "Продолжать?"},
                 {I18N_MISC_SCHEMA_UPDATE, "Обновление базы данных"},
-                {I18N_MISC_SCHEMA_UPDATE_TEXT, "Требуется совместимое базы данных. Продолжать?"},
+                {I18N_MISC_SCHEMA_UPDATE_TEXT, "Требуется совместимое обновление базы данных. Продолжать?"},
                 {I18N_MISC_SHOW_DEACTIVATED_ACCOUNTS, "Показывать неактивные счета"},
                 {I18N_MISC_SHOW_THOUSAND_SEPARATOR, "Показывать разделитель тысяч"},
                 {I18N_MISC_STATEMENT_BALANCE, "Баланс по выписке"},
@@ -166,6 +178,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_UPLOAD_FILES_SKIPPED, "Файлы не загружены:"},
                 {I18N_MISC_UPLOAD_TOO_BIG, ": слишком большой"},
                 {I18N_MISC_XML_FILES, "Файлы XML"},
+                {I18N_MISC_ZIP_FILES, "Файлы ZIP"},
                 {I18N_CREATE_DESKTOP_ENTRY, "Создать ярлык приложения (Linux)"},
                 //
                 {"button.Cancel", "Отмена"},

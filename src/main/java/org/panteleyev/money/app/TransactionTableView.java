@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.app;
 
@@ -19,10 +29,11 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.stage.FileChooser;
+import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.cells.DocumentCountCell;
 import org.panteleyev.money.app.cells.TransactionAccountRequestSumCell;
 import org.panteleyev.money.app.cells.TransactionCheckCell;
 import org.panteleyev.money.app.cells.TransactionCommentCell;
@@ -39,25 +50,20 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
-import org.panteleyev.money.xml.Export;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
-import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -66,7 +72,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_A
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
@@ -74,6 +79,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMEN
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
@@ -102,7 +108,7 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Controller owner;
     private final Mode mode;
 
-    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> { };
+    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> {};
     private final TransactionDetailsCallback transactionDetailsCallback;
 
     private final Consumer<Transaction> transactionAddedCallback;
@@ -134,8 +140,7 @@ public class TransactionTableView extends TableView<Transaction> {
                          Mode mode,
                          TransactionDetailsCallback transactionDetailsCallback,
                          Consumer<Transaction> transactionAddedCallback,
-                         Consumer<Transaction> transactionUpdatedCallback)
-    {
+                         Consumer<Transaction> transactionUpdatedCallback) {
         this(owner, mode, null, transactionDetailsCallback, transactionAddedCallback, transactionUpdatedCallback);
     }
 
@@ -144,8 +149,7 @@ public class TransactionTableView extends TableView<Transaction> {
                          Account account,
                          TransactionDetailsCallback transactionDetailsCallback,
                          Consumer<Transaction> transactionAddedCallback,
-                         Consumer<Transaction> transactionUpdatedCallback)
-    {
+                         Consumer<Transaction> transactionUpdatedCallback) {
         this.owner = owner;
         this.mode = mode;
         if (mode == Mode.ACCOUNT && account == null) {
@@ -162,40 +166,42 @@ public class TransactionTableView extends TableView<Transaction> {
 
         var w = widthProperty().subtract(20);
         var dayComparator = mode.isFullDate() ?
-            cache().getTransactionByDateComparator() : cache().getTransactionByDayComparator();
+                cache().getTransactionByDateComparator() : cache().getTransactionByDayComparator();
 
         Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
-            mode == Mode.ACCOUNT ?
-                x -> new TransactionAccountRequestSumCell(account) :
-                x -> new TransactionSumCell();
+                mode == Mode.ACCOUNT ?
+                        x -> new TransactionAccountRequestSumCell(account) :
+                        x -> new TransactionSumCell();
 
         getColumns().setAll(List.of(
-            tableObjectColumn(fxString(UI, I18N_WORD_DAY), b ->
-                b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
-                    .withComparator(dayComparator)
-                    .withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn(fxString(UI, I18N_WORD_TYPE), b ->
-                b.withCellFactory(x -> new TransactionTypeCell())
-                    .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
-                        .thenComparing(dayComparator))
-                    .withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(UI, I18N_MISC_DEBITED_ACCOUNT), b ->
-                b.withCellFactory(x -> new TransactionDebitedAccountCell())
-                    .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
-                        .thenComparing(dayComparator))
-                    .withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
-                b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
-            tableObjectColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
-                b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
-            tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
-                b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
-            tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
-                b.withCellFactory(sumCellFactory)
-                    .withComparator(Comparator.comparing(Transaction::getSignedAmount))
-                    .withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn("", b ->
-                b.withCellFactory(x -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.05)))
+                tableObjectColumn(fxString(UI, I18N_WORD_DAY), b ->
+                        b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
+                                .withComparator(dayComparator)
+                                .withWidthBinding(w.multiply(0.04))),
+                tableObjectColumn(fxString(UI, I18N_WORD_TYPE), b ->
+                        b.withCellFactory(x -> new TransactionTypeCell())
+                                .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
+                                        .thenComparing(dayComparator))
+                                .withWidthBinding(w.multiply(0.1))),
+                tableObjectColumn(fxString(UI, I18N_MISC_DEBITED_ACCOUNT), b ->
+                        b.withCellFactory(x -> new TransactionDebitedAccountCell())
+                                .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
+                                        .thenComparing(dayComparator))
+                                .withWidthBinding(w.multiply(0.1))),
+                tableObjectColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
+                        b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
+                tableObjectColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
+                        b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
+                tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
+                        b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
+                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                        b.withCellFactory(sumCellFactory)
+                                .withComparator(Comparator.comparing(Transaction::getSignedAmount))
+                                .withWidthBinding(w.multiply(0.05))),
+                tableObjectColumn("", b ->
+                        b.withCellFactory(x -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03))),
+                tableObjectColumn("", b ->
+                        b.withCellFactory(x -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
         ));
 
         getSortOrder().add(getColumns().get(0));
@@ -217,50 +223,51 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void createContextMenu() {
+        var disableBinding = getSelectionModel().selectedItemProperty().isNull();
+
         var newMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onNewTransaction());
         var editMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditTransaction());
         var deleteMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), event -> onDeleteTransaction());
-        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), event -> onExportTransactions());
         var detailsMenuItem = menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> onTransactionDetails());
         var checkMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), event -> onCheckTransactions(true));
         var uncheckMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), event -> onCheckTransactions(false));
 
-        editMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
-        deleteMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
-        detailsMenuItem.disableProperty().bind(getSelectionModel().selectedItemProperty().isNull());
+        editMenuItem.disableProperty().bind(disableBinding);
+        deleteMenuItem.disableProperty().bind(disableBinding);
+        detailsMenuItem.disableProperty().bind(disableBinding);
 
         var ctxMenu = new ContextMenu();
 
         if (mode == Mode.SUMMARY) {
             ctxMenu.getItems().addAll(
-                newMenuItem
+                    newMenuItem
             );
         }
 
         ctxMenu.getItems().addAll(
-            editMenuItem,
-            new SeparatorMenuItem()
+                editMenuItem,
+                new SeparatorMenuItem()
         );
 
         if (mode == Mode.SUMMARY || mode == Mode.QUERY || mode == Mode.ACCOUNT) {
             ctxMenu.getItems().addAll(
-                deleteMenuItem,
-                new SeparatorMenuItem()
+                    deleteMenuItem,
+                    new SeparatorMenuItem()
             );
         }
 
         if (mode != Mode.STATEMENT) {
             ctxMenu.getItems().addAll(
-                exportMenuItem,
-                new SeparatorMenuItem(),
-                detailsMenuItem,
-                new SeparatorMenuItem()
+                    detailsMenuItem,
+                    menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), new ImageView(Images.ATTACHMENT),
+                            event -> onDocuments(), disableBinding),
+                    new SeparatorMenuItem()
             );
         }
 
         ctxMenu.getItems().addAll(
-            checkMenuItem,
-            uncheckMenuItem
+                checkMenuItem,
+                uncheckMenuItem
         );
 
         setContextMenu(ctxMenu);
@@ -287,33 +294,6 @@ public class TransactionTableView extends TableView<Transaction> {
         checkTransactionConsumer = c;
     }
 
-    private void onExportTransactions() {
-        var toExport = getSelectionModel().getSelectedItems();
-        if (toExport.isEmpty()) {
-            return;
-        }
-
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle("Export to file");
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
-
-        var selected = fileChooser.showSaveDialog(owner.getStage());
-        if (selected == null) {
-            return;
-        }
-
-        CompletableFuture.runAsync(() -> {
-            try (var out = new FileOutputStream(selected)) {
-                new Export().withTransactions(toExport, true)
-                    .doExport(out);
-                settings().update(opt -> opt.setLastExportDir(selected.getParent()));
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
-        });
-    }
-
     private void redraw() {
         getColumns().get(0).setVisible(false);
         getColumns().get(0).setVisible(true);
@@ -328,8 +308,8 @@ public class TransactionTableView extends TableView<Transaction> {
                     return;
                 }
                 new TransactionDetailsDialog(owner, childTransactions, t.amount(), false)
-                    .showAndWait()
-                    .ifPresent(list -> transactionDetailsCallback.handleTransactionDetails(t, list));
+                        .showAndWait()
+                        .ifPresent(list -> transactionDetailsCallback.handleTransactionDetails(t, list));
             } else {
                 new TransactionDetailsDialog(owner, childTransactions, BigDecimal.ZERO, true).showAndWait();
             }
@@ -339,8 +319,8 @@ public class TransactionTableView extends TableView<Transaction> {
     void onCheckTransactions(boolean check) {
         var selection = getCurrentSelection();
         var process = getSelectionModel().getSelectedItems().stream()
-            .filter(t -> t.checked() != check)
-            .toList();
+                .filter(t -> t.checked() != check)
+                .toList();
 
         onCheckTransaction(process, check);
         restoreSelection(selection);
@@ -348,27 +328,28 @@ public class TransactionTableView extends TableView<Transaction> {
 
     void onNewTransaction() {
         new TransactionDialog(owner, settings().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
-            builder -> transactionAddedCallback.accept(dao().insertTransaction(builder))
+                builder -> transactionAddedCallback.accept(dao().insertTransaction(builder))
         );
     }
 
     void onEditTransaction() {
         var selection = getCurrentSelection();
         getSelectedTransaction()
-            .flatMap(selected -> new TransactionDialog(owner, settings().getDialogCssFileUrl(), selected, cache()).showAndWait())
-            .ifPresent(builder -> transactionUpdatedCallback.accept(dao().updateTransaction(builder)));
+                .flatMap(selected -> new TransactionDialog(owner, settings().getDialogCssFileUrl(), selected,
+                        cache()).showAndWait())
+                .ifPresent(builder -> transactionUpdatedCallback.accept(dao().updateTransaction(builder)));
         restoreSelection(selection);
     }
 
     void onDeleteTransaction() {
         getSelectedTransaction().ifPresent(transaction ->
-            new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
-                .showAndWait()
-                .ifPresent(r -> {
-                    if (r == ButtonType.OK) {
-                        dao().deleteTransaction(transaction);
-                    }
-                }));
+                new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
+                        .showAndWait()
+                        .ifPresent(r -> {
+                            if (r == ButtonType.OK) {
+                                dao().deleteTransaction(transaction);
+                            }
+                        }));
     }
 
     boolean checkFocus() {
@@ -381,8 +362,8 @@ public class TransactionTableView extends TableView<Transaction> {
 
     private List<UUID> getCurrentSelection() {
         return getSelectionModel().getSelectedItems().stream()
-            .map(Transaction::uuid)
-            .toList();
+                .map(Transaction::uuid)
+                .toList();
     }
 
     /**
@@ -395,10 +376,14 @@ public class TransactionTableView extends TableView<Transaction> {
             getSelectionModel().clearSelection();
             for (var uuid : selection) {
                 getItems().stream()
-                    .filter(t -> t.uuid().equals(uuid))
-                    .findAny()
-                    .ifPresent(t -> getSelectionModel().select(t));
+                        .filter(t -> t.uuid().equals(uuid))
+                        .findAny()
+                        .ifPresent(t -> getSelectionModel().select(t));
             }
         });
+    }
+
+    private void onDocuments() {
+        getSelectedTransaction().ifPresent(BaseController::getDocumentController);
     }
 }

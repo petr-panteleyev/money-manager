@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.app;
 
@@ -64,13 +74,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
+import java.util.zip.ZipOutputStream;
 
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
-import static org.panteleyev.freedesktop.entry.LocaleString.localeString;
+import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -80,8 +91,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.Constants.FILTER_ALL_FILES;
-import static org.panteleyev.money.app.Constants.FILTER_XML_FILES;
+import static org.panteleyev.money.app.Constants.FILTER_ZIP_FILES;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -404,8 +414,8 @@ public class MainWindowController extends BaseController implements TransactionT
                 fileChooser.setInitialDirectory(dir);
             }
         });
-        fileChooser.setInitialFileName(generateFileName());
-        fileChooser.getExtensionFilters().addAll(FILTER_XML_FILES, FILTER_ALL_FILES);
+        fileChooser.setInitialFileName(generateFileName() + ".zip");
+        fileChooser.getExtensionFilters().addAll(FILTER_ZIP_FILES);
 
         var selected = fileChooser.showSaveDialog(getStage());
         if (selected == null) {
@@ -413,15 +423,8 @@ public class MainWindowController extends BaseController implements TransactionT
         }
 
         CompletableFuture.runAsync(() -> {
-            try (var outputStream = new FileOutputStream(selected)) {
-                new Export()
-                        .withIcons(cache().getIcons())
-                        .withCategories(cache().getCategories(), false)
-                        .withAccounts(cache().getAccounts(), false)
-                        .withCurrencies(cache().getCurrencies())
-                        .withContacts(cache().getContacts(), false)
-                        .withTransactions(cache().getTransactions(), false)
-                        .doExport(outputStream);
+            try (var outputStream = new ZipOutputStream(new FileOutputStream(selected))) {
+                new Export().doExport(outputStream);
                 settings().update(opt -> opt.setLastExportDir(selected.getParent()));
             } catch (IOException ex) {
                 throw new UncheckedIOException(ex);
@@ -595,13 +598,13 @@ public class MainWindowController extends BaseController implements TransactionT
 
             var desktopEntry = new DesktopEntryBuilder(DesktopEntryType.APPLICATION)
                     .version(DesktopEntryBuilder.VERSION_1_0)
-                    .name(localeString("Money Manager"))
+                    .name("Money Manager")
                     .name(localeString("Менеджер финансов", "ru_RU"))
                     .categories(List.of(Category.OFFICE, Category.FINANCE, Category.JAVA))
-                    .comment(localeString("Application to manage personal finances"))
+                    .comment("Application to manage personal finances")
                     .comment(localeString("Программа для управления личными финансами", "ru_RU"))
                     .exec("\"" + command + "\"")
-                    .icon(localeString(rootDir + "/lib/Money Manager.png"))
+                    .icon(rootDir + "/lib/Money Manager.png")
                     .build();
             desktopEntry.write("money-manager");
         });

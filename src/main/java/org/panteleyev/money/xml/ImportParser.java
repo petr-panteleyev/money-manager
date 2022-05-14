@@ -1,6 +1,16 @@
 /*
- Copyright (c) Petr Panteleyev. All rights reserved.
- Licensed under the BSD license. See LICENSE file in the project root for full license information.
+ Copyright (c) 2017-2022, Petr Panteleyev
+
+ This program is free software: you can redistribute it and/or modify it under the
+ terms of the GNU General Public License as published by the Free Software
+ Foundation, either version 3 of the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along with this
+ program. If not, see <https://www.gnu.org/licenses/>.
  */
 package org.panteleyev.money.xml;
 
@@ -11,13 +21,17 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+
 import static java.lang.Integer.parseInt;
 
 class ImportParser extends DefaultHandler {
@@ -38,7 +53,8 @@ class ImportParser extends DefaultHandler {
         Account(ImportParser::parseAccount),
         Currency(ImportParser::parseCurrency),
         Contact(ImportParser::parseContact),
-        Transaction(ImportParser::parseTransaction);
+        Transaction(ImportParser::parseTransaction),
+        Document(ImportParser::parseDocument);
 
         Tag(Function<Map<String, String>, MoneyRecord> parseMethod) {
             this.parseMethod = parseMethod;
@@ -60,8 +76,8 @@ class ImportParser extends DefaultHandler {
     }
 
     private static final List<String> NAMES = Arrays.stream(Tag.values())
-        .map(Tag::name)
-        .toList();
+            .map(Tag::name)
+            .toList();
 
     private final List<Icon> icons = new ArrayList<>();
     private final List<Category> categories = new ArrayList<>();
@@ -69,14 +85,16 @@ class ImportParser extends DefaultHandler {
     private final List<Contact> contacts = new ArrayList<>();
     private final List<Currency> currencies = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
+    private final List<MoneyDocument> documents = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
-        Map.entry(Tag.Icon, icons),
-        Map.entry(Tag.Category, categories),
-        Map.entry(Tag.Account, accounts),
-        Map.entry(Tag.Currency, currencies),
-        Map.entry(Tag.Contact, contacts),
-        Map.entry(Tag.Transaction, transactions)
+            Map.entry(Tag.Icon, icons),
+            Map.entry(Tag.Category, categories),
+            Map.entry(Tag.Account, accounts),
+            Map.entry(Tag.Currency, currencies),
+            Map.entry(Tag.Contact, contacts),
+            Map.entry(Tag.Transaction, transactions),
+            Map.entry(Tag.Document, documents)
     );
 
     private Map<String, String> tags = null;
@@ -104,6 +122,10 @@ class ImportParser extends DefaultHandler {
 
     public List<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public List<MoneyDocument> getDocuments() {
+        return documents;
     }
 
     @Override
@@ -138,127 +160,150 @@ class ImportParser extends DefaultHandler {
         currentCharacters.append(new String(ch, start, length));
     }
 
+    @Override
+    public void error(SAXParseException e) throws SAXException {
+        throw e;
+    }
+
     private static Icon parseIcon(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
 
         return new Icon(UUID.fromString(tags.get("uuid")),
-            tags.get("name"),
-            Base64.getDecoder().decode(tags.get("bytes")),
-            created,
-            modified);
+                tags.get("name"),
+                Base64.getDecoder().decode(tags.get("bytes")),
+                created,
+                modified);
     }
 
     private static Category parseCategory(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
         return new Category.Builder()
-            .name(tags.get("name"))
-            .comment(tags.get("comment"))
-            .type(parseCategoryType(tags.get("type")))
-            .iconUuid(parseUuid(tags.get("iconUuid")))
-            .uuid(UUID.fromString(tags.get("guid")))
-            .created(created)
-            .modified(modified)
-            .build();
+                .name(tags.get("name"))
+                .comment(tags.get("comment"))
+                .type(parseCategoryType(tags.get("type")))
+                .iconUuid(parseUuid(tags.get("iconUuid")))
+                .uuid(UUID.fromString(tags.get("guid")))
+                .created(created)
+                .modified(modified)
+                .build();
     }
 
     private static Account parseAccount(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
         return new Account.Builder()
-            .name(tags.get("name"))
-            .comment(tags.get("comment"))
-            .accountNumber(tags.get("accountNumber"))
-            .openingBalance(new BigDecimal(tags.get("openingBalance")))
-            .accountLimit(new BigDecimal(tags.get("accountLimit")))
-            .currencyRate(new BigDecimal(tags.get("currencyRate")))
-            .type(parseCategoryType(tags.get("type")))
-            .categoryUuid(parseUuid(tags.get("categoryUuid")))
-            .currencyUuid(parseUuid(tags.get("currencyUuid")))
-            .enabled(parseBoolean(tags.get("enabled"), true))
-            .interest(parseBigDecimal(tags.get("interest")))
-            .closingDate(parseLocalDate(tags.get("closingDate"), null))
-            .iconUuid(parseUuid(tags.get("iconUuid")))
-            .cardType(parseCardType(tags.get("cardType")))
-            .cardNumber(tags.get("cardNumber"))
-            .total(parseBigDecimal(tags.get("total")))
-            .totalWaiting(parseBigDecimal(tags.get("totalWaiting")))
-            .uuid(UUID.fromString(tags.get("guid")))
-            .created(created)
-            .modified(modified)
-            .build();
+                .name(tags.get("name"))
+                .comment(tags.get("comment"))
+                .accountNumber(tags.get("accountNumber"))
+                .openingBalance(new BigDecimal(tags.get("openingBalance")))
+                .accountLimit(new BigDecimal(tags.get("accountLimit")))
+                .currencyRate(new BigDecimal(tags.get("currencyRate")))
+                .type(parseCategoryType(tags.get("type")))
+                .categoryUuid(parseUuid(tags.get("categoryUuid")))
+                .currencyUuid(parseUuid(tags.get("currencyUuid")))
+                .enabled(parseBoolean(tags.get("enabled"), true))
+                .interest(parseBigDecimal(tags.get("interest")))
+                .closingDate(parseLocalDate(tags.get("closingDate"), null))
+                .iconUuid(parseUuid(tags.get("iconUuid")))
+                .cardType(parseCardType(tags.get("cardType")))
+                .cardNumber(tags.get("cardNumber"))
+                .total(parseBigDecimal(tags.get("total")))
+                .totalWaiting(parseBigDecimal(tags.get("totalWaiting")))
+                .uuid(UUID.fromString(tags.get("guid")))
+                .created(created)
+                .modified(modified)
+                .build();
     }
 
     private static Currency parseCurrency(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
         return new Currency.Builder()
-            .symbol(tags.get("symbol"))
-            .description(tags.get("description"))
-            .formatSymbol(tags.get("formatSymbol"))
-            .formatSymbolPosition(parseInt(tags.get("formatSymbolPosition")))
-            .showFormatSymbol(parseBoolean(tags.get("showFormatSymbol"), false))
-            .def(parseBoolean(tags.get("default"), false))
-            .rate(new BigDecimal(tags.get("rate")))
-            .direction(parseInt(tags.get("direction")))
-            .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator"), false))
-            .uuid(UUID.fromString(tags.get("guid")))
-            .created(created)
-            .modified(modified)
-            .build();
+                .symbol(tags.get("symbol"))
+                .description(tags.get("description"))
+                .formatSymbol(tags.get("formatSymbol"))
+                .formatSymbolPosition(parseInt(tags.get("formatSymbolPosition")))
+                .showFormatSymbol(parseBoolean(tags.get("showFormatSymbol"), false))
+                .def(parseBoolean(tags.get("default"), false))
+                .rate(new BigDecimal(tags.get("rate")))
+                .direction(parseInt(tags.get("direction")))
+                .useThousandSeparator(parseBoolean(tags.get("useThousandSeparator"), false))
+                .uuid(UUID.fromString(tags.get("guid")))
+                .created(created)
+                .modified(modified)
+                .build();
     }
 
     private static Contact parseContact(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
         return new Contact.Builder()
-            .name(tags.get("name"))
-            .type(parseContactType(tags.get("type")))
-            .phone(tags.get("phone"))
-            .mobile(tags.get("mobile"))
-            .email(tags.get("email"))
-            .web(tags.get("web"))
-            .comment(tags.get("comment"))
-            .street(tags.get("street"))
-            .city(tags.get("city"))
-            .country(tags.get("country"))
-            .zip(tags.get("zip"))
-            .iconUuid(parseUuid(tags.get("iconUuid")))
-            .uuid(UUID.fromString(tags.get("guid")))
-            .created(created)
-            .modified(modified)
-            .build();
+                .name(tags.get("name"))
+                .type(parseContactType(tags.get("type")))
+                .phone(tags.get("phone"))
+                .mobile(tags.get("mobile"))
+                .email(tags.get("email"))
+                .web(tags.get("web"))
+                .comment(tags.get("comment"))
+                .street(tags.get("street"))
+                .city(tags.get("city"))
+                .country(tags.get("country"))
+                .zip(tags.get("zip"))
+                .iconUuid(parseUuid(tags.get("iconUuid")))
+                .uuid(UUID.fromString(tags.get("guid")))
+                .created(created)
+                .modified(modified)
+                .build();
     }
 
     private static Transaction parseTransaction(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
         return new Transaction.Builder()
-            .amount(new BigDecimal(tags.get("amount")))
-            .day(parseInt(tags.get("day")))
-            .month(parseInt(tags.get("month")))
-            .year(parseInt(tags.get("year")))
-            .type(parseTransactionType(tags.get("type")))
-            .comment(tags.get("comment"))
-            .checked(parseBoolean(tags.get("checked"), false))
-            .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
-            .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
-            .accountDebitedType(parseCategoryType(tags.get("accountDebitedType")))
-            .accountCreditedType(parseCategoryType(tags.get("accountCreditedType")))
-            .accountDebitedCategoryUuid(parseUuid(tags.get("accountDebitedCategoryUuid")))
-            .accountCreditedCategoryUuid(parseUuid(tags.get("accountCreditedCategoryUuid")))
-            .contactUuid(parseUuid(tags.get("contactUuid")))
-            .rate(new BigDecimal(tags.get("rate")))
-            .rateDirection(parseInt(tags.get("rateDirection")))
-            .invoiceNumber(tags.get("invoiceNumber"))
-            .parentUuid(parseUuid(tags.get("parentUuid")))
-            .detailed(parseBoolean(tags.get("detailed"), false))
-            .uuid(UUID.fromString(tags.get("guid")))
-            .statementDate(parseLocalDate(tags.get("statementDate"), null))
-            .created(created)
-            .modified(modified)
-            .build();
+                .amount(new BigDecimal(tags.get("amount")))
+                .day(parseInt(tags.get("day")))
+                .month(parseInt(tags.get("month")))
+                .year(parseInt(tags.get("year")))
+                .type(parseTransactionType(tags.get("type")))
+                .comment(tags.get("comment"))
+                .checked(parseBoolean(tags.get("checked"), false))
+                .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
+                .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
+                .accountDebitedType(parseCategoryType(tags.get("accountDebitedType")))
+                .accountCreditedType(parseCategoryType(tags.get("accountCreditedType")))
+                .accountDebitedCategoryUuid(parseUuid(tags.get("accountDebitedCategoryUuid")))
+                .accountCreditedCategoryUuid(parseUuid(tags.get("accountCreditedCategoryUuid")))
+                .contactUuid(parseUuid(tags.get("contactUuid")))
+                .rate(new BigDecimal(tags.get("rate")))
+                .rateDirection(parseInt(tags.get("rateDirection")))
+                .invoiceNumber(tags.get("invoiceNumber"))
+                .parentUuid(parseUuid(tags.get("parentUuid")))
+                .detailed(parseBoolean(tags.get("detailed"), false))
+                .uuid(UUID.fromString(tags.get("guid")))
+                .statementDate(parseLocalDate(tags.get("statementDate"), null))
+                .created(created)
+                .modified(modified)
+                .build();
+    }
+
+    private static MoneyDocument parseDocument(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
+        return new MoneyDocument.Builder()
+                .uuid(UUID.fromString(tags.get("uuid")))
+                .ownerUuid(UUID.fromString(tags.get("ownerUuid")))
+                .contactUuid(UUID.fromString(tags.get("contactUuid")))
+                .documentType(parseDocumentType(tags.get("type")))
+                .fileName(tags.get("fileName"))
+                .date(parseLocalDate(tags.get("date"), LocalDate.now()))
+                .size(parseInt(tags.get("size")))
+                .mimeType(tags.get("mimeType"))
+                .description(tags.get("description"))
+                .created(created)
+                .modified(modified)
+                .build();
     }
 
     private static UUID parseUuid(String value) {
@@ -295,5 +340,9 @@ class ImportParser extends DefaultHandler {
 
     private static TransactionType parseTransactionType(String rawValue) {
         return rawValue == null ? TransactionType.UNDEFINED : TransactionType.valueOf(rawValue);
+    }
+
+    private static DocumentType parseDocumentType(String rawValue) {
+        return rawValue == null ? DocumentType.OTHER : DocumentType.valueOf(rawValue);
     }
 }
