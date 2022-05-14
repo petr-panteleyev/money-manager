@@ -19,7 +19,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-desktop</artifactId>
-    <version>22.4.0</version>
+    <version>22.4.1</version>
     <packaging>jar</packaging>
     <name>Money Manager Desktop</name>
 

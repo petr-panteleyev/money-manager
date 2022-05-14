@@ -159,9 +159,12 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
                     .description(descriptionEdit.getText())
                     .modified(now);
 
+            if (documentOwner != null) {
+                builder.ownerUuid(documentOwner.uuid());
+            }
+
             if (document == null) {
                 builder.uuid(UUID.randomUUID())
-                        .ownerUuid(documentOwner.uuid())
                         .fileName(nameEdit.getText())
                         .size(bytes.length)
                         .mimeType(calculateMimeType(nameEdit.getText()))
