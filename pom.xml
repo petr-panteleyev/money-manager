@@ -45,7 +45,7 @@
         <controlsFxVersion>11.1.1</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.14.2</jsoupVersion>
-        <gsonVersion>2.8.6</gsonVersion>
+        <gsonVersion>2.8.9</gsonVersion>
         <mysqlConnectorVersion>8.0.27</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.4.0</testNgVersion>
