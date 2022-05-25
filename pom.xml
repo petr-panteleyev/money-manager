@@ -45,7 +45,6 @@
         <controlsFxVersion>11.1.1</controlsFxVersion>
         <ofxParserVersion>0.3.0</ofxParserVersion>
         <jsoupVersion>1.14.2</jsoupVersion>
-        <gsonVersion>2.8.6</gsonVersion>
         <mysqlConnectorVersion>8.0.27</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.4.0</testNgVersion>
@@ -101,11 +100,6 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoupVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gsonVersion}</version>
         </dependency>
         <!-- JavaFX Start -->
         <dependency>

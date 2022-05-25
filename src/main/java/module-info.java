@@ -14,7 +14,6 @@ open module org.panteleyev.money {
 
     requires org.controlsfx.controls;
 
-    requires com.google.gson;
     requires freemarker;
     requires org.jsoup;
 
