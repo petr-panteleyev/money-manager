@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017-2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,10 +16,12 @@ package org.panteleyev.money.app.database;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
+
 import static org.panteleyev.money.test.BaseTestUtils.randomInt;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.testng.Assert.assertEquals;
@@ -27,34 +29,34 @@ import static org.testng.Assert.assertEquals;
 public class ProfileSettingsTest {
 
     private static final List<ConnectionProfile> PROFILE_LIST = List.of(
-        new ConnectionProfile(
-            randomString(),
-            randomString(),
-            randomInt(),
-            randomString(),
-            randomString(),
-            randomString()
-        ),
-        new ConnectionProfile(
-            randomString(),
-            randomString(),
-            randomInt(),
-            randomString(),
-            randomString(),
-            randomString()
-        )
+            new ConnectionProfile(
+                    randomString(),
+                    randomString(),
+                    randomInt(),
+                    randomString(),
+                    randomString(),
+                    randomString()
+            ),
+            new ConnectionProfile(
+                    randomString(),
+                    randomString(),
+                    randomInt(),
+                    randomString(),
+                    randomString(),
+                    randomString()
+            )
     );
 
     @DataProvider
     public Object[][] dataProvider() {
-        return new Object[][] {
-            {
-                new ProfileSettings(
-                    PROFILE_LIST,
-                    randomString(),
-                    true
-                )
-            }
+        return new Object[][]{
+                {
+                        new ProfileSettings(
+                                PROFILE_LIST,
+                                randomString(),
+                                true
+                        )
+                }
         };
     }
 

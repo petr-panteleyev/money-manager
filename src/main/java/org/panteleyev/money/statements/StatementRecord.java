@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.statements;
 
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public final class StatementRecord {
@@ -51,7 +53,7 @@ public final class StatementRecord {
             }
 
             return new StatementRecord(actual, execution, description, counterParty, place, country, currency, amount,
-                accountCurrency, accountAmount);
+                    accountCurrency, accountAmount);
         }
 
         public Builder actual(LocalDate actual) {
@@ -113,8 +115,7 @@ public final class StatementRecord {
 
     public StatementRecord(LocalDate actual, LocalDate execution, String description, String counterParty, String place,
                            String country, String currency, String amount, String accountCurrency,
-                           String accountAmount)
-    {
+                           String accountAmount) {
         this.actual = actual;
         this.execution = execution;
         this.description = description;
@@ -130,18 +131,18 @@ public final class StatementRecord {
         this.accountAmountDecimal = toBigDecimal(this.accountAmount);
 
         currencyUuid = cache().getCurrencies().stream()
-            .filter(c -> c.description().equalsIgnoreCase(currency)
-                || c.symbol().equalsIgnoreCase(currency))
-            .findAny()
-            .map(Currency::uuid)
-            .orElse(null);
+                .filter(c -> c.description().equalsIgnoreCase(currency)
+                        || c.symbol().equalsIgnoreCase(currency))
+                .findAny()
+                .map(Currency::uuid)
+                .orElse(null);
 
         accountCurrencyUuid = cache().getCurrencies().stream()
-            .filter(c -> c.description().equalsIgnoreCase(accountCurrency)
-                || c.symbol().equalsIgnoreCase(accountCurrency))
-            .findAny()
-            .map(Currency::uuid)
-            .orElse(null);
+                .filter(c -> c.description().equalsIgnoreCase(accountCurrency)
+                        || c.symbol().equalsIgnoreCase(accountCurrency))
+                .findAny()
+                .map(Currency::uuid)
+                .orElse(null);
     }
 
     public LocalDate getActual() {
@@ -219,34 +220,34 @@ public final class StatementRecord {
         }
 
         return Objects.equals(actual, that.actual)
-            && Objects.equals(execution, that.execution)
-            && Objects.equals(description, that.description)
-            && Objects.equals(counterParty, that.counterParty)
-            && Objects.equals(place, that.place)
-            && Objects.equals(country, that.country)
-            && Objects.equals(currency, that.currency)
-            && Objects.equals(amount, that.amount)
-            && Objects.equals(accountCurrency, that.accountCurrency)
-            && Objects.equals(accountAmount, that.accountAmount);
+                && Objects.equals(execution, that.execution)
+                && Objects.equals(description, that.description)
+                && Objects.equals(counterParty, that.counterParty)
+                && Objects.equals(place, that.place)
+                && Objects.equals(country, that.country)
+                && Objects.equals(currency, that.currency)
+                && Objects.equals(amount, that.amount)
+                && Objects.equals(accountCurrency, that.accountCurrency)
+                && Objects.equals(accountAmount, that.accountAmount);
     }
 
     public int hashCode() {
         return Objects.hash(actual, execution, description, counterParty, place, country,
-            currency, amount, accountCurrency, accountAmount);
+                currency, amount, accountCurrency, accountAmount);
     }
 
     public String toString() {
         return "StatementRecord ["
-            + "counterParty=" + counterParty + ","
-            + "description=" + description + ","
-            + "place=" + place + ","
-            + "country=" + country + ","
-            + "currency=" + currency + ","
-            + "actual=" + actual + ","
-            + "execution=" + execution + ","
-            + "amount=" + amount + ","
-            + "amountDecimal=" + amountDecimal
-            + "]";
+                + "counterParty=" + counterParty + ","
+                + "description=" + description + ","
+                + "place=" + place + ","
+                + "country=" + country + ","
+                + "currency=" + currency + ","
+                + "actual=" + actual + ","
+                + "execution=" + execution + ","
+                + "amount=" + amount + ","
+                + "amountDecimal=" + amountDecimal
+                + "]";
     }
 
     private static String normaliseAmount(String str) {

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -187,11 +188,11 @@ public interface XMLUtils {
 
     static Optional<Integer> getIntNodeValue(Element parent, String tagName) {
         return getStringNodeValue(parent, tagName)
-            .map(Integer::parseInt);
+                .map(Integer::parseInt);
     }
 
     static Optional<Boolean> getBooleanNodeValue(Element parent, String tagName) {
         return getStringNodeValue(parent, tagName)
-            .map(Boolean::parseBoolean);
+                .map(Boolean::parseBoolean);
     }
 }

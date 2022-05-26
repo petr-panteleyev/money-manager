@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -49,9 +49,9 @@ public final class ApplicationFiles {
     private static final String APPLICATION_DIRECTORY = ".money-manager";
 
     private final File applicationDirectory =
-        new File(System.getProperty("user.home") + File.separator + APPLICATION_DIRECTORY);
+            new File(System.getProperty("user.home") + File.separator + APPLICATION_DIRECTORY);
     private final File logDirectory =
-        new File(applicationDirectory, "logs");
+            new File(applicationDirectory, "logs");
 
     private final Map<AppFile, File> fileMap = new EnumMap<>(AppFile.class);
 

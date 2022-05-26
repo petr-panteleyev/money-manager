@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
+
 import java.math.RoundingMode;
 
 public class TransactionAccountRequestSumCell extends TableCell<Transaction, Transaction> {
@@ -39,8 +40,8 @@ public class TransactionAccountRequestSumCell extends TableCell<Transaction, Tra
             setText("");
         } else {
             getStyleClass().add(
-                transaction.accountDebitedUuid().equals(account.uuid()) ?
-                    Styles.DEBIT : Styles.CREDIT
+                    transaction.accountDebitedUuid().equals(account.uuid()) ?
+                            Styles.DEBIT : Styles.CREDIT
             );
 
             setText(transaction.amount().setScale(2, RoundingMode.HALF_UP).toString());

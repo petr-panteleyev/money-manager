@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,13 +19,13 @@ import java.util.ListResourceBundle;
 public class ContactTypeBundle extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
-        return new Object[][] {
-            {"PERSONAL", "Personal"},
-            {"CLIENT", "Client"},
-            {"SUPPLIER", "Supplier"},
-            {"EMPLOYEE", "Employee"},
-            {"EMPLOYER", "Employer"},
-            {"SERVICE", "Service"},
+        return new Object[][]{
+                {"PERSONAL", "Personal"},
+                {"CLIENT", "Client"},
+                {"SUPPLIER", "Supplier"},
+                {"EMPLOYEE", "Employee"},
+                {"EMPLOYER", "Employer"},
+                {"SERVICE", "Service"},
         };
     }
 }

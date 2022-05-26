@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.persistence;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.CategoryType;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,70 +31,70 @@ final class AccountRepository extends Repository<Account> {
     @Override
     protected String getInsertSql() {
         return """
-            INSERT INTO account (
-                name, comment, number, opening,
-                account_limit, rate, type, category_uuid, currency_uuid,
-                enabled, interest, closing_date, icon_uuid, card_type,
-                card_number, total, total_waiting, created, modified, uuid
-            ) VALUES (
-                ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?,
-                ?, ?, ?, ?, ?
-            )
-            """;
+                INSERT INTO account (
+                    name, comment, number, opening,
+                    account_limit, rate, type, category_uuid, currency_uuid,
+                    enabled, interest, closing_date, icon_uuid, card_type,
+                    card_number, total, total_waiting, created, modified, uuid
+                ) VALUES (
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?
+                )
+                """;
     }
 
     @Override
     protected String getUpdateSql() {
         return """
-            UPDATE account SET
-                name = ?,
-                comment = ?,
-                number = ?,
-                opening = ?,
-                account_limit = ?,
-                rate = ?,
-                type = ?,
-                category_uuid = ?,
-                currency_uuid = ?,
-                enabled = ?,
-                interest = ?,
-                closing_date = ?,
-                icon_uuid = ?,
-                card_type = ?,
-                card_number = ?,
-                total = ?,
-                total_waiting = ?,
-                created = ?,
-                modified = ?
-            WHERE uuid = ?
-            """;
+                UPDATE account SET
+                    name = ?,
+                    comment = ?,
+                    number = ?,
+                    opening = ?,
+                    account_limit = ?,
+                    rate = ?,
+                    type = ?,
+                    category_uuid = ?,
+                    currency_uuid = ?,
+                    enabled = ?,
+                    interest = ?,
+                    closing_date = ?,
+                    icon_uuid = ?,
+                    card_type = ?,
+                    card_number = ?,
+                    total = ?,
+                    total_waiting = ?,
+                    created = ?,
+                    modified = ?
+                WHERE uuid = ?
+                """;
     }
 
     @Override
     protected Account fromResultSet(ResultSet rs) throws SQLException {
         return new Account(
-            getUuid(rs, "uuid"),
-            rs.getString("name"),
-            rs.getString("comment"),
-            rs.getString("number"),
-            rs.getBigDecimal("opening"),
-            rs.getBigDecimal("account_limit"),
-            rs.getBigDecimal("rate"),
-            getEnum(rs, "type", CategoryType.class),
-            getUuid(rs, "category_uuid"),
-            getUuid(rs, "currency_uuid"),
-            getBoolean(rs, "enabled"),
-            rs.getBigDecimal("interest"),
-            getLocalDate(rs, "closing_date"),
-            getUuid(rs, "icon_uuid"),
-            getEnum(rs, "card_type", CardType.class),
-            rs.getString("card_number"),
-            rs.getBigDecimal("total"),
-            rs.getBigDecimal("total_waiting"),
-            rs.getLong("created"),
-            rs.getLong("modified")
+                getUuid(rs, "uuid"),
+                rs.getString("name"),
+                rs.getString("comment"),
+                rs.getString("number"),
+                rs.getBigDecimal("opening"),
+                rs.getBigDecimal("account_limit"),
+                rs.getBigDecimal("rate"),
+                getEnum(rs, "type", CategoryType.class),
+                getUuid(rs, "category_uuid"),
+                getUuid(rs, "currency_uuid"),
+                getBoolean(rs, "enabled"),
+                rs.getBigDecimal("interest"),
+                getLocalDate(rs, "closing_date"),
+                getUuid(rs, "icon_uuid"),
+                getEnum(rs, "card_type", CardType.class),
+                rs.getString("card_number"),
+                rs.getBigDecimal("total"),
+                rs.getBigDecimal("total_waiting"),
+                rs.getLong("created"),
+                rs.getLong("modified")
         );
     }
 

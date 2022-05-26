@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -43,6 +43,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Named;
 import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.DataCache;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
@@ -130,8 +132,8 @@ final class DetailEditorPane extends BorderPane {
         sumEdit.setPrefColumnCount(8);
 
         var creditedBox = new VBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT, COLON)),
-            new HBox(creditedAccountEdit, creditedMenuButton),
-            creditedCategoryLabel);
+                new HBox(creditedAccountEdit, creditedMenuButton),
+                creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = hBox(Styles.BIG_SPACING, sumEdit);
@@ -146,16 +148,16 @@ final class DetailEditorPane extends BorderPane {
         clearButton.setCancelButton(true);
 
         var addButton = button(fxString(UI, I18N_WORD_ADD), x -> buildTransactionDetail()
-            .ifPresent(t -> {
-                parent.addRecord(t);
-                clear();
-            }));
+                .ifPresent(t -> {
+                    parent.addRecord(t);
+                    clear();
+                }));
 
         var updateButton = button(fxString(UI, I18N_WORD_UPDATE), x -> buildTransactionDetail()
-            .ifPresent(t -> {
-                parent.updateRecord(t);
-                clear();
-            })
+                .ifPresent(t -> {
+                    parent.updateRecord(t);
+                    clear();
+                })
         );
 
         var deleteButton = button(fxString(UI, I18N_WORD_DELETE), x -> {
@@ -166,13 +168,13 @@ final class DetailEditorPane extends BorderPane {
         });
 
         var row3 = hBox(Styles.BIG_SPACING,
-            clearButton, deleteButton, updateButton, addButton);
+                clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
         setCenter(new VBox(Styles.BIG_SPACING,
-            hBox(Styles.BIG_SPACING,
-                creditedBox, commentBox, sumBox),
-            row3));
+                hBox(Styles.BIG_SPACING,
+                        creditedBox, commentBox, sumBox),
+                row3));
 
         HBox.setHgrow(creditedBox, Priority.ALWAYS);
         HBox.setHgrow(commentBox, Priority.ALWAYS);
@@ -189,7 +191,7 @@ final class DetailEditorPane extends BorderPane {
         addButton.disableProperty().bind(validation.invalidProperty());
 
         TextFields.bindAutoCompletion(creditedAccountEdit,
-            new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+                new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
         setupAccountMenus();
@@ -199,17 +201,17 @@ final class DetailEditorPane extends BorderPane {
 
     private void setupBanksAndCashMenuItems(Set<Account> creditedSuggestions) {
         var banksAndCash = cache.getAccountsByType(CategoryType.BANKS_AND_CASH).stream()
-            .filter(Account::enabled)
-            .toList();
+                .filter(Account::enabled)
+                .toList();
 
         banksAndCash.stream()
-            .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
-            .forEach(acc -> {
-                creditedMenuButton.getItems().add(
-                    menuItem('[' + acc.name() + ']',
-                        event -> onCreditedAccountSelected(acc)));
-                creditedSuggestions.add(acc);
-            });
+                .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
+                .forEach(acc -> {
+                    creditedMenuButton.getItems().add(
+                            menuItem('[' + acc.name() + ']',
+                                    event -> onCreditedAccountSelected(acc)));
+                    creditedSuggestions.add(acc);
+                });
 
         if (!banksAndCash.isEmpty()) {
             creditedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -225,28 +227,27 @@ final class DetailEditorPane extends BorderPane {
     }
 
     private void setAccountMenuItemsByCategory(CategoryType categoryType, String prefix,
-                                               Set<Account> creditedSuggestions)
-    {
+                                               Set<Account> creditedSuggestions) {
         var categories = cache.getCategoriesByType(categoryType);
 
         categories.stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                List<Account> accounts = cache.getAccountsByCategory(x.uuid());
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    List<Account> accounts = cache.getAccountsByCategory(x.uuid());
 
-                if (!accounts.isEmpty()) {
-                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
+                    if (!accounts.isEmpty()) {
+                        creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
-                    accounts.stream()
-                        .filter(Account::enabled)
-                        .forEach(acc -> {
-                            creditedMenuButton.getItems().add(
-                                menuItem("  " + prefix + ' ' + acc.name(),
-                                    event -> onCreditedAccountSelected(acc)));
-                            creditedSuggestions.add(acc);
-                        });
-                }
-            });
+                        accounts.stream()
+                                .filter(Account::enabled)
+                                .forEach(acc -> {
+                                    creditedMenuButton.getItems().add(
+                                            menuItem("  " + prefix + ' ' + acc.name(),
+                                                    event -> onCreditedAccountSelected(acc)));
+                                    creditedSuggestions.add(acc);
+                                });
+                    }
+                });
 
 
         if (!categories.isEmpty()) {
@@ -311,15 +312,13 @@ final class DetailEditorPane extends BorderPane {
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter)
-    {
+                                                              StringConverter<T> converter) {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(TextField field,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter)
-    {
+                                                              StringConverter<T> converter) {
         return checkTextFieldValue(field.getText(), items, converter);
     }
 
@@ -345,20 +344,20 @@ final class DetailEditorPane extends BorderPane {
         // Expenses to creditable accounts
         var expenseCategories = cache.getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                var accounts = cache.getAccountsByCategory(x.uuid());
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    var accounts = cache.getAccountsByCategory(x.uuid());
 
-                if (!accounts.isEmpty()) {
-                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
+                    if (!accounts.isEmpty()) {
+                        creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
-                    accounts.forEach(acc -> {
-                        creditedSuggestions.add(acc);
-                        creditedMenuButton.getItems().add(
-                            menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
-                    });
-                }
-            });
+                        accounts.forEach(acc -> {
+                            creditedSuggestions.add(acc);
+                            creditedMenuButton.getItems().add(
+                                    menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                        });
+                    }
+                });
 
         if (!expenseCategories.isEmpty()) {
             creditedMenuButton.getItems().add(new SeparatorMenuItem());

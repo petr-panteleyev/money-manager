@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -31,10 +31,12 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.app.cells.ContactNameCell;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -72,8 +74,8 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 class ContactListWindowController extends BaseController {
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
-        b -> b.withDefaultString(ALL_TYPES_STRING)
-            .withStringConverter(Bundles::translate)
+            b -> b.withDefaultString(ALL_TYPES_STRING)
+                    .withStringConverter(Bundles::translate)
     );
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
@@ -89,37 +91,37 @@ class ContactListWindowController extends BaseController {
 
         // Menu bar
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-            newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
-                    event -> searchField.requestFocus())),
-            newMenu(fxString(UI, I18N_MENU_VIEW),
-                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
-            createWindowMenu(),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+                newMenu(fxString(UI, I18N_MENU_EDIT),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
+                                event -> searchField.requestFocus())),
+                newMenu(fxString(UI, I18N_MENU_VIEW),
+                        menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), addHandler),
-            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding))
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), addHandler),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding))
         );
 
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
-            tableObjectColumn(fxString(UI, I18N_WORD_NAME), b ->
-                b.withCellFactory(x -> new ContactNameCell()).withWidthBinding(w.multiply(0.4))),
-            tableColumn(fxString(UI, I18N_WORD_TYPE), b ->
-                b.withPropertyCallback((Contact p) -> translate(p.type())).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(UI, I18N_WORD_PHONE), b ->
-                b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
-            tableColumn("E-Mail", b ->
-                b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
+                tableObjectColumn(fxString(UI, I18N_WORD_NAME), b ->
+                        b.withCellFactory(x -> new ContactNameCell()).withWidthBinding(w.multiply(0.4))),
+                tableColumn(fxString(UI, I18N_WORD_TYPE), b ->
+                        b.withPropertyCallback((Contact p) -> translate(p.type())).withWidthBinding(w.multiply(0.2))),
+                tableColumn(fxString(UI, I18N_WORD_PHONE), b ->
+                        b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
+                tableColumn("E-Mail", b ->
+                        b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
         ));
         contactTable.setOnMouseClicked(this::onTableMouseClick);
 
@@ -128,8 +130,8 @@ class ContactListWindowController extends BaseController {
         BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
 
         var self = new BorderPane(
-            new BorderPane(contactTable, hBox, null, null, null),
-            menuBar, null, null, null
+                new BorderPane(contactTable, hBox, null, null, null),
+                menuBar, null, null, null
         );
         self.setPrefSize(600.0, 400.0);
 
@@ -173,14 +175,14 @@ class ContactListWindowController extends BaseController {
 
     private void onAddContact() {
         new ContactDialog(this, settings().getDialogCssFileUrl(), null).showAndWait()
-            .ifPresent(c -> dao().insertContact(c));
+                .ifPresent(c -> dao().insertContact(c));
     }
 
     private void onEditContact() {
         getSelectedContact()
-            .flatMap(selected ->
-                new ContactDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
-            .ifPresent(c -> dao().updateContact(c));
+                .flatMap(selected ->
+                        new ContactDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
+                .ifPresent(c -> dao().updateContact(c));
     }
 
     private void onTableMouseClick(Event event) {

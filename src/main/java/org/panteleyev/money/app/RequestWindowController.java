@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.persistence.DataCache;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -41,6 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
+
 import static javafx.scene.layout.Priority.ALWAYS;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
 import static org.panteleyev.fx.BoxFactory.hBox;
@@ -111,30 +113,31 @@ class RequestWindowController extends BaseController {
         this.account = account;
 
         table = account == null ?
-            new TransactionTableView(this, TransactionTableView.Mode.QUERY) :
-            new TransactionTableView(this, account);
+                new TransactionTableView(this, TransactionTableView.Mode.QUERY) :
+                new TransactionTableView(this, account);
 
         var uncheckedOnlyCheckBox = new CheckBox(fxString(UI, I18N_MISC_UNCHECKED_ONLY));
         uncheckedOnlyCheckBox.selectedProperty().addListener(
-            (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
+                (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
         );
 
         filterProperty = PredicateProperty.and(List.of(
-            account == null ? accBox.predicateProperty() : new PredicateProperty<>(transactionByAccount(account.uuid())),
-            transactionFilterBox.predicateProperty(),
-            contactFilterBox.predicateProperty(),
-            uncheckedPredicate
+                account == null ? accBox.predicateProperty() :
+                        new PredicateProperty<>(transactionByAccount(account.uuid())),
+                transactionFilterBox.predicateProperty(),
+                contactFilterBox.predicateProperty(),
+                uncheckedPredicate
         ));
 
         var filterBox = hBox(5.0,
-            account == null ? accBox : SKIP,
-            transactionFilterBox,
-            label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
-            contactFilterBox.getTextField(),
-            uncheckedOnlyCheckBox,
-            fxNode(new Region(), hBoxHGrow(ALWAYS)),
-            label(fxString(UI, I18N_WORD_SUM, COLON)),
-            sumField
+                account == null ? accBox : SKIP,
+                transactionFilterBox,
+                label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
+                contactFilterBox.getTextField(),
+                uncheckedOnlyCheckBox,
+                fxNode(new Region(), hBoxHGrow(ALWAYS)),
+                label(fxString(UI, I18N_WORD_SUM, COLON)),
+                sumField
         );
 
         filterBox.setAlignment(Pos.CENTER_LEFT);
@@ -163,9 +166,9 @@ class RequestWindowController extends BaseController {
         setupContactMenu();
 
         table.selectedTransactions().addListener((ListChangeListener<Transaction>) change ->
-            sumField.setText(
-                DataCache.calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
-            ));
+                sumField.setText(
+                        DataCache.calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
+                ));
 
         setupWindow(root);
         settings().loadStageDimensions(this);
@@ -190,24 +193,28 @@ class RequestWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
-            newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, event -> table.onEditTransaction()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE, event -> table.onDeleteTransaction()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> table.onTransactionDetails()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K, event -> table.onCheckTransactions(true)),
-                menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U, event -> table.onCheckTransactions(false))
-            ),
-            newMenu(fxString(UI, I18N_MENU_VIEW),
-                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
-            createWindowMenu(),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
+                newMenu(fxString(UI, I18N_MENU_EDIT),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
+                                event -> table.onEditTransaction()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
+                                event -> table.onDeleteTransaction()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> table.onTransactionDetails()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
+                                event -> table.onCheckTransactions(true)),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
+                                event -> table.onCheckTransactions(false))
+                ),
+                newMenu(fxString(UI, I18N_MENU_VIEW),
+                        menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
         return menuBar;
@@ -241,8 +248,8 @@ class RequestWindowController extends BaseController {
 
         try (var outputStream = new FileOutputStream(selected)) {
             var transactions = cache().getTransactions(getTransactionFilter())
-                .sorted(cache().getTransactionByDateComparator())
-                .toList();
+                    .sorted(cache().getTransactionByDateComparator())
+                    .toList();
             Reports.reportTransactions(transactions, outputStream);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
@@ -252,8 +259,8 @@ class RequestWindowController extends BaseController {
     private void setupContactMenu() {
         contactSuggestions.clear();
         cache().getContacts().stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .map(Contact::name)
-            .forEach(contactSuggestions::add);
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .map(Contact::name)
+                .forEach(contactSuggestions::add);
     }
 }

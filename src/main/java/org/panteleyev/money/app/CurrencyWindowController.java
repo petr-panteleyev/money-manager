@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,10 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.model.Currency;
+
 import java.util.List;
 import java.util.Optional;
+
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
@@ -48,31 +50,31 @@ final class CurrencyWindowController extends BaseController {
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-            newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                    event -> onAddCurrency()),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                    event -> onEditCurrency(), disableBinding)),
-            createWindowMenu(),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+                newMenu(fxString(UI, I18N_MENU_EDIT),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
+                                event -> onAddCurrency()),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
+                                event -> onEditCurrency(), disableBinding)),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-            menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onAddCurrency()),
-            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditCurrency(), disableBinding))
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onAddCurrency()),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditCurrency(), disableBinding))
         );
 
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-            tableColumn(fxString(UI, I18N_WORD_ENTITY_NAME), b ->
-                b.withPropertyCallback(Currency::symbol).withWidthBinding(w.multiply(0.2))),
-            tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
-                b.withPropertyCallback(Currency::description).withWidthBinding(w.multiply(0.8)))
+                tableColumn(fxString(UI, I18N_WORD_ENTITY_NAME), b ->
+                        b.withPropertyCallback(Currency::symbol).withWidthBinding(w.multiply(0.2))),
+                tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
+                        b.withPropertyCallback(Currency::description).withWidthBinding(w.multiply(0.8)))
         ));
 
         var root = new BorderPane(table, menuBar, null, null, null);
@@ -91,14 +93,14 @@ final class CurrencyWindowController extends BaseController {
 
     private void onAddCurrency() {
         new CurrencyDialog(this, settings().getDialogCssFileUrl(), null)
-            .showAndWait()
-            .ifPresent(c -> dao().insertCurrency(c));
+                .showAndWait()
+                .ifPresent(c -> dao().insertCurrency(c));
     }
 
     private void onEditCurrency() {
         getSelectedCurrency()
-            .flatMap(selected ->
-                new CurrencyDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
-            .ifPresent(c -> dao().updateCurrency(c));
+                .flatMap(selected ->
+                        new CurrencyDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
+                .ifPresent(c -> dao().updateCurrency(c));
     }
 }

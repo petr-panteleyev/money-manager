@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Transaction;
+
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class TransactionCreditedAccountCell extends TableCell<Transaction, Transaction> {

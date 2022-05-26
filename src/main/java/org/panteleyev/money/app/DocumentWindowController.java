@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,14 +16,19 @@ package org.panteleyev.money.app;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
-import javafx.scene.control.ComboBox;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
+import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.cells.DocumentContactNameCell;
-import org.panteleyev.money.model.DocumentType;
+import org.panteleyev.money.app.filters.ContactFilterBox;
+import org.panteleyev.money.app.filters.DocumentTypeFilterBox;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Named;
@@ -37,15 +42,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.MoneyApplication.showDocument;
-import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -71,10 +75,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 public class DocumentWindowController extends BaseController {
     private final MoneyRecord documentOwner;
-    private final ComboBox<DocumentType> typeBox = comboBox(DocumentType.values(),
-            b -> b.withDefaultString(ALL_TYPES_STRING)
-                    .withStringConverter(Bundles::translate)
-    );
 
     private final FilteredList<MoneyDocument> filteredList = cache().getDocuments().filtered(x -> true);
     private final SortedList<MoneyDocument> sortedList =
@@ -83,8 +83,26 @@ public class DocumentWindowController extends BaseController {
 
     public DocumentWindowController(MoneyRecord documentOwner) {
         this.documentOwner = documentOwner;
+
+        var contactFilterBox = new ContactFilterBox();
+        var documentTypeFilterBox = new DocumentTypeFilterBox();
+
         if (documentOwner != null) {
+            filteredList.predicateProperty().bind(
+                    PredicateProperty.and(List.of(
+                            contactFilterBox.documentPredicateProperty(),
+                            documentTypeFilterBox.predicateProperty(),
+                            new PredicateProperty<>(doc -> doc.ownerUuid().equals(documentOwner.uuid()))
+                    ))
+            );
             filteredList.setPredicate(doc -> doc.ownerUuid().equals(documentOwner.uuid()));
+        } else {
+            filteredList.predicateProperty().bind(
+                    PredicateProperty.and(List.of(
+                            contactFilterBox.documentPredicateProperty(),
+                            documentTypeFilterBox.predicateProperty()
+                    ))
+            );
         }
 
         var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
@@ -116,6 +134,11 @@ public class DocumentWindowController extends BaseController {
                 menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload())
         ));
 
+        // Toolbar
+        var toolBar = hBox(5.0, contactFilterBox.getTextField(), documentTypeFilterBox.getNode());
+        toolBar.setAlignment(Pos.CENTER_LEFT);
+        BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
+
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
@@ -145,13 +168,14 @@ public class DocumentWindowController extends BaseController {
                 )
         ));
 
-        var root = new BorderPane(table, menuBar, null, null, null);
+        table.setOnDragOver(this::onDragOver);
+        table.setOnDragDropped(this::onDragDropped);
+
+        var root = new BorderPane(
+                new BorderPane(table, toolBar, null, null, null),
+                menuBar, null, null, null);
         setupWindow(root);
         settings().loadStageDimensions(this);
-    }
-
-    public DocumentWindowController() {
-        this(null);
     }
 
     public boolean thisOwner(MoneyRecord documentOwner) {
@@ -219,5 +243,28 @@ public class DocumentWindowController extends BaseController {
                 }
             }
         });
+    }
+
+    private void onDragOver(DragEvent event) {
+        var dragBoard = event.getDragboard();
+        if (dragBoard.hasFiles() && dragBoard.getFiles().size() == 1) {
+            event.acceptTransferModes(TransferMode.COPY);
+        }
+        event.consume();
+    }
+
+    private void onDragDropped(DragEvent event) {
+        var success = false;
+        var dragBoard = event.getDragboard();
+        if (dragBoard.hasFiles()) {
+            var files = dragBoard.getFiles();
+            if (files.size() == 1) {
+                success = true;
+                var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null, files.get(0));
+                d.showAndWait().ifPresent(document -> dao().insertDocument(document, d.getBytes()));
+            }
+        }
+        event.setDropCompleted(success);
+        event.consume();
     }
 }

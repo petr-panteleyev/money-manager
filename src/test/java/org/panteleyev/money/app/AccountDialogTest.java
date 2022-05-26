@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -26,12 +26,14 @@ import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.test.BaseTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
 import static org.testng.Assert.assertEquals;
@@ -57,70 +59,70 @@ public class AccountDialogTest extends BaseTest {
 
     public AccountDialogTest() {
         curr_1 = new Currency.Builder()
-            .symbol(UUID.randomUUID().toString())
-            .description(UUID.randomUUID().toString())
-            .formatSymbol(UUID.randomUUID().toString())
-            .formatSymbolPosition(1)
-            .showFormatSymbol(false)
-            .def(false)
-            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-            .direction(1)
-            .useThousandSeparator(false)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .symbol(UUID.randomUUID().toString())
+                .description(UUID.randomUUID().toString())
+                .formatSymbol(UUID.randomUUID().toString())
+                .formatSymbolPosition(1)
+                .showFormatSymbol(false)
+                .def(false)
+                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+                .direction(1)
+                .useThousandSeparator(false)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         curr_2 = new Currency.Builder()
-            .symbol(UUID.randomUUID().toString())
-            .description(UUID.randomUUID().toString())
-            .formatSymbol(UUID.randomUUID().toString())
-            .formatSymbolPosition(1)
-            .showFormatSymbol(false)
-            .def(false)
-            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-            .direction(1)
-            .useThousandSeparator(false)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .symbol(UUID.randomUUID().toString())
+                .description(UUID.randomUUID().toString())
+                .formatSymbol(UUID.randomUUID().toString())
+                .formatSymbolPosition(1)
+                .showFormatSymbol(false)
+                .def(false)
+                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+                .direction(1)
+                .useThousandSeparator(false)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         category = new Category.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         acc_1 = new Account.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .accountNumber(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .categoryUuid(category.uuid())
-            .currencyUuid(curr_1.uuid())
-            .enabled(true)
-            .openingBalance(randomBigDecimal())
-            .accountLimit(randomBigDecimal())
-            .closingDate(LocalDate.now())
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .categoryUuid(category.uuid())
+                .currencyUuid(curr_1.uuid())
+                .enabled(true)
+                .openingBalance(randomBigDecimal())
+                .accountLimit(randomBigDecimal())
+                .closingDate(LocalDate.now())
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         acc_2 = new Account.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .accountNumber(UUID.randomUUID().toString())
-            .type(CategoryType.PORTFOLIO)
-            .categoryUuid(category.uuid())
-            .currencyUuid(curr_2.uuid())
-            .enabled(true)
-            .openingBalance(randomBigDecimal())
-            .accountLimit(randomBigDecimal())
-            .closingDate(LocalDate.now())
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .type(CategoryType.PORTFOLIO)
+                .categoryUuid(category.uuid())
+                .currencyUuid(curr_2.uuid())
+                .enabled(true)
+                .openingBalance(randomBigDecimal())
+                .accountLimit(randomBigDecimal())
+                .closingDate(LocalDate.now())
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         cache = new DataCache() {
             {

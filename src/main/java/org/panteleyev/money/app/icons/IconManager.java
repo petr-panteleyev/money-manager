@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import org.panteleyev.money.app.Images;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Icon;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Comparator;
@@ -30,13 +31,15 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class IconManager {
     public static final int ICON_SIZE = 16;
     public static final int ICON_BYTE_LENGTH = 8192;
 
-    public static final Function<Category, Image> CATEGORY_TO_IMAGE = category -> IconManager.getImage(category.iconUuid());
+    public static final Function<Category, Image> CATEGORY_TO_IMAGE =
+            category -> IconManager.getImage(category.iconUuid());
     public static final Function<Account, Image> ACCOUNT_TO_IMAGE = account -> IconManager.getImage(account.iconUuid());
 
     private static final Map<Icon, Image> imageMap = new ConcurrentHashMap<>();
@@ -94,8 +97,8 @@ public class IconManager {
         comboBox.getItems().clear();
         comboBox.getItems().add(EMPTY_ICON);
         comboBox.getItems().addAll(FXCollections.observableArrayList(cache().getIcons().stream()
-            .sorted(Comparator.comparing(Icon::name))
-            .toList()
+                .sorted(Comparator.comparing(Icon::name))
+                .toList()
         ));
     }
 }

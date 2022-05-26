@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.app;
 
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
+
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -23,6 +24,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
+
 import static org.panteleyev.money.app.Constants.TRANSACTION_PREDICATE_BUNDLE;
 
 public enum TransactionPredicate implements Predicate<Transaction> {
@@ -96,12 +98,12 @@ public enum TransactionPredicate implements Predicate<Transaction> {
 
     public static Predicate<Transaction> transactionByAccount(UUID uuid) {
         return it -> Objects.equals(it.accountDebitedUuid(), uuid)
-            || Objects.equals(it.accountCreditedUuid(), uuid);
+                || Objects.equals(it.accountCreditedUuid(), uuid);
     }
 
     public static Predicate<Transaction> transactionByCategory(UUID uuid) {
         return it -> Objects.equals(it.accountDebitedCategoryUuid(), uuid)
-            || Objects.equals(it.accountCreditedCategoryUuid(), uuid);
+                || Objects.equals(it.accountCreditedCategoryUuid(), uuid);
     }
 
     public static Predicate<Transaction> transactionByCategoryType(CategoryType type) {

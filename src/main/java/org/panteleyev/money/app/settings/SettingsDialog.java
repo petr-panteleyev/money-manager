@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,9 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+
 import java.util.List;
+
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
@@ -118,58 +120,68 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
         setupFontField(dialogLabelFontField, settings.getFont(DIALOG_LABEL_FONT));
 
         var tabPane = new TabPane(
-            newTab(UI, I18N_WORD_GENERAL, false, gridPane(
-                List.of(
-                    gridRow(label(fxString(UI, I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, COLON)), autoCompleteLength),
-                    gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING)), accountClosingDayDeltaEdit)
-                ), b -> b.withStyle(GRID_PANE))
-            ),
-            newTab(UI, I18N_WORD_FONTS, false,
-                vBox(DOUBLE_SPACING,
-                    titledPane(fxString(UI, I18N_WORD_CONTROLS),
-                        gridPane(List.of(
-                            gridRow(label(fxString(UI, I18N_WORD_TEXT, COLON)), controlsFontField,
-                                button(ELLIPSIS, actionEvent -> onFontSelected(controlsFontField))),
-                            gridRow(label(fxString(UI, I18N_WORD_MENU, COLON)), menuFontField,
-                                button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
+                newTab(UI, I18N_WORD_GENERAL, false, gridPane(
+                        List.of(
+                                gridRow(label(fxString(UI, I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, COLON)),
+                                        autoCompleteLength),
+                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING)), accountClosingDayDeltaEdit)
                         ), b -> b.withStyle(GRID_PANE))
-                    ),
-                    titledPane(fxString(UI, I18N_WORD_TABLES),
-                        gridPane(List.of(
-                            gridRow(cellFontField,
-                                button(ELLIPSIS, actionEvent -> onFontSelected(cellFontField)))
-                            ), b -> b.withStyle(GRID_PANE)
+                ),
+                newTab(UI, I18N_WORD_FONTS, false,
+                        vBox(DOUBLE_SPACING,
+                                titledPane(fxString(UI, I18N_WORD_CONTROLS),
+                                        gridPane(List.of(
+                                                gridRow(label(fxString(UI, I18N_WORD_TEXT, COLON)), controlsFontField,
+                                                        button(ELLIPSIS,
+                                                                actionEvent -> onFontSelected(controlsFontField))),
+                                                gridRow(label(fxString(UI, I18N_WORD_MENU, COLON)), menuFontField,
+                                                        button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
+                                        ), b -> b.withStyle(GRID_PANE))
+                                ),
+                                titledPane(fxString(UI, I18N_WORD_TABLES),
+                                        gridPane(List.of(
+                                                        gridRow(cellFontField,
+                                                                button(ELLIPSIS,
+                                                                        actionEvent -> onFontSelected(cellFontField)))
+                                                ), b -> b.withStyle(GRID_PANE)
+                                        )
+                                ),
+                                titledPane(fxString(UI, I18N_WORD_DIALOGS),
+                                        gridPane(List.of(
+                                                        gridRow(dialogLabelFontField,
+                                                                button(ELLIPSIS,
+                                                                        actionEvent -> onFontSelected(dialogLabelFontField)))
+                                                ), b -> b.withStyle(GRID_PANE)
+                                        )
+                                )
                         )
-                    ),
-                    titledPane(fxString(UI, I18N_WORD_DIALOGS),
-                        gridPane(List.of(
-                            gridRow(dialogLabelFontField,
-                                button(ELLIPSIS, actionEvent -> onFontSelected(dialogLabelFontField)))
-                            ), b -> b.withStyle(GRID_PANE)
+                ),
+                newTab(UI, I18N_WORD_COLORS, false,
+                        vBox(DOUBLE_SPACING,
+                                titledPane(fxString(UI, I18N_WORD_TRANSACTIONS),
+                                        gridPane(List.of(
+                                                        gridRow(label(fxString(UI, I18N_WORD_DEBIT, COLON)),
+                                                                debitColorPicker),
+                                                        gridRow(label(fxString(UI, I18N_WORD_CREDIT, COLON)),
+                                                                creditColorPicker),
+                                                        gridRow(label(fxString(UI, I18N_WORD_TRANSFER, COLON)),
+                                                                transferColorPicker)
+                                                ), b -> b.withStyle(GRID_PANE)
+                                        )
+                                ),
+                                titledPane(fxString(UI, I18N_WORD_STATEMENTS),
+                                        gridPane(List.of(
+                                                        gridRow(label(fxString(UI, I18N_WORD_CONFIRMED, COLON)),
+                                                                statementCheckedColorPicker),
+                                                        gridRow(label(fxString(UI, I18N_WORD_UNCONFIRMED, COLON)),
+                                                                statementUncheckedColorPicker),
+                                                        gridRow(label(fxString(UI, I18N_MISC_NOT_FOUND, COLON)),
+                                                                statementMissingColorPicker)
+                                                ), b -> b.withStyle(GRID_PANE)
+                                        )
+                                )
                         )
-                    )
                 )
-            ),
-            newTab(UI, I18N_WORD_COLORS, false,
-                vBox(DOUBLE_SPACING,
-                    titledPane(fxString(UI, I18N_WORD_TRANSACTIONS),
-                        gridPane(List.of(
-                            gridRow(label(fxString(UI, I18N_WORD_DEBIT, COLON)), debitColorPicker),
-                            gridRow(label(fxString(UI, I18N_WORD_CREDIT, COLON)), creditColorPicker),
-                            gridRow(label(fxString(UI, I18N_WORD_TRANSFER, COLON)), transferColorPicker)
-                            ), b -> b.withStyle(GRID_PANE)
-                        )
-                    ),
-                    titledPane(fxString(UI, I18N_WORD_STATEMENTS),
-                        gridPane(List.of(
-                            gridRow(label(fxString(UI, I18N_WORD_CONFIRMED, COLON)), statementCheckedColorPicker),
-                            gridRow(label(fxString(UI, I18N_WORD_UNCONFIRMED, COLON)), statementUncheckedColorPicker),
-                            gridRow(label(fxString(UI, I18N_MISC_NOT_FOUND, COLON)), statementMissingColorPicker)
-                            ), b -> b.withStyle(GRID_PANE)
-                        )
-                    )
-                )
-            )
         );
         getDialogPane().setContent(tabPane);
 
@@ -220,13 +232,13 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
     private void onFontSelected(TextField field) {
         var font = (Font) field.getUserData();
         new FontSelectorDialog(font)
-            .showAndWait()
-            .ifPresent(newFont -> setupFontField(field, newFont));
+                .showAndWait()
+                .ifPresent(newFont -> setupFontField(field, newFont));
     }
 
     private static void setupFontField(TextField field, Font font) {
         field.setUserData(font);
         field.setText(String.format("%s %s, %d",
-            font.getFamily(), font.getStyle(), (int) font.getSize()));
+                font.getFamily(), font.getStyle(), (int) font.getSize()));
     }
 }

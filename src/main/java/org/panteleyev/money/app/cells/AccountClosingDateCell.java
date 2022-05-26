@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,11 @@ package org.panteleyev.money.app.cells;
 
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Account;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+
 import static org.panteleyev.money.app.Styles.EXPIRED;
 
 public class AccountClosingDateCell extends TableCell<Account, Account> {

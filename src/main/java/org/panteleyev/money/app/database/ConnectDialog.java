@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ToStringConverter;
+
 import java.util.Objects;
+
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -111,7 +113,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private CheckBox initDefaultCheck() {
         var check = newCheckBox(UI, I18N_MISC_DEFAULT_PROFILE);
         check.setSelected(Objects.equals(profileManager.getDefaultProfile().orElse(null),
-            profileComboBox.getSelectionModel().getSelectedItem()));
+                profileComboBox.getSelectionModel().getSelectedItem()));
         return check;
     }
 

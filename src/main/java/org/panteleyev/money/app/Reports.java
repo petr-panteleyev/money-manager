@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.statements.Statement;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -101,9 +103,9 @@ class Reports {
                 w.println("<tr>");
                 td(w, a.name());
                 td(w, cache().getCategory(a.categoryUuid())
-                    .map(Category::name).orElse(""));
+                        .map(Category::name).orElse(""));
                 td(w, cache().getCurrency(a.currencyUuid())
-                    .map(Currency::symbol).orElse(""));
+                        .map(Currency::symbol).orElse(""));
                 td(w, formatAmount(a.interest()));
                 td(w, a.closingDate().toString());
                 td(w, a.comment());
@@ -164,13 +166,13 @@ class Reports {
 
         for (var ch : s.toCharArray()) {
             result.append(
-                switch (ch) {
-                    case '"' -> "&quot;";
-                    case '&' -> "&amp;";
-                    case '<' -> "&lt;";
-                    case '>' -> "&gt;";
-                    default -> ch;
-                }
+                    switch (ch) {
+                        case '"' -> "&quot;";
+                        case '&' -> "&amp;";
+                        case '<' -> "&lt;";
+                        case '>' -> "&gt;";
+                        default -> ch;
+                    }
             );
         }
 

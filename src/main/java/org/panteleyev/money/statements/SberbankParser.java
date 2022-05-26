@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.statements;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
 import static java.util.Map.entry;
 
 class SberbankParser {
@@ -46,23 +48,23 @@ class SberbankParser {
     }
 
     private final static Map<Param, Object> DEFAULT_CLASSES = new EnumMap<>(Map.ofEntries(
-        entry(Param.TABLE, "b-trs"),
-        entry(Param.RECORD, "trs_it"),
-        entry(Param.HEADER, "trs_head"),
-        entry(Param.DETAIL, "trs_detail"),
-        entry(Param.NAME, "trs_name"),
-        entry(Param.ACTUAL_DATE, "trs_date"),
-        entry(Param.DATE_CLASS, "idate"),
-        entry(Param.DATE_VALUE, "data-date"),
-        entry(Param.SUM, "trs_sum"),
-        entry(Param.AMOUNT, "trs_sum-am"),
-        entry(Param.GEO, "trs-geo"),
-        entry(Param.COUNTRY, "trs_country"),
-        entry(Param.CITY, "trs_city"),
-        entry(Param.VALUE, "trs_val"),
-        entry(Param.CATEGORY, "icat"),
-        entry(Param.EXECUTION_DATE, "trs-post"),
-        entry(Param.CREDIT_CLASSES, List.of("trs_st-refill"))
+            entry(Param.TABLE, "b-trs"),
+            entry(Param.RECORD, "trs_it"),
+            entry(Param.HEADER, "trs_head"),
+            entry(Param.DETAIL, "trs_detail"),
+            entry(Param.NAME, "trs_name"),
+            entry(Param.ACTUAL_DATE, "trs_date"),
+            entry(Param.DATE_CLASS, "idate"),
+            entry(Param.DATE_VALUE, "data-date"),
+            entry(Param.SUM, "trs_sum"),
+            entry(Param.AMOUNT, "trs_sum-am"),
+            entry(Param.GEO, "trs-geo"),
+            entry(Param.COUNTRY, "trs_country"),
+            entry(Param.CITY, "trs_city"),
+            entry(Param.VALUE, "trs_val"),
+            entry(Param.CATEGORY, "icat"),
+            entry(Param.EXECUTION_DATE, "trs-post"),
+            entry(Param.CREDIT_CLASSES, List.of("trs_st-refill"))
     ));
 
     private final static String TEMPLATE_ATTRIBUTE_NAME = "name";
@@ -106,8 +108,8 @@ class SberbankParser {
 
         static Format detectFormat(String formatString) {
             return stream().filter(f -> Objects.equals(f.getFormatString(), formatString))
-                .findFirst()
-                .orElse(Format.UNKNOWN);
+                    .findFirst()
+                    .orElse(Format.UNKNOWN);
         }
     }
 
@@ -139,9 +141,9 @@ class SberbankParser {
             // Account number
             var accountNumber = "";
             var accountNumberTag = document.getElementsByClass("b-info b-card-info")
-                .select("div.info_item:eq(1)")
-                .select("div.info_value")
-                .first();
+                    .select("div.info_item:eq(1)")
+                    .select("div.info_value")
+                    .first();
             if (accountNumberTag != null) {
                 accountNumber = accountNumberTag.text();
             }
@@ -198,10 +200,10 @@ class SberbankParser {
 
                     if (classNames.contains(format.getString(Param.EXECUTION_DATE))) {
                         builder = builder.execution(parseDate(
-                            detail.getElementsByClass(format.getString(Param.VALUE)).first(), format));
+                                detail.getElementsByClass(format.getString(Param.VALUE)).first(), format));
                     } else if (classNames.contains(format.getString(Param.GEO))) {
                         var countryElement =
-                            detail.getElementsByClass(format.getString(Param.COUNTRY)).first();
+                                detail.getElementsByClass(format.getString(Param.COUNTRY)).first();
                         if (countryElement != null) {
                             builder = builder.country(countryElement.text());
                         }
@@ -225,7 +227,7 @@ class SberbankParser {
         var format = Format.UNKNOWN;
         var version = "";
         var versionElement =
-            document.getElementsByAttributeValue(TEMPLATE_ATTRIBUTE_NAME, TEMPLATE_ATTRIBUTE_VALUE).first();
+                document.getElementsByAttributeValue(TEMPLATE_ATTRIBUTE_NAME, TEMPLATE_ATTRIBUTE_VALUE).first();
         if (versionElement != null) {
             var attributes = versionElement.attributes();
             version = attributes.get(TEMPLATE_VALUE);

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -135,22 +135,22 @@ public class TestMoneyDAO extends BaseDaoTest {
         dao().insertIcon(icon);
 
         var category = new Category.Builder()
-            .name(randomString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .uuid(UUID.randomUUID())
-            .build();
+                .name(randomString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .build();
         dao().insertCategory(category);
 
         var accountId = UUID.randomUUID();
 
         var account = new Account.Builder()
-            .name(randomString())
-            .uuid(accountId)
-            .type(category.type())
-            .categoryUuid(category.uuid())
-            .accountNumber("123456")
-            .iconUuid(iconUuid)
-            .build();
+                .name(randomString())
+                .uuid(accountId)
+                .type(category.type())
+                .categoryUuid(category.uuid())
+                .accountNumber("123456")
+                .iconUuid(iconUuid)
+                .build();
         dao().insertAccount(account);
 
         assertEquals(cache().getAccount(accountId).orElseThrow(), account);
@@ -158,8 +158,8 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(retrieved.orElseThrow(), account);
 
         var update = new Account.Builder(account)
-            .accountNumber(UUID.randomUUID().toString())
-            .build();
+                .accountNumber(UUID.randomUUID().toString())
+                .build();
 
         dao().updateAccount(update);
         assertEquals(cache().getAccount(accountId).orElseThrow(), update);
@@ -172,37 +172,37 @@ public class TestMoneyDAO extends BaseDaoTest {
         var repo = new TransactionRepository();
 
         var category = new Category.Builder()
-            .name(randomString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .uuid(UUID.randomUUID())
-            .build();
+                .name(randomString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .build();
         dao().insertCategory(category);
 
         var account = new Account.Builder()
-            .uuid(UUID.randomUUID())
-            .name(randomString())
-            .type(category.type())
-            .categoryUuid(category.uuid())
-            .accountNumber("123456")
-            .build();
+                .uuid(UUID.randomUUID())
+                .name(randomString())
+                .type(category.type())
+                .categoryUuid(category.uuid())
+                .accountNumber("123456")
+                .build();
         dao().insertAccount(account);
 
         var id = UUID.randomUUID();
 
         var now = LocalDate.now();
         var transaction = new Transaction.Builder()
-            .uuid(id)
-            .day(now.getDayOfMonth())
-            .month(now.getMonthValue())
-            .year(now.getYear())
-            .amount(BaseTestUtils.randomBigDecimal())
-            .accountDebitedUuid(account.uuid())
-            .accountCreditedUuid(account.uuid())
-            .accountDebitedCategoryUuid(category.uuid())
-            .accountCreditedCategoryUuid(category.uuid())
-            .accountDebitedType(account.type())
-            .accountCreditedType(account.type())
-            .build();
+                .uuid(id)
+                .day(now.getDayOfMonth())
+                .month(now.getMonthValue())
+                .year(now.getYear())
+                .amount(BaseTestUtils.randomBigDecimal())
+                .accountDebitedUuid(account.uuid())
+                .accountCreditedUuid(account.uuid())
+                .accountDebitedCategoryUuid(category.uuid())
+                .accountCreditedCategoryUuid(category.uuid())
+                .accountDebitedType(account.type())
+                .accountCreditedType(account.type())
+                .build();
 
 
         dao().insertTransaction(transaction);
@@ -211,8 +211,8 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(retrieved.orElseThrow(), transaction);
 
         var update = new Transaction.Builder(transaction)
-            .comment(UUID.randomUUID().toString())
-            .build();
+                .comment(UUID.randomUUID().toString())
+                .build();
 
         dao().updateTransaction(update);
         assertEquals(cache().getTransaction(id).orElseThrow(), update);

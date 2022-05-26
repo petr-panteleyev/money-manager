@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,10 +16,12 @@ package org.panteleyev.money.app.database;
 
 import org.panteleyev.money.xml.XMLUtils;
 import org.w3c.dom.Element;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.appendTextNode;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
@@ -76,9 +78,9 @@ record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultPro
             }
 
             return new ProfileSettings(
-                profiles,
-                defaultProfile,
-                autoConnect
+                    profiles,
+                    defaultProfile,
+                    autoConnect
             );
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -97,12 +99,12 @@ record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultPro
 
     private static ConnectionProfile deserializeConnectionProfile(Element element) {
         return new ConnectionProfile(
-            element.getAttribute(PROFILE_NAME),
-            XMLUtils.getAttribute(element, PROFILE_HOST, "localhost"),
-            XMLUtils.getAttribute(element, PROFILE_PORT, 3306),
-            element.getAttribute(PROFILE_USER),
-            element.getAttribute(PROFILE_PASSWORD),
-            element.getAttribute(PROFILE_SCHEMA)
+                element.getAttribute(PROFILE_NAME),
+                XMLUtils.getAttribute(element, PROFILE_HOST, "localhost"),
+                XMLUtils.getAttribute(element, PROFILE_PORT, 3306),
+                element.getAttribute(PROFILE_USER),
+                element.getAttribute(PROFILE_PASSWORD),
+                element.getAttribute(PROFILE_SCHEMA)
         );
     }
 }

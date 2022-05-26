@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.statements;
 import org.panteleyev.ofx.BankTransactionList;
 import org.panteleyev.ofx.OFXParser;
 import org.panteleyev.ofx.StatementTransaction;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -42,11 +43,11 @@ class RBAParser {
 
         for (StatementTransaction tr : transactionList.transactions()) {
             var builder = new StatementRecord.Builder()
-                .amount(tr.amount().toString())
-                .counterParty(tr.name())
-                .description(tr.memo())
-                .actual(tr.datePosted().toLocalDate())
-                .execution(tr.dateAvailable().toLocalDate());
+                    .amount(tr.amount().toString())
+                    .counterParty(tr.name())
+                    .description(tr.memo())
+                    .actual(tr.datePosted().toLocalDate())
+                    .execution(tr.dateAvailable().toLocalDate());
             records.add(builder.build());
         }
 

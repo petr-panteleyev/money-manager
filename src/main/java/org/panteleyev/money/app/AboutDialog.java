@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,10 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -30,12 +32,12 @@ import static org.panteleyev.money.app.Styles.STYLE_ABOUT_LABEL;
 
 final class AboutDialog extends BaseDialog<Object> {
 
-    private static record BuildInformation(String version, String timestamp) {
+    private record BuildInformation(String version, String timestamp) {
         static BuildInformation load() {
             var bundle = ResourceBundle.getBundle("org.panteleyev.money.buildInfo");
             return new BuildInformation(
-                bundle.getString("version"),
-                bundle.getString("timestamp")
+                    bundle.getString("version"),
+                    bundle.getString("timestamp")
             );
         }
     }
@@ -58,17 +60,17 @@ final class AboutDialog extends BaseDialog<Object> {
         aboutLabel.getStyleClass().add(STYLE_ABOUT_LABEL);
 
         var vBox = vBox(BIG_SPACING,
-            vBox(SMALL_SPACING,
-                aboutLabel,
-                label("Built on " + BUILD.timestamp())
-            ),
-            vBox(SMALL_SPACING,
-                label("Runtime version: " + RUNTIME),
-                label("VM: " + VM)
-            ),
-            vBox(SMALL_SPACING,
-                label("Copyright (c) 2016, " + LocalDate.now().getYear() + ", Petr Panteleyev")
-            )
+                vBox(SMALL_SPACING,
+                        aboutLabel,
+                        label("Built on " + BUILD.timestamp())
+                ),
+                vBox(SMALL_SPACING,
+                        label("Runtime version: " + RUNTIME),
+                        label("VM: " + VM)
+                ),
+                vBox(SMALL_SPACING,
+                        label("Copyright (C) 2016, " + LocalDate.now().getYear() + ", Petr Panteleyev")
+                )
         );
 
         getDialogPane().setContent(vBox);

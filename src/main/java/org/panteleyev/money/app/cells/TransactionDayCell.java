@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,7 @@ public class TransactionDayCell extends TableCell<Transaction, Transaction> {
         } else {
             if (fullDate) {
                 setText(String.format("%02d.%02d.%04d",
-                    transaction.day(), transaction.month(), transaction.year()));
+                        transaction.day(), transaction.month(), transaction.year()));
             } else {
                 setText(Integer.toString(transaction.day()));
             }

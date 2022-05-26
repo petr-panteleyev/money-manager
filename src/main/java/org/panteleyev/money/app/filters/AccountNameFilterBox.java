@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.app.filters;
 import javafx.scene.control.TextField;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.model.Account;
+
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.Predicates.accountByName;

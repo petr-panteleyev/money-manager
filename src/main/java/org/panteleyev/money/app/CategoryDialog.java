@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -27,10 +27,12 @@ import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
+
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -50,7 +52,7 @@ final class CategoryDialog extends BaseDialog<Category> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values(),
-        b -> b.withStringConverter(Bundles::translate));
+            b -> b.withStringConverter(Bundles::translate));
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
@@ -61,11 +63,11 @@ final class CategoryDialog extends BaseDialog<Category> {
         setTitle(fxString(UI, I18N_WORD_CATEGORY));
 
         getDialogPane().setContent(gridPane(
-            List.of(
-                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeComboBox, iconComboBox),
-                gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), gridCell(nameEdit, 2, 1)),
-                gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))),
-            b -> b.withStyle(Styles.GRID_PANE))
+                List.of(
+                        gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeComboBox, iconComboBox),
+                        gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), gridCell(nameEdit, 2, 1)),
+                        gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))),
+                b -> b.withStyle(Styles.GRID_PANE))
         );
 
         nameEdit.setPrefColumnCount(20);
@@ -75,9 +77,9 @@ final class CategoryDialog extends BaseDialog<Category> {
 
         if (category != null) {
             Arrays.stream(CategoryType.values())
-                .filter(t -> t == category.type())
-                .findFirst()
-                .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
+                    .filter(t -> t == category.type())
+                    .findFirst()
+                    .ifPresent(t -> typeComboBox.getSelectionModel().select(t));
 
             nameEdit.setText(category.name());
             commentEdit.setText(category.comment());
@@ -94,15 +96,15 @@ final class CategoryDialog extends BaseDialog<Category> {
             long now = System.currentTimeMillis();
 
             var builder = new Category.Builder(category)
-                .name(nameEdit.getText())
-                .comment(commentEdit.getText())
-                .type(typeComboBox.getSelectionModel().getSelectedItem())
-                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
-                .modified(now);
+                    .name(nameEdit.getText())
+                    .comment(commentEdit.getText())
+                    .type(typeComboBox.getSelectionModel().getSelectedItem())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                    .modified(now);
 
             if (category == null) {
                 builder.uuid(UUID.randomUUID())
-                    .created(now);
+                        .created(now);
             }
 
             return builder.build();
@@ -115,7 +117,7 @@ final class CategoryDialog extends BaseDialog<Category> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameEdit, (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
         validation.initInitialDecoration();
     }
 

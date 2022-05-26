@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -45,6 +45,7 @@ import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementParser;
 import org.panteleyev.money.statements.StatementPredicate;
 import org.panteleyev.money.statements.StatementRecord;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,6 +55,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
@@ -101,7 +103,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
     private final TransactionTableView transactionTable
-        = new TransactionTableView(this, TransactionTableView.Mode.STATEMENT);
+            = new TransactionTableView(this, TransactionTableView.Mode.STATEMENT);
     private final Label ymAccountBalanceLabel = new Label();
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();
@@ -114,9 +116,9 @@ class StatementWindowController extends BaseController {
 
 
     private static final FileChooser.ExtensionFilter OFX_EXTENSION =
-        new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
+            new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
     private static final FileChooser.ExtensionFilter SBERBANK_HTML =
-        new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
+            new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
@@ -126,19 +128,19 @@ class StatementWindowController extends BaseController {
         var root = new BorderPane();
 
         var balanceBox = hBox(5.0,
-            label(fxString(UI, I18N_MISC_STATEMENT_BALANCE, COLON)),
-            ymAccountBalanceLabel);
+                label(fxString(UI, I18N_MISC_STATEMENT_BALANCE, COLON)),
+                ymAccountBalanceLabel);
         balanceBox.setAlignment(Pos.CENTER_LEFT);
 
         var filler1 = new Region();
 
         var hBox = hBox(5.0,
-            label(fxString(UI, I18N_WORD_ACCOUNT, COLON)),
-            accountComboBox,
-            button(fxString(UI, I18N_WORD_CLEAR), x -> onClear()),
-            ignoreExecutionDate,
-            filler1,
-            balanceBox
+                label(fxString(UI, I18N_WORD_ACCOUNT, COLON)),
+                accountComboBox,
+                button(fxString(UI, I18N_WORD_CLEAR), x -> onClear()),
+                ignoreExecutionDate,
+                filler1,
+                balanceBox
         );
         HBox.setHgrow(filler1, Priority.ALWAYS);
 
@@ -168,7 +170,7 @@ class StatementWindowController extends BaseController {
         cache().getTransactions().addListener(new WeakListChangeListener<>(transactionListener));
 
         accountComboBox.getSelectionModel()
-            .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
+                .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
 
         setupWindow(root);
         setupAccountComboBox();
@@ -178,12 +180,12 @@ class StatementWindowController extends BaseController {
     void onNewTransaction(StatementRecord statementRecord) {
         var account = accountComboBox.getSelectionModel().getSelectedItem();
         new TransactionDialog(this, settings().getDialogCssFileUrl(), statementRecord, account, cache()).showAndWait()
-            .ifPresent(builder -> dao().insertTransaction(builder));
+                .ifPresent(builder -> dao().insertTransaction(builder));
     }
 
     void onStatementRecordSelected(StatementRecord statementRecord) {
         transactionTable.setTransactionFilter(
-            new StatementPredicate(accountComboBox.getValue(), statementRecord, ignoreExecutionDate.isSelected()));
+                new StatementPredicate(accountComboBox.getValue(), statementRecord, ignoreExecutionDate.isSelected()));
     }
 
     @Override
@@ -197,23 +199,23 @@ class StatementWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_MENU_ITEM_OPEN, ELLIPSIS), SHORTCUT_O, event -> onBrowse()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
-            newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                    event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
-                    event -> onCheckStatementRecord(true)),
-                menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
-                    event -> onCheckStatementRecord(false))
-            ),
-            createWindowMenu(),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_OPEN, ELLIPSIS), SHORTCUT_O, event -> onBrowse()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
+                newMenu(fxString(UI, I18N_MENU_EDIT),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
+                                event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
+                                event -> onCheckStatementRecord(true)),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
+                                event -> onCheckStatementRecord(false))
+                ),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
         return menuBar;
@@ -226,23 +228,23 @@ class StatementWindowController extends BaseController {
         var selectedUuid = selected == null ? null : selected.uuid();
 
         var accounts = cache().getAccounts().stream()
-            .filter(account -> account.type() == CategoryType.BANKS_AND_CASH
-                || account.type() == CategoryType.DEBTS)
-            .filter(Account::enabled)
-            .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
-            .toList();
+                .filter(account -> account.type() == CategoryType.BANKS_AND_CASH
+                        || account.type() == CategoryType.DEBTS)
+                .filter(Account::enabled)
+                .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
+                .toList();
 
         accountComboBox.getItems().setAll(accounts);
 
         accounts.stream().filter(a -> a.uuid().equals(selectedUuid)).findAny().ifPresentOrElse(
-            selectionModel::select,
-            () -> {
-                if (accountComboBox.getItems().isEmpty()) {
-                    selectionModel.clearSelection();
-                } else {
-                    selectionModel.select(0);
+                selectionModel::select,
+                () -> {
+                    if (accountComboBox.getItems().isEmpty()) {
+                        selectionModel.clearSelection();
+                    } else {
+                        selectionModel.select(0);
+                    }
                 }
-            }
         );
     }
 
@@ -254,8 +256,8 @@ class StatementWindowController extends BaseController {
         var chooser = new FileChooser();
         chooser.setTitle(UI.getString(I18N_WORD_STATEMENT));
         chooser.getExtensionFilters().addAll(
-            OFX_EXTENSION,
-            SBERBANK_HTML
+                OFX_EXTENSION,
+                SBERBANK_HTML
         );
 
         var lastDirString = settings().getLastStatementDir();
@@ -301,8 +303,8 @@ class StatementWindowController extends BaseController {
         this.statement = statement;
         accountComboBox.getSelectionModel().clearSelection();
         cache().getAccountByNumber(statement.accountNumber())
-            .ifPresentOrElse(a -> accountComboBox.getSelectionModel().select(a),
-                () -> accountComboBox.getSelectionModel().selectFirst());
+                .ifPresentOrElse(a -> accountComboBox.getSelectionModel().select(a),
+                        () -> accountComboBox.getSelectionModel().selectFirst());
         ymAccountBalanceLabel.setText(statement.balance().toString());
     }
 
@@ -323,8 +325,8 @@ class StatementWindowController extends BaseController {
 
         for (var record : statement.records()) {
             record.setTransactions(cache().getTransactions().stream()
-                .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
-                .toList());
+                    .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
+                    .toList());
         }
 
         Platform.runLater(() -> {
@@ -376,33 +378,34 @@ class StatementWindowController extends BaseController {
 
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().addAll(List.of(
-            tableColumn(fxString(UI, I18N_WORD_DATE), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
-                b.withCellFactory(x -> new LocalDateCell<>())
-                    .withPropertyCallback(StatementRecord::getActual)
-                    .withWidthBinding(w.multiply(0.05))),
-            tableColumn(fxString(UI, I18N_MISC_EXECUTION_DATE_SHORT), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
-                b.withCellFactory(x -> new LocalDateCell<>())
-                    .withPropertyCallback(StatementRecord::getExecution)
-                    .withWidthBinding(w.multiply(0.05))),
-            tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
-                b.withPropertyCallback(StatementRecord::getDescription).withWidthBinding(w.multiply(0.5))),
-            tableColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
-                b.withPropertyCallback(StatementRecord::getCounterParty).withWidthBinding(w.multiply(0.15))),
-            tableColumn(fxString(UI, I18N_WORD_PLACE), b ->
-                b.withPropertyCallback(StatementRecord::getPlace).withWidthBinding(w.multiply(0.10))),
-            tableColumn(fxString(UI, I18N_WORD_COUNTRY), b ->
-                b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
-            tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
-                b.withCellFactory(x -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
+                tableColumn(fxString(UI, I18N_WORD_DATE), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
+                        b.withCellFactory(x -> new LocalDateCell<>())
+                                .withPropertyCallback(StatementRecord::getActual)
+                                .withWidthBinding(w.multiply(0.05))),
+                tableColumn(fxString(UI, I18N_MISC_EXECUTION_DATE_SHORT), (TableColumnBuilder<StatementRecord,
+                        LocalDate> b) ->
+                        b.withCellFactory(x -> new LocalDateCell<>())
+                                .withPropertyCallback(StatementRecord::getExecution)
+                                .withWidthBinding(w.multiply(0.05))),
+                tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
+                        b.withPropertyCallback(StatementRecord::getDescription).withWidthBinding(w.multiply(0.5))),
+                tableColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
+                        b.withPropertyCallback(StatementRecord::getCounterParty).withWidthBinding(w.multiply(0.15))),
+                tableColumn(fxString(UI, I18N_WORD_PLACE), b ->
+                        b.withPropertyCallback(StatementRecord::getPlace).withWidthBinding(w.multiply(0.10))),
+                tableColumn(fxString(UI, I18N_WORD_COUNTRY), b ->
+                        b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
+                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                        b.withCellFactory(x -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         var menu = new ContextMenu();
         menu.getItems().addAll(menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS),
-            event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
+                event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
         tableView.setContextMenu(menu);
 
         tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) ->
-            onStatementRecordSelected(newValue));
+                onStatementRecordSelected(newValue));
 
         return tableView;
     }

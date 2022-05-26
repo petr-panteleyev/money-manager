@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.app.cells;
 
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
+
 import static org.panteleyev.money.app.Bundles.translate;
 
 public class TransactionTypeCell extends TableCell<Transaction, Transaction> {
@@ -23,7 +24,7 @@ public class TransactionTypeCell extends TableCell<Transaction, Transaction> {
     public void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
         setText(empty || transaction == null ? "" :
-            translate(transaction.type())
+                translate(transaction.type())
         );
     }
 }

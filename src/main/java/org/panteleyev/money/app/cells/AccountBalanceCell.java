@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
+
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class AccountBalanceCell extends TableCell<Account, Account> {
@@ -41,11 +42,11 @@ public class AccountBalanceCell extends TableCell<Account, Account> {
             var sum = total ? Account.getBalance(account) : account.totalWaiting();
 
             setText(cache().getCurrency(account.currencyUuid())
-                .map(curr -> curr.formatValue(sum))
-                .orElse(Currency.defaultFormatValue(sum)));
+                    .map(curr -> curr.formatValue(sum))
+                    .orElse(Currency.defaultFormatValue(sum)));
 
             getStyleClass().add(
-                sum.signum() < 0 ? Styles.DEBIT : Styles.CREDIT
+                    sum.signum() < 0 ? Styles.DEBIT : Styles.CREDIT
             );
         }
     }

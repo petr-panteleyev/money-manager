@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,13 @@ public class TransactionPredicateBundle_ru_RU extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return new Object[][]{
-            {"ALL", "Все проводки"},
-            {"CURRENT_MONTH", "Текущий месяц"},
-            {"CURRENT_WEEK", "Текущая неделя"},
-            {"CURRENT_YEAR", "Текущий год"},
-            {"LAST_MONTH", "Последний месяц"},
-            {"LAST_QUARTER", "Последний квартал"},
-            {"LAST_YEAR", "Последний год"},
+                {"ALL", "Все проводки"},
+                {"CURRENT_MONTH", "Текущий месяц"},
+                {"CURRENT_WEEK", "Текущая неделя"},
+                {"CURRENT_YEAR", "Текущий год"},
+                {"LAST_MONTH", "Последний месяц"},
+                {"LAST_QUARTER", "Последний квартал"},
+                {"LAST_YEAR", "Последний год"},
         };
     }
 }

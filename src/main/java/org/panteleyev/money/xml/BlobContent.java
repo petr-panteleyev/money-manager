@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,5 +19,5 @@ import java.util.UUID;
 public record BlobContent(UUID uuid, BlobType type, byte[] bytes) {
     public enum BlobType {
         DOCUMENT
-    };
+    }
 }

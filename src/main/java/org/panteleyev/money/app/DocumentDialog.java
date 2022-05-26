@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -33,14 +33,13 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Named;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
@@ -76,11 +75,6 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
         }
     }
 
-    private static final Map<String, String> MIME_TYPES = Map.of(
-            ".pdf", "application/pdf",
-            ".xml", "application/xml"
-    );
-
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField contactEdit = new TextField();
@@ -94,6 +88,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     private final TextField descriptionEdit = new TextField();
 
     private byte[] bytes = new byte[0];
+    private String mimeType = "";
     private UUID contactUuid;
 
     private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
@@ -103,6 +98,10 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     };
 
     DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document) {
+        this(owner, documentOwner, css, document, null);
+    }
+
+    DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document, File file) {
         super(owner, css);
         setTitle(fxString(UI, I18N_WORD_DOCUMENT));
 
@@ -116,7 +115,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
         setupContactMenu();
 
         var browseButton = button("...", event -> onBrowse());
-        browseButton.setDisable(document != null);
+        browseButton.setDisable(document != null || file != null);
         getDialogPane().setContent(
                 gridPane(List.of(
                                 gridRow(label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
@@ -136,6 +135,9 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
             nameEdit.setText("");
             typeComboBox.getSelectionModel().select(DocumentType.OTHER);
             datePicker.setValue(LocalDate.now());
+            if (file != null) {
+                readFile(file);
+            }
         } else {
             contactUuid = document.contactUuid();
             contactEdit.setText(cache().getContact(contactUuid).map(Contact::name).orElse(""));
@@ -167,7 +169,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
                 builder.uuid(UUID.randomUUID())
                         .fileName(nameEdit.getText())
                         .size(bytes.length)
-                        .mimeType(calculateMimeType(nameEdit.getText()))
+                        .mimeType(mimeType == null ? "" : mimeType)
                         .created(now);
             }
 
@@ -198,25 +200,20 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     }
 
     private void onBrowse() {
-        var d = new FileChooser();
-        var selected = d.showOpenDialog(getOwner());
+        var selected = new FileChooser().showOpenDialog(getOwner());
         if (selected != null) {
-            try {
-                bytes = Files.readAllBytes(selected.toPath());
-                nameEdit.setText(selected.getName());
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
+            readFile(selected);
         }
     }
 
-    private static String calculateMimeType(String fileName) {
-        var dotIndex = fileName.lastIndexOf(".");
-        if (dotIndex != -1) {
-            var extension = fileName.substring(dotIndex);
-            return Optional.ofNullable(MIME_TYPES.get(extension)).orElse("");
-        } else {
-            return "";
+    private void readFile(File file) {
+        try {
+            var path = file.toPath();
+            bytes = Files.readAllBytes(path);
+            mimeType = Files.probeContentType(path);
+            nameEdit.setText(file.getName());
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 

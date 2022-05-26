@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,12 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.StagePositionAndSize;
 import org.panteleyev.fx.WindowManager;
 import org.w3c.dom.Element;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
 import static org.panteleyev.money.xml.XMLUtils.getAttribute;
@@ -49,7 +51,7 @@ final class WindowsSettings {
 
     void restoreWindowDimensions(Controller controller) {
         controller.setStagePositionAndSize(
-            windowMap.get(controller.getClass().getSimpleName())
+                windowMap.get(controller.getClass().getSimpleName())
         );
     }
 
@@ -83,7 +85,7 @@ final class WindowsSettings {
                 var height = getAttribute(windowElement, HEIGHT_ATTR, DEFAULT_HEIGHT);
                 var maximized = getAttribute(windowElement, MAXIMIZED_ATTR, false);
                 windowMap.put(className, new StagePositionAndSize(
-                    x, y, width, height, maximized
+                        x, y, width, height, maximized
                 ));
             }
         }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,11 +17,10 @@ package org.panteleyev.money.persistence;
 import javafx.embed.swing.JFXPanel;
 import org.h2.jdbcx.JdbcDataSource;
 import org.panteleyev.money.test.BaseTest;
-import java.sql.Connection;
-import java.sql.SQLException;
+
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
+
 import static org.panteleyev.money.app.GlobalContext.dao;
 
 public class BaseDaoTest extends BaseTest {
@@ -31,13 +30,13 @@ public class BaseDaoTest extends BaseTest {
 
     public void setupAndSkip() throws Exception {
         try {
-        var dataSource = new JdbcDataSource();
-        dataSource.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
-        try (var conn = dataSource.getConnection()) {
-            new LiquibaseUtil(conn).update();
-        }
-        dao().initialize(dataSource);
-        new JFXPanel();
+            var dataSource = new JdbcDataSource();
+            dataSource.setURL("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1");
+            try (var conn = dataSource.getConnection()) {
+                new LiquibaseUtil(conn).update();
+            }
+            dao().initialize(dataSource);
+            new JFXPanel();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -46,7 +45,7 @@ public class BaseDaoTest extends BaseTest {
 
     protected void initializeEmptyMoneyFile() {
         dao().createTables();
-        dao().preload(t -> { });
+        dao().preload(t -> {});
     }
 
     protected Optional<?> get(Repository<?> repository, UUID uuid) {

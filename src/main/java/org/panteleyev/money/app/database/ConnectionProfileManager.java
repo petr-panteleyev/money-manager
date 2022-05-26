@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.app.database;
 
 import javafx.scene.control.Dialog;
 import org.panteleyev.money.app.ApplicationFiles;
+
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import static org.panteleyev.money.app.GlobalContext.files;
 
 public final class ConnectionProfileManager {
@@ -40,8 +42,7 @@ public final class ConnectionProfileManager {
     private final Function<ConnectionProfile, DataSource> buildDataSourceCallback;
 
     public ConnectionProfileManager(Function<ConnectionProfile, Exception> initDatabaseCallback,
-                                    Function<ConnectionProfile, DataSource> buildDataSourceCallback)
-    {
+                                    Function<ConnectionProfile, DataSource> buildDataSourceCallback) {
         this.resetDatabaseCallback = Objects.requireNonNull(initDatabaseCallback);
         this.buildDataSourceCallback = Objects.requireNonNull(buildDataSourceCallback);
     }
@@ -77,9 +78,9 @@ public final class ConnectionProfileManager {
 
     public void saveProfiles() {
         files().write(ApplicationFiles.AppFile.PROFILES, out -> new ProfileSettings(
-            profiles.values(),
-            defaultProfile == null ? "" : defaultProfile.name(),
-            autoConnect
+                profiles.values(),
+                defaultProfile == null ? "" : defaultProfile.name(),
+                autoConnect
         ).save(out));
     }
 
@@ -89,7 +90,7 @@ public final class ConnectionProfileManager {
             autoConnect = settings.autoConnect();
             profiles.clear();
             profiles.putAll(settings.profiles().stream()
-                .collect(Collectors.toMap(ConnectionProfile::name, Function.identity())));
+                    .collect(Collectors.toMap(ConnectionProfile::name, Function.identity())));
             var defaultProfileName = settings.defaultProfile();
             if (defaultProfileName != null && !defaultProfileName.isBlank()) {
                 defaultProfile = profiles.get(defaultProfileName);

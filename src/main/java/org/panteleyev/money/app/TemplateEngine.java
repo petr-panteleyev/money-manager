@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.app;
 
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.template.Configuration;
+
 import java.io.Writer;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public final class TemplateEngine {
         }
     }
 
-    private static final String TEMPLATE_PATH  = "/org/panteleyev/money/templates";
+    private static final String TEMPLATE_PATH = "/org/panteleyev/money/templates";
     private static final TemplateEngine ENGINE = new TemplateEngine();
 
     private final Configuration configuration;

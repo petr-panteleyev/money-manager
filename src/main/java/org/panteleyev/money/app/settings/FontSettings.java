@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,12 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import org.w3c.dom.Element;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static java.util.Objects.requireNonNull;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
@@ -45,7 +47,7 @@ final class FontSettings {
 
     Font getFont(FontName fontName) {
         return fontMap.computeIfAbsent(fontName,
-            key -> Font.font(DEFAULT_FONT_FAMILY, FontWeight.NORMAL, FontPosture.REGULAR, DEFAULT_FONT_SIZE));
+                key -> Font.font(DEFAULT_FONT_FAMILY, FontWeight.NORMAL, FontPosture.REGULAR, DEFAULT_FONT_SIZE));
     }
 
     void setFont(FontName fontName, Font font) {
@@ -80,9 +82,9 @@ final class FontSettings {
                 var size = getAttribute(fontElement, FONT_ATTR_SIZE, DEFAULT_FONT_SIZE);
 
                 var font = Font.font(family,
-                    style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
-                    style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
-                    size);
+                        style.toLowerCase().contains("bold") ? FontWeight.BOLD : FontWeight.NORMAL,
+                        style.toLowerCase().contains("italic") ? FontPosture.ITALIC : FontPosture.REGULAR,
+                        size);
 
                 fontMap.put(option, font);
             });

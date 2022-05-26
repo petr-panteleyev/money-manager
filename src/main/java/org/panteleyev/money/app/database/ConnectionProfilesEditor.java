@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -37,9 +37,11 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ReadOnlyStringConverter;
+
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
+
 import static javafx.event.ActionEvent.ACTION;
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.Alert.AlertType.WARNING;
@@ -113,7 +115,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         var saveButtonType = buttonType(fxString(UI, I18N_WORD_SAVE), SMALL_GAP);
 
         getDialogPane().getButtonTypes().addAll(
-            newButtonType, deleteButtonType, testButtonType, saveButtonType, CLOSE
+                newButtonType, deleteButtonType, testButtonType, saveButtonType, CLOSE
         );
 
         getButton(newButtonType).ifPresent(b -> b.addEventFilter(ACTION, this::onNewButton));
@@ -125,7 +127,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         getButton(saveButtonType).ifPresent(b -> {
             b.disableProperty().bind(profileNameValidation.invalidProperty()
-                .or(profileListView.getSelectionModel().selectedItemProperty().isNull())
+                    .or(profileListView.getSelectionModel().selectedItemProperty().isNull())
             );
             b.addEventFilter(ACTION, this::onSaveButton);
         });
@@ -167,7 +169,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         });
 
         listView.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) -> onProfileSelected(newValue));
+                .addListener((observable, oldValue, newValue) -> onProfileSelected(newValue));
 
         listView.addEventFilter(MouseEvent.ANY, event -> {
             if (profileNameValidation.isInvalid()) {
@@ -182,14 +184,14 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onDeleteButton(ActionEvent event) {
         event.consume();
         getSelectedProfile().ifPresent(selected ->
-            new Alert(CONFIRMATION, fxString(UI, I18N_MISC_ARE_YOU_SURE), OK, CANCEL)
-                .showAndWait()
-                .filter(response -> response == OK)
-                .ifPresent(b -> {
-                    profileManager.deleteProfile(selected);
-                    profileManager.saveProfiles();
-                    profileListView.getItems().remove(selected);
-                }));
+                new Alert(CONFIRMATION, fxString(UI, I18N_MISC_ARE_YOU_SURE), OK, CANCEL)
+                        .showAndWait()
+                        .filter(response -> response == OK)
+                        .ifPresent(b -> {
+                            profileManager.deleteProfile(selected);
+                            profileManager.saveProfiles();
+                            profileListView.getItems().remove(selected);
+                        }));
     }
 
     private void onSaveButton(ActionEvent event) {
@@ -208,12 +210,12 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
     private ConnectionProfile buildConnectionProfile() {
         return new ConnectionProfile(
-            profileNameEdit.getText(),
-            tcpEditor.getDataBaseHost(),
-            tcpEditor.getDataBasePort(),
-            tcpEditor.getDataBaseUser(),
-            tcpEditor.getDataBasePassword(),
-            tcpEditor.getSchema()
+                profileNameEdit.getText(),
+                tcpEditor.getDataBaseHost(),
+                tcpEditor.getDataBasePort(),
+                tcpEditor.getDataBaseUser(),
+                tcpEditor.getDataBasePassword(),
+                tcpEditor.getSchema()
         );
     }
 
@@ -225,17 +227,17 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_RESET));
 
         alert.showAndWait()
-            .filter(response -> response == YES)
-            .ifPresent(b -> {
-                var profile = buildConnectionProfile();
+                .filter(response -> response == YES)
+                .ifPresent(b -> {
+                    var profile = buildConnectionProfile();
 
-                var ex = profileManager.getResetDatabaseCallback().apply(profile);
-                if (ex != null) {
-                    testFail(ex.getMessage());
-                } else {
-                    testSuccess();
-                }
-            });
+                    var ex = profileManager.getResetDatabaseCallback().apply(profile);
+                    if (ex != null) {
+                        testFail(ex.getMessage());
+                    } else {
+                        testSuccess();
+                    }
+                });
     }
 
     private void onTestButton(ActionEvent event) {
@@ -289,13 +291,13 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
     private void createValidationSupport() {
         validation.registerValidator(tcpEditor.getSchemaEdit(), (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty())
+                ValidationResult.fromErrorIf(control, null, value.isEmpty())
         );
         validation.registerValidator(tcpEditor.getDataBaseHostEdit(), (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty())
+                ValidationResult.fromErrorIf(control, null, value.isEmpty())
         );
         validation.registerValidator(tcpEditor.getDataBaseUserEdit(), (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty())
+                ValidationResult.fromErrorIf(control, null, value.isEmpty())
         );
         validation.registerValidator(tcpEditor.getDataBasePortEdit(), INTEGER_VALIDATOR);
         validation.initInitialDecoration();
@@ -304,7 +306,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             var selected = getSelectedProfile().orElse(null);
 
             return ValidationResult.fromErrorIf(control, null,
-                profileListView.getItems().stream().anyMatch(p -> p != selected && p.name().equals(value)));
+                    profileListView.getItems().stream().anyMatch(p -> p != selected && p.name().equals(value)));
         });
 
         profileNameValidation.initInitialDecoration();

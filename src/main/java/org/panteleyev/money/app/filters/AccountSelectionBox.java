@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,10 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
+
 import java.util.Optional;
 import java.util.function.Predicate;
+
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
@@ -48,22 +50,22 @@ public class AccountSelectionBox extends HBox {
     private final static String ALL_ACCOUNTS_STRING = UI.getString(I18N_MISC_ALL_ACCOUNTS);
 
     private final ComboBox<CategoryType> categoryTypeBox =
-        comboBox(CategoryType.values(),
-            b -> b.withDefaultString(ALL_TYPES_STRING)
-                .withStringConverter(Bundles::translate)
-        );
+            comboBox(CategoryType.values(),
+                    b -> b.withDefaultString(ALL_TYPES_STRING)
+                            .withStringConverter(Bundles::translate)
+            );
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
     private final ComboBox<Category> categoryBox = comboBox(
-        filteredCategories.sorted(cache().getCategoryByNameComparator()),
-        b -> b.withDefaultString(ALL_CATEGORIES_STRING)
-            .withStringConverter(Category::name)
-            .withImageConverter(CATEGORY_TO_IMAGE));
+            filteredCategories.sorted(cache().getCategoryByNameComparator()),
+            b -> b.withDefaultString(ALL_CATEGORIES_STRING)
+                    .withStringConverter(Category::name)
+                    .withImageConverter(CATEGORY_TO_IMAGE));
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
     private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(cache().getAccountByNameComparator()),
-        b -> b.withDefaultString(ALL_ACCOUNTS_STRING)
-            .withStringConverter(Account::name)
-            .withImageConverter(ACCOUNT_TO_IMAGE));
+            b -> b.withDefaultString(ALL_ACCOUNTS_STRING)
+                    .withStringConverter(Account::name)
+                    .withImageConverter(ACCOUNT_TO_IMAGE));
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
 
     public AccountSelectionBox() {
@@ -77,10 +79,10 @@ public class AccountSelectionBox extends HBox {
         accountBox.setVisibleRowCount(20);
 
         categoryTypeBox.setOnAction(
-            event -> setupCategoryBox(getSelectedCategoryType().orElse(null))
+                event -> setupCategoryBox(getSelectedCategoryType().orElse(null))
         );
         categoryBox.setOnAction(
-            event -> setupAccountBox(getSelectedCategory().orElse(null))
+                event -> setupAccountBox(getSelectedCategory().orElse(null))
         );
         accountBox.setOnAction(event -> updatePredicate());
 
@@ -112,7 +114,7 @@ public class AccountSelectionBox extends HBox {
         var selectedAccount = getSelectedAccount();
 
         filteredAccounts.setPredicate(
-            category == null ? a -> true : a -> a.categoryUuid().equals(category.uuid())
+                category == null ? a -> true : a -> a.categoryUuid().equals(category.uuid())
         );
 
         accountBox.setValue(null);
@@ -137,16 +139,16 @@ public class AccountSelectionBox extends HBox {
 
     Predicate<Transaction> getTransactionFilter() {
         return getSelectedAccount().map(a -> transactionByAccount(a.uuid()))
-            .orElseGet(() -> getSelectedCategory().map(c -> transactionByCategory(c.uuid()))
-                .orElseGet(() -> getSelectedCategoryType().map(TransactionPredicate::transactionByCategoryType)
-                    .orElse(x -> true)));
+                .orElseGet(() -> getSelectedCategory().map(c -> transactionByCategory(c.uuid()))
+                        .orElseGet(() -> getSelectedCategoryType().map(TransactionPredicate::transactionByCategoryType)
+                                .orElse(x -> true)));
     }
 
     public Predicate<Account> getAccountFilter() {
         return getSelectedAccount().map(a -> accountByUuid(a.uuid()))
-            .orElseGet(() -> getSelectedCategory().map(c -> accountByCategory(c.uuid()))
-                .orElseGet(() -> getSelectedCategoryType().map(Predicates::accountByCategoryType)
-                    .orElse(x -> true)));
+                .orElseGet(() -> getSelectedCategory().map(c -> accountByCategory(c.uuid()))
+                        .orElseGet(() -> getSelectedCategoryType().map(Predicates::accountByCategoryType)
+                                .orElse(x -> true)));
     }
 
     private void updatePredicate() {

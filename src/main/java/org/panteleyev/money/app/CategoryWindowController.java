@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -32,9 +32,11 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.app.cells.CategoryNameCell;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
@@ -74,15 +76,15 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 final class CategoryWindowController extends BaseController {
     private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.values(),
-        b -> b.withDefaultString(ALL_TYPES_STRING)
-            .withStringConverter(Bundles::translate)
+            b -> b.withDefaultString(ALL_TYPES_STRING)
+                    .withStringConverter(Bundles::translate)
     );
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
     private final SortedList<Category> sortedList = filteredList.sorted(
-        cache().getCategoryByTypeComparator()
-            .thenComparing(cache().getCategoryByNameComparator())
+            cache().getCategoryByTypeComparator()
+                    .thenComparing(cache().getCategoryByNameComparator())
     );
     private final TableView<Category> categoryTable = new TableView<>(sortedList);
 
@@ -94,47 +96,48 @@ final class CategoryWindowController extends BaseController {
         var disableBinding = categoryTable.getSelectionModel().selectedItemProperty().isNull();
 
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-            newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F, actionEvent -> searchField.requestFocus())),
-            newMenu(fxString(UI, I18N_MENU_VIEW),
-                menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
-            createWindowMenu(),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+                newMenu(fxString(UI, I18N_MENU_EDIT),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
+                                actionEvent -> searchField.requestFocus())),
+                newMenu(fxString(UI, I18N_MENU_VIEW),
+                        menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
         categoryTable.setContextMenu(new ContextMenu(
-            menuItem(fxString(UI, I18N_MENU_ITEM_ADD), addHandler),
-            menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding)));
+                menuItem(fxString(UI, I18N_MENU_ITEM_ADD), addHandler),
+                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding)));
 
         // Table
         var w = categoryTable.widthProperty().subtract(20);
         categoryTable.getColumns().setAll(List.of(
-            tableColumn(fxString(UI, I18N_WORD_TYPE),
-                b -> b.withPropertyCallback(c -> translate(c.type())).withWidthBinding(w.multiply(0.2))),
-            tableObjectColumn(fxString(UI, I18N_WORD_ENTITY_NAME),
-                b -> b.withCellFactory(x -> new CategoryNameCell()).withWidthBinding(w.multiply(0.4))),
-            tableColumn(fxString(UI, I18N_WORD_COMMENT),
-                b -> b.withPropertyCallback(Category::comment).withWidthBinding(w.multiply(0.4)))
+                tableColumn(fxString(UI, I18N_WORD_TYPE),
+                        b -> b.withPropertyCallback(c -> translate(c.type())).withWidthBinding(w.multiply(0.2))),
+                tableObjectColumn(fxString(UI, I18N_WORD_ENTITY_NAME),
+                        b -> b.withCellFactory(x -> new CategoryNameCell()).withWidthBinding(w.multiply(0.4))),
+                tableColumn(fxString(UI, I18N_WORD_COMMENT),
+                        b -> b.withPropertyCallback(Category::comment).withWidthBinding(w.multiply(0.4)))
         ));
 
         categoryTable.setOnMouseClicked(this::onTableMouseClick);
 
         var pane = new BorderPane(categoryTable,
-            fxNode(
-                hBox(List.of(searchField, typeBox), b -> {
-                    b.setSpacing(BIG_SPACING);
-                    b.setAlignment(Pos.CENTER_LEFT);
-                }),
-                b -> BorderPane.setMargin(b, new Insets(5.0, 5.0, 5.0, 5.0))
-            ),
-            null, null, null);
+                fxNode(
+                        hBox(List.of(searchField, typeBox), b -> {
+                            b.setSpacing(BIG_SPACING);
+                            b.setAlignment(Pos.CENTER_LEFT);
+                        }),
+                        b -> BorderPane.setMargin(b, new Insets(5.0, 5.0, 5.0, 5.0))
+                ),
+                null, null, null);
 
         var self = new BorderPane(pane, menuBar, null, null, null);
         self.setPrefSize(600.0, 400.0);
@@ -178,14 +181,14 @@ final class CategoryWindowController extends BaseController {
 
     private void onMenuEdit() {
         getSelectedCategory()
-            .flatMap(category ->
-                new CategoryDialog(this, settings().getDialogCssFileUrl(), category).showAndWait())
-            .ifPresent(c -> dao().updateCategory(c));
+                .flatMap(category ->
+                        new CategoryDialog(this, settings().getDialogCssFileUrl(), category).showAndWait())
+                .ifPresent(c -> dao().updateCategory(c));
     }
 
     private void onMenuAdd() {
         new CategoryDialog(this, settings().getDialogCssFileUrl(), null).showAndWait()
-            .ifPresent(c -> dao().insertCategory(c));
+                .ifPresent(c -> dao().insertCategory(c));
     }
 
     private void updatePredicate() {

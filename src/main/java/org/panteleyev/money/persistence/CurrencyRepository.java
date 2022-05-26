@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Currency;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,50 +28,50 @@ final class CurrencyRepository extends Repository<Currency> {
     @Override
     protected String getInsertSql() {
         return """
-            INSERT INTO currency (
-                symbol, description, format_symbol, format_symbol_pos,
-                show_format_symbol, def, rate, rate_direction, use_th_separator,
-                created, modified, uuid
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-            )
-            """;
+                INSERT INTO currency (
+                    symbol, description, format_symbol, format_symbol_pos,
+                    show_format_symbol, def, rate, rate_direction, use_th_separator,
+                    created, modified, uuid
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
+                """;
     }
 
     @Override
     protected String getUpdateSql() {
         return """
-            UPDATE currency SET
-                symbol = ?,
-                description = ?,
-                format_symbol = ?,
-                format_symbol_pos = ?,
-                show_format_symbol = ?,
-                def = ?,
-                rate = ?,
-                rate_direction = ?,
-                use_th_separator = ?,
-                created = ?,
-                modified = ?
-            WHERE uuid = ?
-            """;
+                UPDATE currency SET
+                    symbol = ?,
+                    description = ?,
+                    format_symbol = ?,
+                    format_symbol_pos = ?,
+                    show_format_symbol = ?,
+                    def = ?,
+                    rate = ?,
+                    rate_direction = ?,
+                    use_th_separator = ?,
+                    created = ?,
+                    modified = ?
+                WHERE uuid = ?
+                """;
     }
 
     @Override
     protected Currency fromResultSet(ResultSet rs) throws SQLException {
         return new Currency(
-            getUuid(rs, "uuid"),
-            rs.getString("symbol"),
-            rs.getString("description"),
-            rs.getString("format_symbol"),
-            rs.getInt("format_symbol_pos"),
-            getBoolean(rs, "show_format_symbol"),
-            getBoolean(rs, "def"),
-            rs.getBigDecimal("rate"),
-            rs.getInt("rate_direction"),
-            getBoolean(rs, "use_th_separator"),
-            rs.getLong("created"),
-            rs.getLong("modified")
+                getUuid(rs, "uuid"),
+                rs.getString("symbol"),
+                rs.getString("description"),
+                rs.getString("format_symbol"),
+                rs.getInt("format_symbol_pos"),
+                getBoolean(rs, "show_format_symbol"),
+                getBoolean(rs, "def"),
+                rs.getBigDecimal("rate"),
+                rs.getInt("rate_direction"),
+                getBoolean(rs, "use_th_separator"),
+                rs.getLong("created"),
+                rs.getLong("modified")
         );
     }
 

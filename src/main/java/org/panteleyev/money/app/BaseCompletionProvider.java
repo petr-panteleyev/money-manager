@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,13 +16,14 @@ package org.panteleyev.money.app;
 
 import javafx.util.Callback;
 import org.controlsfx.control.textfield.AutoCompletionBinding;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
 public abstract class BaseCompletionProvider<T> implements Callback<AutoCompletionBinding.ISuggestionRequest,
-    Collection<T>> {
+        Collection<T>> {
     private final Set<T> set;
     private final Supplier<Integer> minLengthSupplier;
 
@@ -43,8 +44,8 @@ public abstract class BaseCompletionProvider<T> implements Callback<AutoCompleti
         var stripped = userText.stripLeading().toLowerCase();
 
         var result = set.stream()
-            .filter(it -> getElementString(it).toLowerCase().contains(stripped))
-            .toList();
+                .filter(it -> getElementString(it).toLowerCase().contains(stripped))
+                .toList();
 
         if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
             /* If there is a single case sensitive match then no suggestions must be shown. */

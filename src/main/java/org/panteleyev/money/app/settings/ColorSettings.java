@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,10 +16,12 @@ package org.panteleyev.money.app.settings;
 
 import javafx.scene.paint.Color;
 import org.w3c.dom.Element;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static java.util.Objects.requireNonNull;
 import static org.panteleyev.money.xml.XMLUtils.appendElement;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;
@@ -41,15 +43,15 @@ final class ColorSettings {
     String getWebString(ColorName option) {
         var color = getColor(option);
         return "#"
-            + colorToHex(color.getRed())
-            + colorToHex(color.getGreen())
-            + colorToHex(color.getBlue());
+                + colorToHex(color.getRed())
+                + colorToHex(color.getGreen())
+                + colorToHex(color.getBlue());
     }
 
     void setColor(ColorName option, Color color) {
         colorMap.put(
-            requireNonNull(option),
-            requireNonNull(color)
+                requireNonNull(option),
+                requireNonNull(color)
         );
     }
 
@@ -72,7 +74,8 @@ final class ColorSettings {
         for (int i = 0; i < colorNodes.getLength(); i++) {
             var colorElement = (Element) colorNodes.item(i);
             ColorName.of(colorElement.getAttribute(COLOR_ATTR_NAME).toUpperCase())
-                .ifPresent(option -> colorMap.put(option, Color.valueOf(colorElement.getAttribute(COLOR_ATTR_VALUE))));
+                    .ifPresent(option -> colorMap.put(option,
+                            Color.valueOf(colorElement.getAttribute(COLOR_ATTR_VALUE))));
         }
     }
 

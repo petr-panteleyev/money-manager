@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,14 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.app.ApplicationFiles;
 import org.panteleyev.money.app.TemplateEngine;
+
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
@@ -51,39 +53,39 @@ public final class Settings {
 
     private void generateCssFiles() {
         var dataModel = Map.ofEntries(
-            entry("debitColor", colorSettings.getWebString(ColorName.DEBIT)),
-            entry("creditColor", colorSettings.getWebString(ColorName.CREDIT)),
-            entry("transferColor", colorSettings.getWebString(ColorName.TRANSFER)),
-            entry("controlsFontFamily", fontSettings.getFont(FontName.CONTROLS_FONT).getFamily()),
-            entry("controlsFontSize", (int) fontSettings.getFont(FontName.CONTROLS_FONT).getSize()),
-            entry("menuFontFamily", fontSettings.getFont(FontName.MENU_FONT).getFamily()),
-            entry("menuFontSize", (int) fontSettings.getFont(FontName.MENU_FONT).getSize()),
-            entry("tableCellFontFamily", fontSettings.getFont(FontName.TABLE_CELL_FONT).getFamily()),
-            entry("tableCellFontSize", (int) fontSettings.getFont(FontName.TABLE_CELL_FONT).getSize()),
-            entry("statementCheckedColor", colorSettings.getWebString(ColorName.STATEMENT_CHECKED)),
-            entry("statementUncheckedColor", colorSettings.getWebString(ColorName.STATEMENT_UNCHECKED)),
-            entry("statementMissingColor", colorSettings.getWebString(ColorName.STATEMENT_MISSING)),
-            // dialogs
-            entry("dialogLabelFontFamily", fontSettings.getFont(FontName.DIALOG_LABEL_FONT).getFamily()),
-            entry("dialogLabelFontSize", (int) fontSettings.getFont(FontName.DIALOG_LABEL_FONT).getSize())
+                entry("debitColor", colorSettings.getWebString(ColorName.DEBIT)),
+                entry("creditColor", colorSettings.getWebString(ColorName.CREDIT)),
+                entry("transferColor", colorSettings.getWebString(ColorName.TRANSFER)),
+                entry("controlsFontFamily", fontSettings.getFont(FontName.CONTROLS_FONT).getFamily()),
+                entry("controlsFontSize", (int) fontSettings.getFont(FontName.CONTROLS_FONT).getSize()),
+                entry("menuFontFamily", fontSettings.getFont(FontName.MENU_FONT).getFamily()),
+                entry("menuFontSize", (int) fontSettings.getFont(FontName.MENU_FONT).getSize()),
+                entry("tableCellFontFamily", fontSettings.getFont(FontName.TABLE_CELL_FONT).getFamily()),
+                entry("tableCellFontSize", (int) fontSettings.getFont(FontName.TABLE_CELL_FONT).getSize()),
+                entry("statementCheckedColor", colorSettings.getWebString(ColorName.STATEMENT_CHECKED)),
+                entry("statementUncheckedColor", colorSettings.getWebString(ColorName.STATEMENT_UNCHECKED)),
+                entry("statementMissingColor", colorSettings.getWebString(ColorName.STATEMENT_MISSING)),
+                // dialogs
+                entry("dialogLabelFontFamily", fontSettings.getFont(FontName.DIALOG_LABEL_FONT).getFamily()),
+                entry("dialogLabelFontSize", (int) fontSettings.getFont(FontName.DIALOG_LABEL_FONT).getSize())
         );
 
         files.write(ApplicationFiles.AppFile.MAIN_CSS, out -> templateEngine().process(
-            TemplateEngine.Template.MAIN_CSS, dataModel, new OutputStreamWriter(out)
+                TemplateEngine.Template.MAIN_CSS, dataModel, new OutputStreamWriter(out)
         ));
 
         files.write(ApplicationFiles.AppFile.DIALOG_CSS, out -> templateEngine().process(
-            TemplateEngine.Template.DIALOG_CSS, dataModel, new OutputStreamWriter(out)
+                TemplateEngine.Template.DIALOG_CSS, dataModel, new OutputStreamWriter(out)
         ));
 
         files.write(ApplicationFiles.AppFile.ABOUT_DIALOG_CSS, out -> templateEngine().process(
-            TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, new OutputStreamWriter(out)
+                TemplateEngine.Template.ABOUT_DIALOG_CSS, dataModel, new OutputStreamWriter(out)
         ));
     }
 
     private void reloadCssFile() {
         WindowManager.newInstance().getControllers().forEach(
-            c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
+                c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
         );
     }
 

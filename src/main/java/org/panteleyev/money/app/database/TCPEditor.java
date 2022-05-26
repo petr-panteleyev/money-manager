@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,10 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.money.app.Images;
+
 import java.util.List;
 import java.util.function.Consumer;
+
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -57,14 +59,15 @@ final class TCPEditor extends VBox {
         resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
 
         getChildren().addAll(gridPane(
-            List.of(
-                gridRow(label(fxString(UI, I18N_WORD_SERVER, COLON)), dataBaseHostEdit,
-                    label(fxString(UI, I18N_WORD_PORT, COLON)), dataBasePortEdit),
-                gridRow(label(fxString(UI, I18N_WORD_LOGIN, COLON)), gridCell(dataBaseUserEdit, 3, 1)),
-                gridRow(label(fxString(UI, I18N_WORD_PASSWORD, COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
-                gridRow(label(fxString(UI, I18N_WORD_SCHEMA, COLON)), gridCell(schemaEdit, 2, 1), resetSchemaButton)
-            ), b -> b.withStyle(GRID_PANE)
-                .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
+                List.of(
+                        gridRow(label(fxString(UI, I18N_WORD_SERVER, COLON)), dataBaseHostEdit,
+                                label(fxString(UI, I18N_WORD_PORT, COLON)), dataBasePortEdit),
+                        gridRow(label(fxString(UI, I18N_WORD_LOGIN, COLON)), gridCell(dataBaseUserEdit, 3, 1)),
+                        gridRow(label(fxString(UI, I18N_WORD_PASSWORD, COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
+                        gridRow(label(fxString(UI, I18N_WORD_SCHEMA, COLON)), gridCell(schemaEdit, 2, 1),
+                                resetSchemaButton)
+                ), b -> b.withStyle(GRID_PANE)
+                        .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
         ));
 
         VBox.setMargin(getChildren().get(0), new Insets(10.0, 10.0, 10.0, 10.0));

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.app;
 
 import javafx.scene.image.Image;
 import org.panteleyev.money.model.CardType;
+
 import static org.panteleyev.money.app.icons.IconManager.ICON_SIZE;
 
 public interface Images {

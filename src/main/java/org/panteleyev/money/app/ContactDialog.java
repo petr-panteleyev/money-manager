@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -29,9 +29,11 @@ import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
+
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
+
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
@@ -58,7 +60,7 @@ final class ContactDialog extends BaseDialog<Contact> {
     private final ValidationSupport validation = new ValidationSupport();
 
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
-        b -> b.withStringConverter(Bundles::translate));
+            b -> b.withStringConverter(Bundles::translate));
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField mobileField = new TextField();
@@ -80,22 +82,22 @@ final class ContactDialog extends BaseDialog<Contact> {
         IconManager.setupComboBox(iconComboBox);
 
         getDialogPane().setContent(
-            gridPane(
-                List.of(
-                    gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeBox, iconComboBox),
-                    gridRow(label(fxString(UI, I18N_WORD_NAME, COLON)), gridCell(nameField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_PHONE, COLON)), gridCell(phoneField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_MOBILE, COLON)), gridCell(mobileField, 2, 1)),
-                    gridRow(label("E-Mail:"), gridCell(emailField, 2, 1)),
-                    gridRow(label("URL:"), gridCell(webField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_STREET, COLON)), gridCell(streetField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_CITY, COLON)), gridCell(cityField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_COUNTRY, COLON)), gridCell(countryField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_ZIP, COLON)), gridCell(zipField, 2, 1)),
-                    gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))
-                        .withValignment(VPos.TOP)
-                ), b -> b.withStyle(GRID_PANE)
-            )
+                gridPane(
+                        List.of(
+                                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeBox, iconComboBox),
+                                gridRow(label(fxString(UI, I18N_WORD_NAME, COLON)), gridCell(nameField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_PHONE, COLON)), gridCell(phoneField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_MOBILE, COLON)), gridCell(mobileField, 2, 1)),
+                                gridRow(label("E-Mail:"), gridCell(emailField, 2, 1)),
+                                gridRow(label("URL:"), gridCell(webField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_STREET, COLON)), gridCell(streetField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_CITY, COLON)), gridCell(cityField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_COUNTRY, COLON)), gridCell(countryField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_ZIP, COLON)), gridCell(zipField, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))
+                                        .withValignment(VPos.TOP)
+                        ), b -> b.withStyle(GRID_PANE)
+                )
         );
 
         if (contact != null) {
@@ -125,23 +127,23 @@ final class ContactDialog extends BaseDialog<Contact> {
             long now = System.currentTimeMillis();
 
             var builder = new Contact.Builder(contact)
-                .name(nameField.getText())
-                .type(typeBox.getSelectionModel().getSelectedItem())
-                .phone(phoneField.getText())
-                .mobile(mobileField.getText())
-                .email(emailField.getText())
-                .web(webField.getText())
-                .comment(commentEdit.getText())
-                .street(streetField.getText())
-                .city(cityField.getText())
-                .country(countryField.getText())
-                .zip(zipField.getText())
-                .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
-                .modified(now);
+                    .name(nameField.getText())
+                    .type(typeBox.getSelectionModel().getSelectedItem())
+                    .phone(phoneField.getText())
+                    .mobile(mobileField.getText())
+                    .email(emailField.getText())
+                    .web(webField.getText())
+                    .comment(commentEdit.getText())
+                    .street(streetField.getText())
+                    .city(cityField.getText())
+                    .country(countryField.getText())
+                    .zip(zipField.getText())
+                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                    .modified(now);
 
             if (contact == null) {
                 builder.uuid(UUID.randomUUID())
-                    .created(now);
+                        .created(now);
             }
 
             return builder.build();
@@ -153,7 +155,7 @@ final class ContactDialog extends BaseDialog<Contact> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameField, (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
         validation.initInitialDecoration();
     }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,11 +19,13 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.MainWindowController;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
 import static org.panteleyev.money.app.GlobalContext.files;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
@@ -48,7 +50,7 @@ public class MoneyApplication extends Application {
             System.setProperty(FORMAT_PROP, FORMAT);
         }
         LogManager.getLogManager()
-            .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
+                .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 

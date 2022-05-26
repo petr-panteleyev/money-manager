@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.test;
 
 import org.panteleyev.money.model.MoneyRecord;
 import org.testng.Assert;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -24,8 +25,8 @@ public class BaseTest {
 
     protected static <T extends MoneyRecord> List<T> sortedById(Collection<T> list) {
         return list.stream()
-            .sorted(Comparator.comparing(MoneyRecord::uuid))
-            .toList();
+                .sorted(Comparator.comparing(MoneyRecord::uuid))
+                .toList();
     }
 
     protected static void assertEmpty(Collection c) {

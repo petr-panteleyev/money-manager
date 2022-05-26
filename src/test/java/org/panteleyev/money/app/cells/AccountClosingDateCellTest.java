@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,8 +20,10 @@ import org.panteleyev.money.model.CategoryType;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
 import java.time.LocalDate;
 import java.util.UUID;
+
 import static org.panteleyev.money.app.Styles.EXPIRED;
 import static org.testng.Assert.assertEquals;
 
@@ -36,14 +38,14 @@ public class AccountClosingDateCellTest {
     @DataProvider
     public Object[][] testCellColorDataProvider() {
         return new Object[][]{
-            {0, true},
-            {9, true},
-            {-1, true},
-            {10, false},
-            {20, false},
-            {31, false},
-            {90, false},
-            {200, false},
+                {0, true},
+                {9, true},
+                {-1, true},
+                {10, false},
+                {20, false},
+                {31, false},
+                {90, false},
+                {200, false},
         };
     }
 
@@ -53,12 +55,12 @@ public class AccountClosingDateCellTest {
 
         var today = LocalDate.now();
         var account = new Account.Builder()
-            .uuid(UUID.randomUUID())
-            .name(UUID.randomUUID().toString())
-            .categoryUuid(UUID.randomUUID())
-            .type(CategoryType.BANKS_AND_CASH)
-            .closingDate(today.plusDays(delta))
-            .build();
+                .uuid(UUID.randomUUID())
+                .name(UUID.randomUUID().toString())
+                .categoryUuid(UUID.randomUUID())
+                .type(CategoryType.BANKS_AND_CASH)
+                .closingDate(today.plusDays(delta))
+                .build();
 
         cell.updateItem(account, false);
         assertEquals(cell.getStyleClass().contains(EXPIRED), hasRedColor);

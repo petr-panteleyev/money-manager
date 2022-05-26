@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,22 +20,22 @@ public class TransactionTypeBundle_ru_RU extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return new Object[][]{
-            {"CARD_PAYMENT", "Оплата по карте"},
-            {"CASH_PURCHASE", "Покупка за наличные"},
-            {"CHEQUE", "Чек"},
-            {"TRANSFER", "Перевод"},
-            {"DEPOSIT", "Депозит"},
-            {"WITHDRAWAL", "Снятие наличных"},
-            {"INTEREST", "Проценты"},
-            {"INCOME", "Доход"},
-            {"FEE", "Комиссия"},
-            {"CACHIER", "Транзакция в банкомате"},
-            {"DIVIDEND", "Дивиденды"},
-            {"DIRECT_BILLING", "Прямое дебетование"},
-            {"CHARGE", "Списание"},
-            {"SALE", "Продажа"},
-            {"REFUND", "Возврат"},
-            {"UNDEFINED", "Неизвестно"},
+                {"CARD_PAYMENT", "Оплата по карте"},
+                {"CASH_PURCHASE", "Покупка за наличные"},
+                {"CHEQUE", "Чек"},
+                {"TRANSFER", "Перевод"},
+                {"DEPOSIT", "Депозит"},
+                {"WITHDRAWAL", "Снятие наличных"},
+                {"INTEREST", "Проценты"},
+                {"INCOME", "Доход"},
+                {"FEE", "Комиссия"},
+                {"CACHIER", "Транзакция в банкомате"},
+                {"DIVIDEND", "Дивиденды"},
+                {"DIRECT_BILLING", "Прямое дебетование"},
+                {"CHARGE", "Списание"},
+                {"SALE", "Продажа"},
+                {"REFUND", "Возврат"},
+                {"UNDEFINED", "Неизвестно"},
         };
     }
 }

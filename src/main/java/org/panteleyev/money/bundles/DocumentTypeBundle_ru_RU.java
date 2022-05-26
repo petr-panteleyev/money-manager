@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -14,19 +14,24 @@
  */
 package org.panteleyev.money.bundles;
 
-import org.panteleyev.money.model.DocumentType;
-
 import java.util.ListResourceBundle;
 
+import static org.panteleyev.money.model.DocumentType.BILL;
+import static org.panteleyev.money.model.DocumentType.CONTRACT;
+import static org.panteleyev.money.model.DocumentType.OTHER;
+import static org.panteleyev.money.model.DocumentType.RECEIPT;
+import static org.panteleyev.money.model.DocumentType.STATEMENT;
+
+@SuppressWarnings("unused")
 public class DocumentTypeBundle_ru_RU extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return new Object[][]{
-                {DocumentType.BILL.name(), "Счет"},
-                {DocumentType.CONTRACT.name(), "Договор"},
-                {DocumentType.RECEIPT.name(), "Чек"},
-                {DocumentType.STATEMENT.name(), "Выписка"},
-                {DocumentType.OTHER.name(), "Другое"},
+                {BILL.name(), "Счет"},
+                {CONTRACT.name(), "Договор"},
+                {RECEIPT.name(), "Чек"},
+                {STATEMENT.name(), "Выписка"},
+                {OTHER.name(), "Другое"},
         };
     }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -21,8 +21,10 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.test.BaseTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
+
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
 import static org.testng.Assert.assertEquals;
@@ -31,19 +33,19 @@ import static org.testng.Assert.assertTrue;
 
 public class CurrencyDialogTest extends BaseTest {
     private final static Currency CURRENCY = new Currency.Builder()
-        .uuid(UUID.randomUUID())
-        .symbol(UUID.randomUUID().toString())
-        .description(UUID.randomUUID().toString())
-        .formatSymbol(UUID.randomUUID().toString())
-        .formatSymbolPosition(1)
-        .showFormatSymbol(randomBoolean())
-        .def(randomBoolean())
-        .rate(randomBigDecimal())
-        .direction(1)
-        .useThousandSeparator(randomBoolean())
-        .created(System.currentTimeMillis())
-        .modified(System.currentTimeMillis())
-        .build();
+            .uuid(UUID.randomUUID())
+            .symbol(UUID.randomUUID().toString())
+            .description(UUID.randomUUID().toString())
+            .formatSymbol(UUID.randomUUID().toString())
+            .formatSymbolPosition(1)
+            .showFormatSymbol(randomBoolean())
+            .def(randomBoolean())
+            .rate(randomBigDecimal())
+            .direction(1)
+            .useThousandSeparator(randomBoolean())
+            .created(System.currentTimeMillis())
+            .modified(System.currentTimeMillis())
+            .build();
 
     @BeforeClass
     public void setupAndSkip() {

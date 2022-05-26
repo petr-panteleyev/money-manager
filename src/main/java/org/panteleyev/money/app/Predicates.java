@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
+
 import java.util.Collection;
 import java.util.Objects;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public interface Predicates {
 
     static Predicate<Account> accountByName(String name) {
         return name.isBlank() ?
-            account -> true : account -> account.name().toLowerCase().contains(name.toLowerCase());
+                account -> true : account -> account.name().toLowerCase().contains(name.toLowerCase());
     }
 
     static Predicate<Account> accountByCategory(UUID uuid) {
@@ -57,6 +58,6 @@ public interface Predicates {
 
     static Predicate<Contact> contactByName(String name) {
         return name.isBlank() ?
-            contact -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
+                contact -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
     }
 }

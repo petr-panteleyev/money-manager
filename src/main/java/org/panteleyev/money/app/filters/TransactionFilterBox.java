@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,10 @@ import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.TransactionPredicate;
 import org.panteleyev.money.model.Transaction;
+
 import java.time.LocalDate;
 import java.util.function.Predicate;
+
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByDates;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByYear;
@@ -44,10 +46,10 @@ public class TransactionFilterBox extends HBox {
     private final int filterYearsIndex;
 
     private final PredicateProperty<Transaction> predicateProperty =
-        new PredicateProperty<>(TransactionPredicate.CURRENT_MONTH);
+            new PredicateProperty<>(TransactionPredicate.CURRENT_MONTH);
 
     private final EventHandler<ActionEvent> updateHandler =
-        event -> predicateProperty.set(getTransactionFilter());
+            event -> predicateProperty.set(getTransactionFilter());
 
     public TransactionFilterBox() {
         this(false, false);
@@ -86,16 +88,16 @@ public class TransactionFilterBox extends HBox {
 
         // Init constant part of the list
         filterChoice.getItems().setAll(
-            TransactionPredicate.ALL,
-            new Separator(),
-            TransactionPredicate.CURRENT_YEAR,
-            TransactionPredicate.CURRENT_MONTH,
-            TransactionPredicate.CURRENT_WEEK,
-            new Separator(),
-            TransactionPredicate.LAST_YEAR,
-            TransactionPredicate.LAST_QUARTER,
-            TransactionPredicate.LAST_MONTH,
-            new Separator()
+                TransactionPredicate.ALL,
+                new Separator(),
+                TransactionPredicate.CURRENT_YEAR,
+                TransactionPredicate.CURRENT_MONTH,
+                TransactionPredicate.CURRENT_WEEK,
+                new Separator(),
+                TransactionPredicate.LAST_YEAR,
+                TransactionPredicate.LAST_QUARTER,
+                TransactionPredicate.LAST_MONTH,
+                new Separator()
         );
 
         for (int i = TransactionPredicate.JANUARY.ordinal(); i <= TransactionPredicate.DECEMBER.ordinal(); i++) {
@@ -123,10 +125,10 @@ public class TransactionFilterBox extends HBox {
 
         // Add years from existing transactions
         cache().getTransactions().stream()
-            .map(Transaction::year)
-            .distinct()
-            .sorted()
-            .forEach(filterChoice.getItems()::add);
+                .map(Transaction::year)
+                .distinct()
+                .sorted()
+                .forEach(filterChoice.getItems()::add);
 
         filterChoice.setOnAction(updateHandler);
     }

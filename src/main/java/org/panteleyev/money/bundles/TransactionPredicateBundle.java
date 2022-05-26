@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,13 @@ public class TransactionPredicateBundle extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return new Object[][]{
-            {"ALL", "All transactions"},
-            {"CURRENT_MONTH", "Current month"},
-            {"CURRENT_WEEK", "Current week"},
-            {"CURRENT_YEAR", "Current year"},
-            {"LAST_MONTH", "Last month"},
-            {"LAST_QUARTER", "Last quarter"},
-            {"LAST_YEAR", "Last year"},
+                {"ALL", "All transactions"},
+                {"CURRENT_MONTH", "Current month"},
+                {"CURRENT_WEEK", "Current week"},
+                {"CURRENT_YEAR", "Current year"},
+                {"LAST_MONTH", "Last month"},
+                {"LAST_QUARTER", "Last quarter"},
+                {"LAST_YEAR", "Last year"},
         };
     }
 }

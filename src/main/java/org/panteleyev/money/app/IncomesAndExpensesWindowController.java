@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,7 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -43,6 +44,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+
 import static java.util.stream.Collectors.groupingBy;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
@@ -173,14 +175,14 @@ class IncomesAndExpensesWindowController extends BaseController {
         expenseValueText.getStyleClass().add(CREDIT);
 
         var toolBar = hBox(5.0,
-            filterBox,
-            button(fxString(UI, I18N_MISC_RESET_FILTER), x -> filterBox.reset())
+                filterBox,
+                button(fxString(UI, I18N_MISC_RESET_FILTER), x -> filterBox.reset())
         );
 
         var statusBar = createStatusBar();
 
         var root = new BorderPane(new BorderPane(reportTable, toolBar, null, statusBar, null),
-            createMenuBar(), null, null, null);
+                createMenuBar(), null, null, null);
 
         BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
         BorderPane.setMargin(statusBar, new Insets(5.0, 5.0, 5.0, 5.0));
@@ -201,13 +203,13 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
-        var menuBar =  menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-            createWindowMenu(),
-            createHelpMenu()
+        var menuBar = menuBar(
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+                createWindowMenu(),
+                createHelpMenu()
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
         return menuBar;
@@ -215,12 +217,12 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private Node createStatusBar() {
         return hBox(5.0,
-            label(fxString(UI, I18N_WORD_EXPENSES, COLON)),
-            expenseValueText,
-            label(fxString(UI, I18N_WORD_INCOMES, COLON)),
-            incomeValueText,
-            label(fxString(UI, I18N_WORD_BALANCE, COLON)),
-            balanceValueText);
+                label(fxString(UI, I18N_WORD_EXPENSES, COLON)),
+                expenseValueText,
+                label(fxString(UI, I18N_WORD_INCOMES, COLON)),
+                incomeValueText,
+                label(fxString(UI, I18N_WORD_BALANCE, COLON)),
+                balanceValueText);
     }
 
     private void onRefresh() {
@@ -252,53 +254,53 @@ class IncomesAndExpensesWindowController extends BaseController {
         var accSum = new HashMap<UUID, BigDecimal>();
 
         Function<Transaction, UUID> catUuidFunc = type == CategoryType.EXPENSES ?
-            Transaction::accountCreditedCategoryUuid : Transaction::accountDebitedCategoryUuid;
+                Transaction::accountCreditedCategoryUuid : Transaction::accountDebitedCategoryUuid;
         Function<Transaction, UUID> accUuidFunc = type == CategoryType.EXPENSES ?
-            Transaction::accountCreditedUuid : Transaction::accountDebitedUuid;
+                Transaction::accountCreditedUuid : Transaction::accountDebitedUuid;
 
         cache().getTransactions().stream()
-            .filter(filterBox.predicateProperty().get())
-            .filter(t -> cache().getCategory(catUuidFunc.apply(t))
-                .map(Category::type).orElseThrow() == type)
-            .peek(t -> {
-                // TODO: currency conversion rates
-                catSum.compute(catUuidFunc.apply(t),
-                    (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
-                accSum.compute(accUuidFunc.apply(t),
-                    (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
-            })
-            .collect(groupingBy(t -> cache().getCategory(catUuidFunc.apply(t)).orElseThrow(),
-                groupingBy(t -> cache().getAccount(accUuidFunc.apply(t)).orElseThrow(),
-                    groupingBy(t -> Optional.ofNullable(t.contactUuid()).flatMap(id -> cache().getContact(id))
-                        .map(Contact::name).orElse("")))))
-            .entrySet().stream()
-            .sorted(Comparator.comparing(e -> e.getKey().name()))
-            .forEach(categoryMapEntry -> {
-                var category = categoryMapEntry.getKey();
-                var categoryRoot =
-                    treeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
-                root.getChildren().add(categoryRoot);
+                .filter(filterBox.predicateProperty().get())
+                .filter(t -> cache().getCategory(catUuidFunc.apply(t))
+                        .map(Category::type).orElseThrow() == type)
+                .peek(t -> {
+                    // TODO: currency conversion rates
+                    catSum.compute(catUuidFunc.apply(t),
+                            (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
+                    accSum.compute(accUuidFunc.apply(t),
+                            (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
+                })
+                .collect(groupingBy(t -> cache().getCategory(catUuidFunc.apply(t)).orElseThrow(),
+                        groupingBy(t -> cache().getAccount(accUuidFunc.apply(t)).orElseThrow(),
+                                groupingBy(t -> Optional.ofNullable(t.contactUuid()).flatMap(id -> cache().getContact(id))
+                                        .map(Contact::name).orElse("")))))
+                .entrySet().stream()
+                .sorted(Comparator.comparing(e -> e.getKey().name()))
+                .forEach(categoryMapEntry -> {
+                    var category = categoryMapEntry.getKey();
+                    var categoryRoot =
+                            treeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
+                    root.getChildren().add(categoryRoot);
 
-                categoryMapEntry.getValue().entrySet().stream()
-                    .sorted(Comparator.comparing(accountMapEntry -> accountMapEntry.getKey().name()))
-                    .forEach(accountMapEntry -> {
-                        var account = accountMapEntry.getKey();
-                        var accountRoot =
-                            treeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
-                        categoryRoot.getChildren().add(accountRoot);
+                    categoryMapEntry.getValue().entrySet().stream()
+                            .sorted(Comparator.comparing(accountMapEntry -> accountMapEntry.getKey().name()))
+                            .forEach(accountMapEntry -> {
+                                var account = accountMapEntry.getKey();
+                                var accountRoot =
+                                        treeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
+                                categoryRoot.getChildren().add(accountRoot);
 
-                        accountMapEntry.getValue().entrySet().stream()
-                            .sorted(Map.Entry.comparingByKey())
-                            .forEach(contactMapEntry -> {
-                                var name = contactMapEntry.getKey();
-                                var sum = contactMapEntry.getValue().stream()
-                                    .map(Transaction::amount)
-                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                accountMapEntry.getValue().entrySet().stream()
+                                        .sorted(Map.Entry.comparingByKey())
+                                        .forEach(contactMapEntry -> {
+                                            var name = contactMapEntry.getKey();
+                                            var sum = contactMapEntry.getValue().stream()
+                                                    .map(Transaction::amount)
+                                                    .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                                accountRoot.getChildren().add(treeItem(new TreeNode(name, sum), false));
+                                            accountRoot.getChildren().add(treeItem(new TreeNode(name, sum), false));
+                                        });
                             });
-                    });
-            });
+                });
 
         return catSum.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -309,8 +311,8 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var w = reportTable.widthProperty().subtract(20);
         reportTable.getColumns().addAll(List.of(
-            treeTableColumn("", x -> new NodeTextCell(), w.multiply(0.85)),
-            treeTableColumn("", x -> new NodeAmountCell(), w.multiply(0.15))
+                treeTableColumn("", x -> new NodeTextCell(), w.multiply(0.85)),
+                treeTableColumn("", x -> new NodeAmountCell(), w.multiply(0.15))
         ));
     }
 
@@ -332,13 +334,13 @@ class IncomesAndExpensesWindowController extends BaseController {
         dataModel.put("balanceSum", balanceValueText.getText());
 
         dataModel.put("expenses", expenseRoot.getChildren().stream()
-            .map(IncomesAndExpensesWindowController::getItemModel)
-            .toList()
+                .map(IncomesAndExpensesWindowController::getItemModel)
+                .toList()
         );
 
         dataModel.put("incomes", incomeRoot.getChildren().stream()
-            .map(IncomesAndExpensesWindowController::getItemModel)
-            .toList()
+                .map(IncomesAndExpensesWindowController::getItemModel)
+                .toList()
         );
 
         try (var w = new FileWriter(selected)) {
@@ -352,11 +354,11 @@ class IncomesAndExpensesWindowController extends BaseController {
         var map = new LinkedHashMap<String, Object>();
         map.put("text", item.getValue().getText());
         map.put("amount", item.getValue().getAmount()
-            .setScale(2, RoundingMode.HALF_UP).toString());
+                .setScale(2, RoundingMode.HALF_UP).toString());
 
         var items = item.getChildren().stream()
-            .map(IncomesAndExpensesWindowController::getItemModel)
-            .toList();
+                .map(IncomesAndExpensesWindowController::getItemModel)
+                .toList();
 
         if (!items.isEmpty()) {
             map.put("items", items);

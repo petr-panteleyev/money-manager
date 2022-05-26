@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,7 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.statements.StatementRecord;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -55,6 +56,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+
 import static javafx.application.Platform.runLater;
 import static javafx.scene.layout.Priority.ALWAYS;
 import static org.panteleyev.fx.BoxFactory.hBox;
@@ -92,11 +94,11 @@ import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 
 public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
-        new ToStringConverter<>() {
-            public String toString(TransactionType obj) {
-                return translate(obj);
-            }
-        };
+            new ToStringConverter<>() {
+                public String toString(TransactionType obj) {
+                    return translate(obj);
+                }
+            };
 
     private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
         public String toString(Contact obj) {
@@ -202,69 +204,69 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         datePicker.setValue(lastSelectedDate);
 
         getDialogPane().setContent(
-            vBox(
-                DOUBLE_SPACING,
-                hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)),
-                        hBox(List.of(datePicker, checkedCheckBox), hBox -> {
-                            hBox.setSpacing(BIG_SPACING);
-                            hBox.setAlignment(Pos.CENTER);
-                        })
-                    )
-                ),
-                hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM)), sumEdit),
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_WORD_RATE)),
-                        hBox(List.of(rate1Edit, rateDir1Combo, rateAmoutLabel), hBox -> {
-                            hBox.setSpacing(SMALL_SPACING);
-                            hBox.setAlignment(Pos.CENTER);
-                        })
-                    )
-                ),
-                hBox(BIG_SPACING,
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_WORD_TYPE)),
-                        hBox(List.of(typeEdit, typeMenuButton), hBox -> {
-                            hBox.setSpacing(BIG_SPACING);
-                            hBox.setAlignment(Pos.CENTER);
-                        })
-                    )
-                ),
-                fxNode(
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_MISC_DEBITED_ACCOUNT)),
-                        hBox(0,
-                            fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
-                            debitedMenuButton),
-                        debitedCategoryLabel),
-                    hBoxHGrow(ALWAYS)
-                ),
-                fxNode(
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT)),
-                        hBox(0,
-                            fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)),
-                            creditedMenuButton
+                vBox(
+                        DOUBLE_SPACING,
+                        hBox(BIG_SPACING,
+                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)),
+                                        hBox(List.of(datePicker, checkedCheckBox), hBox -> {
+                                            hBox.setSpacing(BIG_SPACING);
+                                            hBox.setAlignment(Pos.CENTER);
+                                        })
+                                )
                         ),
-                        creditedCategoryLabel),
-                    hBoxHGrow(ALWAYS)
-                ),
-                fxNode(
-                    vBox(SMALL_SPACING,
-                        label(fxString(UI, I18N_WORD_COUNTERPARTY)),
-                        hBox(0,
-                            fxNode(contactEdit, hBoxHGrow(ALWAYS)),
-                            contactMenuButton)),
-                    hBoxHGrow(ALWAYS)
-                ),
-                fxNode(
-                    vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT)), commentEdit),
-                    hBoxHGrow(ALWAYS)
-                ),
-                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_INVOICE)), invoiceNumberEdit),
-                vBox(SMALL_SPACING, label(fxString(UI, I18N_MISC_DATE_BY_STATEMENT)), statementDatePicker)
-            )
+                        hBox(BIG_SPACING,
+                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM)), sumEdit),
+                                vBox(SMALL_SPACING,
+                                        label(fxString(UI, I18N_WORD_RATE)),
+                                        hBox(List.of(rate1Edit, rateDir1Combo, rateAmoutLabel), hBox -> {
+                                            hBox.setSpacing(SMALL_SPACING);
+                                            hBox.setAlignment(Pos.CENTER);
+                                        })
+                                )
+                        ),
+                        hBox(BIG_SPACING,
+                                vBox(SMALL_SPACING,
+                                        label(fxString(UI, I18N_WORD_TYPE)),
+                                        hBox(List.of(typeEdit, typeMenuButton), hBox -> {
+                                            hBox.setSpacing(BIG_SPACING);
+                                            hBox.setAlignment(Pos.CENTER);
+                                        })
+                                )
+                        ),
+                        fxNode(
+                                vBox(SMALL_SPACING,
+                                        label(fxString(UI, I18N_MISC_DEBITED_ACCOUNT)),
+                                        hBox(0,
+                                                fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
+                                                debitedMenuButton),
+                                        debitedCategoryLabel),
+                                hBoxHGrow(ALWAYS)
+                        ),
+                        fxNode(
+                                vBox(SMALL_SPACING,
+                                        label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT)),
+                                        hBox(0,
+                                                fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)),
+                                                creditedMenuButton
+                                        ),
+                                        creditedCategoryLabel),
+                                hBoxHGrow(ALWAYS)
+                        ),
+                        fxNode(
+                                vBox(SMALL_SPACING,
+                                        label(fxString(UI, I18N_WORD_COUNTERPARTY)),
+                                        hBox(0,
+                                                fxNode(contactEdit, hBoxHGrow(ALWAYS)),
+                                                contactMenuButton)),
+                                hBoxHGrow(ALWAYS)
+                        ),
+                        fxNode(
+                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT)), commentEdit),
+                                hBoxHGrow(ALWAYS)
+                        ),
+                        vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_INVOICE)), invoiceNumberEdit),
+                        vBox(SMALL_SPACING, label(fxString(UI, I18N_MISC_DATE_BY_STATEMENT)), statementDatePicker)
+                )
         );
 
         typeMenuButton.setFocusTraversable(false);
@@ -291,11 +293,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         rateDir1Combo.getItems().setAll("/", "*");
 
         TextFields.bindAutoCompletion(typeEdit,
-            new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
+                new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
         TextFields.bindAutoCompletion(debitedAccountEdit,
-            new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
+                new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
-            new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+                new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
@@ -420,11 +422,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
 
         var tooltipText = String.format(UI.getString(I18N_MISC_DATE_PICKER_TOOLTIP),
-            tomorrowKey.getDisplayText(),
-            yesterdayKey.getDisplayText(),
-            nextMonthKey.getDisplayText(),
-            prevMonthKey.getDisplayText(),
-            todayKey.getDisplayText());
+                tomorrowKey.getDisplayText(),
+                yesterdayKey.getDisplayText(),
+                nextMonthKey.getDisplayText(),
+                prevMonthKey.getDisplayText(),
+                todayKey.getDisplayText());
 
         datePicker.setTooltip(new Tooltip(tooltipText));
 
@@ -448,21 +450,21 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var enabledCount = banksAndCashAll.stream().filter(Account::enabled).count();
 
         banksAndCashAll.stream()
-            .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
-            .forEach(acc -> {
-                debitedSuggestionsAll.add(acc);
-                creditedSuggestionsAll.add(acc);
+                .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
+                .forEach(acc -> {
+                    debitedSuggestionsAll.add(acc);
+                    creditedSuggestionsAll.add(acc);
 
-                if (acc.enabled()) {
-                    var title = "[" + acc.name() + "]";
+                    if (acc.enabled()) {
+                        var title = "[" + acc.name() + "]";
 
-                    debitedMenuButton.getItems().add(menuItem(title, event -> onDebitedAccountSelected(acc)));
-                    creditedMenuButton.getItems().add(menuItem(title, event -> onCreditedAccountSelected(acc)));
+                        debitedMenuButton.getItems().add(menuItem(title, event -> onDebitedAccountSelected(acc)));
+                        creditedMenuButton.getItems().add(menuItem(title, event -> onCreditedAccountSelected(acc)));
 
-                    debitedSuggestions.add(acc);
-                    creditedSuggestions.add(acc);
-                }
-            });
+                        debitedSuggestions.add(acc);
+                        creditedSuggestions.add(acc);
+                    }
+                });
 
         if (enabledCount != 0) {
             debitedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -486,32 +488,32 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var categories = cache.getCategoriesByType(categoryType);
 
         categories.stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                List<Account> accounts = cache.getAccountsByCategory(x.uuid());
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    List<Account> accounts = cache.getAccountsByCategory(x.uuid());
 
-                if (!accounts.isEmpty()) {
-                    debitedMenuButton.getItems().add(new MenuItem(x.name()));
-                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
+                    if (!accounts.isEmpty()) {
+                        debitedMenuButton.getItems().add(new MenuItem(x.name()));
+                        creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
-                    for (var acc : accounts) {
-                        debitedSuggestionsAll.add(acc);
-                        creditedSuggestionsAll.add(acc);
+                        for (var acc : accounts) {
+                            debitedSuggestionsAll.add(acc);
+                            creditedSuggestionsAll.add(acc);
 
-                        if (acc.enabled()) {
-                            var title = "  " + prefix + " " + acc.name();
+                            if (acc.enabled()) {
+                                var title = "  " + prefix + " " + acc.name();
 
-                            debitedMenuButton.getItems().add(
-                                menuItem(title, event -> onDebitedAccountSelected(acc)));
-                            creditedMenuButton.getItems().add(
-                                menuItem(title, event -> onCreditedAccountSelected(acc)));
+                                debitedMenuButton.getItems().add(
+                                        menuItem(title, event -> onDebitedAccountSelected(acc)));
+                                creditedMenuButton.getItems().add(
+                                        menuItem(title, event -> onCreditedAccountSelected(acc)));
 
-                            debitedSuggestions.add(acc);
-                            creditedSuggestions.add(acc);
+                                debitedSuggestions.add(acc);
+                                creditedSuggestions.add(acc);
+                            }
                         }
                     }
-                }
-            });
+                });
 
         if (!categories.isEmpty()) {
             debitedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -612,11 +614,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             disable = true;
         } else {
             var c1 = cache.getAccount(builder.getAccountDebitedUuid())
-                .map(Account::currencyUuid)
-                .orElse(null);
+                    .map(Account::currencyUuid)
+                    .orElse(null);
             var c2 = cache.getAccount(builder.getAccountCreditedUuid())
-                .map(Account::currencyUuid)
-                .orElse(null);
+                    .map(Account::currencyUuid)
+                    .orElse(null);
 
             disable = Objects.equals(c1, c2);
         }
@@ -632,26 +634,23 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter)
-    {
+                                                              StringConverter<T> converter) {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(String value, Collection<TransactionType> items) {
         return items.stream()
-            .filter(it -> TRANSACTION_TYPE_TO_STRING.toString(it).equals(value)).findFirst();
+                .filter(it -> TRANSACTION_TYPE_TO_STRING.toString(it).equals(value)).findFirst();
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(TextField field,
                                                               Collection<T> items,
-                                                              StringConverter<T> converter)
-    {
+                                                              StringConverter<T> converter) {
         return checkTextFieldValue(field.getText(), items, converter);
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(TextField field,
-                                                                     Collection<TransactionType> items)
-    {
+                                                                     Collection<TransactionType> items) {
         return checkTransactionTypeFieldValue(field.getText(), items);
     }
 
@@ -699,11 +698,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         contactSuggestions.clear();
 
         cache.getContacts().stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                contactMenuButton.getItems().add(menuItem(x.name(), event -> onContactSelected(x)));
-                contactSuggestions.add(x);
-            });
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    contactMenuButton.getItems().add(menuItem(x.name(), event -> onContactSelected(x)));
+                    contactSuggestions.add(x);
+                });
 
         contactMenuButton.setDisable(contactMenuButton.getItems().isEmpty());
     }
@@ -717,7 +716,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
                 typeMenuButton.getItems().add(
-                    menuItem(translate(x), event -> onTransactionTypeSelected(x)));
+                        menuItem(translate(x), event -> onTransactionTypeSelected(x)));
                 typeSuggestions.add(x);
             }
         });
@@ -737,21 +736,21 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         // Incomes to debitable accounts
         List<Category> incomeCategories = cache.getCategoriesByType(CategoryType.INCOMES);
         incomeCategories.stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                var accounts = cache.getAccountsByCategory(x.uuid());
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    var accounts = cache.getAccountsByCategory(x.uuid());
 
-                if (!accounts.isEmpty()) {
-                    debitedMenuButton.getItems().add(new MenuItem(x.name()));
+                    if (!accounts.isEmpty()) {
+                        debitedMenuButton.getItems().add(new MenuItem(x.name()));
 
-                    accounts.forEach(acc -> {
-                        debitedMenuButton.getItems().add(
-                            menuItem("  + " + acc.name(), events -> onDebitedAccountSelected(acc)));
-                        debitedSuggestionsAll.add(acc);
-                        debitedSuggestions.add(acc);
-                    });
-                }
-            });
+                        accounts.forEach(acc -> {
+                            debitedMenuButton.getItems().add(
+                                    menuItem("  + " + acc.name(), events -> onDebitedAccountSelected(acc)));
+                            debitedSuggestionsAll.add(acc);
+                            debitedSuggestions.add(acc);
+                        });
+                    }
+                });
 
         if (!incomeCategories.isEmpty()) {
             debitedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -760,21 +759,21 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         // Expenses to creditable accounts
         List<Category> expenseCategories = cache.getCategoriesByType(CategoryType.EXPENSES);
         expenseCategories.stream()
-            .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
-            .forEach(x -> {
-                var accounts = cache.getAccountsByCategory(x.uuid());
+                .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
+                .forEach(x -> {
+                    var accounts = cache.getAccountsByCategory(x.uuid());
 
-                if (!accounts.isEmpty()) {
-                    creditedMenuButton.getItems().add(new MenuItem(x.name()));
+                    if (!accounts.isEmpty()) {
+                        creditedMenuButton.getItems().add(new MenuItem(x.name()));
 
-                    accounts.forEach(acc -> {
-                        creditedSuggestionsAll.add(acc);
-                        creditedSuggestions.add(acc);
-                        creditedMenuButton.getItems().add(
-                            menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
-                    });
-                }
-            });
+                        accounts.forEach(acc -> {
+                            creditedSuggestionsAll.add(acc);
+                            creditedSuggestions.add(acc);
+                            creditedMenuButton.getItems().add(
+                                    menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                        });
+                    }
+                });
 
         if (!expenseCategories.isEmpty()) {
             creditedMenuButton.getItems().add(new SeparatorMenuItem());
@@ -814,7 +813,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         }
 
         runLater(() ->
-            rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP)));
+                rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP)));
     }
 
     private void updateCategoryLabel(Label label, Account account) {
@@ -835,23 +834,23 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         }
 
         cache.getTransactions().stream()
-            .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
-                && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
-            .max(cache().getTransactionByDateComparator())
-            .ifPresent(it -> {
-                if (commentEdit.getText().isEmpty()) {
-                    commentEdit.setText(it.comment());
-                }
-                if (sumEdit.getText().isEmpty()) {
-                    sumEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
-                }
-
-                cache.getContact(it.contactUuid()).ifPresent(contact -> {
-                    if (contactEdit.getText().isEmpty()) {
-                        contactEdit.setText(contact.name());
+                .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
+                        && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
+                .max(cache().getTransactionByDateComparator())
+                .ifPresent(it -> {
+                    if (commentEdit.getText().isEmpty()) {
+                        commentEdit.setText(it.comment());
                     }
+                    if (sumEdit.getText().isEmpty()) {
+                        sumEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
+                    }
+
+                    cache.getContact(it.contactUuid()).ifPresent(contact -> {
+                        if (contactEdit.getText().isEmpty()) {
+                            contactEdit.setText(contact.name());
+                        }
+                    });
                 });
-            });
     }
 
     private void today() {

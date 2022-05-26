@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,8 +16,11 @@ package org.panteleyev.money.app.filters;
 
 import javafx.scene.control.TextField;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
+
 import java.util.Optional;
+
 import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.GlobalContext.cache;
@@ -25,10 +28,15 @@ import static org.panteleyev.money.app.Predicates.contactByName;
 
 public class ContactFilterBox {
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
+    private final PredicateProperty<MoneyDocument> documentPredicateProperty = new PredicateProperty<>();
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, this::updatePredicate);
 
     public PredicateProperty<Transaction> predicateProperty() {
         return predicateProperty;
+    }
+
+    public PredicateProperty<MoneyDocument> documentPredicateProperty() {
+        return documentPredicateProperty;
     }
 
     public TextField getTextField() {
@@ -38,11 +46,17 @@ public class ContactFilterBox {
     private void updatePredicate(String contactString) {
         if (contactString.isBlank()) {
             predicateProperty.reset();
+            documentPredicateProperty.reset();
         } else {
             predicateProperty.set(t -> Optional.ofNullable(t.contactUuid())
-                .flatMap(uuid -> cache().getContact(uuid))
-                .filter(contactByName(contactString))
-                .isPresent());
+                    .flatMap(uuid -> cache().getContact(uuid))
+                    .filter(contactByName(contactString))
+                    .isPresent());
+
+            documentPredicateProperty.set(d -> Optional.ofNullable(d.contactUuid())
+                    .flatMap(uuid -> cache().getContact(uuid))
+                    .filter(contactByName(contactString))
+                    .isPresent());
         }
     }
 }

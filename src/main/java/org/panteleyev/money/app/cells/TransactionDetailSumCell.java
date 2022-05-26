@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.app.cells;
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.TransactionDetail;
+
 import java.math.RoundingMode;
 
 public class TransactionDetailSumCell extends TableCell<TransactionDetail, TransactionDetail> {

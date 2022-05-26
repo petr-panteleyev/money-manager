@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableRow;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.statements.StatementRecord;
+
 import static org.panteleyev.money.app.Styles.STATEMENT_ALL_CHECKED;
 import static org.panteleyev.money.app.Styles.STATEMENT_NOT_CHECKED;
 import static org.panteleyev.money.app.Styles.STATEMENT_NOT_FOUND;

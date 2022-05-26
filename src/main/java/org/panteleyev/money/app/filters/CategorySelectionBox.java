@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -30,10 +30,12 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.persistence.ReadOnlyStringConverter;
+
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.money.app.GlobalContext.cache;
@@ -59,13 +61,13 @@ public class CategorySelectionBox extends HBox {
 
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Category> categoryListener = change ->
-        Platform.runLater(this::onTypeChanged);
+            Platform.runLater(this::onTypeChanged);
 
     private final EventHandler<ActionEvent> categoryTypeHandler =
-        event -> onTypeChanged();
+            event -> onTypeChanged();
 
     private final EventHandler<ActionEvent> categoryHandler =
-        event -> accountFilterProperty.set(getAccountFilter());
+            event -> accountFilterProperty.set(getAccountFilter());
 
     public CategorySelectionBox() {
         super(5.0);
@@ -110,11 +112,11 @@ public class CategorySelectionBox extends HBox {
         categoryTypeChoiceBox.setOnAction(event -> {});
 
         categoryTypeChoiceBox.getItems().setAll(
-            TypeListItem.of(fxString(UI, I18N_MISC_ACCOUNTS_CASH_CARDS),
-                CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
-            TypeListItem.of(fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES),
-                CategoryType.INCOMES, CategoryType.EXPENSES),
-            new Separator()
+                TypeListItem.of(fxString(UI, I18N_MISC_ACCOUNTS_CASH_CARDS),
+                        CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
+                TypeListItem.of(fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES),
+                        CategoryType.INCOMES, CategoryType.EXPENSES),
+                new Separator()
         );
 
         for (var t : CategoryType.values()) {
@@ -127,21 +129,21 @@ public class CategorySelectionBox extends HBox {
 
     private Optional<Category> getSelectedCategory() {
         return categoryChoiceBox.getSelectionModel().getSelectedItem() instanceof Category category ?
-            Optional.of(category) : Optional.empty();
+                Optional.of(category) : Optional.empty();
     }
 
     private Set<CategoryType> getSelectedCategoryTypes() {
         return categoryTypeChoiceBox.getSelectionModel().getSelectedItem() instanceof TypeListItem item ?
-            item.types() : Set.of();
+                item.types() : Set.of();
     }
 
     private Predicate<Account> getAccountFilter() {
         return getSelectedCategory().map(c -> accountByCategory(c.uuid()))
-            .orElseGet(() -> {
-                var selectedTypes = getSelectedCategoryTypes();
-                return selectedTypes.isEmpty() ? a -> false :
-                    accountByCategoryType(selectedTypes);
-            });
+                .orElseGet(() -> {
+                    var selectedTypes = getSelectedCategoryTypes();
+                    return selectedTypes.isEmpty() ? a -> false :
+                            accountByCategoryType(selectedTypes);
+                });
     }
 
     private void onTypeChanged() {
@@ -152,11 +154,11 @@ public class CategorySelectionBox extends HBox {
         }
 
         ObservableList<Object> items =
-            observableArrayList(
-                cache().getCategoriesByType(typeListItem.types()).stream()
-                    .sorted(Category.COMPARE_BY_NAME)
-                    .toList()
-            );
+                observableArrayList(
+                        cache().getCategoriesByType(typeListItem.types()).stream()
+                                .sorted(Category.COMPARE_BY_NAME)
+                                .toList()
+                );
 
         if (!items.isEmpty()) {
             items.add(0, new Separator());

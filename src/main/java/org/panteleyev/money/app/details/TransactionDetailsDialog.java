@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -31,9 +31,11 @@ import org.panteleyev.money.app.cells.TransactionDetailSumCell;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -57,7 +59,8 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     private final BigDecimal totalAmount;
     private final TableView<TransactionDetail> detailsTable = new TableView<>();
 
-    public TransactionDetailsDialog(Controller owner, List<Transaction> transactions, BigDecimal totalAmount, boolean readOnly) {
+    public TransactionDetailsDialog(Controller owner, List<Transaction> transactions, BigDecimal totalAmount,
+                                    boolean readOnly) {
         super(owner);
 
         setTitle(fxString(UI, I18N_MISC_TRANSACTION_DETAILS));
@@ -66,8 +69,8 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
         detailEditor = new DetailEditorPane(this, cache());
 
         details.addAll(transactions.stream()
-            .map(TransactionDetail::new)
-            .toList());
+                .map(TransactionDetail::new)
+                .toList());
 
         calculateDelta();
 
@@ -75,13 +78,13 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
-            tableColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
-                b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
-                    .withWidthBinding(w.multiply(0.3))),
-            tableColumn(fxString(UI, I18N_WORD_COMMENT), b ->
-                b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
-            tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
-                b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
+                tableColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
+                        b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
+                                .withWidthBinding(w.multiply(0.3))),
+                tableColumn(fxString(UI, I18N_WORD_COMMENT), b ->
+                        b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
+                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                        b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         detailsTable.setItems(details);
@@ -120,9 +123,9 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
     private void calculateDelta() {
         deltaLabel.setText(
-            details.stream()
-                .map(TransactionDetail::amount)
-                .reduce(totalAmount, BigDecimal::subtract).toString()
+                details.stream()
+                        .map(TransactionDetail::amount)
+                        .reduce(totalAmount, BigDecimal::subtract).toString()
         );
     }
 

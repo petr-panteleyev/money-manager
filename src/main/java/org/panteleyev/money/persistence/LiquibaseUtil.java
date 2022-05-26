@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import liquibase.changelog.ChangeSetStatus;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
+
 import java.sql.Connection;
 
 public class LiquibaseUtil {
@@ -37,8 +38,8 @@ public class LiquibaseUtil {
     public LiquibaseUtil(Connection connection) {
         try {
             liquibase = new Liquibase(CHANGELOG_XML,
-                new ClassLoaderResourceAccessor(),
-                new JdbcConnection(connection));
+                    new ClassLoaderResourceAccessor(),
+                    new JdbcConnection(connection));
         } catch (LiquibaseException ex) {
             throw new RuntimeException(ex);
         }
@@ -65,7 +66,7 @@ public class LiquibaseUtil {
         try {
             var report = liquibase.getChangeSetStatuses(new Contexts(), new LabelExpression(), true);
             return report.stream().anyMatch(ChangeSetStatus::getWillRun) ?
-                SchemaStatus.UPDATE_REQUIRED : SchemaStatus.UP_TO_DATE;
+                    SchemaStatus.UPDATE_REQUIRED : SchemaStatus.UP_TO_DATE;
         } catch (LiquibaseException ex) {
             return SchemaStatus.INCOMPATIBLE;
         }

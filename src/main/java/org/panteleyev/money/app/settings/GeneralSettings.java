@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
 import static java.util.Objects.requireNonNull;
 import static org.panteleyev.money.xml.XMLUtils.appendObjectTextNode;
 import static org.panteleyev.money.xml.XMLUtils.createDocument;

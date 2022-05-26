@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import org.panteleyev.money.test.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -38,6 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
+
 import static org.panteleyev.money.app.Bundles.translate;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 import static org.testng.Assert.assertEquals;
@@ -58,83 +60,83 @@ public class TransactionDialogTest extends BaseTest {
 
     public TransactionDialogTest() {
         var currency1 = new Currency.Builder()
-            .symbol(UUID.randomUUID().toString())
-            .description(UUID.randomUUID().toString())
-            .formatSymbol(UUID.randomUUID().toString())
-            .formatSymbolPosition(1)
-            .showFormatSymbol(false)
-            .def(false)
-            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-            .direction(1)
-            .useThousandSeparator(false)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .symbol(UUID.randomUUID().toString())
+                .description(UUID.randomUUID().toString())
+                .formatSymbol(UUID.randomUUID().toString())
+                .formatSymbolPosition(1)
+                .showFormatSymbol(false)
+                .def(false)
+                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+                .direction(1)
+                .useThousandSeparator(false)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         var currency2 = new Currency.Builder()
-            .symbol(UUID.randomUUID().toString())
-            .description(UUID.randomUUID().toString())
-            .formatSymbol(UUID.randomUUID().toString())
-            .formatSymbolPosition(1)
-            .showFormatSymbol(false)
-            .def(false)
-            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-            .direction(1)
-            .useThousandSeparator(false)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .symbol(UUID.randomUUID().toString())
+                .description(UUID.randomUUID().toString())
+                .formatSymbol(UUID.randomUUID().toString())
+                .formatSymbolPosition(1)
+                .showFormatSymbol(false)
+                .def(false)
+                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+                .direction(1)
+                .useThousandSeparator(false)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         category = new Category.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         contact = new Contact.Builder()
-            .uuid(UUID.randomUUID())
-            .name(UUID.randomUUID().toString())
-            .build();
+                .uuid(UUID.randomUUID())
+                .name(UUID.randomUUID().toString())
+                .build();
 
         account1 = new Account.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .accountNumber(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .categoryUuid(category.uuid())
-            .currencyUuid(currency1.uuid())
-            .enabled(true)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .categoryUuid(category.uuid())
+                .currencyUuid(currency1.uuid())
+                .enabled(true)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         // different currency
         account2 = new Account.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .accountNumber(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .categoryUuid(category.uuid())
-            .currencyUuid(currency2.uuid())
-            .enabled(true)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .categoryUuid(category.uuid())
+                .currencyUuid(currency2.uuid())
+                .enabled(true)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         // same currency as (1)
         account3 = new Account.Builder()
-            .name(UUID.randomUUID().toString())
-            .comment(UUID.randomUUID().toString())
-            .accountNumber(UUID.randomUUID().toString())
-            .type(CategoryType.BANKS_AND_CASH)
-            .categoryUuid(category.uuid())
-            .currencyUuid(currency1.uuid())
-            .enabled(true)
-            .uuid(UUID.randomUUID())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(UUID.randomUUID().toString())
+                .comment(UUID.randomUUID().toString())
+                .accountNumber(UUID.randomUUID().toString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .categoryUuid(category.uuid())
+                .currencyUuid(currency1.uuid())
+                .enabled(true)
+                .uuid(UUID.randomUUID())
+                .modified(System.currentTimeMillis())
+                .build();
 
         cache = new DataCache() {
             {
@@ -184,13 +186,13 @@ public class TransactionDialogTest extends BaseTest {
 
         // Debited account
         dialog.getDebitedAccountEdit().setText(cache.getAccount(t.accountDebitedUuid())
-            .map(Account::name)
-            .orElse(""));
+                .map(Account::name)
+                .orElse(""));
 
         // Credited account
         dialog.getCreditedAccountEdit().setText(cache.getAccount(t.accountCreditedUuid())
-            .map(Account::name)
-            .orElse(""));
+                .map(Account::name)
+                .orElse(""));
 
         dialog.getCommentEdit().setText(t.comment());
         dialog.getSumEdit().setText(t.amount().toString());
@@ -218,27 +220,27 @@ public class TransactionDialogTest extends BaseTest {
 
     private void pressOkButton(TransactionDialog dialog) {
         dialog.getDialogPane()
-            .lookupButton(ButtonType.OK)
-            .fireEvent(new ActionEvent());
+                .lookupButton(ButtonType.OK)
+                .fireEvent(new ActionEvent());
     }
 
     private Transaction createTestTransaction(Account debit, Account credit, Contact contact) {
         var now = LocalDate.now();
         var builder = new Transaction.Builder()
-            .uuid(UUID.randomUUID())
-            .type(TransactionType.CARD_PAYMENT)
-            .accountCreditedType(category.type())
-            .accountDebitedType(category.type())
-            .accountCreditedCategoryUuid(category.uuid())
-            .accountDebitedCategoryUuid(category.uuid())
-            .accountDebitedUuid(debit.uuid())
-            .accountCreditedUuid(credit.uuid())
-            .day(now.getDayOfMonth())
-            .month(now.getMonthValue())
-            .year(now.getYear())
-            .comment(UUID.randomUUID().toString())
-            .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
-            .checked(RANDOM.nextBoolean());
+                .uuid(UUID.randomUUID())
+                .type(TransactionType.CARD_PAYMENT)
+                .accountCreditedType(category.type())
+                .accountDebitedType(category.type())
+                .accountCreditedCategoryUuid(category.uuid())
+                .accountDebitedCategoryUuid(category.uuid())
+                .accountDebitedUuid(debit.uuid())
+                .accountCreditedUuid(credit.uuid())
+                .day(now.getDayOfMonth())
+                .month(now.getMonthValue())
+                .year(now.getYear())
+                .comment(UUID.randomUUID().toString())
+                .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
+                .checked(RANDOM.nextBoolean());
 
         if (Objects.equals(debit.currencyUuid(), credit.currencyUuid())) {
             builder.rate(BigDecimal.ONE);
@@ -255,8 +257,8 @@ public class TransactionDialogTest extends BaseTest {
 
     private StatementRecord createTestStatementRecord() {
         var builder = new StatementRecord.Builder()
-            .actual(LocalDate.now())
-            .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
+                .actual(LocalDate.now())
+                .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP).toString());
         return builder.build();
     }
 
@@ -264,23 +266,23 @@ public class TransactionDialogTest extends BaseTest {
         assertNotNull(r.uuid(), "UUID must not be null");
 
         assertEquals(r.type(), t.type(),
-            "Transaction type ID is invalid");
+                "Transaction type ID is invalid");
 
         // Debited account
         assertEquals(r.accountDebitedUuid(), t.accountDebitedUuid(),
-            "Debited account UUID is invalid");
+                "Debited account UUID is invalid");
         assertEquals(r.accountDebitedCategoryUuid(), t.accountDebitedCategoryUuid(),
-            "Debited account category UUID is invalid");
+                "Debited account category UUID is invalid");
         assertEquals(r.accountDebitedType(), t.accountDebitedType(),
-            "Debited account category type ID is invalid");
+                "Debited account category type ID is invalid");
 
         // Credited account
         assertEquals(r.accountCreditedUuid(), t.accountCreditedUuid(),
-            "Credited account UUID is invalid");
+                "Credited account UUID is invalid");
         assertEquals(r.accountCreditedCategoryUuid(), t.accountCreditedCategoryUuid(),
-            "Credited account category UUID is invalid");
+                "Credited account category UUID is invalid");
         assertEquals(r.accountCreditedType(), t.accountCreditedType(),
-            "Credited account category type ID is invalid");
+                "Credited account category type ID is invalid");
 
         assertEquals(r.day(), t.day(), "Day is invalid");
         assertEquals(r.month(), t.month(), "Month is invalid");
@@ -317,13 +319,13 @@ public class TransactionDialogTest extends BaseTest {
             assertNull(builder.getUuid());
             assertNull(builder.getNewContactName());
             var resultedTransaction = builder
-                .build();
+                    .build();
             assertMainFields(resultedTransaction, transaction);
             assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
-                "Contact UUID is invalid");
+                    "Contact UUID is invalid");
             assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
             assertEquals(resultedTransaction.amount(), transaction.amount(),
-                "Amount is invalid");
+                    "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -346,12 +348,12 @@ public class TransactionDialogTest extends BaseTest {
             assertNull(builder.getUuid());
             var now = LocalDate.now();
             var resultedTransaction = builder
-                .month(now.getMonthValue())
-                .year(now.getYear())
-                .build();
+                    .month(now.getMonthValue())
+                    .year(now.getYear())
+                    .build();
             assertMainFields(resultedTransaction, transaction);
             assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
-                "Contact UUID is invalid");
+                    "Contact UUID is invalid");
             assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
             assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
@@ -380,9 +382,9 @@ public class TransactionDialogTest extends BaseTest {
             assertEquals(builder.getNewContactName(), newContact);
             var now = LocalDate.now();
             var resultedTransaction = builder
-                .month(now.getMonthValue())
-                .year(now.getYear())
-                .build();
+                    .month(now.getMonthValue())
+                    .year(now.getYear())
+                    .build();
             assertMainFields(resultedTransaction, transaction);
             assertNull(resultedTransaction.contactUuid(), "Contact UUID is invalid");
             assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
@@ -413,7 +415,7 @@ public class TransactionDialogTest extends BaseTest {
 
             assertMainFields(resultedTransaction, transaction);
             assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
-                "Contact UUID is invalid");
+                    "Contact UUID is invalid");
             assertEquals(resultedTransaction.rate(), transaction.rate(), "Rate is invalid");
             assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
 
@@ -440,15 +442,15 @@ public class TransactionDialogTest extends BaseTest {
 
             var resultedTransaction = builder.build();
             assertEquals(resultedTransaction.uuid(), transaction.uuid(),
-                "Transaction UUID is wrong");
+                    "Transaction UUID is wrong");
 
             assertMainFields(resultedTransaction, transaction);
             assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
-                "Contact UUID is invalid");
+                    "Contact UUID is invalid");
             assertEquals(resultedTransaction.rate(), transaction.rate(),
-                "Rate is invalid");
+                    "Rate is invalid");
             assertEquals(resultedTransaction.amount(), transaction.amount(),
-                "Amount is invalid");
+                    "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 

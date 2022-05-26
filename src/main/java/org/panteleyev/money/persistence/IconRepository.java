@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Icon;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,34 +28,34 @@ final class IconRepository extends Repository<Icon> {
     @Override
     protected String getInsertSql() {
         return """
-            INSERT INTO icon (
-                name, bytes, created, modified, uuid
-            ) VALUES (
-                ?, ?, ?, ?, ?
-            )
-            """;
+                INSERT INTO icon (
+                    name, bytes, created, modified, uuid
+                ) VALUES (
+                    ?, ?, ?, ?, ?
+                )
+                """;
     }
 
     @Override
     protected String getUpdateSql() {
         return """
-            UPDATE icon SET
-                name = ?,
-                bytes = ?,
-                created = ?,
-                modified = ?
-            WHERE uuid = ?
-            """;
+                UPDATE icon SET
+                    name = ?,
+                    bytes = ?,
+                    created = ?,
+                    modified = ?
+                WHERE uuid = ?
+                """;
     }
 
     @Override
     protected Icon fromResultSet(ResultSet rs) throws SQLException {
         return new Icon(
-            getUuid(rs, "uuid"),
-            rs.getString("name"),
-            rs.getBytes("bytes"),
-            rs.getLong("created"),
-            rs.getLong("modified")
+                getUuid(rs, "uuid"),
+                rs.getString("name"),
+                rs.getBytes("bytes"),
+                rs.getLong("created"),
+                rs.getLong("modified")
         );
     }
 

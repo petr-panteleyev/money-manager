@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,55 +29,55 @@ final class ContactRepository extends Repository<Contact> {
     @Override
     protected String getInsertSql() {
         return """
-            INSERT INTO contact (
-                name, type, phone, mobile, email, 
-                web, comment, street, city, country, 
-                zip, icon_uuid, created, modified, uuid
-            ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-            )
-            """;
+                INSERT INTO contact (
+                    name, type, phone, mobile, email, 
+                    web, comment, street, city, country, 
+                    zip, icon_uuid, created, modified, uuid
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
+                """;
     }
 
     @Override
     protected String getUpdateSql() {
         return """
-            UPDATE contact SET
-                name = ?,
-                type = ?,
-                phone = ?,
-                mobile = ?,
-                email = ?,
-                web = ?,
-                comment = ?,
-                street = ?,
-                city = ?,
-                country = ?,
-                zip = ?,
-                icon_uuid = ?,
-                created = ?,
-                modified = ?
-            WHERE uuid = ?
-            """;
+                UPDATE contact SET
+                    name = ?,
+                    type = ?,
+                    phone = ?,
+                    mobile = ?,
+                    email = ?,
+                    web = ?,
+                    comment = ?,
+                    street = ?,
+                    city = ?,
+                    country = ?,
+                    zip = ?,
+                    icon_uuid = ?,
+                    created = ?,
+                    modified = ?
+                WHERE uuid = ?
+                """;
     }
 
     protected Contact fromResultSet(ResultSet rs) throws SQLException {
         return new Contact(
-            getUuid(rs, "uuid"),
-            rs.getString("name"),
-            getEnum(rs, "type", ContactType.class),
-            rs.getString("phone"),
-            rs.getString("mobile"),
-            rs.getString("email"),
-            rs.getString("web"),
-            rs.getString("comment"),
-            rs.getString("street"),
-            rs.getString("city"),
-            rs.getString("country"),
-            rs.getString("zip"),
-            getUuid(rs, "icon_uuid"),
-            rs.getLong("created"),
-            rs.getLong("modified")
+                getUuid(rs, "uuid"),
+                rs.getString("name"),
+                getEnum(rs, "type", ContactType.class),
+                rs.getString("phone"),
+                rs.getString("mobile"),
+                rs.getString("email"),
+                rs.getString("web"),
+                rs.getString("comment"),
+                rs.getString("street"),
+                rs.getString("city"),
+                rs.getString("country"),
+                rs.getString("zip"),
+                getUuid(rs, "icon_uuid"),
+                rs.getLong("created"),
+                rs.getLong("modified")
         );
     }
 

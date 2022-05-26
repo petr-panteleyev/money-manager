@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.model.Icon;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,6 +43,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -92,12 +94,12 @@ public final class IconWindowController extends BaseController {
         super(new Stage(), settings().getMainCssFilePath());
 
         var menuBar = menuBar(
-            newMenu(fxString(UI, I18N_MENU_FILE),
-                menuItem(fxString(UI, I18N_MENU_ITEM_UPLOAD), SHORTCUT_U,
-                    event -> onUpload()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
-            createHelpMenu()
+                newMenu(fxString(UI, I18N_MENU_FILE),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_UPLOAD), SHORTCUT_U,
+                                event -> onUpload()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
+                createHelpMenu()
         );
 
         iconFlow.setVgap(20);
@@ -147,9 +149,9 @@ public final class IconWindowController extends BaseController {
 
     private void updateIconFlow() {
         iconFlow.getChildren().setAll(
-            sortedList.stream()
-                .map(icon -> new IconCell(icon, this))
-                .toList()
+                sortedList.stream()
+                        .map(icon -> new IconCell(icon, this))
+                        .toList()
         );
     }
 
@@ -235,7 +237,7 @@ public final class IconWindowController extends BaseController {
         var fileChooser = new FileChooser();
         fileChooser.setTitle(fxString(UI, I18N_WORD_UPLOAD));
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG images", "*.png"),
-            new FileChooser.ExtensionFilter("GIF images", "*.gif"));
+                new FileChooser.ExtensionFilter("GIF images", "*.gif"));
 
         var selected = fileChooser.showOpenMultipleDialog(getStage());
         if (selected != null) {

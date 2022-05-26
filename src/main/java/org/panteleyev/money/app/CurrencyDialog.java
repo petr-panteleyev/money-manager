@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -28,11 +28,13 @@ import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.model.Currency;
+
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
@@ -73,20 +75,21 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         setTitle(fxString(UI, I18N_WORD_CURRENCY));
 
         getDialogPane().setContent(
-            gridPane(
-                List.of(
-                    gridRow(label(fxString(UI, I18N_WORD_SYMBOL, COLON)), nameEdit),
-                    gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)), descrEdit),
-                    gridRow(label(fxString(UI, I18N_WORD_RATE, COLON)), rateEdit, rateDirectionChoice),
-                    gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice), hBox -> {
-                        hBox.setAlignment(CENTER_LEFT);
-                        HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
-                    })),
-                    gridRow(SKIP, thousandSeparatorCheck),
-                    gridRow(SKIP, defaultCheck)
+                gridPane(
+                        List.of(
+                                gridRow(label(fxString(UI, I18N_WORD_SYMBOL, COLON)), nameEdit),
+                                gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)), descrEdit),
+                                gridRow(label(fxString(UI, I18N_WORD_RATE, COLON)), rateEdit, rateDirectionChoice),
+                                gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo,
+                                        formatSymbolPositionChoice), hBox -> {
+                                    hBox.setAlignment(CENTER_LEFT);
+                                    HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
+                                })),
+                                gridRow(SKIP, thousandSeparatorCheck),
+                                gridRow(SKIP, defaultCheck)
 
-                ), b -> b.withStyle(GRID_PANE)
-            )
+                        ), b -> b.withStyle(GRID_PANE)
+                )
         );
 
         nameEdit.setPrefColumnCount(20);
@@ -95,13 +98,13 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         rateDirectionChoice.getItems().setAll("/", "*");
 
         formatSymbolPositionChoice.getItems().setAll(
-            UI.getString(I18N_WORD_BEFORE),
-            UI.getString(I18N_WORD_AFTER));
+                UI.getString(I18N_WORD_BEFORE),
+                UI.getString(I18N_WORD_AFTER));
 
         formatSymbolCombo.getItems().setAll(cache().getCurrencies().stream()
-            .map(Currency::formatSymbol)
-            .filter(s -> !s.isEmpty())
-            .collect(Collectors.toSet()));
+                .map(Currency::formatSymbol)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet()));
 
         if (currency == null) {
             rateDirectionChoice.getSelectionModel().select(0);
@@ -127,20 +130,20 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             long now = System.currentTimeMillis();
 
             var builder = new Currency.Builder(currency)
-                .symbol(nameEdit.getText())
-                .description(descrEdit.getText())
-                .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
-                .formatSymbolPosition(formatSymbolPositionChoice.getSelectionModel().getSelectedIndex())
-                .showFormatSymbol(showSymbolCheck.isSelected())
-                .def(defaultCheck.isSelected())
-                .rate(new BigDecimal(rateEdit.getText()))
-                .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
-                .useThousandSeparator(thousandSeparatorCheck.isSelected())
-                .modified(now);
+                    .symbol(nameEdit.getText())
+                    .description(descrEdit.getText())
+                    .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())
+                    .formatSymbolPosition(formatSymbolPositionChoice.getSelectionModel().getSelectedIndex())
+                    .showFormatSymbol(showSymbolCheck.isSelected())
+                    .def(defaultCheck.isSelected())
+                    .rate(new BigDecimal(rateEdit.getText()))
+                    .direction(rateDirectionChoice.getSelectionModel().getSelectedIndex())
+                    .useThousandSeparator(thousandSeparatorCheck.isSelected())
+                    .modified(now);
 
             if (currency == null) {
                 builder.uuid(UUID.randomUUID())
-                    .created(now);
+                        .created(now);
             }
 
             return builder.build();
@@ -153,7 +156,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
     private void createValidationSupport() {
         validation.registerValidator(nameEdit, (Control control, String value) ->
-            ValidationResult.fromErrorIf(control, null, value.isEmpty()));
+                ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
         validation.registerValidator(rateEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.initInitialDecoration();

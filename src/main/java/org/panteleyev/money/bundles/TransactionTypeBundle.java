@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -20,22 +20,22 @@ public class TransactionTypeBundle extends ListResourceBundle {
     @Override
     protected Object[][] getContents() {
         return new Object[][]{
-            {"CARD_PAYMENT", "Card Payment"},
-            {"CASH_PURCHASE", "Cash Purchase"},
-            {"CHEQUE", "Cheque"},
-            {"TRANSFER", "Transfer"},
-            {"DEPOSIT", "Deposit"},
-            {"WITHDRAWAL", "Cash Withdrawal"},
-            {"INTEREST", "Interest"},
-            {"INCOME", "Income"},
-            {"FEE", "Fee"},
-            {"CACHIER", "Cashier"},
-            {"DIVIDEND", "Dividend"},
-            {"DIRECT_BILLING", "Direct Billing"},
-            {"CHARGE", "Charge"},
-            {"SALE", "Sale"},
-            {"REFUND", "Refund"},
-            {"UNDEFINED", "Undefined"},
+                {"CARD_PAYMENT", "Card Payment"},
+                {"CASH_PURCHASE", "Cash Purchase"},
+                {"CHEQUE", "Cheque"},
+                {"TRANSFER", "Transfer"},
+                {"DEPOSIT", "Deposit"},
+                {"WITHDRAWAL", "Cash Withdrawal"},
+                {"INTEREST", "Interest"},
+                {"INCOME", "Income"},
+                {"FEE", "Fee"},
+                {"CACHIER", "Cashier"},
+                {"DIVIDEND", "Dividend"},
+                {"DIRECT_BILLING", "Direct Billing"},
+                {"CHARGE", "Charge"},
+                {"SALE", "Sale"},
+                {"REFUND", "Refund"},
+                {"UNDEFINED", "Undefined"},
         };
     }
 }

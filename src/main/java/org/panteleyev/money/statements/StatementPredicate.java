@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2017, 2018, 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@ package org.panteleyev.money.statements;
 
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -41,27 +42,27 @@ public class StatementPredicate implements Predicate<Transaction> {
         }
 
         var result = (Objects.equals(transaction.accountDebitedUuid(), accountUuid)
-            || Objects.equals(transaction.accountCreditedUuid(), accountUuid))
-            && (compareDate(record.getActual(), transaction)
-            || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));
+                || Objects.equals(transaction.accountCreditedUuid(), accountUuid))
+                && (compareDate(record.getActual(), transaction)
+                || (!ignoreExecutionDate && compareDate(record.getExecution(), transaction)));
 
         result = result && (compareAmount(record.getAmountDecimal(), transaction)
-            || compareAmount(record.getAccountAmountDecimal(), transaction));
+                || compareAmount(record.getAccountAmountDecimal(), transaction));
 
         return result;
     }
 
     private boolean compareDate(LocalDate date, Transaction transaction) {
         return (transaction.day() == date.getDayOfMonth()
-            && transaction.month() == date.getMonthValue()
-            && transaction.year() == date.getYear()
+                && transaction.month() == date.getMonthValue()
+                && transaction.year() == date.getYear()
         ) || Objects.equals(transaction.statementDate(), date);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private boolean compareAmount(Optional<BigDecimal> amount, Transaction transaction) {
         return amount.map(BigDecimal::abs)
-            .map(a -> a.compareTo(transaction.amount()) == 0)
-            .orElse(false);
+                .map(a -> a.compareTo(transaction.amount()) == 0)
+                .orElse(false);
     }
 }

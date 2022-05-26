@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2017-2022, Petr Panteleyev
+ Copyright (C) 2019, 2020, 2021, 2022 Petr Panteleyev
 
  This program is free software: you can redistribute it and/or modify it under the
  terms of the GNU General Public License as published by the Free Software
@@ -22,9 +22,11 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.test.BaseTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
 import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -37,12 +39,12 @@ public class CategoryDialogTest extends BaseTest {
     private static final CategoryType CATEGORY_TYPE_NEW = randomCategoryType();
 
     private final static Category CATEGORY = new Category.Builder()
-        .name(UUID.randomUUID().toString())
-        .comment(UUID.randomUUID().toString())
-        .type(CategoryType.BANKS_AND_CASH)
-        .uuid(UUID.randomUUID())
-        .modified(System.currentTimeMillis())
-        .build();
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .type(CategoryType.BANKS_AND_CASH)
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
     @BeforeClass
     public void setupAndSkip() {
