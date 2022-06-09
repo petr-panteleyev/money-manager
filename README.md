@@ -8,16 +8,16 @@ Personal finance manager. Work in progress.
 
 ## Build
 
-Make sure ```JAVA_HOME``` is set to JDK 18.
+Make sure ```JAVA_HOME``` points to JDK 18.
 
 ```shell script
-mvn clean verify
+mvn clean install
 ```
 
 ## Run
 
 ```shell script
-mvn javafx:run
+mvn -pl desktop javafx:run
 ```
 
 To open specific profile add ```-Dprofile=<profile>``` to the command line.
@@ -30,18 +30,18 @@ environment variable
 * Execute one of the following commands:
 
 ```shell script
-mvn clean package jpackage:jpackage@mac
+mvn -pl desktop jpackage:jpackage@mac
 ```
 
 ```shell script
-mvn clean package jpackage:jpackage@win
+mvn -pl desktop jpackage:jpackage@win
 ```
 
 ```shell script
-mvn clean package jpackage:jpackage@linux
+mvn -pl desktop jpackage:jpackage@linux
 ```
 
-Installation package will be found in ```target/dist``` directory.
+Installation package will be found in ```desktop/target/dist``` directory.
 
 ## Support
 
