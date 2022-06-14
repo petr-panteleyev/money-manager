@@ -13,8 +13,8 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
@@ -46,7 +46,6 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -70,7 +69,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UNCHECKED_ONLY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REQUESTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
@@ -225,25 +223,16 @@ class RequestWindowController extends BaseController {
     }
 
     private void onReport() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName("transactions"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
-
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
-
-        try (var outputStream = new FileOutputStream(selected)) {
-            var transactions = cache().getTransactions(getTransactionFilter())
-                    .sorted(cache().getTransactionByDateComparator())
-                    .toList();
-            Reports.reportTransactions(transactions, outputStream);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        new ReportFileDialog().show(getStage(), ReportType.TRANSACTIONS).ifPresent(selected -> {
+            try (var outputStream = new FileOutputStream(selected)) {
+                var transactions = cache().getTransactions(getTransactionFilter())
+                        .sorted(cache().getTransactionByDateComparator())
+                        .toList();
+                Reports.reportTransactions(transactions, outputStream);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void setupContactMenu() {

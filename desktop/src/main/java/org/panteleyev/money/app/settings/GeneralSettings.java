@@ -27,7 +27,8 @@ final class GeneralSettings {
         ACCOUNT_CLOSING_DAY_DELTA("accountClosingDayDelta", 10),
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts", false),
         LAST_STATEMENT_DIR("lastStatementDir", ""),
-        LAST_EXPORT_DIR("lastExportDir", "");
+        LAST_EXPORT_DIR("lastExportDir", ""),
+        LAST_REPORT_DIR("lastReportDir", "");
 
         private final String elementName;
         private final Object defaultValue;

@@ -14,7 +14,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
+import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -47,7 +47,6 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -62,7 +61,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BALANC
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INCOMES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 
 class IncomesAndExpensesWindowController extends BaseController {
     private static class TreeNode {
@@ -307,37 +305,30 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private void onReport() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName("IncomesAndExpenses"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
+        new ReportFileDialog().show(getStage(), ReportType.INCOMES_AND_EXPENSES).ifPresent(selected-> {
+            var dataModel = new HashMap<String, Object>();
+            dataModel.put("expensesSum", expenseValueText.getText());
+            dataModel.put("incomesSum", incomeValueText.getText());
+            dataModel.put("balanceSum", balanceValueText.getText());
 
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
+            dataModel.put("expenses", expenseRoot.getChildren().stream()
+                    .map(IncomesAndExpensesWindowController::getItemModel)
+                    .toList()
+            );
 
-        var dataModel = new HashMap<String, Object>();
-        dataModel.put("expensesSum", expenseValueText.getText());
-        dataModel.put("incomesSum", incomeValueText.getText());
-        dataModel.put("balanceSum", balanceValueText.getText());
+            dataModel.put("incomes", incomeRoot.getChildren().stream()
+                    .map(IncomesAndExpensesWindowController::getItemModel)
+                    .toList()
+            );
 
-        dataModel.put("expenses", expenseRoot.getChildren().stream()
-                .map(IncomesAndExpensesWindowController::getItemModel)
-                .toList()
-        );
+            try (var w = new FileWriter(selected)) {
+                templateEngine().process(TemplateEngine.Template.INCOMES_AND_EXPENSES, dataModel, w);
+                settings().update(opt -> opt.setLastReportDir(selected.getParent()));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
 
-        dataModel.put("incomes", incomeRoot.getChildren().stream()
-                .map(IncomesAndExpensesWindowController::getItemModel)
-                .toList()
-        );
-
-        try (var w = new FileWriter(selected)) {
-            templateEngine().process(TemplateEngine.Template.INCOMES_AND_EXPENSES, dataModel, w);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
     }
 
     private static Map<String, Object> getItemModel(TreeItem<TreeNode> item) {

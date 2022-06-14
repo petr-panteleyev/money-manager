@@ -97,7 +97,7 @@ class Reports {
                 td(w, cache().getCurrency(a.currencyUuid())
                         .map(Currency::symbol).orElse(""));
                 td(w, formatAmount(a.interest()));
-                td(w, a.closingDate().toString());
+                td(w, a.closingDate() == null ? "" : a.closingDate().toString());
                 td(w, a.comment());
                 td(w, "amount", Account.getBalance(a).toString());
                 w.println();

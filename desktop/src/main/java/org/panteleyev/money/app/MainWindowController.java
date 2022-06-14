@@ -24,7 +24,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.controlsfx.validation.ValidationResult;
@@ -37,6 +36,8 @@ import org.panteleyev.money.MoneyApplication;
 import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
 import org.panteleyev.money.app.database.ConnectionProfileManager;
+import org.panteleyev.money.app.dialogs.ExportFileFialog;
+import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.icons.IconWindowController;
 import org.panteleyev.money.app.settings.SettingsDialog;
 import org.panteleyev.money.bundles.UiBundle;
@@ -80,8 +81,6 @@ import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
-import static org.panteleyev.money.app.Constants.FILTER_ZIP_FILES;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -120,7 +119,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     public static final ResourceBundle UI = ResourceBundle.getBundle(UiBundle.class.getCanonicalName());
@@ -397,28 +395,15 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void xmlDump() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle("Export to file");
-        settings().getLastExportDir().ifPresent(dir -> {
-            if (dir.exists() && dir.isDirectory()) {
-                fileChooser.setInitialDirectory(dir);
-            }
-        });
-        fileChooser.setInitialFileName(generateFileName() + ".zip");
-        fileChooser.getExtensionFilters().addAll(FILTER_ZIP_FILES);
-
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
-
-        CompletableFuture.runAsync(() -> {
-            try (var outputStream = new ZipOutputStream(new FileOutputStream(selected))) {
-                new Export().doExport(outputStream);
-                settings().update(opt -> opt.setLastExportDir(selected.getParent()));
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
+        new ExportFileFialog().showExportDialog(getStage()).ifPresent(selected -> {
+            CompletableFuture.runAsync(() -> {
+                try (var outputStream = new ZipOutputStream(new FileOutputStream(selected))) {
+                    new Export().doExport(outputStream);
+                    settings().update(opt -> opt.setLastExportDir(selected.getParent()));
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
+            });
         });
     }
 
@@ -427,26 +412,18 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onReport() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName("transactions"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
-
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
-
-        try (var outputStream = new FileOutputStream(selected)) {
-            var filter = transactionTable.getTransactionFilter();
-            var transactions = cache().getTransactions(filter)
-                    .sorted(cache().getTransactionByDateComparator())
-                    .toList();
-            Reports.reportTransactions(transactions, outputStream);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        new ReportFileDialog().show(getStage(), ReportType.TRANSACTIONS).ifPresent(selected -> {
+            try (var outputStream = new FileOutputStream(selected)) {
+                var filter = transactionTable.getTransactionFilter();
+                var transactions = cache().getTransactions(filter)
+                        .sorted(cache().getTransactionByDateComparator())
+                        .toList();
+                Reports.reportTransactions(transactions, outputStream);
+                settings().update(opt -> opt.setLastReportDir(selected.getParent()));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private Exception onResetDatabase(ConnectionProfile profile) {

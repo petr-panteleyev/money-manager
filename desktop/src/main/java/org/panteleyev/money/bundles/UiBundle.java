@@ -121,7 +121,6 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_ACCOUNTS_CASH_CARDS, "Accounts, cash, cards"},
                 {I18N_MISC_ALL_ACCOUNTS, "All Accounts"},
                 {I18N_MISC_ALL_CATEGORIES, "All Categories"},
-                {I18N_MISC_ALL_FILES, "All Files"},
                 {I18N_MISC_ALL_TYPES, "All Types"},
                 {I18N_MISC_ARE_YOU_SURE, "Are you sure?"},
                 {I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, "Autocomplete Prefix Length"},
@@ -142,6 +141,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_FULL_DUMP_IMPORT_CHECK, "Yes, I'm sure!"},
                 {I18N_MISC_FULL_DUMP_IMPORT_WARNING, "Warning!\nImporting full dump will complete erase all\nexisting" +
                         " records."},
+                {I18N_MISC_HTML_FILES, "HTML Files"},
                 {I18N_MISC_IGNORE_EXECUTION_DATE, "Ignore Execution Date"},
                 {I18N_MISC_IMPORT_FILE_NAME, "Import file name"},
                 {I18M_MISC_INCOMES_AND_EXPENSES, "Incomes and Expenses"},
@@ -166,7 +166,6 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_UPLOAD_DIPLICATE, ": duplicate"},
                 {I18N_MISC_UPLOAD_FILES_SKIPPED, "Files skipped:"},
                 {I18N_MISC_UPLOAD_TOO_BIG, ": too big"},
-                {I18N_MISC_XML_FILES, "XML Files"},
                 {I18N_MISC_ZIP_FILES, "ZIP Files"},
                 {I18N_CREATE_DESKTOP_ENTRY, "Create Desktop Entry (Linux)"},
                 //

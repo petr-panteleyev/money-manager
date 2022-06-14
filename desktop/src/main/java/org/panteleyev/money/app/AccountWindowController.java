@@ -21,7 +21,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.AccountBalanceCell;
@@ -32,6 +31,7 @@ import org.panteleyev.money.app.cells.AccountCommentCell;
 import org.panteleyev.money.app.cells.AccountInterestCell;
 import org.panteleyev.money.app.cells.AccountNameCell;
 import org.panteleyev.money.app.cells.DocumentCountCell;
+import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
 import org.panteleyev.money.model.Account;
@@ -55,7 +55,6 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -92,7 +91,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMEN
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNTIL;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_WAITING;
@@ -361,26 +359,18 @@ final class AccountWindowController extends BaseController {
     }
 
     private void onReport() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName("accounts"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
-
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
-
-        try (var outputStream = new FileOutputStream(selected)) {
-            var accounts = cache().getAccounts(filterProperty.get())
-                    .sorted(cache().getAccountByCategoryComparator()
-                            .thenComparing(cache().getAccountByNameComparator()))
-                    .toList();
-            Reports.reportAccounts(accounts, outputStream);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        new ReportFileDialog().show(getStage(), ReportType.ACCOUNTS).ifPresent(selected -> {
+            try (var outputStream = new FileOutputStream(selected)) {
+                var accounts = cache().getAccounts(filterProperty.get())
+                        .sorted(cache().getAccountByCategoryComparator()
+                                .thenComparing(cache().getAccountByNameComparator()))
+                        .toList();
+                Reports.reportAccounts(accounts, outputStream);
+                settings().update(opt -> opt.setLastReportDir(selected.getParent()));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void onUpdateBalance() {

@@ -122,7 +122,6 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_ACCOUNTS_CASH_CARDS, "Счета, наличные, карты"},
                 {I18N_MISC_ALL_ACCOUNTS, "Все счета"},
                 {I18N_MISC_ALL_CATEGORIES, "Все категории"},
-                {I18N_MISC_ALL_FILES, "Все файлы"},
                 {I18N_MISC_ALL_TYPES, "Все типы"},
                 {I18N_MISC_ARE_YOU_SURE, "Вы уверены?"},
                 {I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, "Длина префикса автодополнения"},
@@ -143,6 +142,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_FULL_DUMP_IMPORT_CHECK, "Да, я уверен!"},
                 {I18N_MISC_FULL_DUMP_IMPORT_WARNING, "Внимание!\nИмпортирование полного дампа полностью уничтожит\n" +
                         "все существующие записи в базе."},
+                {I18N_MISC_HTML_FILES, "Файлы HTML"},
                 {I18N_MISC_IGNORE_EXECUTION_DATE, "Игнорировать дату исполнения"},
                 {I18N_MISC_IMPORT_FILE_NAME, "Имя файла для импорта"},
                 {I18M_MISC_INCOMES_AND_EXPENSES, "Доходы и расходы"},
@@ -167,7 +167,6 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_UPLOAD_DIPLICATE, ": дубликат"},
                 {I18N_MISC_UPLOAD_FILES_SKIPPED, "Файлы не загружены:"},
                 {I18N_MISC_UPLOAD_TOO_BIG, ": слишком большой"},
-                {I18N_MISC_XML_FILES, "Файлы XML"},
                 {I18N_MISC_ZIP_FILES, "Файлы ZIP"},
                 {I18N_CREATE_DESKTOP_ENTRY, "Создать ярлык приложения (Linux)"},
                 //

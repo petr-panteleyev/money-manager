@@ -85,7 +85,6 @@ public class DocumentWindowController extends BaseController {
                             new PredicateProperty<>(doc -> doc.ownerUuid().equals(documentOwner.uuid()))
                     ))
             );
-            filteredList.setPredicate(doc -> doc.ownerUuid().equals(documentOwner.uuid()));
         } else {
             filteredList.predicateProperty().bind(
                     PredicateProperty.and(List.of(
