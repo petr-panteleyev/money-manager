@@ -4,15 +4,22 @@
  */
 package org.panteleyev.money.app;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import org.panteleyev.freedesktop.directory.XDGBaseDirectory;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
+
+import static org.panteleyev.freedesktop.Utility.isLinux;
 
 public final class ApplicationFiles {
     public enum AppFile {
@@ -25,6 +32,14 @@ public final class ApplicationFiles {
         COLORS("colors.xml"),
         FONTS("fonts.xml");
 
+        static final Set<AppFile> CONFIG_FILES = Set.of(
+                PROFILES, SETTINGS, WINDOWS, COLORS, FONTS
+        );
+
+        static final Set<AppFile> DATA_FILES = Set.of(
+                MAIN_CSS, DIALOG_CSS, ABOUT_DIALOG_CSS
+        );
+
         private final String fileName;
 
         AppFile(String fileName) {
@@ -36,41 +51,59 @@ public final class ApplicationFiles {
         }
     }
 
-    private static final String APPLICATION_DIRECTORY = ".money-manager";
+    private static final String PACKAGE_NAME = "panteleyev.org";
+    private static final String APP_NAME = "MoneyManager";
+    private static final String LOGS_DIR_NAME = "logs";
 
-    private final File applicationDirectory =
-            new File(System.getProperty("user.home") + File.separator + APPLICATION_DIRECTORY);
-    private final File logDirectory =
-            new File(applicationDirectory, "logs");
+    private final Path configDirectory;
+    private final Path dataDirectory;
+    private final Path logDirectory;
 
-    private final Map<AppFile, File> fileMap = new EnumMap<>(AppFile.class);
+    private final Map<AppFile, Path> fileMap = new EnumMap<>(AppFile.class);
 
     public ApplicationFiles() {
-        for (var appFile : AppFile.values()) {
-            fileMap.put(appFile, new File(applicationDirectory, appFile.getFileName()));
+        if (isLinux()) {
+            configDirectory = XDGBaseDirectory.getConfigHome()
+                    .resolve(PACKAGE_NAME)
+                    .resolve(APP_NAME);
+            dataDirectory = XDGBaseDirectory.getDataHome()
+                    .resolve(PACKAGE_NAME)
+                    .resolve(APP_NAME);
+        } else {
+            configDirectory = Path.of(System.getProperty("user.home"), ".money-manager");
+            dataDirectory = configDirectory;
+        }
+        logDirectory = dataDirectory.resolve(LOGS_DIR_NAME);
+
+        for (var appFile : AppFile.CONFIG_FILES) {
+            fileMap.put(appFile, configDirectory.resolve(appFile.getFileName()));
+        }
+        for (var appFile : AppFile.DATA_FILES) {
+            fileMap.put(appFile, dataDirectory.resolve(appFile.getFileName()));
         }
     }
 
     public void initialize() {
-        initDirectory(applicationDirectory, "Application");
+        initDirectory(configDirectory, "Application");
+        initDirectory(dataDirectory, "Data");
         initDirectory(logDirectory, "Log");
     }
 
-    public void write(AppFile appFile, Consumer<FileOutputStream> fileConsumer) {
-        try (var out = new FileOutputStream(fileMap.get(appFile))) {
+    public void write(AppFile appFile, Consumer<OutputStream> fileConsumer) {
+        try (var out = Files.newOutputStream(fileMap.get(appFile))) {
             fileConsumer.accept(out);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
-    public void read(AppFile appFile, Consumer<FileInputStream> fileConsumer) {
+    public void read(AppFile appFile, Consumer<InputStream> fileConsumer) {
         var file = fileMap.get(appFile);
-        if (!file.exists()) {
+        if (!Files.exists(file)) {
             return;
         }
 
-        try (var in = new FileInputStream(file)) {
+        try (var in = Files.newInputStream(file)) {
             fileConsumer.accept(in);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
@@ -79,21 +112,19 @@ public final class ApplicationFiles {
 
     public URL getUrl(AppFile appFile) {
         try {
-            return fileMap.get(appFile).toURI().toURL();
+            return fileMap.get(appFile).toUri().toURL();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
-    private static void initDirectory(File dir, String name) {
-        if (!dir.exists()) {
-            if (!dir.mkdir()) {
-                throw new RuntimeException(name + " directory cannot be created");
-            }
-        } else {
-            if (!dir.isDirectory()) {
-                throw new RuntimeException(name + " directory cannot be opened");
-            }
+    private static void initDirectory(Path path, String name) {
+        try {
+            Files.createDirectories(path);
+        } catch (FileAlreadyExistsException ex) {
+            // Do nothing
+        } catch (IOException ex) {
+            throw new RuntimeException(name + " directory cannot be created");
         }
     }
 }

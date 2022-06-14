@@ -7,6 +7,7 @@ package org.panteleyev.money.app;
 import org.panteleyev.money.bundles.CategoryTypeBundle;
 import org.panteleyev.money.bundles.ContactTypeBundle;
 import org.panteleyev.money.bundles.DocumentTypeBundle;
+import org.panteleyev.money.bundles.TransactionPredicateBundle;
 import org.panteleyev.money.bundles.TransactionTypeBundle;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.ContactType;
@@ -22,6 +23,7 @@ public interface Bundles {
     ResourceBundle CONTACT_TYPE_BUNDLE = getBundle(ContactTypeBundle.class.getCanonicalName());
     ResourceBundle TRANSACTION_TYPE_BUNDLE = getBundle(TransactionTypeBundle.class.getCanonicalName());
     ResourceBundle DOCUMENT_TYPE_BUNDLE = getBundle(DocumentTypeBundle.class.getCanonicalName());
+    ResourceBundle TRANSACTION_PREDICATE_BUNDLE = getBundle(TransactionPredicateBundle.class.getCanonicalName());
 
     static String translate(CategoryType type) {
         return CATEGORY_TYPE_BUNDLE.getString(type.name() + "_name");

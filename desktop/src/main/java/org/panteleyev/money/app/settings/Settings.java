@@ -107,21 +107,37 @@ public final class Settings {
         generalSettings.put(GeneralSettings.Setting.AUTO_COMPLETE_LENGTH, x);
     }
 
-    public String getLastStatementDir() {
-        return generalSettings.get(GeneralSettings.Setting.LAST_STATEMENT_DIR);
+    private Optional<File> getDirectorySetting(GeneralSettings.Setting key) {
+        String value = generalSettings.get(key);
+        if (value.isEmpty()) {
+            return Optional.empty();
+        }
+        var dir = new File(value);
+        return dir.isDirectory() ? Optional.of(dir) : Optional.empty();
+    }
+
+    public Optional<File> getLastStatementDir() {
+        return getDirectorySetting(GeneralSettings.Setting.LAST_STATEMENT_DIR);
     }
 
     public void setLastStatementDir(String dir) {
-        generalSettings.put(GeneralSettings.Setting.LAST_STATEMENT_DIR, dir);
+        generalSettings.put(GeneralSettings.Setting.LAST_STATEMENT_DIR, dir == null ? "" : dir);
     }
 
     public Optional<File> getLastExportDir() {
-        String lastExportDir = generalSettings.get(GeneralSettings.Setting.LAST_EXPORT_DIR);
-        return lastExportDir.isEmpty() ? Optional.empty() : Optional.of(new File(lastExportDir));
+        return getDirectorySetting(GeneralSettings.Setting.LAST_EXPORT_DIR);
     }
 
     public void setLastExportDir(String dir) {
-        generalSettings.put(GeneralSettings.Setting.LAST_EXPORT_DIR, dir);
+        generalSettings.put(GeneralSettings.Setting.LAST_EXPORT_DIR, dir == null ? "" : dir);
+    }
+
+    public Optional<File> getLastReportDir() {
+        return getDirectorySetting(GeneralSettings.Setting.LAST_REPORT_DIR);
+    }
+
+    public void setLastReportDir(String dir) {
+        generalSettings.put(GeneralSettings.Setting.LAST_REPORT_DIR, dir == null ? "" : dir);
     }
 
     public int getAccountClosingDayDelta() {

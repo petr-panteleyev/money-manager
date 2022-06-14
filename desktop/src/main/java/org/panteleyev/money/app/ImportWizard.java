@@ -16,13 +16,13 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.MoneyApplication;
+import org.panteleyev.money.app.dialogs.ExportFileFialog;
 import org.panteleyev.money.xml.Import;
 
 import java.io.File;
@@ -39,7 +39,6 @@ import static org.panteleyev.fx.ButtonFactory.radioButton;
 import static org.panteleyev.fx.FxFactory.newCheckBox;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.money.app.Constants.FILTER_ZIP_FILES;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -105,18 +104,11 @@ final class ImportWizard extends BaseDialog<Object> {
         }
 
         private void onBrowse() {
-            var chooser = new FileChooser();
-            chooser.setTitle(fxString(UI, I18N_WORD_IMPORT));
-            settings().getLastExportDir().ifPresent(dir -> {
-                if (dir.exists() && dir.isDirectory()) {
-                    chooser.setInitialDirectory(dir);
-                }
-            });
-            chooser.getExtensionFilters().addAll(FILTER_ZIP_FILES);
+            var fileName = new ExportFileFialog().showImportDialog(owner)
+                    .map(File::getAbsolutePath)
+                    .orElse("");
 
-            var selected = chooser.showOpenDialog(owner);
-
-            fileNameEdit.setText(selected != null ? selected.getAbsolutePath() : "");
+            fileNameEdit.setText(fileName);
         }
     }
 

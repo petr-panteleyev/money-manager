@@ -22,11 +22,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.stage.FileChooser;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.cells.LocalDateCell;
 import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
+import org.panteleyev.money.app.dialogs.ReportFileDialog;
+import org.panteleyev.money.app.dialogs.StatementFileDialog;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
@@ -36,7 +37,6 @@ import org.panteleyev.money.statements.StatementParser;
 import org.panteleyev.money.statements.StatementPredicate;
 import org.panteleyev.money.statements.StatementRecord;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -58,7 +58,6 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -85,8 +84,6 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTR
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PLACE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
@@ -103,12 +100,6 @@ class StatementWindowController extends BaseController {
     private final ListChangeListener<Account> accountListener = c -> Platform.runLater(this::setupAccountComboBox);
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Transaction> transactionListener = c -> calculateTransactions();
-
-
-    private static final FileChooser.ExtensionFilter OFX_EXTENSION =
-            new FileChooser.ExtensionFilter("OFX Statements", "*.ofx");
-    private static final FileChooser.ExtensionFilter SBERBANK_HTML =
-            new FileChooser.ExtensionFilter("Sberbank HTML Statement", "*.html");
 
     private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
 
@@ -243,50 +234,23 @@ class StatementWindowController extends BaseController {
     }
 
     private void onBrowse() {
-        var chooser = new FileChooser();
-        chooser.setTitle(UI.getString(I18N_WORD_STATEMENT));
-        chooser.getExtensionFilters().addAll(
-                OFX_EXTENSION,
-                SBERBANK_HTML
-        );
+        var dialog = new StatementFileDialog();
+        dialog.show(getStage()).ifPresent(selected -> {
+            setTitle(getTitle() + " - " + selected.getAbsolutePath());
+            settings().update(opt -> opt.setLastStatementDir(selected.getParent()));
 
-        var lastDirString = settings().getLastStatementDir();
-        if (!lastDirString.isEmpty()) {
-            var lastDir = new File(lastDirString);
-            if (lastDir.exists() && lastDir.isDirectory()) {
-                chooser.setInitialDirectory(lastDir);
+            statementType = dialog.getStatementType();
+            if (statementType.equals(Statement.StatementType.UNKNOWN)) {
+                return;
             }
-        }
 
-        var selected = chooser.showOpenDialog(getStage());
-        if (selected == null || !selected.exists()) {
-            return;
-        }
-
-        var filter = chooser.getSelectedExtensionFilter();
-        if (OFX_EXTENSION.equals(filter)) {
-            statementType = Statement.StatementType.RAIFFEISEN_OFX;
-        } else if (SBERBANK_HTML.equals(filter)) {
-            statementType = Statement.StatementType.SBERBANK_HTML;
-        } else {
-            statementType = Statement.StatementType.UNKNOWN;
-        }
-
-        var dir = selected.getParentFile();
-        settings().update(opt -> opt.setLastStatementDir(dir == null ? "" : dir.getAbsolutePath()));
-
-        setTitle(getTitle() + " - " + selected.getAbsolutePath());
-
-        if (statementType.equals(Statement.StatementType.UNKNOWN)) {
-            return;
-        }
-
-        try (var in = new FileInputStream(selected)) {
-            var statement = StatementParser.parse(statementType, in);
-            analyzeStatement(statement);
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+            try (var in = new FileInputStream(selected)) {
+                var statement = StatementParser.parse(statementType, in);
+                analyzeStatement(statement);
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void analyzeStatement(Statement statement) {
@@ -329,22 +293,14 @@ class StatementWindowController extends BaseController {
     }
 
     private void onReport() {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_REPORT));
-        settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
-        fileChooser.setInitialFileName(generateFileName("statement"));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("HTML Files", "*.html"));
-
-        var selected = fileChooser.showSaveDialog(getStage());
-        if (selected == null) {
-            return;
-        }
-
-        try (var outputStream = new FileOutputStream(selected)) {
-            getStatement().ifPresent(statement -> Reports.reportStatement(statement, outputStream));
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
+        new ReportFileDialog().show(getStage(), ReportType.STATEMENT).ifPresent(selected -> {
+            try (var outputStream = new FileOutputStream(selected)) {
+                getStatement().ifPresent(statement -> Reports.reportStatement(statement, outputStream));
+                settings().update(opt -> opt.setLastReportDir(selected.getParent()));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
+        });
     }
 
     private void onCheckStatementRecord(boolean check) {

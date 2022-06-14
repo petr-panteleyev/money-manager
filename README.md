@@ -1,9 +1,5 @@
 # Money Manager
 
-[![GitHub](https://img.shields.io/github/license/petr-panteleyev/money-manager)](LICENSE)
-[![Java](https://img.shields.io/badge/Java-18-orange?logo=java)](https://jdk.java.net/18/)
-[![JavaFX](https://img.shields.io/badge/JavaFX-18-orange?logo=java)](https://openjfx.io/)
-
 Personal finance manager. Work in progress.
 
 ## Build
