@@ -33,7 +33,7 @@
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
         <jsoupVersion>1.14.2</jsoupVersion>
-        <mysqlConnectorVersion>8.0.27</mysqlConnectorVersion>
+        <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
         <testNgVersion>7.4.0</testNgVersion>
         <mockitoVersion>4.5.1</mockitoVersion>
