@@ -10,19 +10,30 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import org.panteleyev.money.app.MainWindowController;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.panteleyev.money.app.GlobalContext.files;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
 public class MoneyApplication extends Application {
     private final static Logger LOGGER = Logger.getLogger(MoneyApplication.class.getName());
-    private final static String FORMAT_PROP = "java.util.logging.SimpleFormatter.format";
-    private final static String FORMAT = "%1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n";
+
+    private final static String LOG_PROPERTIES = """
+            handlers                                = java.util.logging.FileHandler
+                        
+            java.util.logging.FileHandler.level     = ALL
+            java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
+            java.util.logging.FileHandler.pattern   = %FILE_PATTERN%
+            java.util.logging.FileHandler.append    = true
+                        
+            java.util.logging.SimpleFormatter.format = %1$tF %1$tk:%1$tM:%1$tS %2$s%n%4$s: %5$s%6$s%n
+            """;
 
     private static MoneyApplication application;
 
@@ -35,12 +46,11 @@ public class MoneyApplication extends Application {
         files().initialize();
         settings().load();
 
-        var formatProperty = System.getProperty(FORMAT_PROP);
-        if (formatProperty == null) {
-            System.setProperty(FORMAT_PROP, FORMAT);
+        var logProperties = LOG_PROPERTIES.replace("%FILE_PATTERN%",
+                files().getLogDirectory().resolve("MoneyManager.log").toString());
+        try (var inputStream = new ByteArrayInputStream(logProperties.getBytes(UTF_8))) {
+            LogManager.getLogManager().readConfiguration(inputStream);
         }
-        LogManager.getLogManager()
-                .readConfiguration(MoneyApplication.class.getResourceAsStream("logger.properties"));
 
         Thread.setDefaultUncaughtExceptionHandler((t, e) -> uncaughtException(e));
 

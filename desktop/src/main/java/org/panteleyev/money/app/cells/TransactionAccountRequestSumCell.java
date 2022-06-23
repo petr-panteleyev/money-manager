@@ -34,7 +34,11 @@ public class TransactionAccountRequestSumCell extends TableCell<Transaction, Tra
                             Styles.DEBIT : Styles.CREDIT
             );
 
-            setText(transaction.amount().setScale(2, RoundingMode.HALF_UP).toString());
+            var amount = transaction.accountCreditedUuid().equals(account.uuid()) ?
+                    Transaction.getConvertedAmount(transaction) :
+                    transaction.amount();
+
+            setText(amount.setScale(2, RoundingMode.HALF_UP).toString());
         }
     }
 }

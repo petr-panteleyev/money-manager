@@ -83,6 +83,10 @@ public final class ApplicationFiles {
         }
     }
 
+    public Path getLogDirectory() {
+        return logDirectory;
+    }
+
     public void initialize() {
         initDirectory(configDirectory, "Application");
         initDirectory(dataDirectory, "Data");
