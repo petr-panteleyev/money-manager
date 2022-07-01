@@ -8,6 +8,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
 
 import static java.util.Map.entry;
 
-class SberbankParser {
+class SberbankParser implements Parser {
     private final static Logger LOGGER = Logger.getLogger(SberbankParser.class.getName());
 
     private enum Param {
@@ -105,6 +106,23 @@ class SberbankParser {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+    @Override
+    public StatementType detectType(String content) {
+        if (content.contains("HTML_DEBIT_RUS_REPORT") || content.contains("HTML_CREDIT_RUS_REPORT")) {
+            return StatementType.SBERBANK_HTML;
+        } else {
+            return StatementType.UNKNOWN;
+        }
+    }
+
+    public Statement parse(String content) {
+        try (var inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
+            return parseCreditCardHtml(inputStream);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
     private static void checkElement(Element element) {
         Objects.requireNonNull(element, "Malformed statement");
     }
@@ -148,13 +166,13 @@ class SberbankParser {
             var transactionTable = document.getElementsByClass(format.getString(Param.TABLE)).first();
             if (transactionTable == null) {
                 LOGGER.warning("Transactions not found in statement");
-                return new Statement(Statement.StatementType.SBERBANK_HTML, accountNumber, records);
+                return new Statement(StatementType.SBERBANK_HTML, accountNumber, records);
             }
 
             var transactionList = transactionTable.getElementsByClass(format.getString(Param.RECORD));
             if (transactionList.isEmpty()) {
                 LOGGER.warning("Transactions not found in statement");
-                return new Statement(Statement.StatementType.SBERBANK_HTML, accountNumber, records);
+                return new Statement(StatementType.SBERBANK_HTML, accountNumber, records);
             }
 
             for (var transaction : transactionList) {
@@ -207,7 +225,7 @@ class SberbankParser {
                 records.add(builder.build());
             }
 
-            return new Statement(Statement.StatementType.SBERBANK_HTML, accountNumber, records);
+            return new Statement(StatementType.SBERBANK_HTML, accountNumber, records);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

@@ -8,12 +8,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record Statement(StatementType type, String accountNumber, List<StatementRecord> records, BigDecimal balance) {
-    public enum StatementType {
-        UNKNOWN,
-        RAIFFEISEN_OFX,
-        SBERBANK_HTML
-    }
-
     public Statement {
         if (accountNumber == null) {
             accountNumber = "";

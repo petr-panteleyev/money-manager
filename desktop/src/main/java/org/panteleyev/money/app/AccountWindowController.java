@@ -17,7 +17,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
@@ -72,6 +71,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ACTIVATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ATTACH_DOCUMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_COPY_NAME;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DEACTIVATE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
@@ -190,7 +190,9 @@ final class AccountWindowController extends BaseController {
                 menuItem(fxString(UI, I18N_WORD_TRANSACTIONS, ELLIPSIS), SHORTCUT_T,
                         event -> onShowTransactions(), disableBinding),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), new ImageView(Images.ATTACHMENT),
+                menuItem(fxString(UI, I18N_MENU_ITEM_ATTACH_DOCUMENT, ELLIPSIS),
+                        event -> onAttachDocument(), disableBinding),
+                menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS),
                         event -> onDocuments(), disableBinding),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI, I18N_MISC_RECALCULATE_BALANCE), SHORTCUT_R,
@@ -270,8 +272,9 @@ final class AccountWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), event -> onDeleteAccount(), disableBinding),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), new ImageView(Images.ATTACHMENT),
-                        event -> onDocuments(), disableBinding),
+                menuItem(fxString(UI, I18N_MENU_ITEM_ATTACH_DOCUMENT, ELLIPSIS),
+                        event -> onAttachDocument(), disableBinding),
+                menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), event -> onDocuments(), disableBinding),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI, I18N_MENU_ITEM_COPY_NAME), event -> onCopyName(), disableBinding),
                 activateAccountMenuItem,
@@ -384,4 +387,12 @@ final class AccountWindowController extends BaseController {
     private void onDocuments() {
         getSelectedAccount().ifPresent(BaseController::getDocumentController);
     }
+
+    private void onAttachDocument() {
+        getSelectedAccount().ifPresent(account -> {
+            var controller = getDocumentController(account);
+            controller.onAddDocument();
+        });
+    }
+
 }

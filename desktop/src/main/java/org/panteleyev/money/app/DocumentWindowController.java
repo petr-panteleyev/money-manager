@@ -19,10 +19,12 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.cells.DocumentContactNameCell;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.DocumentTypeFilterBox;
+import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Named;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.statements.RawStatementData;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,11 +49,13 @@ import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_S;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PROCESS_STATEMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
@@ -105,7 +109,10 @@ public class DocumentWindowController extends BaseController {
                                 event -> onEditDocument(), disableBinding),
                         new SeparatorMenuItem(),
                         menuItem(fxString(UI, I18N_WORD_OPEN), SHORTCUT_O, event -> onOpenDocument()),
-                        menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload())
+                        menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload()),
+                        new SeparatorMenuItem(),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_PROCESS_STATEMENT), SHORTCUT_R,
+                                event -> onOpenStatement())
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -120,7 +127,9 @@ public class DocumentWindowController extends BaseController {
                         event -> onEditDocument(), disableBinding),
                 new SeparatorMenuItem(),
                 menuItem(fxString(UI, I18N_WORD_OPEN), SHORTCUT_O, event -> onOpenDocument()),
-                menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload())
+                menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload()),
+                new SeparatorMenuItem(),
+                menuItem(fxString(UI, I18N_MENU_ITEM_PROCESS_STATEMENT), event -> onOpenStatement())
         ));
 
         // Toolbar
@@ -186,7 +195,7 @@ public class DocumentWindowController extends BaseController {
         return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
     }
 
-    private void onAddDocument() {
+    public void onAddDocument() {
         var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null);
         d.showAndWait().ifPresent(document -> dao().insertDocument(document, d.getBytes()));
     }
@@ -255,5 +264,17 @@ public class DocumentWindowController extends BaseController {
         }
         event.setDropCompleted(success);
         event.consume();
+    }
+
+    private void onOpenStatement() {
+        getSelectedDocument().ifPresent(doc -> {
+            if (doc.documentType() != DocumentType.STATEMENT) {
+                return;
+            }
+
+            var data = new RawStatementData(dao().getDocumentBytes(doc));
+            var controller = getController(StatementWindowController.class);
+            controller.setStatement(doc.fileName(), data);
+        });
     }
 }

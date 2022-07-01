@@ -19,7 +19,6 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.image.ImageView;
 import javafx.util.Callback;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
@@ -59,6 +58,7 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ATTACH_DOCUMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
@@ -249,7 +249,10 @@ public class TransactionTableView extends TableView<Transaction> {
         if (mode != Mode.STATEMENT) {
             ctxMenu.getItems().addAll(
                     detailsMenuItem,
-                    menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), new ImageView(Images.ATTACHMENT),
+                    new SeparatorMenuItem(),
+                    menuItem(fxString(UI, I18N_MENU_ITEM_ATTACH_DOCUMENT, ELLIPSIS),
+                            event -> onAttachDocument(), disableBinding),
+                    menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS),
                             event -> onDocuments(), disableBinding),
                     new SeparatorMenuItem()
             );
@@ -375,5 +378,12 @@ public class TransactionTableView extends TableView<Transaction> {
 
     private void onDocuments() {
         getSelectedTransaction().ifPresent(BaseController::getDocumentController);
+    }
+
+    private void onAttachDocument() {
+        getSelectedTransaction().ifPresent(transaction -> {
+            var controller = BaseController.getDocumentController(transaction);
+            controller.onAddDocument();
+        });
     }
 }

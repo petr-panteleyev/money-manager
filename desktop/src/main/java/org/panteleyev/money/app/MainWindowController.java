@@ -459,7 +459,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void goToTransaction(Transaction transaction) {
         transactionTable.getSelectionModel().clearSelection();
-        var date = Transaction.getDate(transaction);
+        var date = transaction.getDate();
         monthFilterBox.getSelectionModel().select(date.getMonth().getValue() - 1);
         yearSpinner.getValueFactory().setValue(date.getYear());
         transactionTable.getSelectionModel().select(transaction);

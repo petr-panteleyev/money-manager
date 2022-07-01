@@ -8,10 +8,31 @@ import org.panteleyev.ofx.BankTransactionList;
 import org.panteleyev.ofx.OFXParser;
 import org.panteleyev.ofx.StatementTransaction;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-class RBAParser {
+class RBAParser implements Parser {
+    @Override
+    public StatementType detectType(String content) {
+        if (content.contains("<?OFX")) {
+            return StatementType.OFX;
+        } else {
+            return StatementType.UNKNOWN;
+        }
+    }
+
+    public Statement parse(String content) {
+        try (var inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
+            return parseOfx(inputStream);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
     static Statement parseOfx(InputStream inStream) {
         var records = new ArrayList<StatementRecord>();
 
@@ -41,6 +62,6 @@ class RBAParser {
             records.add(builder.build());
         }
 
-        return new Statement(Statement.StatementType.RAIFFEISEN_OFX, accountNumber, records);
+        return new Statement(StatementType.OFX, accountNumber, records);
     }
 }

@@ -32,12 +32,12 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
+import org.panteleyev.money.statements.RawStatementData;
 import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementParser;
 import org.panteleyev.money.statements.StatementPredicate;
 import org.panteleyev.money.statements.StatementRecord;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -101,12 +101,11 @@ class StatementWindowController extends BaseController {
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Transaction> transactionListener = c -> calculateTransactions();
 
-    private Statement.StatementType statementType = Statement.StatementType.UNKNOWN;
-
     private Statement statement = null;
 
     StatementWindowController() {
         var root = new BorderPane();
+        ignoreExecutionDate.setSelected(true);
 
         var balanceBox = hBox(5.0,
                 label(fxString(UI, I18N_MISC_STATEMENT_BALANCE, COLON)),
@@ -239,18 +238,15 @@ class StatementWindowController extends BaseController {
             setTitle(getTitle() + " - " + selected.getAbsolutePath());
             settings().update(opt -> opt.setLastStatementDir(selected.getParent()));
 
-            statementType = dialog.getStatementType();
-            if (statementType.equals(Statement.StatementType.UNKNOWN)) {
-                return;
-            }
-
-            try (var in = new FileInputStream(selected)) {
-                var statement = StatementParser.parse(statementType, in);
-                analyzeStatement(statement);
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
+            StatementParser.parse(new RawStatementData(selected))
+                    .ifPresent(this::analyzeStatement);
         });
+    }
+
+    public void setStatement(String fileName, RawStatementData statementData) {
+        setTitle(getTitle() + " - " + fileName);
+        StatementParser.parse(statementData)
+                .ifPresent(this::analyzeStatement);
     }
 
     private void analyzeStatement(Statement statement) {
@@ -264,7 +260,6 @@ class StatementWindowController extends BaseController {
 
     private void onClear() {
         setTitle(getTitle());
-        statementType = Statement.StatementType.UNKNOWN;
         statementTable.getItems().clear();
     }
 

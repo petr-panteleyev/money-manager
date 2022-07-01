@@ -4,14 +4,24 @@
  */
 package org.panteleyev.money.statements;
 
-import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
 
 public final class StatementParser {
-    public static Statement parse(Statement.StatementType type, InputStream inStream) {
-        return switch (type) {
-            case RAIFFEISEN_OFX -> RBAParser.parseOfx(inStream);
-            case SBERBANK_HTML -> SberbankParser.parseCreditCardHtml(inStream);
-            default -> throw new IllegalArgumentException();
-        };
+    private static final List<Parser> PARSERS = List.of(new RBAParser(), new SberbankParser());
+
+    private static Optional<Parser> getParser(RawStatementData data) {
+        for (var parser : PARSERS) {
+            var type = parser.detectType(data.getContent());
+            if (type != StatementType.UNKNOWN) {
+                return Optional.of(parser);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<Statement> parse(RawStatementData data) {
+        return getParser(data)
+                .map(parser -> parser.parse(data.getContent()));
     }
 }

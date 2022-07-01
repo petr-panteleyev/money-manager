@@ -132,7 +132,7 @@ public class BaseController extends Controller {
                 menuItem(fxString(UI, I18N_MENU_ITEM_ABOUT), x -> new AboutDialog(this).showAndWait()));
     }
 
-    static <T extends BaseController> void getController(Class<T> clazz) {
+    static <T extends BaseController> T getController(Class<T> clazz) {
         @SuppressWarnings("unchecked")
         T controller = (T) WINDOW_MANAGER.find(clazz).orElseGet(() -> {
             try {
@@ -145,6 +145,7 @@ public class BaseController extends Controller {
         var stage = controller.getStage();
         stage.show();
         stage.toFront();
+        return controller;
     }
 
     private static void getRequestController() {
@@ -166,7 +167,7 @@ public class BaseController extends Controller {
         stage.toFront();
     }
 
-    static void getDocumentController(MoneyRecord owner) {
+    static DocumentWindowController getDocumentController(MoneyRecord owner) {
         var controller = (DocumentWindowController) WINDOW_MANAGER
                 .find(DocumentWindowController.class, c -> ((DocumentWindowController) c).thisOwner(owner))
                 .orElseGet(() -> new DocumentWindowController(owner));
@@ -174,5 +175,6 @@ public class BaseController extends Controller {
         var stage = controller.getStage();
         stage.show();
         stage.toFront();
+        return controller;
     }
 }

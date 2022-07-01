@@ -10,29 +10,29 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record Transaction(
-    UUID uuid,
-    BigDecimal amount,
-    int day,
-    int month,
-    int year,
-    TransactionType type,
-    String comment,
-    boolean checked,
-    UUID accountDebitedUuid,
-    UUID accountCreditedUuid,
-    CategoryType accountDebitedType,
-    CategoryType accountCreditedType,
-    UUID accountDebitedCategoryUuid,
-    UUID accountCreditedCategoryUuid,
-    UUID contactUuid,
-    BigDecimal rate,
-    int rateDirection,
-    String invoiceNumber,
-    UUID parentUuid,
-    boolean detailed,
-    LocalDate statementDate,
-    long created,
-    long modified
+        UUID uuid,
+        BigDecimal amount,
+        int day,
+        int month,
+        int year,
+        TransactionType type,
+        String comment,
+        boolean checked,
+        UUID accountDebitedUuid,
+        UUID accountCreditedUuid,
+        CategoryType accountDebitedType,
+        CategoryType accountCreditedType,
+        UUID accountDebitedCategoryUuid,
+        UUID accountCreditedCategoryUuid,
+        UUID contactUuid,
+        BigDecimal rate,
+        int rateDirection,
+        String invoiceNumber,
+        UUID parentUuid,
+        boolean detailed,
+        LocalDate statementDate,
+        long created,
+        long modified
 ) implements MoneyRecord {
 
     public Transaction {
@@ -86,44 +86,43 @@ public record Transaction(
 
     public static BigDecimal getSignedAmount(Transaction t) {
         return t.accountCreditedType() != t.accountDebitedType() && t.accountDebitedType() != CategoryType.INCOMES ?
-            t.amount().negate() : t.amount();
+                t.amount().negate() : t.amount();
     }
 
     public Transaction check(boolean check) {
         return new Builder(this)
-            .checked(check)
-            .modified(System.currentTimeMillis())
-            .build();
+                .checked(check)
+                .modified(System.currentTimeMillis())
+                .build();
     }
 
     public Transaction setParentUuid(UUID newParentUuid) {
         return new Builder(this)
-            .parentUuid(newParentUuid)
-            .modified(System.currentTimeMillis())
-            .build();
+                .parentUuid(newParentUuid)
+                .modified(System.currentTimeMillis())
+                .build();
     }
 
-    public static LocalDate getDate(Transaction t) {
-        return LocalDate.of(t.year(), t.month(), t.day());
+    public LocalDate getDate() {
+        return LocalDate.of(year, month, day);
     }
 
     /**
      * Returns amount with conversion rate applied to it.
      *
-     * @param t transaction
      * @return converted amount
      */
-    public static BigDecimal getConvertedAmount(Transaction t) {
-        if (t.rate().compareTo(BigDecimal.ZERO) == 0 || t.rate().compareTo(BigDecimal.ONE) == 0) {
-            return t.amount();
+    public BigDecimal getConvertedAmount() {
+        if (rate.compareTo(BigDecimal.ZERO) == 0 || rate.compareTo(BigDecimal.ONE) == 0) {
+            return amount;
         }
-        return t.rateDirection() == 0 ?
-            t.amount().divide(t.rate(), RoundingMode.HALF_UP) :
-            t.amount().multiply(t.rate());
+        return rateDirection == 0 ?
+                amount.divide(rate, RoundingMode.HALF_UP) :
+                amount.multiply(rate);
     }
 
-    public static BigDecimal getNegatedAmount(Transaction t) {
-        return t.amount().negate();
+    public BigDecimal getNegatedAmount() {
+        return amount.negate();
     }
 
     public static final class Builder {
@@ -328,10 +327,10 @@ public record Transaction(
 
         public Transaction build() {
             return new Transaction(uuid, amount, day, month, year, type, comment,
-                checked, accountDebitedUuid, accountCreditedUuid,
-                accountDebitedType, accountCreditedType,
-                accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
+                    checked, accountDebitedUuid, accountCreditedUuid,
+                    accountDebitedType, accountCreditedType,
+                    accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
+                    rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
         }
     }
 }
