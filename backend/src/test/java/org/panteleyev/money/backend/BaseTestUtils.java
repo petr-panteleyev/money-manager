@@ -31,13 +31,6 @@ public interface BaseTestUtils {
     String ICON_DOLLAR = "dollar.png";
     String ICON_EURO = "euro.png";
 
-    UUID ICON_UUID = UUID.randomUUID();
-    UUID CATEGORY_UUID = UUID.randomUUID();
-    UUID CURRENCY_UUID = UUID.randomUUID();
-    UUID CONTACT_UUID = UUID.randomUUID();
-    UUID ACCOUNT_UUID = UUID.randomUUID();
-    UUID TRANSACTION_UUID = UUID.randomUUID();
-
     Random RANDOM = new Random(System.currentTimeMillis());
 
     static int randomDay() {

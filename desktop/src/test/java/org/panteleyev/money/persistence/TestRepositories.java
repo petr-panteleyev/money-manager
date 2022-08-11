@@ -13,6 +13,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -54,6 +55,12 @@ public class TestRepositories extends BaseDaoTest {
         } catch (Exception ex) {
             throw new SkipException(ex.getMessage());
         }
+    }
+
+    @AfterClass
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     @Test

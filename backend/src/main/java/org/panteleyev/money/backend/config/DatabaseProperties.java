@@ -9,5 +9,5 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConfigurationProperties(prefix = "database")
 @ConstructorBinding
-public record DatabaseProperties(String userName, String password, String host, int port, String schema) {
+public record DatabaseProperties(String userName, String password, String host, int port, String name, String schema) {
 }

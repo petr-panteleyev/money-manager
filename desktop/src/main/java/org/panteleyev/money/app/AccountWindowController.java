@@ -66,6 +66,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
@@ -207,7 +208,8 @@ final class AccountWindowController extends BaseController {
 
         var menuBar = menuBar(
                 newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_SHIFT_R,
+                                event -> onReport()),
                         new SeparatorMenuItem(),
                         menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
                 editMenu,

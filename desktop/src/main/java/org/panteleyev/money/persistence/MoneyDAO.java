@@ -4,7 +4,6 @@
  */
 package org.panteleyev.money.persistence;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -15,6 +14,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -405,7 +405,7 @@ public class MoneyDAO {
         });
     }
 
-    public static Exception resetDatabase(MysqlDataSource dataSource, String schema) {
+    public static Exception resetDatabase(PGSimpleDataSource dataSource, String schema) {
         try {
             dataSource.setDatabaseName(schema);
 

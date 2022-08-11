@@ -55,11 +55,11 @@ final class CurrencyRepository extends Repository<Currency> {
                 rs.getString("description"),
                 rs.getString("format_symbol"),
                 rs.getInt("format_symbol_pos"),
-                getBoolean(rs, "show_format_symbol"),
-                getBoolean(rs, "def"),
+                rs.getBoolean("show_format_symbol"),
+                rs.getBoolean("def"),
                 rs.getBigDecimal("rate"),
                 rs.getInt("rate_direction"),
-                getBoolean(rs, "use_th_separator"),
+                rs.getBoolean("use_th_separator"),
                 rs.getLong("created"),
                 rs.getLong("modified")
         );
@@ -72,13 +72,13 @@ final class CurrencyRepository extends Repository<Currency> {
         st.setString(index++, currency.description());
         st.setString(index++, currency.formatSymbol());
         st.setInt(index++, currency.formatSymbolPosition());
-        setBoolean(st, index++, currency.showFormatSymbol());
-        setBoolean(st, index++, currency.def());
+        st.setBoolean(index++, currency.showFormatSymbol());
+        st.setBoolean(index++, currency.def());
         st.setBigDecimal(index++, currency.rate());
         st.setInt(index++, currency.direction());
-        setBoolean(st, index++, currency.useThousandSeparator());
+        st.setBoolean(index++, currency.useThousandSeparator());
         st.setLong(index++, currency.created());
         st.setLong(index++, currency.modified());
-        st.setString(index, currency.uuid().toString());
+        setUuid(st, index, currency.uuid());
     }
 }

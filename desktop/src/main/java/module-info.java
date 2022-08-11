@@ -21,6 +21,6 @@ open module org.panteleyev.money {
     requires freemarker;
     requires org.jsoup;
 
-    requires mysql.connector.java;
+    requires org.postgresql.jdbc;
     requires liquibase.core;
 }

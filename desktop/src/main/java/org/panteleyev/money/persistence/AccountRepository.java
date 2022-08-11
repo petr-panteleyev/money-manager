@@ -75,7 +75,7 @@ final class AccountRepository extends Repository<Account> {
                 getEnum(rs, "type", CategoryType.class),
                 getUuid(rs, "category_uuid"),
                 getUuid(rs, "currency_uuid"),
-                getBoolean(rs, "enabled"),
+                rs.getBoolean("enabled"),
                 rs.getBigDecimal("interest"),
                 getLocalDate(rs, "closing_date"),
                 getUuid(rs, "icon_uuid"),
@@ -100,7 +100,7 @@ final class AccountRepository extends Repository<Account> {
         st.setString(index++, account.type().name());
         setUuid(st, index++, account.categoryUuid());
         setUuid(st, index++, account.currencyUuid());
-        setBoolean(st, index++, account.enabled());
+        st.setBoolean(index++, account.enabled());
         st.setBigDecimal(index++, account.interest());
         setLocalDate(st, index++, account.closingDate());
         setUuid(st, index++, account.iconUuid());

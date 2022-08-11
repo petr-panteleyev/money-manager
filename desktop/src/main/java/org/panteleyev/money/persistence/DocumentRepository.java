@@ -85,8 +85,8 @@ final class DocumentRepository extends Repository<MoneyDocument> {
     @Override
     protected void toStatement(PreparedStatement st, MoneyDocument document) throws SQLException {
         var index = 1;
-        st.setString(index++, document.ownerUuid().toString());
-        st.setString(index++, document.contactUuid().toString());
+        setUuid(st, index++, document.ownerUuid());
+        setUuid(st, index++, document.contactUuid());
         st.setString(index++, document.documentType().name());
         st.setString(index++, document.fileName());
         setLocalDate(st, index++, document.date());
@@ -95,13 +95,13 @@ final class DocumentRepository extends Repository<MoneyDocument> {
         st.setString(index++, document.description());
         st.setLong(index++, document.created());
         st.setLong(index++, document.modified());
-        st.setString(index, document.uuid().toString());
+        setUuid(st, index, document.uuid());
     }
 
     void insertBytes(Connection conn, UUID uuid, byte[] bytes) {
         try (var st = conn.prepareStatement(SQL_INSERT_BYTES)) {
             st.setBytes(1, bytes);
-            st.setString(2, uuid.toString());
+            setUuid(st, 2, uuid);
             st.executeUpdate();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -110,7 +110,7 @@ final class DocumentRepository extends Repository<MoneyDocument> {
 
     Optional<byte[]> getBytes(Connection conn, UUID uuid) {
         try (var st = conn.prepareStatement(SQL_GET_BYTES)) {
-            st.setString(1, uuid.toString());
+            setUuid(st, 1, uuid);
             try (var rs = st.executeQuery()) {
                 if (rs.next()) {
                     return Optional.ofNullable(rs.getBytes(1));

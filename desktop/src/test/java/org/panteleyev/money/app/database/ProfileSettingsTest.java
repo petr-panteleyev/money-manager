@@ -25,12 +25,14 @@ public class ProfileSettingsTest {
                     randomInt(),
                     randomString(),
                     randomString(),
+                    randomString(),
                     randomString()
             ),
             new ConnectionProfile(
                     randomString(),
                     randomString(),
                     randomInt(),
+                    randomString(),
                     randomString(),
                     randomString(),
                     randomString()

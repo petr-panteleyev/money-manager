@@ -38,6 +38,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_CREDIT, "Credit"},
                 {I18N_WORD_CURRENCIES, "Currencies"},
                 {I18N_WORD_CURRENCY, "Currency"},
+                {I18N_WORD_DATABASE, "Database"},
                 {I18N_WORD_DATE, "Date"},
                 {I18N_WORD_DAY, "Day"},
                 {I18N_WORD_DEBIT, "Debit"},

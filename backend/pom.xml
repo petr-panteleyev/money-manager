@@ -11,7 +11,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.7.0</version>
+    <version>22.8.0</version>
     <name>Backend</name>
     <properties>
         <java.version>18</java.version>
@@ -22,12 +22,24 @@
         <mavenSurefirePluginVersion>3.0.0-M6</mavenSurefirePluginVersion>
         <!-- Dependencies -->
         <moneyManagerModelVersion>1.1.0</moneyManagerModelVersion>
-        <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
-        <h2Version>2.1.210</h2Version>
+        <postgresVersion>42.4.2</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
         <restAssuredVersion>5.0.1</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
+        <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testContainersVersion}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -48,9 +60,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>${mysqlConnectorVersion}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -67,12 +79,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2Version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${restAssuredVersion}</version>
@@ -82,6 +88,16 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>xml-path</artifactId>
             <version>${restAssuredVersion}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

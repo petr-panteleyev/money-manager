@@ -48,7 +48,7 @@ abstract class Repository<T extends MoneyRecord> {
 
     public Optional<T> get(Connection conn, UUID uuid) {
         try (var st = conn.prepareStatement("SELECT * FROM " + tableName + " WHERE uuid = ?")) {
-            st.setString(1, uuid.toString());
+            st.setObject(1, uuid);
             try (var rs = st.executeQuery()) {
                 return rs.next() ? Optional.of(fromResultSet(rs)) : Optional.empty();
             }
@@ -104,7 +104,7 @@ abstract class Repository<T extends MoneyRecord> {
 
     public int delete(Connection conn, T object) {
         try (var st = conn.prepareStatement("DELETE FROM " + tableName + " WHERE uuid = ?")) {
-            st.setString(1, object.uuid().toString());
+            st.setObject(1, object.uuid());
             return st.executeUpdate();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -113,11 +113,11 @@ abstract class Repository<T extends MoneyRecord> {
 
     static UUID getUuid(ResultSet set, String columnLabel) throws SQLException {
         var obj = set.getObject(columnLabel);
-        return (obj instanceof String str && !str.isBlank()) ? UUID.fromString(str) : null;
+        return (obj instanceof UUID uuid) ? uuid : null;
     }
 
     static void setUuid(PreparedStatement st, int index, UUID uuid) throws SQLException {
-        st.setString(index, uuid == null ? null : uuid.toString());
+        st.setObject(index, uuid);
     }
 
     static <E extends Enum<E>> E getEnum(ResultSet set, String columnLabel, Class<E> eClass) throws SQLException {
@@ -131,14 +131,6 @@ abstract class Repository<T extends MoneyRecord> {
         } else {
             st.setString(index, value.name());
         }
-    }
-
-    static boolean getBoolean(ResultSet set, String columnLabel) throws SQLException {
-        return set.getInt(columnLabel) != 0;
-    }
-
-    static void setBoolean(PreparedStatement st, int index, boolean value) throws SQLException {
-        st.setInt(index, value ? 1 : 0);
     }
 
     static LocalDate getLocalDate(ResultSet set, String columnLabel) throws SQLException {

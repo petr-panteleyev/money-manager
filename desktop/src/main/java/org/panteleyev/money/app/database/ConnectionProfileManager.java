@@ -114,14 +114,6 @@ public final class ConnectionProfileManager {
         }
     }
 
-    public String getDatabaseHost(ConnectionProfile profile) {
-        return profile.dataBaseHost();
-    }
-
-    public int getDatabasePort(ConnectionProfile profile) {
-        return profile.dataBasePort();
-    }
-
     public Dialog<?> getEditor() {
         return new ConnectionProfilesEditor(this);
     }

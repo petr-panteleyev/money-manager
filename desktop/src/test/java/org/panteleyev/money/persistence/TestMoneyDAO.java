@@ -10,6 +10,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.test.BaseTestUtils;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,12 @@ public class TestMoneyDAO extends BaseDaoTest {
         } catch (Exception ex) {
             throw new SkipException(ex.getMessage());
         }
+    }
+
+    @AfterClass
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     @Test

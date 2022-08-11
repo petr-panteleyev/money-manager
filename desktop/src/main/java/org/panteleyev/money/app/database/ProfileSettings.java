@@ -30,6 +30,7 @@ record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultPro
     private static final String PROFILE_SCHEMA = "schema";
     private static final String PROFILE_USER = "user";
     private static final String PROFILE_PASSWORD = "password";
+    private static final String PROFILE_DATABASE = "database";
 
     public void save(OutputStream out) {
         var root = createDocument(ROOT);
@@ -84,6 +85,7 @@ record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultPro
         element.setAttribute(PROFILE_PORT, Integer.toString(profile.dataBasePort()));
         element.setAttribute(PROFILE_USER, profile.dataBaseUser());
         element.setAttribute(PROFILE_PASSWORD, profile.dataBasePassword());
+        element.setAttribute(PROFILE_DATABASE, profile.databaseName());
         element.setAttribute(PROFILE_SCHEMA, profile.schema());
     }
 
@@ -94,6 +96,7 @@ record ProfileSettings(Collection<ConnectionProfile> profiles, String defaultPro
                 XMLUtils.getAttribute(element, PROFILE_PORT, 3306),
                 element.getAttribute(PROFILE_USER),
                 element.getAttribute(PROFILE_PASSWORD),
+                element.getAttribute(PROFILE_DATABASE),
                 element.getAttribute(PROFILE_SCHEMA)
         );
     }

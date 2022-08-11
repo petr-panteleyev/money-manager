@@ -79,7 +79,7 @@ public class IconRepository implements MoneyRepository<Icon> {
     public Optional<Icon> get(UUID uuid) {
         var result = jdbcTemplate.query("""
                 SELECT * FROM icon WHERE uuid = :uuid
-                """, Map.of("uuid", uuid.toString()), rowMapper);
+                """, Map.of("uuid", uuid), rowMapper);
         return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
     }
 }

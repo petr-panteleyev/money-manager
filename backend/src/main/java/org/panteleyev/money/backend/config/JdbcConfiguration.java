@@ -4,13 +4,13 @@
  */
 package org.panteleyev.money.backend.config;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
 import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.TimeZone;
+
 import static org.panteleyev.money.backend.Profiles.NOT;
 import static org.panteleyev.money.backend.Profiles.TEST;
 
@@ -25,21 +25,13 @@ public class JdbcConfiguration {
     @Bean
     @Profile(NOT + TEST)
     public DataSource mysqlDataSource() {
-        try {
-            var ds = new MysqlDataSource();
-
-            ds.setCharacterEncoding("utf8");
-            ds.setUseSSL(false);
-            ds.setServerTimezone(TimeZone.getDefault().getID());
-            ds.setPort(properties.port());
-            ds.setServerName(properties.host());
-            ds.setUser(properties.userName());
-            ds.setPassword(properties.password());
-            ds.setDatabaseName(properties.schema());
-            ds.setAllowPublicKeyRetrieval(true);
-            return ds;
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+        var ds = new PGSimpleDataSource();
+        ds.setServerNames(new String[]{properties.host()});
+        ds.setPortNumbers(new int[]{properties.port()});
+        ds.setUser(properties.userName());
+        ds.setPassword(properties.password());
+        ds.setDatabaseName(properties.name());
+        ds.setCurrentSchema(properties.schema());
+        return ds;
     }
 }

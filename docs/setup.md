@@ -1,24 +1,16 @@
 # Setup Database
 
-1. Create schema
+1. Create user
 
-```shell
-mysql> create schema <schema> character set = utf8;
+```postgresql
+create role <username> with login password '<password>';
 ```
 
-2. Create user
+2. Create schema
 
-```shell
-mysql> create user <username> identified by '<password>';
+```postgresql
+create schema <schema> authorization <username>;
 ```
 
-3. Grant privileges
-
-```shell
-mysql> grant alter,create,delete,drop,insert,references,select,update on <schema>.* to <username>;
-```
-
-4. Create connection profile using schema and user setup
-
-![profiles](images/profiles.png)
+3. Create connection profile using schema and user setup
 

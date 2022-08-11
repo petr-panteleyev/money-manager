@@ -77,7 +77,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 rs.getInt("date_year"),
                 getEnum(rs, "type", TransactionType.class),
                 rs.getString("comment"),
-                getBoolean(rs, "checked"),
+                rs.getBoolean("checked"),
                 getUuid(rs, "acc_debited_uuid"),
                 getUuid(rs, "acc_credited_uuid"),
                 getEnum(rs, "acc_debited_type", CategoryType.class),
@@ -89,7 +89,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 rs.getInt("rate_direction"),
                 rs.getString("invoice_number"),
                 getUuid(rs, "parent_uuid"),
-                getBoolean(rs, "detailed"),
+                rs.getBoolean("detailed"),
                 getLocalDate(rs, "statement_date"),
                 rs.getLong("created"),
                 rs.getLong("modified")
@@ -105,7 +105,7 @@ final class TransactionRepository extends Repository<Transaction> {
         st.setInt(index++, transaction.year());
         setEnum(st, index++, transaction.type());
         st.setString(index++, transaction.comment());
-        setBoolean(st, index++, transaction.checked());
+        st.setBoolean(index++, transaction.checked());
         setUuid(st, index++, transaction.accountDebitedUuid());
         setUuid(st, index++, transaction.accountCreditedUuid());
         setEnum(st, index++, transaction.accountDebitedType());
@@ -117,7 +117,7 @@ final class TransactionRepository extends Repository<Transaction> {
         st.setInt(index++, transaction.rateDirection());
         st.setString(index++, transaction.invoiceNumber());
         setUuid(st, index++, transaction.parentUuid());
-        setBoolean(st, index++, transaction.detailed());
+        st.setBoolean(index++, transaction.detailed());
         setLocalDate(st, index++, transaction.statementDate());
         st.setLong(index++, transaction.created());
         st.setLong(index++, transaction.modified());

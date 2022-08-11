@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -31,14 +32,9 @@ import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.panteleyev.money.backend.BaseTestUtils.ACCOUNT_UUID;
-import static org.panteleyev.money.backend.BaseTestUtils.CATEGORY_UUID;
-import static org.panteleyev.money.backend.BaseTestUtils.CONTACT_UUID;
-import static org.panteleyev.money.backend.BaseTestUtils.CURRENCY_UUID;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.backend.BaseTestUtils.ICON_DOLLAR;
 import static org.panteleyev.money.backend.BaseTestUtils.ICON_EURO;
-import static org.panteleyev.money.backend.BaseTestUtils.ICON_UUID;
-import static org.panteleyev.money.backend.BaseTestUtils.TRANSACTION_UUID;
 import static org.panteleyev.money.backend.BaseTestUtils.newIcon;
 import static org.panteleyev.money.backend.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.backend.BaseTestUtils.randomBoolean;
@@ -63,7 +59,15 @@ import static org.panteleyev.money.backend.WebmoneyApplication.TRANSACTION_ROOT;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles(TEST)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Testcontainers
 public class ControllerTest {
+    private static final UUID ICON_UUID = UUID.randomUUID();
+    private static final UUID CATEGORY_UUID = UUID.randomUUID();
+    private static final UUID CURRENCY_UUID = UUID.randomUUID();
+    private static final UUID CONTACT_UUID = UUID.randomUUID();
+    private static final UUID ACCOUNT_UUID = UUID.randomUUID();
+    private static final UUID TRANSACTION_UUID = UUID.randomUUID();
+
     @LocalServerPort
     private int port;
 
@@ -341,7 +345,7 @@ public class ControllerTest {
         assertEquals(insert, retrieved);
 
         var list = get(arrayClass, api);
-        assertEquals(List.of(retrieved), list);
+        assertTrue(list.contains(retrieved));
     }
 
     private <T extends MoneyRecord> void updateAndCheck(T update, Class<T> clazz, String api) {

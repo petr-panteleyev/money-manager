@@ -54,6 +54,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
@@ -182,7 +183,8 @@ class RequestWindowController extends BaseController {
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
                 newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_SHIFT_R,
+                                event -> onReport()),
                         new SeparatorMenuItem(),
                         menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
                 newMenu(fxString(UI, I18N_MENU_EDIT),

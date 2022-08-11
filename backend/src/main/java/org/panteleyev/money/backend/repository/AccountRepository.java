@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import static java.util.Map.entry;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
-import static org.panteleyev.money.backend.repository.RepositoryUtil.getBoolean;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getLocalDate;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
@@ -40,7 +39,7 @@ public class AccountRepository implements MoneyRepository<Account> {
             getEnum(rs, "type", CategoryType.class),
             getUuid(rs, "category_uuid"),
             getUuid(rs, "currency_uuid"),
-            getBoolean(rs, "enabled"),
+            rs.getBoolean("enabled"),
             rs.getBigDecimal("interest"),
             getLocalDate(rs, "closing_date"),
             getUuid(rs, "icon_uuid"),
@@ -54,7 +53,7 @@ public class AccountRepository implements MoneyRepository<Account> {
 
     private static Map<String, Object> toMap(Account account) {
         var map = new HashMap<String, Object>(Map.ofEntries(
-                entry("uuid", account.uuid().toString()),
+                entry("uuid", account.uuid()),
                 entry("name", account.name()),
                 entry("comment", account.comment()),
                 entry("number", account.accountNumber()),
@@ -62,8 +61,8 @@ public class AccountRepository implements MoneyRepository<Account> {
                 entry("accountLimit", account.accountLimit()),
                 entry("rate", account.currencyRate()),
                 entry("type", account.type().name()),
-                entry("categoryUuid", account.categoryUuid().toString()),
-                entry("enabled", convert(account.enabled())),
+                entry("categoryUuid", account.categoryUuid()),
+                entry("enabled", account.enabled()),
                 entry("interest", account.interest()),
                 entry("cardType", convert(account.cardType())),
                 entry("cardNumber", account.cardNumber()),
@@ -72,9 +71,9 @@ public class AccountRepository implements MoneyRepository<Account> {
                 entry("created", account.created()),
                 entry("modified", account.modified())
         ));
-        map.put("currencyUuid", convert(account.currencyUuid()));
+        map.put("currencyUuid", account.currencyUuid());
         map.put("closingDate", convert(account.closingDate()));
-        map.put("iconUuid", convert(account.iconUuid()));
+        map.put("iconUuid", account.iconUuid());
         return map;
     }
 

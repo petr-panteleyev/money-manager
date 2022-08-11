@@ -10,6 +10,7 @@ import org.panteleyev.money.model.ContactType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 final class ContactRepository extends Repository<Contact> {
     ContactRepository() {
@@ -53,7 +54,8 @@ final class ContactRepository extends Repository<Contact> {
 
     protected Contact fromResultSet(ResultSet rs) throws SQLException {
         return new Contact(
-                getUuid(rs, "uuid"),
+                rs.getObject("uuid", UUID.class),
+//                getUuid(rs, "uuid"),
                 rs.getString("name"),
                 getEnum(rs, "type", ContactType.class),
                 rs.getString("phone"),
@@ -88,6 +90,6 @@ final class ContactRepository extends Repository<Contact> {
         setUuid(st, index++, contact.iconUuid());
         st.setLong(index++, contact.created());
         st.setLong(index++, contact.modified());
-        st.setString(index, contact.uuid().toString());
+        st.setObject(index, contact.uuid());
     }
 }

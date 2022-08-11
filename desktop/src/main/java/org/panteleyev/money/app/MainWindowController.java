@@ -4,7 +4,6 @@
  */
 package org.panteleyev.money.app;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
@@ -46,20 +45,19 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
+import org.postgresql.ds.PGSimpleDataSource;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -91,6 +89,10 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_E;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_I;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
 import static org.panteleyev.money.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
@@ -177,9 +179,12 @@ public class MainWindowController extends BaseController implements TransactionT
                 event -> onOpenConnection());
         var fileCloseMenuItem = menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose());
         var fileExitMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXIT), event -> onExit());
-        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), event -> xmlDump());
-        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), event -> onImport());
-        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport());
+        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), SHORTCUT_SHIFT_E,
+                event -> xmlDump());
+        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), SHORTCUT_SHIFT_I,
+                event -> onImport());
+        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_SHIFT_R,
+                event -> onReport());
 
         var fileMenu = newMenu(fxString(UI, I18N_MENU_FILE),
                 fileConnectMenuItem,
@@ -217,7 +222,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
-        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS),
+        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS), SHORTCUT_SHIFT_P,
                 x -> profileManager.getEditor().showAndWait());
 
         var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
@@ -431,24 +436,15 @@ public class MainWindowController extends BaseController implements TransactionT
         return MoneyDAO.resetDatabase(ds, profile.schema());
     }
 
-    private MysqlDataSource onBuildDatasource(ConnectionProfile profile) {
-        try {
-            var ds = new MysqlDataSource();
-
-            ds.setCharacterEncoding("utf8");
-            ds.setUseSSL(false);
-            ds.setServerTimezone(TimeZone.getDefault().getID());
-            ds.setPort(profileManager.getDatabasePort(profile));
-            ds.setServerName(profileManager.getDatabaseHost(profile));
-            ds.setUser(profile.dataBaseUser());
-            ds.setPassword(profile.dataBasePassword());
-            ds.setDatabaseName(profile.schema());
-            ds.setAllowPublicKeyRetrieval(true);
-
-            return ds;
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
+    private PGSimpleDataSource onBuildDatasource(ConnectionProfile profile) {
+        var ds = new PGSimpleDataSource();
+        ds.setServerNames(new String[]{profile.dataBaseHost()});
+        ds.setPortNumbers(new int[]{profile.dataBasePort()});
+        ds.setUser(profile.dataBaseUser());
+        ds.setPassword(profile.dataBasePassword());
+        ds.setDatabaseName(profile.databaseName());
+        ds.setCurrentSchema(profile.schema());
+        return ds;
     }
 
     private void setCurrentDate() {

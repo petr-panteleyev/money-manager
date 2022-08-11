@@ -63,6 +63,9 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SAVE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TEST;
 
 class ConnectionProfilesEditor extends BaseDialog<Object> {
+    static final String DEFAULT_DATABASE = "postgres";
+    static final String DEFAULT_SCHEMA = "money";
+
     private final ValidationSupport validation = new ValidationSupport();
 
     private static int counter = 0;
@@ -205,6 +208,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
                 tcpEditor.getDataBasePort(),
                 tcpEditor.getDataBaseUser(),
                 tcpEditor.getDataBasePassword(),
+                tcpEditor.getDatabaseName(),
                 tcpEditor.getSchema()
         );
     }
@@ -235,7 +239,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         var profile = buildConnectionProfile();
 
-        var TEST_QUERY = "SHOW TABLES FROM " + profile.schema();
+        var TEST_QUERY = "SELECT 1";
 
         var ds = profileManager.getBuildDataSourceCallback().apply(profile);
 
@@ -274,13 +278,16 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onNewButton(ActionEvent event) {
         event.consume();
 
-        var profile = new ConnectionProfile("New Profile" + (++counter), "money");
+        var profile = new ConnectionProfile("New Profile" + (++counter), DEFAULT_DATABASE, DEFAULT_SCHEMA);
         profileListView.getItems().add(profile);
         profileListView.getSelectionModel().select(profile);
     }
 
     private void createValidationSupport() {
         validation.registerValidator(tcpEditor.getSchemaEdit(), (Control control, String value) ->
+                ValidationResult.fromErrorIf(control, null, value.isEmpty())
+        );
+        validation.registerValidator(tcpEditor.getDatabaseNameEdit(), (Control control, String value) ->
                 ValidationResult.fromErrorIf(control, null, value.isEmpty())
         );
         validation.registerValidator(tcpEditor.getDataBaseHostEdit(), (Control control, String value) ->

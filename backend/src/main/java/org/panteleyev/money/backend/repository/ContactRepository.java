@@ -119,7 +119,7 @@ public class ContactRepository implements MoneyRepository<Contact> {
     public Optional<Contact> get(UUID uuid) {
         var queryResult = jdbcTemplate.query(
                 "SELECT * FROM contact WHERE uuid = :id",
-                Map.of("id", uuid.toString()),
+                Map.of("id", uuid),
                 rowMapper);
         return queryResult.size() == 0 ?
                 Optional.empty() :

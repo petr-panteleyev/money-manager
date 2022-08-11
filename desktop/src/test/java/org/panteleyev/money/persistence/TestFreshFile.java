@@ -5,6 +5,7 @@
 package org.panteleyev.money.persistence;
 
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -20,6 +21,12 @@ public class TestFreshFile extends BaseDaoTest {
         } catch (Exception ex) {
             throw new SkipException(ex.getMessage());
         }
+    }
+
+    @AfterClass
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     @Test

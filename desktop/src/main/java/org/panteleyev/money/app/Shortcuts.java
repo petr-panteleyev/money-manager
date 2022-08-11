@@ -19,10 +19,12 @@ import static javafx.scene.input.KeyCode.DIGIT7;
 import static javafx.scene.input.KeyCode.E;
 import static javafx.scene.input.KeyCode.F;
 import static javafx.scene.input.KeyCode.H;
+import static javafx.scene.input.KeyCode.I;
 import static javafx.scene.input.KeyCode.K;
 import static javafx.scene.input.KeyCode.LEFT;
 import static javafx.scene.input.KeyCode.N;
 import static javafx.scene.input.KeyCode.O;
+import static javafx.scene.input.KeyCode.P;
 import static javafx.scene.input.KeyCode.R;
 import static javafx.scene.input.KeyCode.RIGHT;
 import static javafx.scene.input.KeyCode.S;
@@ -48,6 +50,11 @@ public interface Shortcuts {
     KeyCodeCombination SHORTCUT_ALT_LEFT = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN);
     KeyCodeCombination SHORTCUT_ALT_SHIFT_RIGHT = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
     KeyCodeCombination SHORTCUT_ALT_SHIFT_LEFT = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
+
+    KeyCodeCombination SHORTCUT_SHIFT_E = new KeyCodeCombination(E, SHORTCUT_DOWN, SHIFT_DOWN);
+    KeyCodeCombination SHORTCUT_SHIFT_I = new KeyCodeCombination(I, SHORTCUT_DOWN, SHIFT_DOWN);
+    KeyCodeCombination SHORTCUT_SHIFT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, SHIFT_DOWN);
+    KeyCodeCombination SHORTCUT_SHIFT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, SHIFT_DOWN);
 
     KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
     KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);

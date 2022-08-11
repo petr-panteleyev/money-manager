@@ -39,6 +39,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_CREDIT, "Кредит"},
                 {I18N_WORD_CURRENCIES, "Валюты"},
                 {I18N_WORD_CURRENCY, "Валюта"},
+                {I18N_WORD_DATABASE, "База данных"},
                 {I18N_WORD_DATE, "Дата"},
                 {I18N_WORD_DAY, "День"},
                 {I18N_WORD_DEBIT, "Дебет"},

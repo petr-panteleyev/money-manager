@@ -327,6 +327,7 @@
             <xsd:enumeration value="BILL"/>
             <xsd:enumeration value="CONTRACT"/>
             <xsd:enumeration value="RECEIPT"/>
+            <xsd:enumeration value="STATEMENT"/>
             <xsd:enumeration value="OTHER"/>
         </xsd:restriction>
     </xsd:simpleType>

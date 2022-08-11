@@ -18,7 +18,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Map.entry;
-import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 
@@ -38,14 +37,14 @@ public class CategoryRepository implements MoneyRepository<Category> {
 
     private static Map<String, Object> toMap(Category category) {
         var map = new HashMap<String, Object>(Map.ofEntries(
-                entry("uuid", category.uuid().toString()),
+                entry("uuid", category.uuid()),
                 entry("name", category.name()),
                 entry("comment", category.comment()),
                 entry("type", category.type().name()),
                 entry("created", category.created()),
                 entry("modified", category.modified())
         ));
-        map.put("iconUuid", convert(category.iconUuid()));
+        map.put("iconUuid", category.iconUuid());
         return map;
     }
 
@@ -94,7 +93,7 @@ public class CategoryRepository implements MoneyRepository<Category> {
     public Optional<Category> get(UUID uuid) {
         var result = jdbcTemplate.query("""
                 SELECT * FROM category WHERE uuid = :uuid
-                """, Map.of("uuid", uuid.toString()), rowMapper);
+                """, Map.of("uuid", uuid), rowMapper);
         return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
     }
 }

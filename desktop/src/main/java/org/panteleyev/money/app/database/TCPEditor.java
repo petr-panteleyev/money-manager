@@ -28,6 +28,9 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
+import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_DATABASE;
+import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_SCHEMA;
+import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATABASE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_LOGIN;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PASSWORD;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PORT;
@@ -37,6 +40,7 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SERVER
 
 final class TCPEditor extends VBox {
     private final TextField schemaEdit = initSchemaEdit();
+    private final TextField databaseNameEdit = new TextField();
     private final TextField dataBaseHostEdit = new TextField();
     private final TextField dataBasePortEdit = new TextField();
     private final TextField dataBaseUserEdit = new TextField();
@@ -54,6 +58,7 @@ final class TCPEditor extends VBox {
                                 label(fxString(UI, I18N_WORD_PORT, COLON)), dataBasePortEdit),
                         gridRow(label(fxString(UI, I18N_WORD_LOGIN, COLON)), gridCell(dataBaseUserEdit, 3, 1)),
                         gridRow(label(fxString(UI, I18N_WORD_PASSWORD, COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
+                        gridRow(label(fxString(UI, I18N_WORD_DATABASE, COLON)), gridCell(databaseNameEdit, 3, 1)),
                         gridRow(label(fxString(UI, I18N_WORD_SCHEMA, COLON)), gridCell(schemaEdit, 2, 1),
                                 resetSchemaButton)
                 ), b -> b.withStyle(GRID_PANE)
@@ -65,6 +70,10 @@ final class TCPEditor extends VBox {
 
     TextField getSchemaEdit() {
         return schemaEdit;
+    }
+
+    TextField getDatabaseNameEdit() {
+        return databaseNameEdit;
     }
 
     TextField getDataBaseHostEdit() {
@@ -85,6 +94,14 @@ final class TCPEditor extends VBox {
 
     void setSchema(String schema) {
         schemaEdit.setText(schema);
+    }
+
+    String getDatabaseName() {
+        return databaseNameEdit.getText();
+    }
+
+    void setDatabaseName(String databaseName) {
+        databaseNameEdit.setText(databaseName);
     }
 
     String getDataBaseHost() {
@@ -131,13 +148,15 @@ final class TCPEditor extends VBox {
             setDataBasePort(profile.dataBasePort());
             setDataBaseUser(profile.dataBaseUser());
             setDataBasePassword(profile.dataBasePassword());
+            setDatabaseName(profile.databaseName());
             setSchema(profile.schema());
         } else {
-            setDataBaseHost("");
-            setDataBasePort(3306);
+            setDataBaseHost("localhost");
+            setDataBasePort(5432);
             setDataBaseUser("");
             setDataBasePassword("");
-            setSchema("");
+            setDatabaseName(DEFAULT_DATABASE);
+            setSchema(DEFAULT_SCHEMA);
         }
     }
 }
