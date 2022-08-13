@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.model.Account;
 import org.springframework.http.MediaType;
@@ -15,20 +16,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.ACCOUNT_ROOT;
+import static org.panteleyev.money.backend.controller.JsonUtil.writeObjectToStream;
 
 @Controller
 @CrossOrigin
 @RequestMapping(ACCOUNT_ROOT)
 public class AccountController {
     private final AccountRepository accountRepository;
+    private final ObjectMapper objectMapper;
 
-    public AccountController(AccountRepository accountRepository) {
+    public AccountController(AccountRepository accountRepository, ObjectMapper objectMapper) {
         this.accountRepository = accountRepository;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,5 +69,17 @@ public class AccountController {
             rows = accountRepository.update(account);
         }
         return rows == 1 ? ResponseEntity.ok(account) : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public ResponseEntity<StreamingResponseBody> getTransactionStream() {
+        StreamingResponseBody body = (OutputStream out) -> {
+            try (var stream = accountRepository.getStream()) {
+                stream.forEach(t -> writeObjectToStream(out, objectMapper, t));
+            } finally {
+                out.flush();
+            }
+        };
+        return ResponseEntity.accepted().body(body);
     }
 }

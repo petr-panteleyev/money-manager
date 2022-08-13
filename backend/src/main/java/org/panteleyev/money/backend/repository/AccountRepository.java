@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static java.util.Map.entry;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
@@ -84,6 +85,11 @@ public class AccountRepository implements MoneyRepository<Account> {
     @Override
     public List<Account> getAll() {
         return jdbcTemplate.query("SELECT * FROM account", rowMapper);
+    }
+
+    @Override
+    public Stream<Account> getStream() {
+        return jdbcTemplate.queryForStream("SELECT * FROM account", Map.of(), rowMapper);
     }
 
     @Override

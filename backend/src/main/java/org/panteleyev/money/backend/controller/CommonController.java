@@ -13,9 +13,8 @@ import static org.panteleyev.money.backend.WebmoneyApplication.VERSION_ROOT;
 
 @Controller
 public class CommonController {
-    private static record Version(String name, String version) {
+    private record Version(String name, String version) {
     }
-
 
     @Value("${spring.application.version}")
     private String appVersion;

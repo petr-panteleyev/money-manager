@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.backend.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.model.Contact;
 import org.springframework.http.MediaType;
@@ -15,20 +16,25 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.CONTACT_ROOT;
+import static org.panteleyev.money.backend.controller.JsonUtil.writeObjectToStream;
 
 @Controller
 @CrossOrigin
 @RequestMapping(CONTACT_ROOT)
 public class ContactController {
     private final ContactRepository contactRepository;
+    private final ObjectMapper objectMapper;
 
-    public ContactController(ContactRepository contactRepository) {
+    public ContactController(ContactRepository contactRepository, ObjectMapper objectMapper) {
         this.contactRepository = contactRepository;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,17 +43,17 @@ public class ContactController {
     }
 
     @GetMapping(
-        value = "/{uuid}",
-        produces = MediaType.APPLICATION_JSON_VALUE
+            value = "/{uuid}",
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Contact> getContact(@PathVariable("uuid") UUID uuid) {
         return ResponseEntity.of(contactRepository.get(uuid));
     }
 
     @PutMapping(
-        value = "/{uuid}",
-        consumes = MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
+            value = "/{uuid}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Contact> putContact(@PathVariable("uuid") UUID uuid, @RequestBody Contact contact) {
         if (!uuid.equals(contact.uuid())) {
@@ -61,5 +67,17 @@ public class ContactController {
             rows = contactRepository.update(contact);
         }
         return rows == 1 ? ResponseEntity.ok(contact) : ResponseEntity.internalServerError().build();
+    }
+
+    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public ResponseEntity<StreamingResponseBody> getTransactionStream() {
+        StreamingResponseBody body = (OutputStream out) -> {
+            try (var stream = contactRepository.getStream()) {
+                stream.forEach(t -> writeObjectToStream(out, objectMapper, t));
+            } finally {
+                out.flush();
+            }
+        };
+        return ResponseEntity.accepted().body(body);
     }
 }

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
+
 import static java.util.Map.entry;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getBoolean;
@@ -88,6 +90,11 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
     @Override
     public List<Transaction> getAll() {
         return jdbcTemplate.query("SELECT * FROM transaction", rowMapper);
+    }
+
+    @Override
+    public Stream<Transaction> getStream() {
+        return jdbcTemplate.queryForStream("SELECT * FROM transaction", Map.of(), rowMapper);
     }
 
     @Override

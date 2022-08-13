@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -8,10 +8,13 @@ import org.panteleyev.money.model.Currency;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
+
 import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getBoolean;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
@@ -42,6 +45,11 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
     @Override
     public List<Currency> getAll() {
         return jdbcTemplate.query("SELECT * FROM currency", rowMapper);
+    }
+
+    @Override
+    public Stream<Currency> getStream() {
+        return jdbcTemplate.queryForStream("SELECT * FROM currency", Map.of(), rowMapper);
     }
 
     @Override
