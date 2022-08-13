@@ -45,6 +45,7 @@
         <module>model</module>
         <module>ofx</module>
         <module>desktop</module>
+        <module>backend</module>
     </modules>
 
     <dependencyManagement>

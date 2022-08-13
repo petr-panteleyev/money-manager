@@ -1,0 +1,140 @@
+/*
+ Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ SPDX-License-Identifier: BSD-2-Clause
+ */
+package org.panteleyev.money.backend.repository;
+
+import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CardType;
+import org.panteleyev.money.model.CategoryType;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
+import static java.util.Map.entry;
+import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
+import static org.panteleyev.money.backend.repository.RepositoryUtil.getBoolean;
+import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
+import static org.panteleyev.money.backend.repository.RepositoryUtil.getLocalDate;
+import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
+
+@Repository
+public class AccountRepository implements MoneyRepository<Account> {
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+
+    private final RowMapper<Account> rowMapper = (rs, i) -> new Account(
+            getUuid(rs, "uuid"),
+            rs.getString("name"),
+            rs.getString("comment"),
+            rs.getString("number"),
+            rs.getBigDecimal("opening"),
+            rs.getBigDecimal("account_limit"),
+            rs.getBigDecimal("rate"),
+            getEnum(rs, "type", CategoryType.class),
+            getUuid(rs, "category_uuid"),
+            getUuid(rs, "currency_uuid"),
+            getBoolean(rs, "enabled"),
+            rs.getBigDecimal("interest"),
+            getLocalDate(rs, "closing_date"),
+            getUuid(rs, "icon_uuid"),
+            getEnum(rs, "card_type", CardType.class),
+            rs.getString("card_number"),
+            rs.getBigDecimal("total"),
+            rs.getBigDecimal("total_waiting"),
+            rs.getLong("created"),
+            rs.getLong("modified")
+    );
+
+    private static Map<String, Object> toMap(Account account) {
+        var map = new HashMap<String, Object>(Map.ofEntries(
+                entry("uuid", account.uuid().toString()),
+                entry("name", account.name()),
+                entry("comment", account.comment()),
+                entry("number", account.accountNumber()),
+                entry("opening", account.openingBalance()),
+                entry("accountLimit", account.accountLimit()),
+                entry("rate", account.currencyRate()),
+                entry("type", account.type().name()),
+                entry("categoryUuid", account.categoryUuid().toString()),
+                entry("enabled", convert(account.enabled())),
+                entry("interest", account.interest()),
+                entry("cardType", convert(account.cardType())),
+                entry("cardNumber", account.cardNumber()),
+                entry("total", account.total()),
+                entry("totalWaiting", account.totalWaiting()),
+                entry("created", account.created()),
+                entry("modified", account.modified())
+        ));
+        map.put("currencyUuid", convert(account.currencyUuid()));
+        map.put("closingDate", convert(account.closingDate()));
+        map.put("iconUuid", convert(account.iconUuid()));
+        return map;
+    }
+
+    public AccountRepository(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public List<Account> getAll() {
+        return jdbcTemplate.query("SELECT * FROM account", rowMapper);
+    }
+
+    @Override
+    public int insert(Account account) {
+        return jdbcTemplate.update("""
+                        INSERT INTO account (
+                            uuid, name, comment, number, opening, account_limit, rate, type,
+                            category_uuid, currency_uuid, enabled, interest, closing_date, icon_uuid,
+                            card_type, card_number, total, total_waiting, created, modified
+                        ) VALUES (
+                            :uuid, :name, :comment, :number, :opening, :accountLimit, :rate, :type,
+                            :categoryUuid, :currencyUuid, :enabled, :interest, :closingDate, :iconUuid,
+                            :cardType, :cardNumber, :total, :totalWaiting, :created, :modified
+                        )
+                        """,
+                toMap(account)
+        );
+    }
+
+    public int update(Account account) {
+        return jdbcTemplate.update("""
+                        UPDATE account SET
+                            name = :name,
+                            comment = :comment,
+                            number = :number,
+                            opening = :opening,
+                            account_limit = :accountLimit,
+                            rate = :rate,
+                            type = :type,
+                            category_uuid = :categoryUuid,
+                            currency_uuid = :currencyUuid,
+                            enabled = :enabled,
+                            interest = :interest,
+                            closing_date = :closingDate,
+                            icon_uuid = :iconUuid,
+                            card_type = :cardType,
+                            card_number = :cardNumber,
+                            total = :total,
+                            total_waiting = :totalWaiting,
+                            modified = :modified
+                        WHERE uuid = :uuid
+                        """,
+                toMap(account)
+        );
+    }
+
+    @Override
+    public Optional<Account> get(UUID uuid) {
+        var result = jdbcTemplate.query("""
+                SELECT * FROM account WHERE uuid = :uuid
+                """, Map.of("uuid", uuid), rowMapper);
+        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
+    }
+}

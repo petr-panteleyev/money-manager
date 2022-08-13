@@ -378,8 +378,8 @@ public class DataCache {
                 .filter(filter)
                 .filter(t -> t.parentUuid() == null)
                 .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
-                        t.getConvertedAmount() :
-                        t.getNegatedAmount())
+                        Transaction.getConvertedAmount(t) :
+                        Transaction.getNegatedAmount(t))
                 .reduce(initialBalance, BigDecimal::add);
     }
 

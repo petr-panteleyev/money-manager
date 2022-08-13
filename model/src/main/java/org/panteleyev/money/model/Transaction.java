@@ -103,26 +103,22 @@ public record Transaction(
                 .build();
     }
 
-    public LocalDate getDate() {
-        return LocalDate.of(year, month, day);
-    }
-
     /**
      * Returns amount with conversion rate applied to it.
      *
      * @return converted amount
      */
-    public BigDecimal getConvertedAmount() {
-        if (rate.compareTo(BigDecimal.ZERO) == 0 || rate.compareTo(BigDecimal.ONE) == 0) {
-            return amount;
+    public static BigDecimal getConvertedAmount(Transaction t) {
+        if (t.rate.compareTo(BigDecimal.ZERO) == 0 || t.rate.compareTo(BigDecimal.ONE) == 0) {
+            return t.amount;
         }
-        return rateDirection == 0 ?
-                amount.divide(rate, RoundingMode.HALF_UP) :
-                amount.multiply(rate);
+        return t.rateDirection == 0 ?
+                t.amount.divide(t.rate, RoundingMode.HALF_UP) :
+                t.amount.multiply(t.rate);
     }
 
-    public BigDecimal getNegatedAmount() {
-        return amount.negate();
+    public static BigDecimal getNegatedAmount(Transaction t) {
+        return t.amount.negate();
     }
 
     public static final class Builder {
