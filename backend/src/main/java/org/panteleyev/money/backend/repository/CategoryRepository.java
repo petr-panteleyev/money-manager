@@ -63,37 +63,29 @@ public class CategoryRepository implements MoneyRepository<Category> {
     }
 
     @Override
-    public int insert(Category category) {
+    public Optional<Category> get(UUID uuid) {
+        var result = jdbcTemplate.query("""
+                SELECT * FROM category WHERE uuid = :uuid
+                """, Map.of("uuid", uuid), rowMapper);
+        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public int insertOrUpdate(Category category) {
         return jdbcTemplate.update("""
                         INSERT INTO category (
                             uuid, name, comment, type, icon_uuid, created, modified
                         ) VALUES (
                             :uuid, :name, :comment, :type, :iconUuid, :created, :modified
                         )
-                        """,
-                toMap(category)
-        );
-    }
-
-    public int update(Category category) {
-        return jdbcTemplate.update("""
-                        UPDATE category SET
+                        ON CONFLICT (uuid) DO UPDATE SET
                             name = :name,
                             comment = :comment,
                             type = :type,
                             icon_uuid = :iconUuid,
                             modified = :modified
-                        WHERE uuid = :uuid
                         """,
                 toMap(category)
         );
-    }
-
-    @Override
-    public Optional<Category> get(UUID uuid) {
-        var result = jdbcTemplate.query("""
-                SELECT * FROM category WHERE uuid = :uuid
-                """, Map.of("uuid", uuid), rowMapper);
-        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
     }
 }

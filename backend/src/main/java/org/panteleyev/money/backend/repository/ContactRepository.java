@@ -79,7 +79,19 @@ public class ContactRepository implements MoneyRepository<Contact> {
     }
 
     @Override
-    public int insert(Contact contact) {
+    public Optional<Contact> get(UUID uuid) {
+        var queryResult = jdbcTemplate.query(
+                "SELECT * FROM contact WHERE uuid = :id",
+                Map.of("id", uuid),
+                rowMapper);
+        return queryResult.size() == 0 ?
+                Optional.empty() :
+                Optional.of(queryResult.get(0));
+
+    }
+
+    @Override
+    public int insertOrUpdate(Contact contact) {
         return jdbcTemplate.update("""
                         INSERT INTO contact (uuid, name, type, phone, mobile, email, web, comment, street, city,
                             country, zip, icon_uuid, created, modified
@@ -87,15 +99,7 @@ public class ContactRepository implements MoneyRepository<Contact> {
                             :uuid, :name, :type, :phone, :mobile, :email, :web, :comment, :street, :city,
                             :country, :zip, :iconUuid, :created, :modified
                         )
-                        """,
-                toMap(contact)
-        );
-    }
-
-    @Override
-    public int update(Contact contact) {
-        return jdbcTemplate.update("""
-                        UPDATE contact SET
+                        ON CONFLICT (uuid) DO UPDATE SET
                             name = :name,
                             type = :type,
                             phone = :phone,
@@ -109,21 +113,8 @@ public class ContactRepository implements MoneyRepository<Contact> {
                             zip = :zip,
                             icon_uuid = :iconUuid,
                             modified = :modified
-                        WHERE uuid = :uuid
                         """,
                 toMap(contact)
         );
-    }
-
-    @Override
-    public Optional<Contact> get(UUID uuid) {
-        var queryResult = jdbcTemplate.query(
-                "SELECT * FROM contact WHERE uuid = :id",
-                Map.of("id", uuid),
-                rowMapper);
-        return queryResult.size() == 0 ?
-                Optional.empty() :
-                Optional.of(queryResult.get(0));
-
     }
 }

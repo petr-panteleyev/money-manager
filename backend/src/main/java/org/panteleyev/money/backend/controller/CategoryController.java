@@ -62,12 +62,7 @@ public class CategoryController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (categoryRepository.get(category.uuid()).isEmpty()) {
-            rows = categoryRepository.insert(category);
-        } else {
-            rows = categoryRepository.update(category);
-        }
+        var rows = categoryRepository.insertOrUpdate(category);
         return rows == 1 ? ResponseEntity.ok(category) : ResponseEntity.internalServerError().build();
     }
 

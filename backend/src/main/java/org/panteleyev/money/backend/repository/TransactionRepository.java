@@ -108,7 +108,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
     }
 
     @Override
-    public int insert(Transaction transaction) {
+    public int insertOrUpdate(Transaction transaction) {
         return jdbcTemplate.update("""
                         INSERT INTO transaction (
                             uuid, amount, date_day, date_month, date_year, type, comment, checked,
@@ -121,15 +121,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             :accDebitedCategoryUuid, :accCreditedCategoryUuid, :contactUuid, :rate, :rateDirection,
                             :invoiceNumber, :parentUuid, :detailed, :statementDate, :created, :modified
                         )
-                        """,
-                toMap(transaction)
-        );
-    }
-
-    @Override
-    public int update(Transaction transaction) {
-        return jdbcTemplate.update("""
-                        UPDATE transaction SET
+                        ON CONFLICT (uuid) DO UPDATE SET
                             uuid = :uuid,
                             amount = :amount,
                             date_day = :day,
@@ -152,7 +144,6 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             detailed = :detailed,
                             statement_date = :statementDate,
                             modified = :modified
-                        WHERE uuid = :uuid
                         """,
                 toMap(transaction)
         );

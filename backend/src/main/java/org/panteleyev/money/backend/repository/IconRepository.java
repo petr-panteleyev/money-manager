@@ -44,33 +44,32 @@ public class IconRepository implements MoneyRepository<Icon> {
     }
 
     @Override
-    public int insert(Icon icon) {
+    public int insertOrUpdate(Icon icon) {
         return jdbcTemplate.update("""
-                        INSERT INTO icon (uuid, name, bytes, created, modified)
-                        VALUES (:uuid, :name, :bytes, :created, :modified)
+                        INSERT INTO icon (
+                            uuid,
+                            name,
+                            bytes,
+                            created,
+                            modified
+                        )
+                        VALUES (
+                            :uuid,
+                            :name,
+                            :bytes,
+                            :created,
+                            :modified
+                        )
+                        ON CONFLICT (uuid) DO UPDATE SET
+                            name = :name,
+                            bytes = :bytes,
+                            modified = :modified
                         """,
                 Map.of(
                         "uuid", icon.uuid(),
                         "name", icon.name(),
                         "bytes", icon.bytes(),
                         "created", icon.created(),
-                        "modified", icon.modified()
-                ));
-    }
-
-    @Override
-    public int update(Icon icon) {
-        return jdbcTemplate.update("""
-                        UPDATE icon SET
-                            name = :name,
-                            bytes = :bytes,
-                            modified = :modified
-                        WHERE uuid = :uuid
-                        """,
-                Map.of(
-                        "uuid", icon.uuid(),
-                        "name", icon.name(),
-                        "bytes", icon.bytes(),
                         "modified", icon.modified()
                 ));
     }

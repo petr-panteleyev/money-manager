@@ -5,6 +5,7 @@
 package org.panteleyev.money.backend.repository;
 
 import org.panteleyev.money.model.MoneyRecord;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,7 +18,5 @@ public interface MoneyRepository<T extends MoneyRecord> {
 
     Optional<T> get(UUID uuid);
 
-    int insert(T record);
-
-    int update(T record);
+    int insertOrUpdate(T record);
 }

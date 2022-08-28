@@ -92,7 +92,15 @@ public class AccountRepository implements MoneyRepository<Account> {
     }
 
     @Override
-    public int insert(Account account) {
+    public Optional<Account> get(UUID uuid) {
+        var result = jdbcTemplate.query("""
+                SELECT * FROM account WHERE uuid = :uuid
+                """, Map.of("uuid", uuid), rowMapper);
+        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
+    }
+
+    @Override
+    public int insertOrUpdate(Account account) {
         return jdbcTemplate.update("""
                         INSERT INTO account (
                             uuid, name, comment, number, opening, account_limit, rate, type,
@@ -103,14 +111,7 @@ public class AccountRepository implements MoneyRepository<Account> {
                             :categoryUuid, :currencyUuid, :enabled, :interest, :closingDate, :iconUuid,
                             :cardType, :cardNumber, :total, :totalWaiting, :created, :modified
                         )
-                        """,
-                toMap(account)
-        );
-    }
-
-    public int update(Account account) {
-        return jdbcTemplate.update("""
-                        UPDATE account SET
+                        ON CONFLICT (uuid) DO UPDATE SET
                             name = :name,
                             comment = :comment,
                             number = :number,
@@ -129,17 +130,8 @@ public class AccountRepository implements MoneyRepository<Account> {
                             total = :total,
                             total_waiting = :totalWaiting,
                             modified = :modified
-                        WHERE uuid = :uuid
                         """,
                 toMap(account)
         );
-    }
-
-    @Override
-    public Optional<Account> get(UUID uuid) {
-        var result = jdbcTemplate.query("""
-                SELECT * FROM account WHERE uuid = :uuid
-                """, Map.of("uuid", uuid), rowMapper);
-        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
     }
 }

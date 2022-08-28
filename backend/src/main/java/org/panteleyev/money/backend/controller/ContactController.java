@@ -60,12 +60,7 @@ public class ContactController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (contactRepository.get(contact.uuid()).isEmpty()) {
-            rows = contactRepository.insert(contact);
-        } else {
-            rows = contactRepository.update(contact);
-        }
+        var rows = contactRepository.insertOrUpdate(contact);
         return rows == 1 ? ResponseEntity.ok(contact) : ResponseEntity.internalServerError().build();
     }
 

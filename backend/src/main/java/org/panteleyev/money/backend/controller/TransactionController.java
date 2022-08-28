@@ -62,12 +62,7 @@ public class TransactionController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (transactionRepository.get(uuid).isEmpty()) {
-            rows = transactionRepository.insert(transaction);
-        } else {
-            rows = transactionRepository.update(transaction);
-        }
+        var rows = transactionRepository.insertOrUpdate(transaction);
         return rows == 1 ? ResponseEntity.ok(transaction) : ResponseEntity.internalServerError().build();
     }
 

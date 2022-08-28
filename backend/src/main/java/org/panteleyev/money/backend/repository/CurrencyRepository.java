@@ -51,7 +51,18 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
     }
 
     @Override
-    public int insert(Currency currency) {
+    public Optional<Currency> get(UUID uuid) {
+        var queryResult = jdbcTemplate.query(
+                "SELECT * FROM currency WHERE uuid = :id",
+                Map.of("id", uuid),
+                rowMapper);
+        return queryResult.size() == 0 ?
+                Optional.empty() :
+                Optional.of(queryResult.get(0));
+    }
+
+    @Override
+    public int insertOrUpdate(Currency currency) {
         return jdbcTemplate.update("""
                         INSERT INTO currency (
                             uuid, symbol, description, format_symbol, format_symbol_pos, show_format_symbol, def,
@@ -59,7 +70,17 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
                         ) VALUES (
                             :uuid, :symbol, :description, :formatSymbol, :formatSymbolPos, :showFormatSymbol, :def,
                             :rate, :rateDirection, :useThousandSeparator, :created, :modified
-                        )
+                        ) ON CONFLICT (uuid) DO UPDATE SET
+                            symbol = :symbol,
+                            description = :description,
+                            format_symbol = :formatSymbol,
+                            format_symbol_pos = :formatSymbolPos,
+                            show_format_symbol = :showFormatSymbol,
+                            def = :def,
+                            rate = :rate,
+                            rate_direction = :rateDirection,
+                            use_th_separator = :useThousandSeparator,
+                            modified = :modified
                         """,
                 Map.ofEntries(
                         Map.entry("uuid", currency.uuid()),
@@ -74,48 +95,7 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
                         Map.entry("useThousandSeparator", currency.useThousandSeparator()),
                         Map.entry("created", currency.created()),
                         Map.entry("modified", currency.modified())
-                ));
-    }
-
-    @Override
-    public int update(Currency currency) {
-        return jdbcTemplate.update("""
-                        UPDATE currency SET
-                            symbol = :symbol,
-                            description = :description,
-                            format_symbol = :formatSymbol,
-                            format_symbol_pos = :formatSymbolPos,
-                            show_format_symbol = :showFormatSymbol,
-                            def = :def,
-                            rate = :rate,
-                            rate_direction = :rateDirection,
-                            use_th_separator = :useThousandSeparator,
-                            modified = :modified
-                        WHERE uuid = :uuid
-                        """,
-                Map.ofEntries(
-                        Map.entry("uuid", currency.uuid()),
-                        Map.entry("symbol", currency.symbol()),
-                        Map.entry("description", currency.description()),
-                        Map.entry("formatSymbol", currency.formatSymbol()),
-                        Map.entry("formatSymbolPos", currency.formatSymbolPosition()),
-                        Map.entry("showFormatSymbol", currency.showFormatSymbol()),
-                        Map.entry("def", currency.def()),
-                        Map.entry("rate", currency.rate()),
-                        Map.entry("rateDirection", currency.direction()),
-                        Map.entry("useThousandSeparator", currency.useThousandSeparator()),
-                        Map.entry("modified", currency.modified())
-                ));
-    }
-
-    @Override
-    public Optional<Currency> get(UUID uuid) {
-        var queryResult = jdbcTemplate.query(
-                "SELECT * FROM currency WHERE uuid = :id",
-                Map.of("id", uuid),
-                rowMapper);
-        return queryResult.size() == 0 ?
-                Optional.empty() :
-                Optional.of(queryResult.get(0));
+                )
+        );
     }
 }

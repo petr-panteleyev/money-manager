@@ -62,12 +62,7 @@ public class AccountController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (accountRepository.get(uuid).isEmpty()) {
-            rows = accountRepository.insert(account);
-        } else {
-            rows = accountRepository.update(account);
-        }
+        var rows = accountRepository.insertOrUpdate(account);
         return rows == 1 ? ResponseEntity.ok(account) : ResponseEntity.internalServerError().build();
     }
 

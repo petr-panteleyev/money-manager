@@ -60,12 +60,7 @@ public class IconController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (iconRepository.get(icon.uuid()).isEmpty()) {
-            rows = iconRepository.insert(icon);
-        } else {
-            rows = iconRepository.update(icon);
-        }
+        var rows = iconRepository.insertOrUpdate(icon);
         return rows == 1 ? ResponseEntity.ok(icon) : ResponseEntity.internalServerError().build();
     }
 

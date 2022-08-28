@@ -294,11 +294,11 @@ public interface BaseTestUtils {
     static <T extends MoneyRecord> void insertAndUpdate(MoneyRepository<T> repository, T insert, T update) {
         var uuid = insert.uuid();
 
-        var insertResult = repository.insert(insert);
+        var insertResult = repository.insertOrUpdate(insert);
         assertEquals(1, insertResult);
         assertEquals(repository.get(uuid).orElseThrow(), insert);
 
-        var updateResult = repository.update(update);
+        var updateResult = repository.insertOrUpdate(update);
         assertEquals(1, updateResult);
         assertEquals(repository.get(uuid).orElseThrow(), update);
     }

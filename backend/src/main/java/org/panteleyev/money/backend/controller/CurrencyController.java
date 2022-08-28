@@ -62,12 +62,7 @@ public class CurrencyController {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = 0;
-        if (currencyRepository.get(uuid).isEmpty()) {
-            rows = currencyRepository.insert(currency);
-        } else {
-            rows = currencyRepository.update(currency);
-        }
+        var rows = currencyRepository.insertOrUpdate(currency);
         return rows == 1 ? ResponseEntity.ok(currency) : ResponseEntity.internalServerError().build();
     }
 
