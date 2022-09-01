@@ -32,7 +32,7 @@
         <javaFxHelpersVersion>1.11.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
-        <jsoupVersion>1.14.2</jsoupVersion>
+        <jsoupVersion>1.15.3</jsoupVersion>
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <postgresVersion>42.4.2</postgresVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
