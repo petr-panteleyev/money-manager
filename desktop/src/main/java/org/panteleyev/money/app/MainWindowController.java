@@ -261,6 +261,7 @@ public class MainWindowController extends BaseController implements TransactionT
         var transactionTab = new BorderPane();
 
         monthFilterBox.setOnAction(event -> onMonthChanged());
+        monthFilterBox.setFocusTraversable(false);
 
         var transactionCountLabel = label("");
         transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
@@ -288,6 +289,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 .IntegerSpinnerValueFactory(1970, 2050);
         yearSpinner.setValueFactory(valueFactory);
         yearSpinner.valueProperty().addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
+        yearSpinner.setFocusTraversable(false);
 
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);
 
