@@ -25,53 +25,53 @@ import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
-public interface BaseTestUtils {
-    Random RANDOM = new Random(System.currentTimeMillis());
+public final class BaseTestUtils {
+    public static final Random RANDOM = new Random(System.currentTimeMillis());
 
-    static int randomDay() {
+    public static int randomDay() {
         return 1 + RANDOM.nextInt(28);
     }
 
-    static int randomMonth() {
+    public static int randomMonth() {
         return 1 + RANDOM.nextInt(12);
     }
 
-    static int randomYear() {
+    public static int randomYear() {
         return 1 + RANDOM.nextInt(3000);
     }
 
-    static String randomString() {
+    public static String randomString() {
         return UUID.randomUUID().toString();
     }
 
-    static boolean randomBoolean() {
+    public static boolean randomBoolean() {
         return RANDOM.nextBoolean();
     }
 
-    static int randomInt() {
+    public static int randomInt() {
         return RANDOM.nextInt();
     }
 
-    static BigDecimal randomBigDecimal() {
+    public static BigDecimal randomBigDecimal() {
         return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
-    static CategoryType randomCategoryType() {
+    public static CategoryType randomCategoryType() {
         int index = RANDOM.nextInt(CategoryType.values().length);
         return CategoryType.values()[index];
     }
 
-    static CardType randomCardType() {
+    public static CardType randomCardType() {
         int index = RANDOM.nextInt(CardType.values().length);
         return CardType.values()[index];
     }
 
-    static ContactType randomContactType() {
+    public static ContactType randomContactType() {
         int index = RANDOM.nextInt(ContactType.values().length);
         return ContactType.values()[index];
     }
 
-    static TransactionType randomTransactionType() {
+    public static TransactionType randomTransactionType() {
         while (true) {
             int index = RANDOM.nextInt(TransactionType.values().length);
             var type = TransactionType.values()[index];
@@ -81,7 +81,7 @@ public interface BaseTestUtils {
         }
     }
 
-    static Account newAccount(Category category, Currency currency) {
+    public static Account newAccount(Category category, Currency currency) {
         return new Account.Builder()
                 .name(UUID.randomUUID().toString())
                 .comment(UUID.randomUUID().toString())
@@ -102,7 +102,7 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Account newAccount(Category category, Currency currency, Icon icon) {
+    public static Account newAccount(Category category, Currency currency, Icon icon) {
         return new Account.Builder()
                 .name(UUID.randomUUID().toString())
                 .comment(UUID.randomUUID().toString())
@@ -124,27 +124,27 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Category newCategory() {
+    public static Category newCategory() {
         return newCategory(UUID.randomUUID(), randomCategoryType());
     }
 
-    static Category newCategory(Icon icon) {
+    public static Category newCategory(Icon icon) {
         return newCategory(UUID.randomUUID(), icon.uuid());
     }
 
-    static Category newCategory(UUID uuid) {
+    public static Category newCategory(UUID uuid) {
         return newCategory(uuid, randomCategoryType());
     }
 
-    static Category newCategory(UUID uuid, UUID iconUuid) {
+    public static Category newCategory(UUID uuid, UUID iconUuid) {
         return newCategory(uuid, randomCategoryType(), iconUuid);
     }
 
-    static Category newCategory(UUID uuid, CategoryType type) {
+    public static Category newCategory(UUID uuid, CategoryType type) {
         return newCategory(uuid, type, null);
     }
 
-    static Category newCategory(UUID uuid, CategoryType type, UUID iconUuid) {
+    public static Category newCategory(UUID uuid, CategoryType type, UUID iconUuid) {
         return new Category.Builder()
                 .name(UUID.randomUUID().toString())
                 .comment(UUID.randomUUID().toString())
@@ -155,11 +155,11 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Currency newCurrency() {
+    public static Currency newCurrency() {
         return newCurrency(UUID.randomUUID());
     }
 
-    static Currency newCurrency(UUID uuid) {
+    public static Currency newCurrency(UUID uuid) {
         return new Currency.Builder()
                 .symbol(UUID.randomUUID().toString())
                 .description(UUID.randomUUID().toString())
@@ -175,15 +175,15 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Contact newContact() {
+    public static Contact newContact() {
         return newContact(UUID.randomUUID());
     }
 
-    static Contact newContact(UUID uuid) {
+    public static Contact newContact(UUID uuid) {
         return newContact(uuid, null);
     }
 
-    static Contact newContact(UUID uuid, UUID iconUuid) {
+    public static Contact newContact(UUID uuid, UUID iconUuid) {
         return new Contact.Builder()
                 .name(UUID.randomUUID().toString())
                 .type(randomContactType())
@@ -202,7 +202,7 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Contact newContact(String name) {
+    public static Contact newContact(String name) {
         return new Contact.Builder()
                 .name(name)
                 .type(randomContactType())
@@ -221,11 +221,11 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Transaction newTransaction() {
+    public static Transaction newTransaction() {
         return newTransaction(UUID.randomUUID());
     }
 
-    static Transaction newTransaction(UUID uuid) {
+    public static Transaction newTransaction(UUID uuid) {
         return new Transaction.Builder()
                 .uuid(uuid)
                 .amount(randomBigDecimal())
@@ -249,7 +249,7 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Transaction newTransaction(Account accountDebited, Account accountCredited, Contact contact) {
+    public static Transaction newTransaction(Account accountDebited, Account accountCredited, Contact contact) {
         return new Transaction.Builder()
                 .amount(randomBigDecimal())
                 .day(randomDay())
@@ -273,15 +273,15 @@ public interface BaseTestUtils {
                 .build();
     }
 
-    static Transaction newTransaction(Account accountDebited, Account accountCredited) {
+    public static Transaction newTransaction(Account accountDebited, Account accountCredited) {
         return newTransaction(accountDebited, accountCredited, null);
     }
 
-    static Icon newIcon(String name) {
+    public static Icon newIcon(String name) {
         return newIcon(UUID.randomUUID(), name);
     }
 
-    static Icon newIcon(UUID uuid, String name) {
+    public static Icon newIcon(UUID uuid, String name) {
         try (var inputStream = BaseTestUtils.class.getResourceAsStream("/org/panteleyev/money/icons/" + name)) {
             var bytes = inputStream.readAllBytes();
             var timestamp = System.currentTimeMillis();
@@ -291,7 +291,7 @@ public interface BaseTestUtils {
         }
     }
 
-    static MoneyDocument newDocument(DocumentType type) {
+    public static MoneyDocument newDocument(DocumentType type) {
         return new MoneyDocument.Builder()
                 .uuid(UUID.randomUUID())
                 .ownerUuid(UUID.randomUUID())
@@ -304,5 +304,8 @@ public interface BaseTestUtils {
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();
+    }
+
+    private BaseTestUtils() {
     }
 }

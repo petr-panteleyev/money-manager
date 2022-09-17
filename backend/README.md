@@ -2,11 +2,9 @@
 
 ## Environment
 
-| Property          | Description        | Default |
-|-------------------|--------------------|---|
-| DATABASE_USER     | Database user name ||
-| DATABASE_PASSWORD | Database password  ||
-| DATABASE_HOST     | Database host      |localhost|
-| DATABASE_PORT     | Database port      |3306|
-| DATABASE_NAME     | Database name      ||
-| DATABASE_SCHEMA   | Database schema    ||
+| Property          | Description                 | Example   |
+|-------------------|-----------------------------|-----------|
+| DATABASE_URL      | Database connection URL | jdbc:postgresql://localhost:5432/postgres |
+| DATABASE_SCHEMA| Database schema||
+| DATABASE_USER     | Database user name          ||
+| DATABASE_PASSWORD | Database password           ||

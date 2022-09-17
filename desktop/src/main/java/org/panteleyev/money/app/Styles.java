@@ -4,34 +4,37 @@
  */
 package org.panteleyev.money.app;
 
-public interface Styles {
-    double BIG_SPACING = 5.0;
-    double SMALL_SPACING = 2.0;
-    double DOUBLE_SPACING = BIG_SPACING * 2;
+public final class Styles {
+    public static final double BIG_SPACING = 5.0;
+    public static final double SMALL_SPACING = 2.0;
+    public static final double DOUBLE_SPACING = BIG_SPACING * 2;
 
     // Amounts
-    String DEBIT = "amount-debit";
-    String CREDIT = "amount-credit";
-    String TRANSFER = "amount-transfer";
+    public static final String DEBIT = "amount-debit";
+    public static final String CREDIT = "amount-credit";
+    public static final String TRANSFER = "amount-transfer";
 
     // Account expiration date
-    String EXPIRED = "expired";
+    public static final String EXPIRED = "expired";
 
-    String GROUP_CELL = "groupCell";
+    public static final String GROUP_CELL = "groupCell";
 
-    String BOLD_TEXT = "boldText";
+    public static final String BOLD_TEXT = "boldText";
 
-    String GRID_PANE = "gridPane";
+    public static final String GRID_PANE = "gridPane";
 
     // About Dialog
-    String STYLE_ABOUT_LABEL = "aboutLabel";
+    public static final String STYLE_ABOUT_LABEL = "aboutLabel";
 
     // Transaction Editor
-    String RATE_LABEL = "rateLabel";
-    String SUB_LABEL = "subLabel";
+    public static final String RATE_LABEL = "rateLabel";
+    public static final String SUB_LABEL = "subLabel";
 
     // Statement
-    String STATEMENT_NOT_FOUND = "statementMissing";
-    String STATEMENT_ALL_CHECKED = "statementChecked";
-    String STATEMENT_NOT_CHECKED = "statementUnchecked";
+    public static final String STATEMENT_NOT_FOUND = "statementMissing";
+    public static final String STATEMENT_ALL_CHECKED = "statementChecked";
+    public static final String STATEMENT_NOT_CHECKED = "statementUnchecked";
+
+    private Styles() {
+    }
 }

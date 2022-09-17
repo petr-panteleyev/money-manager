@@ -9,18 +9,20 @@ import org.panteleyev.money.model.CardType;
 
 import static org.panteleyev.money.app.icons.IconManager.ICON_SIZE;
 
-public interface Images {
-    Image APP_ICON = new Image("org/panteleyev/money/images/icon48.png");
-    Image WARNING = new Image("org/panteleyev/money/images/warning-16.png");
-    Image EMPTY = new Image("org/panteleyev/money/images/empty.png");
-    Image SEARCH = new Image("org/panteleyev/money/images/search.png");
-    Image VISA = new Image("org/panteleyev/money/images/visa.png", ICON_SIZE, ICON_SIZE, true, true);
-    Image MASTERCARD = new Image("org/panteleyev/money/images/mastercard.png", ICON_SIZE, ICON_SIZE, true, true);
-    Image AMEX = new Image("org/panteleyev/money/images/amex.png", ICON_SIZE, ICON_SIZE, true, true);
-    Image MIR = new Image("org/panteleyev/money/images/mir.png", ICON_SIZE, ICON_SIZE, true, true);
-    Image ATTACHMENT = new Image("org/panteleyev/money/images/attachment.png", ICON_SIZE, ICON_SIZE, true, true);
+public final class Images {
+    private static final String BASE_PACKAGE = "org/panteleyev/money/images/";
 
-    static Image getCardTypeIcon(CardType cardType) {
+    public static final Image APP_ICON = image("icon48.png");
+    public static final Image WARNING = image("warning-16.png");
+    public static final Image EMPTY = image("empty.png");
+    public static final Image SEARCH = image("search.png");
+    public static final Image VISA = image("visa.png");
+    public static final Image MASTERCARD = image("mastercard.png");
+    public static final Image AMEX = image("amex.png");
+    public static final Image MIR = image("mir.png");
+    public static final Image ATTACHMENT = image("attachment.png");
+
+    public static Image getCardTypeIcon(CardType cardType) {
         return switch (cardType) {
             case VISA -> Images.VISA;
             case MASTERCARD -> Images.MASTERCARD;
@@ -28,5 +30,12 @@ public interface Images {
             case MIR -> Images.MIR;
             default -> null;
         };
+    }
+
+    private static Image image(String name) {
+        return new Image(BASE_PACKAGE + name, ICON_SIZE, ICON_SIZE, true, true);
+    }
+
+    private Images() {
     }
 }

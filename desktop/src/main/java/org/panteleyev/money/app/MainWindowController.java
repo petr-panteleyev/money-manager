@@ -84,15 +84,16 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_I;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_R;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_E;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_I;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_P;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
 import static org.panteleyev.money.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
@@ -175,15 +176,15 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = menuItem(fxString(UI, I18N_WORD_CONNECTION, ELLIPSIS), SHORTCUT_N,
+        var fileConnectMenuItem = menuItem(fxString(UI, I18N_WORD_CONNECTION, ELLIPSIS),
                 event -> onOpenConnection());
         var fileCloseMenuItem = menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose());
         var fileExitMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXIT), event -> onExit());
-        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), SHORTCUT_SHIFT_E,
+        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), SHORTCUT_ALT_E,
                 event -> xmlDump());
-        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), SHORTCUT_SHIFT_I,
+        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), SHORTCUT_ALT_I,
                 event -> onImport());
-        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_SHIFT_R,
+        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_ALT_R,
                 event -> onReport());
 
         var fileMenu = newMenu(fxString(UI, I18N_MENU_FILE),
@@ -222,11 +223,11 @@ public class MainWindowController extends BaseController implements TransactionT
                 menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
-        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS), SHORTCUT_SHIFT_P,
+        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS), SHORTCUT_ALT_P,
                 x -> profileManager.getEditor().showAndWait());
 
         var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
-                x -> onOptions());
+                SHORTCUT_ALT_S, x -> onOptions());
         var iconWindowMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ICONS, ELLIPSIS),
                 x -> onIconWindow());
 

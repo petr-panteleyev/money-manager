@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.CATEGORY_ROOT;
-import static org.panteleyev.money.backend.controller.JsonUtil.writeObjectToStream;
+import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
 @Controller
 @CrossOrigin
@@ -66,13 +66,11 @@ public class CategoryController {
         return rows == 1 ? ResponseEntity.ok(category) : ResponseEntity.internalServerError().build();
     }
 
-    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {
             try (var stream = categoryRepository.getStream()) {
-                stream.forEach(t -> writeObjectToStream(out, objectMapper, t));
-            } finally {
-                out.flush();
+                writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };
         return ResponseEntity.accepted().body(body);

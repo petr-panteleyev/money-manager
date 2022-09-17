@@ -22,8 +22,8 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface XMLUtils {
-    static void appendTextNode(Element e, String name, String value) {
+public final class XMLUtils {
+    public static void appendTextNode(Element e, String name, String value) {
         if (value == null) {
             return;
         }
@@ -35,49 +35,49 @@ public interface XMLUtils {
         child.appendChild(text);
     }
 
-    static void appendTextNode(Element e, String name, int value) {
+    public static void appendTextNode(Element e, String name, int value) {
         appendTextNode(e, name, Integer.toString(value));
     }
 
-    static void appendTextNode(Element e, String name, boolean value) {
+    public static void appendTextNode(Element e, String name, boolean value) {
         appendTextNode(e, name, Boolean.toString(value));
     }
 
-    static void appendTextNode(Element e, String name, long value) {
+    public static void appendTextNode(Element e, String name, long value) {
         appendTextNode(e, name, Long.toString(value));
     }
 
-    static void appendTextNode(Element e, String name, BigDecimal value) {
+    public static void appendTextNode(Element e, String name, BigDecimal value) {
         if (value != null) {
             appendTextNode(e, name, value.toString());
         }
     }
 
-    static void appendTextNode(Element e, String name, LocalDate value) {
+    public static void appendTextNode(Element e, String name, LocalDate value) {
         if (value != null) {
             appendTextNode(e, name, value.toEpochDay());
         }
     }
 
-    static void appendTextNode(Element e, String name, UUID value) {
+    public static void appendTextNode(Element e, String name, UUID value) {
         if (value != null) {
             appendTextNode(e, name, value.toString());
         }
     }
 
-    static void appendTextNode(Element e, String name, byte[] value) {
+    public static void appendTextNode(Element e, String name, byte[] value) {
         if (value != null) {
             appendTextNode(e, name, Base64.getEncoder().encodeToString(value));
         }
     }
 
-    static void appendTextNode(Element e, String name, Enum<?> value) {
+    public static void appendTextNode(Element e, String name, Enum<?> value) {
         if (value != null) {
             appendTextNode(e, name, value.name());
         }
     }
 
-    static void appendObjectTextNode(Element e, String name, Object value) {
+    public static void appendObjectTextNode(Element e, String name, Object value) {
         // TODO: reimplement with switch pattern matching when available
         if (value instanceof Integer intValue) {
             appendTextNode(e, name, intValue);
@@ -90,13 +90,13 @@ public interface XMLUtils {
         }
     }
 
-    static Element appendElement(Element parent, String name) {
+    public static Element appendElement(Element parent, String name) {
         var element = parent.getOwnerDocument().createElement(name);
         parent.appendChild(element);
         return element;
     }
 
-    static Element createDocument(String rootElementName) {
+    public static Element createDocument(String rootElementName) {
         try {
             var docFactory = DocumentBuilderFactory.newInstance();
             var docBuilder = docFactory.newDocumentBuilder();
@@ -111,7 +111,7 @@ public interface XMLUtils {
         }
     }
 
-    static Element readDocument(InputStream in) {
+    public static Element readDocument(InputStream in) {
         try {
             var docFactory = DocumentBuilderFactory.newInstance();
             var docBuilder = docFactory.newDocumentBuilder();
@@ -122,7 +122,7 @@ public interface XMLUtils {
         }
     }
 
-    static void writeDocument(Document document, OutputStream outputStream) {
+    public static void writeDocument(Document document, OutputStream outputStream) {
         try {
             var transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -133,12 +133,12 @@ public interface XMLUtils {
         }
     }
 
-    static String getAttribute(Element element, String name, String defValue) {
+    public static String getAttribute(Element element, String name, String defValue) {
         var value = element.getAttribute(name);
         return value.isEmpty() ? defValue : value;
     }
 
-    static int getAttribute(Element element, String name, int defValue) {
+    public static int getAttribute(Element element, String name, int defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -147,7 +147,7 @@ public interface XMLUtils {
         }
     }
 
-    static double getAttribute(Element element, String name, double defValue) {
+    public static double getAttribute(Element element, String name, double defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -156,7 +156,7 @@ public interface XMLUtils {
         }
     }
 
-    static boolean getAttribute(Element element, String name, boolean defValue) {
+    public static boolean getAttribute(Element element, String name, boolean defValue) {
         var value = element.getAttribute(name);
         if (value.isBlank()) {
             return defValue;
@@ -165,7 +165,7 @@ public interface XMLUtils {
         }
     }
 
-    static Optional<String> getStringNodeValue(Element parent, String tagName) {
+    public static Optional<String> getStringNodeValue(Element parent, String tagName) {
         var nodes = parent.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
             var node = nodes.item(i);
@@ -176,13 +176,16 @@ public interface XMLUtils {
         return Optional.empty();
     }
 
-    static Optional<Integer> getIntNodeValue(Element parent, String tagName) {
+    public static Optional<Integer> getIntNodeValue(Element parent, String tagName) {
         return getStringNodeValue(parent, tagName)
                 .map(Integer::parseInt);
     }
 
-    static Optional<Boolean> getBooleanNodeValue(Element parent, String tagName) {
+    public static Optional<Boolean> getBooleanNodeValue(Element parent, String tagName) {
         return getStringNodeValue(parent, tagName)
                 .map(Boolean::parseBoolean);
+    }
+
+    private XMLUtils() {
     }
 }

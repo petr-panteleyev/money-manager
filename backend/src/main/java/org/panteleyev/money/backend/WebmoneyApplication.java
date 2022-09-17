@@ -1,16 +1,13 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
 
-import org.panteleyev.money.backend.config.DatabaseProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(DatabaseProperties.class)
 public class WebmoneyApplication {
 	public static final String CONTEXT_ROOT = "/money";
 	public static final String API_ROOT = "/api/1.0.0";

@@ -35,38 +35,44 @@ import static javafx.scene.input.KeyCombination.ALT_DOWN;
 import static javafx.scene.input.KeyCombination.SHIFT_DOWN;
 import static javafx.scene.input.KeyCombination.SHORTCUT_DOWN;
 
-public interface Shortcuts {
-    KeyCodeCombination SHORTCUT_0 = new KeyCodeCombination(DIGIT0, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_1 = new KeyCodeCombination(DIGIT1, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_2 = new KeyCodeCombination(DIGIT2, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_3 = new KeyCodeCombination(DIGIT3, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_4 = new KeyCodeCombination(DIGIT4, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_5 = new KeyCodeCombination(DIGIT5, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_6 = new KeyCodeCombination(DIGIT6, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_7 = new KeyCodeCombination(DIGIT7, SHORTCUT_DOWN);
+public final class Shortcuts {
+    public static final KeyCodeCombination SHORTCUT_0 = new KeyCodeCombination(DIGIT0, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_1 = new KeyCodeCombination(DIGIT1, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_2 = new KeyCodeCombination(DIGIT2, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_3 = new KeyCodeCombination(DIGIT3, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_4 = new KeyCodeCombination(DIGIT4, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_5 = new KeyCodeCombination(DIGIT5, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_6 = new KeyCodeCombination(DIGIT6, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_7 = new KeyCodeCombination(DIGIT7, SHORTCUT_DOWN);
 
-    KeyCodeCombination SHORTCUT_ALT_UP = new KeyCodeCombination(UP, SHORTCUT_DOWN, ALT_DOWN);
-    KeyCodeCombination SHORTCUT_ALT_RIGHT = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN);
-    KeyCodeCombination SHORTCUT_ALT_LEFT = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN);
-    KeyCodeCombination SHORTCUT_ALT_SHIFT_RIGHT = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
-    KeyCodeCombination SHORTCUT_ALT_SHIFT_LEFT = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_UP = new KeyCodeCombination(UP, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_RIGHT = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_LEFT = new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_SHIFT_RIGHT =
+            new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_SHIFT_LEFT =
+            new KeyCodeCombination(LEFT, SHORTCUT_DOWN, ALT_DOWN, SHIFT_DOWN);
 
-    KeyCodeCombination SHORTCUT_SHIFT_E = new KeyCodeCombination(E, SHORTCUT_DOWN, SHIFT_DOWN);
-    KeyCodeCombination SHORTCUT_SHIFT_I = new KeyCodeCombination(I, SHORTCUT_DOWN, SHIFT_DOWN);
-    KeyCodeCombination SHORTCUT_SHIFT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, SHIFT_DOWN);
-    KeyCodeCombination SHORTCUT_SHIFT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, SHIFT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_C = new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_E = new KeyCodeCombination(E, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_I = new KeyCodeCombination(I, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_S = new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN);
 
-    KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_F = new KeyCodeCombination(F, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_H = new KeyCodeCombination(H, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_K = new KeyCodeCombination(K, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(N, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_O = new KeyCodeCombination(O, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_R = new KeyCodeCombination(R, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_S = new KeyCodeCombination(S, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_T = new KeyCodeCombination(T, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(U, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_DELETE = new KeyCodeCombination(DELETE, SHORTCUT_DOWN);
-    KeyCodeCombination SHORTCUT_ALT_C = new KeyCodeCombination(C, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_F = new KeyCodeCombination(F, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_H = new KeyCodeCombination(H, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_K = new KeyCodeCombination(K, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(N, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_O = new KeyCodeCombination(O, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_R = new KeyCodeCombination(R, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_S = new KeyCodeCombination(S, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_T = new KeyCodeCombination(T, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(U, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_DELETE = new KeyCodeCombination(DELETE, SHORTCUT_DOWN);
+
+    private Shortcuts() {
+    }
 }

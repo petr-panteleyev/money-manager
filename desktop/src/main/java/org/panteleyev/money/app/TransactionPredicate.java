@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static org.panteleyev.money.app.Bundles.TRANSACTION_PREDICATE_BUNDLE;
+import static org.panteleyev.money.app.Bundles.translate;
 
 public enum TransactionPredicate implements Predicate<Transaction> {
     ALL(it -> true),
@@ -69,7 +69,7 @@ public enum TransactionPredicate implements Predicate<Transaction> {
 
     TransactionPredicate(Predicate<Transaction> p) {
         predicate = p;
-        description = TRANSACTION_PREDICATE_BUNDLE.getString(name());
+        description = translate(this);
     }
 
     TransactionPredicate(Month month) {

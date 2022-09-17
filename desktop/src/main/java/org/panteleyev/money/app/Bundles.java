@@ -18,26 +18,38 @@ import java.util.ResourceBundle;
 
 import static java.util.ResourceBundle.getBundle;
 
-public interface Bundles {
-    ResourceBundle CATEGORY_TYPE_BUNDLE = getBundle(CategoryTypeBundle.class.getCanonicalName());
-    ResourceBundle CONTACT_TYPE_BUNDLE = getBundle(ContactTypeBundle.class.getCanonicalName());
-    ResourceBundle TRANSACTION_TYPE_BUNDLE = getBundle(TransactionTypeBundle.class.getCanonicalName());
-    ResourceBundle DOCUMENT_TYPE_BUNDLE = getBundle(DocumentTypeBundle.class.getCanonicalName());
-    ResourceBundle TRANSACTION_PREDICATE_BUNDLE = getBundle(TransactionPredicateBundle.class.getCanonicalName());
+public final class Bundles {
+    private static final ResourceBundle CATEGORY_TYPE_BUNDLE =
+            getBundle(CategoryTypeBundle.class.getCanonicalName());
+    private static final ResourceBundle CONTACT_TYPE_BUNDLE =
+            getBundle(ContactTypeBundle.class.getCanonicalName());
+    private static final ResourceBundle TRANSACTION_TYPE_BUNDLE =
+            getBundle(TransactionTypeBundle.class.getCanonicalName());
+    private static final ResourceBundle DOCUMENT_TYPE_BUNDLE =
+            getBundle(DocumentTypeBundle.class.getCanonicalName());
+    private static final ResourceBundle TRANSACTION_PREDICATE_BUNDLE =
+            getBundle(TransactionPredicateBundle.class.getCanonicalName());
 
-    static String translate(CategoryType type) {
+    public static String translate(CategoryType type) {
         return CATEGORY_TYPE_BUNDLE.getString(type.name() + "_name");
     }
 
-    static String translate(ContactType type) {
+    public static String translate(ContactType type) {
         return CONTACT_TYPE_BUNDLE.getString(type.name());
     }
 
-    static String translate(TransactionType type) {
+    public static String translate(TransactionType type) {
         return TRANSACTION_TYPE_BUNDLE.getString(type.name());
     }
 
-    static String translate(DocumentType type) {
+    public static String translate(DocumentType type) {
         return DOCUMENT_TYPE_BUNDLE.getString(type.name());
+    }
+
+    public static String translate(TransactionPredicate predicate) {
+        return TRANSACTION_PREDICATE_BUNDLE.getString(predicate.name());
+    }
+
+    private Bundles() {
     }
 }

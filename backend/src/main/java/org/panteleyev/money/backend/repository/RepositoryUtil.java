@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public interface RepositoryUtil {
+final class RepositoryUtil {
     static UUID getUuid(ResultSet set, String columnLabel) throws SQLException {
         var obj = set.getObject(columnLabel);
         return (obj instanceof UUID uuid) ? uuid : null;
@@ -34,5 +34,8 @@ public interface RepositoryUtil {
 
     static String convert(Enum<?> enumValue) {
         return enumValue == null ? null : enumValue.name();
+    }
+
+    private RepositoryUtil() {
     }
 }

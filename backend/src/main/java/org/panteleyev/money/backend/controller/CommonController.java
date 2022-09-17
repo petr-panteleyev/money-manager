@@ -13,16 +13,49 @@ import static org.panteleyev.money.backend.WebmoneyApplication.VERSION_ROOT;
 
 @Controller
 public class CommonController {
-    private record Version(String name, String version) {
+    private record DatabaseInfo(String url, String schema, String user) {
     }
 
-    @Value("${spring.application.version}")
-    private String appVersion;
-    @Value("${spring.application.name}")
-    private String appName;
+    private record Version(String name, String version, DatabaseInfo database) {
+    }
+
+    private final String appVersion;
+    private final String appName;
+    private final String databaseUser;
+    private final String databaseUrl;
+    private final String schema;
+
+    public CommonController(
+            @Value("${spring.application.version}")
+            String appVersion,
+            @Value("${spring.application.name}")
+            String appName,
+            @Value("${spring.datasource.username}")
+            String databaseUser,
+            @Value("${spring.datasource.url}")
+            String databaseUrl,
+            @Value("${spring.datasource.hikari.schema}")
+            String schema
+    ) {
+        this.appVersion = appVersion;
+        this.appName = appName;
+        this.databaseUser = databaseUser;
+        this.databaseUrl = databaseUrl;
+        this.schema = schema;
+    }
 
     @GetMapping(VERSION_ROOT)
     public ResponseEntity<Version> getVersion() {
-        return ResponseEntity.ok(new Version(appName, appVersion));
+        return ResponseEntity.ok(
+                new Version(
+                        appName,
+                        appVersion,
+                        new DatabaseInfo(
+                                databaseUrl,
+                                schema,
+                                databaseUser
+                        )
+                )
+        );
     }
 }

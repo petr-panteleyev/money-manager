@@ -14,40 +14,43 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-public interface Predicates {
+public final class Predicates {
     // Account
-    static Predicate<Account> activeAccount(boolean active) {
+    public static Predicate<Account> activeAccount(boolean active) {
         return account -> account.enabled() == active;
     }
 
-    static Predicate<Account> accountByUuid(UUID uuid) {
+    public static Predicate<Account> accountByUuid(UUID uuid) {
         return account -> Objects.equals(account.uuid(), uuid);
     }
 
-    static Predicate<Account> accountByName(String name) {
+    public static Predicate<Account> accountByName(String name) {
         return name.isBlank() ?
                 account -> true : account -> account.name().toLowerCase().contains(name.toLowerCase());
     }
 
-    static Predicate<Account> accountByCategory(UUID uuid) {
+    public static Predicate<Account> accountByCategory(UUID uuid) {
         return account -> Objects.equals(account.categoryUuid(), uuid);
     }
 
-    static Predicate<Account> accountByCategoryType(CategoryType type) {
+    public static Predicate<Account> accountByCategoryType(CategoryType type) {
         return account -> account.type() == type;
     }
 
-    static Predicate<Account> accountByCategoryType(Collection<CategoryType> types) {
+    public static Predicate<Account> accountByCategoryType(Collection<CategoryType> types) {
         return account -> types.contains(account.type());
     }
 
     // Contact
-    static Predicate<Contact> contactByType(ContactType type) {
+    public static Predicate<Contact> contactByType(ContactType type) {
         return contact -> contact.type() == type;
     }
 
-    static Predicate<Contact> contactByName(String name) {
+    public static Predicate<Contact> contactByName(String name) {
         return name.isBlank() ?
                 contact -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
+    }
+
+    private Predicates() {
     }
 }
