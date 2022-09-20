@@ -10,21 +10,17 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-manager-parent</artifactId>
-        <version>22.8.2</version>
+        <version>22.8.3</version>
     </parent>
 
     <artifactId>money-manager-desktop</artifactId>
-    <version>22.8.2</version>
+    <version>22.8.3</version>
     <packaging>jar</packaging>
     <name>Desktop</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>18</maven.compiler.release>
-        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <appModule>org.panteleyev.money</appModule>
         <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
-        <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
 
     <dependencies>
@@ -172,13 +168,6 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
-                    <argLine>
-                        --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls
-                        --add-opens javafx.graphics/javafx.scene=org.controlsfx.controls
-                        --add-exports javafx.base/com.sun.javafx.logging=ALL-UNNAMED
-                        --add-exports javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
-                        --add-exports javafx.graphics/com.sun.javafx.embed=ALL-UNNAMED
-                    </argLine>
                 </configuration>
             </plugin>
             <plugin>

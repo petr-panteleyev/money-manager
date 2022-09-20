@@ -9,26 +9,24 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-parent</artifactId>
-    <version>22.8.2</version>
+    <version>22.8.3</version>
     <packaging>pom</packaging>
     <name>Parent</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>18</maven.compiler.release>
+        <maven.compiler.release>19</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
-        <appModule>org.panteleyev.money</appModule>
-        <appMainClass>org.panteleyev.money.MoneyApplication</appMainClass>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.2.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M6</mavenSurefirePluginVersion>
+        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>18</javaFxVersion>
+        <javaFxVersion>19</javaFxVersion>
         <javaFxHelpersVersion>1.11.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
@@ -52,11 +50,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.panteleyev.money</groupId>
-                <artifactId>money-manager-model</artifactId>
-                <version>${moneyManagerModelVersion}</version>
-            </dependency>
             <dependency>
                 <groupId>org.panteleyev</groupId>
                 <artifactId>java-fx-helpers</artifactId>
