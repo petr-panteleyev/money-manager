@@ -9,5 +9,6 @@ public enum DocumentType {
     CONTRACT,
     RECEIPT,
     STATEMENT,
+    NOTIFICATION,
     OTHER
 }

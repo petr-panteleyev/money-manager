@@ -5,6 +5,8 @@
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.TransactionRepository;
 import org.panteleyev.money.model.Transaction;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.UUID;
 import static org.panteleyev.money.backend.WebmoneyApplication.TRANSACTION_ROOT;
 import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
+@Tag(name = "Transactions")
 @Controller
 @CrossOrigin
 @RequestMapping(TRANSACTION_ROOT)
@@ -37,21 +40,22 @@ public class TransactionController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "Get all transactions")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Transaction>> getTransactions() {
         return ResponseEntity.ok(transactionRepository.getAll());
     }
 
+    @Operation(summary = "Get transaction")
     @GetMapping(
             value = "/{uuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Transaction> getTransaction(@PathVariable("uuid") UUID uuid) {
-        return transactionRepository.get(uuid)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.of(transactionRepository.get(uuid));
     }
 
+    @Operation(summary = "Insert or update transaction")
     @PutMapping(
             value = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -66,6 +70,7 @@ public class TransactionController {
         return rows == 1 ? ResponseEntity.ok(transaction) : ResponseEntity.internalServerError().build();
     }
 
+    @Operation(summary = "Get all transactions as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {

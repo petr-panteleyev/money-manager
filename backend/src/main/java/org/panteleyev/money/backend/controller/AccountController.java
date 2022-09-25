@@ -5,6 +5,8 @@
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.model.Account;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.UUID;
 import static org.panteleyev.money.backend.WebmoneyApplication.ACCOUNT_ROOT;
 import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
+@Tag(name = "Accounts")
 @Controller
 @CrossOrigin
 @RequestMapping(ACCOUNT_ROOT)
@@ -37,21 +40,22 @@ public class AccountController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "Get all accounts")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Account>> getAccounts() {
         return ResponseEntity.ok(accountRepository.getAll());
     }
 
+    @Operation(summary = "Get account")
     @GetMapping(
             value = "/{uuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Account> getAccount(@PathVariable("uuid") UUID uuid) {
-        return accountRepository.get(uuid)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.of(accountRepository.get(uuid));
     }
 
+    @Operation(summary = "Insert or update account")
     @PutMapping(
             value = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -66,6 +70,7 @@ public class AccountController {
         return rows == 1 ? ResponseEntity.ok(account) : ResponseEntity.internalServerError().build();
     }
 
+    @Operation(summary = "Get all accounts as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {

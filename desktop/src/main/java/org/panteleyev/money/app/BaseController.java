@@ -27,6 +27,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_4;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_HELP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ABOUT;
@@ -81,7 +82,7 @@ public class BaseController extends Controller {
                 x -> getController(CategoryWindowController.class));
         var contactsMenuItem = menuItem(fxString(UI, I18N_WORD_CONTACTS, ELLIPSIS), SHORTCUT_7,
                 x -> getController(ContactListWindowController.class));
-        var documentsMenuItem = menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS),
+        var documentsMenuItem = menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), SHORTCUT_ALT_U,
                 x -> getDocumentController(null));
 
         if (dbOpenProperty != null) {

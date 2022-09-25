@@ -12,37 +12,29 @@ import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.backend.repository.CurrencyRepository;
+import org.panteleyev.money.backend.repository.DocumentRepository;
 import org.panteleyev.money.backend.repository.IconRepository;
+import org.panteleyev.money.backend.repository.MoneyRepository;
 import org.panteleyev.money.backend.repository.TransactionRepository;
-import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.MoneyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.panteleyev.money.backend.BaseTestUtils.ICON_DOLLAR;
 import static org.panteleyev.money.backend.BaseTestUtils.ICON_EURO;
-import static org.panteleyev.money.backend.BaseTestUtils.insertAndUpdate;
+import static org.panteleyev.money.backend.BaseTestUtils.newAccount;
+import static org.panteleyev.money.backend.BaseTestUtils.newCategory;
+import static org.panteleyev.money.backend.BaseTestUtils.newContact;
+import static org.panteleyev.money.backend.BaseTestUtils.newCurrency;
+import static org.panteleyev.money.backend.BaseTestUtils.newDocument;
 import static org.panteleyev.money.backend.BaseTestUtils.newIcon;
-import static org.panteleyev.money.backend.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.backend.BaseTestUtils.randomBoolean;
-import static org.panteleyev.money.backend.BaseTestUtils.randomCardType;
-import static org.panteleyev.money.backend.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.backend.BaseTestUtils.randomContactType;
-import static org.panteleyev.money.backend.BaseTestUtils.randomDay;
-import static org.panteleyev.money.backend.BaseTestUtils.randomInt;
-import static org.panteleyev.money.backend.BaseTestUtils.randomMonth;
-import static org.panteleyev.money.backend.BaseTestUtils.randomString;
-import static org.panteleyev.money.backend.BaseTestUtils.randomTransactionType;
-import static org.panteleyev.money.backend.BaseTestUtils.randomYear;
+import static org.panteleyev.money.backend.BaseTestUtils.newTransaction;
 import static org.panteleyev.money.backend.Profiles.TEST;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -57,6 +49,7 @@ public class RepositoriesTest {
     private static final UUID CONTACT_UUID = UUID.randomUUID();
     private static final UUID ACCOUNT_UUID = UUID.randomUUID();
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
+    private static final UUID DOCUMENT_UUID = UUID.randomUUID();
     @Autowired
     private IconRepository iconRepository;
     @Autowired
@@ -69,6 +62,8 @@ public class RepositoriesTest {
     private AccountRepository accountRepository;
     @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
+    private DocumentRepository documentRepository;
 
     @Test
     @Order(1)
@@ -83,27 +78,8 @@ public class RepositoriesTest {
     @Order(2)
     public void testCategory() {
         var created = System.currentTimeMillis();
-
-        var insert = new Category(
-                CATEGORY_UUID,
-                randomString(),
-                randomString(),
-                randomCategoryType(),
-                ICON_UUID,
-                created,
-                created
-        );
-
-        var update = new Category(
-                CATEGORY_UUID,
-                randomString(),
-                randomString(),
-                randomCategoryType(),
-                null,
-                created,
-                System.currentTimeMillis()
-        );
-
+        var insert = newCategory(CATEGORY_UUID, ICON_UUID, created, created);
+        var update = newCategory(CATEGORY_UUID, null, created, System.currentTimeMillis());
         insertAndUpdate(categoryRepository, insert, update);
     }
 
@@ -111,36 +87,8 @@ public class RepositoriesTest {
     @Order(3)
     public void testCurrency() {
         var created = System.currentTimeMillis();
-        var insert = new Currency(
-                CURRENCY_UUID,
-                randomString(),
-                randomString(),
-                randomString(),
-                randomInt(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBigDecimal(),
-                randomInt(),
-                randomBoolean(),
-                created,
-                created
-        );
-
-        var update = new Currency(
-                CURRENCY_UUID,
-                randomString(),
-                randomString(),
-                randomString(),
-                randomInt(),
-                randomBoolean(),
-                randomBoolean(),
-                randomBigDecimal(),
-                randomInt(),
-                randomBoolean(),
-                created,
-                System.currentTimeMillis()
-        );
-
+        var insert = newCurrency(CURRENCY_UUID, created, created);
+        var update = newCurrency(CURRENCY_UUID, created, System.currentTimeMillis());
         insertAndUpdate(currencyRepository, insert, update);
     }
 
@@ -148,43 +96,8 @@ public class RepositoriesTest {
     @Order(4)
     public void testContact() {
         var created = System.currentTimeMillis();
-
-        var insert = new Contact(
-                CONTACT_UUID,
-                randomString(),
-                randomContactType(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                ICON_UUID,
-                created,
-                created
-        );
-
-        var update = new Contact(
-                CONTACT_UUID,
-                randomString(),
-                randomContactType(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                randomString(),
-                null,
-                created,
-                System.currentTimeMillis()
-        );
-
+        var insert = newContact(CONTACT_UUID, ICON_UUID, created, created);
+        var update = newContact(CONTACT_UUID, null, created, System.currentTimeMillis());
         insertAndUpdate(contactRepository, insert, update);
     }
 
@@ -192,53 +105,9 @@ public class RepositoriesTest {
     @Order(5)
     public void testAccount() {
         var created = System.currentTimeMillis();
-
-        var insert = new Account(
-                ACCOUNT_UUID,
-                randomString(),
-                randomString(),
-                randomString(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                randomCategoryType(),
-                CATEGORY_UUID,
-                CURRENCY_UUID,
-                randomBoolean(),
-                randomBigDecimal(),
-                LocalDate.now(),
-                ICON_UUID,
-                randomCardType(),
-                randomString(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                created,
-                created
-        );
-
-        var update = new Account(
-                ACCOUNT_UUID,
-                randomString(),
-                randomString(),
-                randomString(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                randomCategoryType(),
-                CATEGORY_UUID,
-                null,
-                randomBoolean(),
-                randomBigDecimal(),
-                LocalDate.now(),
-                null,
-                randomCardType(),
-                randomString(),
-                randomBigDecimal(),
-                randomBigDecimal(),
-                created,
-                System.currentTimeMillis()
-        );
-
+        var insert = newAccount(ACCOUNT_UUID, CATEGORY_UUID, CURRENCY_UUID, ICON_UUID, created, created);
+        var update = newAccount(ACCOUNT_UUID, CATEGORY_UUID, CURRENCY_UUID, null,
+                created, System.currentTimeMillis());
         insertAndUpdate(accountRepository, insert, update);
     }
 
@@ -246,59 +115,31 @@ public class RepositoriesTest {
     @Order(6)
     public void testTransaction() {
         var created = System.currentTimeMillis();
-
-        var insert = new Transaction(
-                TRANSACTION_UUID,
-                randomBigDecimal(),
-                randomDay(),
-                randomMonth(),
-                randomYear(),
-                randomTransactionType(),
-                randomString(),
-                randomBoolean(),
-                ACCOUNT_UUID,
-                ACCOUNT_UUID,
-                randomCategoryType(),
-                randomCategoryType(),
-                CATEGORY_UUID,
-                CATEGORY_UUID,
-                CONTACT_UUID,
-                randomBigDecimal(),
-                randomInt(),
-                randomString(),
-                null,
-                randomBoolean(),
-                LocalDate.now(),
-                created,
-                created
-        );
-
-        var update = new Transaction(
-                TRANSACTION_UUID,
-                randomBigDecimal(),
-                randomDay(),
-                randomMonth(),
-                randomYear(),
-                randomTransactionType(),
-                randomString(),
-                randomBoolean(),
-                ACCOUNT_UUID,
-                ACCOUNT_UUID,
-                randomCategoryType(),
-                randomCategoryType(),
-                CATEGORY_UUID,
-                CATEGORY_UUID,
-                null,
-                randomBigDecimal(),
-                randomInt(),
-                randomString(),
-                TRANSACTION_UUID,
-                randomBoolean(),
-                LocalDate.now(),
-                created,
-                System.currentTimeMillis()
-        );
-
+        var insert = newTransaction(TRANSACTION_UUID, ACCOUNT_UUID, CATEGORY_UUID, CONTACT_UUID, created, created);
+        var update = newTransaction(TRANSACTION_UUID, ACCOUNT_UUID, CATEGORY_UUID, null,
+                created, System.currentTimeMillis());
         insertAndUpdate(transactionRepository, insert, update);
+    }
+
+    @Test
+    @Order(7)
+    public void testDocument() {
+        var created = System.currentTimeMillis();
+        var insert = newDocument(DOCUMENT_UUID, ACCOUNT_UUID, CONTACT_UUID, created, created);
+        var update = newDocument(DOCUMENT_UUID, null, CONTACT_UUID,
+                created, System.currentTimeMillis());
+        insertAndUpdate(documentRepository, insert, update);
+    }
+
+    private static <T extends MoneyRecord> void insertAndUpdate(MoneyRepository<T> repository, T insert, T update) {
+        var uuid = insert.uuid();
+
+        var insertResult = repository.insertOrUpdate(insert);
+        assertEquals(1, insertResult);
+        assertEquals(repository.get(uuid).orElseThrow(), insert);
+
+        var updateResult = repository.insertOrUpdate(update);
+        assertEquals(1, updateResult);
+        assertEquals(repository.get(uuid).orElseThrow(), update);
     }
 }

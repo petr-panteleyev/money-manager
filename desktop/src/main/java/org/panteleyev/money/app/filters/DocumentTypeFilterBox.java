@@ -43,6 +43,7 @@ public class DocumentTypeFilterBox {
         });
         typeBox.setOnAction(this::typeHandler);
         typeBox.getSelectionModel().selectFirst();
+        typeBox.setFocusTraversable(false);
     }
 
     public PredicateProperty<MoneyDocument> predicateProperty() {

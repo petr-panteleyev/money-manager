@@ -59,6 +59,7 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_ALT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_S = new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_U = new KeyCodeCombination(U, SHORTCUT_DOWN, ALT_DOWN);
 
     public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);

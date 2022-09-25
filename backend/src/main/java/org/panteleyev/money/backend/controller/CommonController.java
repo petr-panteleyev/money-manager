@@ -4,14 +4,31 @@
  */
 package org.panteleyev.money.backend.controller;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.VERSION_ROOT;
 
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Money Manager REST API",
+                license = @License(
+                        name = "BSD-2-Clause License",
+                        url = "https://raw.githubusercontent.com/petr-panteleyev/money-manager/master/LICENSE"
+                )
+        ))
+@Tag(name = "Common API")
 @Controller
+@RequestMapping("/")
 public class CommonController {
     private record DatabaseInfo(String url, String schema, String user) {
     }
@@ -44,6 +61,24 @@ public class CommonController {
         this.schema = schema;
     }
 
+    @GetMapping(
+            value = "/",
+            produces = MediaType.TEXT_HTML_VALUE
+    )
+    public ResponseEntity<String> welcomePage() {
+        return ResponseEntity.ok("""
+                <html>
+                <body>
+                <h1>Money Manager Backend</h1>
+                <p>
+                <a href="/money/swagger-ui/index.html">API Documentation</a>
+                </p>
+                </body>
+                </html>
+                """);
+    }
+
+    @Operation(summary = "Get application version and database information")
     @GetMapping(VERSION_ROOT)
     public ResponseEntity<Version> getVersion() {
         return ResponseEntity.ok(

@@ -8,6 +8,7 @@ import java.util.ListResourceBundle;
 
 import static org.panteleyev.money.model.DocumentType.BILL;
 import static org.panteleyev.money.model.DocumentType.CONTRACT;
+import static org.panteleyev.money.model.DocumentType.NOTIFICATION;
 import static org.panteleyev.money.model.DocumentType.OTHER;
 import static org.panteleyev.money.model.DocumentType.RECEIPT;
 import static org.panteleyev.money.model.DocumentType.STATEMENT;
@@ -20,6 +21,7 @@ public class DocumentTypeBundle extends ListResourceBundle {
                 {CONTRACT.name(), "Contract"},
                 {RECEIPT.name(), "Receipt"},
                 {STATEMENT.name(), "Statement"},
+                {NOTIFICATION.name(), "Notification"},
                 {OTHER.name(), "Other"},
         };
     }

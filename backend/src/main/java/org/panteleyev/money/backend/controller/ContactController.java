@@ -5,6 +5,8 @@
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.model.Contact;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.UUID;
 import static org.panteleyev.money.backend.WebmoneyApplication.CONTACT_ROOT;
 import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
+@Tag(name = "Contacts")
 @Controller
 @CrossOrigin
 @RequestMapping(CONTACT_ROOT)
@@ -37,11 +40,13 @@ public class ContactController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "Get all contacts")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Contact>> getContacts() {
         return ResponseEntity.ok(contactRepository.getAll());
     }
 
+    @Operation(summary = "Get contact")
     @GetMapping(
             value = "/{uuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
@@ -50,6 +55,7 @@ public class ContactController {
         return ResponseEntity.of(contactRepository.get(uuid));
     }
 
+    @Operation(summary = "Insert or update contact")
     @PutMapping(
             value = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -64,6 +70,7 @@ public class ContactController {
         return rows == 1 ? ResponseEntity.ok(contact) : ResponseEntity.internalServerError().build();
     }
 
+    @Operation(summary = "Get all contacts as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {

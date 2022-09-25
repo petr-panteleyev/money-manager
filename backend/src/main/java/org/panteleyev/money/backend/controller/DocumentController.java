@@ -1,14 +1,16 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.panteleyev.money.backend.repository.CurrencyRepository;
-import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.backend.repository.DocumentRepository;
+import org.panteleyev.money.model.MoneyDocument;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,57 +26,57 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
-import static org.panteleyev.money.backend.WebmoneyApplication.CURRENCY_ROOT;
+import static org.panteleyev.money.backend.WebmoneyApplication.DOCUMENT_ROOT;
 import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
-@Tag(name = "Currencies")
+@Tag(name = "Documents")
 @Controller
+@RequestMapping(DOCUMENT_ROOT)
 @CrossOrigin
-@RequestMapping(CURRENCY_ROOT)
-public class CurrencyController {
-    private final CurrencyRepository currencyRepository;
+public class DocumentController {
+    private final DocumentRepository documentRepository;
     private final ObjectMapper objectMapper;
 
-    public CurrencyController(CurrencyRepository currencyRepository, ObjectMapper objectMapper) {
-        this.currencyRepository = currencyRepository;
+    public DocumentController(DocumentRepository documentRepository, ObjectMapper objectMapper) {
+        this.documentRepository = documentRepository;
         this.objectMapper = objectMapper;
     }
 
-    @Operation(summary = "Get all currencies")
+    @Operation(summary = "Get all documents")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Currency>> getCurrencies() {
-        return ResponseEntity.ok(currencyRepository.getAll());
+    public ResponseEntity<List<MoneyDocument>> getCurrencies() {
+        return ResponseEntity.ok(documentRepository.getAll());
     }
 
-    @Operation(summary = "Get currency")
+    @Operation(summary = "Get document")
     @GetMapping(
             value = "/{uuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Currency> getCurrency(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(currencyRepository.get(uuid));
+    public ResponseEntity<MoneyDocument> getDocument(@PathVariable("uuid") UUID uuid) {
+        return ResponseEntity.of(documentRepository.get(uuid));
     }
 
-    @Operation(summary = "Insert or update currency")
+    @Operation(summary = "Insert or update document")
     @PutMapping(
             value = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<Currency> putCurrency(@PathVariable UUID uuid, @RequestBody Currency currency) {
-        if (!uuid.equals(currency.uuid())) {
+    public ResponseEntity<MoneyDocument> putDocument(@PathVariable UUID uuid, @RequestBody MoneyDocument document) {
+        if (!uuid.equals(document.uuid())) {
             return ResponseEntity.badRequest().build();
         }
 
-        var rows = currencyRepository.insertOrUpdate(currency);
-        return rows == 1 ? ResponseEntity.ok(currency) : ResponseEntity.internalServerError().build();
+        var rows = documentRepository.insertOrUpdate(document);
+        return rows == 1 ? ResponseEntity.ok(document) : ResponseEntity.internalServerError().build();
     }
 
-    @Operation(summary = "Get all currencies as stream")
+    @Operation(summary = "Get all documents as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<StreamingResponseBody> getTransactionStream() {
+    public ResponseEntity<StreamingResponseBody> getDocumentStream() {
         StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = currencyRepository.getStream()) {
+            try (var stream = documentRepository.getStream()) {
                 writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };

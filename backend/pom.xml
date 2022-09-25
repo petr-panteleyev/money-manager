@@ -11,7 +11,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.8.3</version>
+    <version>22.9.4</version>
     <name>Backend</name>
     <properties>
         <java.version>19</java.version>
@@ -21,10 +21,10 @@
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <!-- Dependencies -->
-        <moneyManagerModelVersion>1.1.0</moneyManagerModelVersion>
         <postgresVersion>42.4.2</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
-        <restAssuredVersion>5.0.1</restAssuredVersion>
+        <springDocsVersion>1.6.11</springDocsVersion>
+        <restAssuredVersion>5.2.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
@@ -69,6 +69,11 @@
             <artifactId>liquibase-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springDocsVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -99,6 +104,11 @@
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.panteleyev.money</groupId>
+            <artifactId>money-manager-client</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

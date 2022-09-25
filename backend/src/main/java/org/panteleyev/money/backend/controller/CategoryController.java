@@ -5,6 +5,8 @@
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.model.Category;
 import org.springframework.http.MediaType;
@@ -25,6 +27,7 @@ import java.util.UUID;
 import static org.panteleyev.money.backend.WebmoneyApplication.CATEGORY_ROOT;
 import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
+@Tag(name = "Categories")
 @Controller
 @CrossOrigin
 @RequestMapping(CATEGORY_ROOT)
@@ -37,21 +40,22 @@ public class CategoryController {
         this.objectMapper = objectMapper;
     }
 
+    @Operation(summary = "Get all categories")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Category>> getCategories() {
         return ResponseEntity.ok(categoryRepository.getAll());
     }
 
+    @Operation(summary = "Get category")
     @GetMapping(
             value = "/{uuid}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Category> getCategory(@PathVariable UUID uuid) {
-        return categoryRepository.get(uuid)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.of(categoryRepository.get(uuid));
     }
 
+    @Operation(summary = "Insert or update category")
     @PutMapping(
             value = "/{uuid}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -66,6 +70,7 @@ public class CategoryController {
         return rows == 1 ? ResponseEntity.ok(category) : ResponseEntity.internalServerError().build();
     }
 
+    @Operation(summary = "Get all categories as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {
