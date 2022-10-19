@@ -19,7 +19,7 @@
     <name>Client Library</name>
 
     <properties>
-        <jacksonVersion>2.13.4</jacksonVersion>
+        <jacksonVersion>2.13.4.1</jacksonVersion>
     </properties>
 
     <dependencies>
