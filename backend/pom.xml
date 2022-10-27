@@ -11,7 +11,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.9.4</version>
+    <version>22.10.1</version>
     <name>Backend</name>
     <properties>
         <java.version>19</java.version>
@@ -21,7 +21,7 @@
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.4.2</postgresVersion>
+        <postgresVersion>42.5.0</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
         <springDocsVersion>1.6.11</springDocsVersion>
         <restAssuredVersion>5.2.0</restAssuredVersion>

@@ -6,7 +6,7 @@ package org.panteleyev.money.app;
 
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.MenuButton;
@@ -17,6 +17,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.ReadOnlyStringConverter;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
@@ -39,7 +40,7 @@ import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.choicebox.ChoiceBoxBuilder.choiceBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
@@ -72,8 +73,13 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
 
     private final TextField nameEdit = new TextField();
-    private final ComboBox<DocumentType> typeComboBox =
-            comboBox(DocumentType.values(), b -> b.withStringConverter(Bundles::translate));
+    private final ChoiceBox<DocumentType> typeChoiceBox =
+            choiceBox(DocumentType.values(), b -> b.withStringConverter(new ReadOnlyStringConverter<>() {
+                @Override
+                public String toString(DocumentType object) {
+                    return Bundles.translate(object);
+                }
+            }));
     private final DatePicker datePicker = new DatePicker();
     private final TextField descriptionEdit = new TextField();
 
@@ -96,8 +102,8 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
         setTitle(fxString(UI, I18N_WORD_DOCUMENT));
 
         nameEdit.setEditable(false);
+        nameEdit.setPrefColumnCount(40);
         descriptionEdit.setPrefColumnCount(40);
-        typeComboBox.setEditable(false);
         contactMenuButton.setFocusTraversable(false);
 
         TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
@@ -111,7 +117,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
                                 gridRow(label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
                                         contactEdit, contactMenuButton),
                                 gridRow(label(fxString(UI, I18N_WORD_FILE, COLON)), nameEdit, browseButton),
-                                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), gridCell(typeComboBox, 2, 1)),
+                                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), gridCell(typeChoiceBox, 2, 1)),
                                 gridRow(label(fxString(UI, I18N_WORD_DATE, COLON)),
                                         gridCell(datePicker, 2, 1)),
                                 gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)),
@@ -123,7 +129,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
 
         if (document == null) {
             nameEdit.setText("");
-            typeComboBox.getSelectionModel().select(DocumentType.OTHER);
+            typeChoiceBox.getSelectionModel().select(DocumentType.OTHER);
             datePicker.setValue(LocalDate.now());
             if (file != null) {
                 readFile(file);
@@ -133,7 +139,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
             contactEdit.setText(cache().getContact(contactUuid).map(Contact::name).orElse(""));
             nameEdit.setText(document.fileName());
             descriptionEdit.setText(document.description());
-            typeComboBox.getSelectionModel().select(document.documentType());
+            typeChoiceBox.getSelectionModel().select(document.documentType());
             datePicker.setValue(document.date());
         }
 
@@ -145,7 +151,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
             long now = System.currentTimeMillis();
 
             var builder = new MoneyDocument.Builder(document)
-                    .documentType(typeComboBox.getSelectionModel().getSelectedItem())
+                    .documentType(typeChoiceBox.getSelectionModel().getSelectedItem())
                     .contactUuid(contactUuid)
                     .date(datePicker.getValue())
                     .description(descriptionEdit.getText())

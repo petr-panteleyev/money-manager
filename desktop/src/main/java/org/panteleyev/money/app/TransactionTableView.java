@@ -194,7 +194,9 @@ public class TransactionTableView extends TableView<Transaction> {
                         b.withCellFactory(x -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
         ));
 
-        getSortOrder().add(getColumns().get(0));
+        var dayColumn = getColumns().get(0);
+        getSortOrder().add(dayColumn);
+        dayColumn.setSortType(TableColumn.SortType.DESCENDING);
 
         createContextMenu();
 
