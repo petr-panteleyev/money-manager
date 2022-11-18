@@ -1,0 +1,48 @@
+enum CardType {
+    NONE,
+    VISA,
+    MASTERCARD,
+    MIR,
+    AMEX
+}
+
+type Account {
+    uuid: ID!,
+    name: String!,
+    comment: String,
+    accountNumber: String,
+    openingBalance: BigDecimal!,
+    accountLimit: BigDecimal!,
+    currencyRate: BigDecimal,
+    category: Category!,
+    currency: Currency,
+    enabled: Boolean!,
+    interest: BigDecimal,
+    closingDate: LocalDate,
+    icon: Icon,
+    cardType: CardType,
+    cardNumber: String,
+    total: BigDecimal!,
+    totalWaiting: BigDecimal!,
+    created: Long!,
+    modified: Long!
+}
+
+input AccountInput {
+    name: String!,
+    comment: String!,
+    accountNumber: String!,
+    openingBalance: BigDecimal!,
+    accountLimit: BigDecimal!,
+    currencyRate: BigDecimal!,
+    categoryUuid: String!,
+    currencyUuid: String!,
+    enabled: Boolean!,
+    interest: BigDecimal!,
+    closingDate: LocalDate,
+    iconUuid: String,
+    cardType: CardType!,
+    cardNumber: String!,
+    total: BigDecimal!,
+    totalWaiting: BigDecimal!
+}

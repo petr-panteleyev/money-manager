@@ -1,0 +1,31 @@
+query {
+    accounts {
+        uuid,
+        name,
+        comment,
+        accountNumber,
+        openingBalance,
+        accountLimit,
+        currencyRate,
+        category {
+            uuid,
+            name,
+            type
+        },
+        currency {
+            uuid
+        },
+        enabled,
+        interest,
+        closingDate,
+        icon {
+            uuid
+        },
+        cardType,
+        cardNumber,
+        total,
+        totalWaiting,
+        created,
+        modified
+    }
+}

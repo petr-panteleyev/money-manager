@@ -10,15 +10,16 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-manager-parent</artifactId>
-        <version>22.10.1</version>
+        <version>22.11.1</version>
     </parent>
 
     <artifactId>money-manager-client</artifactId>
-    <version>22.10.1</version>
+    <version>22.11.1</version>
     <packaging>jar</packaging>
     <name>Client Library</name>
 
     <properties>
+        <jacksonDatabindVersion>2.13.4.2</jacksonDatabindVersion>
         <jacksonVersion>2.13.4</jacksonVersion>
         <jacksonDatabindVersion>2.13.4.2</jacksonDatabindVersion>
     </properties>
@@ -37,6 +38,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jacksonVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
             <version>${jacksonVersion}</version>
         </dependency>
         <dependency>

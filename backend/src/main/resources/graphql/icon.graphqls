@@ -1,0 +1,6 @@
+type Icon {
+    uuid: ID!,
+    name: String!,
+    created: Long!,
+    modified: Long!
+}

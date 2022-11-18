@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.AccountRepository;
+import org.panteleyev.money.backend.service.AccountService;
 import org.panteleyev.money.model.Account;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +34,12 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @RequestMapping(ACCOUNT_ROOT)
 public class AccountController {
     private final AccountRepository accountRepository;
+    private final AccountService service;
     private final ObjectMapper objectMapper;
 
-    public AccountController(AccountRepository accountRepository, ObjectMapper objectMapper) {
+    public AccountController(AccountRepository accountRepository, AccountService service, ObjectMapper objectMapper) {
         this.accountRepository = accountRepository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
@@ -52,7 +55,7 @@ public class AccountController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Account> getAccount(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(accountRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update account")
@@ -64,10 +67,11 @@ public class AccountController {
     public ResponseEntity<Account> putAccount(@PathVariable UUID uuid, @RequestBody Account account) {
         if (!uuid.equals(account.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(account)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = accountRepository.insertOrUpdate(account);
-        return rows == 1 ? ResponseEntity.ok(account) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get all accounts as stream")

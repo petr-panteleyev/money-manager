@@ -17,7 +17,6 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.fx.ReadOnlyStringConverter;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
@@ -73,13 +72,8 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
 
     private final TextField nameEdit = new TextField();
-    private final ChoiceBox<DocumentType> typeChoiceBox =
-            choiceBox(DocumentType.values(), b -> b.withStringConverter(new ReadOnlyStringConverter<>() {
-                @Override
-                public String toString(DocumentType object) {
-                    return Bundles.translate(object);
-                }
-            }));
+    private final ChoiceBox<DocumentType> typeChoiceBox = choiceBox(DocumentType.values(),
+            b -> b.withStringConverter(Bundles::translate));
     private final DatePicker datePicker = new DatePicker();
     private final TextField descriptionEdit = new TextField();
 

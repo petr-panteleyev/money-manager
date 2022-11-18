@@ -49,7 +49,6 @@ public class BaseDaoTest extends BaseTest {
                 new LiquibaseUtil(conn).update();
             }
             dao().initialize(dataSource);
-            new JFXPanel();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

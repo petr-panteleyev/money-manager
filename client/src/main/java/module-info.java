@@ -8,8 +8,10 @@ module money.manager.client {
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
+    requires com.fasterxml.jackson.datatype.jdk8;
 
     requires org.panteleyev.money.model;
 
     exports org.panteleyev.money.client;
+    exports org.panteleyev.money.client.dto;
 }

@@ -5,11 +5,10 @@
 package org.panteleyev.money.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.DocumentRepository;
+import org.panteleyev.money.backend.service.DocumentService;
 import org.panteleyev.money.model.MoneyDocument;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,18 +33,20 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @RequestMapping(DOCUMENT_ROOT)
 @CrossOrigin
 public class DocumentController {
-    private final DocumentRepository documentRepository;
+    private final DocumentRepository repository;
+    private final DocumentService service;
     private final ObjectMapper objectMapper;
 
-    public DocumentController(DocumentRepository documentRepository, ObjectMapper objectMapper) {
-        this.documentRepository = documentRepository;
+    public DocumentController(DocumentRepository repository, DocumentService service, ObjectMapper objectMapper) {
+        this.repository = repository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all documents")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MoneyDocument>> getCurrencies() {
-        return ResponseEntity.ok(documentRepository.getAll());
+        return ResponseEntity.ok(repository.getAll());
     }
 
     @Operation(summary = "Get document")
@@ -54,7 +55,7 @@ public class DocumentController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<MoneyDocument> getDocument(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(documentRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update document")
@@ -66,17 +67,18 @@ public class DocumentController {
     public ResponseEntity<MoneyDocument> putDocument(@PathVariable UUID uuid, @RequestBody MoneyDocument document) {
         if (!uuid.equals(document.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(document)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = documentRepository.insertOrUpdate(document);
-        return rows == 1 ? ResponseEntity.ok(document) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get all documents as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getDocumentStream() {
         StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = documentRepository.getStream()) {
+            try (var stream = repository.getStream()) {
                 writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };

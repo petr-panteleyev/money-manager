@@ -1,0 +1,8 @@
+enum DocumentType {
+    BILL,
+    CONTRACT,
+    RECEIPT,
+    STATEMENT,
+    NOTIFICATION,
+    OTHER
+}

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.ContactRepository;
+import org.panteleyev.money.backend.service.ContactService;
 import org.panteleyev.money.model.Contact;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +33,20 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @CrossOrigin
 @RequestMapping(CONTACT_ROOT)
 public class ContactController {
-    private final ContactRepository contactRepository;
+    private final ContactRepository repository;
+    private final ContactService service;
     private final ObjectMapper objectMapper;
 
-    public ContactController(ContactRepository contactRepository, ObjectMapper objectMapper) {
-        this.contactRepository = contactRepository;
+    public ContactController(ContactRepository repository, ContactService service, ObjectMapper objectMapper) {
+        this.repository = repository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all contacts")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Contact>> getContacts() {
-        return ResponseEntity.ok(contactRepository.getAll());
+        return ResponseEntity.ok(repository.getAll());
     }
 
     @Operation(summary = "Get contact")
@@ -52,7 +55,7 @@ public class ContactController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Contact> getContact(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(contactRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update contact")
@@ -64,17 +67,18 @@ public class ContactController {
     public ResponseEntity<Contact> putContact(@PathVariable("uuid") UUID uuid, @RequestBody Contact contact) {
         if (!uuid.equals(contact.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(contact)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = contactRepository.insertOrUpdate(contact);
-        return rows == 1 ? ResponseEntity.ok(contact) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get all contacts as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = contactRepository.getStream()) {
+            try (var stream = repository.getStream()) {
                 writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };

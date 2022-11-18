@@ -1,0 +1,29 @@
+mutation($uuid: String!) {
+    updateContact(
+        uuid: $uuid,
+        contact: {
+            name: "Test Contact 1",
+            type: EMPLOYER,
+            phone: "+1234567890 1",
+            mobile: "+7123456778 1",
+            email: "address@email.com 1",
+            web: "www.web.com 1",
+            comment: "Test comment 1",
+            street: "Test Street 1",
+            city: "Test City 1",
+            country: "Test Country 1",
+            zip: "Test ZIP 1",
+            iconUuid: null
+        }
+    ) {
+        uuid, name, type, comment,
+        phone, mobile,
+        email, web,
+        street, city, country, zip,
+        icon {
+            uuid,
+        },
+        created,
+        modified
+    }
+}

@@ -7,6 +7,7 @@ package org.panteleyev.money.backend.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.panteleyev.money.backend.service.CategoryService;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.model.Category;
 import org.springframework.http.MediaType;
@@ -32,18 +33,20 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @CrossOrigin
 @RequestMapping(CATEGORY_ROOT)
 public class CategoryController {
-    private final CategoryRepository categoryRepository;
+    private final CategoryRepository repository;
+    private final CategoryService service;
     private final ObjectMapper objectMapper;
 
-    public CategoryController(CategoryRepository categoryRepository, ObjectMapper objectMapper) {
-        this.categoryRepository = categoryRepository;
+    public CategoryController(CategoryRepository repository, CategoryService service, ObjectMapper objectMapper) {
+        this.repository = repository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all categories")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Category>> getCategories() {
-        return ResponseEntity.ok(categoryRepository.getAll());
+        return ResponseEntity.ok(repository.getAll());
     }
 
     @Operation(summary = "Get category")
@@ -52,7 +55,7 @@ public class CategoryController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Category> getCategory(@PathVariable UUID uuid) {
-        return ResponseEntity.of(categoryRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update category")
@@ -64,17 +67,18 @@ public class CategoryController {
     public ResponseEntity<Category> putCategory(@PathVariable UUID uuid, @RequestBody Category category) {
         if (!uuid.equals(category.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(category)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = categoryRepository.insertOrUpdate(category);
-        return rows == 1 ? ResponseEntity.ok(category) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get all categories as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = categoryRepository.getStream()) {
+            try (var stream = repository.getStream()) {
                 writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };

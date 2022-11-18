@@ -1,0 +1,9 @@
+query ($uuid: String!) {
+    category(uuid: $uuid) {
+        uuid, name, type, comment,
+        icon {
+            uuid
+        },
+        created, modified
+    }
+}

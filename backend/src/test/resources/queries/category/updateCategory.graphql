@@ -1,0 +1,16 @@
+mutation ($uuid: String!) {
+    updateCategory(
+        uuid: $uuid,
+        category: {
+            name: "New name",
+            comment: "",
+            type: BANKS_AND_CASH
+        }
+    ) {
+        uuid, name, type, comment,
+        icon {
+            uuid
+        },
+        created, modified
+    }
+}

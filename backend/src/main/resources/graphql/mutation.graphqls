@@ -1,0 +1,16 @@
+type Mutation {
+    createCategory(category: CategoryInput!): Category!,
+    updateCategory(uuid: String!, category: CategoryInput!): Category!,
+
+    createCurrency(currency: CurrencyInput!): Currency!,
+    updateCurrency(uuid: String!, currency: CurrencyInput!): Currency!,
+
+    createContact(contact: ContactInput!): Contact!,
+    updateContact(uuid: String!, contact: ContactInput!): Contact!,
+
+    createAccount(account: AccountInput!): Account!,
+    updateAccount(uuid: String!, account: AccountInput!):Account!,
+
+    createTransaction(transaction: TransactionInput!): TransactionResponse!,
+    updateTransaction(uuid: String!, transaction: TransactionInput!): TransactionResponse!
+}

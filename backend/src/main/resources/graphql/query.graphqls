@@ -1,0 +1,16 @@
+type Query {
+    currencies: [Currency]!,
+    currency(uuid: String!): Currency!,
+
+    categories: [Category]!,
+    category(uuid: String!): Category!,
+
+    accounts: [Account]!,
+    account(uuid: String!): Account!,
+
+    contacts: [Contact]!,
+    contact(uuid: String!): Contact!,
+
+    transaction(uuid: String!): Transaction!,
+    transactionsByYearAndMonth(year: Int, month: Int): [Transaction]!
+}

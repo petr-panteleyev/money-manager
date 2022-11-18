@@ -11,7 +11,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.10.1</version>
+    <version>22.11.1</version>
     <name>Backend</name>
     <properties>
         <java.version>19</java.version>
@@ -20,6 +20,7 @@
         <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
+        <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.5.0</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
@@ -74,6 +75,25 @@
             <version>${springDocsVersion}</version>
         </dependency>
         <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-spring-boot-starter</artifactId>
+            <version>5.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java-tools</artifactId>
+            <version>5.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
@@ -109,6 +129,7 @@
             <groupId>org.panteleyev.money</groupId>
             <artifactId>money-manager-client</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -132,6 +153,32 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/jar</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>${jpackageMavenPluginVersion}</version>
+                <configuration>
+                    <name>Money Manager Backend</name>
+                    <appVersion>${project.version}</appVersion>
+                    <vendor>panteleyev.org</vendor>
+                    <runtimeImage>${java.home}</runtimeImage>
+                    <input>${project.build.directory}/jar</input>
+                    <mainJar>money-manager-backend-${project.version}.jar</mainJar>
+                    <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
+                    <destination>target/dist</destination>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>linux</id>
+                        <configuration>
+                            <type>APP_IMAGE</type>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

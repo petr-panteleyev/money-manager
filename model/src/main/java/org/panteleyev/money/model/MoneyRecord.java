@@ -9,7 +9,7 @@ import java.math.RoundingMode;
 import java.util.UUID;
 
 public sealed interface MoneyRecord
-    permits Account, Category, Contact, Currency, Icon, Transaction, MoneyDocument {
+        permits Account, Category, Contact, Currency, Icon, Transaction, MoneyDocument {
 
     UUID uuid();
 

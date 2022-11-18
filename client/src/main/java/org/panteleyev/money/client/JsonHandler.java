@@ -9,18 +9,22 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 final class JsonHandler<T> {
     private final ObjectMapper objectMapper = JsonMapper.builder()
             .addModule(new JavaTimeModule())
+            .addModule(new Jdk8Module())
             .configure(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, false)
             .build();
 
@@ -101,6 +105,22 @@ final class JsonHandler<T> {
         try {
             return objectMapper.writeValueAsBytes(record);
         } catch (JsonProcessingException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public Map<String, Object> jsonToMap(InputStream inputStream) {
+        try {
+            return objectMapper.readValue(inputStream, HashMap.class);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public T jsonToObject(InputStream inputStream) {
+        try {
+            return objectMapper.readValue(inputStream, objectClass);
+        } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }

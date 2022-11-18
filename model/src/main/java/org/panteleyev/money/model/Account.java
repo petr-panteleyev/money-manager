@@ -31,8 +31,6 @@ public record Account(
     long created,
     long modified
 ) implements MoneyRecord, Named, Comparable<Account> {
-    public final static Predicate<Account> FILTER_ENABLED = Account::enabled;
-
     public Account {
         if (uuid == null) {
             uuid = UUID.randomUUID();

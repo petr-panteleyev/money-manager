@@ -1,0 +1,28 @@
+mutation {
+    createCurrency(
+        currency: {
+            symbol: "USD",
+            description: "US Dollar",
+            formatSymbol: "$",
+            formatSymbolPosition: 0,
+            showFormatSymbol: true,
+            def: true,
+            rate: 10.0,
+            direction: 1,
+            useThousandSeparator: true
+        }
+    ) {
+        uuid,
+        symbol,
+        description,
+        formatSymbol,
+        formatSymbolPosition,
+        showFormatSymbol,
+        def,
+        rate,
+        direction,
+        useThousandSeparator,
+        created,
+        modified
+    }
+}

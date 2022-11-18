@@ -4,6 +4,23 @@
  */
 package org.panteleyev.money.client;
 
+import org.panteleyev.money.client.dto.AccountDto;
+import org.panteleyev.money.client.dto.CategoryDto;
+import org.panteleyev.money.client.dto.ContactDto;
+import org.panteleyev.money.client.dto.CurrencyDto;
+import org.panteleyev.money.client.dto.MoneyDto;
+import org.panteleyev.money.client.dto.TransactionModificationResponseDto;
+import org.panteleyev.money.client.graphql.GQLAccountListResponse;
+import org.panteleyev.money.client.graphql.GQLAccountResponse;
+import org.panteleyev.money.client.graphql.GQLCategoryListResponse;
+import org.panteleyev.money.client.graphql.GQLCategoryResponse;
+import org.panteleyev.money.client.graphql.GQLContactListResponse;
+import org.panteleyev.money.client.graphql.GQLContactResponse;
+import org.panteleyev.money.client.graphql.GQLCurrencyListResponse;
+import org.panteleyev.money.client.graphql.GQLCurrencyResponse;
+import org.panteleyev.money.client.graphql.GQLListResponse;
+import org.panteleyev.money.client.graphql.GQLScalarResponse;
+import org.panteleyev.money.client.graphql.GQLTransactionModificationResponse;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -16,6 +33,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,6 +52,8 @@ public class MoneyClient {
     private static final String API_TRANSACTIONS = "/transactions";
     private static final String API_DOCUMENTS = "/documents";
 
+    private static final String API_GRAPHQL = "/graphql";
+
     private final Client<Icon> iconClient;
     private final Client<Currency> currencyClient;
     private final Client<Contact> contactClient;
@@ -41,6 +61,7 @@ public class MoneyClient {
     private final Client<Account> accountClient;
     private final Client<Transaction> transactionClient;
     private final Client<MoneyDocument> documentClient;
+    private final GraphQLClient graphQLClient;
 
     /**
      * Money client builder.
@@ -110,6 +131,7 @@ public class MoneyClient {
                 httpClient, Transaction.class, streamingChunkSize);
         documentClient = new Client<>(URI.create(baseUrl + API_DOCUMENTS),
                 httpClient, MoneyDocument.class, streamingChunkSize);
+        graphQLClient = new GraphQLClient(URI.create(serverUrl + CONTEXT_ROOT + API_GRAPHQL), httpClient);
     }
 
     /* Icons */
@@ -229,6 +251,107 @@ public class MoneyClient {
 
     public MoneyDocument putDocument(MoneyDocument document) {
         return documentClient.put(document);
+    }
+
+    private <T extends MoneyDto, R extends GQLScalarResponse<T>> GraphQLResponse<T> graphQLQuery(
+            String query,
+            Class<R> responseClass,
+            Map<String, Object> variables
+    ) {
+        var result = graphQLClient.query(query, responseClass, variables);
+        return new GraphQLResponse<T>(
+                result.getOperation().orElse(null),
+                result.getPayload().orElse(null)
+        );
+    }
+
+    private <T extends MoneyDto, R extends GQLListResponse<T>> GraphQLListResponse<T> graphQLQueryForList(
+            String query,
+            Class<R> responseClass,
+            Map<String, Object> variables
+    ) {
+        var result = graphQLClient.query(query, responseClass, variables);
+        return new GraphQLListResponse<T>(
+                result.getOperation().orElse(null),
+                result.getPayload()
+        );
+    }
+
+    // Category
+
+    public GraphQLResponse<CategoryDto> categoryQuery(String query, Map<String, Object> variables) {
+        return graphQLQuery(query, GQLCategoryResponse.class, variables);
+    }
+
+    public GraphQLResponse<CategoryDto> categoryQuery(String query) {
+        return categoryQuery(query, Map.of());
+    }
+
+    public GraphQLListResponse<CategoryDto> categoryListQuery(String query, Map<String, Object> variables) {
+        return graphQLQueryForList(query, GQLCategoryListResponse.class, variables);
+    }
+
+    public GraphQLListResponse<CategoryDto> categoryListQuery(String query) {
+        return categoryListQuery(query, Map.of());
+    }
+
+    // Currency
+
+    public GraphQLResponse<CurrencyDto> currencyQuery(String query, Map<String, Object> variables) {
+        return graphQLQuery(query, GQLCurrencyResponse.class, variables);
+    }
+
+    public GraphQLResponse<CurrencyDto> currencyQuery(String query) {
+        return currencyQuery(query, Map.of());
+    }
+
+    public GraphQLListResponse<CurrencyDto> currencyListQuery(String query, Map<String, Object> variables) {
+        return graphQLQueryForList(query, GQLCurrencyListResponse.class, variables);
+    }
+
+    public GraphQLListResponse<CurrencyDto> currencyListQuery(String query) {
+        return currencyListQuery(query, Map.of());
+    }
+
+    // Contact
+
+    public GraphQLResponse<ContactDto> contactQuery(String query, Map<String, Object> variables) {
+        return graphQLQuery(query, GQLContactResponse.class, variables);
+    }
+
+    public GraphQLResponse<ContactDto> contactQuery(String query) {
+        return contactQuery(query, Map.of());
+    }
+
+    public GraphQLListResponse<ContactDto> contactListQuery(String query, Map<String, Object> variables) {
+        return graphQLQueryForList(query, GQLContactListResponse.class, variables);
+    }
+
+    public GraphQLListResponse<ContactDto> contactListQuery(String query) {
+        return contactListQuery(query, Map.of());
+    }
+
+    // Contact
+
+    public GraphQLResponse<AccountDto> accountQuery(String query, Map<String, Object> variables) {
+        return graphQLQuery(query, GQLAccountResponse.class, variables);
+    }
+
+    public GraphQLListResponse<AccountDto> accountListQuery(String query, Map<String, Object> variables) {
+        return graphQLQueryForList(query, GQLAccountListResponse.class, variables);
+    }
+
+    public GraphQLListResponse<AccountDto> accountListQuery(String query) {
+        return accountListQuery(query, Map.of());
+    }
+
+    // Transaction
+
+    public GraphQLResponse<TransactionModificationResponseDto> transactionModificationQuery(
+            String query,
+            Map<String, Object> variables
+    ) {
+        return graphQLQuery(query, GQLTransactionModificationResponse.class, variables);
     }
 }
 

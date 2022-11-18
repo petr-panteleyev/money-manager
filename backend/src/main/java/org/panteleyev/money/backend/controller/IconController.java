@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.IconRepository;
+import org.panteleyev.money.backend.service.IconService;
 import org.panteleyev.money.model.Icon;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +34,12 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @CrossOrigin
 public class IconController {
     private final IconRepository iconRepository;
+    private final IconService service;
     private final ObjectMapper objectMapper;
 
-    public IconController(IconRepository iconRepository, ObjectMapper objectMapper) {
+    public IconController(IconRepository iconRepository, IconService service, ObjectMapper objectMapper) {
         this.iconRepository = iconRepository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
@@ -52,7 +55,7 @@ public class IconController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     ResponseEntity<Icon> getIcon(@PathVariable UUID uuid) {
-        return ResponseEntity.of(iconRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update icon by id")
@@ -64,10 +67,11 @@ public class IconController {
     ResponseEntity<Icon> updateIcon(@PathVariable UUID uuid, @RequestBody Icon icon) {
         if (!uuid.equals(icon.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(icon)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = iconRepository.insertOrUpdate(icon);
-        return rows == 1 ? ResponseEntity.ok(icon) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get icon image bytes")

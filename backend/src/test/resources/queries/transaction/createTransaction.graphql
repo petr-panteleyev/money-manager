@@ -1,0 +1,62 @@
+mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactUuid: String = null, $contactName: String = null) {
+    createTransaction(transaction: {
+        amount: 1100.12,
+        day: 1,
+        month: 10,
+        year: 2022,
+        type: CARD_PAYMENT,
+        comment: "Test comment",
+        checked: false,
+        accountDebitedUuid: $debitedAccountUuid,
+        accountCreditedUuid: $creditedAccountUuid,
+        contactUuid: $contactUuid,
+        contactName: $contactName,
+        rate: 1.0,
+        rateDirection: 0,
+        invoiceNumber: "12345",
+        parentUuid: null,
+        detailed: false,
+        statementDate: "2022-10-01"
+    }) {
+        transaction {
+            uuid,
+            amount,
+            day,
+            month,
+            year,
+            type,
+            comment,
+            checked,
+            accountDebited {
+                uuid
+            },
+            accountCredited {
+                uuid
+            },
+            contact {
+                name
+            },
+            rate,
+            rateDirection,
+            invoiceNumber,
+            parent {
+                uuid
+            },
+            detailed,
+            statementDate,
+            created,
+            modified
+        },
+        contact {
+            uuid,
+            name
+        },
+        accounts {
+            uuid,
+            name,
+            total,
+            totalWaiting
+        }
+    }
+
+}

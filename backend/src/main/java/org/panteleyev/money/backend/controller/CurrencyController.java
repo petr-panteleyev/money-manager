@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.panteleyev.money.backend.repository.CurrencyRepository;
+import org.panteleyev.money.backend.service.CurrencyService;
 import org.panteleyev.money.model.Currency;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +33,20 @@ import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJson
 @CrossOrigin
 @RequestMapping(CURRENCY_ROOT)
 public class CurrencyController {
-    private final CurrencyRepository currencyRepository;
+    private final CurrencyRepository repository;
+    private final CurrencyService service;
     private final ObjectMapper objectMapper;
 
-    public CurrencyController(CurrencyRepository currencyRepository, ObjectMapper objectMapper) {
-        this.currencyRepository = currencyRepository;
+    public CurrencyController(CurrencyRepository repository, CurrencyService service, ObjectMapper objectMapper) {
+        this.repository = repository;
+        this.service = service;
         this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all currencies")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Currency>> getCurrencies() {
-        return ResponseEntity.ok(currencyRepository.getAll());
+        return ResponseEntity.ok(repository.getAll());
     }
 
     @Operation(summary = "Get currency")
@@ -52,7 +55,7 @@ public class CurrencyController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<Currency> getCurrency(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(currencyRepository.get(uuid));
+        return ResponseEntity.of(service.get(uuid));
     }
 
     @Operation(summary = "Insert or update currency")
@@ -64,17 +67,18 @@ public class CurrencyController {
     public ResponseEntity<Currency> putCurrency(@PathVariable UUID uuid, @RequestBody Currency currency) {
         if (!uuid.equals(currency.uuid())) {
             return ResponseEntity.badRequest().build();
+        } else {
+            return service.put(currency)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.internalServerError().build());
         }
-
-        var rows = currencyRepository.insertOrUpdate(currency);
-        return rows == 1 ? ResponseEntity.ok(currency) : ResponseEntity.internalServerError().build();
     }
 
     @Operation(summary = "Get all currencies as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
         StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = currencyRepository.getStream()) {
+            try (var stream = repository.getStream()) {
                 writeStreamAsJsonArray(objectMapper, stream, out);
             }
         };

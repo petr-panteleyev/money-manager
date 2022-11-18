@@ -1,0 +1,16 @@
+query ($uuid: String!) {
+    currency(uuid: $uuid) {
+        uuid,
+        symbol,
+        description,
+        formatSymbol,
+        formatSymbolPosition,
+        showFormatSymbol,
+        def,
+        rate,
+        direction,
+        useThousandSeparator,
+        created,
+        modified
+    }
+}

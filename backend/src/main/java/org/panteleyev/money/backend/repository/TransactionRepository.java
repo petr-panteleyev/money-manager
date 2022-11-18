@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,29 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
     @Override
     public List<Transaction> getAll() {
         return jdbcTemplate.query("SELECT * FROM transaction", rowMapper);
+    }
+
+    public List<Transaction> getByYearAndMonth(int year, int month) {
+        return jdbcTemplate.query("""
+                        SELECT * FROM transaction
+                        WHERE date_month = :month AND date_year = :year
+                        """,
+                Map.of(
+                        "month", month,
+                        "year", year
+                ),
+                rowMapper);
+    }
+
+    public Collection<Transaction> getByAccountId(UUID uuid) {
+        return jdbcTemplate.query("""
+                        SELECT * FROM transaction
+                        WHERE acc_debited_uuid = :uuid OR acc_credited_uuid = :uuid
+                        """,
+                Map.of(
+                        "uuid", uuid
+                ),
+                rowMapper);
     }
 
     @Override

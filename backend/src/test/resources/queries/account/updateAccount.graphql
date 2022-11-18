@@ -1,0 +1,50 @@
+mutation ($uuid: String!, $categoryUuid: String!, $currencyUuid: String!) {
+    updateAccount(
+        uuid: $uuid,
+        account: {
+            name: "Test Account 1",
+            comment: "Test account comment 1",
+            accountNumber: "1234567890",
+            openingBalance: 110.0,
+            accountLimit: 210.0,
+            currencyRate: 11.0,
+            categoryUuid: $categoryUuid,
+            currencyUuid: $currencyUuid,
+            enabled: false,
+            interest: 1.3,
+            closingDate: null,
+            iconUuid: null,
+            cardType: MASTERCARD,
+            cardNumber: "1234 5678",
+            total: 110.0,
+            totalWaiting: 20.0
+        }) {
+        uuid,
+        name,
+        comment,
+        accountNumber,
+        openingBalance,
+        accountLimit,
+        currencyRate,
+        category {
+            uuid,
+            name,
+            type
+        },
+        currency {
+            uuid
+        },
+        enabled,
+        interest,
+        closingDate,
+        icon {
+            uuid
+        },
+        cardType,
+        cardNumber,
+        total,
+        totalWaiting,
+        created,
+        modified
+    }
+}

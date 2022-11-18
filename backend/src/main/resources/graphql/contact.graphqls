@@ -1,0 +1,41 @@
+enum ContactType {
+    PERSONAL,
+    CLIENT,
+    SUPPLIER,
+    EMPLOYEE,
+    EMPLOYER,
+    SERVICE
+}
+
+type Contact {
+    uuid: ID!,
+    name: String!,
+    type: ContactType!,
+    phone: String,
+    mobile: String,
+    email: String,
+    web: String,
+    comment: String,
+    street: String,
+    city: String,
+    country: String,
+    zip: String,
+    icon: Icon,
+    created: Long!,
+    modified: Long!
+}
+
+input ContactInput {
+    name: String!,
+    type: ContactType!,
+    phone: String!,
+    mobile: String!,
+    email: String!,
+    web: String!,
+    comment: String!,
+    street: String!,
+    city: String!,
+    country: String!,
+    zip: String!,
+    iconUuid: String
+}

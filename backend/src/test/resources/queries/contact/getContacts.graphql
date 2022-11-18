@@ -1,0 +1,13 @@
+query {
+    contacts {
+        uuid, name, type, comment,
+        phone, mobile,
+        email, web,
+        street, city, country, zip,
+        icon {
+            uuid,
+        },
+        created,
+        modified
+    }
+}
