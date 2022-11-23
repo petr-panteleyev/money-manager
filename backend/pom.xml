@@ -22,7 +22,7 @@
         <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.5.0</postgresVersion>
+        <postgresVersion>42.5.1</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
         <springDocsVersion>1.6.11</springDocsVersion>
         <restAssuredVersion>5.2.0</restAssuredVersion>
