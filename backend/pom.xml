@@ -5,13 +5,13 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.6</version>
+        <version>2.6.14</version>
         <relativePath/>
     </parent>
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.11.1</version>
+    <version>22.11.2</version>
     <name>Backend</name>
     <properties>
         <java.version>19</java.version>
@@ -22,10 +22,10 @@
         <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.5.0</postgresVersion>
+        <postgresVersion>42.5.1</postgresVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
-        <springDocsVersion>1.6.11</springDocsVersion>
-        <restAssuredVersion>5.2.0</restAssuredVersion>
+        <springDocsVersion>1.6.13</springDocsVersion>
+        <restAssuredVersion>5.3.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
@@ -38,6 +38,11 @@
                 <version>${testContainersVersion}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured-common</artifactId>
+                <version>${restAssuredVersion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -54,6 +59,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
             <groupId>org.panteleyev.money</groupId>
@@ -83,10 +92,6 @@
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-tools</artifactId>
             <version>5.2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
