@@ -2,27 +2,43 @@
  Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.money.backend.graphql.mutation;
+package org.panteleyev.money.backend.graphql.controller;
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.panteleyev.money.backend.graphql.exception.GraphQLCreateException;
+import org.panteleyev.money.backend.graphql.exception.GraphQLNotFoundException;
 import org.panteleyev.money.backend.graphql.exception.GraphQLUpdateException;
 import org.panteleyev.money.backend.graphql.input.CurrencyInput;
 import org.panteleyev.money.backend.service.CurrencyService;
 import org.panteleyev.money.model.Currency;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.UUID;
 
-@Component
-public class CurrencyMutation implements GraphQLMutationResolver {
+@Controller
+public class CurrencyGraphQLController {
     private final CurrencyService service;
 
-    public CurrencyMutation(CurrencyService service) {
+    public CurrencyGraphQLController(CurrencyService service) {
         this.service = service;
     }
 
-    public Currency createCurrency(CurrencyInput input) {
+    @QueryMapping
+    public List<Currency> currencies() {
+        return service.getAll();
+    }
+
+    @QueryMapping
+    public Currency currency(@Argument UUID uuid) {
+        return service.get(uuid)
+                .orElseThrow(() -> new GraphQLNotFoundException("Currency", uuid));
+    }
+
+    @MutationMapping
+    public Currency createCurrency(@Argument CurrencyInput input) {
         var currency = new Currency.Builder()
                 .symbol(input.symbol())
                 .description(input.description())
@@ -38,7 +54,11 @@ public class CurrencyMutation implements GraphQLMutationResolver {
                 .orElseThrow(() -> new GraphQLCreateException("Currency"));
     }
 
-    public Currency updateCurrency(UUID uuid, CurrencyInput input) {
+    @MutationMapping
+    public Currency updateCurrency(
+            @Argument UUID uuid,
+            @Argument CurrencyInput input
+    ) {
         var builder = service.get(uuid)
                 .map(Currency.Builder::new)
                 .orElseThrow();

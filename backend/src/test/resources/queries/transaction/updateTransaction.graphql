@@ -1,7 +1,7 @@
 mutation ($uuid: String!, $debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactUuid: String = null, $contactName: String = null) {
     updateTransaction(
         uuid: $uuid,
-        transaction: {
+        input: {
             amount: 1100.20,
             day: 2,
             month: 11,

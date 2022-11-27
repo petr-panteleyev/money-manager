@@ -1,3 +1,3 @@
-scalar LocalDate
+scalar Date
 scalar BigDecimal
 scalar Long

@@ -1,16 +1,16 @@
 type Mutation {
-    createCategory(category: CategoryInput!): Category!,
-    updateCategory(uuid: String!, category: CategoryInput!): Category!,
+    createCategory(input: CategoryInput!): Category!,
+    updateCategory(uuid: String!, input: CategoryInput!): Category!,
 
-    createCurrency(currency: CurrencyInput!): Currency!,
-    updateCurrency(uuid: String!, currency: CurrencyInput!): Currency!,
+    createCurrency(input: CurrencyInput!): Currency!,
+    updateCurrency(uuid: String!, input: CurrencyInput!): Currency!,
 
-    createContact(contact: ContactInput!): Contact!,
-    updateContact(uuid: String!, contact: ContactInput!): Contact!,
+    createContact(input: ContactInput!): Contact!,
+    updateContact(uuid: String!, input: ContactInput!): Contact!,
 
-    createAccount(account: AccountInput!): Account!,
-    updateAccount(uuid: String!, account: AccountInput!):Account!,
+    createAccount(input: AccountInput!): Account!,
+    updateAccount(uuid: String!, input: AccountInput!):Account!,
 
-    createTransaction(transaction: TransactionInput!): TransactionResponse!,
-    updateTransaction(uuid: String!, transaction: TransactionInput!): TransactionResponse!
+    createTransaction(input: TransactionInput!): TransactionResponse!,
+    updateTransaction(uuid: String!, input: TransactionInput!): TransactionResponse!
 }

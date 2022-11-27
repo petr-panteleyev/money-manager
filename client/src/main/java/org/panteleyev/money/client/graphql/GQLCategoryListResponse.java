@@ -4,10 +4,14 @@
  */
 package org.panteleyev.money.client.graphql;
 
+import org.panteleyev.money.client.GraphQLError;
 import org.panteleyev.money.client.dto.CategoryDto;
 
 import java.util.List;
 import java.util.Map;
 
-public record GQLCategoryListResponse(Map<String, List<CategoryDto>> data) implements GQLListResponse<CategoryDto> {
+public record GQLCategoryListResponse(
+        Map<String, List<CategoryDto>> data,
+        List<GraphQLError> errors
+) implements GQLListResponse<CategoryDto> {
 }

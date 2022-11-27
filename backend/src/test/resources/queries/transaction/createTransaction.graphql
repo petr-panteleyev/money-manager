@@ -1,5 +1,5 @@
 mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactUuid: String = null, $contactName: String = null) {
-    createTransaction(transaction: {
+    createTransaction(input: {
         amount: 1100.12,
         day: 1,
         month: 10,

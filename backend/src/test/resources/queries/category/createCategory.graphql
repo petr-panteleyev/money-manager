@@ -2,7 +2,7 @@ mutation(
     $name: String = "AAA",
     $type: CategoryType = INCOMES
 ) {
-    createCategory(category: {
+    createCategory(input: {
         name: $name,
         comment: "Some comment",
         type: $type

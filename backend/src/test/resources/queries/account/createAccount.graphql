@@ -1,5 +1,5 @@
 mutation ($categoryUuid: String!, $currencyUuid: String!) {
-    createAccount(account: {
+    createAccount(input: {
         name: "Test Account",
         comment: "Test account comment",
         accountNumber: "12345678",

@@ -1,7 +1,7 @@
 mutation ($uuid: String!, $categoryUuid: String!, $currencyUuid: String!) {
     updateAccount(
         uuid: $uuid,
-        account: {
+        input: {
             name: "Test Account 1",
             comment: "Test account comment 1",
             accountNumber: "1234567890",

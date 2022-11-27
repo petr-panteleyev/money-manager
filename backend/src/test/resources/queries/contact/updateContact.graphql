@@ -1,7 +1,7 @@
 mutation($uuid: String!) {
     updateContact(
         uuid: $uuid,
-        contact: {
+        input: {
             name: "Test Contact 1",
             type: EMPLOYER,
             phone: "+1234567890 1",

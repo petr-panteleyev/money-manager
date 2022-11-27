@@ -2,44 +2,68 @@
  Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.money.backend.graphql.mutation;
+package org.panteleyev.money.backend.graphql.controller;
 
-import com.coxautodev.graphql.tools.GraphQLMutationResolver;
 import org.panteleyev.money.backend.graphql.exception.GraphQLCreateException;
 import org.panteleyev.money.backend.graphql.exception.GraphQLNotFoundException;
 import org.panteleyev.money.backend.graphql.exception.GraphQLUpdateException;
 import org.panteleyev.money.backend.graphql.input.TransactionInput;
 import org.panteleyev.money.backend.model.TransactionOperationResult;
+import org.panteleyev.money.backend.repository.TransactionRepository;
 import org.panteleyev.money.backend.service.AccountService;
 import org.panteleyev.money.backend.service.ContactService;
 import org.panteleyev.money.backend.service.TransactionService;
+import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Transaction;
-import org.springframework.stereotype.Component;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
-@Component
-public class TransactionMutation implements GraphQLMutationResolver {
-    private final TransactionService transactionService;
+@Controller
+public class TransactionGraphQLController {
     private final AccountService accountService;
     private final ContactService contactService;
+    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
-    public TransactionMutation(
-            TransactionService transactionService,
+    public TransactionGraphQLController(
             AccountService accountService,
-            ContactService contactService
+            ContactService contactService,
+            TransactionRepository transactionRepository,
+            TransactionService transactionService
     ) {
-        this.transactionService = transactionService;
         this.accountService = accountService;
         this.contactService = contactService;
+        this.transactionRepository = transactionRepository;
+        this.transactionService = transactionService;
+    }
+
+    @QueryMapping
+    public Transaction transaction(@Argument UUID uuid) {
+        return transactionService.get(uuid)
+                .orElseThrow(() -> new GraphQLNotFoundException("Transaction", uuid));
+    }
+
+    @QueryMapping
+    public List<Transaction> transactionsByYearAndMonth(
+            @Argument int year,
+            @Argument int month
+    ) {
+        return transactionService.getByYearAndMonth(year, month);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TransactionOperationResult createTransaction(TransactionInput input) {
+    @MutationMapping
+    public TransactionOperationResult createTransaction(@Argument TransactionInput input) {
         var debitedAccount = accountService.get(input.accountDebitedUuid()).orElseThrow();
         var creditedAccount = accountService.get(input.accountCreditedUuid()).orElseThrow();
         if (input.parentUuid() != null) {
@@ -87,7 +111,11 @@ public class TransactionMutation implements GraphQLMutationResolver {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public TransactionOperationResult updateTransaction(UUID uuid, TransactionInput input) {
+    @MutationMapping
+    public TransactionOperationResult updateTransaction(
+            @Argument UUID uuid,
+            @Argument TransactionInput input
+    ) {
         var existing = transactionService.get(uuid).orElseThrow();
         var builder = new Transaction.Builder(existing);
 
@@ -162,5 +190,27 @@ public class TransactionMutation implements GraphQLMutationResolver {
         } else {
             return null;
         }
+    }
+
+    @SchemaMapping
+    public Account accountDebited(Transaction transaction) {
+        return accountService.get(transaction.accountDebitedUuid()).orElseThrow();
+    }
+
+    @SchemaMapping
+    public Account accountCredited(Transaction transaction) {
+        return accountService.get(transaction.accountCreditedUuid()).orElseThrow();
+    }
+
+    @SchemaMapping
+    public Contact contact(Transaction transaction) {
+        return transaction.contactUuid() == null ?
+                null : contactService.get(transaction.contactUuid()).orElseThrow();
+    }
+
+    @SchemaMapping
+    public Transaction parent(Transaction transaction) {
+        return transaction.parentUuid() == null ?
+                null : transactionRepository.get(transaction.parentUuid()).orElseThrow();
     }
 }

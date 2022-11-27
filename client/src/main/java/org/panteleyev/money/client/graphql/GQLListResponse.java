@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.client.graphql;
 
+import org.panteleyev.money.client.GraphQLError;
 import org.panteleyev.money.client.dto.MoneyDto;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Optional;
 
 public interface GQLListResponse<T extends MoneyDto> {
     Map<String, List<T>> data();
+    List<GraphQLError> errors();
 
     default Optional<String> getOperation() {
         return data().entrySet().stream()
@@ -24,5 +26,11 @@ public interface GQLListResponse<T extends MoneyDto> {
                 .findFirst()
                 .map(Map.Entry::getValue)
                 .orElse(List.of());
+    }
+
+    default List<GraphQLError> getErrors() {
+        return errors() == null ?
+                List.of() :
+                errors();
     }
 }

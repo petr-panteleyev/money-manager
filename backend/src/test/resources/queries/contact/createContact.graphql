@@ -1,6 +1,6 @@
 mutation {
     createContact(
-        contact: {
+        input: {
             name: "Test Contact",
             type: PERSONAL,
             phone: "+1234567890",

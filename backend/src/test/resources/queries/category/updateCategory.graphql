@@ -1,7 +1,7 @@
 mutation ($uuid: String!) {
     updateCategory(
         uuid: $uuid,
-        category: {
+        input: {
             name: "New name",
             comment: "",
             type: BANKS_AND_CASH

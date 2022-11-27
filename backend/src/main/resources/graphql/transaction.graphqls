@@ -34,7 +34,7 @@ type Transaction {
     invoiceNumber: String,
     parent: Transaction,
     detailed: Boolean!,
-    statementDate: LocalDate,
+    statementDate: Date,
     created: Long!,
     modified: Long!
 }
@@ -56,7 +56,7 @@ input TransactionInput {
     invoiceNumber: String!,
     parentUuid: String,
     detailed: Boolean!,
-    statementDate: LocalDate
+    statementDate: Date
 }
 
 type TransactionResponse {

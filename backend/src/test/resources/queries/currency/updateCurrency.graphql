@@ -1,7 +1,7 @@
 mutation($uuid: String!) {
     updateCurrency(
         uuid: $uuid,
-        currency: {
+        input: {
             symbol: "EUR",
             description: "Euro",
             formatSymbol: "",

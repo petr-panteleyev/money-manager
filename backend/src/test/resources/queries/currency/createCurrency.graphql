@@ -1,6 +1,6 @@
 mutation {
     createCurrency(
-        currency: {
+        input: {
             symbol: "USD",
             description: "US Dollar",
             formatSymbol: "$",
