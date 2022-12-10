@@ -4,8 +4,6 @@
  */
 package org.panteleyev.money.persistence;
 
-import javafx.embed.swing.JFXPanel;
-import org.panteleyev.money.test.BaseTest;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -16,7 +14,7 @@ import java.util.logging.Logger;
 
 import static org.panteleyev.money.app.GlobalContext.dao;
 
-public class BaseDaoTest extends BaseTest {
+public class BaseDaoTest {
     private final static Logger LOGGER = Logger.getLogger(BaseDaoTest.class.getName());
 
     public static final String ICON_DOLLAR = "dollar.png";
@@ -25,7 +23,7 @@ public class BaseDaoTest extends BaseTest {
 
     private static PostgreSQLContainer<?> container = null;
 
-    public void setupAndSkip() throws Exception {
+    public static boolean setupAndSkip() {
         try {
             container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.5"))
                     .withLogConsumer(outputFrame -> {
@@ -49,12 +47,14 @@ public class BaseDaoTest extends BaseTest {
                 new LiquibaseUtil(conn).update();
             }
             dao().initialize(dataSource);
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return false;
         }
     }
 
-    public void tearDown() throws Exception {
+    public static void tearDown() throws Exception {
         if (container != null && container.isRunning()) {
             container.close();
             container.stop();
@@ -63,7 +63,7 @@ public class BaseDaoTest extends BaseTest {
 
     protected void initializeEmptyMoneyFile() {
         dao().createTables();
-        dao().preload(t -> {});
+        dao().preload(Runnable::run, t -> {});
     }
 
     protected Optional<?> get(Repository<?> repository, UUID uuid) {

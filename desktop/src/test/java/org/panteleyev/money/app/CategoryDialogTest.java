@@ -7,22 +7,21 @@ package org.panteleyev.money.app;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.test.BaseTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
-public class CategoryDialogTest extends BaseTest {
+public class CategoryDialogTest {
     private static final String CATEGORY_NAME = UUID.randomUUID().toString();
     private static final String CATEGORY_COMMENT = UUID.randomUUID().toString();
     private static final CategoryType CATEGORY_TYPE = randomCategoryType();
@@ -36,8 +35,8 @@ public class CategoryDialogTest extends BaseTest {
             .modified(System.currentTimeMillis())
             .build();
 
-    @BeforeClass
-    public void setupAndSkip() {
+    @BeforeAll
+    public static void init() {
         new JFXPanel();
     }
 
@@ -65,9 +64,9 @@ public class CategoryDialogTest extends BaseTest {
         var category = queue.take();
 
         assertNotNull(category.uuid());
-        assertEquals(category.name(), CATEGORY_NAME);
-        assertEquals(category.comment(), CATEGORY_COMMENT);
-        assertEquals(category.type(), CATEGORY_TYPE);
+        assertEquals(CATEGORY_NAME, category.name());
+        assertEquals(CATEGORY_COMMENT, category.comment());
+        assertEquals(CATEGORY_TYPE, category.type());
         assertEquals(category.created(), category.modified());
     }
 
@@ -84,10 +83,10 @@ public class CategoryDialogTest extends BaseTest {
 
         var category = queue.take();
 
-        assertEquals(category.uuid(), CATEGORY.uuid());
-        assertEquals(category.name(), CATEGORY.name());
-        assertEquals(category.comment(), CATEGORY.comment());
-        assertEquals(category.type(), CATEGORY_TYPE_NEW);
+        assertEquals(CATEGORY.uuid(), category.uuid());
+        assertEquals(CATEGORY.name(), category.name());
+        assertEquals(CATEGORY.comment(), category.comment());
+        assertEquals(CATEGORY_TYPE_NEW, category.type());
         assertTrue(category.modified() > CATEGORY.modified());
         assertTrue(category.modified() > category.created());
     }

@@ -4,21 +4,22 @@
  */
 package org.panteleyev.money.model;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.model.BaseTestUtils.randomDocumentType;
 import static org.panteleyev.money.model.BaseTestUtils.randomInt;
 import static org.panteleyev.money.model.BaseTestUtils.randomString;
 
-@Test
-public class TestMoneyDocument extends ModelTestBase {
-    @DataProvider
-    @Override
-    public Object[][] testBuildDataProvider() {
+public class TestMoneyDocument {
+    public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
         var ownerUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
@@ -31,8 +32,8 @@ public class TestMoneyDocument extends ModelTestBase {
         long created = System.currentTimeMillis();
         long modified = created + 1000L;
 
-        return new Object[][]{
-                {
+        return List.of(
+                Arguments.of(
                         new MoneyDocument.Builder()
                                 .uuid(uuid)
                                 .ownerUuid(ownerUuid)
@@ -59,7 +60,15 @@ public class TestMoneyDocument extends ModelTestBase {
                                 created,
                                 modified
                         )
-                }
-        };
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testBuildDataProvider")
+    public void testBuild(MoneyRecord actual, MoneyRecord expected) {
+        assertEquals(expected, actual);
+        assertTrue(actual.created() > 0);
+        assertTrue(actual.modified() >= actual.created());
     }
 }

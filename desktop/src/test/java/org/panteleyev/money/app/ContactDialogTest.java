@@ -7,21 +7,20 @@ package org.panteleyev.money.app;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.test.BaseTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
-public class ContactDialogTest extends BaseTest {
+public class ContactDialogTest {
     private final static Contact CONTACT = new Contact.Builder()
             .uuid(UUID.randomUUID())
             .name(randomString())
@@ -39,8 +38,8 @@ public class ContactDialogTest extends BaseTest {
             .modified(System.currentTimeMillis())
             .build();
 
-    @BeforeClass
-    public void setupAndSkip() {
+    @BeforeAll
+    public static void init() {
         new JFXPanel();
     }
 
@@ -88,23 +87,23 @@ public class ContactDialogTest extends BaseTest {
 
         var contact = queue.take();
 
-        assertEquals(contact.uuid(), CONTACT.uuid());
+        assertEquals(CONTACT.uuid(), contact.uuid());
         assertContact(contact);
         assertTrue(contact.modified() > CONTACT.modified());
         assertTrue(contact.modified() > contact.created());
     }
 
     private static void assertContact(Contact contact) {
-        assertEquals(contact.name(), CONTACT.name());
-        assertEquals(contact.phone(), CONTACT.phone());
-        assertEquals(contact.mobile(), CONTACT.mobile());
-        assertEquals(contact.email(), CONTACT.email());
-        assertEquals(contact.web(), CONTACT.web());
-        assertEquals(contact.comment(), CONTACT.comment());
-        assertEquals(contact.street(), CONTACT.street());
-        assertEquals(contact.city(), CONTACT.city());
-        assertEquals(contact.country(), CONTACT.country());
-        assertEquals(contact.zip(), CONTACT.zip());
-        assertEquals(contact.type(), CONTACT.type());
+        assertEquals(CONTACT.name(), contact.name());
+        assertEquals(CONTACT.phone(), contact.phone());
+        assertEquals(CONTACT.mobile(), contact.mobile());
+        assertEquals(CONTACT.email(), contact.email());
+        assertEquals(CONTACT.web(), contact.web());
+        assertEquals(CONTACT.comment(), contact.comment());
+        assertEquals(CONTACT.street(), contact.street());
+        assertEquals(CONTACT.city(), contact.city());
+        assertEquals(CONTACT.country(), contact.country());
+        assertEquals(CONTACT.zip(), contact.zip());
+        assertEquals(CONTACT.type(), contact.type());
     }
 }

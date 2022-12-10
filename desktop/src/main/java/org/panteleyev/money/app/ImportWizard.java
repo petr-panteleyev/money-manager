@@ -145,7 +145,7 @@ final class ImportWizard extends BaseDialog<Object> {
                     progress.accept("done\n\n");
                     dao().importFullDump(imp, progress);
                     progress.accept("\n");
-                    dao().preload(progress);
+                    dao().preload(Platform::runLater, progress);
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }

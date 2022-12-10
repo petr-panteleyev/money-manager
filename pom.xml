@@ -9,7 +9,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-parent</artifactId>
-    <version>22.11.3-SNAPSHOT</version>
+    <version>22.12.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Parent</name>
 
@@ -34,7 +34,7 @@
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <postgresVersion>42.5.1</postgresVersion>
         <freemarkerVersion>2.3.29</freemarkerVersion>
-        <testNgVersion>7.4.0</testNgVersion>
+        <jUnitVersion>5.9.1</jUnitVersion>
         <mockitoVersion>4.5.1</mockitoVersion>
         <liquibaseVersion>4.8.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
@@ -134,9 +134,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${testNgVersion}</version>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${jUnitVersion}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -170,6 +170,16 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${mavenSurefirePluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.panteleyev</groupId>
+                    <artifactId>jpackage-maven-plugin</artifactId>
+                    <version>${jpackageMavenPluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.openjfx</groupId>
+                    <artifactId>javafx-maven-plugin</artifactId>
+                    <version>${javaFxPluginVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

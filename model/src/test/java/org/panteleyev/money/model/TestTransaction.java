@@ -4,21 +4,23 @@
  */
 package org.panteleyev.money.model;
 
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestTransaction extends ModelTestBase {
+public class TestTransaction {
 
-    @DataProvider
-    @Override
-    public Object[][] testBuildDataProvider() {
+    public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
         var amount = BaseTestUtils.randomBigDecimal();
         var day = BaseTestUtils.randomDay();
@@ -43,58 +45,69 @@ public class TestTransaction extends ModelTestBase {
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
-        return new Object[][]{
-            {
-                new Transaction.Builder()
-                    .uuid(uuid)
-                    .amount(amount)
-                    .day(day)
-                    .month(month)
-                    .year(year)
-                    .type(type)
-                    .comment(comment)
-                    .checked(checked)
-                    .accountDebitedUuid(accountDebitedUuid)
-                    .accountCreditedUuid(accountCreditedUuid)
-                    .accountDebitedType(accountDebitedType)
-                    .accountCreditedType(accountCreditedType)
-                    .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
-                    .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
-                    .contactUuid(contactUuid)
-                    .rate(rate)
-                    .rateDirection(rateDirection)
-                    .invoiceNumber(invoiceNumber)
-                    .parentUuid(parentUuid)
-                    .detailed(detailed)
-                    .statementDate(statementDate)
-                    .created(created)
-                    .modified(modified)
-                    .build(),
-                new Transaction(
-                    uuid, amount, day, month, year,
-                    type, comment, checked, accountDebitedUuid, accountCreditedUuid,
-                    accountDebitedType, accountCreditedType, accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                    contactUuid, rate, rateDirection, invoiceNumber, parentUuid,
-                    detailed, statementDate, created, modified
-                )
-            },
-            {
-                new Transaction(
-                    uuid, amount, day, month, year,
-                    type, null, checked, accountDebitedUuid, accountCreditedUuid,
-                    accountDebitedType, accountCreditedType, accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                    contactUuid, null, rateDirection, null, null,
-                    detailed, null, created, modified
+        return List.of(
+                Arguments.of(
+                        new Transaction.Builder()
+                                .uuid(uuid)
+                                .amount(amount)
+                                .day(day)
+                                .month(month)
+                                .year(year)
+                                .type(type)
+                                .comment(comment)
+                                .checked(checked)
+                                .accountDebitedUuid(accountDebitedUuid)
+                                .accountCreditedUuid(accountCreditedUuid)
+                                .accountDebitedType(accountDebitedType)
+                                .accountCreditedType(accountCreditedType)
+                                .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
+                                .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
+                                .contactUuid(contactUuid)
+                                .rate(rate)
+                                .rateDirection(rateDirection)
+                                .invoiceNumber(invoiceNumber)
+                                .parentUuid(parentUuid)
+                                .detailed(detailed)
+                                .statementDate(statementDate)
+                                .created(created)
+                                .modified(modified)
+                                .build(),
+                        new Transaction(
+                                uuid, amount, day, month, year,
+                                type, comment, checked, accountDebitedUuid, accountCreditedUuid,
+                                accountDebitedType, accountCreditedType,
+                                accountDebitedCategoryUuid, accountCreditedCategoryUuid,
+                                contactUuid, rate, rateDirection, invoiceNumber, parentUuid,
+                                detailed, statementDate, created, modified
+                        )
                 ),
-                new Transaction(
-                    uuid, amount, day, month, year,
-                    type, "", checked, accountDebitedUuid, accountCreditedUuid,
-                    accountDebitedType, accountCreditedType, accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                    contactUuid, BigDecimal.ONE, rateDirection, "", null,
-                    detailed, LocalDate.of(year, month, day), created, modified
+                Arguments.of(
+                        new Transaction(
+                                uuid, amount, day, month, year,
+                                type, null, checked, accountDebitedUuid, accountCreditedUuid,
+                                accountDebitedType, accountCreditedType,
+                                accountDebitedCategoryUuid, accountCreditedCategoryUuid,
+                                contactUuid, null, rateDirection, null, null,
+                                detailed, null, created, modified
+                        ),
+                        new Transaction(
+                                uuid, amount, day, month, year,
+                                type, "", checked, accountDebitedUuid, accountCreditedUuid,
+                                accountDebitedType, accountCreditedType,
+                                accountDebitedCategoryUuid, accountCreditedCategoryUuid,
+                                contactUuid, BigDecimal.ONE, rateDirection, "", null,
+                                detailed, LocalDate.of(year, month, day), created, modified
+                        )
                 )
-            }
-        };
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testBuildDataProvider")
+    public void testBuild(Transaction actual, Transaction expected) {
+        assertEquals(actual, expected);
+        assertTrue(actual.created() > 0);
+        assertTrue(actual.modified() >= actual.created());
     }
 
     @Test
@@ -124,56 +137,56 @@ public class TestTransaction extends ModelTestBase {
         var statementDate = LocalDate.now();
 
         var t1 = new Transaction.Builder()
-            .amount(amount)
-            .day(day)
-            .month(month)
-            .year(year)
-            .type(type)
-            .comment(comment)
-            .checked(checked)
-            .accountDebitedUuid(accountDebitedUuid)
-            .accountCreditedUuid(accountCreditedUuid)
-            .accountDebitedType(accountDebitedType)
-            .accountCreditedType(accountCreditedType)
-            .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
-            .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
-            .contactUuid(contactUuid)
-            .rate(rate)
-            .rateDirection(rateDirection)
-            .invoiceNumber(invoiceNumber)
-            .uuid(guid)
-            .created(created)
-            .modified(modified)
-            .parentUuid(parentUuid)
-            .detailed(detailed)
-            .statementDate(statementDate)
-            .build();
+                .amount(amount)
+                .day(day)
+                .month(month)
+                .year(year)
+                .type(type)
+                .comment(comment)
+                .checked(checked)
+                .accountDebitedUuid(accountDebitedUuid)
+                .accountCreditedUuid(accountCreditedUuid)
+                .accountDebitedType(accountDebitedType)
+                .accountCreditedType(accountCreditedType)
+                .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
+                .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
+                .contactUuid(contactUuid)
+                .rate(rate)
+                .rateDirection(rateDirection)
+                .invoiceNumber(invoiceNumber)
+                .uuid(guid)
+                .created(created)
+                .modified(modified)
+                .parentUuid(parentUuid)
+                .detailed(detailed)
+                .statementDate(statementDate)
+                .build();
 
         var t2 = new Transaction.Builder()
-            .amount(amount)
-            .day(day)
-            .month(month)
-            .year(year)
-            .type(type)
-            .comment(comment)
-            .checked(checked)
-            .accountDebitedUuid(accountDebitedUuid)
-            .accountCreditedUuid(accountCreditedUuid)
-            .accountDebitedType(accountDebitedType)
-            .accountCreditedType(accountCreditedType)
-            .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
-            .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
-            .contactUuid(contactUuid)
-            .rate(rate)
-            .rateDirection(rateDirection)
-            .invoiceNumber(invoiceNumber)
-            .uuid(guid)
-            .created(created)
-            .modified(modified)
-            .parentUuid(parentUuid)
-            .detailed(detailed)
-            .statementDate(statementDate)
-            .build();
+                .amount(amount)
+                .day(day)
+                .month(month)
+                .year(year)
+                .type(type)
+                .comment(comment)
+                .checked(checked)
+                .accountDebitedUuid(accountDebitedUuid)
+                .accountCreditedUuid(accountCreditedUuid)
+                .accountDebitedType(accountDebitedType)
+                .accountCreditedType(accountCreditedType)
+                .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
+                .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
+                .contactUuid(contactUuid)
+                .rate(rate)
+                .rateDirection(rateDirection)
+                .invoiceNumber(invoiceNumber)
+                .uuid(guid)
+                .created(created)
+                .modified(modified)
+                .parentUuid(parentUuid)
+                .detailed(detailed)
+                .statementDate(statementDate)
+                .build();
 
         assertEquals(t2, t1);
         assertEquals(t2.hashCode(), t1.hashCode());
@@ -182,29 +195,29 @@ public class TestTransaction extends ModelTestBase {
     @Test
     public void testCheck() {
         var t1 = new Transaction.Builder()
-            .amount(BaseTestUtils.randomBigDecimal())
-            .day(BaseTestUtils.randomDay())
-            .month(BaseTestUtils.randomMonth())
-            .year(BaseTestUtils.randomYear())
-            .type(BaseTestUtils.randomTransactionType())
-            .comment(BaseTestUtils.randomString())
-            .checked(BaseTestUtils.randomBoolean())
-            .accountDebitedUuid(UUID.randomUUID())
-            .accountCreditedUuid(UUID.randomUUID())
-            .accountDebitedType(BaseTestUtils.randomCategoryType())
-            .accountCreditedType(BaseTestUtils.randomCategoryType())
-            .accountDebitedCategoryUuid(UUID.randomUUID())
-            .accountCreditedCategoryUuid(UUID.randomUUID())
-            .contactUuid(UUID.randomUUID())
-            .rate(BaseTestUtils.randomBigDecimal())
-            .rateDirection(BaseTestUtils.RANDOM.nextInt())
-            .invoiceNumber(BaseTestUtils.randomString())
-            .uuid(UUID.randomUUID())
-            .created(System.currentTimeMillis())
-            .modified(System.currentTimeMillis())
-            .parentUuid(UUID.randomUUID())
-            .detailed(BaseTestUtils.randomBoolean())
-            .build();
+                .amount(BaseTestUtils.randomBigDecimal())
+                .day(BaseTestUtils.randomDay())
+                .month(BaseTestUtils.randomMonth())
+                .year(BaseTestUtils.randomYear())
+                .type(BaseTestUtils.randomTransactionType())
+                .comment(BaseTestUtils.randomString())
+                .checked(BaseTestUtils.randomBoolean())
+                .accountDebitedUuid(UUID.randomUUID())
+                .accountCreditedUuid(UUID.randomUUID())
+                .accountDebitedType(BaseTestUtils.randomCategoryType())
+                .accountCreditedType(BaseTestUtils.randomCategoryType())
+                .accountDebitedCategoryUuid(UUID.randomUUID())
+                .accountCreditedCategoryUuid(UUID.randomUUID())
+                .contactUuid(UUID.randomUUID())
+                .rate(BaseTestUtils.randomBigDecimal())
+                .rateDirection(BaseTestUtils.RANDOM.nextInt())
+                .invoiceNumber(BaseTestUtils.randomString())
+                .uuid(UUID.randomUUID())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .parentUuid(UUID.randomUUID())
+                .detailed(BaseTestUtils.randomBoolean())
+                .build();
 
         var t2 = t1.check(!t1.checked());
 
@@ -226,7 +239,7 @@ public class TestTransaction extends ModelTestBase {
         assertEquals(t2.parentUuid(), t1.parentUuid());
         assertEquals(t2.uuid(), t1.uuid());
         assertEquals(t1.created(), t2.created());
-        Assert.assertTrue(t2.modified() >= t1.modified());
+        assertTrue(t2.modified() >= t1.modified());
     }
 
     @Test
@@ -235,6 +248,6 @@ public class TestTransaction extends ModelTestBase {
 
         // Builder copy
         var builderCopy = new Transaction.Builder(original).build();
-        assertEquals(builderCopy, original);
+        assertEquals(original, builderCopy);
     }
 }

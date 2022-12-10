@@ -4,19 +4,21 @@
  */
 package org.panteleyev.money.model;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestCurrency extends ModelTestBase {
+public class TestCurrency {
 
-    @DataProvider
-    @Override
-    public Object[][] testBuildDataProvider() {
+    public static List<Arguments> testBuildDataProvider() {
         UUID uuid = UUID.randomUUID();
         String symbol = BaseTestUtils.randomString();
         String description = BaseTestUtils.randomString();
@@ -30,41 +32,49 @@ public class TestCurrency extends ModelTestBase {
         long created = System.currentTimeMillis();
         var modified = created + 1000;
 
-        return new Object[][]{
-            {
-                new Currency.Builder()
-                    .uuid(uuid)
-                    .symbol(symbol)
-                    .description(description)
-                    .formatSymbol(formatSymbol)
-                    .formatSymbolPosition(formatSymbolPosition)
-                    .showFormatSymbol(showFormatSymbol)
-                    .def(def)
-                    .rate(rate)
-                    .direction(direction)
-                    .useThousandSeparator(useThousandSeparator)
-                    .created(created)
-                    .modified(modified)
-                    .build(),
-                new Currency(
-                    uuid, symbol, description, formatSymbol, formatSymbolPosition,
-                    showFormatSymbol, def, rate, direction, useThousandSeparator, created,
-                    modified
-                )
-            },
-            {
-                new Currency(
-                    uuid, symbol, null, null, formatSymbolPosition,
-                    showFormatSymbol, def, null, direction, useThousandSeparator, created,
-                    modified
+        return List.of(
+                Arguments.of(
+                        new Currency.Builder()
+                                .uuid(uuid)
+                                .symbol(symbol)
+                                .description(description)
+                                .formatSymbol(formatSymbol)
+                                .formatSymbolPosition(formatSymbolPosition)
+                                .showFormatSymbol(showFormatSymbol)
+                                .def(def)
+                                .rate(rate)
+                                .direction(direction)
+                                .useThousandSeparator(useThousandSeparator)
+                                .created(created)
+                                .modified(modified)
+                                .build(),
+                        new Currency(
+                                uuid, symbol, description, formatSymbol, formatSymbolPosition,
+                                showFormatSymbol, def, rate, direction, useThousandSeparator, created,
+                                modified
+                        )
                 ),
-                new Currency(
-                    uuid, symbol, "", "", formatSymbolPosition,
-                    showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator, created,
-                    modified
+                Arguments.of(
+                        new Currency(
+                                uuid, symbol, null, null, formatSymbolPosition,
+                                showFormatSymbol, def, null, direction, useThousandSeparator, created,
+                                modified
+                        ),
+                        new Currency(
+                                uuid, symbol, "", "", formatSymbolPosition,
+                                showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator, created,
+                                modified
+                        )
                 )
-            }
-        };
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testBuildDataProvider")
+    public void testBuild(Currency actual, Currency expected) {
+        assertEquals(actual, expected);
+        assertTrue(actual.created() > 0);
+        assertTrue(actual.modified() >= actual.created());
     }
 
     @Test
@@ -83,34 +93,34 @@ public class TestCurrency extends ModelTestBase {
         var modified = System.currentTimeMillis();
 
         var c1 = new Currency.Builder()
-            .symbol(symbol)
-            .description(description)
-            .formatSymbol(formatSymbol)
-            .formatSymbolPosition(formatSymbolPosition)
-            .showFormatSymbol(showFormatSymbol)
-            .def(def)
-            .rate(rate)
-            .direction(direction)
-            .useThousandSeparator(useSeparator)
-            .uuid(uuid)
-            .created(created)
-            .modified(modified)
-            .build();
+                .symbol(symbol)
+                .description(description)
+                .formatSymbol(formatSymbol)
+                .formatSymbolPosition(formatSymbolPosition)
+                .showFormatSymbol(showFormatSymbol)
+                .def(def)
+                .rate(rate)
+                .direction(direction)
+                .useThousandSeparator(useSeparator)
+                .uuid(uuid)
+                .created(created)
+                .modified(modified)
+                .build();
 
         var c2 = new Currency.Builder()
-            .symbol(symbol)
-            .description(description)
-            .formatSymbol(formatSymbol)
-            .formatSymbolPosition(formatSymbolPosition)
-            .showFormatSymbol(showFormatSymbol)
-            .def(def)
-            .rate(rate)
-            .direction(direction)
-            .useThousandSeparator(useSeparator)
-            .uuid(uuid)
-            .created(created)
-            .modified(modified)
-            .build();
+                .symbol(symbol)
+                .description(description)
+                .formatSymbol(formatSymbol)
+                .formatSymbolPosition(formatSymbolPosition)
+                .showFormatSymbol(showFormatSymbol)
+                .def(def)
+                .rate(rate)
+                .direction(direction)
+                .useThousandSeparator(useSeparator)
+                .uuid(uuid)
+                .created(created)
+                .modified(modified)
+                .build();
 
         assertEquals(c1, c2);
         assertEquals(c1.hashCode(), c2.hashCode());
@@ -121,22 +131,22 @@ public class TestCurrency extends ModelTestBase {
         var original = BaseTestUtils.newCurrency();
 
         var copy = new Currency.Builder(original).build();
-        assertEquals(copy, original);
+        assertEquals(original, copy);
 
         var manualCopy = new Currency.Builder()
-            .symbol(original.symbol())
-            .description(original.description())
-            .formatSymbol(original.formatSymbol())
-            .formatSymbolPosition(original.formatSymbolPosition())
-            .showFormatSymbol(original.showFormatSymbol())
-            .def(original.def())
-            .rate(original.rate())
-            .direction(original.direction())
-            .useThousandSeparator(original.useThousandSeparator())
-            .uuid(original.uuid())
-            .created(original.created())
-            .modified(original.modified())
-            .build();
-        assertEquals(manualCopy, original);
+                .symbol(original.symbol())
+                .description(original.description())
+                .formatSymbol(original.formatSymbol())
+                .formatSymbolPosition(original.formatSymbolPosition())
+                .showFormatSymbol(original.showFormatSymbol())
+                .def(original.def())
+                .rate(original.rate())
+                .direction(original.direction())
+                .useThousandSeparator(original.useThousandSeparator())
+                .uuid(original.uuid())
+                .created(original.created())
+                .modified(original.modified())
+                .build();
+        assertEquals(original, manualCopy);
     }
 }

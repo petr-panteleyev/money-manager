@@ -4,18 +4,17 @@
  */
 package org.panteleyev.ofx;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestAccountStatement {
     private static final String FILE_NAME = "src/test/resources/org/panteleyev/ofx/account.ofx";
@@ -66,7 +65,7 @@ public class TestAccountStatement {
 
             var accountStatement = st.getAccountStatements();
             assertNotNull(accountStatement);
-            assertEquals(accountStatement.size(), 1);
+            assertEquals(1, accountStatement.size());
 
             var creditCardStatement = st.getCreditCardStatements();
             assertTrue(creditCardStatement.isEmpty());
@@ -74,24 +73,23 @@ public class TestAccountStatement {
 
             var r1 = accountStatement.get(0);
             var statementList = r1.accountStatementList();
-            assertEquals(statementList.size(), 1);
+            assertEquals(1, statementList.size());
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.bankAccountFrom();
-            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
-            assertEquals(accountInfo.bankId(), BANK_ID);
-            assertEquals(accountInfo.type(), AccountInfo.Type.SAVINGS);
+            assertEquals(ACCOUNT_NUMBER, accountInfo.accountNumber());
+            assertEquals(BANK_ID, accountInfo.bankId());
+            assertEquals(AccountInfo.Type.SAVINGS, accountInfo.type());
 
             var bankTransactionList = statement.bankTransactionList();
 
-            assertEquals(bankTransactionList.dateStart(),
-                    LocalDateTime.of(2018, 8, 10, 12, 0));
-            assertEquals(bankTransactionList.dateEnd(),
-                    LocalDateTime.of(2018, 7, 18, 12, 0));
-            assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
+            assertEquals(LocalDateTime.of(2018, 8, 10, 12, 0),
+                    bankTransactionList.dateStart());
+            assertEquals(LocalDateTime.of(2018, 7, 18, 12, 0),
+                    bankTransactionList.dateEnd());
+            assertEquals(EXPECTED_TRANSACTIONS, bankTransactionList.transactions());
         }
     }
-
 }

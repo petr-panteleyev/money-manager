@@ -4,6 +4,12 @@
  */
 package org.panteleyev.money.persistence;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -12,14 +18,12 @@ import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
-import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.test.BaseTestUtils.newIcon;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
@@ -33,8 +37,8 @@ import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.panteleyev.money.test.BaseTestUtils.randomTransactionType;
 import static org.panteleyev.money.test.BaseTestUtils.randomYear;
-import static org.testng.Assert.assertEquals;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestRepositories extends BaseDaoTest {
     public static final String ICON_DOLLAR = "dollar.png";
     public static final String ICON_EURO = "euro.png";
@@ -47,23 +51,19 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
     private static final UUID DOCUMENT_UUID = UUID.randomUUID();
 
-    @BeforeClass
-    @Override
-    public void setupAndSkip() {
-        try {
-            super.setupAndSkip();
-        } catch (Exception ex) {
-            throw new SkipException(ex.getMessage());
-        }
+    @BeforeAll
+    public static void init() {
+        var initialized = BaseDaoTest.setupAndSkip();
+        assumeTrue(initialized);
     }
 
-    @AfterClass
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @AfterAll
+    public static void tearDown() throws Exception {
+        BaseDaoTest.tearDown();
     }
 
     @Test
+    @Order(1)
     public void testIcon() {
         var repository = new IconRepository();
         var insert = newIcon(ICON_UUID, ICON_DOLLAR);
@@ -71,7 +71,8 @@ public class TestRepositories extends BaseDaoTest {
         insertAndUpdate(repository, insert, update);
     }
 
-    @Test(dependsOnMethods = "testIcon")
+    @Test
+    @Order(2)
     public void testCategory() {
         var repository = new CategoryRepository();
 
@@ -99,6 +100,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
+    @Order(3)
     public void testCurrency() {
         var repository = new CurrencyRepository();
 
@@ -135,7 +137,8 @@ public class TestRepositories extends BaseDaoTest {
         insertAndUpdate(repository, insert, update);
     }
 
-    @Test(dependsOnMethods = "testIcon")
+    @Test
+    @Order(4)
     public void testContact() {
         var repository = new ContactRepository();
 
@@ -178,7 +181,8 @@ public class TestRepositories extends BaseDaoTest {
         insertAndUpdate(repository, insert, update);
     }
 
-    @Test(dependsOnMethods = {"testIcon", "testCategory", "testCurrency"})
+    @Test
+    @Order(5)
     public void testAccount() {
         var repository = new AccountRepository();
 
@@ -231,7 +235,8 @@ public class TestRepositories extends BaseDaoTest {
         insertAndUpdate(repository, insert, update);
     }
 
-    @Test(dependsOnMethods = {"testCategory", "testAccount", "testContact"})
+    @Test
+    @Order(6)
     public void testTransaction() {
         var repository = new TransactionRepository();
 
@@ -290,7 +295,8 @@ public class TestRepositories extends BaseDaoTest {
         insertAndUpdate(repository, insert, update);
     }
 
-    @Test(dependsOnMethods = {"testContact"})
+    @Test
+    @Order(7)
     public void testDocument() {
         var repository = new DocumentRepository();
 
@@ -330,10 +336,10 @@ public class TestRepositories extends BaseDaoTest {
             var uuid = insert.uuid();
 
             repository.insert(conn, insert);
-            assertEquals(repository.get(conn, uuid).orElseThrow(), insert);
+            assertEquals(insert, repository.get(conn, uuid).orElseThrow());
 
             repository.update(conn, update);
-            assertEquals(repository.get(conn, uuid).orElseThrow(), update);
+            assertEquals(update, repository.get(conn, uuid).orElseThrow());
         });
     }
 }

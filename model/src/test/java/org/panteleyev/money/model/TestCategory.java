@@ -4,18 +4,21 @@
  */
 package org.panteleyev.money.model;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.List;
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestCategory extends ModelTestBase {
+public class TestCategory {
 
-    @DataProvider
-    @Override
-    public Object[][] testBuildDataProvider() {
+    public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
         var name = BaseTestUtils.randomString();
         var comment = BaseTestUtils.randomString();
@@ -24,24 +27,32 @@ public class TestCategory extends ModelTestBase {
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
-        return new Object[][]{
-            {
-                new Category.Builder()
-                    .uuid(uuid)
-                    .name(name)
-                    .comment(comment)
-                    .type(type)
-                    .iconUuid(iconUuid)
-                    .created(created)
-                    .modified(modified)
-                    .build(),
-                new Category(uuid, name, comment, type, iconUuid, created, modified)
-            },
-            {
-                new Category(uuid, name, null, type, iconUuid, created, modified),
-                new Category(uuid, name, "", type, iconUuid, created, modified)
-            }
-        };
+        return List.of(
+                Arguments.of(
+                        new Category.Builder()
+                                .uuid(uuid)
+                                .name(name)
+                                .comment(comment)
+                                .type(type)
+                                .iconUuid(iconUuid)
+                                .created(created)
+                                .modified(modified)
+                                .build(),
+                        new Category(uuid, name, comment, type, iconUuid, created, modified)
+                ),
+                Arguments.of(
+                        new Category(uuid, name, null, type, iconUuid, created, modified),
+                        new Category(uuid, name, "", type, iconUuid, created, modified)
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testBuildDataProvider")
+    public void testBuild(Category actual, Category expected) {
+        assertEquals(expected, actual);
+        assertTrue(actual.created() > 0);
+        assertTrue(actual.modified() >= actual.created());
     }
 
     @Test
@@ -55,23 +66,23 @@ public class TestCategory extends ModelTestBase {
         var modified = System.currentTimeMillis();
 
         var c1 = new Category.Builder()
-            .name(name)
-            .comment(comment)
-            .type(type)
-            .iconUuid(iconUuid)
-            .uuid(uuid)
-            .created(created)
-            .modified(modified)
-            .build();
+                .name(name)
+                .comment(comment)
+                .type(type)
+                .iconUuid(iconUuid)
+                .uuid(uuid)
+                .created(created)
+                .modified(modified)
+                .build();
         var c2 = new Category.Builder()
-            .name(name)
-            .comment(comment)
-            .type(type)
-            .iconUuid(iconUuid)
-            .uuid(uuid)
-            .created(created)
-            .modified(modified)
-            .build();
+                .name(name)
+                .comment(comment)
+                .type(type)
+                .iconUuid(iconUuid)
+                .uuid(uuid)
+                .created(created)
+                .modified(modified)
+                .build();
 
         assertEquals(c1, c2);
         assertEquals(c1.hashCode(), c2.hashCode());
@@ -80,32 +91,32 @@ public class TestCategory extends ModelTestBase {
     @Test
     public void testCopy() {
         var original = new Category.Builder()
-            .name(BaseTestUtils.randomString())
-            .comment(BaseTestUtils.randomString())
-            .type(BaseTestUtils.randomCategoryType())
-            .iconUuid(UUID.randomUUID())
-            .uuid(UUID.randomUUID())
-            .created(System.currentTimeMillis())
-            .modified(System.currentTimeMillis())
-            .build();
+                .name(BaseTestUtils.randomString())
+                .comment(BaseTestUtils.randomString())
+                .type(BaseTestUtils.randomCategoryType())
+                .iconUuid(UUID.randomUUID())
+                .uuid(UUID.randomUUID())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
 
         var copy = new Category.Builder(original).build();
         assertEquals(copy, original);
 
         var manualCopy = new Category.Builder()
-            .name(original.name())
-            .comment(original.comment())
-            .type(original.type())
-            .iconUuid(original.iconUuid())
-            .uuid(original.uuid())
-            .created(original.created())
-            .modified(original.modified())
-            .build();
-        assertEquals(manualCopy, original);
+                .name(original.name())
+                .comment(original.comment())
+                .type(original.type())
+                .iconUuid(original.iconUuid())
+                .uuid(original.uuid())
+                .created(original.created())
+                .modified(original.modified())
+                .build();
+        assertEquals(original, manualCopy);
     }
 
-    @Test(expectedExceptions = {IllegalStateException.class})
+    @Test
     public void testNegativeBuilder() {
-        new Category.Builder().build();
+        assertThrows(IllegalStateException.class, () -> new Category.Builder().build());
     }
 }

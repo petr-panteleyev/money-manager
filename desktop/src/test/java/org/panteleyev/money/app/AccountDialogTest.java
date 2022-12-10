@@ -7,15 +7,14 @@ package org.panteleyev.money.app;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.persistence.DataCache;
-import org.panteleyev.money.test.BaseTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,13 +23,13 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
-public class AccountDialogTest extends BaseTest {
+public class AccountDialogTest {
     private static final String ACCOUNT_NAME = UUID.randomUUID().toString();
     private static final String ACCOUNT_COMMENT = UUID.randomUUID().toString();
     private static final String ACCOUNT_NUMBER = UUID.randomUUID().toString();
@@ -123,8 +122,8 @@ public class AccountDialogTest extends BaseTest {
         };
     }
 
-    @BeforeClass
-    public void setupAndSkip() {
+    @BeforeAll
+    public static void init() {
         new JFXPanel();
     }
 
@@ -166,17 +165,17 @@ public class AccountDialogTest extends BaseTest {
         var account = queue.take();
 
         assertNotNull(account.uuid());
-        assertEquals(account.name(), ACCOUNT_NAME);
-        assertEquals(account.comment(), ACCOUNT_COMMENT);
-        assertEquals(account.accountNumber(), ACCOUNT_NUMBER);
-        assertEquals(account.categoryUuid(), category.uuid());
-        assertEquals(account.type(), category.type());
-        assertEquals(account.interest().stripTrailingZeros(), ACCOUNT_INTEREST.stripTrailingZeros());
-        assertEquals(account.cardType(), ACCOUNT_CARD_TYPE);
-        assertEquals(account.cardNumber(), ACCOUNT_CARD_NUMBER);
-        assertEquals(account.accountLimit(), ACCOUNT_CREDIT);
+        assertEquals(ACCOUNT_NAME, account.name());
+        assertEquals(ACCOUNT_COMMENT, account.comment());
+        assertEquals(ACCOUNT_NUMBER, account.accountNumber());
+        assertEquals(category.uuid(), account.categoryUuid());
+        assertEquals(category.type(), account.type());
+        assertEquals(ACCOUNT_INTEREST.stripTrailingZeros(), account.interest().stripTrailingZeros());
+        assertEquals(ACCOUNT_CARD_TYPE, account.cardType());
+        assertEquals(ACCOUNT_CARD_NUMBER, account.cardNumber());
+        assertEquals(ACCOUNT_CREDIT, account.accountLimit());
         assertTrue(account.enabled());
-        assertEquals(account.currencyUuid(), curr_1.uuid());
+        assertEquals(curr_1.uuid(), account.currencyUuid());
     }
 
     @Test
@@ -192,21 +191,20 @@ public class AccountDialogTest extends BaseTest {
 
         var account = queue.take();
 
-        assertEquals(account.uuid(), acc_1.uuid());
-        assertEquals(account.name(), acc_2.name());
-        assertEquals(account.comment(), acc_2.comment());
-        assertEquals(account.accountNumber(), acc_2.accountNumber());
-        assertEquals(account.categoryUuid(), acc_2.categoryUuid());
-        assertEquals(account.type(), acc_2.type());
-        assertEquals(account.interest().stripTrailingZeros(), acc_2.interest().stripTrailingZeros());
-        assertEquals(account.created(), acc_1.created());
-        assertEquals(account.currencyUuid(), curr_2.uuid());
-        assertEquals(account.closingDate(), acc_2.closingDate());
+        assertEquals(acc_1.uuid(), account.uuid());
+        assertEquals(acc_2.name(), account.name());
+        assertEquals(acc_2.comment(), account.comment());
+        assertEquals(acc_2.accountNumber(), account.accountNumber());
+        assertEquals(acc_2.categoryUuid(), account.categoryUuid());
+        assertEquals(acc_2.type(), account.type());
+        assertEquals(acc_2.interest().stripTrailingZeros(), account.interest().stripTrailingZeros());
+        assertEquals(acc_1.created(), account.created());
+        assertEquals(curr_2.uuid(), account.currencyUuid());
+        assertEquals(acc_2.closingDate(), account.closingDate());
         assertTrue(account.modified() > acc_1.modified());
-        assertEquals(account.openingBalance().stripTrailingZeros(), acc_2.openingBalance().stripTrailingZeros());
-        assertEquals(account.accountLimit().stripTrailingZeros(), acc_2.accountLimit().stripTrailingZeros());
+        assertEquals(acc_2.openingBalance().stripTrailingZeros(), account.openingBalance().stripTrailingZeros());
+        assertEquals(acc_2.accountLimit().stripTrailingZeros(), account.accountLimit().stripTrailingZeros());
         assertTrue(account.enabled());
-        assertEquals(account.cardType(), acc_2.cardType());
-        assertEquals(account.cardNumber(), acc_2.cardNumber());
+        assertEquals(acc_2.cardType(), account.cardType());
     }
 }

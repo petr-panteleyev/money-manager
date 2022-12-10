@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -17,10 +19,6 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.statements.StatementRecord;
-import org.panteleyev.money.test.BaseTest;
-import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,14 +28,16 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.panteleyev.money.app.Bundles.translate;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
 
-public class TransactionDialogTest extends BaseTest {
+public class TransactionDialogTest {
     private static final BigDecimal RATE = BigDecimal.ONE.setScale(6, RoundingMode.HALF_UP);
 
     private final Category category;
@@ -138,8 +138,8 @@ public class TransactionDialogTest extends BaseTest {
         };
     }
 
-    @BeforeClass
-    public void setupAndSkip() {
+    @BeforeAll
+    public static void init() {
         new JFXPanel();
     }
 
@@ -252,42 +252,42 @@ public class TransactionDialogTest extends BaseTest {
         return builder.build();
     }
 
-    private void assertMainFields(Transaction r, Transaction t) {
-        assertNotNull(r.uuid(), "UUID must not be null");
+    private void assertMainFields(Transaction expected, Transaction actual) {
+        assertNotNull(expected.uuid(), "UUID must not be null");
 
-        assertEquals(r.type(), t.type(),
+        assertEquals(expected.type(), actual.type(),
                 "Transaction type ID is invalid");
 
         // Debited account
-        assertEquals(r.accountDebitedUuid(), t.accountDebitedUuid(),
+        assertEquals(expected.accountDebitedUuid(), actual.accountDebitedUuid(),
                 "Debited account UUID is invalid");
-        assertEquals(r.accountDebitedCategoryUuid(), t.accountDebitedCategoryUuid(),
+        assertEquals(expected.accountDebitedCategoryUuid(), actual.accountDebitedCategoryUuid(),
                 "Debited account category UUID is invalid");
-        assertEquals(r.accountDebitedType(), t.accountDebitedType(),
+        assertEquals(expected.accountDebitedType(), actual.accountDebitedType(),
                 "Debited account category type ID is invalid");
 
         // Credited account
-        assertEquals(r.accountCreditedUuid(), t.accountCreditedUuid(),
+        assertEquals(expected.accountCreditedUuid(), actual.accountCreditedUuid(),
                 "Credited account UUID is invalid");
-        assertEquals(r.accountCreditedCategoryUuid(), t.accountCreditedCategoryUuid(),
+        assertEquals(expected.accountCreditedCategoryUuid(), actual.accountCreditedCategoryUuid(),
                 "Credited account category UUID is invalid");
-        assertEquals(r.accountCreditedType(), t.accountCreditedType(),
+        assertEquals(expected.accountCreditedType(), actual.accountCreditedType(),
                 "Credited account category type ID is invalid");
 
-        assertEquals(r.day(), t.day(), "Day is invalid");
-        assertEquals(r.month(), t.month(), "Month is invalid");
-        assertEquals(r.year(), t.year(), "Year is invalid");
-        assertEquals(r.comment(), t.comment(), "Comment is invalid");
-        assertEquals(r.checked(), t.checked(), "Checked status is invalid");
+        assertEquals(expected.day(), actual.day(), "Day is invalid");
+        assertEquals(expected.month(), actual.month(), "Month is invalid");
+        assertEquals(expected.year(), actual.year(), "Year is invalid");
+        assertEquals(expected.comment(), actual.comment(), "Comment is invalid");
+        assertEquals(expected.checked(), actual.checked(), "Checked status is invalid");
     }
 
     private void assertStatementRecord(TransactionDialog pane, StatementRecord record) {
-        assertEquals(pane.getSumEdit().getText(), record.getAmount());
-        assertEquals(pane.getDatePicker().getValue(), record.getActual());
+        assertEquals(record.getAmount(), pane.getSumEdit().getText());
+        assertEquals(record.getActual(), pane.getDatePicker().getValue());
     }
 
     private void failOnEmptyBuilder() {
-        Assert.fail("Builder is null");
+        fail("Builder is null");
     }
 
     @Test
@@ -310,11 +310,11 @@ public class TransactionDialogTest extends BaseTest {
             assertNull(builder.getNewContactName());
             var resultedTransaction = builder
                     .build();
-            assertMainFields(resultedTransaction, transaction);
-            assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
+            assertMainFields(transaction, resultedTransaction);
+            assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
-            assertEquals(resultedTransaction.amount(), transaction.amount(),
+            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
+            assertEquals(transaction.amount(), resultedTransaction.amount(),
                     "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
@@ -341,11 +341,11 @@ public class TransactionDialogTest extends BaseTest {
                     .month(now.getMonthValue())
                     .year(now.getYear())
                     .build();
-            assertMainFields(resultedTransaction, transaction);
-            assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
+            assertMainFields(transaction, resultedTransaction);
+            assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
-            assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
+            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
+            assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -369,16 +369,16 @@ public class TransactionDialogTest extends BaseTest {
         var result = queue.take();
         result.ifPresentOrElse(builder -> {
             assertNull(builder.getUuid());
-            assertEquals(builder.getNewContactName(), newContact);
+            assertEquals(newContact, builder.getNewContactName());
             var now = LocalDate.now();
             var resultedTransaction = builder
                     .month(now.getMonthValue())
                     .year(now.getYear())
                     .build();
-            assertMainFields(resultedTransaction, transaction);
+            assertMainFields(transaction, resultedTransaction);
             assertNull(resultedTransaction.contactUuid(), "Contact UUID is invalid");
-            assertEquals(resultedTransaction.rate(), RATE, "Rate is invalid");
-            assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
+            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
+            assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
 
@@ -401,13 +401,13 @@ public class TransactionDialogTest extends BaseTest {
             assertNull(builder.getNewContactName());
 
             var resultedTransaction = builder.build();
-            assertEquals(resultedTransaction.uuid(), transaction.uuid());
+            assertEquals(transaction.uuid(), resultedTransaction.uuid());
 
-            assertMainFields(resultedTransaction, transaction);
-            assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
+            assertMainFields(transaction, resultedTransaction);
+            assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(resultedTransaction.rate(), transaction.rate(), "Rate is invalid");
-            assertEquals(resultedTransaction.amount(), transaction.amount(), "Amount is invalid");
+            assertEquals(transaction.rate(), resultedTransaction.rate(), "Rate is invalid");
+            assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
 
         }, this::failOnEmptyBuilder);
     }
@@ -422,7 +422,7 @@ public class TransactionDialogTest extends BaseTest {
             var dialog = createDialog(transaction);
             pressOkButton(dialog);
             var builder = dialog.getResultConverter().call(ButtonType.OK);
-            Assert.assertFalse(dialog.getRate1Edit().isDisabled());
+            assertFalse(dialog.getRate1Edit().isDisabled());
             queue.add(Optional.ofNullable(builder));
         });
 
@@ -431,15 +431,15 @@ public class TransactionDialogTest extends BaseTest {
             assertNull(builder.getNewContactName());
 
             var resultedTransaction = builder.build();
-            assertEquals(resultedTransaction.uuid(), transaction.uuid(),
+            assertEquals(transaction.uuid(), resultedTransaction.uuid(),
                     "Transaction UUID is wrong");
 
-            assertMainFields(resultedTransaction, transaction);
-            assertEquals(resultedTransaction.contactUuid(), transaction.contactUuid(),
+            assertMainFields(transaction, resultedTransaction);
+            assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(resultedTransaction.rate(), transaction.rate(),
+            assertEquals(transaction.rate(), resultedTransaction.rate(),
                     "Rate is invalid");
-            assertEquals(resultedTransaction.amount(), transaction.amount(),
+            assertEquals(transaction.amount(), resultedTransaction.amount(),
                     "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }

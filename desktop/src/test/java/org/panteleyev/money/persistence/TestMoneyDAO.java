@@ -4,39 +4,34 @@
  */
 package org.panteleyev.money.persistence;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.test.BaseTestUtils;
-import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
-import static org.testng.Assert.assertEquals;
 
 public class TestMoneyDAO extends BaseDaoTest {
-    @BeforeClass
-    @Override
-    public void setupAndSkip() {
-        try {
-            super.setupAndSkip();
-        } catch (Exception ex) {
-            throw new SkipException(ex.getMessage());
-        }
+    @BeforeAll
+    public static void init() {
+        var initialized = BaseDaoTest.setupAndSkip();
+        assumeTrue(initialized);
     }
 
-    @AfterClass
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @AfterAll
+    public static void tearDown() throws Exception {
+        BaseDaoTest.tearDown();
     }
 
     @Test
@@ -47,15 +42,15 @@ public class TestMoneyDAO extends BaseDaoTest {
         var icon = BaseTestUtils.newIcon(uuid, ICON_DOLLAR);
 
         dao().insertIcon(icon);
-        assertEquals(cache().getIcon(uuid).orElseThrow(), icon);
+        assertEquals(icon, cache().getIcon(uuid).orElseThrow());
         var retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), icon);
+        assertEquals(icon, retrieved.orElseThrow());
 
         var update = BaseTestUtils.newIcon(uuid, ICON_EURO);
         dao().updateIcon(update);
-        assertEquals(cache().getIcon(uuid).orElseThrow(), update);
+        assertEquals(update, cache().getIcon(uuid).orElseThrow());
         retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 
     @Test
@@ -70,15 +65,15 @@ public class TestMoneyDAO extends BaseDaoTest {
         var category = BaseTestUtils.newCategory(uuid, iconUuid);
 
         dao().insertCategory(category);
-        assertEquals(cache().getCategory(uuid).orElseThrow(), category);
+        assertEquals(category, cache().getCategory(uuid).orElseThrow());
         var retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), category);
+        assertEquals(category, retrieved.orElseThrow());
 
         var update = BaseTestUtils.newCategory(uuid);
         dao().updateCategory(update);
-        assertEquals(cache().getCategory(uuid).orElseThrow(), update);
+        assertEquals(update, cache().getCategory(uuid).orElseThrow());
         retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 
     @Test
@@ -86,18 +81,18 @@ public class TestMoneyDAO extends BaseDaoTest {
         var repo = new CurrencyRepository();
 
         var uuid = UUID.randomUUID();
-        var category = BaseTestUtils.newCurrency(uuid);
+        var currency = BaseTestUtils.newCurrency(uuid);
 
-        dao().insertCurrency(category);
-        assertEquals(cache().getCurrency(uuid).orElseThrow(), category);
+        dao().insertCurrency(currency);
+        assertEquals(currency, cache().getCurrency(uuid).orElseThrow());
         var retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), category);
+        assertEquals(currency, retrieved.orElseThrow());
 
         var update = BaseTestUtils.newCurrency(uuid);
         dao().updateCurrency(update);
-        assertEquals(cache().getCurrency(uuid).orElseThrow(), update);
+        assertEquals(update, cache().getCurrency(uuid).orElseThrow());
         retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 
     @Test
@@ -112,15 +107,15 @@ public class TestMoneyDAO extends BaseDaoTest {
         var contact = BaseTestUtils.newContact(uuid, iconUuid);
 
         dao().insertContact(contact);
-        assertEquals(cache().getContact(uuid).orElseThrow(), contact);
+        assertEquals(contact, cache().getContact(uuid).orElseThrow());
         var retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), contact);
+        assertEquals(contact, retrieved.orElseThrow());
 
         var update = BaseTestUtils.newContact(uuid);
         dao().updateContact(update);
-        assertEquals(cache().getContact(uuid).orElseThrow(), update);
+        assertEquals(update, cache().getContact(uuid).orElseThrow());
         retrieved = get(repo, uuid);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 
     @Test
@@ -150,18 +145,18 @@ public class TestMoneyDAO extends BaseDaoTest {
                 .build();
         dao().insertAccount(account);
 
-        assertEquals(cache().getAccount(accountId).orElseThrow(), account);
+        assertEquals(account, cache().getAccount(accountId).orElseThrow());
         var retrieved = get(repo, accountId);
-        assertEquals(retrieved.orElseThrow(), account);
+        assertEquals(account, retrieved.orElseThrow());
 
         var update = new Account.Builder(account)
                 .accountNumber(UUID.randomUUID().toString())
                 .build();
 
         dao().updateAccount(update);
-        assertEquals(cache().getAccount(accountId).orElseThrow(), update);
+        assertEquals(update, cache().getAccount(accountId).orElseThrow());
         retrieved = get(repo, accountId);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 
     @Test
@@ -203,17 +198,17 @@ public class TestMoneyDAO extends BaseDaoTest {
 
 
         dao().insertTransaction(transaction);
-        assertEquals(cache().getTransaction(id).orElseThrow(), transaction);
+        assertEquals(transaction, cache().getTransaction(id).orElseThrow());
         var retrieved = get(repo, id);
-        assertEquals(retrieved.orElseThrow(), transaction);
+        assertEquals(transaction, retrieved.orElseThrow());
 
         var update = new Transaction.Builder(transaction)
                 .comment(UUID.randomUUID().toString())
                 .build();
 
         dao().updateTransaction(update);
-        assertEquals(cache().getTransaction(id).orElseThrow(), update);
+        assertEquals(update, cache().getTransaction(id).orElseThrow());
         retrieved = get(repo, id);
-        assertEquals(retrieved.orElseThrow(), update);
+        assertEquals(update, retrieved.orElseThrow());
     }
 }

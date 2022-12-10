@@ -25,14 +25,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class MoneyDAO {
-    private final static Logger LOGGER = Logger.getLogger(MoneyDAO.class.getName());
-
     private final DataCache cache;
     private final AtomicReference<DataSource> dataSource = new AtomicReference<>();
     // Repositories
@@ -298,10 +296,10 @@ public class MoneyDAO {
     }
 
     public void preload() {
-        preload(IGNORE_PROGRESS);
+        preload(Platform::runLater, IGNORE_PROGRESS);
     }
 
-    public void preload(Consumer<String> progress) {
+    public void preload(Executor executor, Consumer<String> progress) {
         withNewConnection(conn -> {
             progress.accept("Preloading data...\n");
 
@@ -344,7 +342,7 @@ public class MoneyDAO {
                 cache.getAccounts().setAll(accountList);
                 cache.getTransactions().setAll(transactionList);
                 return null;
-            }, Platform::runLater);
+            }, executor);
         });
     }
 

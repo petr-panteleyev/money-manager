@@ -5,41 +5,43 @@
 package org.panteleyev.money.app.cells;
 
 import javafx.embed.swing.JFXPanel;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.panteleyev.money.app.Styles.EXPIRED;
-import static org.testng.Assert.assertEquals;
 
 public class AccountClosingDateCellTest {
     private static final int DELTA = 10;
 
-    @BeforeClass
-    public void initFx() {
+    @BeforeAll
+    public static void initFx() {
         new JFXPanel();
     }
 
-    @DataProvider
-    public Object[][] testCellColorDataProvider() {
-        return new Object[][]{
-                {0, true},
-                {9, true},
-                {-1, true},
-                {10, false},
-                {20, false},
-                {31, false},
-                {90, false},
-                {200, false},
-        };
+    public static List<Arguments> testCellColorDataProvider() {
+        return List.of(
+                Arguments.of(0, true),
+                Arguments.of(9, true),
+                Arguments.of(-1, true),
+                Arguments.of(10, false),
+                Arguments.of(20, false),
+                Arguments.of(31, false),
+                Arguments.of(90, false),
+                Arguments.of(200, false)
+        );
     }
 
-    @Test(dataProvider = "testCellColorDataProvider")
+    @ParameterizedTest
+    @MethodSource("testCellColorDataProvider")
     public void testCellColor(int delta, boolean hasRedColor) {
         var cell = new AccountClosingDateCell(DELTA);
 
@@ -53,6 +55,6 @@ public class AccountClosingDateCellTest {
                 .build();
 
         cell.updateItem(account, false);
-        assertEquals(cell.getStyleClass().contains(EXPIRED), hasRedColor);
+        assertEquals(hasRedColor, cell.getStyleClass().contains(EXPIRED));
     }
 }

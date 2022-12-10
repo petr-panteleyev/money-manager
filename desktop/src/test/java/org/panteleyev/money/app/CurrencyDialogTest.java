@@ -7,21 +7,20 @@ package org.panteleyev.money.app;
 import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.test.BaseTest;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
 
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.test.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
-public class CurrencyDialogTest extends BaseTest {
+public class CurrencyDialogTest {
     private final static Currency CURRENCY = new Currency.Builder()
             .uuid(UUID.randomUUID())
             .symbol(UUID.randomUUID().toString())
@@ -37,8 +36,8 @@ public class CurrencyDialogTest extends BaseTest {
             .modified(System.currentTimeMillis())
             .build();
 
-    @BeforeClass
-    public void setupAndSkip() {
+    @BeforeAll
+    public static void init() {
         new JFXPanel();
     }
 
@@ -84,17 +83,17 @@ public class CurrencyDialogTest extends BaseTest {
 
         var currency = queue.take();
 
-        assertEquals(currency.uuid(), CURRENCY.uuid());
+        assertEquals(CURRENCY.uuid(), currency.uuid());
         assertCurrency(currency);
         assertTrue(currency.modified() > CURRENCY.modified());
         assertTrue(currency.modified() > currency.created());
     }
 
     private static void assertCurrency(Currency currency) {
-        assertEquals(currency.symbol(), CURRENCY.symbol());
-        assertEquals(currency.description(), CURRENCY.description());
-        assertEquals(currency.rate(), CURRENCY.rate());
-        assertEquals(currency.useThousandSeparator(), CURRENCY.useThousandSeparator());
-        assertEquals(currency.def(), CURRENCY.def());
+        assertEquals(CURRENCY.symbol(), currency.symbol());
+        assertEquals(CURRENCY.description(), currency.description());
+        assertEquals(CURRENCY.rate(), currency.rate());
+        assertEquals(CURRENCY.useThousandSeparator(), currency.useThousandSeparator());
+        assertEquals(CURRENCY.def(), currency.def());
     }
 }

@@ -4,29 +4,24 @@
  */
 package org.panteleyev.money.persistence;
 
-import org.testng.SkipException;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.testng.Assert.assertTrue;
 
 public class TestFreshFile extends BaseDaoTest {
-    @BeforeClass
-    @Override
-    public void setupAndSkip() {
-        try {
-            super.setupAndSkip();
-        } catch (Exception ex) {
-            throw new SkipException(ex.getMessage());
-        }
+    @BeforeAll
+    public static void init() {
+        var initialized = BaseDaoTest.setupAndSkip();
+        Assumptions.assumeTrue(initialized);
     }
 
-    @AfterClass
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
+    @AfterAll
+    public static void tearDown() throws Exception {
+        BaseDaoTest.tearDown();
     }
 
     @Test

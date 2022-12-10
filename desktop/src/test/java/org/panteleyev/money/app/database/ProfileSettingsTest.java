@@ -4,17 +4,18 @@
  */
 package org.panteleyev.money.app.database;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.panteleyev.money.test.BaseTestUtils.randomInt;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
-import static org.testng.Assert.assertEquals;
 
 public class ProfileSettingsTest {
 
@@ -39,26 +40,26 @@ public class ProfileSettingsTest {
             )
     );
 
-    @DataProvider
-    public Object[][] dataProvider() {
-        return new Object[][]{
-                {
+    public static List<Arguments> dataProvider() {
+        return List.of(
+                Arguments.of(
                         new ProfileSettings(
                                 PROFILE_LIST,
                                 randomString(),
                                 true
                         )
-                }
-        };
+                )
+        );
     }
 
-    @Test(dataProvider = "dataProvider")
+    @ParameterizedTest
+    @MethodSource("dataProvider")
     public void testImportExport(ProfileSettings settings) throws IOException {
         try (var out = new ByteArrayOutputStream()) {
             settings.save(out);
             try (var in = new ByteArrayInputStream(out.toByteArray())) {
                 var actual = ProfileSettings.load(in);
-                assertEquals(actual, settings);
+                assertEquals(settings, actual);
             }
         }
     }

@@ -10,18 +10,18 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-manager-parent</artifactId>
-        <version>22.11.3-SNAPSHOT</version>
+        <version>22.12.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>money-manager-ofx</artifactId>
-    <version>22.11.3-SNAPSHOT</version>
+    <version>22.12.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>OFX Parser</name>
 
     <dependencies>
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -35,11 +35,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
             </plugin>
         </plugins>
     </build>

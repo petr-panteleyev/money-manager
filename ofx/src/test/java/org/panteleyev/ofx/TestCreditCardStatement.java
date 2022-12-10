@@ -4,18 +4,17 @@
  */
 package org.panteleyev.ofx;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestCreditCardStatement {
     private static final String FILE_NAME = "src/test/resources/org/panteleyev/ofx/credit.ofx";
@@ -117,7 +116,7 @@ public class TestCreditCardStatement {
 
     @Test
     public void testCreditCardStatementFull() throws Exception {
-        try (var in = new FileInputStream(new File(FILE_NAME))) {
+        try (var in = new FileInputStream(FILE_NAME)) {
             var st = new OFXParser().parse(in);
 
             assertNotNull(st);
@@ -127,34 +126,34 @@ public class TestCreditCardStatement {
 
             var creditCardStatement = st.getCreditCardStatements();
             assertNotNull(creditCardStatement);
-            assertEquals(creditCardStatement.size(), 1);
+            assertEquals(1, creditCardStatement.size());
 
             var r1 = creditCardStatement.get(0);
             var statementList = r1.getCreditCardStatementList();
-            assertEquals(statementList.size(), 1);
+            assertEquals(1, statementList.size());
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();
-            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
+            assertEquals(ACCOUNT_NUMBER, accountInfo.accountNumber());
 
             var bankTransactionList = statement.bankTransactionList();
             if (!bankTransactionList.isEmpty()) {
-                assertEquals(bankTransactionList.dateStart(),
-                        LocalDateTime.of(2018, 12, 6, 12, 0));
-                assertEquals(bankTransactionList.dateEnd(),
-                        LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
+                assertEquals(LocalDateTime.of(2018, 12, 6, 12, 0),
+                        bankTransactionList.dateStart());
+                assertEquals(LocalDateTime.of(2018, 12, 8, 12, 0),
+                        bankTransactionList.dateEnd());
+                assertEquals(EXPECTED_TRANSACTIONS, bankTransactionList.transactions());
             } else {
                 fail("No bank transaction list present");
             }
 
             var pendingTransactionList = statement.pendingTransactionList();
             if (!pendingTransactionList.isEmpty()) {
-                assertEquals(pendingTransactionList.dateAsOf(),
-                        LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(pendingTransactionList.transactions(), EXPECTED_PENDING_TRANSACTIONS);
+                assertEquals(LocalDateTime.of(2018, 12, 8, 12, 0),
+                        pendingTransactionList.dateAsOf());
+                assertEquals(EXPECTED_PENDING_TRANSACTIONS, pendingTransactionList.transactions());
             } else {
                 fail("No pending transaction list present");
             }
@@ -173,25 +172,25 @@ public class TestCreditCardStatement {
 
             var creditCardStatement = st.getCreditCardStatements();
             assertNotNull(creditCardStatement);
-            assertEquals(creditCardStatement.size(), 1);
+            assertEquals(1, creditCardStatement.size());
 
             var r1 = creditCardStatement.get(0);
             var statementList = r1.getCreditCardStatementList();
-            assertEquals(statementList.size(), 1);
+            assertEquals(1, statementList.size());
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();
-            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
+            assertEquals(ACCOUNT_NUMBER, accountInfo.accountNumber());
 
             var bankTransactionList = statement.bankTransactionList();
             if (!bankTransactionList.isEmpty()) {
-                assertEquals(bankTransactionList.dateStart(),
-                        LocalDateTime.of(2018, 12, 6, 12, 0));
-                assertEquals(bankTransactionList.dateEnd(),
-                        LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(bankTransactionList.transactions(), EXPECTED_TRANSACTIONS);
+                assertEquals(LocalDateTime.of(2018, 12, 6, 12, 0),
+                        bankTransactionList.dateStart());
+                assertEquals(LocalDateTime.of(2018, 12, 8, 12, 0),
+                        bankTransactionList.dateEnd());
+                assertEquals(EXPECTED_TRANSACTIONS, bankTransactionList.transactions());
             } else {
                 fail("No bank transaction list present");
             }
@@ -212,25 +211,25 @@ public class TestCreditCardStatement {
 
             var creditCardStatement = st.getCreditCardStatements();
             assertNotNull(creditCardStatement);
-            assertEquals(creditCardStatement.size(), 1);
+            assertEquals(1, creditCardStatement.size());
 
             var r1 = creditCardStatement.get(0);
             var statementList = r1.getCreditCardStatementList();
-            assertEquals(statementList.size(), 1);
+            assertEquals(1, statementList.size());
 
             var statement = statementList.get(0);
 
-            assertEquals(statement.currency(), STATEMENT_CURRENCY);
+            assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();
-            assertEquals(accountInfo.accountNumber(), ACCOUNT_NUMBER);
+            assertEquals(ACCOUNT_NUMBER, accountInfo.accountNumber());
 
             assertTrue(statement.bankTransactionList().isEmpty());
 
             var pendingTransactionList = statement.pendingTransactionList();
             if (!pendingTransactionList.isEmpty()) {
-                assertEquals(pendingTransactionList.dateAsOf(),
-                        LocalDateTime.of(2018, 12, 8, 12, 0));
-                assertEquals(pendingTransactionList.transactions(), EXPECTED_PENDING_TRANSACTIONS);
+                assertEquals(LocalDateTime.of(2018, 12, 8, 12, 0),
+                        pendingTransactionList.dateAsOf());
+                assertEquals(EXPECTED_PENDING_TRANSACTIONS, pendingTransactionList.transactions());
             } else {
                 fail("No pending transaction list present");
             }
