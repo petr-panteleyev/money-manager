@@ -11,4 +11,5 @@
                    logicalFilePath="masterChangelog">
 
     <include file="v22.8.0/changelog.xml" relativeToChangelogFile="true"/>
+    <include file="v22.12.1/changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

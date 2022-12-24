@@ -1,15 +1,25 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <!--
-  Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
   -->
+<!--suppress SqlNoDataSourceInspection -->
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
-                   logicalFilePath="masterChangelog">
+                   logicalFilePath="v22.12.1/changelog.xml">
 
-    <include file="v22.8.0/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v22.12.1/changelog.xml" relativeToChangelogFile="true"/>
+    <changeSet id="v22.12.1-document" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE document
+                ADD COLUMN compressed BOOLEAN DEFAULT FALSE NOT NULL
+        </sql>
+        <rollback>
+            <sql>
+                ALTER TABLE document DROP COLUMN compressed
+            </sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.randomBoolean;
 import static org.panteleyev.money.model.BaseTestUtils.randomDocumentType;
 import static org.panteleyev.money.model.BaseTestUtils.randomInt;
 import static org.panteleyev.money.model.BaseTestUtils.randomString;
@@ -28,6 +29,7 @@ public class TestMoneyDocument {
         var date = LocalDate.now();
         var mimeType = randomString();
         var size = randomInt();
+        var compressed = randomBoolean();
         var description = randomString();
         long created = System.currentTimeMillis();
         long modified = created + 1000L;
@@ -42,6 +44,7 @@ public class TestMoneyDocument {
                                 .fileName(fileName)
                                 .date(date)
                                 .size(size)
+                                .compressed(compressed)
                                 .mimeType(mimeType)
                                 .description(description)
                                 .created(created)
@@ -55,6 +58,7 @@ public class TestMoneyDocument {
                                 fileName,
                                 date,
                                 size,
+                                compressed,
                                 mimeType,
                                 description,
                                 created,

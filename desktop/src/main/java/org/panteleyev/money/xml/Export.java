@@ -242,6 +242,7 @@ public class Export {
         appendTextNode(e, "fileName", moneyDocument.fileName());
         appendTextNode(e, "date", moneyDocument.date());
         appendTextNode(e, "size", moneyDocument.size());
+        appendTextNode(e, "compressed", moneyDocument.compressed());
         appendTextNode(e, "mimeType", moneyDocument.mimeType());
         appendTextNode(e, "description", moneyDocument.description());
         appendTextNode(e, "created", moneyDocument.created());

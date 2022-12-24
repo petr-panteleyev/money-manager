@@ -19,9 +19,12 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -308,6 +311,7 @@ public class TestRepositories extends BaseDaoTest {
                 randomString(),
                 LocalDate.now(),
                 randomInt(),
+                randomBoolean(),
                 randomString(),
                 randomString(),
                 System.currentTimeMillis(),
@@ -322,6 +326,7 @@ public class TestRepositories extends BaseDaoTest {
                 randomString(),
                 LocalDate.now(),
                 randomInt(),
+                randomBoolean(),
                 randomString(),
                 randomString(),
                 System.currentTimeMillis(),
@@ -329,6 +334,26 @@ public class TestRepositories extends BaseDaoTest {
         );
 
         insertAndUpdate(repository, insert, update);
+    }
+
+    @Test
+    @Order(8)
+    public void testDocumentContent() {
+        var repository = new DocumentRepository();
+
+        try (var inputStream = getClass().getResourceAsStream("/org/panteleyev/money/icons/" + ICON_DOLLAR)) {
+            var bytes = inputStream.readAllBytes();
+
+            dao().withNewConnection(conn -> {
+                repository.insertBytes(conn, DOCUMENT_UUID, bytes);
+
+                var actual = repository.getBytes(conn, DOCUMENT_UUID)
+                                .orElseThrow();
+                assertArrayEquals(bytes, actual);
+            });
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
     }
 
     private static <T extends MoneyRecord> void insertAndUpdate(Repository<T> repository, T insert, T update) {

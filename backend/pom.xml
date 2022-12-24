@@ -11,7 +11,7 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>22.12.1-SNAPSHOT</version>
+    <version>22.12.1</version>
     <name>Backend</name>
     <properties>
         <java.version>19</java.version>

@@ -237,6 +237,7 @@
             <xsd:element name="fileName" type="xsd:string"/>
             <xsd:element name="date" type="xsd:long"/>
             <xsd:element name="size" type="xsd:int"/>
+            <xsd:element name="compressed" type="xsd:boolean" minOccurs="0"/>
             <xsd:element name="mimeType" type="xsd:string"/>
             <xsd:element name="description" type="xsd:string"/>
             <xsd:element name="created" type="Timestamp"/>
@@ -328,6 +329,8 @@
             <xsd:enumeration value="CONTRACT"/>
             <xsd:enumeration value="RECEIPT"/>
             <xsd:enumeration value="STATEMENT"/>
+            <xsd:enumeration value="NOTIFICATION"/>
+            <xsd:enumeration value="PAYSLIP"/>
             <xsd:enumeration value="OTHER"/>
         </xsd:restriction>
     </xsd:simpleType>

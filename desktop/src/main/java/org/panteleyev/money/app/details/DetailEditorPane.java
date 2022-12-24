@@ -24,6 +24,7 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.money.app.BaseCompletionProvider;
+import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.ToStringConverter;
@@ -360,7 +361,7 @@ final class DetailEditorPane extends BorderPane {
     private void updateCategoryLabel(Label label, Account account) {
         if (account != null) {
             var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
-            label.setText(account.type() + " | " + catName);
+            label.setText(Bundles.translate(account.type()) + " | " + catName);
         } else {
             label.setText("");
         }

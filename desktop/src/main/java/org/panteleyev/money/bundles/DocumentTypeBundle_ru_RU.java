@@ -10,6 +10,7 @@ import static org.panteleyev.money.model.DocumentType.BILL;
 import static org.panteleyev.money.model.DocumentType.CONTRACT;
 import static org.panteleyev.money.model.DocumentType.NOTIFICATION;
 import static org.panteleyev.money.model.DocumentType.OTHER;
+import static org.panteleyev.money.model.DocumentType.PAYSLIP;
 import static org.panteleyev.money.model.DocumentType.RECEIPT;
 import static org.panteleyev.money.model.DocumentType.STATEMENT;
 
@@ -23,6 +24,7 @@ public class DocumentTypeBundle_ru_RU extends ListResourceBundle {
                 {RECEIPT.name(), "Чек"},
                 {STATEMENT.name(), "Выписка"},
                 {NOTIFICATION.name(), "Уведомление"},
+                {PAYSLIP.name(), "Платёжная ведомость"},
                 {OTHER.name(), "Другое"},
         };
     }

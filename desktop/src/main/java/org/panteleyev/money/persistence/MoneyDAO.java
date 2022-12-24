@@ -404,13 +404,8 @@ public class MoneyDAO {
     }
 
     public static Exception resetDatabase(PGSimpleDataSource dataSource, String schema) {
-        try {
-            dataSource.setDatabaseName(schema);
-
-            try (var liquibaseConn = dataSource.getConnection()) {
-                new LiquibaseUtil(liquibaseConn).dropAndUpdate();
-            }
-
+        try (var liquibaseConn = dataSource.getConnection()) {
+            new LiquibaseUtil(liquibaseConn).dropAndUpdate();
             return null;
         } catch (SQLException ex) {
             return ex;

@@ -289,6 +289,7 @@ class ImportParser extends DefaultHandler {
                 .fileName(tags.get("fileName"))
                 .date(parseLocalDate(tags.get("date"), LocalDate.now()))
                 .size(parseInt(tags.get("size")))
+                .compressed(parseBoolean(tags.get("compressed"), false))
                 .mimeType(tags.get("mimeType"))
                 .description(tags.get("description"))
                 .created(created)

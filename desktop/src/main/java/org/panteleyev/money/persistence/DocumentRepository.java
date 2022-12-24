@@ -14,12 +14,15 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.panteleyev.money.persistence.Compression.compress;
+import static org.panteleyev.money.persistence.Compression.decompress;
+
 final class DocumentRepository extends Repository<MoneyDocument> {
     private static final String SQL_INSERT_BYTES = """
-            UPDATE document SET content=? WHERE uuid=?
+            UPDATE document SET content=?, compressed=? WHERE uuid=?
             """;
     private static final String SQL_GET_BYTES = """
-            SELECT content FROM document WHERE uuid=?
+            SELECT content, compressed FROM document WHERE uuid=?
             """;
 
     DocumentRepository() {
@@ -36,13 +39,14 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                     file_name,
                     file_date,
                     file_size,
+                    compressed,
                     mime_type,
                     description,
                     created,
                     modified,
                     uuid
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?,?,?,?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
                 """;
     }
@@ -57,6 +61,7 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                     file_name = ?,
                     file_date = ?,
                     file_size = ?,
+                    compressed = ?,
                     mime_type = ?,
                     description = ?,
                     created = ?,
@@ -75,6 +80,7 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                 rs.getString("file_name"),
                 getLocalDate(rs, "file_date"),
                 rs.getInt("file_size"),
+                rs.getBoolean("compressed"),
                 rs.getString("mime_type"),
                 rs.getString("description"),
                 rs.getLong("created"),
@@ -91,6 +97,7 @@ final class DocumentRepository extends Repository<MoneyDocument> {
         st.setString(index++, document.fileName());
         setLocalDate(st, index++, document.date());
         st.setInt(index++, document.size());
+        st.setBoolean(index++, document.compressed());
         st.setString(index++, document.mimeType());
         st.setString(index++, document.description());
         st.setLong(index++, document.created());
@@ -100,8 +107,15 @@ final class DocumentRepository extends Repository<MoneyDocument> {
 
     void insertBytes(Connection conn, UUID uuid, byte[] bytes) {
         try (var st = conn.prepareStatement(SQL_INSERT_BYTES)) {
-            st.setBytes(1, bytes);
-            setUuid(st, 2, uuid);
+            var compressed = compress(bytes);
+            if (compressed.length < bytes.length) {
+                st.setBytes(1, compressed);
+                st.setBoolean(2, true);
+            } else {
+                st.setBytes(1, bytes);
+                st.setBoolean(2, false);
+            }
+            setUuid(st, 3, uuid);
             st.executeUpdate();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -113,7 +127,12 @@ final class DocumentRepository extends Repository<MoneyDocument> {
             setUuid(st, 1, uuid);
             try (var rs = st.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.ofNullable(rs.getBytes(1));
+                    var bytes = rs.getBytes(1);
+                    var compressed = rs.getBoolean(2);
+                    if (compressed) {
+                        bytes = decompress(bytes);
+                    }
+                    return Optional.ofNullable(bytes);
                 } else {
                     return Optional.empty();
                 }

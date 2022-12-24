@@ -300,10 +300,17 @@ public final class BaseTestUtils {
                 .fileName(randomString())
                 .mimeType(randomString())
                 .description(randomString())
+                .compressed(true)
                 .date(LocalDate.now())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();
+    }
+
+    public static byte[] randomBytes(int size) {
+        var result = new byte[size];
+        RANDOM.nextBytes(result);
+        return result;
     }
 
     private BaseTestUtils() {

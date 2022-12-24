@@ -10,5 +10,6 @@ public enum DocumentType {
     RECEIPT,
     STATEMENT,
     NOTIFICATION,
+    PAYSLIP,
     OTHER
 }
