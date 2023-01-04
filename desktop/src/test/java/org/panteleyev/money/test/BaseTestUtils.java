@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.test;
@@ -300,7 +300,6 @@ public final class BaseTestUtils {
                 .fileName(randomString())
                 .mimeType(randomString())
                 .description(randomString())
-                .compressed(true)
                 .date(LocalDate.now())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -29,10 +29,12 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.FxUtils.COLON;
@@ -54,7 +56,13 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUME
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_FILE;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
-final class DocumentDialog extends BaseDialog<MoneyDocument> {
+record DocumentWithBytes(MoneyDocument document, byte[] bytes) {
+}
+
+final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
+    private record FileInfo(String name, String mimeType, byte[] bytes) {
+    }
+
     private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
         CompletionProvider(Set<T> set) {
             super(set, () -> settings().getAutoCompleteLength());
@@ -77,9 +85,8 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     private final DatePicker datePicker = new DatePicker();
     private final TextField descriptionEdit = new TextField();
 
-    private byte[] bytes = new byte[0];
-    private String mimeType = "";
     private UUID contactUuid;
+    private final List<FileInfo> fileInfos = new ArrayList<>();
 
     private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
         public String toString(Contact obj) {
@@ -88,10 +95,10 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     };
 
     DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document) {
-        this(owner, documentOwner, css, document, null);
+        this(owner, documentOwner, css, document, List.of());
     }
 
-    DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document, File file) {
+    DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document, List<File> files) {
         super(owner, css);
         setTitle(fxString(UI, I18N_WORD_DOCUMENT));
 
@@ -105,7 +112,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
         setupContactMenu();
 
         var browseButton = button("...", event -> onBrowse());
-        browseButton.setDisable(document != null || file != null);
+        browseButton.setDisable(document != null || !files.isEmpty());
         getDialogPane().setContent(
                 gridPane(List.of(
                                 gridRow(label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
@@ -125,9 +132,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
             nameEdit.setText("");
             typeChoiceBox.getSelectionModel().select(DocumentType.OTHER);
             datePicker.setValue(LocalDate.now());
-            if (file != null) {
-                readFile(file);
-            }
+            readFiles(files);
         } else {
             contactUuid = document.contactUuid();
             contactEdit.setText(cache().getContact(contactUuid).map(Contact::name).orElse(""));
@@ -135,6 +140,7 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
             descriptionEdit.setText(document.description());
             typeChoiceBox.getSelectionModel().select(document.documentType());
             datePicker.setValue(document.date());
+            fileInfos.add(new FileInfo(document.fileName(), document.mimeType(), new byte[0]));
         }
 
         setResultConverter((ButtonType b) -> {
@@ -144,34 +150,35 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
 
             long now = System.currentTimeMillis();
 
-            var builder = new MoneyDocument.Builder(document)
-                    .documentType(typeChoiceBox.getSelectionModel().getSelectedItem())
-                    .contactUuid(contactUuid)
-                    .date(datePicker.getValue())
-                    .description(descriptionEdit.getText())
-                    .modified(now);
+            var result = new ArrayList<DocumentWithBytes>(fileInfos.size());
+            for (var fileInfo: fileInfos) {
+                var builder = new MoneyDocument.Builder(document)
+                        .documentType(typeChoiceBox.getSelectionModel().getSelectedItem())
+                        .contactUuid(contactUuid)
+                        .date(datePicker.getValue())
+                        .description(descriptionEdit.getText())
+                        .modified(now);
 
-            if (documentOwner != null) {
-                builder.ownerUuid(documentOwner.uuid());
+                if (documentOwner != null) {
+                    builder.ownerUuid(documentOwner.uuid());
+                }
+
+                if (document == null) {
+                    builder.uuid(UUID.randomUUID())
+                            .fileName(fileInfo.name())
+                            .size(fileInfo.bytes().length)
+                            .mimeType(fileInfo.mimeType() == null ? "" : fileInfo.mimeType())
+                            .created(now);
+                }
+
+                result.add(new DocumentWithBytes(builder.build(), fileInfo.bytes()));
             }
 
-            if (document == null) {
-                builder.uuid(UUID.randomUUID())
-                        .fileName(nameEdit.getText())
-                        .size(bytes.length)
-                        .mimeType(mimeType == null ? "" : mimeType)
-                        .created(now);
-            }
-
-            return builder.build();
+            return result;
         });
 
         createDefaultButtons(UI, validation.invalidProperty());
         Platform.runLater(this::createValidationSupport);
-    }
-
-    byte[] getBytes() {
-        return bytes;
     }
 
     private void createValidationSupport() {
@@ -190,21 +197,29 @@ final class DocumentDialog extends BaseDialog<MoneyDocument> {
     }
 
     private void onBrowse() {
-        var selected = new FileChooser().showOpenDialog(getOwner());
-        if (selected != null) {
-            readFile(selected);
+        var selected = new FileChooser().showOpenMultipleDialog(getOwner());
+        if (selected != null && !selected.isEmpty()) {
+            readFiles(selected);
         }
     }
 
-    private void readFile(File file) {
-        try {
-            var path = file.toPath();
-            bytes = Files.readAllBytes(path);
-            mimeType = Files.probeContentType(path);
-            nameEdit.setText(file.getName());
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+    private void readFiles(List<File> files) {
+        fileInfos.clear();
+        for (var file : files) {
+            try {
+                var path = file.toPath();
+                fileInfos.add(new FileInfo(
+                        file.getName(), Files.probeContentType(path), Files.readAllBytes(path)
+                ));
+            } catch (IOException ex) {
+                throw new UncheckedIOException(ex);
+            }
         }
+        nameEdit.setText(
+                fileInfos.stream()
+                        .map(f -> f.name)
+                        .collect(Collectors.joining(","))
+        );
     }
 
     private void setupContactMenu() {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -311,7 +311,6 @@ public class TestRepositories extends BaseDaoTest {
                 randomString(),
                 LocalDate.now(),
                 randomInt(),
-                randomBoolean(),
                 randomString(),
                 randomString(),
                 System.currentTimeMillis(),
@@ -326,7 +325,6 @@ public class TestRepositories extends BaseDaoTest {
                 randomString(),
                 LocalDate.now(),
                 randomInt(),
-                randomBoolean(),
                 randomString(),
                 randomString(),
                 System.currentTimeMillis(),

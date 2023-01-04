@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -39,14 +39,13 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                     file_name,
                     file_date,
                     file_size,
-                    compressed,
                     mime_type,
                     description,
                     created,
                     modified,
                     uuid
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
                 """;
     }
@@ -61,7 +60,6 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                     file_name = ?,
                     file_date = ?,
                     file_size = ?,
-                    compressed = ?,
                     mime_type = ?,
                     description = ?,
                     created = ?,
@@ -80,7 +78,6 @@ final class DocumentRepository extends Repository<MoneyDocument> {
                 rs.getString("file_name"),
                 getLocalDate(rs, "file_date"),
                 rs.getInt("file_size"),
-                rs.getBoolean("compressed"),
                 rs.getString("mime_type"),
                 rs.getString("description"),
                 rs.getLong("created"),
@@ -97,7 +94,6 @@ final class DocumentRepository extends Repository<MoneyDocument> {
         st.setString(index++, document.fileName());
         setLocalDate(st, index++, document.date());
         st.setInt(index++, document.size());
-        st.setBoolean(index++, document.compressed());
         st.setString(index++, document.mimeType());
         st.setString(index++, document.description());
         st.setLong(index++, document.created());

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -197,14 +197,22 @@ public class DocumentWindowController extends BaseController {
 
     public void onAddDocument() {
         var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null);
-        d.showAndWait().ifPresent(document -> dao().insertDocument(document, d.getBytes()));
+        d.showAndWait().ifPresent(documents -> {
+            for (var doc: documents) {
+                dao().insertDocument(doc.document(), doc.bytes());
+            }
+        });
     }
 
     private void onEditDocument() {
         getSelectedDocument()
                 .flatMap(document -> new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), document)
                         .showAndWait())
-                .ifPresent(updated -> dao().updateDocument(updated));
+                .ifPresent(updated ->  {
+                    for (var doc: updated) {
+                        dao().updateDocument(doc.document());
+                    }
+                });
     }
 
     private void onOpenDocument() {
@@ -245,7 +253,7 @@ public class DocumentWindowController extends BaseController {
 
     private void onDragOver(DragEvent event) {
         var dragBoard = event.getDragboard();
-        if (dragBoard.hasFiles() && dragBoard.getFiles().size() == 1) {
+        if (dragBoard.hasFiles() && dragBoard.getFiles().size() > 0) {
             event.acceptTransferModes(TransferMode.COPY);
         }
         event.consume();
@@ -256,10 +264,14 @@ public class DocumentWindowController extends BaseController {
         var dragBoard = event.getDragboard();
         if (dragBoard.hasFiles()) {
             var files = dragBoard.getFiles();
-            if (files.size() == 1) {
+            if (files.size() > 0) {
                 success = true;
-                var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null, files.get(0));
-                d.showAndWait().ifPresent(document -> dao().insertDocument(document, d.getBytes()));
+                var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null, files);
+                d.showAndWait().ifPresent(documents -> {
+                    for (var doc: documents) {
+                        dao().insertDocument(doc.document(), doc.bytes());
+                    }
+                });
             }
         }
         event.setDropCompleted(success);

@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -289,7 +289,6 @@ class ImportParser extends DefaultHandler {
                 .fileName(tags.get("fileName"))
                 .date(parseLocalDate(tags.get("date"), LocalDate.now()))
                 .size(parseInt(tags.get("size")))
-                .compressed(parseBoolean(tags.get("compressed"), false))
                 .mimeType(tags.get("mimeType"))
                 .description(tags.get("description"))
                 .created(created)

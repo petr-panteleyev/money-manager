@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -242,7 +242,6 @@ public class Export {
         appendTextNode(e, "fileName", moneyDocument.fileName());
         appendTextNode(e, "date", moneyDocument.date());
         appendTextNode(e, "size", moneyDocument.size());
-        appendTextNode(e, "compressed", moneyDocument.compressed());
         appendTextNode(e, "mimeType", moneyDocument.mimeType());
         appendTextNode(e, "description", moneyDocument.description());
         appendTextNode(e, "created", moneyDocument.created());

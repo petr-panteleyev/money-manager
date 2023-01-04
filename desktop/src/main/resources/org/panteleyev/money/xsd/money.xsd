@@ -1,5 +1,5 @@
 <!--
-  Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 
@@ -237,7 +237,6 @@
             <xsd:element name="fileName" type="xsd:string"/>
             <xsd:element name="date" type="xsd:long"/>
             <xsd:element name="size" type="xsd:int"/>
-            <xsd:element name="compressed" type="xsd:boolean" minOccurs="0"/>
             <xsd:element name="mimeType" type="xsd:string"/>
             <xsd:element name="description" type="xsd:string"/>
             <xsd:element name="created" type="Timestamp"/>

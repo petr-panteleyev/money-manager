@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -16,7 +16,6 @@ public record MoneyDocument(
         String fileName,
         LocalDate date,
         int size,
-        boolean compressed,
         String mimeType,
         String description,
         long created,
@@ -59,7 +58,6 @@ public record MoneyDocument(
         private String fileName;
         private LocalDate date = LocalDate.now();
         private int size;
-        private boolean compressed;
         private String mimeType;
         private String description;
         private long created;
@@ -80,7 +78,6 @@ public record MoneyDocument(
             fileName = moneyDocument.fileName();
             date = moneyDocument.date();
             size = moneyDocument.size();
-            compressed = moneyDocument.compressed();
             mimeType = moneyDocument.mimeType();
             description = moneyDocument.description();
             created = moneyDocument.created();
@@ -89,7 +86,7 @@ public record MoneyDocument(
 
         public MoneyDocument build() {
             return new MoneyDocument(uuid, ownerUuid, contactUuid, documentType, fileName, date,
-                    size, compressed, mimeType, description, created, modified
+                    size, mimeType, description, created, modified
             );
         }
 
@@ -125,11 +122,6 @@ public record MoneyDocument(
 
         public Builder size(int size) {
             this.size = size;
-            return this;
-        }
-
-        public Builder compressed(boolean compressed) {
-            this.compressed = compressed;
             return this;
         }
 

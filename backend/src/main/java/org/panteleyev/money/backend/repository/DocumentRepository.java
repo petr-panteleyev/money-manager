@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -30,7 +30,6 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
             rs.getString("file_name"),
             getLocalDate(rs, "file_date"),
             rs.getInt("file_size"),
-            rs.getBoolean("compressed"),
             rs.getString("mime_type"),
             rs.getString("description"),
             rs.getLong("created"),
@@ -69,10 +68,10 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
         return jdbcTemplate.update("""
                         INSERT INTO document (
                             uuid, owner_uuid, contact_uuid, document_type, file_name, file_date, file_size,
-                            compressed, mime_type, description, created, modified
+                            mime_type, description, created, modified
                         ) VALUES (
                             :uuid, :ownerUuid, :contactUuid, :documentType, :fileName, :fileDate, :fileSize,
-                            :compressed, :mimeType, :description, :created, :modified
+                            :mimeType, :description, :created, :modified
                         ) ON CONFLICT (uuid) DO UPDATE SET
                             owner_uuid = :ownerUuid,
                             contact_uuid = :contactUuid,
@@ -80,7 +79,6 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
                             file_name = :fileName,
                             file_date = :fileDate,
                             file_size = :fileSize,
-                            compressed = :compressed,
                             mime_type = :mimeType,
                             description = :description,
                             modified = :modified
@@ -93,7 +91,6 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
                         Map.entry("fileName", document.fileName()),
                         Map.entry("fileDate", document.date().toEpochDay()),
                         Map.entry("fileSize", document.size()),
-                        Map.entry("compressed", document.compressed()),
                         Map.entry("mimeType", document.mimeType()),
                         Map.entry("description", document.description()),
                         Map.entry("created", document.created()),
