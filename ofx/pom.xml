@@ -10,11 +10,11 @@
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-manager-parent</artifactId>
-        <version>23.1.1</version>
+        <version>23.3.1</version>
     </parent>
 
     <artifactId>money-manager-ofx</artifactId>
-    <version>23.1.1</version>
+    <version>23.3.1</version>
     <packaging>jar</packaging>
     <name>OFX Parser</name>
 

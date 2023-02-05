@@ -8,6 +8,7 @@ import java.util.ListResourceBundle;
 
 import static org.panteleyev.money.model.DocumentType.BILL;
 import static org.panteleyev.money.model.DocumentType.CONTRACT;
+import static org.panteleyev.money.model.DocumentType.INVOICE;
 import static org.panteleyev.money.model.DocumentType.NOTIFICATION;
 import static org.panteleyev.money.model.DocumentType.OTHER;
 import static org.panteleyev.money.model.DocumentType.PAYSLIP;
@@ -25,6 +26,7 @@ public class DocumentTypeBundle_ru_RU extends ListResourceBundle {
                 {STATEMENT.name(), "Выписка"},
                 {NOTIFICATION.name(), "Уведомление"},
                 {PAYSLIP.name(), "Платёжная ведомость"},
+                {INVOICE.name(), "Инвойс"},
                 {OTHER.name(), "Другое"},
         };
     }

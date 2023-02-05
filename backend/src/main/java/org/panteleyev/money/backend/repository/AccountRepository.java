@@ -134,4 +134,11 @@ public class AccountRepository implements MoneyRepository<Account> {
                 toMap(account)
         );
     }
+
+    public int getCount(boolean inactive) {
+        return jdbcTemplate.query("SELECT COUNT(uuid) FROM account" + (inactive ? "" : " WHERE enabled=true"),
+                Map.of(),
+                (rs, i) -> rs.getInt(1)
+        ).get(0);
+    }
 }

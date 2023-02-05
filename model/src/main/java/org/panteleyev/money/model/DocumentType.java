@@ -11,5 +11,6 @@ public enum DocumentType {
     STATEMENT,
     NOTIFICATION,
     PAYSLIP,
+    INVOICE,
     OTHER
 }

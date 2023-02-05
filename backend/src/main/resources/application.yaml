@@ -1,7 +1,7 @@
 spring:
   application:
     name: Money Manager Backend
-    version: 23.1.1
+    version: 23.3.1
   liquibase:
     change-log: classpath:liquibase/masterChangelog.xml
   datasource:
@@ -16,3 +16,16 @@ server:
   port: ${SERVER_PORT:8080}
   servlet:
     context-path: /money
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,beans,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true

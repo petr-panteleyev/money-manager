@@ -75,4 +75,7 @@ public class AccountService {
                 .reduce(initialBalance, BigDecimal::add);
     }
 
+    public int getCount(boolean inactive) {
+        return accountRepository.getCount(inactive);
+    }
 }
