@@ -9,24 +9,27 @@
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-parent</artifactId>
-    <version>23.3.1</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>Parent</name>
 
     <properties>
+        <revision>23.3.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>19</maven.compiler.release>
+        <maven.compiler.release>20</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
-        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.11.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.1.1</mavenDependencyPluginVersion>
+        <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.5.0</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
+        <flattenMavenPluginVersion>1.4.1</flattenMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>19</javaFxVersion>
+        <javaFxVersion>20</javaFxVersion>
         <javaFxHelpersVersion>1.12.1</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.1.1</controlsFxVersion>
@@ -153,6 +156,11 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${mavenResourcePluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${mavenCompilerPluginVersion}</version>
                 </plugin>
@@ -183,5 +191,32 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>${flattenMavenPluginVersion}</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

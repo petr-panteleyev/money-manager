@@ -4,7 +4,7 @@ Personal finance manager. Work in progress.
 
 ## Build
 
-Make sure ```JAVA_HOME``` points to JDK 19.
+Make sure ```JAVA_HOME``` points to JDK 20.
 
 ```shell script
 mvn clean install

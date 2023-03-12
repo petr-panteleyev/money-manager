@@ -1,0 +1,144 @@
+@startuml
+
+hide circle
+skinparam linetype ortho
+
+entity Icon {
+    * uuid: UUID
+    --
+    * name: VARCHAR
+    * bytes : BYTEA
+    * created : BIGINT
+    * modified: BIGINT
+}
+
+entity Category {
+    * uuid : UUID
+    --
+    * name : VARCHAR
+    * type : VARCHAR
+    * created : BIGINT
+    * modified : BIGINT
+    comment : VARCHAR
+    icon_uuid : UUID <<FK>>
+}
+
+entity Currency {
+    * uuid: UUID
+    --
+    * symbol : VARCHAR(255)
+    * description : VARCHAR(255)
+    * format_symbol : VARCHAR(255)
+    * format_symbol_pos : INT
+    * show_format_symbol : BOOLEAN
+    * def : BOOLEAN
+    * rate : DECIMAL(15, 6)
+    * rate_direction : INT
+    * use_th_separator : BOOLEAN
+    * created : BIGINT
+    * modified : BIGINT
+}
+
+entity Contact {
+    * uuid: UUID
+    --
+    * name : VARCHAR
+    * type : VARCHAR
+    * phone : VARCHAR
+    * mobile : VARCHAR
+    * email : VARCHAR
+    * web : VARCHAR
+    * comment : VARCHAR
+    * street : VARCHAR
+    * city : VARCHAR
+    * country : VARCHAR
+    * zip : VARCHAR
+    * created : BIGINT
+    * modified : BIGINT
+    icon_uuid : UUID <<FK>>
+}
+
+entity Document {
+    * uuid : UUID
+    --
+    * contact_uuid : UUID <<FK>>
+    * document_type : VARCHAR(255)
+    * file_name : VARCHAR(255)
+    * file_date : BIGINT
+    * file_size : INT
+    * mime_type : VARCHAR(255)
+    * description : VARCHAR(255)
+    * compressed : BOOLEAN
+    * created : BIGINT
+    * modified : BIGINT
+    owner_uuid : UUID
+    content : BYTEA
+}
+
+entity Account {
+    * uuid : UUID
+    --
+    * name : VARCHAR
+    * comment : VARCHAR
+    * number : VARCHAR
+    * opening : DECIMAL(15,6)
+    * account_limit : DECIMAL(15,6)
+    * rate : DECIMAL(15,6)
+    * type : VARCHAR
+    * category_uuid : UUID
+    * enabled : BOOLEAN
+    * interest : DECIMAL(15,6)
+    * card_type : VARCHAR
+    * card_number : VARCHAR
+    * total : DECIMAL(15,6)
+    * total_waiting : DECIMAL(15,6)
+    * created : BIGINT
+    * modified : bigint
+    currency_uuid : UUID
+    closing_date : BIGINT
+    icon_uuid : UUID <<FK>>
+}
+
+entity Transaction {
+    * uuid : UUID
+    --
+    * amount : DECIMAL(15, 6)
+    * date_day : INT
+    * date_month : INT
+    * date_year : INT
+    * type : VARCHAR(255)
+    * comment : VARCHAR(255)
+    * checked : BOOLEAN
+    * acc_debited_uuid : UUID <<FK>>
+    * acc_credited_uuid : UUID <<FK>>
+    * acc_debited_type : VARCHAR(255)
+    * acc_credited_type : VARCHAR(255)
+    * acc_debited_category_uuid  : UUID <<FK>>
+    * acc_credited_category_uuid : UUID <<FK>>
+    * rate : DECIMAL(15, 6)
+    * rate_direction : INT
+    * invoice_number : VARCHAR(255)
+    * detailed : BOOLEAN
+    * statement_date : BIGINT
+    * created : BIGINT
+    * modified : BIGINT
+    contact_uuid : UUID <<FK>>
+    parent_uuid : UUID <<FK>>
+}
+
+Icon ||--|{ Category
+Icon ||--|{ Contact
+Icon ||--|{ Account
+
+Currency ||--|{ Account
+
+Contact ||--|{ Document
+
+Category ||--|{ Account
+Category ||--|{ Transaction
+
+Account ||--|{ Transaction
+
+Transaction ||--|{ Transaction
+
+@enduml

@@ -9,26 +9,32 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.5</version>
         <relativePath/>
     </parent>
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
-    <version>23.3.1</version>
+    <version>${revision}</version>
     <name>Backend</name>
+
     <properties>
-        <java.version>19</java.version>
-        <maven.compiler.release>19</maven.compiler.release>
+        <revision>23.3.2</revision>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>20</java.version>
+        <maven.compiler.release>20</maven.compiler.release>
         <!-- Plugins -->
-        <mavenCompilerPluginVersion>3.10.1</mavenCompilerPluginVersion>
+        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.11.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0-M7</mavenSurefirePluginVersion>
+        <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.5.1</postgresVersion>
-        <liquibaseVersion>4.8.0</liquibaseVersion>
-        <springDocsVersion>1.6.13</springDocsVersion>
+        <liquibaseVersion>4.20.0</liquibaseVersion>
+        <springDocsVersion>1.6.15</springDocsVersion>
+        <caffeineVersion>3.1.1</caffeineVersion>
+        <graphqlJavaExtendedScalarsVersion>19.1</graphqlJavaExtendedScalarsVersion>
         <restAssuredVersion>5.3.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
@@ -102,12 +108,12 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>19.1</version>
+            <version>${graphqlJavaExtendedScalarsVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
-            <version>3.1.1</version>
+            <version>${caffeineVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -151,6 +157,11 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${mavenResourcePluginVersion}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
