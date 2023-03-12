@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -11,6 +11,7 @@ import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
+import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
@@ -41,6 +42,7 @@ public class MoneyDAO {
     private final TransactionRepository transactionRepository = new TransactionRepository();
     private final IconRepository iconRepository = new IconRepository();
     private final DocumentRepository documentRepository = new DocumentRepository();
+    private final PeriodicPaymentRepository periodicPaymentRepository = new PeriodicPaymentRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -269,6 +271,36 @@ public class MoneyDAO {
         );
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Periodic Payments
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertPeriodicPayment(PeriodicPayment periodicPayment) {
+        withNewConnection(conn -> {
+            periodicPaymentRepository.insert(conn, periodicPayment);
+            cache.add(periodicPayment);
+        });
+    }
+
+    public void updatePeriodicPayment(PeriodicPayment periodicPayment) {
+        withNewConnection(conn -> {
+            updatePeriodicPayment(conn, periodicPayment);
+        });
+    }
+
+    public void updatePeriodicPayment(Connection conn, PeriodicPayment periodicPayment) {
+        periodicPaymentRepository.update(conn, periodicPayment);
+        cache.update(periodicPayment);
+    }
+
+    public void deletePeriodicPayment(PeriodicPayment periodicPayment) {
+        withNewConnection(conn -> {
+            cache.remove(periodicPayment);
+            periodicPaymentRepository.delete(conn, periodicPayment);
+        });
+    }
+
+
     /**
      * This method recalculates total values for all involved accounts.
      *
@@ -331,6 +363,10 @@ public class MoneyDAO {
             var documentList = documentRepository.getAll(conn);
             progress.accept("done\n");
 
+            progress.accept("    periodic payments...");
+            var periodicPaymentsList = periodicPaymentRepository.getAll(conn);
+            progress.accept("done\n");
+
             progress.accept("done\n");
 
             CompletableFuture.supplyAsync(() -> {
@@ -341,6 +377,7 @@ public class MoneyDAO {
                 cache.getCurrencies().setAll(currencyList);
                 cache.getAccounts().setAll(accountList);
                 cache.getTransactions().setAll(transactionList);
+                cache.getPeriodicPayments().setAll(periodicPaymentsList);
                 return null;
             }, executor);
         });
@@ -389,6 +426,11 @@ public class MoneyDAO {
             progress.accept("    documents...");
             documentRepository.insert(conn, BATCH_SIZE, imp.getDocuments());
             progress.accept("done\n");
+
+            progress.accept("    periodic payments...");
+            periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
+            progress.accept("done\n");
+
 
             progress.accept("done\n");
 

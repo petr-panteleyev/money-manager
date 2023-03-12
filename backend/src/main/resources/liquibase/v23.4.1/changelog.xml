@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v23.4.1/changelog.xml">
+
+    <changeSet id="v23.4.1-periodic" author="petr-panteleyev@yandex.ru">
+        <sql>
+            CREATE TABLE periodic (
+                uuid                    UUID            NOT NULL PRIMARY KEY,
+                name                    VARCHAR(255)    NOT NULl,
+                payment_type            VARCHAR(255)    NOT NULL,
+                recurrence_type         VARCHAR(255)    NOT NULL,
+                amount                  DECIMAL(15, 6)  NOT NULL,
+                day_of_month            INT             NOT NULL,
+                month                   VARCHAR(9)      NOT NULL,
+                account_debited_uuid    UUID            NOT NULL,
+                account_credited_uuid   UUID            NOT NULL,
+                contact_uuid            UUID            NOT NULL,
+                comment                 VARCHAR(255)    NOT NULL,
+                created                 BIGINT          NOT NULL,
+                modified                BIGINT          NOT NULL,
+                CONSTRAINT periodic_debited_fk FOREIGN KEY (account_debited_uuid)
+                    REFERENCES account (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                CONSTRAINT periodic_credited_fk FOREIGN KEY (account_credited_uuid)
+                    REFERENCES account (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                CONSTRAINT periodic_contact_fk FOREIGN KEY (contact_uuid)
+                    REFERENCES contact (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT
+            )
+        </sql>
+        <rollback>
+            <sql>
+                DROP TABLE periodic
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

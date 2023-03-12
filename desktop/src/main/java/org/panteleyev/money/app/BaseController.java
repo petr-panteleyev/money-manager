@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -28,10 +28,12 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
 import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_HELP;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ABOUT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_WINDOW;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PERIODIC_PAYMENTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNTS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORIES;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTACTS;
@@ -84,6 +86,8 @@ public class BaseController extends Controller {
                 x -> getController(ContactListWindowController.class));
         var documentsMenuItem = menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), SHORTCUT_ALT_U,
                 x -> getDocumentController(null));
+        var periodicPaymentsMenuItem = menuItem(fxString(UI, I18N_MISC_PERIODIC_PAYMENTS, ELLIPSIS), SHORTCUT_SHIFT_P,
+                x -> getController(PeriodicPaymentWindowController.class));
 
         if (dbOpenProperty != null) {
             accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -94,6 +98,7 @@ public class BaseController extends Controller {
             contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
             chartsMenuItem.disableProperty().bind(dbOpenProperty.not());
             documentsMenuItem.disableProperty().bind(dbOpenProperty.not());
+            periodicPaymentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
         var menu = newMenu(fxString(UI, I18N_MENU_WINDOW),
@@ -108,11 +113,12 @@ public class BaseController extends Controller {
                 categoriesMenuItem,
                 contactsMenuItem,
                 new SeparatorMenuItem(),
-                documentsMenuItem
+                documentsMenuItem,
+                periodicPaymentsMenuItem
         );
 
         menu.setOnShowing(event -> {
-            var lastIndex = menu.getItems().indexOf(documentsMenuItem);
+            var lastIndex = menu.getItems().indexOf(periodicPaymentsMenuItem);
             menu.getItems().remove(lastIndex + 1, menu.getItems().size());
 
             var accountControllers = WINDOW_MANAGER.getControllerStream(RequestWindowController.class)

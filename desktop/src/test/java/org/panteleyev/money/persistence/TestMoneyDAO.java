@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
+import org.panteleyev.money.model.Contact;
+import org.panteleyev.money.model.PeriodicPayment;
+import org.panteleyev.money.model.PeriodicPaymentType;
+import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.test.BaseTestUtils;
 
@@ -20,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.test.BaseTestUtils.randomDay;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 
 public class TestMoneyDAO extends BaseDaoTest {
@@ -209,6 +214,56 @@ public class TestMoneyDAO extends BaseDaoTest {
         dao().updateTransaction(update);
         assertEquals(update, cache().getTransaction(id).orElseThrow());
         retrieved = get(repo, id);
+        assertEquals(update, retrieved.orElseThrow());
+    }
+    
+    @Test
+    public void testPeriodicPayment() {
+        var repo = new PeriodicPaymentRepository();
+
+        var category = new Category.Builder()
+                .name(randomString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .build();
+        dao().insertCategory(category);
+
+        var account = new Account.Builder()
+                .uuid(UUID.randomUUID())
+                .name(randomString())
+                .type(category.type())
+                .categoryUuid(category.uuid())
+                .accountNumber("123456")
+                .build();
+        dao().insertAccount(account);
+
+        var contact = new Contact.Builder()
+                .name(randomString())
+                .build();
+        dao().insertContact(contact);
+
+        var periodic = new PeriodicPayment.Builder()
+                .name(randomString())
+                .dayOfMonth(randomDay())
+                .paymentType(PeriodicPaymentType.AUTO_PAYMENT)
+                .recurrenceType(RecurrenceType.MONTHLY)
+                .accountDebitedUuid(account.uuid())
+                .accountCreditedUuid(account.uuid())
+                .contactUuid(contact.uuid())
+                .comment(randomString())
+                .build();
+        dao().insertPeriodicPayment(periodic);
+        assertEquals(periodic, cache().getPeriodicPayment(periodic.uuid()).orElseThrow());
+        var retrieved = get(repo, periodic.uuid());
+        assertEquals(periodic, retrieved.orElseThrow());
+
+        var update = new PeriodicPayment.Builder(periodic)
+                .comment(UUID.randomUUID().toString())
+                .build();
+
+        dao().updatePeriodicPayment(update);
+        assertEquals(update, cache().getPeriodicPayment(periodic.uuid()).orElseThrow());
+        retrieved = get(repo, periodic.uuid());
         assertEquals(update, retrieved.orElseThrow());
     }
 }

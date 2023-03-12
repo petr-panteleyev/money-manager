@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -25,6 +25,7 @@ final class GeneralSettings {
     enum Setting {
         AUTO_COMPLETE_LENGTH("autoCompleteLength", 3),
         ACCOUNT_CLOSING_DAY_DELTA("accountClosingDayDelta", 10),
+        PERIODIC_PAYMENT_DAY_DELTA("periodicPaymentDayDelta", 5),
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts", false),
         LAST_STATEMENT_DIR("lastStatementDir", ""),
         LAST_EXPORT_DIR("lastExportDir", ""),
@@ -70,15 +71,12 @@ final class GeneralSettings {
         var rootElement = readDocument(in);
 
         for (var key : Setting.values()) {
-            // TODO: reimplement with switch pattern matching when available
-            Optional<?> value = Optional.empty();
-            if (key.getDefaultValue() instanceof Integer) {
-                value = getIntNodeValue(rootElement, key.getElementName());
-            } else if (key.getDefaultValue() instanceof String) {
-                value = getStringNodeValue(rootElement, key.getElementName());
-            } else if (key.getDefaultValue() instanceof Boolean) {
-                value = getBooleanNodeValue(rootElement, key.getElementName());
-            }
+            var value = switch (key.getDefaultValue()) {
+                case Integer ignored -> getIntNodeValue(rootElement, key.getElementName());
+                case String ignored -> getStringNodeValue(rootElement, key.getElementName());
+                case Boolean ignored -> getBooleanNodeValue(rootElement, key.getElementName());
+                default -> Optional.empty();
+            };
             value.ifPresent(x -> settings.put(key, x));
         }
     }

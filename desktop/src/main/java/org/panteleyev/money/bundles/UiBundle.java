@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.bundles;
@@ -64,6 +64,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_LOGIN, "Login"},
                 {I18N_WORD_MENU, "Menu"},
                 {I18N_WORD_MOBILE, "Mobile"},
+                {I18N_WORD_MONTH, "Month"},
                 {I18N_WORD_NAME, "Name"},
                 {I18N_WORD_OPEN, "Open"},
                 {I18N_WORD_OPTIONS, "Options"},
@@ -74,6 +75,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_WORD_PROFILE, "Profile"},
                 {I18N_WORD_PROFILES, "Profiles"},
                 {I18N_WORD_RATE, "Rate"},
+                {I18N_WORD_RECURRENCE, "Recurrence"},
                 {I18N_WORD_REPORT, "Report"},
                 {I18N_WORD_REQUESTS, "Requests"},
                 {I18N_WORD_RESET, "Reset"},
@@ -136,6 +138,7 @@ public class UiBundle extends ListResourceBundle {
                 {I18N_MISC_DATE_PICKER_TOOLTIP, "%s - next day\n%s - previous day\n%s - next month\n%s - previous " +
                         "month\n%s - today"},
                 {I18N_MISC_DAYS_BEFORE_CLOSING, "Days Before Account Closing"},
+                {I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT, "Days Before Periodic Payment"},
                 {I18N_MISC_DEBITED_ACCOUNT, "Debited Account"},
                 {I18N_MISC_DEFAULT_CURRENCY, "Default Currency"},
                 {I18N_MISC_DEFAULT_PROFILE, "Default Profile"},
@@ -150,8 +153,11 @@ public class UiBundle extends ListResourceBundle {
                 {I18M_MISC_INCOMES_AND_EXPENSES, "Incomes and Expenses"},
                 {I18N_MISC_INCOMPATIBLE_SCHEMA, "Database is incompatible with the application, exiting."},
                 {I18N_MISC_INITIAL_BALANCE, "Initial Balance"},
+                {I18N_MISC_NEXT_PAYMENT, "Next\nPayment"},
                 {I18N_MISC_NOT_FOUND, "Not Found"},
                 {I18N_MISC_PARTIAL_IMPORT, "Partial import"},
+                {I18N_MISC_PERIODIC_PAYMENT, "Periodic Payment"},
+                {I18N_MISC_PERIODIC_PAYMENTS, "Periodic Payments"},
                 {I18N_MISC_PROFILE_NAME, "Profile Name"},
                 {I18N_MISC_RECALCULATE_BALANCE, "Recalculate Balance"},
                 {I18N_MISC_RESET_FILTER, "Reset Filter"},

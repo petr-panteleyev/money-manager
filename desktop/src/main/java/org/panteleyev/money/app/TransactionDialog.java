@@ -25,6 +25,8 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.money.app.util.NamedCompletionProvider;
+import org.panteleyev.money.app.util.NamedToStringConverter;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -90,27 +92,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 }
             };
 
-    private static final ToStringConverter<Contact> CONTACT_TO_STRING = new ToStringConverter<>() {
-        public String toString(Contact obj) {
-            return obj.name();
-        }
-    };
-
-    private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
-        public String toString(Account obj) {
-            return obj.name();
-        }
-    };
-
-    private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
-        CompletionProvider(Set<T> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(T element) {
-            return element.name();
-        }
-    }
+    private static final NamedToStringConverter<Contact> CONTACT_TO_STRING = new NamedToStringConverter<>();
+    private static final NamedToStringConverter<Account> ACCOUNT_TO_STRING = new NamedToStringConverter<>();
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
@@ -285,10 +268,10 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         TextFields.bindAutoCompletion(typeEdit,
                 new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
         TextFields.bindAutoCompletion(debitedAccountEdit,
-                new CompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
+                new NamedCompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
-                new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
-        TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
+                new NamedCompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+        TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
         creditedAccountEdit.focusedProperty().addListener((x, oldValue, newValue) -> {

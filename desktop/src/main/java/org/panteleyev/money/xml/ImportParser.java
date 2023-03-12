@@ -15,6 +15,9 @@ import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.model.PeriodicPayment;
+import org.panteleyev.money.model.PeriodicPaymentType;
+import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.xml.sax.Attributes;
@@ -24,6 +27,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -44,7 +48,8 @@ class ImportParser extends DefaultHandler {
         Currency(ImportParser::parseCurrency),
         Contact(ImportParser::parseContact),
         Transaction(ImportParser::parseTransaction),
-        Document(ImportParser::parseDocument);
+        Document(ImportParser::parseDocument),
+        PeriodicPayment(ImportParser::parsePeriodicPayment);
 
         Tag(Function<Map<String, String>, MoneyRecord> parseMethod) {
             this.parseMethod = parseMethod;
@@ -76,6 +81,7 @@ class ImportParser extends DefaultHandler {
     private final List<Currency> currencies = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
     private final List<MoneyDocument> documents = new ArrayList<>();
+    private final List<PeriodicPayment> periodicPayments = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
             Map.entry(Tag.Icon, icons),
@@ -84,7 +90,8 @@ class ImportParser extends DefaultHandler {
             Map.entry(Tag.Currency, currencies),
             Map.entry(Tag.Contact, contacts),
             Map.entry(Tag.Transaction, transactions),
-            Map.entry(Tag.Document, documents)
+            Map.entry(Tag.Document, documents),
+            Map.entry(Tag.PeriodicPayment, periodicPayments)
     );
 
     private Map<String, String> tags = null;
@@ -116,6 +123,10 @@ class ImportParser extends DefaultHandler {
 
     public List<MoneyDocument> getDocuments() {
         return documents;
+    }
+
+    public List<PeriodicPayment> getPeriodicPayments() {
+        return periodicPayments;
     }
 
     @Override
@@ -296,6 +307,26 @@ class ImportParser extends DefaultHandler {
                 .build();
     }
 
+    private static PeriodicPayment parsePeriodicPayment(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
+        return new PeriodicPayment.Builder()
+                .uuid(UUID.fromString(tags.get("uuid")))
+                .name(tags.get("name"))
+                .paymentType(parsePeriodicPaymentType(tags.get("paymentType")))
+                .recurrenceType(parseRecurrenceType(tags.get("recurrenceType")))
+                .amount(parseBigDecimal(tags.get("amount")))
+                .dayOfMonth(parseInt(tags.get("dayOfMonth")))
+                .month(parseMonthName(tags.get("month")))
+                .accountDebitedUuid(parseUuid(tags.get("accountDebitedUuid")))
+                .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
+                .contactUuid(parseUuid(tags.get("contactUuid")))
+                .comment(tags.get("comment"))
+                .created(created)
+                .modified(modified)
+                .build();
+    }
+
     private static UUID parseUuid(String value) {
         return value == null ? null : UUID.fromString(value);
     }
@@ -334,5 +365,17 @@ class ImportParser extends DefaultHandler {
 
     private static DocumentType parseDocumentType(String rawValue) {
         return rawValue == null ? DocumentType.OTHER : DocumentType.valueOf(rawValue);
+    }
+
+    private static PeriodicPaymentType parsePeriodicPaymentType(String rawValue) {
+        return rawValue == null ? PeriodicPaymentType.MANUAL_PAYMENT : PeriodicPaymentType.valueOf(rawValue);
+    }
+
+    private static RecurrenceType parseRecurrenceType(String rawValue) {
+        return rawValue == null ? RecurrenceType.MONTHLY : RecurrenceType.valueOf(rawValue);
+    }
+
+    private static Month parseMonthName(String rawValue) {
+        return rawValue == null ? Month.JANUARY : Month.valueOf(rawValue);
     }
 }

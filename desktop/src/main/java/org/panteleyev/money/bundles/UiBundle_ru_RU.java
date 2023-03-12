@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.bundles;
@@ -65,6 +65,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_LOGIN, "Логин"},
                 {I18N_WORD_MENU, "Меню"},
                 {I18N_WORD_MOBILE, "Мобильный"},
+                {I18N_WORD_MONTH, "Месяц"},
                 {I18N_WORD_NAME, "Имя"},
                 {I18N_WORD_OPEN, "Открыть"},
                 {I18N_WORD_OPTIONS, "Настройки"},
@@ -75,6 +76,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_WORD_PROFILE, "Профиль"},
                 {I18N_WORD_PROFILES, "Профили"},
                 {I18N_WORD_RATE, "Курс"},
+                {I18N_WORD_RECURRENCE, "Периодичность"},
                 {I18N_WORD_REPORT, "Отчет"},
                 {I18N_WORD_REQUESTS, "Запросы"},
                 {I18N_WORD_RESET, "Сбросить"},
@@ -137,6 +139,7 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18N_MISC_DATE_PICKER_TOOLTIP, "%s - следующий день\n%s - предыдущий день\n%s - следующий месяц\n%s " +
                         "- предыдущий месяц\n%s - сегодня"},
                 {I18N_MISC_DAYS_BEFORE_CLOSING, "Дней до закрытия счета"},
+                {I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT, "Дней до периодического платежа"},
                 {I18N_MISC_DEBITED_ACCOUNT, "Исходный счет"},
                 {I18N_MISC_DEFAULT_CURRENCY, "Валюта по умолчанию"},
                 {I18N_MISC_DEFAULT_PROFILE, "Профиль по умолчанию"},
@@ -151,8 +154,11 @@ public class UiBundle_ru_RU extends ListResourceBundle {
                 {I18M_MISC_INCOMES_AND_EXPENSES, "Доходы и расходы"},
                 {I18N_MISC_INCOMPATIBLE_SCHEMA, "База данных несовместима с приложением, завершение работы."},
                 {I18N_MISC_INITIAL_BALANCE, "Начальный баланс"},
+                {I18N_MISC_NEXT_PAYMENT, "Следующий\nплатёж"},
                 {I18N_MISC_NOT_FOUND, "Не найдено"},
                 {I18N_MISC_PARTIAL_IMPORT, "Импорт записей"},
+                {I18N_MISC_PERIODIC_PAYMENT, "Периодический платёж"},
+                {I18N_MISC_PERIODIC_PAYMENTS, "Периодические платежи"},
                 {I18N_MISC_PROFILE_NAME, "Имя профиля"},
                 {I18N_MISC_RECALCULATE_BALANCE, "Пересчитать баланс"},
                 {I18N_MISC_RESET_FILTER, "Сбросить фильтр"},

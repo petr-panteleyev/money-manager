@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -78,15 +78,11 @@ public final class XMLUtils {
     }
 
     public static void appendObjectTextNode(Element e, String name, Object value) {
-        // TODO: reimplement with switch pattern matching when available
-        if (value instanceof Integer intValue) {
-            appendTextNode(e, name, intValue);
-        } else if (value instanceof String stringValue) {
-            appendTextNode(e, name, stringValue);
-        } else if (value instanceof Boolean booleanValue) {
-            appendTextNode(e, name, booleanValue);
-        } else {
-            throw new IllegalArgumentException("Unsupported value type");
+        switch (value) {
+            case Integer intValue -> appendTextNode(e, name, intValue);
+            case String stringValue -> appendTextNode(e, name, stringValue);
+            case Boolean booleanValue -> appendTextNode(e, name, booleanValue);
+            default -> throw new IllegalArgumentException("Unsupported value type");
         }
     }
 
@@ -140,29 +136,17 @@ public final class XMLUtils {
 
     public static int getAttribute(Element element, String name, int defValue) {
         var value = element.getAttribute(name);
-        if (value.isBlank()) {
-            return defValue;
-        } else {
-            return Integer.parseInt(value);
-        }
+        return value.isBlank() ? defValue : Integer.parseInt(value);
     }
 
     public static double getAttribute(Element element, String name, double defValue) {
         var value = element.getAttribute(name);
-        if (value.isBlank()) {
-            return defValue;
-        } else {
-            return Double.parseDouble(value);
-        }
+        return value.isBlank() ? defValue : Double.parseDouble(value);
     }
 
     public static boolean getAttribute(Element element, String name, boolean defValue) {
         var value = element.getAttribute(name);
-        if (value.isBlank()) {
-            return defValue;
-        } else {
-            return Boolean.parseBoolean(value);
-        }
+        return value.isBlank() ? defValue : Boolean.parseBoolean(value);
     }
 
     public static Optional<String> getStringNodeValue(Element parent, String tagName) {

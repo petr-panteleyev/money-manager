@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -12,10 +12,13 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
+import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
+import org.panteleyev.money.model.PeriodicPayment;
+import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 
@@ -43,6 +46,7 @@ import static org.panteleyev.money.test.BaseTestUtils.newContact;
 import static org.panteleyev.money.test.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.test.BaseTestUtils.newDocument;
 import static org.panteleyev.money.test.BaseTestUtils.newIcon;
+import static org.panteleyev.money.test.BaseTestUtils.newPeriodicPayment;
 import static org.panteleyev.money.test.BaseTestUtils.newTransaction;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 
@@ -78,6 +82,16 @@ public class TestImportExport {
     private static final Account ACCOUNT_2 = newAccount(CATEGORY_2, CURRENCY_1, ICON_2);
     private static final Account ACCOUNT_3 = newAccount(CATEGORY_3, CURRENCY_2, ICON_3);
 
+    private static final Contact CONTACT_1 = newContact();
+    private static final Contact CONTACT_2 = newContact();
+
+    private static final PeriodicPayment PAYMENT_1 = newPeriodicPayment(
+            PeriodicPaymentType.CARD_PAYMENT, ACCOUNT_1, ACCOUNT_2, CONTACT_1
+    );
+    private static final PeriodicPayment PAYMENT_2 = newPeriodicPayment(
+            PeriodicPaymentType.MANUAL_PAYMENT, ACCOUNT_2, ACCOUNT_3, CONTACT_2
+    );
+
     private final MoneyDAO dao = Mockito.mock(MoneyDAO.class);
 
     @BeforeEach
@@ -100,13 +114,13 @@ public class TestImportExport {
                                 getDocuments().addAll(DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4);
                                 getCategories().addAll(CATEGORY_1, CATEGORY_2);
                                 getAccounts().addAll(ACCOUNT_1, ACCOUNT_2, ACCOUNT_3);
-                                getContacts().addAll(newContact(), newContact(), newContact("A & B <some@email.com>"));
+                                getContacts().addAll(CONTACT_1, CONTACT_2, newContact("A & B <some@email.com>"));
                                 getCurrencies().addAll(CURRENCY_1, CURRENCY_2, CURRENCY_3);
                                 getTransactions().addAll(newTransaction(ACCOUNT_1, ACCOUNT_2),
                                         newTransaction(ACCOUNT_2, ACCOUNT_3),
                                         newTransaction(ACCOUNT_1, ACCOUNT_3),
                                         newTransaction(ACCOUNT_1, ACCOUNT_2));
-
+                                getPeriodicPayments().addAll(PAYMENT_1, PAYMENT_2);
                             }
                         }
                 )
@@ -129,6 +143,7 @@ public class TestImportExport {
             assertEquals(cache.getContacts(), imp.getContacts());
             assertEquals(cache.getCurrencies(), imp.getCurrencies());
             assertEquals(cache.getTransactions(), imp.getTransactions());
+            assertEquals(cache.getPeriodicPayments(), imp.getPeriodicPayments());
 
             // Get blobs
             var actualBlobs = new ArrayList<BlobContent>();

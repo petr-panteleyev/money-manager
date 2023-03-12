@@ -19,7 +19,7 @@
     <name>Backend</name>
 
     <properties>
-        <revision>23.3.2</revision>
+        <revision>23.4.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>20</java.version>
         <maven.compiler.release>20</maven.compiler.release>

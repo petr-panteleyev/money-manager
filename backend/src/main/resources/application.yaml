@@ -1,7 +1,7 @@
 spring:
   application:
     name: Money Manager Backend
-    version: 23.3.2
+    version: 23.4.1
   liquibase:
     change-log: classpath:liquibase/masterChangelog.xml
   datasource:

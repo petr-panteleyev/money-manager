@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -60,6 +60,8 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_ALT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_S = new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_U = new KeyCodeCombination(U, SHORTCUT_DOWN, ALT_DOWN);
+
+    public static final KeyCodeCombination SHORTCUT_SHIFT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, SHIFT_DOWN);
 
     public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);

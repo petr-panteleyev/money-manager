@@ -17,6 +17,9 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.model.PeriodicPayment;
+import org.panteleyev.money.model.PeriodicPaymentType;
+import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 
 import java.io.IOException;
@@ -37,6 +40,7 @@ import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.test.BaseTestUtils.randomDay;
 import static org.panteleyev.money.test.BaseTestUtils.randomInt;
 import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.test.BaseTestUtils.randomMonthNumber;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.panteleyev.money.test.BaseTestUtils.randomTransactionType;
 import static org.panteleyev.money.test.BaseTestUtils.randomYear;
@@ -53,6 +57,7 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID ACCOUNT_UUID = UUID.randomUUID();
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
     private static final UUID DOCUMENT_UUID = UUID.randomUUID();
+    private static final UUID PERIODIC_PAYMENT_UUID = UUID.randomUUID();
 
     @BeforeAll
     public static void init() {
@@ -247,7 +252,7 @@ public class TestRepositories extends BaseDaoTest {
                 TRANSACTION_UUID,
                 randomBigDecimal(),
                 randomDay(),
-                randomMonth(),
+                randomMonthNumber(),
                 randomYear(),
                 randomTransactionType(),
                 randomString(),
@@ -273,7 +278,7 @@ public class TestRepositories extends BaseDaoTest {
                 TRANSACTION_UUID,
                 randomBigDecimal(),
                 randomDay(),
-                randomMonth(),
+                randomMonthNumber(),
                 randomYear(),
                 randomTransactionType(),
                 randomString(),
@@ -346,12 +351,52 @@ public class TestRepositories extends BaseDaoTest {
                 repository.insertBytes(conn, DOCUMENT_UUID, bytes);
 
                 var actual = repository.getBytes(conn, DOCUMENT_UUID)
-                                .orElseThrow();
+                        .orElseThrow();
                 assertArrayEquals(bytes, actual);
             });
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    @Test
+    @Order(9)
+    public void testPeriodicPayment() {
+        var repository = new PeriodicPaymentRepository();
+
+        var insert = new PeriodicPayment(
+                PERIODIC_PAYMENT_UUID,
+                randomString(),
+                PeriodicPaymentType.CARD_PAYMENT,
+                RecurrenceType.MONTHLY,
+                randomBigDecimal(),
+                randomDay(),
+                randomMonth(),
+                ACCOUNT_UUID,
+                ACCOUNT_UUID,
+                CONTACT_UUID,
+                randomString(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        var update = new PeriodicPayment(
+                PERIODIC_PAYMENT_UUID,
+                randomString(),
+                PeriodicPaymentType.MANUAL_PAYMENT,
+                RecurrenceType.MONTHLY,
+                randomBigDecimal(),
+                randomDay(),
+                randomMonth(),
+                ACCOUNT_UUID,
+                ACCOUNT_UUID,
+                CONTACT_UUID,
+                randomString(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        insertAndUpdate(repository, insert, update);
     }
 
     private static <T extends MoneyRecord> void insertAndUpdate(Repository<T> repository, T insert, T update) {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.bundles;
@@ -57,6 +57,7 @@ public final class Internationalization {
     public static final String I18N_WORD_LOGIN = "I18N_WORD_LOGIN";
     public static final String I18N_WORD_MENU = "I18N_WORD_MENU";
     public static final String I18N_WORD_MOBILE = "I18N_WORD_MOBILE";
+    public static final String I18N_WORD_MONTH = "I18N_WORD_MONTH";
     public static final String I18N_WORD_NAME = "I18N_WORD_NAME";
     public static final String I18N_WORD_OPEN = "I18N_WORD_OPEN";
     public static final String I18N_WORD_OPTIONS = "I18N_WORD_OPTIONS";
@@ -67,6 +68,7 @@ public final class Internationalization {
     public static final String I18N_WORD_PROFILE = "I18N_WORD_PROFILE";
     public static final String I18N_WORD_PROFILES = "I18N_WORD_PROFILES";
     public static final String I18N_WORD_RATE = "I18N_WORD_RATE";
+    public static final String I18N_WORD_RECURRENCE = "I18N_WORD_RECURRENCE";
     public static final String I18N_WORD_REPORT = "I18N_WORD_REPORT";
     public static final String I18N_WORD_REQUESTS = "I18N_WORD_REQUESTS";
     public static final String I18N_WORD_RESET = "I18N_WORD_RESET";
@@ -141,6 +143,7 @@ public final class Internationalization {
     public static final String I18N_MISC_DATE_BY_STATEMENT = "I18N_MISC_DATE_BY_STATEMENT";
     public static final String I18N_MISC_DATE_PICKER_TOOLTIP = "I18N_MISC_DATE_PICKER_TOOLTIP";
     public static final String I18N_MISC_DAYS_BEFORE_CLOSING = "I18N_MISC_DAYS_BEFORE_CLOSING";
+    public static final String I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT = "I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT";
     public static final String I18N_MISC_DEBITED_ACCOUNT = "I18N_MISC_DEBITED_ACCOUNT";
     public static final String I18N_MISC_DEFAULT_CURRENCY = "I18N_MISC_DEFAULT_CURRENCY";
     public static final String I18N_MISC_DEFAULT_PROFILE = "I18N_MISC_DEFAULT_PROFILE";
@@ -154,8 +157,11 @@ public final class Internationalization {
     public static final String I18M_MISC_INCOMES_AND_EXPENSES = "I18M_MISC_INCOMES_AND_EXPENSES";
     public static final String I18N_MISC_INCOMPATIBLE_SCHEMA = "I18N_MISC_INCOMPATIBLE_SCHEMA";
     public static final String I18N_MISC_INITIAL_BALANCE = "I18N_MISC_INITIAL_BALANCE";
+    public static final String I18N_MISC_NEXT_PAYMENT = "I18N_MISC_NEXT_PAYMENT";
     public static final String I18N_MISC_NOT_FOUND = "I18N_MISC_NOT_FOUND";
     public static final String I18N_MISC_PARTIAL_IMPORT = "I18N_MISC_PARTIAL_IMPORT";
+    public static final String I18N_MISC_PERIODIC_PAYMENT = "I18N_MISC_PERIODIC_PAYMENT";
+    public static final String I18N_MISC_PERIODIC_PAYMENTS = "I18N_MISC_PERIODIC_PAYMENTS";
     public static final String I18N_MISC_PROFILE_NAME = "I18N_MISC_PROFILE_NAME";
     public static final String I18N_MISC_RECALCULATE_BALANCE = "I18N_MISC_RECALCULATE_BALANCE";
     public static final String I18N_MISC_RESET_FILTER = "I18N_MISC_RESET_FILTER";

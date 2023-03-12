@@ -14,6 +14,9 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
+import org.panteleyev.money.model.PeriodicPayment;
+import org.panteleyev.money.model.PeriodicPaymentType;
+import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 
@@ -22,6 +25,7 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Random;
 import java.util.UUID;
 
@@ -32,8 +36,13 @@ public final class BaseTestUtils {
         return 1 + RANDOM.nextInt(28);
     }
 
-    public static int randomMonth() {
+    public static int randomMonthNumber() {
         return 1 + RANDOM.nextInt(12);
+    }
+
+    public static Month randomMonth() {
+        int index = RANDOM.nextInt(Month.values().length);
+        return Month.values()[index];
     }
 
     public static int randomYear() {
@@ -230,7 +239,7 @@ public final class BaseTestUtils {
                 .uuid(uuid)
                 .amount(randomBigDecimal())
                 .day(randomDay())
-                .month(randomMonth())
+                .month(randomMonthNumber())
                 .year(randomYear())
                 .type(randomTransactionType())
                 .comment(UUID.randomUUID().toString())
@@ -253,7 +262,7 @@ public final class BaseTestUtils {
         return new Transaction.Builder()
                 .amount(randomBigDecimal())
                 .day(randomDay())
-                .month(randomMonth())
+                .month(randomMonthNumber())
                 .year(randomYear())
                 .type(randomTransactionType())
                 .comment(UUID.randomUUID().toString())
@@ -301,6 +310,27 @@ public final class BaseTestUtils {
                 .mimeType(randomString())
                 .description(randomString())
                 .date(LocalDate.now())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static PeriodicPayment newPeriodicPayment(
+            PeriodicPaymentType paymentType,
+            Account accountDebited,
+            Account accountCredited,
+            Contact contact
+    ) {
+        return new PeriodicPayment.Builder()
+                .name(randomString())
+                .paymentType(paymentType)
+                .recurrenceType(RecurrenceType.MONTHLY)
+                .accountDebitedUuid(accountDebited.uuid())
+                .accountCreditedUuid(accountCredited.uuid())
+                .contactUuid(contact.uuid())
+                .dayOfMonth(randomDay())
+                .amount(randomBigDecimal())
+                .comment(randomString())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();

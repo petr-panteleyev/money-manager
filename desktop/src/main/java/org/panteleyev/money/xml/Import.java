@@ -10,6 +10,7 @@ import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
+import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 
 import javax.xml.XMLConstants;
@@ -40,6 +41,7 @@ public class Import {
     private final List<Currency> currencies;
     private final List<Transaction> transactions;
     private final List<MoneyDocument> documents;
+    private final List<PeriodicPayment> periodicPayments;
 
     private final ZipInputStream zipInputStream;
 
@@ -53,6 +55,7 @@ public class Import {
         currencies = importParser.getCurrencies();
         transactions = importParser.getTransactions();
         documents = importParser.getDocuments();
+        periodicPayments = importParser.getPeriodicPayments();
 
         this.zipInputStream = zipInputStream;
     }
@@ -83,6 +86,10 @@ public class Import {
 
     public List<MoneyDocument> getDocuments() {
         return documents;
+    }
+
+    public List<PeriodicPayment> getPeriodicPayments() {
+        return periodicPayments;
     }
 
     public static Import doImport(ZipInputStream inStream) {

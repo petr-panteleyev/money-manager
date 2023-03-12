@@ -10,6 +10,7 @@ import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
+import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
@@ -90,6 +91,11 @@ public class Export {
         var documentRoot = XMLUtils.appendElement(rootElement, "Documents");
         for (var document : cache.getDocuments()) {
             documentRoot.appendChild(exportDocument(doc, document));
+        }
+
+        var periodicPaymentRoot = XMLUtils.appendElement(rootElement, "PeriodicPayments");
+        for (var payment : cache.getPeriodicPayments()) {
+            periodicPaymentRoot.appendChild(exportPeriodicPayment(doc, payment));
         }
 
         XMLUtils.writeDocument(doc, out);
@@ -246,6 +252,26 @@ public class Export {
         appendTextNode(e, "description", moneyDocument.description());
         appendTextNode(e, "created", moneyDocument.created());
         appendTextNode(e, "modified", moneyDocument.modified());
+
+        return e;
+    }
+
+    private static Element exportPeriodicPayment(Document doc, PeriodicPayment payment) {
+        var e = doc.createElement("PeriodicPayment");
+
+        appendTextNode(e, "uuid", payment.uuid());
+        appendTextNode(e, "name", payment.name());
+        appendTextNode(e, "paymentType", payment.paymentType());
+        appendTextNode(e, "recurrenceType", payment.recurrenceType());
+        appendTextNode(e, "amount", payment.amount());
+        appendTextNode(e, "dayOfMonth", payment.dayOfMonth());
+        appendTextNode(e, "month", payment.month());
+        appendTextNode(e, "accountDebitedUuid", payment.accountDebitedUuid());
+        appendTextNode(e, "accountCreditedUuid", payment.accountCreditedUuid());
+        appendTextNode(e, "contactUuid", payment.contactUuid());
+        appendTextNode(e, "comment", payment.comment());
+        appendTextNode(e, "created", payment.created());
+        appendTextNode(e, "modified", payment.modified());
 
         return e;
     }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -15,6 +15,7 @@ import javafx.scene.text.Font;
 import org.controlsfx.dialog.FontSelectorDialog;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
+import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 
@@ -23,11 +24,11 @@ import java.util.List;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxFactory.newTab;
 import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
@@ -46,6 +47,7 @@ import static org.panteleyev.money.app.settings.FontName.MENU_FONT;
 import static org.panteleyev.money.app.settings.FontName.TABLE_CELL_FONT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_CLOSING;
+import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT;
 import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_NOT_FOUND;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COLORS;
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONFIRMED;
@@ -65,10 +67,23 @@ import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSF
 import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNCONFIRMED;
 
 public class SettingsDialog extends BaseDialog<ButtonType> {
+    private static final Validator<String> DELTA_VALIDATOR = (Control control, String value) -> {
+        var invalid = false;
+        try {
+            Integer.parseInt(value);
+            invalid = Integer.parseInt(value) <= 0;
+        } catch (NumberFormatException ex) {
+            invalid = true;
+        }
+
+        return ValidationResult.fromErrorIf(control, null, invalid);
+    };
+
     private final ValidationSupport validation = new ValidationSupport();
 
     private final ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(observableArrayList(2, 3, 4, 5));
     private final TextField accountClosingDayDeltaEdit = new TextField();
+    private final TextField periodicPaymentDayDeltaEdit = new TextField();
 
     private final TextField controlsFontField = new TextField();
     private final TextField menuFontField = new TextField();
@@ -110,14 +125,17 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
         setupFontField(dialogLabelFontField, settings.getFont(DIALOG_LABEL_FONT));
 
         var tabPane = new TabPane(
-                newTab(UI, I18N_WORD_GENERAL, false, gridPane(
+                tab(fxString(UI, I18N_WORD_GENERAL), false, gridPane(
                         List.of(
                                 gridRow(label(fxString(UI, I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, COLON)),
                                         autoCompleteLength),
-                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING)), accountClosingDayDeltaEdit)
+                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING, COLON)),
+                                        accountClosingDayDeltaEdit),
+                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT, COLON)),
+                                        periodicPaymentDayDeltaEdit)
                         ), b -> b.withStyle(GRID_PANE))
                 ),
-                newTab(UI, I18N_WORD_FONTS, false,
+                tab(fxString(UI, I18N_WORD_FONTS), false,
                         vBox(DOUBLE_SPACING,
                                 titledPane(fxString(UI, I18N_WORD_CONTROLS),
                                         gridPane(List.of(
@@ -146,7 +164,7 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                 )
                         )
                 ),
-                newTab(UI, I18N_WORD_COLORS, false,
+                tab(fxString(UI, I18N_WORD_COLORS), false,
                         vBox(DOUBLE_SPACING,
                                 titledPane(fxString(UI, I18N_WORD_TRANSACTIONS),
                                         gridPane(List.of(
@@ -177,12 +195,14 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(settings.getAutoCompleteLength()));
         accountClosingDayDeltaEdit.setText(Integer.toString(settings.getAccountClosingDayDelta()));
+        periodicPaymentDayDeltaEdit.setText(Integer.toString(settings.getPeriodicPaymentDayDelta()));
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
                 settings.update(opt -> {
                     opt.setAutoCompleteLength(autoCompleteLength.getValue());
                     opt.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
+                    opt.setPeriodicPaymentDayDelta(Integer.parseInt(periodicPaymentDayDeltaEdit.getText()));
                     // Fonts
                     opt.setFont(CONTROLS_FONT, (Font) controlsFontField.getUserData());
                     opt.setFont(MENU_FONT, (Font) menuFontField.getUserData());
@@ -204,18 +224,8 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
     }
 
     private void createValidationSupport() {
-        validation.registerValidator(accountClosingDayDeltaEdit, (Control control, String value) -> {
-            var invalid = false;
-            try {
-                Integer.parseInt(value);
-                invalid = Integer.parseInt(value) <= 0;
-            } catch (NumberFormatException ex) {
-                invalid = true;
-            }
-
-            return ValidationResult.fromErrorIf(control, null, invalid);
-        });
-
+        validation.registerValidator(accountClosingDayDeltaEdit, DELTA_VALIDATOR);
+        validation.registerValidator(periodicPaymentDayDeltaEdit, DELTA_VALIDATOR);
         validation.initInitialDecoration();
     }
 

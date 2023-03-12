@@ -14,6 +14,7 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 
 import java.math.BigDecimal;
@@ -52,6 +53,7 @@ public class DataCache {
     private final ObservableList<Currency> currencies = FXCollections.observableArrayList();
     private final ObservableList<Account> accounts = FXCollections.observableArrayList();
     private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
+    private final ObservableList<PeriodicPayment> periodicPayments = FXCollections.observableArrayList();
 
     public void clear() {
         icons.clear();
@@ -61,6 +63,7 @@ public class DataCache {
         currencies.clear();
         accounts.clear();
         transactions.clear();
+        periodicPayments.clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -361,6 +364,30 @@ public class DataCache {
 
     public Comparator<Transaction> getTransactionByDayComparator() {
         return COMPARE_TRANSACTION_BY_DAY;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Periodic Payments
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<PeriodicPayment> getPeriodicPayment(UUID uuid) {
+        return getRecord(periodicPayments, uuid);
+    }
+
+    public ObservableList<PeriodicPayment> getPeriodicPayments() {
+        return periodicPayments;
+    }
+
+    public void add(PeriodicPayment periodicPayment) {
+        periodicPayments.add(periodicPayment);
+    }
+
+    public void update(PeriodicPayment periodicPayment) {
+        updateRecord(periodicPayments, periodicPayment);
+    }
+
+    public void remove(PeriodicPayment periodicPayment) {
+        removeRecord(periodicPayments, periodicPayment.uuid());
     }
 
     /**

@@ -7,7 +7,7 @@
     <xsd:annotation>
         <xsd:documentation xml:lang="en">
             Money Database export file schema.
-            Copyright (C) 2017, 2022 Petr Panteleyev
+            Copyright (C) 2017-2023 Petr Panteleyev
         </xsd:documentation>
     </xsd:annotation>
 
@@ -109,6 +109,20 @@
                     </xsd:complexType>
                     <xsd:unique name="DocumentUniqueUUID">
                         <xsd:selector xpath="Document"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="PeriodicPayments" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="PeriodicPayment"
+                                         type="PeriodicPayment"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="PeriodicPaymentUniqueUUID">
+                        <xsd:selector xpath="PeriodicPayment"/>
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
@@ -244,6 +258,24 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="PeriodicPayment">
+        <xsd:all>
+            <xsd:element name="uuid" type="UUID"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="paymentType" type="PeriodicPaymentType"/>
+            <xsd:element name="recurrenceType" type = "RecurrenceType"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="dayOfMonth" type="xsd:int"/>
+            <xsd:element name="month" type="MonthName"/>
+            <xsd:element name="accountDebitedUuid" type="UUID"/>
+            <xsd:element name="accountCreditedUuid" type="UUID"/>
+            <xsd:element name="contactUuid" type="UUID"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="created" type="Timestamp"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:simpleType name="UUID">
         <xsd:restriction base="xsd:string">
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
@@ -331,6 +363,37 @@
             <xsd:enumeration value="NOTIFICATION"/>
             <xsd:enumeration value="PAYSLIP"/>
             <xsd:enumeration value="OTHER"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="PeriodicPaymentType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="MANUAL_PAYMENT"/>
+            <xsd:enumeration value="AUTO_PAYMENT"/>
+            <xsd:enumeration value="CARD_PAYMENT"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="RecurrenceType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="MONTHLY"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="MonthName">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="JANUARY"/>
+            <xsd:enumeration value="FEBRUARY"/>
+            <xsd:enumeration value="MARCH"/>
+            <xsd:enumeration value="APRIL"/>
+            <xsd:enumeration value="MAY"/>
+            <xsd:enumeration value="JUNE"/>
+            <xsd:enumeration value="JULY"/>
+            <xsd:enumeration value="AUGUST"/>
+            <xsd:enumeration value="SEPTEMBER"/>
+            <xsd:enumeration value="OCTOBER"/>
+            <xsd:enumeration value="NOVEMBER"/>
+            <xsd:enumeration value="DECEMBER"/>
         </xsd:restriction>
     </xsd:simpleType>
 
