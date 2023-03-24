@@ -33,10 +33,10 @@
         <jsoupVersion>1.15.3</jsoupVersion>
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <postgresVersion>42.5.1</postgresVersion>
-        <freemarkerVersion>2.3.29</freemarkerVersion>
+        <freemarkerVersion>2.3.32</freemarkerVersion>
         <jUnitVersion>5.9.1</jUnitVersion>
         <mockitoVersion>4.5.1</mockitoVersion>
-        <liquibaseVersion>4.8.0</liquibaseVersion>
+        <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
 
