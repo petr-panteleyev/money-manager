@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -27,14 +27,9 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import static javafx.collections.FXCollections.observableArrayList;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByCategoryType;
-import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ACCOUNTS_CASH_CARDS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CATEGORIES;
 
 public class CategorySelectionBox extends HBox {
 
@@ -102,9 +97,9 @@ public class CategorySelectionBox extends HBox {
         categoryTypeChoiceBox.setOnAction(event -> {});
 
         categoryTypeChoiceBox.getItems().setAll(
-                TypeListItem.of(fxString(UI, I18N_MISC_ACCOUNTS_CASH_CARDS),
+                TypeListItem.of("Счета, наличные, карты",
                         CategoryType.BANKS_AND_CASH, CategoryType.DEBTS),
-                TypeListItem.of(fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES),
+                TypeListItem.of("Доходы и расходы",
                         CategoryType.INCOMES, CategoryType.EXPENSES),
                 new Separator()
         );
@@ -154,7 +149,7 @@ public class CategorySelectionBox extends HBox {
             items.add(0, new Separator());
         }
 
-        items.add(0, fxString(UI, I18N_MISC_ALL_CATEGORIES));
+        items.add(0, "Все категории");
 
         categoryChoiceBox.setItems(items);
         categoryChoiceBox.getSelectionModel().selectFirst();

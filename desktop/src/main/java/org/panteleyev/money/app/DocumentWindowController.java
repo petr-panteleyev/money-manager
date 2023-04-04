@@ -6,6 +6,7 @@ package org.panteleyev.money.app;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
@@ -16,6 +17,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.app.cells.DocumentContactNameCell;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.DocumentTypeFilterBox;
@@ -34,9 +36,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
@@ -45,27 +46,9 @@ import static org.panteleyev.money.MoneyApplication.showDocument;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_S;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PROCESS_STATEMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_OPEN;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SAVE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SIZE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 public class DocumentWindowController extends BaseController {
     private final MoneyRecord documentOwner;
@@ -77,6 +60,11 @@ public class DocumentWindowController extends BaseController {
 
     public DocumentWindowController(MoneyRecord documentOwner) {
         this.documentOwner = documentOwner;
+
+        var crudActionsHolder = new CrudActionsHolder(
+                this::onCreateDocument, this::onEditDocument, event -> {},
+                table.getSelectionModel().selectedItemProperty().isNull()
+        );
 
         var contactFilterBox = new ContactFilterBox();
         var documentTypeFilterBox = new DocumentTypeFilterBox();
@@ -98,20 +86,18 @@ public class DocumentWindowController extends BaseController {
             );
         }
 
-        var disableBinding = table.getSelectionModel().selectedItemProperty().isNull();
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-                newMenu(fxString(UI, I18N_MENU_EDIT),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                                event -> onAddDocument()),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                                event -> onEditDocument(), disableBinding),
+                newMenu("Файл",
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                newMenu("Правка",
+                        createMenuItem(crudActionsHolder.getCreateAction()),
+                        createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_WORD_OPEN), SHORTCUT_O, event -> onOpenDocument()),
-                        menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload()),
+                        menuItem("Открыть", SHORTCUT_O, event -> onOpenDocument()),
+                        menuItem("Сохранить...", SHORTCUT_S, event -> onDownload()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_PROCESS_STATEMENT), SHORTCUT_R,
+                        menuItem("Обработать выписку", SHORTCUT_R,
                                 event -> onOpenStatement())
                 ),
                 createWindowMenu(),
@@ -121,15 +107,13 @@ public class DocumentWindowController extends BaseController {
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                        event -> onAddDocument()),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                        event -> onEditDocument(), disableBinding),
+                createMenuItem(crudActionsHolder.getCreateAction()),
+                createMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_OPEN), SHORTCUT_O, event -> onOpenDocument()),
-                menuItem(fxString(UI, I18N_WORD_SAVE, ELLIPSIS), SHORTCUT_S, event -> onDownload()),
+                menuItem("Открыть", SHORTCUT_O, event -> onOpenDocument()),
+                menuItem("Сохранить...", SHORTCUT_S, event -> onDownload()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_PROCESS_STATEMENT), event -> onOpenStatement())
+                menuItem("Обработать выписку", event -> onOpenStatement())
         ));
 
         // Toolbar
@@ -140,27 +124,27 @@ public class DocumentWindowController extends BaseController {
         // Table
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-                tableColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
+                tableColumn("Контрагент", b ->
                         b.withPropertyCallback(MoneyDocument::contactUuid)
                                 .withCellFactory(x -> new DocumentContactNameCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_FILE), b ->
+                tableColumn("Файл", b ->
                         b.withPropertyCallback(MoneyDocument::fileName)
                                 .withWidthBinding(w.multiply(0.2))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_TYPE), b ->
+                tableColumn("Тип", b ->
                         b.withPropertyCallback(doc -> Bundles.translate(doc.documentType()))
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_SIZE), b ->
+                tableColumn("Размер", b ->
                         b.withPropertyCallback(doc -> Integer.toString(doc.size()))
                                 .withWidthBinding(w.multiply(0.05))),
-                tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
+                tableColumn("Описание", b ->
                         b.withPropertyCallback(MoneyDocument::description)
                                 .withWidthBinding(w.multiply(0.4))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_DATE), b ->
+                tableColumn("Дата", b ->
                         b.withPropertyCallback(MoneyDocument::date)
                                 .withWidthBinding(w.multiply(0.15))
                 )
@@ -182,7 +166,7 @@ public class DocumentWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        var name = UI.getString(I18N_WORD_DOCUMENTS);
+        var name = "Документы";
         if (documentOwner instanceof Named named) {
             name = name + " - " + named.name();
         } else if (documentOwner instanceof Transaction transaction) {
@@ -195,16 +179,16 @@ public class DocumentWindowController extends BaseController {
         return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
     }
 
-    public void onAddDocument() {
+    public void onCreateDocument(ActionEvent event) {
         var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null);
         d.showAndWait().ifPresent(documents -> {
-            for (var doc: documents) {
-                dao().insertDocument(doc.document(), doc.bytes());
+            for (DocumentWithBytes(MoneyDocument document, byte[] bytes) : documents) {
+                dao().insertDocument(document, bytes);
             }
         });
     }
 
-    private void onEditDocument() {
+    private void onEditDocument(ActionEvent event) {
         getSelectedDocument()
                 .flatMap(document -> new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), document)
                         .showAndWait())
@@ -268,8 +252,8 @@ public class DocumentWindowController extends BaseController {
                 success = true;
                 var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null, files);
                 d.showAndWait().ifPresent(documents -> {
-                    for (var doc: documents) {
-                        dao().insertDocument(doc.document(), doc.bytes());
+                    for (DocumentWithBytes(MoneyDocument document, byte[] bytes) : documents) {
+                        dao().insertDocument(document, bytes);
                     }
                 });
             }

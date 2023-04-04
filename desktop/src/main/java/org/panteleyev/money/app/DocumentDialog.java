@@ -37,8 +37,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.choicebox.ChoiceBoxBuilder.choiceBox;
@@ -49,12 +47,6 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 record DocumentWithBytes(MoneyDocument document, byte[] bytes) {
 }
@@ -100,7 +92,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
 
     DocumentDialog(Controller owner, MoneyRecord documentOwner, URL css, MoneyDocument document, List<File> files) {
         super(owner, css);
-        setTitle(fxString(UI, I18N_WORD_DOCUMENT));
+        setTitle("Документ");
 
         nameEdit.setEditable(false);
         nameEdit.setPrefColumnCount(40);
@@ -115,13 +107,13 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
         browseButton.setDisable(document != null || !files.isEmpty());
         getDialogPane().setContent(
                 gridPane(List.of(
-                                gridRow(label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
+                                gridRow(label("Контрагент:"),
                                         contactEdit, contactMenuButton),
-                                gridRow(label(fxString(UI, I18N_WORD_FILE, COLON)), nameEdit, browseButton),
-                                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), gridCell(typeChoiceBox, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_DATE, COLON)),
+                                gridRow(label("Файл:"), nameEdit, browseButton),
+                                gridRow(label("Тип:"), gridCell(typeChoiceBox, 2, 1)),
+                                gridRow(label("Дата:"),
                                         gridCell(datePicker, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)),
+                                gridRow(label("Описание:"),
                                         gridCell(descriptionEdit, 2, 1))
                         ),
                         b -> b.withStyle(GRID_PANE)

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -36,17 +36,9 @@ import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NEXT;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.ButtonFactory.radioButton;
-import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_CHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_FULL_DUMP_IMPORT_WARNING;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_IMPORT_FILE_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PARTIAL_IMPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_IMPORT;
 
 final class ImportWizard extends BaseDialog<Object> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -70,7 +62,7 @@ final class ImportWizard extends BaseDialog<Object> {
             getStyleClass().add(Styles.GRID_PANE);
 
 
-            var partialImportRadio = radioButton(fxString(UI, I18N_MISC_PARTIAL_IMPORT), btnGroup, true);
+            var partialImportRadio = radioButton("Импорт записей", btnGroup, true);
 
             var warningLabel = createWarningLabel();
 
@@ -86,19 +78,20 @@ final class ImportWizard extends BaseDialog<Object> {
 
         private TextField createFileNameEdit() {
             var field = new TextField();
-            field.setPromptText(fxString(UI, I18N_MISC_IMPORT_FILE_NAME));
+            field.setPromptText("Имя файла для импорта");
             field.setPrefColumnCount(40);
             return field;
         }
 
         private Label createWarningLabel() {
-            var label = label(fxString(UI, I18N_MISC_FULL_DUMP_IMPORT_WARNING));
+            var label = label("Внимание!\nИмпортирование полного дампа полностью уничтожит\n" +
+                    "все существующие записи в базе.");
             label.setWrapText(true);
             return label;
         }
 
         private CheckBox createWarningCheckBox() {
-            var checkBox = newCheckBox(UI, I18N_MISC_FULL_DUMP_IMPORT_CHECK);
+            var checkBox = new CheckBox("Да, я уверен!");
             checkBox.getStyleClass().add(Styles.BOLD_TEXT);
             return checkBox;
         }
@@ -162,7 +155,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
     ImportWizard(Controller owner) {
         super(owner, settings().getDialogCssFileUrl());
-        setTitle(fxString(UI, I18N_WORD_IMPORT));
+        setTitle("Импорт");
 
         getDialogPane().getButtonTypes().addAll(NEXT, CANCEL);
 
@@ -170,7 +163,7 @@ final class ImportWizard extends BaseDialog<Object> {
         progressPage.setVisible(false);
 
         getButton(NEXT).ifPresent(nextButton -> {
-            nextButton.setText(fxString(UI, I18N_WORD_IMPORT));
+            nextButton.setText("Импорт");
             nextButton.addEventFilter(ActionEvent.ACTION, event -> {
                 event.consume();
 

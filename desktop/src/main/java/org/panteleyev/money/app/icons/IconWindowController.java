@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.icons;
@@ -34,24 +34,15 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import static org.panteleyev.fx.FxUtils.fxString;
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.icons.IconManager.ICON_BYTE_LENGTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UPLOAD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_DIPLICATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_FILES_SKIPPED;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UPLOAD_TOO_BIG;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ICONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UPLOAD;
 
 public final class IconWindowController extends BaseController {
 
@@ -84,11 +75,11 @@ public final class IconWindowController extends BaseController {
         super(new Stage(), settings().getMainCssFilePath());
 
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_UPLOAD), SHORTCUT_U,
-                                event -> onUpload()),
+                newMenu("Файл",
+                        menuItem("Загрузить", SHORTCUT_U, event -> onUpload()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
+                        createMenuItem(ACTION_CLOSE)
+                ),
                 createHelpMenu()
         );
 
@@ -130,7 +121,7 @@ public final class IconWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return fxString(UI, I18N_WORD_ICONS);
+        return "Значки";
     }
 
     private SelectionModel<Icon> getSelectionModel() {
@@ -189,13 +180,13 @@ public final class IconWindowController extends BaseController {
                 dao().insertIcon(icon);
                 iconList.add(icon);
             } else {
-                errors.add(icon.name() + UI.getString(I18N_MISC_UPLOAD_DIPLICATE));
+                errors.add(icon.name() + ": дубликат");
             }
         }
 
         if (!errors.isEmpty()) {
             var content = String.join("\n", errors);
-            new DuplicateAlert(UI.getString(I18N_MISC_UPLOAD_FILES_SKIPPED) + "\n\n" + content).showAndWait();
+            new DuplicateAlert("Файлы не загружены:\n\n" + content).showAndWait();
         }
     }
 
@@ -207,7 +198,7 @@ public final class IconWindowController extends BaseController {
         try (var inputStream = new FileInputStream(file)) {
             var bytes = inputStream.readAllBytes();
             if (bytes.length > ICON_BYTE_LENGTH) {
-                errors.add(file.getName() + UI.getString(I18N_MISC_UPLOAD_TOO_BIG));
+                errors.add(file.getName() + ": слишком большой");
                 return null;
             }
 
@@ -225,7 +216,7 @@ public final class IconWindowController extends BaseController {
 
     private void onUpload() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(fxString(UI, I18N_WORD_UPLOAD));
+        fileChooser.setTitle("Загрузка");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("PNG images", "*.png"),
                 new FileChooser.ExtensionFilter("GIF images", "*.gif"));
 

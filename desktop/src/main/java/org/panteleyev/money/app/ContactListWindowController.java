@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -9,7 +9,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
@@ -18,6 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.app.cells.ContactNameCell;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
@@ -27,10 +27,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxFactory.newSearchField;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
@@ -39,32 +38,15 @@ import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Bundles.translate;
-import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_SEARCH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTACTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PHONE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 class ContactListWindowController extends BaseController {
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
-            b -> b.withDefaultString(ALL_TYPES_STRING)
+            b -> b.withDefaultString("Все типы")
                     .withStringConverter(Bundles::translate)
     );
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
@@ -74,23 +56,24 @@ class ContactListWindowController extends BaseController {
     private final TableView<Contact> contactTable = new TableView<>(sortedList);
 
     ContactListWindowController() {
-        EventHandler<ActionEvent> addHandler = event -> onAddContact();
-        EventHandler<ActionEvent> editHandler = event -> onEditContact();
-
-        var disableBinding = contactTable.getSelectionModel().selectedItemProperty().isNull();
+        var crudActionsHolder = new CrudActionsHolder(
+                this::onCreateContact, this::onEditContact, event -> {},
+                contactTable.getSelectionModel().selectedItemProperty().isNull()
+        );
 
         // Menu bar
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
-                newMenu(fxString(UI, I18N_MENU_EDIT),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N, addHandler),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E, editHandler, disableBinding),
+                newMenu("Файл",
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                newMenu("Правка",
+                        createMenuItem(crudActionsHolder.getCreateAction()),
+                        createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_SEARCH), SHORTCUT_F,
-                                event -> searchField.requestFocus())),
-                newMenu(fxString(UI, I18N_MENU_VIEW),
-                        menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
+                        createMenuItem(searchAction(this::onSearch))
+                ),
+                newMenu("Вид",
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );
@@ -98,17 +81,17 @@ class ContactListWindowController extends BaseController {
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), addHandler),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), editHandler, disableBinding))
-        );
+                createMenuItem(crudActionsHolder.getCreateAction()),
+                createMenuItem(crudActionsHolder.getUpdateAction())
+        ));
 
         var w = contactTable.widthProperty().subtract(20);
         contactTable.getColumns().setAll(List.of(
-                tableObjectColumn(fxString(UI, I18N_WORD_NAME), b ->
+                tableObjectColumn("Имя", b ->
                         b.withCellFactory(x -> new ContactNameCell()).withWidthBinding(w.multiply(0.4))),
-                tableColumn(fxString(UI, I18N_WORD_TYPE), b ->
+                tableColumn("Тип", b ->
                         b.withPropertyCallback((Contact p) -> translate(p.type())).withWidthBinding(w.multiply(0.2))),
-                tableColumn(fxString(UI, I18N_WORD_PHONE), b ->
+                tableColumn("Телефон", b ->
                         b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
                 tableColumn("E-Mail", b ->
                         b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
@@ -142,7 +125,7 @@ class ContactListWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return UI.getString(I18N_WORD_CONTACTS);
+        return "Контакты";
     }
 
     private void reloadContacts() {
@@ -163,12 +146,12 @@ class ContactListWindowController extends BaseController {
         return filter;
     }
 
-    private void onAddContact() {
+    private void onCreateContact(ActionEvent event) {
         new ContactDialog(this, settings().getDialogCssFileUrl(), null).showAndWait()
                 .ifPresent(c -> dao().insertContact(c));
     }
 
-    private void onEditContact() {
+    private void onEditContact(ActionEvent event) {
         getSelectedContact()
                 .flatMap(selected ->
                         new ContactDialog(this, settings().getDialogCssFileUrl(), selected).showAndWait())
@@ -177,7 +160,7 @@ class ContactListWindowController extends BaseController {
 
     private void onTableMouseClick(Event event) {
         if (((MouseEvent) event).getClickCount() == 2) {
-            onEditContact();
+            onEditContact(null);
         }
     }
 
@@ -188,5 +171,9 @@ class ContactListWindowController extends BaseController {
     private void resetFilter() {
         clearValueAndSelection(typeBox);
         searchField.setText("");
+    }
+
+    private void onSearch(ActionEvent ignored) {
+        searchField.requestFocus();
     }
 }

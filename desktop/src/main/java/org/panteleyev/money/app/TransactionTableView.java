@@ -1,27 +1,31 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
+import org.controlsfx.control.action.Action;
+import org.controlsfx.control.action.ActionUtils;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.money.app.actions.CrudActionsHolder;
+import org.panteleyev.money.app.actions.DocumentActionsHolder;
 import org.panteleyev.money.app.cells.DocumentCountCell;
 import org.panteleyev.money.app.cells.TransactionAccountRequestSumCell;
 import org.panteleyev.money.app.cells.TransactionCheckCell;
@@ -41,6 +45,8 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -49,29 +55,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ATTACH_DOCUMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
+import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class TransactionTableView extends TableView<Transaction> {
     public interface TransactionDetailsCallback {
@@ -98,7 +89,8 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Controller owner;
     private final Mode mode;
 
-    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> {};
+    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> {
+    };
     private final TransactionDetailsCallback transactionDetailsCallback;
 
     private final Consumer<Transaction> transactionAddedCallback;
@@ -118,12 +110,42 @@ public class TransactionTableView extends TableView<Transaction> {
     // List size property
     private final SimpleIntegerProperty listSizeProperty = new SimpleIntegerProperty(0);
 
+    private final BooleanBinding disableBinding = getSelectionModel().selectedItemProperty().isNull();
+
+    // transaction table view actions
+
+    private final CrudActionsHolder crudActionsHolder = new CrudActionsHolder(
+            this::onCreateTransaction, this::onEditTransaction, this::onDeleteTransaction,
+            disableBinding
+    );
+    private final DocumentActionsHolder documentActionsHolder = new DocumentActionsHolder(
+            this::onDocuments, this::onAttachDocument, disableBinding
+    );
+
+    private final Action transactionDetailsAction = actionBuilder("Детали...", this::onTransactionDetails)
+            .disableBinding(disableBinding)
+            .build();
+    private final Action checkTransactionAction = actionBuilder("Отметить", e -> onCheckTransactions(true))
+            .accelerator(SHORTCUT_K)
+            .disableBinding(disableBinding)
+            .build();
+    private final Action uncheckTransactionAction = actionBuilder("Снять отметку", e -> onCheckTransactions(false))
+            .accelerator(SHORTCUT_U)
+            .disableBinding(disableBinding)
+            .build();
+
+    private final Collection<Action> actions;
+
     TransactionTableView(Controller owner, Mode mode) {
-        this(owner, mode, null, null, x -> {}, x -> {});
+        this(owner, mode, null, null, x -> {
+        }, x -> {
+        });
     }
 
     TransactionTableView(Controller owner, Account account) {
-        this(owner, Mode.ACCOUNT, account, null, x -> {}, x -> {});
+        this(owner, Mode.ACCOUNT, account, null, x -> {
+        }, x -> {
+        });
     }
 
     TransactionTableView(Controller owner,
@@ -164,27 +186,27 @@ public class TransactionTableView extends TableView<Transaction> {
                         x -> new TransactionSumCell();
 
         getColumns().setAll(List.of(
-                tableObjectColumn(fxString(UI, I18N_WORD_DAY), b ->
+                tableObjectColumn("День", b ->
                         b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
                                 .withComparator(dayComparator)
                                 .withWidthBinding(w.multiply(0.04))),
-                tableObjectColumn(fxString(UI, I18N_WORD_TYPE), b ->
+                tableObjectColumn("Тип", b ->
                         b.withCellFactory(x -> new TransactionTypeCell())
                                 .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
                                         .thenComparing(dayComparator))
                                 .withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn(fxString(UI, I18N_MISC_DEBITED_ACCOUNT), b ->
+                tableObjectColumn("Исходный счет", b ->
                         b.withCellFactory(x -> new TransactionDebitedAccountCell())
                                 .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
                                         .thenComparing(dayComparator))
                                 .withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
+                tableObjectColumn("Счет получателя", b ->
                         b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
+                tableObjectColumn("Контрагент", b ->
                         b.withCellFactory(x -> new TransactionContactCell()).withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn(fxString(UI, I18N_WORD_COMMENT), b ->
+                tableObjectColumn("Комментарий", b ->
                         b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
-                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                tableObjectColumn("Сумма", b ->
                         b.withCellFactory(sumCellFactory)
                                 .withComparator(Comparator.comparing(Transaction::getSignedAmount))
                                 .withWidthBinding(w.multiply(0.05))),
@@ -198,7 +220,8 @@ public class TransactionTableView extends TableView<Transaction> {
         getSortOrder().add(dayColumn);
         dayColumn.setSortType(TableColumn.SortType.DESCENDING);
 
-        createContextMenu();
+        actions = createActions();
+        createContextMenu(actions);
 
         cache().getContacts().addListener(new WeakListChangeListener<>(contactChangeLister));
         cache().getCategories().addListener(new WeakListChangeListener<>(categoryChangeLister));
@@ -210,62 +233,47 @@ public class TransactionTableView extends TableView<Transaction> {
         setItems(sortedList);
     }
 
+    public Collection<Action> getActions() {
+        return actions;
+    }
+
     ReadOnlyIntegerProperty listSizeProperty() {
         return listSizeProperty;
     }
 
-    private void createContextMenu() {
-        var disableBinding = getSelectionModel().selectedItemProperty().isNull();
-
-        var newMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), event -> onNewTransaction());
-        var editMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), event -> onEditTransaction());
-        var deleteMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), event -> onDeleteTransaction());
-        var detailsMenuItem = menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> onTransactionDetails());
-        var checkMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), event -> onCheckTransactions(true));
-        var uncheckMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), event -> onCheckTransactions(false));
-
-        editMenuItem.disableProperty().bind(disableBinding);
-        deleteMenuItem.disableProperty().bind(disableBinding);
-        detailsMenuItem.disableProperty().bind(disableBinding);
-
-        var ctxMenu = new ContextMenu();
-
+    private Collection<Action> createActions() {
+        var actionList = new ArrayList<Action>();
         if (mode == Mode.SUMMARY) {
-            ctxMenu.getItems().addAll(
-                    newMenuItem
-            );
+            actionList.add(crudActionsHolder.getCreateAction());
         }
-
-        ctxMenu.getItems().addAll(
-                editMenuItem,
-                new SeparatorMenuItem()
-        );
-
+        actionList.add(crudActionsHolder.getUpdateAction());
+        actionList.add(ACTION_SEPARATOR);
         if (mode == Mode.SUMMARY || mode == Mode.QUERY || mode == Mode.ACCOUNT) {
-            ctxMenu.getItems().addAll(
-                    deleteMenuItem,
-                    new SeparatorMenuItem()
-            );
+            actionList.addAll(List.of(
+                    crudActionsHolder.getDeleteAction(),
+                    ACTION_SEPARATOR
+            ));
         }
 
         if (mode != Mode.STATEMENT) {
-            ctxMenu.getItems().addAll(
-                    detailsMenuItem,
-                    new SeparatorMenuItem(),
-                    menuItem(fxString(UI, I18N_MENU_ITEM_ATTACH_DOCUMENT, ELLIPSIS),
-                            event -> onAttachDocument(), disableBinding),
-                    menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS),
-                            event -> onDocuments(), disableBinding),
-                    new SeparatorMenuItem()
-            );
+            actionList.addAll(List.of(
+                    transactionDetailsAction,
+                    ACTION_SEPARATOR,
+                    documentActionsHolder.getAttachDocumentAction(),
+                    documentActionsHolder.getDocumentsAction(),
+                    ACTION_SEPARATOR
+            ));
         }
 
-        ctxMenu.getItems().addAll(
-                checkMenuItem,
-                uncheckMenuItem
-        );
+        actionList.addAll(List.of(
+                checkTransactionAction,
+                uncheckTransactionAction
+        ));
+        return actionList;
+    }
 
-        setContextMenu(ctxMenu);
+    private void createContextMenu(Collection<? extends Action> actions) {
+        setContextMenu(ActionUtils.createContextMenu(actions));
     }
 
     Predicate<Transaction> getTransactionFilter() {
@@ -294,7 +302,7 @@ public class TransactionTableView extends TableView<Transaction> {
         getColumns().get(0).setVisible(true);
     }
 
-    void onTransactionDetails() {
+    void onTransactionDetails(ActionEvent ignored) {
         getSelectedTransaction().ifPresent(t -> {
             var childTransactions = cache().getTransactionDetails(t);
 
@@ -321,13 +329,13 @@ public class TransactionTableView extends TableView<Transaction> {
         restoreSelection(selection);
     }
 
-    void onNewTransaction() {
+    void onCreateTransaction(ActionEvent event) {
         new TransactionDialog(owner, settings().getDialogCssFileUrl(), cache()).showAndWait().ifPresent(
                 builder -> transactionAddedCallback.accept(dao().insertTransaction(builder))
         );
     }
 
-    void onEditTransaction() {
+    void onEditTransaction(ActionEvent event) {
         var selection = getCurrentSelection();
         getSelectedTransaction()
                 .flatMap(selected -> new TransactionDialog(owner, settings().getDialogCssFileUrl(), selected,
@@ -336,7 +344,7 @@ public class TransactionTableView extends TableView<Transaction> {
         restoreSelection(selection);
     }
 
-    void onDeleteTransaction() {
+    void onDeleteTransaction(ActionEvent event) {
         getSelectedTransaction().ifPresent(transaction ->
                 new Alert(Alert.AlertType.CONFIRMATION, "Are you sure to delete this transaction?")
                         .showAndWait()
@@ -378,14 +386,14 @@ public class TransactionTableView extends TableView<Transaction> {
         });
     }
 
-    private void onDocuments() {
+    private void onDocuments(ActionEvent event) {
         getSelectedTransaction().ifPresent(BaseController::getDocumentController);
     }
 
-    private void onAttachDocument() {
+    private void onAttachDocument(ActionEvent event) {
         getSelectedTransaction().ifPresent(transaction -> {
             var controller = BaseController.getDocumentController(transaction);
-            controller.onAddDocument();
+            controller.onCreateDocument(event);
         });
     }
 }

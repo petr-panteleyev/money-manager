@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -46,12 +46,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -61,31 +58,10 @@ import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_OPEN;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_EXECUTION_DATE_SHORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_IGNORE_EXECUTION_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_STATEMENT_BALANCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLEAR;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTRY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PLACE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
 class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
@@ -94,7 +70,7 @@ class StatementWindowController extends BaseController {
     private final Label ymAccountBalanceLabel = new Label();
 
     private final ComboBox<Account> accountComboBox = new ComboBox<>();
-    private final CheckBox ignoreExecutionDate = newCheckBox(UI, I18N_MISC_IGNORE_EXECUTION_DATE);
+    private final CheckBox ignoreExecutionDate = new CheckBox("Игнорировать дату исполнения");
 
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Account> accountListener = c -> Platform.runLater(this::setupAccountComboBox);
@@ -108,16 +84,16 @@ class StatementWindowController extends BaseController {
         ignoreExecutionDate.setSelected(true);
 
         var balanceBox = hBox(5.0,
-                label(fxString(UI, I18N_MISC_STATEMENT_BALANCE, COLON)),
+                label("Баланс по выписке:"),
                 ymAccountBalanceLabel);
         balanceBox.setAlignment(Pos.CENTER_LEFT);
 
         var filler1 = new Region();
 
         var hBox = hBox(5.0,
-                label(fxString(UI, I18N_WORD_ACCOUNT, COLON)),
+                label("Счёт:"),
                 accountComboBox,
-                button(fxString(UI, I18N_WORD_CLEAR), x -> onClear()),
+                button("Очистить", x -> onClear()),
                 ignoreExecutionDate,
                 filler1,
                 balanceBox
@@ -170,7 +146,7 @@ class StatementWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return fxString(UI, I18N_WORD_STATEMENTS);
+        return "Выписки";
     }
 
     private Optional<Statement> getStatement() {
@@ -179,20 +155,19 @@ class StatementWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_OPEN, ELLIPSIS), SHORTCUT_O, event -> onBrowse()),
+                newMenu("Файл",
+                        menuItem("Открыть...", SHORTCUT_O, event -> onBrowse()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                        menuItem("Отчет...", event -> onReport()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
-                newMenu(fxString(UI, I18N_MENU_EDIT),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                newMenu("Правка",
+                        menuItem("Добавить...", SHORTCUT_N,
                                 event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
-                                event -> onCheckStatementRecord(true)),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
-                                event -> onCheckStatementRecord(false))
+                        menuItem("Отметить", SHORTCUT_K, event -> onCheckStatementRecord(true)),
+                        menuItem("Снять отметку", SHORTCUT_U, event -> onCheckStatementRecord(false))
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -319,29 +294,29 @@ class StatementWindowController extends BaseController {
 
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().addAll(List.of(
-                tableColumn(fxString(UI, I18N_WORD_DATE), (TableColumnBuilder<StatementRecord, LocalDate> b) ->
+                tableColumn("Дата", (TableColumnBuilder<StatementRecord, LocalDate> b) ->
                         b.withCellFactory(x -> new LocalDateCell<>())
                                 .withPropertyCallback(StatementRecord::getActual)
                                 .withWidthBinding(w.multiply(0.05))),
-                tableColumn(fxString(UI, I18N_MISC_EXECUTION_DATE_SHORT), (TableColumnBuilder<StatementRecord,
+                tableColumn("Дата исп.", (TableColumnBuilder<StatementRecord,
                         LocalDate> b) ->
                         b.withCellFactory(x -> new LocalDateCell<>())
                                 .withPropertyCallback(StatementRecord::getExecution)
                                 .withWidthBinding(w.multiply(0.05))),
-                tableColumn(fxString(UI, I18N_WORD_DESCRIPTION), b ->
+                tableColumn("Описание", b ->
                         b.withPropertyCallback(StatementRecord::getDescription).withWidthBinding(w.multiply(0.5))),
-                tableColumn(fxString(UI, I18N_WORD_COUNTERPARTY), b ->
+                tableColumn("Контрагент", b ->
                         b.withPropertyCallback(StatementRecord::getCounterParty).withWidthBinding(w.multiply(0.15))),
-                tableColumn(fxString(UI, I18N_WORD_PLACE), b ->
+                tableColumn("Место", b ->
                         b.withPropertyCallback(StatementRecord::getPlace).withWidthBinding(w.multiply(0.10))),
-                tableColumn(fxString(UI, I18N_WORD_COUNTRY), b ->
+                tableColumn("Страна", b ->
                         b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                tableObjectColumn("Сумма", b ->
                         b.withCellFactory(x -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         var menu = new ContextMenu();
-        menu.getItems().addAll(menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS),
+        menu.getItems().addAll(menuItem("Добавить...",
                 event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
         tableView.setContextMenu(menu);
 

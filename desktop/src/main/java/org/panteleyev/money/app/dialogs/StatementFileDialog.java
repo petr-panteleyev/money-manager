@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.dialogs;
@@ -12,14 +12,12 @@ import java.util.Optional;
 
 import static org.panteleyev.money.app.Constants.FILTER_STATEMENT_FILES;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENT;
 
 public class StatementFileDialog {
     private final FileChooser fileChooser = new FileChooser();
 
     public Optional<File> show(Stage owner) {
-        fileChooser.setTitle(UI.getString(I18N_WORD_STATEMENT));
+        fileChooser.setTitle("Выписка");
 
         settings().getLastStatementDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.getExtensionFilters().add(FILTER_STATEMENT_FILES);

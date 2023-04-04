@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -8,6 +8,7 @@ import java.util.List;
 
 public enum TransactionType {
     CARD_PAYMENT,
+    SBP_PAYMENT,
     CASH_PURCHASE,
     CHEQUE,
     S1(true),
@@ -15,6 +16,7 @@ public enum TransactionType {
     CACHIER,
     DEPOSIT,
     TRANSFER,
+    SBP_TRANSFER,
     S2(true),
     INTEREST,
     DIVIDEND,

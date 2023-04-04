@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -23,37 +23,30 @@ import java.util.function.Predicate;
 
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
-import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByUuid;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByCategory;
 import static org.panteleyev.money.app.icons.IconManager.ACCOUNT_TO_IMAGE;
 import static org.panteleyev.money.app.icons.IconManager.CATEGORY_TO_IMAGE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_ACCOUNTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ALL_CATEGORIES;
 
 public class AccountSelectionBox extends HBox {
-    private final static String ALL_CATEGORIES_STRING = UI.getString(I18N_MISC_ALL_CATEGORIES);
-    private final static String ALL_ACCOUNTS_STRING = UI.getString(I18N_MISC_ALL_ACCOUNTS);
-
     private final ComboBox<CategoryType> categoryTypeBox =
             comboBox(CategoryType.values(),
-                    b -> b.withDefaultString(ALL_TYPES_STRING)
+                    b -> b.withDefaultString("Все типы")
                             .withStringConverter(Bundles::translate)
             );
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
     private final ComboBox<Category> categoryBox = comboBox(
             filteredCategories.sorted(cache().getCategoryByNameComparator()),
-            b -> b.withDefaultString(ALL_CATEGORIES_STRING)
+            b -> b.withDefaultString("Все категории")
                     .withStringConverter(Category::name)
                     .withImageConverter(CATEGORY_TO_IMAGE));
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
     private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(cache().getAccountByNameComparator()),
-            b -> b.withDefaultString(ALL_ACCOUNTS_STRING)
+            b -> b.withDefaultString("Все счета")
                     .withStringConverter(Account::name)
                     .withImageConverter(ACCOUNT_TO_IMAGE));
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();

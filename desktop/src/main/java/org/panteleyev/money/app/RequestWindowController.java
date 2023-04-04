@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -34,14 +34,12 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 
 import static javafx.scene.layout.Priority.ALWAYS;
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -49,29 +47,9 @@ import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_UNCHECKED_ONLY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REQUESTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
 class RequestWindowController extends BaseController {
     private final Account account;
@@ -105,7 +83,7 @@ class RequestWindowController extends BaseController {
                 new TransactionTableView(this, TransactionTableView.Mode.QUERY) :
                 new TransactionTableView(this, account);
 
-        var uncheckedOnlyCheckBox = new CheckBox(fxString(UI, I18N_MISC_UNCHECKED_ONLY));
+        var uncheckedOnlyCheckBox = new CheckBox("Только неотмеченные");
         uncheckedOnlyCheckBox.selectedProperty().addListener(
                 (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
         );
@@ -121,11 +99,11 @@ class RequestWindowController extends BaseController {
         var filterBox = hBox(5.0,
                 account == null ? accBox : SKIP,
                 transactionFilterBox,
-                label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
+                label("Контрагент:"),
                 contactFilterBox.getTextField(),
                 uncheckedOnlyCheckBox,
                 fxNode(new Region(), hBoxHGrow(ALWAYS)),
-                label(fxString(UI, I18N_WORD_SUM, COLON)),
+                label("Сумма:"),
                 sumField
         );
 
@@ -169,7 +147,7 @@ class RequestWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return account == null ? UI.getString(I18N_WORD_REQUESTS) : account.name();
+        return account == null ? "Запросы" : account.name();
     }
 
     boolean thisAccount(Account account) {
@@ -182,27 +160,14 @@ class RequestWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_ALT_R,
-                                event -> onReport()),
+                newMenu("Файл",
+                        menuItem("Отчет...", SHORTCUT_ALT_R, event -> onReport()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_CLOSE), event -> onClose())),
-                newMenu(fxString(UI, I18N_MENU_EDIT),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                                event -> table.onEditTransaction()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
-                                event -> table.onDeleteTransaction()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), event -> table.onTransactionDetails()),
-                        new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
-                                event -> table.onCheckTransactions(true)),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
-                                event -> table.onCheckTransactions(false))
+                        createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu(fxString(UI, I18N_MENU_VIEW),
-                        menuItem(fxString(UI, I18N_MISC_RESET_FILTER), SHORTCUT_ALT_C, event -> resetFilter())),
+                createMenu("Правка", table.getActions()),
+                newMenu("Вид",
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );

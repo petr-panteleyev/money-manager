@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -36,11 +36,9 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.groupingBy;
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
@@ -49,18 +47,9 @@ import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.CREDIT;
 import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
-import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_RESET_FILTER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BALANCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_EXPENSES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INCOMES;
 
 class IncomesAndExpensesWindowController extends BaseController {
     private static class TreeNode {
@@ -164,7 +153,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var toolBar = hBox(5.0,
                 filterBox,
-                button(fxString(UI, I18N_MISC_RESET_FILTER), x -> filterBox.reset())
+                button("Сбросить фильтр", x -> filterBox.reset())
         );
 
         var statusBar = createStatusBar();
@@ -187,15 +176,16 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES);
+        return "Доходы и расходы";
     }
 
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), event -> onReport()),
+                newMenu("Файл",
+                        menuItem("Отчет...", event -> onReport()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())),
+                        createMenuItem(ACTION_CLOSE)
+                ),
                 createWindowMenu(),
                 createHelpMenu()
         );
@@ -205,22 +195,20 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private Node createStatusBar() {
         return hBox(5.0,
-                label(fxString(UI, I18N_WORD_EXPENSES, COLON)),
-                expenseValueText,
-                label(fxString(UI, I18N_WORD_INCOMES, COLON)),
-                incomeValueText,
-                label(fxString(UI, I18N_WORD_BALANCE, COLON)),
-                balanceValueText);
+                label("Расходы:"), expenseValueText,
+                label("Доходы:"), incomeValueText,
+                label("Баланс:"), balanceValueText
+        );
     }
 
     private void onRefresh() {
         expenseRoot.getChildren().clear();
         var expenseSum = calculateTotal(CategoryType.EXPENSES, expenseRoot);
-        expenseRoot.setValue(new ExpenseRootNode(UI.getString(I18N_WORD_EXPENSES), expenseSum));
+        expenseRoot.setValue(new ExpenseRootNode("Расходы", expenseSum));
 
         incomeRoot.getChildren().clear();
         var incomeSum = calculateTotal(CategoryType.INCOMES, incomeRoot);
-        incomeRoot.setValue(new IncomeRootNode(UI.getString(I18N_WORD_INCOMES), incomeSum));
+        incomeRoot.setValue(new IncomeRootNode("Доходы", incomeSum));
 
         expenseValueText.setText(expenseSum.setScale(2, RoundingMode.HALF_UP).toString());
         incomeValueText.setText(incomeSum.setScale(2, RoundingMode.HALF_UP).toString());
@@ -305,7 +293,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private void onReport() {
-        new ReportFileDialog().show(getStage(), ReportType.INCOMES_AND_EXPENSES).ifPresent(selected-> {
+        new ReportFileDialog().show(getStage(), ReportType.INCOMES_AND_EXPENSES).ifPresent(selected -> {
             var dataModel = new HashMap<String, Object>();
             dataModel.put("expensesSum", expenseValueText.getText());
             dataModel.put("incomesSum", incomeValueText.getText());

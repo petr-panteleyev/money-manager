@@ -1,29 +1,28 @@
 # Money Manager
 
-Personal finance manager. Work in progress.
+Программа для учета расходов и сверки выписок.
 
-## Build
+## Как собрать
 
-Make sure ```JAVA_HOME``` points to JDK 20.
+Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 20.
 
 ```shell script
 mvn clean install
 ```
 
-## Run
+## Как запустить
 
 ```shell script
 mvn -pl desktop javafx:run
 ```
 
-To open specific profile add ```-Dprofile=<profile>``` to the command line.
+Чтобы открыть конкретный профиль соединения добавьте ```-Dprofile=<profile>``` к командной строке.
 
-## Binary Packages
+## Установка
 
-To build binary installers perform the following steps:
-* On Microsoft Windows: install [WiX Toolset](https://wixtoolset.org/releases/), add its binary directory to ```PATH``` 
-environment variable
-* Execute one of the following commands:
+Чтобы собрать пакет для установки приложения выполните следующие шаги:
+* На Microsoft Windows: установите [WiX Toolset](https://wixtoolset.org/releases/), добавьте каталог с утилитами в переменную окружения ```PATH```
+* Выполните одну из следующих команд в зависимости от операционной системы:
 
 ```shell script
 mvn -pl desktop jpackage:jpackage@mac
@@ -37,8 +36,8 @@ mvn -pl desktop jpackage:jpackage@win
 mvn -pl desktop jpackage:jpackage@linux
 ```
 
-Installation package will be found in ```desktop/target/dist``` directory.
+Пакет для установки будет находиться в каталоге ```desktop/target/dist```.
 
-## Support
+## Поддержка
 
-There is no support for this application.
+Поддержка данного приложения не осуществляется.

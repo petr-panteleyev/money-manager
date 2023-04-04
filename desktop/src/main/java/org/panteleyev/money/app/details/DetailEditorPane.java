@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.details;
@@ -46,19 +46,9 @@ import java.util.TreeSet;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLEAR;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UPDATE;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -122,36 +112,37 @@ final class DetailEditorPane extends BorderPane {
         commentEdit.setPrefColumnCount(30);
         sumEdit.setPrefColumnCount(8);
 
-        var creditedBox = new VBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT, COLON)),
+        var creditedBox = new VBox(Styles.SMALL_SPACING,
+                label("Счет получателя:"),
                 new HBox(creditedAccountEdit, creditedMenuButton),
                 creditedCategoryLabel);
         HBox.setHgrow(creditedAccountEdit, Priority.ALWAYS);
 
         var hBox1 = hBox(Styles.BIG_SPACING, sumEdit);
         hBox1.setAlignment(Pos.CENTER_LEFT);
-        var sumBox = vBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM, COLON)), hBox1);
+        var sumBox = vBox(Styles.SMALL_SPACING, label("Сумма:"), hBox1);
 
-        var commentBox = vBox(Styles.SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT, COLON)), commentEdit);
+        var commentBox = vBox(Styles.SMALL_SPACING, label("Комментарий:"), commentEdit);
 
         var filler = new Region();
 
-        var clearButton = button(fxString(UI, I18N_WORD_CLEAR), x -> clear());
+        var clearButton = button("Очистить", x -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = button(fxString(UI, I18N_WORD_ADD), x -> buildTransactionDetail()
+        var addButton = button("Добавить", x -> buildTransactionDetail()
                 .ifPresent(t -> {
                     parent.addRecord(t);
                     clear();
                 }));
 
-        var updateButton = button(fxString(UI, I18N_WORD_UPDATE), x -> buildTransactionDetail()
+        var updateButton = button("Изменить", x -> buildTransactionDetail()
                 .ifPresent(t -> {
                     parent.updateRecord(t);
                     clear();
                 })
         );
 
-        var deleteButton = button(fxString(UI, I18N_WORD_DELETE), x -> {
+        var deleteButton = button("Удалить", x -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();

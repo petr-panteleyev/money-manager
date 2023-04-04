@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -22,7 +22,7 @@ public record Contact(
     UUID iconUuid,
     long created,
     long modified
-) implements MoneyRecord, Named, Comparable<Contact> {
+) implements MoneyRecord, Named {
 
     public Contact {
         if (uuid == null) {
@@ -58,11 +58,6 @@ public record Contact(
         if (modified == 0) {
             modified = now;
         }
-    }
-
-    @Override
-    public int compareTo(Contact other) {
-        return name.compareToIgnoreCase(other.name);
     }
 
     public static final class Builder {

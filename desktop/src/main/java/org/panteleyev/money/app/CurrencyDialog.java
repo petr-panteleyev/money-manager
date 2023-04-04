@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -27,24 +27,13 @@ import java.util.stream.Collectors;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
 import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEFAULT_CURRENCY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SHOW_THOUSAND_SEPARATOR;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_AFTER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BEFORE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SYMBOL;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -53,23 +42,23 @@ final class CurrencyDialog extends BaseDialog<Currency> {
     private final TextField descrEdit = new TextField();
     private final TextField rateEdit = new TextField();
     private final ChoiceBox<String> rateDirectionChoice = new ChoiceBox<>();
-    private final CheckBox defaultCheck = newCheckBox(UI, I18N_MISC_DEFAULT_CURRENCY);
+    private final CheckBox defaultCheck = new CheckBox("Валюта по умолчанию");
     private final CheckBox showSymbolCheck = new CheckBox();
     private final ComboBox<String> formatSymbolCombo = new ComboBox<>();
     private final ChoiceBox<String> formatSymbolPositionChoice = new ChoiceBox<>();
-    private final CheckBox thousandSeparatorCheck = newCheckBox(UI, I18N_MISC_SHOW_THOUSAND_SEPARATOR);
+    private final CheckBox thousandSeparatorCheck = new CheckBox("Показывать разделитель тысяч");
 
     CurrencyDialog(Controller owner, URL css, Currency currency) {
         super(owner, css);
 
-        setTitle(fxString(UI, I18N_WORD_CURRENCY));
+        setTitle("Валюта");
 
         getDialogPane().setContent(
                 gridPane(
                         List.of(
-                                gridRow(label(fxString(UI, I18N_WORD_SYMBOL, COLON)), nameEdit),
-                                gridRow(label(fxString(UI, I18N_WORD_DESCRIPTION, COLON)), descrEdit),
-                                gridRow(label(fxString(UI, I18N_WORD_RATE, COLON)), rateEdit, rateDirectionChoice),
+                                gridRow(label("Символ:"), nameEdit),
+                                gridRow(label("Описание:"), descrEdit),
+                                gridRow(label("Курс:"), rateEdit, rateDirectionChoice),
                                 gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo,
                                         formatSymbolPositionChoice), hBox -> {
                                     hBox.setAlignment(CENTER_LEFT);
@@ -88,8 +77,8 @@ final class CurrencyDialog extends BaseDialog<Currency> {
         rateDirectionChoice.getItems().setAll("/", "*");
 
         formatSymbolPositionChoice.getItems().setAll(
-                UI.getString(I18N_WORD_BEFORE),
-                UI.getString(I18N_WORD_AFTER));
+                "Перед",
+                "После");
 
         formatSymbolCombo.getItems().setAll(cache().getCurrencies().stream()
                 .map(Currency::formatSymbol)

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -28,6 +28,7 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -55,7 +56,6 @@ import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Bundles.translate;
@@ -70,21 +70,17 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_BY_STATEMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DATE_PICKER_TOOLTIP;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INVOICE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 
 public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
+    private record AccountCard(
+            String name,
+            CategoryType type,
+            UUID accountUuid,
+            UUID categoryUuid
+    ) implements Named {
+    }
+
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
             new ToStringConverter<>() {
                 public String toString(TransactionType obj) {
@@ -94,6 +90,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static final NamedToStringConverter<Contact> CONTACT_TO_STRING = new NamedToStringConverter<>();
     private static final NamedToStringConverter<Account> ACCOUNT_TO_STRING = new NamedToStringConverter<>();
+    private static final NamedToStringConverter<Named> NAMED_TO_STRING = new NamedToStringConverter<>();
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
@@ -148,8 +145,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private final TreeSet<TransactionType> typeSuggestions = new TreeSet<>();
     private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
-    private final TreeSet<Account> debitedSuggestions = new TreeSet<>();
-    private final TreeSet<Account> debitedSuggestionsAll = new TreeSet<>();
+    private final TreeSet<Named> debitedSuggestions = new TreeSet<>();
+    private final TreeSet<Named> debitedSuggestionsAll = new TreeSet<>();
     private final TreeSet<Account> creditedSuggestions = new TreeSet<>();
     private final TreeSet<Account> creditedSuggestionsAll = new TreeSet<>();
     private final TreeSet<String> commentSuggestions = new TreeSet<>();
@@ -180,7 +177,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 vBox(
                         DOUBLE_SPACING,
                         hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_DATE)),
+                                vBox(SMALL_SPACING, label("Дата"),
                                         hBox(List.of(datePicker, checkedCheckBox), hBox -> {
                                             hBox.setSpacing(BIG_SPACING);
                                             hBox.setAlignment(Pos.CENTER);
@@ -188,9 +185,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                                 )
                         ),
                         hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_SUM)), sumEdit),
+                                vBox(SMALL_SPACING, label("Сумма"), sumEdit),
                                 vBox(SMALL_SPACING,
-                                        label(fxString(UI, I18N_WORD_RATE)),
+                                        label("Курс"),
                                         hBox(List.of(rate1Edit, rateDir1Combo, rateAmoutLabel), hBox -> {
                                             hBox.setSpacing(SMALL_SPACING);
                                             hBox.setAlignment(Pos.CENTER);
@@ -199,7 +196,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         ),
                         hBox(BIG_SPACING,
                                 vBox(SMALL_SPACING,
-                                        label(fxString(UI, I18N_WORD_TYPE)),
+                                        label("Тип"),
                                         hBox(List.of(typeEdit, typeMenuButton), hBox -> {
                                             hBox.setSpacing(BIG_SPACING);
                                             hBox.setAlignment(Pos.CENTER);
@@ -208,7 +205,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         ),
                         fxNode(
                                 vBox(SMALL_SPACING,
-                                        label(fxString(UI, I18N_MISC_DEBITED_ACCOUNT)),
+                                        label("Исходный счет"),
                                         hBox(0,
                                                 fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
                                                 debitedMenuButton),
@@ -217,7 +214,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         ),
                         fxNode(
                                 vBox(SMALL_SPACING,
-                                        label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT)),
+                                        label("Счет получателя"),
                                         hBox(0,
                                                 fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)),
                                                 creditedMenuButton
@@ -227,18 +224,18 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         ),
                         fxNode(
                                 vBox(SMALL_SPACING,
-                                        label(fxString(UI, I18N_WORD_COUNTERPARTY)),
+                                        label("Контрагент"),
                                         hBox(0,
                                                 fxNode(contactEdit, hBoxHGrow(ALWAYS)),
                                                 contactMenuButton)),
                                 hBoxHGrow(ALWAYS)
                         ),
                         fxNode(
-                                vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_COMMENT)), commentEdit),
+                                vBox(SMALL_SPACING, label("Комментарий"), commentEdit),
                                 hBoxHGrow(ALWAYS)
                         ),
-                        vBox(SMALL_SPACING, label(fxString(UI, I18N_WORD_INVOICE)), invoiceNumberEdit),
-                        vBox(SMALL_SPACING, label(fxString(UI, I18N_MISC_DATE_BY_STATEMENT)), statementDatePicker)
+                        vBox(SMALL_SPACING, label("Счёт"), invoiceNumberEdit),
+                        vBox(SMALL_SPACING, label("Дата по выписке"), statementDatePicker)
                 )
         );
 
@@ -268,7 +265,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         TextFields.bindAutoCompletion(typeEdit,
                 new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
         TextFields.bindAutoCompletion(debitedAccountEdit,
-                new NamedCompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
+                new NamedCompletionProvider<>(debitedSuggestions), NAMED_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
                 new NamedCompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
@@ -319,7 +316,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         builder = new Transaction.Builder(transaction);
 
-        setTitle(UI.getString(I18N_WORD_TRANSACTION) + ": " + uuid);
+        setTitle("Проводка: " + uuid);
 
         // Type
         typeEdit.setText(translate(transaction.type()));
@@ -394,7 +391,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var nextMonthKey = SHORTCUT_ALT_SHIFT_RIGHT;
         var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
 
-        var tooltipText = String.format(UI.getString(I18N_MISC_DATE_PICKER_TOOLTIP),
+        var tooltipText = String.format("%s - следующий день\n" +
+                        "%s - предыдущий день\n" +
+                        "%s - следующий месяц\n" +
+                        "%s - предыдущий месяц\n" +
+                        "%s - сегодня",
                 tomorrowKey.getDisplayText(),
                 yesterdayKey.getDisplayText(),
                 nextMonthKey.getDisplayText(),
@@ -415,7 +416,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void clearTitle() {
-        setTitle(fxString(UI, I18N_WORD_TRANSACTION));
+        setTitle("Проводка");
     }
 
     private void setupBanksAndCashMenuItems() {
@@ -436,6 +437,17 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
                         debitedSuggestions.add(acc);
                         creditedSuggestions.add(acc);
+
+                        if (acc.cardType() != CardType.NONE) {
+                            var cardAlias = new AccountCard(
+                                    acc.cardNumber(),
+                                    acc.type(),
+                                    acc.uuid(),
+                                    acc.categoryUuid()
+                            );
+                            debitedSuggestions.add(cardAlias);
+                            debitedSuggestionsAll.add(cardAlias);
+                        }
                     }
                 });
 
@@ -519,11 +531,21 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         Optional<TransactionType> type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions);
         type.ifPresent(it -> builder.type(it));
 
-        var debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, ACCOUNT_TO_STRING);
+        var debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
         if (debitedAccount.isPresent()) {
-            builder.accountDebitedUuid(debitedAccount.get().uuid());
-            builder.accountDebitedCategoryUuid(debitedAccount.get().categoryUuid());
-            builder.accountDebitedType(debitedAccount.get().type());
+            switch (debitedAccount.get()) {
+                case Account account -> {
+                    builder.accountDebitedUuid(account.uuid());
+                    builder.accountDebitedCategoryUuid(account.categoryUuid());
+                    builder.accountDebitedType(account.type());
+                }
+                case AccountCard card -> {
+                    builder.accountDebitedUuid(card.accountUuid());
+                    builder.accountDebitedCategoryUuid(card.categoryUuid());
+                    builder.accountDebitedType(card.type());
+                }
+                default -> {}
+            }
         } else {
             return false;
         }
@@ -641,10 +663,10 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         });
 
         validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
-            var account = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, ACCOUNT_TO_STRING);
+            var account = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
             updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
 
-            builder.accountDebitedUuid(account.map(Account::uuid).orElse(null));
+            //builder.accountDebitedUuid(account.map(Account::uuid).orElse(null));
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
@@ -789,13 +811,20 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP)));
     }
 
-    private void updateCategoryLabel(Label label, Account account) {
-        if (account != null) {
-            var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
-            label.setText(translate(account.type()) + " | " + catName);
-        } else {
-            label.setText("");
-        }
+    private void updateCategoryLabel(Label label, Named named) {
+        var labelContent = switch (named) {
+            case Account account -> {
+                var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
+                yield translate(account.type()) + " | " + catName;
+            }
+            case AccountCard card -> {
+                var catName = cache.getCategory(card.categoryUuid()).map(Category::name).orElse("");
+                yield translate(card.type()) + " | " + catName;
+            }
+            case null, default -> "";
+        };
+
+        label.setText(labelContent);
     }
 
     private void processAutoFill() {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.details;
@@ -28,18 +28,10 @@ import java.util.Objects;
 
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_TRANSACTION_DETAILS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELTA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
 
 public final class TransactionDetailsDialog extends BaseDialog<List<TransactionDetail>> implements RecordEditorCallback<TransactionDetail> {
     private final ObservableList<TransactionDetail> details = FXCollections.observableArrayList();
@@ -53,7 +45,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
                                     boolean readOnly) {
         super(owner);
 
-        setTitle(fxString(UI, I18N_MISC_TRANSACTION_DETAILS));
+        setTitle("Детали транзакции");
 
         this.totalAmount = totalAmount;
         detailEditor = new DetailEditorPane(this, cache());
@@ -68,18 +60,18 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
-                tableColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT), b ->
+                tableColumn("Счет получателя", b ->
                         b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
                                 .withWidthBinding(w.multiply(0.3))),
-                tableColumn(fxString(UI, I18N_WORD_COMMENT), b ->
+                tableColumn("Комментарий", b ->
                         b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
-                tableObjectColumn(fxString(UI, I18N_WORD_SUM), b ->
+                tableObjectColumn("Сумма", b ->
                         b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         detailsTable.setItems(details);
 
-        var hBox = hBox(Styles.BIG_SPACING, label(fxString(UI, I18N_WORD_DELTA, COLON)), deltaLabel);
+        var hBox = hBox(Styles.BIG_SPACING, label("Разница:"), deltaLabel);
         var vBox = vBox(Styles.BIG_SPACING, hBox, detailEditor);
         VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
 

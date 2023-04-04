@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -19,24 +19,14 @@ import java.util.function.Consumer;
 
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.grid.GridBuilder.columnConstraints;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_DATABASE;
 import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_SCHEMA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATABASE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_LOGIN;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PASSWORD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RESET;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SCHEMA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SERVER;
 
 final class TCPEditor extends VBox {
     private final TextField schemaEdit = initSchemaEdit();
@@ -47,20 +37,18 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> resetSchemaHandler) {
-        var resetSchemaButton = button(fxString(UI, I18N_WORD_RESET));
+        var resetSchemaButton = button("Сбросить");
         resetSchemaButton.setGraphic(new ImageView(Images.WARNING));
         resetSchemaButton.disableProperty().bind(validation.invalidProperty());
         resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
 
         getChildren().addAll(gridPane(
                 List.of(
-                        gridRow(label(fxString(UI, I18N_WORD_SERVER, COLON)), dataBaseHostEdit,
-                                label(fxString(UI, I18N_WORD_PORT, COLON)), dataBasePortEdit),
-                        gridRow(label(fxString(UI, I18N_WORD_LOGIN, COLON)), gridCell(dataBaseUserEdit, 3, 1)),
-                        gridRow(label(fxString(UI, I18N_WORD_PASSWORD, COLON)), gridCell(dataBasePasswordEdit, 3, 1)),
-                        gridRow(label(fxString(UI, I18N_WORD_DATABASE, COLON)), gridCell(databaseNameEdit, 3, 1)),
-                        gridRow(label(fxString(UI, I18N_WORD_SCHEMA, COLON)), gridCell(schemaEdit, 2, 1),
-                                resetSchemaButton)
+                        gridRow(label("Сервер:"), dataBaseHostEdit, label("Порт:"), dataBasePortEdit),
+                        gridRow(label("Логин:"), gridCell(dataBaseUserEdit, 3, 1)),
+                        gridRow(label("Пароль:"), gridCell(dataBasePasswordEdit, 3, 1)),
+                        gridRow(label("База данных:"), gridCell(databaseNameEdit, 3, 1)),
+                        gridRow(label("Схема:"), gridCell(schemaEdit, 2, 1), resetSchemaButton)
                 ), b -> b.withStyle(GRID_PANE)
                         .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
         ));

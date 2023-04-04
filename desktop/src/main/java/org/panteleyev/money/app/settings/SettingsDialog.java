@@ -24,9 +24,7 @@ import java.util.List;
 import static javafx.collections.FXCollections.observableArrayList;
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
@@ -45,26 +43,6 @@ import static org.panteleyev.money.app.settings.FontName.CONTROLS_FONT;
 import static org.panteleyev.money.app.settings.FontName.DIALOG_LABEL_FONT;
 import static org.panteleyev.money.app.settings.FontName.MENU_FONT;
 import static org.panteleyev.money.app.settings.FontName.TABLE_CELL_FONT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_CLOSING;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_NOT_FOUND;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COLORS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONFIRMED;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTROLS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CREDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DEBIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DIALOGS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_FONTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_GENERAL;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_MENU;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_OPTIONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TABLES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TEXT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSFER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNCONFIRMED;
 
 public class SettingsDialog extends BaseDialog<ButtonType> {
     private static final Validator<String> DELTA_VALIDATOR = (Control control, String value) -> {
@@ -100,7 +78,7 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
     public SettingsDialog(Controller owner, Settings settings) {
         super(owner, settings.getDialogCssFileUrl());
 
-        setTitle(fxString(UI, I18N_WORD_OPTIONS));
+        setTitle("Настройки");
         createDefaultButtons(UI, validation.invalidProperty());
 
         controlsFontField.setEditable(false);
@@ -125,28 +103,25 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
         setupFontField(dialogLabelFontField, settings.getFont(DIALOG_LABEL_FONT));
 
         var tabPane = new TabPane(
-                tab(fxString(UI, I18N_WORD_GENERAL), false, gridPane(
+                tab("Общие", false, gridPane(
                         List.of(
-                                gridRow(label(fxString(UI, I18N_MISC_AUTOCOMPLETE_PREFIX_LENGTH, COLON)),
-                                        autoCompleteLength),
-                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_CLOSING, COLON)),
-                                        accountClosingDayDeltaEdit),
-                                gridRow(label(fxString(UI, I18N_MISC_DAYS_BEFORE_PERIDIC_PAYMENT, COLON)),
-                                        periodicPaymentDayDeltaEdit)
+                                gridRow(label("Длина префикса автодополнения:"), autoCompleteLength),
+                                gridRow(label("Дней до закрытия счета:"), accountClosingDayDeltaEdit),
+                                gridRow(label("Дней до периодического платежа:"), periodicPaymentDayDeltaEdit)
                         ), b -> b.withStyle(GRID_PANE))
                 ),
-                tab(fxString(UI, I18N_WORD_FONTS), false,
+                tab("Шрифты", false,
                         vBox(DOUBLE_SPACING,
-                                titledPane(fxString(UI, I18N_WORD_CONTROLS),
+                                titledPane("Элементы управления",
                                         gridPane(List.of(
-                                                gridRow(label(fxString(UI, I18N_WORD_TEXT, COLON)), controlsFontField,
+                                                gridRow(label("Текст:"), controlsFontField,
                                                         button(ELLIPSIS,
                                                                 actionEvent -> onFontSelected(controlsFontField))),
-                                                gridRow(label(fxString(UI, I18N_WORD_MENU, COLON)), menuFontField,
+                                                gridRow(label("Меню:"), menuFontField,
                                                         button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
                                         ), b -> b.withStyle(GRID_PANE))
                                 ),
-                                titledPane(fxString(UI, I18N_WORD_TABLES),
+                                titledPane("Таблицы",
                                         gridPane(List.of(
                                                         gridRow(cellFontField,
                                                                 button(ELLIPSIS,
@@ -154,7 +129,7 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                                 ), b -> b.withStyle(GRID_PANE)
                                         )
                                 ),
-                                titledPane(fxString(UI, I18N_WORD_DIALOGS),
+                                titledPane("Диалоги",
                                         gridPane(List.of(
                                                         gridRow(dialogLabelFontField,
                                                                 button(ELLIPSIS,
@@ -164,26 +139,23 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                 )
                         )
                 ),
-                tab(fxString(UI, I18N_WORD_COLORS), false,
+                tab("Цвета", false,
                         vBox(DOUBLE_SPACING,
-                                titledPane(fxString(UI, I18N_WORD_TRANSACTIONS),
+                                titledPane("Проводки",
                                         gridPane(List.of(
-                                                        gridRow(label(fxString(UI, I18N_WORD_DEBIT, COLON)),
-                                                                debitColorPicker),
-                                                        gridRow(label(fxString(UI, I18N_WORD_CREDIT, COLON)),
-                                                                creditColorPicker),
-                                                        gridRow(label(fxString(UI, I18N_WORD_TRANSFER, COLON)),
-                                                                transferColorPicker)
+                                                        gridRow(label("Дебет:"), debitColorPicker),
+                                                        gridRow(label("Кредит:"), creditColorPicker),
+                                                        gridRow(label("Перевод:"), transferColorPicker)
                                                 ), b -> b.withStyle(GRID_PANE)
                                         )
                                 ),
-                                titledPane(fxString(UI, I18N_WORD_STATEMENTS),
+                                titledPane("Выписки",
                                         gridPane(List.of(
-                                                        gridRow(label(fxString(UI, I18N_WORD_CONFIRMED, COLON)),
+                                                        gridRow(label("Подтверждено:"),
                                                                 statementCheckedColorPicker),
-                                                        gridRow(label(fxString(UI, I18N_WORD_UNCONFIRMED, COLON)),
+                                                        gridRow(label("Не подтверждено:"),
                                                                 statementUncheckedColorPicker),
-                                                        gridRow(label(fxString(UI, I18N_MISC_NOT_FOUND, COLON)),
+                                                        gridRow(label("Не найдено:"),
                                                                 statementMissingColorPicker)
                                                 ), b -> b.withStyle(GRID_PANE)
                                         )

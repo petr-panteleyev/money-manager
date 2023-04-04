@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -22,26 +22,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_EXECUTION_DATE_SHORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_BALANCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DESCRIPTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_UNTIL;
 
 class Reports {
     private static final String CSS_PATH = "/org/panteleyev/money/report.css";
@@ -50,15 +31,15 @@ class Reports {
     static void reportTransactions(List<Transaction> transactions, OutputStream out) {
         loadCss();
         try (var w = new PrintWriter(out)) {
-            printHeader(w, UI.getString(I18N_WORD_TRANSACTIONS));
+            printHeader(w, "Проводки");
 
             w.println("<table>\n<tr>");
-            th(w, UI.getString(I18N_WORD_DAY));
-            th(w, UI.getString(I18N_MISC_DEBITED_ACCOUNT));
-            th(w, UI.getString(I18N_MISC_CREDITED_ACCOUNT));
-            th(w, UI.getString(I18N_WORD_COUNTERPARTY));
-            th(w, UI.getString(I18N_WORD_COMMENT));
-            th(w, UI.getString(I18N_WORD_SUM));
+            th(w, "День");
+            th(w, "Исходный счет");
+            th(w, "Счет получателя");
+            th(w, "Контрагент");
+            th(w, "Комментарий");
+            th(w, "Сумма");
 
             for (var t : transactions) {
                 w.print("<tr>");
@@ -78,16 +59,16 @@ class Reports {
     static void reportAccounts(List<Account> accounts, OutputStream out) {
         loadCss();
         try (var w = new PrintWriter(out)) {
-            printHeader(w, fxString(UI, I18N_WORD_ACCOUNTS));
+            printHeader(w, "Счета");
 
             w.println("<table>\n<tr>");
-            th(w, UI.getString(I18N_WORD_ENTITY_NAME));
-            th(w, UI.getString(I18N_WORD_CATEGORY));
-            th(w, UI.getString(I18N_WORD_CURRENCY));
+            th(w, "Название");
+            th(w, "Категория");
+            th(w, "Валюта");
             w.println("<th>%%");
-            th(w, UI.getString(I18N_WORD_UNTIL));
-            th(w, UI.getString(I18N_WORD_COMMENT));
-            th(w, UI.getString(I18N_WORD_BALANCE));
+            th(w, "До");
+            th(w, "Комментарий");
+            th(w, "Баланс");
 
             for (var a : accounts) {
                 w.println("<tr>");
@@ -110,13 +91,13 @@ class Reports {
     static void reportStatement(Statement statement, OutputStream out) {
         loadCss();
         try (var w = new PrintWriter(out)) {
-            printHeader(w, UI.getString(I18N_WORD_STATEMENT));
+            printHeader(w, "Выписка");
 
             w.println("<table>\n<tr>");
-            th(w, UI.getString(I18N_WORD_DATE));
-            th(w, UI.getString(I18N_MISC_EXECUTION_DATE_SHORT));
-            th(w, UI.getString(I18N_WORD_DESCRIPTION));
-            th(w, UI.getString(I18N_WORD_SUM));
+            th(w, "Дата");
+            th(w, "Дата исп.");
+            th(w, "Описание");
+            th(w, "Сумма");
 
             for (var r : statement.records()) {
                 w.println("<tr>");

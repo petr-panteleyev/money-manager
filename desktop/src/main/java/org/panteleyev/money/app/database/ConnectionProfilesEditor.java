@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -44,23 +44,8 @@ import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
 import static org.panteleyev.fx.ButtonFactory.buttonType;
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ARE_YOU_SURE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PROFILE_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_RESET;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_RESET_TEXT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_PROFILES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SAVE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TEST;
 
 class ConnectionProfilesEditor extends BaseDialog<Object> {
     static final String DEFAULT_DATABASE = "postgres";
@@ -100,12 +85,12 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         tcpEditor = new TCPEditor(validation, this::onResetButton);
 
-        setTitle(fxString(UI, I18N_WORD_PROFILES));
+        setTitle("Профили");
 
-        var newButtonType = buttonType(fxString(UI, I18N_WORD_ADD), LEFT);
-        var deleteButtonType = buttonType(fxString(UI, I18N_WORD_DELETE), LEFT);
-        var testButtonType = buttonType(fxString(UI, I18N_WORD_TEST), BIG_GAP);
-        var saveButtonType = buttonType(fxString(UI, I18N_WORD_SAVE), SMALL_GAP);
+        var newButtonType = buttonType("Добавить", LEFT);
+        var deleteButtonType = buttonType("Удалить", LEFT);
+        var testButtonType = buttonType("Тест", BIG_GAP);
+        var saveButtonType = buttonType("Сохранить", SMALL_GAP);
 
         getDialogPane().getButtonTypes().addAll(
                 newButtonType, deleteButtonType, testButtonType, saveButtonType, CLOSE
@@ -130,7 +115,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
             b.addEventFilter(ACTION, this::onTestButton);
         });
 
-        getButton(CLOSE).ifPresent(b -> b.setText(fxString(UI, I18N_WORD_CLOSE)));
+        getButton(CLOSE).ifPresent(b -> b.setText("Закрыть"));
 
         var root = new BorderPane();
         root.setLeft(initLeftPane());
@@ -177,7 +162,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onDeleteButton(ActionEvent event) {
         event.consume();
         getSelectedProfile().ifPresent(selected ->
-                new Alert(CONFIRMATION, fxString(UI, I18N_MISC_ARE_YOU_SURE), OK, CANCEL)
+                new Alert(CONFIRMATION, "Вы уверены?", OK, CANCEL)
                         .showAndWait()
                         .filter(response -> response == OK)
                         .ifPresent(b -> {
@@ -216,9 +201,10 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onResetButton(ActionEvent event) {
         event.consume();
 
-        var alert = new Alert(WARNING, UI.getString(I18N_MISC_SCHEMA_RESET_TEXT), YES, NO);
-        alert.setHeaderText(fxString(UI, I18M_MISC_SCHEMA_RESET_HEADER));
-        alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_RESET));
+        var alert = new Alert(WARNING, "Все данные будут уничтожены. Проверьте, есть ли резервная копия базы. " +
+                "Продолжать?", YES, NO);
+        alert.setHeaderText("Внимание");
+        alert.setTitle("Сброс базы данных");
 
         alert.showAndWait()
                 .filter(response -> response == YES)
@@ -312,7 +298,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private BorderPane initLeftPane() {
         var pane = new BorderPane();
 
-        var titled = new TitledPane(fxString(UI, I18N_WORD_PROFILES), profileListView);
+        var titled = new TitledPane("Профили", profileListView);
         titled.setCollapsible(false);
         titled.setMaxHeight(Double.MAX_VALUE);
 
@@ -323,10 +309,10 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private VBox initCenterPane() {
         var pane = new VBox();
 
-        var hBox = new HBox(label(fxString(UI, I18N_MISC_PROFILE_NAME, COLON)), profileNameEdit);
+        var hBox = new HBox(label("Имя профиля:"), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
-        var titled = new TitledPane(UI.getString(I18N_WORD_CONNECTION), tcpEditor);
+        var titled = new TitledPane("Соединение", tcpEditor);
         titled.setCollapsible(false);
 
 

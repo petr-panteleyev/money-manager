@@ -5,20 +5,25 @@
 package org.panteleyev.money.app;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.stage.Stage;
+import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.MoneyRecord;
 
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
+import java.util.Collection;
+import java.util.function.Consumer;
+
+import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
+import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_2;
@@ -28,23 +33,13 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
-import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_INCOMES_AND_EXPENSES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_HELP;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ABOUT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_WINDOW;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PERIODIC_PAYMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORIES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONTACTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCIES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DOCUMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_REQUESTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_STATEMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TRANSACTIONS;
 
 public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
+
+    protected final Action ACTION_CLOSE = new Action("Закрыть", event -> onClose());
 
     BaseController() {
         super(settings().getMainCssFilePath());
@@ -68,25 +63,24 @@ public class BaseController extends Controller {
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = menuItem(fxString(UI, I18N_WORD_TRANSACTIONS, ELLIPSIS), SHORTCUT_0,
+        var transactionsMenuItem = menuItem("Проводки...", SHORTCUT_0,
                 x -> getController(MainWindowController.class));
-        var accountsMenuItem = menuItem(fxString(UI, I18N_WORD_ACCOUNTS, ELLIPSIS), SHORTCUT_1,
+        var accountsMenuItem = menuItem("Счета...", SHORTCUT_1,
                 x -> getController(AccountWindowController.class));
-        var statementMenuItem = menuItem(fxString(UI, I18N_WORD_STATEMENTS, ELLIPSIS), SHORTCUT_2,
+        var statementMenuItem = menuItem("Выписки...", SHORTCUT_2,
                 x -> getController(StatementWindowController.class));
-        var requestsMenuItem = menuItem(fxString(UI, I18N_WORD_REQUESTS, ELLIPSIS), SHORTCUT_3,
-                x -> getRequestController());
-        var chartsMenuItem = menuItem(fxString(UI, I18M_MISC_INCOMES_AND_EXPENSES, ELLIPSIS), SHORTCUT_4,
+        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_3, x -> getRequestController());
+        var chartsMenuItem = menuItem("Доходы и расходы...", SHORTCUT_4,
                 x -> getController(IncomesAndExpensesWindowController.class));
-        var currenciesMenuItem = menuItem(fxString(UI, I18N_WORD_CURRENCIES, ELLIPSIS), SHORTCUT_5,
+        var currenciesMenuItem = menuItem("Валюты...", SHORTCUT_5,
                 x -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = menuItem(fxString(UI, I18N_WORD_CATEGORIES, ELLIPSIS), SHORTCUT_6,
+        var categoriesMenuItem = menuItem("Категории...", SHORTCUT_6,
                 x -> getController(CategoryWindowController.class));
-        var contactsMenuItem = menuItem(fxString(UI, I18N_WORD_CONTACTS, ELLIPSIS), SHORTCUT_7,
+        var contactsMenuItem = menuItem("Контакты...", SHORTCUT_7,
                 x -> getController(ContactListWindowController.class));
-        var documentsMenuItem = menuItem(fxString(UI, I18N_WORD_DOCUMENTS, ELLIPSIS), SHORTCUT_ALT_U,
+        var documentsMenuItem = menuItem("Документы...", SHORTCUT_ALT_U,
                 x -> getDocumentController(null));
-        var periodicPaymentsMenuItem = menuItem(fxString(UI, I18N_MISC_PERIODIC_PAYMENTS, ELLIPSIS), SHORTCUT_SHIFT_P,
+        var periodicPaymentsMenuItem = menuItem("Периодические платежи...", SHORTCUT_SHIFT_P,
                 x -> getController(PeriodicPaymentWindowController.class));
 
         if (dbOpenProperty != null) {
@@ -101,7 +95,7 @@ public class BaseController extends Controller {
             periodicPaymentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
-        var menu = newMenu(fxString(UI, I18N_MENU_WINDOW),
+        var menu = newMenu("Окно",
                 transactionsMenuItem,
                 new SeparatorMenuItem(),
                 accountsMenuItem,
@@ -135,8 +129,8 @@ public class BaseController extends Controller {
     }
 
     protected Menu createHelpMenu() {
-        return newMenu(fxString(UI, I18N_MENU_HELP),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ABOUT), x -> new AboutDialog(this).showAndWait()));
+        return newMenu("Справка",
+                menuItem("О программе", x -> new AboutDialog(this).showAndWait()));
     }
 
     static <T extends BaseController> T getController(Class<T> clazz) {
@@ -183,5 +177,24 @@ public class BaseController extends Controller {
         stage.show();
         stage.toFront();
         return controller;
+    }
+
+    // Actions
+    static Action searchAction(Consumer<ActionEvent> handler) {
+        return actionBuilder("Поиск", handler)
+                .accelerator(SHORTCUT_F)
+                .build();
+    }
+
+    static Menu createMenu(String text, Collection<Action> actions) {
+        var menu = new Menu(text);
+        for (var action : actions) {
+            if (action == ACTION_SEPARATOR) {
+                menu.getItems().add(new SeparatorMenuItem());
+            } else {
+                menu.getItems().add(createMenuItem(action));
+            }
+        }
+        return menu;
     }
 }

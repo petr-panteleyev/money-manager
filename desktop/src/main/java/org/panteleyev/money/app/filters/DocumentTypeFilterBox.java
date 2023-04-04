@@ -14,8 +14,6 @@ import org.panteleyev.money.app.ToStringConverter;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 
-import static org.panteleyev.money.app.Constants.ALL_TYPES_STRING;
-
 public class DocumentTypeFilterBox {
     private final PredicateProperty<MoneyDocument> predicateProperty = new PredicateProperty<>();
 
@@ -23,7 +21,7 @@ public class DocumentTypeFilterBox {
 
     public DocumentTypeFilterBox() {
         typeBox.getItems().addAll(
-                ALL_TYPES_STRING,
+                "Все типы",
                 new Separator()
         );
         typeBox.getItems().addAll(

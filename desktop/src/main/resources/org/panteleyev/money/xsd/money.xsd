@@ -336,6 +336,7 @@
     <xsd:simpleType name="TransactionType">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="CARD_PAYMENT"/>
+            <xsd:enumeration value="SBP_PAYMENT"/>
             <xsd:enumeration value="CASH_PURCHASE"/>
             <xsd:enumeration value="CHEQUE"/>
             <xsd:enumeration value="WITHDRAWAL"/>

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.panteleyev.fx.FxUtils.COLON;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
@@ -33,10 +31,6 @@ import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 final class CategoryDialog extends BaseDialog<Category> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -50,13 +44,13 @@ final class CategoryDialog extends BaseDialog<Category> {
     CategoryDialog(Controller owner, URL css, Category category) {
         super(owner, css);
 
-        setTitle(fxString(UI, I18N_WORD_CATEGORY));
+        setTitle("Категория");
 
         getDialogPane().setContent(gridPane(
                 List.of(
-                        gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeComboBox, iconComboBox),
-                        gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), gridCell(nameEdit, 2, 1)),
-                        gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit, 2, 1))),
+                        gridRow(label("Тип:"), typeComboBox, iconComboBox),
+                        gridRow(label("Название:"), gridCell(nameEdit, 2, 1)),
+                        gridRow(label("Комментарий:"), gridCell(commentEdit, 2, 1))),
                 b -> b.withStyle(Styles.GRID_PANE))
         );
 

@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.app;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -11,6 +12,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.app.cells.PeriodicPaymentContactCell;
 import org.panteleyev.money.app.cells.PeriodicPaymentCreditedAccountCell;
 import org.panteleyev.money.app.cells.PeriodicPaymentDebitedAccountCell;
@@ -24,46 +26,26 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ARE_YOU_SURE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_NEXT_PAYMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PERIODIC_PAYMENTS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DAY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_MONTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RECURRENCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 final class PeriodicPaymentWindowController extends BaseController {
     private final TableView<PeriodicPayment> tableView = new TableView<>(
             cache().getPeriodicPayments().sorted(
                     Comparator.comparing(PeriodicPayment::calculateNextDate)
             )
+    );
+
+    private final CrudActionsHolder crudActionsHolder = new CrudActionsHolder(
+            this::onCreatePeriodicPayment, this::onEditPeriodicPayment, this::onDeletePeriodicPayment,
+            tableView.getSelectionModel().selectedItemProperty().isNull()
     );
 
     PeriodicPaymentWindowController() {
@@ -84,23 +66,19 @@ final class PeriodicPaymentWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return UI.getString(I18N_MISC_PERIODIC_PAYMENTS);
+        return "Периодические платежи";
     }
 
     private MenuBar createMainMenu() {
-        var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
         var menuBar = menuBar(
-                newMenu(fxString(UI, I18N_MENU_FILE),
-                        menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose())
+                newMenu("Файл",
+                        createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu(fxString(UI, I18N_MENU_EDIT),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                                event -> onNewPeriodicPayment()),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                                event -> onEditPeriodicPayment(), disableBinding),
+                newMenu("Правка",
+                        createMenuItem(crudActionsHolder.getCreateAction()),
+                        createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),
-                        menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
-                                event -> onDeletePeriodicPayment(), disableBinding)
+                        createMenuItem(crudActionsHolder.getDeleteAction())
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -113,46 +91,46 @@ final class PeriodicPaymentWindowController extends BaseController {
         var w = tableView.widthProperty().subtract(20);
 
         tableView.getColumns().setAll(List.of(
-                tableColumn(fxString(UI, I18N_WORD_ENTITY_NAME),
+                tableColumn("Название",
                         b -> b.withPropertyCallback(PeriodicPayment::name)
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableObjectColumn(fxString(UI, I18N_WORD_SUM),
+                tableObjectColumn("Сумма",
                         b -> b.withCellFactory(x -> new PeriodicPaymentSumCell())
                                 .withWidthBinding(w.multiply(0.03))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_TYPE),
+                tableColumn("Тип",
                         b -> b.withPropertyCallback(p -> Bundles.translate(p.paymentType()))
                                 .withWidthBinding(w.multiply(0.05))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_RECURRENCE),
+                tableColumn("Периодичность",
                         b -> b.withPropertyCallback(p -> Bundles.translate(p.recurrenceType()))
                                 .withWidthBinding(w.multiply(0.05))
                 ),
-                tableColumn(fxString(UI, I18N_WORD_DAY),
+                tableColumn("День",
                         b -> b.withPropertyCallback(PeriodicPayment::dayOfMonth)
                                 .withWidthBinding(w.multiply(0.02))
                 ),
-                tableObjectColumn(fxString(UI, I18N_WORD_MONTH),
+                tableObjectColumn("Месяц",
                         b -> b.withCellFactory(x -> new PeriodicPaymentMonthCell())
                                 .withWidthBinding(w.multiply(0.05))
                 ),
-                tableObjectColumn(fxString(UI, I18N_MISC_DEBITED_ACCOUNT),
+                tableObjectColumn("Исходный счет",
                         b -> b.withCellFactory(x -> new PeriodicPaymentDebitedAccountCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableObjectColumn(fxString(UI, I18N_MISC_CREDITED_ACCOUNT),
+                tableObjectColumn("Счет получателя",
                         b -> b.withCellFactory(x -> new PeriodicPaymentCreditedAccountCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableObjectColumn(fxString(UI, I18N_WORD_COUNTERPARTY),
+                tableObjectColumn("Контрагент",
                         b -> b.withCellFactory(x -> new PeriodicPaymentContactCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
-                tableObjectColumn(fxString(UI, I18N_MISC_NEXT_PAYMENT), b ->
+                tableObjectColumn("Следующий\nплатёж", b ->
                         b.withCellFactory(x -> new PeriodicPaymentNextDateCell(settings().getPeriodicPaymentDayDelta()))
                                 .withWidthBinding(w.multiply(0.05))),
-                tableColumn(fxString(UI, I18N_WORD_COMMENT),
+                tableColumn("Комментарий",
                         b -> b.withPropertyCallback(PeriodicPayment::comment)
                                 .withWidthBinding(w.multiply(0.35))
                 )
@@ -165,7 +143,7 @@ final class PeriodicPaymentWindowController extends BaseController {
         );
     }
 
-    private void onNewPeriodicPayment() {
+    private void onCreatePeriodicPayment(ActionEvent event) {
         new PeriodicPaymentDialog(this, settings().getDialogCssFileUrl(), null, cache()).showAndWait()
                 .ifPresent(payment -> {
                     dao().insertPeriodicPayment(payment);
@@ -174,7 +152,7 @@ final class PeriodicPaymentWindowController extends BaseController {
                 });
     }
 
-    private void onEditPeriodicPayment() {
+    private void onEditPeriodicPayment(ActionEvent event) {
         getSelectedPeriodicPayment().flatMap(periodicPayment ->
                         new PeriodicPaymentDialog(
                                 this,
@@ -188,11 +166,11 @@ final class PeriodicPaymentWindowController extends BaseController {
                 });
     }
 
-    private void onDeletePeriodicPayment() {
+    private void onDeletePeriodicPayment(ActionEvent event) {
         getSelectedPeriodicPayment().ifPresent(periodicPayment ->
                 new Alert(
                         Alert.AlertType.CONFIRMATION,
-                        fxString(UI, I18N_MISC_ARE_YOU_SURE),
+                        "Вы уверены?",
                         ButtonType.OK,
                         ButtonType.CANCEL
                 ).showAndWait()

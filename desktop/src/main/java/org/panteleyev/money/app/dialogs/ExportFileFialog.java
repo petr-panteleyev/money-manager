@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.dialogs;
@@ -13,13 +13,11 @@ import java.util.Optional;
 import static org.panteleyev.money.MoneyApplication.generateFileName;
 import static org.panteleyev.money.app.Constants.FILTER_ZIP_FILES;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_IMPORT;
 
 public class ExportFileFialog {
     public Optional<File> showImportDialog(Window owner) {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(UI.getString(I18N_WORD_IMPORT));
+        fileChooser.setTitle("Импорт");
 
         settings().getLastExportDir().ifPresent(fileChooser::setInitialDirectory);
         fileChooser.getExtensionFilters().addAll(FILTER_ZIP_FILES);

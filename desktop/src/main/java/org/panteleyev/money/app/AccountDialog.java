@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -33,10 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import static org.panteleyev.fx.FxFactory.newCheckBox;
-import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
@@ -45,20 +42,6 @@ import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_ACCOUNT_NUMBER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CARD_NUMBER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CARD_TYPE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CLOSING_DATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INITIAL_BALANCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ACTIVE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CATEGORY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CREDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CURRENCY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_INTEREST;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 class AccountDialog extends BaseDialog<Account> {
     private final ValidationSupport validation = new ValidationSupport();
@@ -73,7 +56,7 @@ class AccountDialog extends BaseDialog<Account> {
                     .withStringConverter(Bundles::translate));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
-    private final CheckBox activeCheckBox = newCheckBox(UI, I18N_WORD_ACTIVE);
+    private final CheckBox activeCheckBox = new CheckBox("Активен");
     private final TextField interestEdit = new TextField();
     private final DatePicker closingDatePicker = new DatePicker();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
@@ -99,34 +82,23 @@ class AccountDialog extends BaseDialog<Account> {
 
     AccountDialog(Controller owner, URL css, Account account, Category initialCategory, DataCache cache) {
         super(owner, css);
-        setTitle(fxString(UI, I18N_WORD_ACCOUNT));
+        setTitle("Счёт");
 
         getDialogPane().setContent(
                 gridPane(
                         List.of(
-                                gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), gridCell(nameEdit,
-                                        2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), typeComboBox, iconComboBox),
-                                gridRow(label(fxString(UI, I18N_WORD_CATEGORY, COLON)),
-                                        gridCell(categoryComboBox, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_MISC_INITIAL_BALANCE, COLON)),
-                                        gridCell(initialEdit, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_CREDIT, COLON)), gridCell(creditEdit, 2,
-                                        1)),
-                                gridRow(label(fxString(UI, I18N_MISC_ACCOUNT_NUMBER, COLON)),
-                                        gridCell(accountNumberEdit, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), gridCell(commentEdit,
-                                        2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_CURRENCY, COLON)),
-                                        gridCell(currencyComboBox, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_WORD_INTEREST, COLON)), gridCell(interestEdit
-                                        , 2, 1)),
-                                gridRow(label(fxString(UI, I18N_MISC_CLOSING_DATE, COLON)),
-                                        gridCell(closingDatePicker, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_MISC_CARD_TYPE, COLON)),
-                                        gridCell(cardTypeComboBox, 2, 1)),
-                                gridRow(label(fxString(UI, I18N_MISC_CARD_NUMBER, COLON)),
-                                        gridCell(cardNumberEdit, 2, 1)),
+                                gridRow(label("Название:"), gridCell(nameEdit, 2, 1)),
+                                gridRow(label("Тип:"), typeComboBox, iconComboBox),
+                                gridRow(label("Категория:"), gridCell(categoryComboBox, 2, 1)),
+                                gridRow(label("Начальный баланс:"), gridCell(initialEdit, 2, 1)),
+                                gridRow(label("Кредит:"), gridCell(creditEdit, 2, 1)),
+                                gridRow(label("Номер счёта:"), gridCell(accountNumberEdit, 2, 1)),
+                                gridRow(label("Комментарий:"), gridCell(commentEdit, 2, 1)),
+                                gridRow(label("Валюта:"), gridCell(currencyComboBox, 2, 1)),
+                                gridRow(label("Проценты:"), gridCell(interestEdit, 2, 1)),
+                                gridRow(label("Дата закрытия:"), gridCell(closingDatePicker, 2, 1)),
+                                gridRow(label("Тип карты:"), gridCell(cardTypeComboBox, 2, 1)),
+                                gridRow(label("Номер карты:"), gridCell(cardNumberEdit, 2, 1)),
                                 gridRow(SKIP, gridCell(activeCheckBox, 2, 1))
                         ), b -> b.withStyle(Styles.GRID_PANE)
 

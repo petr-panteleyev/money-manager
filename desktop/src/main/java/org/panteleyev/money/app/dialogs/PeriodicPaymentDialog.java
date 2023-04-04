@@ -48,9 +48,7 @@ import static javafx.scene.layout.Priority.ALWAYS;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.FxUtils.COLON;
 import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.choicebox.ChoiceBoxBuilder.choiceBox;
@@ -59,15 +57,6 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_CREDITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_DEBITED_ACCOUNT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_PERIODIC_PAYMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COMMENT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_COUNTERPARTY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_ENTITY_NAME;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_RECURRENCE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_SUM;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_TYPE;
 
 public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
     private static final NamedToStringConverter<Contact> CONTACT_TO_STRING = new NamedToStringConverter<>();
@@ -114,21 +103,21 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
         super(owner, css);
         this.cache = cache;
 
-        setTitle(fxString(UI, I18N_MISC_PERIODIC_PAYMENT));
+        setTitle("Периодический платёж");
 
         getDialogPane().setContent(gridPane(List.of(
-                gridRow(label(fxString(UI, I18N_WORD_ENTITY_NAME, COLON)), nameEdit),
-                gridRow(label(fxString(UI, I18N_WORD_TYPE, COLON)), paymentTypeBox),
-                gridRow(label(fxString(UI, I18N_WORD_RECURRENCE, COLON)),
+                gridRow(label("Название:"), nameEdit),
+                gridRow(label("Тип:"), paymentTypeBox),
+                gridRow(label("Периодичность:"),
                         hBox(SMALL_SPACING, recurrenceTypeBox, dayComboBox, monthChoiceBox)),
-                gridRow(label(fxString(UI, I18N_WORD_SUM)), sumEdit),
-                gridRow(label(fxString(UI, I18N_MISC_DEBITED_ACCOUNT, COLON)),
+                gridRow(label("Сумма"), sumEdit),
+                gridRow(label("Исходный счет:"),
                         hBox(0, fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)), debitedMenuButton)),
-                gridRow(label(fxString(UI, I18N_MISC_CREDITED_ACCOUNT, COLON)),
+                gridRow(label("Счет получателя:"),
                         hBox(0, fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)), creditedMenuButton)),
-                gridRow(label(fxString(UI, I18N_WORD_COUNTERPARTY, COLON)),
+                gridRow(label("Контрагент:"),
                         hBox(0, fxNode(contactEdit, hBoxHGrow(ALWAYS)), contactMenuButton)),
-                gridRow(label(fxString(UI, I18N_WORD_COMMENT, COLON)), commentEdit)
+                gridRow(label("Комментарий:"), commentEdit)
         ), b -> b.withStyle(Styles.GRID_PANE)));
 
         nameEdit.setPrefColumnCount(20);

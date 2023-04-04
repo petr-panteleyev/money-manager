@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -7,7 +7,6 @@ package org.panteleyev.money.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 public record Account(
     UUID uuid,
@@ -30,7 +29,7 @@ public record Account(
     BigDecimal totalWaiting,
     long created,
     long modified
-) implements MoneyRecord, Named, Comparable<Account> {
+) implements MoneyRecord, Named {
     public Account {
         if (uuid == null) {
             uuid = UUID.randomUUID();
@@ -63,11 +62,6 @@ public record Account(
         interest = MoneyRecord.normalize(interest, BigDecimal.ZERO);
         total = MoneyRecord.normalize(total, BigDecimal.ZERO);
         totalWaiting = MoneyRecord.normalize(totalWaiting, BigDecimal.ZERO);
-    }
-
-    @Override
-    public int compareTo(Account other) {
-        return name.compareToIgnoreCase(other.name);
     }
 
     public Account enable(boolean e) {

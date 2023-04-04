@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -39,7 +39,6 @@ import org.panteleyev.money.app.dialogs.ExportFileFialog;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.icons.IconWindowController;
 import org.panteleyev.money.app.settings.SettingsDialog;
-import org.panteleyev.money.bundles.UiBundle;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
@@ -56,6 +55,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.List;
+import java.util.ListResourceBundle;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -70,61 +70,35 @@ import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
+import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
 import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.FxUtils.fxString;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_E;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_I;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_P;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_DELETE;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_E;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_I;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_P;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.bundles.Internationalization.I18M_MISC_SCHEMA_RESET_HEADER;
-import static org.panteleyev.money.bundles.Internationalization.I18N_CREATE_DESKTOP_ENTRY;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_FILE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ADD;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_CURRENT_MONTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_DELETE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EDIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXIT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_EXPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_ICONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_IMPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_NEXT_MONTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_OPTIONS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PREVIOUS_MONTH;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_PROFILES;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_REPORT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_ITEM_UNCHECK;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_TOOLS;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MENU_VIEW;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_INCOMPATIBLE_SCHEMA;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_MISC_SCHEMA_UPDATE_TEXT;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CLOSE;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_CONNECTION;
-import static org.panteleyev.money.bundles.Internationalization.I18N_WORD_DETAILS;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
-    public static final ResourceBundle UI = ResourceBundle.getBundle(UiBundle.class.getCanonicalName());
+    public static final ResourceBundle UI = new ListResourceBundle() {
+        @Override
+        protected Object[][] getContents() {
+            return new Object[][]{
+                    {"button.Cancel", "Отмена"}
+            };
+        }
+    };
 
     private final BorderPane self = new BorderPane();
 
@@ -176,18 +150,13 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = menuItem(fxString(UI, I18N_WORD_CONNECTION, ELLIPSIS),
-                event -> onOpenConnection());
-        var fileCloseMenuItem = menuItem(fxString(UI, I18N_WORD_CLOSE), event -> onClose());
-        var fileExitMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXIT), event -> onExit());
-        var exportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_EXPORT, ELLIPSIS), SHORTCUT_ALT_E,
-                event -> xmlDump());
-        var importMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_IMPORT, ELLIPSIS), SHORTCUT_ALT_I,
-                event -> onImport());
-        var reportMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_REPORT, ELLIPSIS), SHORTCUT_ALT_R,
-                event -> onReport());
+        var fileConnectMenuItem = menuItem("Соединение...", event -> onOpenConnection());
+        var fileExitMenuItem = menuItem("Выход", event -> onExit());
+        var exportMenuItem = menuItem("Экспорт...", SHORTCUT_ALT_E, event -> xmlDump());
+        var importMenuItem = menuItem("Импорт...", SHORTCUT_ALT_I, event -> onImport());
+        var reportMenuItem = menuItem("Отчет...", SHORTCUT_ALT_R, event -> onReport());
 
-        var fileMenu = newMenu(fxString(UI, I18N_MENU_FILE),
+        var fileMenu = newMenu("Файл",
                 fileConnectMenuItem,
                 new SeparatorMenuItem(),
                 importMenuItem,
@@ -195,50 +164,35 @@ public class MainWindowController extends BaseController implements TransactionT
                 new SeparatorMenuItem(),
                 reportMenuItem,
                 new SeparatorMenuItem(),
-                fileCloseMenuItem,
+                createMenuItem(ACTION_CLOSE),
                 new SeparatorMenuItem(),
                 fileExitMenuItem);
 
-        var editMenu = newMenu(fxString(UI, I18N_MENU_EDIT),
-                menuItem(fxString(UI, I18N_MENU_ITEM_ADD, ELLIPSIS), SHORTCUT_N,
-                        event -> transactionTable.onNewTransaction()),
-                menuItem(fxString(UI, I18N_MENU_ITEM_EDIT, ELLIPSIS), SHORTCUT_E,
-                        event -> transactionTable.onEditTransaction()),
+        var editMenu = createMenu("Правка", transactionTable.getActions());
+
+        var viewMenu = newMenu("Вид",
+                menuItem("Текущий месяц", SHORTCUT_ALT_UP, x -> onCurrentMonth()),
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_DELETE, ELLIPSIS), SHORTCUT_DELETE,
-                        event -> transactionTable.onDeleteTransaction()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_WORD_DETAILS, ELLIPSIS), x -> transactionTable.onTransactionDetails()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CHECK), SHORTCUT_K,
-                        event -> transactionTable.onCheckTransactions(true)),
-                menuItem(fxString(UI, I18N_MENU_ITEM_UNCHECK), SHORTCUT_U,
-                        event -> transactionTable.onCheckTransactions(false))
+                menuItem("Следующий месяц", SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
+                menuItem("Предыдущий месяц", SHORTCUT_ALT_LEFT, x -> onPrevMonth())
         );
 
-        var viewMenu = newMenu(fxString(UI, I18N_MENU_VIEW),
-                menuItem(fxString(UI, I18N_MENU_ITEM_CURRENT_MONTH), SHORTCUT_ALT_UP, x -> onCurrentMonth()),
-                new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_MENU_ITEM_NEXT_MONTH), SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
-                menuItem(fxString(UI, I18N_MENU_ITEM_PREVIOUS_MONTH), SHORTCUT_ALT_LEFT, x -> onPrevMonth())
-        );
-
-        var profilesMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_PROFILES, ELLIPSIS), SHORTCUT_ALT_P,
+        var profilesMenuItem = menuItem("Профили...", SHORTCUT_ALT_P,
                 x -> profileManager.getEditor().showAndWait());
 
-        var optionsMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_OPTIONS, ELLIPSIS),
+        var optionsMenuItem = menuItem("Настройки...",
                 SHORTCUT_ALT_S, x -> onOptions());
-        var iconWindowMenuItem = menuItem(fxString(UI, I18N_MENU_ITEM_ICONS, ELLIPSIS),
+        var iconWindowMenuItem = menuItem("Значки...",
                 x -> onIconWindow());
 
-        var toolsMenu = newMenu(fxString(UI, I18N_MENU_TOOLS),
+        var toolsMenu = newMenu("Сервис",
                 profilesMenuItem,
                 new SeparatorMenuItem(),
                 iconWindowMenuItem,
                 new SeparatorMenuItem(),
                 optionsMenuItem,
                 new SeparatorMenuItem(),
-                menuItem(fxString(UI, I18N_CREATE_DESKTOP_ENTRY), a -> onCreateDesktopEntry())
+                menuItem("Создать ярлык приложения (Linux)", a -> onCreateDesktopEntry())
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
@@ -349,9 +303,9 @@ public class MainWindowController extends BaseController implements TransactionT
         var schemaStatus = dao().checkSchemaUpdateStatus();
         switch (schemaStatus) {
             case UPDATE_REQUIRED -> {
-                var alert = new Alert(WARNING, fxString(UI, I18N_MISC_SCHEMA_UPDATE_TEXT), YES, NO);
-                alert.setHeaderText(fxString(UI, I18M_MISC_SCHEMA_RESET_HEADER));
-                alert.setTitle(fxString(UI, I18N_MISC_SCHEMA_UPDATE));
+                var alert = new Alert(WARNING, "Требуется совместимое обновление базы данных. Продолжать?", YES, NO);
+                alert.setHeaderText("Внимание");
+                alert.setTitle("Обновление базы данных");
 
                 var confirmed = alert.showAndWait()
                         .filter(response -> response == YES)
@@ -364,7 +318,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 }
             }
             case INCOMPATIBLE -> {
-                new Alert(ERROR, fxString(UI, I18N_MISC_INCOMPATIBLE_SCHEMA), OK).showAndWait();
+                new Alert(ERROR, "База данных несовместима с приложением, завершение работы.", OK).showAndWait();
                 System.exit(-1);
             }
         }
