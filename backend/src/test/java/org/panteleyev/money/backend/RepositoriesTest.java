@@ -1,13 +1,11 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
 
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.backend.repository.ContactRepository;
@@ -18,10 +16,6 @@ import org.panteleyev.money.backend.repository.MoneyRepository;
 import org.panteleyev.money.backend.repository.TransactionRepository;
 import org.panteleyev.money.model.MoneyRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
@@ -35,14 +29,8 @@ import static org.panteleyev.money.backend.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.backend.BaseTestUtils.newDocument;
 import static org.panteleyev.money.backend.BaseTestUtils.newIcon;
 import static org.panteleyev.money.backend.BaseTestUtils.newTransaction;
-import static org.panteleyev.money.backend.Profiles.TEST;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(TEST)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Testcontainers
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class RepositoriesTest {
+public class RepositoriesTest extends BaseSpringBootTest {
     private static final UUID ICON_UUID = UUID.randomUUID();
     private static final UUID CATEGORY_UUID = UUID.randomUUID();
     private static final UUID CURRENCY_UUID = UUID.randomUUID();

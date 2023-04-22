@@ -1,14 +1,12 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.panteleyev.money.client.MoneyClient;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
@@ -18,10 +16,7 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,13 +36,8 @@ import static org.panteleyev.money.backend.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.backend.BaseTestUtils.newDocument;
 import static org.panteleyev.money.backend.BaseTestUtils.newIcon;
 import static org.panteleyev.money.backend.BaseTestUtils.newTransaction;
-import static org.panteleyev.money.backend.Profiles.TEST;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(TEST)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Testcontainers
-public class ClientTest {
+public class ClientTest extends BaseSpringBootTest {
     private static final UUID ICON_UUID = UUID.randomUUID();
     private static final UUID CATEGORY_UUID = UUID.randomUUID();
     private static final UUID CURRENCY_UUID = UUID.randomUUID();

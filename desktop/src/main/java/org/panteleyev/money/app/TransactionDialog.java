@@ -544,7 +544,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     builder.accountDebitedCategoryUuid(card.categoryUuid());
                     builder.accountDebitedType(card.type());
                 }
-                default -> {}
+                default -> {
+                }
             }
         } else {
             return false;
@@ -663,13 +664,17 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         });
 
         validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
-            var account = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
-            updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
+            var debitedValue = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
+            updateCategoryLabel(debitedCategoryLabel, debitedValue.orElse(null));
 
-            //builder.accountDebitedUuid(account.map(Account::uuid).orElse(null));
+            switch (debitedValue.orElse(null)) {
+                case Account acc -> builder.accountDebitedUuid(acc.uuid());
+                case AccountCard card -> builder.accountCreditedUuid(card.accountUuid());
+                case null, default -> {/* do nothing */}
+            }
 
             enableDisableRate();
-            return ValidationResult.fromErrorIf(control, null, account.isEmpty());
+            return ValidationResult.fromErrorIf(control, null, debitedValue.isEmpty());
         });
 
         validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {

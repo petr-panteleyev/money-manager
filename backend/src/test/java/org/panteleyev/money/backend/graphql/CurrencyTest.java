@@ -1,16 +1,14 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.panteleyev.money.backend.BaseSpringBootTest;
 import org.panteleyev.money.client.MoneyClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -18,16 +16,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.panteleyev.money.backend.Profiles.TEST;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.checkObject;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.createCurrency;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.loadQuery;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.newClient;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles(TEST)
-@Testcontainers
-public class CurrencyTest {
+public class CurrencyTest extends BaseSpringBootTest {
 
     @LocalServerPort
     private int port;
