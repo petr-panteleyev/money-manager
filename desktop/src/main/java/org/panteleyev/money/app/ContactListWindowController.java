@@ -43,6 +43,7 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
+import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 class ContactListWindowController extends BaseController {
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
@@ -81,8 +82,8 @@ class ContactListWindowController extends BaseController {
 
         // Context menu
         contactTable.setContextMenu(new ContextMenu(
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction())
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createContextMenuItem(crudActionsHolder.getUpdateAction())
         ));
 
         var w = contactTable.widthProperty().subtract(20);

@@ -21,6 +21,7 @@ import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
+import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 final class CurrencyWindowController extends BaseController {
 
@@ -47,8 +48,8 @@ final class CurrencyWindowController extends BaseController {
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getDeleteAction())
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createContextMenuItem(crudActionsHolder.getDeleteAction())
         ));
 
         // Table

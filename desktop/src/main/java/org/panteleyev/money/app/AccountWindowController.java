@@ -67,6 +67,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 final class AccountWindowController extends BaseController {
     // Filters
@@ -249,22 +250,22 @@ final class AccountWindowController extends BaseController {
                 disableBinding);
 
         var contextMenu = new ContextMenu(
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction()),
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createContextMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
-                createMenuItem(crudActionsHolder.getDeleteAction()),
+                createContextMenuItem(crudActionsHolder.getDeleteAction()),
                 new SeparatorMenuItem(),
-                createMenuItem(attachDocumentAction),
-                createMenuItem(documentsAction),
+                createContextMenuItem(attachDocumentAction),
+                createContextMenuItem(documentsAction),
                 new SeparatorMenuItem(),
-                createMenuItem(copyNameAction),
+                createContextMenuItem(copyNameAction),
                 activateAccountMenuItem,
                 new SeparatorMenuItem(),
-                createMenuItem(searchAction),
+                createContextMenuItem(searchAction),
                 new SeparatorMenuItem(),
-                createMenuItem(transactionsAction),
+                createContextMenuItem(transactionsAction),
                 new SeparatorMenuItem(),
-                createMenuItem(refreshBalanceAction)
+                createContextMenuItem(refreshBalanceAction)
         );
 
         contextMenu.setOnShowing(event -> getSelectedAccount()

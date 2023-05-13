@@ -49,6 +49,7 @@ import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_S;
+import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public class DocumentWindowController extends BaseController {
     private final MoneyRecord documentOwner;
@@ -107,8 +108,8 @@ public class DocumentWindowController extends BaseController {
 
         // Context Menu
         table.setContextMenu(new ContextMenu(
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction()),
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createContextMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
                 menuItem("Открыть", SHORTCUT_O, event -> onOpenDocument()),
                 menuItem("Сохранить...", SHORTCUT_S, event -> onDownload()),

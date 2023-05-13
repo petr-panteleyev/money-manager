@@ -21,7 +21,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
 import org.controlsfx.control.action.Action;
-import org.controlsfx.control.action.ActionUtils;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
@@ -38,6 +37,7 @@ import org.panteleyev.money.app.cells.TransactionRow;
 import org.panteleyev.money.app.cells.TransactionSumCell;
 import org.panteleyev.money.app.cells.TransactionTypeCell;
 import org.panteleyev.money.app.details.TransactionDetailsDialog;
+import org.panteleyev.money.app.util.MenuUtils;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -273,7 +273,7 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void createContextMenu(Collection<? extends Action> actions) {
-        setContextMenu(ActionUtils.createContextMenu(actions));
+        setContextMenu(MenuUtils.createContextMenu(actions));
     }
 
     Predicate<Transaction> getTransactionFilter() {

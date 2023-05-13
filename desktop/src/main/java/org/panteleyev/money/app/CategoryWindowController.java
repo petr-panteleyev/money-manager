@@ -45,6 +45,7 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
+import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 final class CategoryWindowController extends BaseController {
     private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.values(),
@@ -85,8 +86,8 @@ final class CategoryWindowController extends BaseController {
 
         // Context Menu
         categoryTable.setContextMenu(new ContextMenu(
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction())
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createContextMenuItem(crudActionsHolder.getUpdateAction())
         ));
 
         // Table
