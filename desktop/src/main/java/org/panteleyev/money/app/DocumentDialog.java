@@ -17,11 +17,12 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.money.app.util.NamedCompletionProvider;
+import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
-import org.panteleyev.money.model.Named;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +45,6 @@ import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 
@@ -55,21 +55,11 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
     private record FileInfo(String name, String mimeType, byte[] bytes) {
     }
 
-    private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
-        CompletionProvider(Set<T> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(T element) {
-            return element.name();
-        }
-    }
-
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField contactEdit = new TextField();
     private final MenuButton contactMenuButton = new MenuButton();
-    private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
+    private final Set<Contact> contactSuggestions = new TreeSet<>();
 
     private final TextField nameEdit = new TextField();
     private final ChoiceBox<DocumentType> typeChoiceBox = choiceBox(DocumentType.values(),
@@ -94,12 +84,15 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
         super(owner, css);
         setTitle("Документ");
 
-        nameEdit.setEditable(false);
+        nameEdit.setEditable(document != null);
         nameEdit.setPrefColumnCount(40);
         descriptionEdit.setPrefColumnCount(40);
         contactMenuButton.setFocusTraversable(false);
 
-        TextFields.bindAutoCompletion(contactEdit, new CompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
+        TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
+
+        var descriptionSuggestions = new TreeSet<>(cache().getUniqueDocumentDescriptions());
+        TextFields.bindAutoCompletion(descriptionEdit, new StringCompletionProvider(descriptionSuggestions));
 
         setupContactMenu();
 
@@ -143,7 +136,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
             long now = System.currentTimeMillis();
 
             var result = new ArrayList<DocumentWithBytes>(fileInfos.size());
-            for (var fileInfo: fileInfos) {
+            for (var fileInfo : fileInfos) {
                 var builder = new MoneyDocument.Builder(document)
                         .documentType(typeChoiceBox.getSelectionModel().getSelectedItem())
                         .contactUuid(contactUuid)
@@ -161,6 +154,8 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
                             .size(fileInfo.bytes().length)
                             .mimeType(fileInfo.mimeType() == null ? "" : fileInfo.mimeType())
                             .created(now);
+                } else {
+                    builder.fileName(nameEdit.getText());
                 }
 
                 result.add(new DocumentWithBytes(builder.build(), fileInfo.bytes()));

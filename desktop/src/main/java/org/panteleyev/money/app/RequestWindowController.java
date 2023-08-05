@@ -18,6 +18,7 @@ import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
@@ -64,17 +65,7 @@ class RequestWindowController extends BaseController {
     private final PredicateProperty<Transaction> uncheckedPredicate = new PredicateProperty<>();
     private final PredicateProperty<Transaction> filterProperty;
 
-    private final TreeSet<String> contactSuggestions = new TreeSet<>();
-
-    private static class CompletionProvider extends BaseCompletionProvider<String> {
-        CompletionProvider(Set<String> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(String element) {
-            return element;
-        }
-    }
+    private final Set<String> contactSuggestions = new TreeSet<>();
 
     RequestWindowController(Account account) {
         this.account = account;
@@ -129,7 +120,7 @@ class RequestWindowController extends BaseController {
 
         transactionFilterBox.setFilterYears();
 
-        bindAutoCompletion(contactFilterBox.getTextField(), new CompletionProvider(contactSuggestions));
+        bindAutoCompletion(contactFilterBox.getTextField(), new StringCompletionProvider(contactSuggestions));
         setupContactMenu();
 
         table.selectedTransactions().addListener((ListChangeListener<Transaction>) change ->

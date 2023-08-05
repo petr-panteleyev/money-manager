@@ -27,6 +27,7 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
+import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
@@ -103,16 +104,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         }
     }
 
-    private static class StringCompletionProvider extends BaseCompletionProvider<String> {
-        StringCompletionProvider(Set<String> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(String element) {
-            return element;
-        }
-    }
-
     private final DataCache cache;
 
     private UUID uuid;      // current transaction uuid if any
@@ -143,13 +134,13 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private Transaction.Builder builder = new Transaction.Builder();
 
-    private final TreeSet<TransactionType> typeSuggestions = new TreeSet<>();
-    private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
-    private final TreeSet<Named> debitedSuggestions = new TreeSet<>();
-    private final TreeSet<Named> debitedSuggestionsAll = new TreeSet<>();
-    private final TreeSet<Account> creditedSuggestions = new TreeSet<>();
-    private final TreeSet<Account> creditedSuggestionsAll = new TreeSet<>();
-    private final TreeSet<String> commentSuggestions = new TreeSet<>();
+    private final Set<TransactionType> typeSuggestions = new TreeSet<>();
+    private final Set<Contact> contactSuggestions = new TreeSet<>();
+    private final Set<Named> debitedSuggestions = new TreeSet<>();
+    private final Set<Named> debitedSuggestionsAll = new TreeSet<>();
+    private final Set<Account> creditedSuggestions = new TreeSet<>();
+    private final Set<Account> creditedSuggestionsAll = new TreeSet<>();
+    private final Set<String> commentSuggestions = new TreeSet<>();
 
     private final ValidationSupport validation = new ValidationSupport();
 
@@ -391,11 +382,12 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var nextMonthKey = SHORTCUT_ALT_SHIFT_RIGHT;
         var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
 
-        var tooltipText = String.format("%s - следующий день\n" +
-                        "%s - предыдущий день\n" +
-                        "%s - следующий месяц\n" +
-                        "%s - предыдущий месяц\n" +
-                        "%s - сегодня",
+        var tooltipText = String.format("""
+                        %s - следующий день
+                        %s - предыдущий день
+                        %s - следующий месяц
+                        %s - предыдущий месяц
+                        %s - сегодня""",
                 tomorrowKey.getDisplayText(),
                 yesterdayKey.getDisplayText(),
                 nextMonthKey.getDisplayText(),
@@ -669,7 +661,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
             switch (debitedValue.orElse(null)) {
                 case Account acc -> builder.accountDebitedUuid(acc.uuid());
-                case AccountCard card -> builder.accountCreditedUuid(card.accountUuid());
+                case AccountCard card -> builder.accountDebitedUuid(card.accountUuid());
                 case null, default -> {/* do nothing */}
             }
 

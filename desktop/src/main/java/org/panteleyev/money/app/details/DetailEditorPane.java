@@ -23,11 +23,12 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
-import org.panteleyev.money.app.BaseCompletionProvider;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.ToStringConverter;
+import org.panteleyev.money.app.util.NamedCompletionProvider;
+import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -48,7 +49,6 @@ import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.money.app.GlobalContext.settings;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -56,26 +56,6 @@ final class DetailEditorPane extends BorderPane {
             return obj.name();
         }
     };
-
-    private static class CompletionProvider<T extends Named> extends BaseCompletionProvider<T> {
-        CompletionProvider(Set<T> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(T element) {
-            return element.name();
-        }
-    }
-
-    private static class StringCompletionProvider extends BaseCompletionProvider<String> {
-        StringCompletionProvider(Set<String> set) {
-            super(set, () -> settings().getAutoCompleteLength());
-        }
-
-        public String getElementString(String element) {
-            return element;
-        }
-    }
 
     private final DataCache cache;
 
@@ -88,9 +68,7 @@ final class DetailEditorPane extends BorderPane {
 
     private TransactionDetail transactionDetail = null;
 
-    private final TreeSet<Account> creditedSuggestions = new TreeSet<>();
-    private final TreeSet<String> commentSuggestions = new TreeSet<>();
-
+    private final Set<Account> creditedSuggestions = new TreeSet<>();
     private final ValidationSupport validation = new ValidationSupport();
 
     private final SimpleBooleanProperty newTransactionProperty = new SimpleBooleanProperty(true);
@@ -173,7 +151,9 @@ final class DetailEditorPane extends BorderPane {
         addButton.disableProperty().bind(validation.invalidProperty());
 
         TextFields.bindAutoCompletion(creditedAccountEdit,
-                new CompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+                new NamedCompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
+
+        var commentSuggestions = new TreeSet<>(cache.getUniqueTransactionComments());
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
         setupAccountMenus();

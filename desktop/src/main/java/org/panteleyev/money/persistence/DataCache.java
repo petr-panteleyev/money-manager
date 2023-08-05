@@ -139,6 +139,13 @@ public class DataCache {
                 .count();
     }
 
+    public Set<String> getUniqueDocumentDescriptions() {
+        return getDocuments().stream()
+                .map(MoneyDocument::description)
+                .filter(c -> !c.isEmpty())
+                .collect(Collectors.toSet());
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Categories
     ////////////////////////////////////////////////////////////////////////////

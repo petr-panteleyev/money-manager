@@ -39,6 +39,7 @@ import java.time.Month;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -65,9 +66,9 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
     private final DataCache cache;
     private final PeriodicPayment.Builder builder;
 
-    private final TreeSet<Account> debitedSuggestions = new TreeSet<>();
-    private final TreeSet<Account> creditedSuggestions = new TreeSet<>();
-    private final TreeSet<Contact> contactSuggestions = new TreeSet<>();
+    private final Set<Account> debitedSuggestions = new TreeSet<>();
+    private final Set<Account> creditedSuggestions = new TreeSet<>();
+    private final Set<Contact> contactSuggestions = new TreeSet<>();
     private final ValidationSupport validation = new ValidationSupport();
     private final Validator<String> DECIMAL_VALIDATOR = (Control control, String value) -> {
         var invalid = false;
