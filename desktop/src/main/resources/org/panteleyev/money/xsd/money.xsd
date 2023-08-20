@@ -211,6 +211,9 @@
             <xsd:element name="guid" type="UUID"/>
             <xsd:element name="created" type="Timestamp"/>
             <xsd:element name="modified" type="Timestamp"/>
+            <xsd:element name="type" type="CurrencyType" minOccurs="0"/>
+            <xsd:element name="isin" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="registry" type="xsd:string" minOccurs="0"/>
         </xsd:all>
     </xsd:complexType>
 
@@ -343,12 +346,15 @@
             <xsd:enumeration value="CACHIER"/>
             <xsd:enumeration value="DEPOSIT"/>
             <xsd:enumeration value="TRANSFER"/>
+            <xsd:enumeration value="SBP_TRANSFER"/>
             <xsd:enumeration value="INTEREST"/>
             <xsd:enumeration value="DIVIDEND"/>
+            <xsd:enumeration value="COUPON"/>
             <xsd:enumeration value="DIRECT_BILLING"/>
             <xsd:enumeration value="CHARGE"/>
             <xsd:enumeration value="FEE"/>
             <xsd:enumeration value="INCOME"/>
+            <xsd:enumeration value="PURCHASE"/>
             <xsd:enumeration value="SALE"/>
             <xsd:enumeration value="REFUND"/>
             <xsd:enumeration value="UNDEFINED"/>
@@ -363,6 +369,7 @@
             <xsd:enumeration value="STATEMENT"/>
             <xsd:enumeration value="NOTIFICATION"/>
             <xsd:enumeration value="PAYSLIP"/>
+            <xsd:enumeration value="INVOICE"/>
             <xsd:enumeration value="OTHER"/>
         </xsd:restriction>
     </xsd:simpleType>
@@ -375,6 +382,13 @@
         </xsd:restriction>
     </xsd:simpleType>
     
+    <xsd:simpleType name="CurrencyType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="CURRENCY"/>
+            <xsd:enumeration value="SECURITY"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
     <xsd:simpleType name="RecurrenceType">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="MONTHLY"/>

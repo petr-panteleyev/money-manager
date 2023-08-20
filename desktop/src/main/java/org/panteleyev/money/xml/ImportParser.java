@@ -11,6 +11,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
@@ -221,6 +222,7 @@ class ImportParser extends DefaultHandler {
     private static Currency parseCurrency(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
+
         return new Currency.Builder()
                 .symbol(tags.get("symbol"))
                 .description(tags.get("description"))
@@ -234,6 +236,9 @@ class ImportParser extends DefaultHandler {
                 .uuid(UUID.fromString(tags.get("guid")))
                 .created(created)
                 .modified(modified)
+                .type(parseCurrencyType(tags.get("type")))
+                .isin(parseString(tags.get("isin")))
+                .registry(parseString(tags.get("registry")))
                 .build();
     }
 
@@ -335,6 +340,10 @@ class ImportParser extends DefaultHandler {
         return rawValue == null ? BigDecimal.ZERO : new BigDecimal(rawValue);
     }
 
+    private static String parseString(String rawValue) {
+        return rawValue == null ? "" : rawValue;
+    }
+
     private static LocalDate parseLocalDate(String rawValue, LocalDate defaultValue) {
         return rawValue == null ? defaultValue : LocalDate.ofEpochDay(Long.parseLong(rawValue));
     }
@@ -369,6 +378,10 @@ class ImportParser extends DefaultHandler {
 
     private static PeriodicPaymentType parsePeriodicPaymentType(String rawValue) {
         return rawValue == null ? PeriodicPaymentType.MANUAL_PAYMENT : PeriodicPaymentType.valueOf(rawValue);
+    }
+
+    private static CurrencyType parseCurrencyType(String rawValue) {
+        return rawValue == null ? CurrencyType.CURRENCY : CurrencyType.valueOf(rawValue);
     }
 
     private static RecurrenceType parseRecurrenceType(String rawValue) {

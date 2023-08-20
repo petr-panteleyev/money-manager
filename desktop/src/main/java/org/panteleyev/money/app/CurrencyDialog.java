@@ -18,6 +18,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.CurrencyType;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -109,6 +110,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
             long now = System.currentTimeMillis();
 
             var builder = new Currency.Builder(currency)
+                    .type(CurrencyType.CURRENCY)
                     .symbol(nameEdit.getText())
                     .description(descrEdit.getText())
                     .formatSymbol(formatSymbolCombo.getSelectionModel().getSelectedItem())

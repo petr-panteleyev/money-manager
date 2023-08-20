@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -9,18 +9,21 @@ import java.math.RoundingMode;
 import java.util.UUID;
 
 public record Currency(
-    UUID uuid,
-    String symbol,
-    String description,
-    String formatSymbol,
-    int formatSymbolPosition,
-    boolean showFormatSymbol,
-    boolean def,
-    BigDecimal rate,
-    int direction,
-    boolean useThousandSeparator,
-    long created,
-    long modified
+        UUID uuid,
+        CurrencyType type,
+        String symbol,
+        String description,
+        String formatSymbol,
+        int formatSymbolPosition,
+        boolean showFormatSymbol,
+        boolean def,
+        BigDecimal rate,
+        int direction,
+        boolean useThousandSeparator,
+        String isin,
+        String registry,
+        long created,
+        long modified
 ) implements MoneyRecord {
 
     public Currency {
@@ -45,14 +48,20 @@ public record Currency(
     }
 
     public String formatValue(BigDecimal value) {
-        var sumString = value.abs().setScale(2, RoundingMode.HALF_UP).toString();
-        var signString = value.signum() < 0 ? "-" : "";
+        return switch (type()) {
+            case CURRENCY -> {
+                var sumString = value.abs().setScale(2, RoundingMode.HALF_UP).toString();
+                var signString = value.signum() < 0 ? "-" : "";
 
-        sumString = formatSymbolPosition == 0 ?
-            signString + formatSymbol + sumString :
-            signString + sumString + formatSymbol;
-
-        return sumString;
+                yield formatSymbolPosition == 0 ?
+                        signString + formatSymbol + sumString :
+                        signString + sumString + formatSymbol;
+            }
+            case SECURITY -> {
+                var total = value.multiply(rate());
+                yield total.setScale(2, RoundingMode.HALF_UP).toString();
+            }
+        };
     }
 
     public static String defaultFormatValue(BigDecimal value) {
@@ -60,6 +69,7 @@ public record Currency(
     }
 
     public static final class Builder {
+        private CurrencyType type = CurrencyType.CURRENCY;
         private String symbol = "";
         private String description = "";
         private String formatSymbol = "";
@@ -70,6 +80,8 @@ public record Currency(
         private int direction = 1;
         private boolean useThousandSeparator = false;
         private UUID uuid = null;
+        private String isin = "";
+        private String registry = "";
         private long created = 0;
         private long modified = 0;
 
@@ -81,6 +93,7 @@ public record Currency(
                 return;
             }
 
+            type = c.type();
             symbol = c.symbol();
             description = c.description();
             formatSymbol = c.formatSymbol();
@@ -91,13 +104,20 @@ public record Currency(
             direction = c.direction();
             useThousandSeparator = c.useThousandSeparator();
             uuid = c.uuid();
+            isin = c.isin();
             created = c.created();
             modified = c.modified();
         }
 
         public Currency build() {
-            return new Currency(uuid, symbol, description, formatSymbol, formatSymbolPosition,
-                showFormatSymbol, def, rate, direction, useThousandSeparator, created, modified);
+            return new Currency(uuid, type, symbol, description, formatSymbol, formatSymbolPosition,
+                    showFormatSymbol, def, rate, direction, useThousandSeparator,
+                    isin, registry, created, modified);
+        }
+
+        public Builder type(CurrencyType type) {
+            this.type = type;
+            return this;
         }
 
         public Builder symbol(String symbol) {
@@ -147,6 +167,16 @@ public record Currency(
 
         public Builder uuid(UUID uuid) {
             this.uuid = uuid;
+            return this;
+        }
+
+        public Builder isin(String isin) {
+            this.isin = isin;
+            return this;
+        }
+
+        public Builder registry(String registry) {
+            this.registry = registry;
             return this;
         }
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -15,27 +15,32 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.randomString;
 
 public class TestCurrency {
 
     public static List<Arguments> testBuildDataProvider() {
-        UUID uuid = UUID.randomUUID();
-        String symbol = BaseTestUtils.randomString();
-        String description = BaseTestUtils.randomString();
-        String formatSymbol = BaseTestUtils.randomString();
+        var uuid = UUID.randomUUID();
+        var type = CurrencyType.SECURITY;
+        var symbol = randomString();
+        var description = randomString();
+        var formatSymbol = randomString();
         int formatSymbolPosition = BaseTestUtils.randomInt();
-        boolean showFormatSymbol = BaseTestUtils.randomBoolean();
-        boolean def = BaseTestUtils.randomBoolean();
-        BigDecimal rate = BaseTestUtils.randomBigDecimal();
-        int direction = BaseTestUtils.randomInt();
-        boolean useThousandSeparator = BaseTestUtils.randomBoolean();
-        long created = System.currentTimeMillis();
+        var showFormatSymbol = BaseTestUtils.randomBoolean();
+        var def = BaseTestUtils.randomBoolean();
+        var rate = BaseTestUtils.randomBigDecimal();
+        var direction = BaseTestUtils.randomInt();
+        var useThousandSeparator = BaseTestUtils.randomBoolean();
+        var isin = randomString();
+        var registry = randomString();
+        var created = System.currentTimeMillis();
         var modified = created + 1000;
 
         return List.of(
                 Arguments.of(
                         new Currency.Builder()
                                 .uuid(uuid)
+                                .type(CurrencyType.SECURITY)
                                 .symbol(symbol)
                                 .description(description)
                                 .formatSymbol(formatSymbol)
@@ -45,25 +50,27 @@ public class TestCurrency {
                                 .rate(rate)
                                 .direction(direction)
                                 .useThousandSeparator(useThousandSeparator)
+                                .isin(isin)
+                                .registry(registry)
                                 .created(created)
                                 .modified(modified)
                                 .build(),
                         new Currency(
-                                uuid, symbol, description, formatSymbol, formatSymbolPosition,
-                                showFormatSymbol, def, rate, direction, useThousandSeparator, created,
-                                modified
+                                uuid, type, symbol, description, formatSymbol, formatSymbolPosition,
+                                showFormatSymbol, def, rate, direction, useThousandSeparator, isin, registry,
+                                created, modified
                         )
                 ),
                 Arguments.of(
                         new Currency(
-                                uuid, symbol, null, null, formatSymbolPosition,
-                                showFormatSymbol, def, null, direction, useThousandSeparator, created,
-                                modified
+                                uuid, type, symbol, null, null, formatSymbolPosition,
+                                showFormatSymbol, def, null, direction, useThousandSeparator, isin, registry,
+                                created, modified
                         ),
                         new Currency(
-                                uuid, symbol, "", "", formatSymbolPosition,
-                                showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator, created,
-                                modified
+                                uuid, type, symbol, "", "", formatSymbolPosition,
+                                showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator, isin, registry,
+                                created, modified
                         )
                 )
         );

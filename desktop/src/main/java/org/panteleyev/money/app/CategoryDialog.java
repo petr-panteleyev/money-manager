@@ -79,11 +79,14 @@ final class CategoryDialog extends BaseDialog<Category> {
 
             long now = System.currentTimeMillis();
 
+            var iconUuid = iconComboBox.getSelectionModel().getSelectedItem().equals(EMPTY_ICON) ?
+                    null : iconComboBox.getSelectionModel().getSelectedItem().uuid();
+
             var builder = new Category.Builder(category)
                     .name(nameEdit.getText())
                     .comment(commentEdit.getText())
                     .type(typeComboBox.getSelectionModel().getSelectedItem())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                    .iconUuid(iconUuid)
                     .modified(now);
 
             if (category == null) {

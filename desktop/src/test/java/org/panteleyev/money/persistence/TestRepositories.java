@@ -14,6 +14,7 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
@@ -114,6 +115,7 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Currency(
                 CURRENCY_UUID,
+                CurrencyType.CURRENCY,
                 randomString(),
                 randomString(),
                 randomString(),
@@ -123,12 +125,15 @@ public class TestRepositories extends BaseDaoTest {
                 randomBigDecimal(),
                 randomInt(),
                 randomBoolean(),
+                randomString(),
+                randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
 
         var update = new Currency(
                 CURRENCY_UUID,
+                CurrencyType.SECURITY,
                 randomString(),
                 randomString(),
                 randomString(),
@@ -138,6 +143,8 @@ public class TestRepositories extends BaseDaoTest {
                 randomBigDecimal(),
                 randomInt(),
                 randomBoolean(),
+                randomString(),
+                randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );

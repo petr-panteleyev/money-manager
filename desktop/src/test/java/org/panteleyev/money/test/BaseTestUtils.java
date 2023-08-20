@@ -11,6 +11,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
@@ -156,7 +157,7 @@ public final class BaseTestUtils {
     public static Category newCategory(UUID uuid, CategoryType type, UUID iconUuid) {
         return new Category.Builder()
                 .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
+                .comment(randomString())
                 .type(type)
                 .iconUuid(iconUuid)
                 .uuid(uuid)
@@ -170,9 +171,10 @@ public final class BaseTestUtils {
 
     public static Currency newCurrency(UUID uuid) {
         return new Currency.Builder()
-                .symbol(UUID.randomUUID().toString())
-                .description(UUID.randomUUID().toString())
-                .formatSymbol(UUID.randomUUID().toString())
+                .type(CurrencyType.CURRENCY)
+                .symbol(randomString())
+                .description(randomString())
+                .formatSymbol(randomString())
                 .formatSymbolPosition(RANDOM.nextInt(2))
                 .showFormatSymbol(RANDOM.nextBoolean())
                 .def(RANDOM.nextBoolean())
@@ -180,6 +182,8 @@ public final class BaseTestUtils {
                 .direction(RANDOM.nextInt(2))
                 .useThousandSeparator(RANDOM.nextBoolean())
                 .uuid(uuid)
+                .isin(randomString())
+                .registry(randomString())
                 .modified(System.currentTimeMillis())
                 .build();
     }
@@ -194,17 +198,17 @@ public final class BaseTestUtils {
 
     public static Contact newContact(UUID uuid, UUID iconUuid) {
         return new Contact.Builder()
-                .name(UUID.randomUUID().toString())
+                .name(randomString())
                 .type(randomContactType())
-                .phone(UUID.randomUUID().toString())
-                .mobile(UUID.randomUUID().toString())
-                .email(UUID.randomUUID().toString())
-                .web(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .street(UUID.randomUUID().toString())
-                .city(UUID.randomUUID().toString())
-                .country(UUID.randomUUID().toString())
-                .zip(UUID.randomUUID().toString())
+                .phone(randomString())
+                .mobile(randomString())
+                .email(randomString())
+                .web(randomString())
+                .comment(randomString())
+                .street(randomString())
+                .city(randomString())
+                .country(randomString())
+                .zip(randomString())
                 .iconUuid(iconUuid)
                 .uuid(uuid)
                 .modified(System.currentTimeMillis())
@@ -215,15 +219,15 @@ public final class BaseTestUtils {
         return new Contact.Builder()
                 .name(name)
                 .type(randomContactType())
-                .phone(UUID.randomUUID().toString())
-                .mobile(UUID.randomUUID().toString())
-                .email(UUID.randomUUID().toString())
-                .web(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .street(UUID.randomUUID().toString())
-                .city(UUID.randomUUID().toString())
-                .country(UUID.randomUUID().toString())
-                .zip(UUID.randomUUID().toString())
+                .phone(randomString())
+                .mobile(randomString())
+                .email(randomString())
+                .web(randomString())
+                .comment(randomString())
+                .street(randomString())
+                .city(randomString())
+                .country(randomString())
+                .zip(randomString())
                 .uuid(UUID.randomUUID())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
@@ -242,7 +246,7 @@ public final class BaseTestUtils {
                 .month(randomMonthNumber())
                 .year(randomYear())
                 .type(randomTransactionType())
-                .comment(UUID.randomUUID().toString())
+                .comment(randomString())
                 .checked(RANDOM.nextBoolean())
                 .accountDebitedUuid(UUID.randomUUID())
                 .accountCreditedUuid(UUID.randomUUID())
@@ -253,7 +257,7 @@ public final class BaseTestUtils {
                 .contactUuid(UUID.randomUUID())
                 .rate(randomBigDecimal())
                 .rateDirection(RANDOM.nextInt(2))
-                .invoiceNumber(UUID.randomUUID().toString())
+                .invoiceNumber(randomString())
                 .modified(System.currentTimeMillis())
                 .build();
     }
@@ -265,7 +269,7 @@ public final class BaseTestUtils {
                 .month(randomMonthNumber())
                 .year(randomYear())
                 .type(randomTransactionType())
-                .comment(UUID.randomUUID().toString())
+                .comment(randomString())
                 .checked(RANDOM.nextBoolean())
                 .accountDebitedUuid(accountDebited.uuid())
                 .accountCreditedUuid(accountCredited.uuid())
@@ -276,7 +280,7 @@ public final class BaseTestUtils {
                 .contactUuid(contact == null ? null : contact.uuid())
                 .rate(randomBigDecimal())
                 .rateDirection(RANDOM.nextInt(2))
-                .invoiceNumber(UUID.randomUUID().toString())
+                .invoiceNumber(randomString())
                 .uuid(UUID.randomUUID())
                 .modified(System.currentTimeMillis())
                 .build();
