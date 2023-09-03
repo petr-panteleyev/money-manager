@@ -39,6 +39,7 @@ public class AccountRepository implements MoneyRepository<Account> {
             getEnum(rs, "type", CategoryType.class),
             getUuid(rs, "category_uuid"),
             getUuid(rs, "currency_uuid"),
+            getUuid(rs, "security_uuid"),
             rs.getBoolean("enabled"),
             rs.getBigDecimal("interest"),
             getLocalDate(rs, "closing_date"),

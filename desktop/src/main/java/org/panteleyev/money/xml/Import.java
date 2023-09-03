@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -12,6 +12,7 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParserFactory;
@@ -39,6 +40,7 @@ public class Import {
     private final List<Account> accounts;
     private final List<Contact> contacts;
     private final List<Currency> currencies;
+    private final List<ExchangeSecurity> exchangeSecurities;
     private final List<Transaction> transactions;
     private final List<MoneyDocument> documents;
     private final List<PeriodicPayment> periodicPayments;
@@ -53,6 +55,7 @@ public class Import {
         accounts = importParser.getAccounts();
         contacts = importParser.getContacts();
         currencies = importParser.getCurrencies();
+        exchangeSecurities = importParser.getExchangeSecurities();
         transactions = importParser.getTransactions();
         documents = importParser.getDocuments();
         periodicPayments = importParser.getPeriodicPayments();
@@ -78,6 +81,10 @@ public class Import {
 
     public List<Currency> getCurrencies() {
         return currencies;
+    }
+
+    public List<ExchangeSecurity> getExchangeSecurities() {
+        return exchangeSecurities;
     }
 
     public List<Transaction> getTransactions() {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -38,89 +38,79 @@ public class AccountDialogTest {
     private static final String ACCOUNT_CARD_NUMBER = UUID.randomUUID().toString();
     private static final BigDecimal ACCOUNT_CREDIT = BigDecimal.ONE.setScale(6, RoundingMode.HALF_UP);
 
-    private final Currency curr_1;
-    private final Currency curr_2;
-    private final Category category;
-    private final Account acc_1;
-    private final Account acc_2;
+    private final Currency curr_1 = new Currency.Builder()
+            .symbol(UUID.randomUUID().toString())
+            .description(UUID.randomUUID().toString())
+            .formatSymbol(UUID.randomUUID().toString())
+            .formatSymbolPosition(1)
+            .showFormatSymbol(false)
+            .def(false)
+            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+            .direction(1)
+            .useThousandSeparator(false)
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
-    private final DataCache cache;
+    private final Currency curr_2 = new Currency.Builder()
+            .symbol(UUID.randomUUID().toString())
+            .description(UUID.randomUUID().toString())
+            .formatSymbol(UUID.randomUUID().toString())
+            .formatSymbolPosition(1)
+            .showFormatSymbol(false)
+            .def(false)
+            .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
+            .direction(1)
+            .useThousandSeparator(false)
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
-    public AccountDialogTest() {
-        curr_1 = new Currency.Builder()
-                .symbol(UUID.randomUUID().toString())
-                .description(UUID.randomUUID().toString())
-                .formatSymbol(UUID.randomUUID().toString())
-                .formatSymbolPosition(1)
-                .showFormatSymbol(false)
-                .def(false)
-                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-                .direction(1)
-                .useThousandSeparator(false)
-                .uuid(UUID.randomUUID())
-                .modified(System.currentTimeMillis())
-                .build();
+    private final Category category = new Category.Builder()
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .type(CategoryType.BANKS_AND_CASH)
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        curr_2 = new Currency.Builder()
-                .symbol(UUID.randomUUID().toString())
-                .description(UUID.randomUUID().toString())
-                .formatSymbol(UUID.randomUUID().toString())
-                .formatSymbolPosition(1)
-                .showFormatSymbol(false)
-                .def(false)
-                .rate(BigDecimal.valueOf(RANDOM.nextDouble()))
-                .direction(1)
-                .useThousandSeparator(false)
-                .uuid(UUID.randomUUID())
-                .modified(System.currentTimeMillis())
-                .build();
+    private final Account acc_1 = new Account.Builder()
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .type(CategoryType.BANKS_AND_CASH)
+            .categoryUuid(category.uuid())
+            .currencyUuid(curr_1.uuid())
+            .enabled(true)
+            .openingBalance(randomBigDecimal())
+            .accountLimit(randomBigDecimal())
+            .closingDate(LocalDate.now())
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        category = new Category.Builder()
-                .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .type(CategoryType.BANKS_AND_CASH)
-                .uuid(UUID.randomUUID())
-                .modified(System.currentTimeMillis())
-                .build();
+    private final Account acc_2 = new Account.Builder()
+            .name(UUID.randomUUID().toString())
+            .comment(UUID.randomUUID().toString())
+            .accountNumber(UUID.randomUUID().toString())
+            .type(CategoryType.PORTFOLIO)
+            .categoryUuid(category.uuid())
+            .currencyUuid(curr_2.uuid())
+            .enabled(true)
+            .openingBalance(randomBigDecimal())
+            .accountLimit(randomBigDecimal())
+            .closingDate(LocalDate.now())
+            .uuid(UUID.randomUUID())
+            .modified(System.currentTimeMillis())
+            .build();
 
-        acc_1 = new Account.Builder()
-                .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .accountNumber(UUID.randomUUID().toString())
-                .type(CategoryType.BANKS_AND_CASH)
-                .categoryUuid(category.uuid())
-                .currencyUuid(curr_1.uuid())
-                .enabled(true)
-                .openingBalance(randomBigDecimal())
-                .accountLimit(randomBigDecimal())
-                .closingDate(LocalDate.now())
-                .uuid(UUID.randomUUID())
-                .modified(System.currentTimeMillis())
-                .build();
-
-        acc_2 = new Account.Builder()
-                .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .accountNumber(UUID.randomUUID().toString())
-                .type(CategoryType.PORTFOLIO)
-                .categoryUuid(category.uuid())
-                .currencyUuid(curr_2.uuid())
-                .enabled(true)
-                .openingBalance(randomBigDecimal())
-                .accountLimit(randomBigDecimal())
-                .closingDate(LocalDate.now())
-                .uuid(UUID.randomUUID())
-                .modified(System.currentTimeMillis())
-                .build();
-
-        cache = new DataCache() {
-            {
-                getCurrencies().addAll(curr_1, curr_2);
-                getCategories().add(category);
-                getAccounts().add(acc_1);
-            }
-        };
-    }
+    private final DataCache cache = new DataCache() {
+        {
+            getCurrencies().addAll(curr_1, curr_2);
+            getCategories().add(category);
+            getAccounts().add(acc_1);
+        }
+    };
 
     @BeforeAll
     public static void init() {
@@ -134,7 +124,7 @@ public class AccountDialogTest {
         dialog.getInterestEdit().setText(ACCOUNT_INTEREST.toString());
         dialog.getCardTypeComboBox().getSelectionModel().select(ACCOUNT_CARD_TYPE);
         dialog.getCardNumberEdit().setText(ACCOUNT_CARD_NUMBER);
-        dialog.getCurrencyComboBox().getSelectionModel().select(curr_1);
+        dialog.getCurrencyEdit().setText(curr_1.symbol());
         dialog.getCreditEdit().setText(ACCOUNT_CREDIT.toString());
     }
 
@@ -146,7 +136,7 @@ public class AccountDialogTest {
         dialog.getInterestEdit().setText(account.interest().toString());
         dialog.getCardTypeComboBox().getSelectionModel().select(account.cardType());
         dialog.getCardNumberEdit().setText(account.cardNumber());
-        dialog.getCurrencyComboBox().getSelectionModel().select(curr_2);
+        dialog.getCurrencyEdit().setText(curr_2.symbol());
         dialog.getCreditEdit().setText(account.accountLimit().toString());
         dialog.getOpeningBalanceEdit().setText(account.openingBalance().toString());
     }

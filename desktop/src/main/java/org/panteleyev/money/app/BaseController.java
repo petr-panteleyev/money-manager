@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
+import org.panteleyev.money.app.exchange.SecuritiesWindowController;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.MoneyRecord;
 
@@ -22,7 +23,6 @@ import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
@@ -35,13 +35,14 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
+import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
 
     protected final Action ACTION_CLOSE = new Action("Закрыть", event -> onClose());
 
-    BaseController() {
+    protected BaseController() {
         super(settings().getMainCssFilePath());
     }
 
@@ -58,8 +59,21 @@ public class BaseController extends Controller {
         settings().saveStageDimensions(this);
     }
 
-    Menu createWindowMenu() {
+    public Menu createWindowMenu() {
         return createWindowMenu(null);
+    }
+
+    Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
+        var securitiesMenuItem = menuItem("Ценные бумаги...",
+                x -> getController(SecuritiesWindowController.class));
+
+        if (dbOpenProperty != null) {
+            securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
+        }
+
+        return newMenu("Портфель",
+                securitiesMenuItem
+        );
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {

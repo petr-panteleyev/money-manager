@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 open module org.panteleyev.money {
@@ -13,6 +13,7 @@ open module org.panteleyev.money {
 
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
+    requires org.panteleyev.moex;
     requires org.panteleyev.freedesktop;
     requires org.panteleyev.money.model;
 

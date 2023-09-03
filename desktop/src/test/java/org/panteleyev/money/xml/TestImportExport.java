@@ -19,6 +19,7 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.PeriodicPaymentType;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 
@@ -45,6 +46,8 @@ import static org.panteleyev.money.test.BaseTestUtils.newCategory;
 import static org.panteleyev.money.test.BaseTestUtils.newContact;
 import static org.panteleyev.money.test.BaseTestUtils.newCurrency;
 import static org.panteleyev.money.test.BaseTestUtils.newDocument;
+import static org.panteleyev.money.test.BaseTestUtils.newExchangeSecurity;
+import static org.panteleyev.money.test.BaseTestUtils.newExchangeSecurityShare;
 import static org.panteleyev.money.test.BaseTestUtils.newIcon;
 import static org.panteleyev.money.test.BaseTestUtils.newPeriodicPayment;
 import static org.panteleyev.money.test.BaseTestUtils.newTransaction;
@@ -77,6 +80,9 @@ public class TestImportExport {
     private static final Currency CURRENCY_1 = newCurrency();
     private static final Currency CURRENCY_2 = newCurrency();
     private static final Currency CURRENCY_3 = newCurrency();
+
+    private static final ExchangeSecurity EXCHANGE_SECURITY_1 = newExchangeSecurity(UUID.randomUUID());
+    private static final ExchangeSecurity EXCHANGE_SECURITY_2 = newExchangeSecurityShare(UUID.randomUUID());
 
     private static final Account ACCOUNT_1 = newAccount(CATEGORY_1, CURRENCY_1);
     private static final Account ACCOUNT_2 = newAccount(CATEGORY_2, CURRENCY_1, ICON_2);
@@ -116,6 +122,7 @@ public class TestImportExport {
                                 getAccounts().addAll(ACCOUNT_1, ACCOUNT_2, ACCOUNT_3);
                                 getContacts().addAll(CONTACT_1, CONTACT_2, newContact("A & B <some@email.com>"));
                                 getCurrencies().addAll(CURRENCY_1, CURRENCY_2, CURRENCY_3);
+                                getExchangeSecurities().addAll(EXCHANGE_SECURITY_1, EXCHANGE_SECURITY_2);
                                 getTransactions().addAll(newTransaction(ACCOUNT_1, ACCOUNT_2),
                                         newTransaction(ACCOUNT_2, ACCOUNT_3),
                                         newTransaction(ACCOUNT_1, ACCOUNT_3),
@@ -142,6 +149,7 @@ public class TestImportExport {
             assertEquals(cache.getAccounts(), imp.getAccounts());
             assertEquals(cache.getContacts(), imp.getContacts());
             assertEquals(cache.getCurrencies(), imp.getCurrencies());
+            assertEquals(cache.getExchangeSecurities(), imp.getExchangeSecurities());
             assertEquals(cache.getTransactions(), imp.getTransactions());
             assertEquals(cache.getPeriodicPayments(), imp.getPeriodicPayments());
 

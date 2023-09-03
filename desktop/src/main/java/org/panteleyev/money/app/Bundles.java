@@ -54,7 +54,6 @@ public final class Bundles {
             entry(TransactionType.FEE, "Комиссия"),
             entry(TransactionType.CACHIER, "Транзакция в банкомате"),
             entry(TransactionType.DIVIDEND, "Дивиденды"),
-            entry(TransactionType.COUPON, "Купонный доход"),
             entry(TransactionType.DIRECT_BILLING, "Прямое дебетование"),
             entry(TransactionType.CHARGE, "Списание"),
             entry(TransactionType.PURCHASE, "Покупка"),

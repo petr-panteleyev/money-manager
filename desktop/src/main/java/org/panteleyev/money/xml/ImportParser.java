@@ -21,6 +21,7 @@ import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -47,6 +48,7 @@ class ImportParser extends DefaultHandler {
         Category(ImportParser::parseCategory),
         Account(ImportParser::parseAccount),
         Currency(ImportParser::parseCurrency),
+        ExchangeSecurity(ImportParser::parseExchangeSecurity),
         Contact(ImportParser::parseContact),
         Transaction(ImportParser::parseTransaction),
         Document(ImportParser::parseDocument),
@@ -80,6 +82,7 @@ class ImportParser extends DefaultHandler {
     private final List<Account> accounts = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
     private final List<Currency> currencies = new ArrayList<>();
+    private final List<ExchangeSecurity> exchangeSecurities = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
     private final List<MoneyDocument> documents = new ArrayList<>();
     private final List<PeriodicPayment> periodicPayments = new ArrayList<>();
@@ -89,6 +92,7 @@ class ImportParser extends DefaultHandler {
             Map.entry(Tag.Category, categories),
             Map.entry(Tag.Account, accounts),
             Map.entry(Tag.Currency, currencies),
+            Map.entry(Tag.ExchangeSecurity, exchangeSecurities),
             Map.entry(Tag.Contact, contacts),
             Map.entry(Tag.Transaction, transactions),
             Map.entry(Tag.Document, documents),
@@ -116,6 +120,10 @@ class ImportParser extends DefaultHandler {
 
     public List<Currency> getCurrencies() {
         return currencies;
+    }
+
+    public List<ExchangeSecurity> getExchangeSecurities() {
+        return exchangeSecurities;
     }
 
     public List<Transaction> getTransactions() {
@@ -205,6 +213,7 @@ class ImportParser extends DefaultHandler {
                 .type(parseCategoryType(tags.get("type")))
                 .categoryUuid(parseUuid(tags.get("categoryUuid")))
                 .currencyUuid(parseUuid(tags.get("currencyUuid")))
+                .securityUuid(parseUuid(tags.get("securityUuid")))
                 .enabled(parseBoolean(tags.get("enabled"), true))
                 .interest(parseBigDecimal(tags.get("interest")))
                 .closingDate(parseLocalDate(tags.get("closingDate"), null))
@@ -239,6 +248,35 @@ class ImportParser extends DefaultHandler {
                 .type(parseCurrencyType(tags.get("type")))
                 .isin(parseString(tags.get("isin")))
                 .registry(parseString(tags.get("registry")))
+                .build();
+    }
+
+    private static ExchangeSecurity parseExchangeSecurity(Map<String, String> tags) {
+        var cf = parseInteger(tags.get("couponFrequency"), null);
+        return new ExchangeSecurity.Builder()
+                .uuid(UUID.fromString(tags.get("uuid")))
+                .secId(tags.get("secId"))
+                .name(tags.get("name"))
+                .shortName(tags.get("shortName"))
+                .isin(tags.get("isin"))
+                .regNumber(tags.get("regNumber"))
+                .faceValue(parseBigDecimal(tags.get("faceValue"), null))
+                .issueDate(parseLocalDate(tags.get("issueDate"), null))
+                .matDate(parseLocalDate(tags.get("matDate"), null))
+                .daysToRedemption(parseInteger(tags.get("daysToRedemption"), null))
+                .group(tags.get("group"))
+                .groupName(tags.get("groupName"))
+                .type(tags.get("type"))
+                .typeName(tags.get("typeName"))
+                .marketValue(parseBigDecimal(tags.get("marketValue"), null))
+                .couponValue(parseBigDecimal(tags.get("couponValue"), null))
+                .couponPercent(parseBigDecimal(tags.get("couponPercent"), null))
+                .couponDate(parseLocalDate(tags.get("couponDate"), null))
+                .couponFrequency(parseInteger(tags.get("couponFrequency"), null))
+                .accruedInterest(parseBigDecimal(tags.get("accruedInterest"), null))
+                .couponPeriod(parseInteger(tags.get("couponPeriod"), null))
+                .created(parseLong(tags.get("created"), 0L))
+                .modified(parseLong(tags.get("modified"), 0L))
                 .build();
     }
 
@@ -340,6 +378,10 @@ class ImportParser extends DefaultHandler {
         return rawValue == null ? BigDecimal.ZERO : new BigDecimal(rawValue);
     }
 
+    private static BigDecimal parseBigDecimal(String rawValue, BigDecimal defaultValue) {
+        return rawValue == null ? defaultValue : new BigDecimal(rawValue);
+    }
+
     private static String parseString(String rawValue) {
         return rawValue == null ? "" : rawValue;
     }
@@ -354,6 +396,10 @@ class ImportParser extends DefaultHandler {
 
     private static long parseLong(String rawValue, long defaultValue) {
         return rawValue == null ? defaultValue : Long.parseLong(rawValue);
+    }
+
+    private static Integer parseInteger(String rawValue, Integer defaultValue) {
+        return rawValue == null ? defaultValue : Integer.valueOf(rawValue);
     }
 
     private static CardType parseCardType(String rawValue) {

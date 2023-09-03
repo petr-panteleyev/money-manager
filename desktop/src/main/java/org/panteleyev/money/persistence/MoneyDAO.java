@@ -13,6 +13,7 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -43,6 +44,7 @@ public class MoneyDAO {
     private final IconRepository iconRepository = new IconRepository();
     private final DocumentRepository documentRepository = new DocumentRepository();
     private final PeriodicPaymentRepository periodicPaymentRepository = new PeriodicPaymentRepository();
+    private final ExchangeSecurityRepository exchangeSecurityRepository = new ExchangeSecurityRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -300,6 +302,27 @@ public class MoneyDAO {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Exchange Securities
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertExchangeSecurity(ExchangeSecurity security) {
+        withNewConnection(conn -> {
+            exchangeSecurityRepository.insert(conn, security);
+            cache.add(security);
+        });
+    }
+
+    public void updateExchangeSecurity(ExchangeSecurity security) {
+        withNewConnection(conn -> {
+            updateExchangeSecurity(conn, security);
+        });
+    }
+
+    public void updateExchangeSecurity(Connection conn, ExchangeSecurity security) {
+        exchangeSecurityRepository.update(conn, security);
+        cache.update(security);
+    }
 
     /**
      * This method recalculates total values for all involved accounts.
@@ -367,6 +390,10 @@ public class MoneyDAO {
             var periodicPaymentsList = periodicPaymentRepository.getAll(conn);
             progress.accept("done\n");
 
+            progress.accept("    periodic secirities...");
+            var exchangeSecuritiesList = exchangeSecurityRepository.getAll(conn);
+            progress.accept("done\n");
+
             progress.accept("done\n");
 
             CompletableFuture.supplyAsync(() -> {
@@ -378,6 +405,7 @@ public class MoneyDAO {
                 cache.getAccounts().setAll(accountList);
                 cache.getTransactions().setAll(transactionList);
                 cache.getPeriodicPayments().setAll(periodicPaymentsList);
+                cache.getExchangeSecurities().setAll(exchangeSecuritiesList);
                 return null;
             }, executor);
         });
@@ -408,6 +436,10 @@ public class MoneyDAO {
             currencyRepository.insert(conn, BATCH_SIZE, imp.getCurrencies());
             progress.accept("done\n");
 
+            progress.accept("    securities... ");
+            exchangeSecurityRepository.insert(conn, BATCH_SIZE, imp.getExchangeSecurities());
+            progress.accept("done\n");
+
             progress.accept("    accounts... ");
             accountRepository.insert(conn, BATCH_SIZE, imp.getAccounts());
             progress.accept("done\n");
@@ -431,6 +463,9 @@ public class MoneyDAO {
             periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
             progress.accept("done\n");
 
+//            progress.accept("    securities...");
+//            exchangeSecurityRepository.insert(conn, BATCH_SIZE, imp.get());
+//            progress.accept("done\n");
 
             progress.accept("done\n");
 

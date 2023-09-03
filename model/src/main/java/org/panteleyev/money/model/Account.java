@@ -9,26 +9,27 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record Account(
-    UUID uuid,
-    String name,
-    String comment,
-    String accountNumber,
-    BigDecimal openingBalance,
-    BigDecimal accountLimit,
-    BigDecimal currencyRate,
-    CategoryType type,
-    UUID categoryUuid,
-    UUID currencyUuid,
-    boolean enabled,
-    BigDecimal interest,
-    LocalDate closingDate,
-    UUID iconUuid,
-    CardType cardType,
-    String cardNumber,
-    BigDecimal total,
-    BigDecimal totalWaiting,
-    long created,
-    long modified
+        UUID uuid,
+        String name,
+        String comment,
+        String accountNumber,
+        BigDecimal openingBalance,
+        BigDecimal accountLimit,
+        BigDecimal currencyRate,
+        CategoryType type,
+        UUID categoryUuid,
+        UUID currencyUuid,
+        UUID securityUuid,
+        boolean enabled,
+        BigDecimal interest,
+        LocalDate closingDate,
+        UUID iconUuid,
+        CardType cardType,
+        String cardNumber,
+        BigDecimal total,
+        BigDecimal totalWaiting,
+        long created,
+        long modified
 ) implements MoneyRecord, Named {
     public Account {
         if (uuid == null) {
@@ -66,17 +67,17 @@ public record Account(
 
     public Account enable(boolean e) {
         return new Builder(this)
-            .enabled(e)
-            .modified(System.currentTimeMillis())
-            .build();
+                .enabled(e)
+                .modified(System.currentTimeMillis())
+                .build();
     }
 
     public Account updateBalance(BigDecimal total, BigDecimal totalWaiting) {
         return new Builder(this)
-            .total(total)
-            .totalWaiting(totalWaiting)
-            .modified(System.currentTimeMillis())
-            .build();
+                .total(total)
+                .totalWaiting(totalWaiting)
+                .modified(System.currentTimeMillis())
+                .build();
     }
 
     public static String getAccountNumberNoSpaces(Account account) {
@@ -101,6 +102,7 @@ public record Account(
         private CategoryType type;
         private UUID categoryUuid;
         private UUID currencyUuid;
+        private UUID securityUuid;
         private boolean enabled = true;
         private BigDecimal interest = BigDecimal.ZERO;
         private LocalDate closingDate = null;
@@ -130,6 +132,7 @@ public record Account(
             type = account.type();
             categoryUuid = account.categoryUuid();
             currencyUuid = account.currencyUuid();
+            securityUuid = account.securityUuid();
             enabled = account.enabled();
             interest = account.interest();
             closingDate = account.closingDate();
@@ -149,9 +152,9 @@ public record Account(
 
         public Account build() {
             return new Account(uuid, name, comment, accountNumber, openingBalance,
-                accountLimit, currencyRate, type, categoryUuid,
-                currencyUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
-                total, totalWaiting, created, modified);
+                    accountLimit, currencyRate, type, categoryUuid,
+                    currencyUuid, securityUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
+                    total, totalWaiting, created, modified);
         }
 
         public Builder name(String name) {
@@ -196,6 +199,11 @@ public record Account(
 
         public Builder currencyUuid(UUID currencyUuid) {
             this.currencyUuid = currencyUuid;
+            return this;
+        }
+
+        public Builder securityUuid(UUID securityUuid) {
+            this.securityUuid = securityUuid;
             return this;
         }
 

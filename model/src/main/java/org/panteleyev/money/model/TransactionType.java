@@ -20,7 +20,6 @@ public enum TransactionType {
     S2(true),
     INTEREST,
     DIVIDEND,
-    COUPON,
     S3(true),
     DIRECT_BILLING,
     CHARGE,

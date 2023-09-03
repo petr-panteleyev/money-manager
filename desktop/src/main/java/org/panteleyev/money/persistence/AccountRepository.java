@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -23,12 +23,12 @@ final class AccountRepository extends Repository<Account> {
         return """
                 INSERT INTO account (
                     name, comment, number, opening,
-                    account_limit, rate, type, category_uuid, currency_uuid,
+                    account_limit, rate, type, category_uuid, currency_uuid, security_uuid,
                     enabled, interest, closing_date, icon_uuid, card_type,
                     card_number, total, total_waiting, created, modified, uuid
                 ) VALUES (
                     ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?
                 )
@@ -48,6 +48,7 @@ final class AccountRepository extends Repository<Account> {
                     type = ?,
                     category_uuid = ?,
                     currency_uuid = ?,
+                    security_uuid = ?,
                     enabled = ?,
                     interest = ?,
                     closing_date = ?,
@@ -75,6 +76,7 @@ final class AccountRepository extends Repository<Account> {
                 getEnum(rs, "type", CategoryType.class),
                 getUuid(rs, "category_uuid"),
                 getUuid(rs, "currency_uuid"),
+                getUuid(rs, "security_uuid"),
                 rs.getBoolean("enabled"),
                 rs.getBigDecimal("interest"),
                 getLocalDate(rs, "closing_date"),
@@ -100,6 +102,7 @@ final class AccountRepository extends Repository<Account> {
         st.setString(index++, account.type().name());
         setUuid(st, index++, account.categoryUuid());
         setUuid(st, index++, account.currencyUuid());
+        setUuid(st, index++, account.securityUuid());
         st.setBoolean(index++, account.enabled());
         st.setBigDecimal(index++, account.interest());
         setLocalDate(st, index++, account.closingDate());

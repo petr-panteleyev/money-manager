@@ -22,6 +22,7 @@ import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -54,6 +55,7 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID ICON_UUID = UUID.randomUUID();
     private static final UUID CATEGORY_UUID = UUID.randomUUID();
     private static final UUID CURRENCY_UUID = UUID.randomUUID();
+    private static final UUID EXCHANGE_SECURITY_UUID = UUID.randomUUID();
     private static final UUID CONTACT_UUID = UUID.randomUUID();
     private static final UUID ACCOUNT_UUID = UUID.randomUUID();
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
@@ -153,7 +155,67 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(4)
+    @Order(3)
+    public void testExchangeSecurity() {
+        var repository = new ExchangeSecurityRepository();
+
+        var insert = new ExchangeSecurity(
+                EXCHANGE_SECURITY_UUID,
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                LocalDate.now(),
+                LocalDate.now(),
+                randomInt(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                LocalDate.now(),
+                randomInt(),
+                randomBigDecimal(),
+                randomInt(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        var update = new ExchangeSecurity(
+                EXCHANGE_SECURITY_UUID,
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                LocalDate.now(),
+                null,
+                null,
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        insertAndUpdate(repository, insert, update);
+    }
+
+    @Test
+    @Order(5)
     public void testContact() {
         var repository = new ContactRepository();
 
@@ -197,7 +259,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void testAccount() {
         var repository = new AccountRepository();
 
@@ -212,6 +274,7 @@ public class TestRepositories extends BaseDaoTest {
                 randomCategoryType(),
                 CATEGORY_UUID,
                 CURRENCY_UUID,
+                EXCHANGE_SECURITY_UUID,
                 randomBoolean(),
                 randomBigDecimal(),
                 LocalDate.now(),
@@ -235,6 +298,7 @@ public class TestRepositories extends BaseDaoTest {
                 randomCategoryType(),
                 CATEGORY_UUID,
                 null,
+                null,
                 randomBoolean(),
                 randomBigDecimal(),
                 LocalDate.now(),
@@ -251,7 +315,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testTransaction() {
         var repository = new TransactionRepository();
 
@@ -311,7 +375,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(7)
+    @Order(8)
     public void testDocument() {
         var repository = new DocumentRepository();
 
@@ -347,7 +411,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testDocumentContent() {
         var repository = new DocumentRepository();
 

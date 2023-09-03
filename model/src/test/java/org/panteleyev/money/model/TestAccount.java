@@ -30,6 +30,7 @@ public class TestAccount {
         var type = BaseTestUtils.randomCategoryType();
         var categoryUuid = UUID.randomUUID();
         var currencyUuid = UUID.randomUUID();
+        var securityUuid = UUID.randomUUID();
         var enabled = BaseTestUtils.randomBoolean();
         var interest = BaseTestUtils.randomBigDecimal();
         var closingDate = LocalDate.now();
@@ -54,6 +55,7 @@ public class TestAccount {
                                 .type(type)
                                 .categoryUuid(categoryUuid)
                                 .currencyUuid(currencyUuid)
+                                .securityUuid(securityUuid)
                                 .enabled(enabled)
                                 .interest(interest)
                                 .closingDate(closingDate)
@@ -67,7 +69,7 @@ public class TestAccount {
                                 .build(),
                         new Account(
                                 uuid, name, comment, accountNumber, openingBalance,
-                                accountLimit, currencyRate, type, categoryUuid, currencyUuid,
+                                accountLimit, currencyRate, type, categoryUuid, currencyUuid, securityUuid,
                                 enabled, interest, closingDate, iconUuid, cardType,
                                 cardNumber, total, totalWaiting, created, modified
                         )
@@ -75,13 +77,13 @@ public class TestAccount {
                 Arguments.of(
                         new Account(
                                 uuid, name, null, null, null,
-                                null, null, type, categoryUuid, null,
+                                null, null, type, categoryUuid, null, null,
                                 enabled, null, null, null, cardType,
                                 cardNumber, null, null, created, modified
                         ),
                         new Account(
                                 uuid, name, "", "", BigDecimal.ZERO,
-                                BigDecimal.ZERO, BigDecimal.ONE, type, categoryUuid, null,
+                                BigDecimal.ZERO, BigDecimal.ONE, type, categoryUuid, null, null,
                                 enabled, BigDecimal.ZERO, null, null, cardType,
                                 cardNumber, BigDecimal.ZERO, BigDecimal.ZERO, created, modified
                         )

@@ -12,6 +12,7 @@ import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.w3c.dom.Document;
@@ -83,6 +84,11 @@ public class Export {
             currencyRoot.appendChild(exportCurrency(doc, currency));
         }
 
+        var exchangeSecurityRoot = XMLUtils.appendElement(rootElement, "ExchangeSecurities");
+        for (var security : cache.getExchangeSecurities()) {
+            exchangeSecurityRoot.appendChild(exportExchangeSecurity(doc, security));
+        }
+
         var transactionRoot = XMLUtils.appendElement(rootElement, "Transactions");
         for (var transaction : cache.getTransactions()) {
             transactionRoot.appendChild(exportTransaction(doc, transaction));
@@ -152,6 +158,7 @@ public class Export {
         appendTextNode(e, "type", account.type());
         appendTextNode(e, "categoryUuid", account.categoryUuid());
         appendTextNode(e, "currencyUuid", account.currencyUuid());
+        appendTextNode(e, "securityUuid", account.securityUuid());
         appendTextNode(e, "enabled", account.enabled());
         appendTextNode(e, "interest", account.interest());
         appendTextNode(e, "closingDate", account.closingDate());
@@ -207,6 +214,36 @@ public class Export {
         appendTextNode(e, "registry", currency.registry());
         appendTextNode(e, "created", currency.created());
         appendTextNode(e, "modified", currency.modified());
+
+        return e;
+    }
+
+    private static Element exportExchangeSecurity(Document doc, ExchangeSecurity security) {
+        var e = doc.createElement("ExchangeSecurity");
+
+        appendTextNode(e, "uuid", security.uuid());
+        appendTextNode(e, "secId", security.secId());
+        appendTextNode(e, "name", security.name());
+        appendTextNode(e, "shortName", security.shortName());
+        appendTextNode(e, "isin", security.isin());
+        appendTextNode(e, "regNumber", security.regNumber());
+        appendTextNode(e, "faceValue", security.faceValue());
+        appendTextNode(e, "issueDate", security.issueDate());
+        appendTextNode(e, "matDate", security.matDate());
+        appendTextNode(e, "daysToRedemption", security.daysToRedemption());
+        appendTextNode(e, "group", security.group());
+        appendTextNode(e, "groupName", security.groupName());
+        appendTextNode(e, "type", security.type());
+        appendTextNode(e, "typeName", security.typeName());
+        appendTextNode(e, "marketValue", security.marketValue());
+        appendTextNode(e, "couponValue", security.couponValue());
+        appendTextNode(e, "couponPercent", security.couponPercent());
+        appendTextNode(e, "couponDate", security.couponDate());
+        appendTextNode(e, "couponFrequency", security.couponFrequency());
+        appendTextNode(e, "accruedInterest", security.accruedInterest());
+        appendTextNode(e, "couponPeriod", security.couponPeriod());
+        appendTextNode(e, "created", security.created());
+        appendTextNode(e, "modified", security.modified());
 
         return e;
     }

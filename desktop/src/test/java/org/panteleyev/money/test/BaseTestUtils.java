@@ -20,6 +20,7 @@ import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -184,6 +185,55 @@ public final class BaseTestUtils {
                 .uuid(uuid)
                 .isin(randomString())
                 .registry(randomString())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static ExchangeSecurity newExchangeSecurity(UUID uuid) {
+        return new ExchangeSecurity.Builder()
+                .uuid(uuid)
+                .secId(randomString())
+                .name(randomString())
+                .shortName(randomString())
+                .isin(randomString())
+                .regNumber(randomString())
+                .faceValue(randomBigDecimal())
+                .issueDate(LocalDate.now())
+                .matDate(LocalDate.now())
+                .daysToRedemption(randomInt())
+                .group(randomString())
+                .groupName(randomString())
+                .type(randomString())
+                .typeName(randomString())
+                .marketValue(randomBigDecimal())
+                .couponValue(randomBigDecimal())
+                .couponPercent(randomBigDecimal())
+                .couponDate(LocalDate.now())
+                .couponFrequency(randomInt())
+                .accruedInterest(randomBigDecimal())
+                .couponPeriod(randomInt())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static ExchangeSecurity newExchangeSecurityShare(UUID uuid) {
+        return new ExchangeSecurity.Builder()
+                .uuid(uuid)
+                .secId(randomString())
+                .name(randomString())
+                .shortName(randomString())
+                .isin(randomString())
+                .regNumber(randomString())
+                .faceValue(randomBigDecimal())
+                .issueDate(LocalDate.now())
+                .daysToRedemption(randomInt())
+                .group(randomString())
+                .groupName(randomString())
+                .type(randomString())
+                .typeName(randomString())
+                .marketValue(randomBigDecimal())
+                .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();
     }

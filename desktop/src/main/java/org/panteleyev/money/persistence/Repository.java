@@ -6,6 +6,7 @@ package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.MoneyRecord;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -142,6 +143,19 @@ abstract class Repository<T extends MoneyRecord> {
             st.setNull(index, Types.INTEGER);
         } else {
             st.setLong(index, localDate.toEpochDay());
+        }
+    }
+
+    static Integer getInteger(ResultSet set, String columnLabel) throws SQLException {
+        var value = set.getInt(columnLabel);
+        return set.wasNull() ? null : value;
+    }
+
+    static void setInteger(PreparedStatement st, int index, Integer value) throws SQLException {
+        if (value == null) {
+            st.setNull(index, Types.INTEGER);
+        } else {
+            st.setInt(index, value);
         }
     }
 }

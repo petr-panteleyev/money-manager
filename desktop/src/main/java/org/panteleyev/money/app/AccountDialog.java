@@ -11,7 +11,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
@@ -23,27 +26,67 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.ReadOnlyNamedConverter;
-import org.panteleyev.money.persistence.ReadOnlyStringConverter;
 
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 
 class AccountDialog extends BaseDialog<Account> {
+    private record CurrencyOrSecurity(Object object) implements Comparable<CurrencyOrSecurity> {
+        @Override
+        public int compareTo(CurrencyOrSecurity other) {
+            return this.object.toString().compareTo(other.toString());
+        }
+
+        @Override
+        public String toString() {
+            return switch (object) {
+                case Currency currency -> currency.symbol();
+                case ExchangeSecurity security -> String.format("%s (%s)", security.secId(), security.shortName());
+                default -> "";
+            };
+        }
+    }
+
+    private static final class CurrencyCompletionProvider extends BaseCompletionProvider<CurrencyOrSecurity> {
+        public CurrencyCompletionProvider(Set<CurrencyOrSecurity> set) {
+            super(set, () -> settings().getAutoCompleteLength());
+        }
+
+        public String getElementString(CurrencyOrSecurity cos) {
+            return cos.toString();
+        }
+    }
+
+    private static final ToStringConverter<CurrencyOrSecurity> CURRENCY_TO_STRING =
+            new ToStringConverter<>() {
+                public String toString(CurrencyOrSecurity obj) {
+                    return obj.toString();
+                }
+            };
+
+
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = new TextField();
@@ -55,7 +98,9 @@ class AccountDialog extends BaseDialog<Account> {
             b -> b.withHandler(event -> onCategoryTypeSelected())
                     .withStringConverter(Bundles::translate));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
-    private final ComboBox<Currency> currencyComboBox = new ComboBox<>();
+    private final TextField currencyEdit = new TextField();
+    private final MenuButton currencyMenuButton = new MenuButton();
+    private final Set<CurrencyOrSecurity> currencySuggestions = new TreeSet<>();
     private final CheckBox activeCheckBox = new CheckBox("Активен");
     private final TextField interestEdit = new TextField();
     private final DatePicker closingDatePicker = new DatePicker();
@@ -67,6 +112,8 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField cardNumberEdit = new TextField();
 
     private final Collection<Category> categories;
+
+    private final DataCache cache;
 
     AccountDialog(Controller owner, URL css, Category initialCategory) {
         this(owner, css, null, initialCategory, cache());
@@ -84,6 +131,8 @@ class AccountDialog extends BaseDialog<Account> {
         super(owner, css);
         setTitle("Счёт");
 
+        this.cache = cache;
+
         getDialogPane().setContent(
                 gridPane(
                         List.of(
@@ -94,14 +143,13 @@ class AccountDialog extends BaseDialog<Account> {
                                 gridRow(label("Кредит:"), gridCell(creditEdit, 2, 1)),
                                 gridRow(label("Номер счёта:"), gridCell(accountNumberEdit, 2, 1)),
                                 gridRow(label("Комментарий:"), gridCell(commentEdit, 2, 1)),
-                                gridRow(label("Валюта:"), gridCell(currencyComboBox, 2, 1)),
+                                gridRow(label("Валюта:"), currencyEdit, currencyMenuButton),
                                 gridRow(label("Проценты:"), gridCell(interestEdit, 2, 1)),
                                 gridRow(label("Дата закрытия:"), gridCell(closingDatePicker, 2, 1)),
                                 gridRow(label("Тип карты:"), gridCell(cardTypeComboBox, 2, 1)),
                                 gridRow(label("Номер карты:"), gridCell(cardNumberEdit, 2, 1)),
                                 gridRow(SKIP, gridCell(activeCheckBox, 2, 1))
                         ), b -> b.withStyle(Styles.GRID_PANE)
-
                 )
         );
 
@@ -110,18 +158,11 @@ class AccountDialog extends BaseDialog<Account> {
         categories = cache.getCategories().sorted(Category.COMPARE_BY_NAME);
 
         categoryComboBox.setConverter(new ReadOnlyNamedConverter<>());
-        currencyComboBox.setConverter(new ReadOnlyStringConverter<>() {
-            @Override
-            public String toString(Currency currency) {
-                return currency == null ? "" : currency.symbol();
-            }
-        });
-
-        var currencyList = cache.getCurrencies();
-        currencyComboBox.setItems(FXCollections.observableArrayList(currencyList));
         categoryComboBox.setItems(FXCollections.observableArrayList(categories));
 
         IconManager.setupComboBox(iconComboBox);
+
+        TextFields.bindAutoCompletion(currencyEdit, new CurrencyCompletionProvider(currencySuggestions), CURRENCY_TO_STRING);
 
         if (account == null) {
             nameEdit.setText("");
@@ -143,8 +184,6 @@ class AccountDialog extends BaseDialog<Account> {
                 typeComboBox.getSelectionModel().select(0);
                 onCategoryTypeSelected();
             }
-
-            currencyComboBox.getSelectionModel().select(cache.getDefaultCurrency().orElse(null));
         } else {
             nameEdit.setText(account.name());
             commentEdit.setText(account.comment());
@@ -161,18 +200,24 @@ class AccountDialog extends BaseDialog<Account> {
             typeComboBox.getSelectionModel().select(account.type());
             categoryComboBox.getSelectionModel()
                     .select(cache.getCategory(account.categoryUuid()).orElse(null));
-            currencyComboBox.getSelectionModel()
-                    .select(cache.getCurrency(account.currencyUuid()).orElse(null));
+
+            CurrencyOrSecurity currencyOrSecurity;
+            if (account.currencyUuid() != null) {
+                currencyOrSecurity = new CurrencyOrSecurity(cache.getCurrency(account.currencyUuid()).orElse(null));
+            } else if (account.securityUuid() != null) {
+                currencyOrSecurity = new CurrencyOrSecurity(cache.getExchangeSecurity(account.securityUuid()).orElse(null));
+            } else {
+                currencyOrSecurity = new CurrencyOrSecurity(null);
+            }
+            currencyEdit.setText(currencyOrSecurity.toString());
         }
         onCardTypeSelected();
+        setupCurrencyMenuButton();
 
         setResultConverter((ButtonType b) -> {
             if (b != ButtonType.OK) {
                 return null;
             }
-
-            // TODO: reconsider using null currency value
-            var selectedCurrency = currencyComboBox.getSelectionModel().getSelectedItem();
 
             var now = System.currentTimeMillis();
 
@@ -188,7 +233,6 @@ class AccountDialog extends BaseDialog<Account> {
                     .accountLimit(new BigDecimal(creditEdit.getText()))
                     .type(typeComboBox.getSelectionModel().getSelectedItem())
                     .categoryUuid(categoryComboBox.getSelectionModel().getSelectedItem().uuid())
-                    .currencyUuid(selectedCurrency != null ? selectedCurrency.uuid() : null)
                     .enabled(activeCheckBox.isSelected())
                     .interest(new BigDecimal(interestEdit.getText()))
                     .closingDate(closingDatePicker.getValue())
@@ -196,6 +240,17 @@ class AccountDialog extends BaseDialog<Account> {
                     .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
                     .cardNumber(cardNumberEdit.getText())
                     .modified(now);
+
+            var selectedCurrencyOrSecurity = findCurrencyOrSecurity(currencyEdit.getText())
+                    .orElseThrow();
+
+            if (selectedCurrencyOrSecurity.object() instanceof Currency currency) {
+                builder.currencyUuid(currency.uuid())
+                        .securityUuid(null);
+            } else if (selectedCurrencyOrSecurity.object() instanceof ExchangeSecurity security) {
+                builder.currencyUuid(null)
+                        .securityUuid(security.uuid());
+            }
 
             if (account == null) {
                 builder.uuid(UUID.randomUUID())
@@ -222,6 +277,8 @@ class AccountDialog extends BaseDialog<Account> {
         if (!filtered.isEmpty()) {
             categoryComboBox.getSelectionModel().select(0);
         }
+
+        setupCurrencyMenuButton();
     }
 
     private void onCardTypeSelected() {
@@ -238,7 +295,51 @@ class AccountDialog extends BaseDialog<Account> {
         validation.registerValidator(initialEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.registerValidator(creditEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
         validation.registerValidator(interestEdit, MainWindowController.BIG_DECIMAL_VALIDATOR);
+        validation.registerValidator(currencyEdit, (Control control, String value) -> {
+            var correct = findCurrencyOrSecurity(value).isPresent();
+            return ValidationResult.fromErrorIf(control, null, !correct);
+        });
         validation.initInitialDecoration();
+    }
+
+    private void setupCurrencyMenuButton() {
+        currencyMenuButton.getItems().clear();
+        currencySuggestions.clear();
+
+        // Add currencies
+        for (var currency : cache.getCurrencies()) {
+            var item = new CurrencyOrSecurity(currency);
+            currencyMenuButton.getItems().add(
+                    menuItem(item.toString(), actionEvent -> onCurrencyOrSecuritySelected(item))
+            );
+            currencySuggestions.add(new CurrencyOrSecurity(currency));
+        }
+
+        if (typeComboBox.getValue() == CategoryType.PORTFOLIO) {
+            // Add securities
+            if (!cache.getExchangeSecurities().isEmpty()) {
+                currencyMenuButton.getItems().add(new SeparatorMenuItem());
+                for (var security : cache.getExchangeSecurities()) {
+                    var item = new CurrencyOrSecurity(security);
+                    currencySuggestions.add(item);
+                    currencyMenuButton.getItems().add(
+                            menuItem(item.toString(), actionEvent -> onCurrencyOrSecuritySelected(item))
+                    );
+                }
+            }
+        }
+
+        validation.revalidate(currencyEdit);
+    }
+
+    private void onCurrencyOrSecuritySelected(CurrencyOrSecurity cos) {
+        currencyEdit.setText(cos.toString());
+    }
+
+    private Optional<CurrencyOrSecurity> findCurrencyOrSecurity(String text) {
+        return currencySuggestions.stream()
+                .filter(cos -> Objects.equals(cos.toString(), text))
+                .findAny();
     }
 
     TextField getNameEdit() {
@@ -255,10 +356,6 @@ class AccountDialog extends BaseDialog<Account> {
 
     TextField getInterestEdit() {
         return interestEdit;
-    }
-
-    ComboBox<Currency> getCurrencyComboBox() {
-        return currencyComboBox;
     }
 
     ComboBox<CardType> getCardTypeComboBox() {
@@ -279,5 +376,9 @@ class AccountDialog extends BaseDialog<Account> {
 
     TextField getOpeningBalanceEdit() {
         return initialEdit;
+    }
+
+    TextField getCurrencyEdit() {
+        return currencyEdit;
     }
 }

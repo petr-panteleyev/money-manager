@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -16,6 +16,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -54,6 +55,7 @@ public class DataCache {
     private final ObservableList<Account> accounts = FXCollections.observableArrayList();
     private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
     private final ObservableList<PeriodicPayment> periodicPayments = FXCollections.observableArrayList();
+    private final ObservableList<ExchangeSecurity> exchangeSecurities = FXCollections.observableArrayList();
 
     public void clear() {
         icons.clear();
@@ -64,6 +66,7 @@ public class DataCache {
         accounts.clear();
         transactions.clear();
         periodicPayments.clear();
+        exchangeSecurities.clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -396,6 +399,31 @@ public class DataCache {
     public void remove(PeriodicPayment periodicPayment) {
         removeRecord(periodicPayments, periodicPayment.uuid());
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Exchange Securities
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<ExchangeSecurity> getExchangeSecurity(UUID uuid) {
+        return getRecord(exchangeSecurities, uuid);
+    }
+
+    public ObservableList<ExchangeSecurity> getExchangeSecurities() {
+        return exchangeSecurities;
+    }
+
+    public void add(ExchangeSecurity exchangeSecurity) {
+        exchangeSecurities.add(exchangeSecurity);
+    }
+
+    public void update(ExchangeSecurity exchangeSecurity) {
+        updateRecord(exchangeSecurities, exchangeSecurity);
+    }
+
+    public void remove(ExchangeSecurity exchangeSecurity) {
+        removeRecord(exchangeSecurities, exchangeSecurity.uuid());
+    }
+
 
     /**
      * Calculates balance of all transactions related to the specified account.

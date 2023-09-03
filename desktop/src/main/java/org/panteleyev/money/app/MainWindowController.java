@@ -196,6 +196,7 @@ public class MainWindowController extends BaseController implements TransactionT
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
+                createPortfolioMenu(dbOpenProperty),
                 createWindowMenu(dbOpenProperty), createHelpMenu());
 
         menuBar.setUseSystemMenuBar(true);

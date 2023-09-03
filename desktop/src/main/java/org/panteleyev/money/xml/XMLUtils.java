@@ -35,8 +35,10 @@ public final class XMLUtils {
         child.appendChild(text);
     }
 
-    public static void appendTextNode(Element e, String name, int value) {
-        appendTextNode(e, name, Integer.toString(value));
+    public static void appendTextNode(Element e, String name, Integer value) {
+        if (value != null) {
+            appendTextNode(e, name, Integer.toString(value));
+        }
     }
 
     public static void appendTextNode(Element e, String name, boolean value) {
