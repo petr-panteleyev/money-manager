@@ -5,7 +5,6 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.CurrencyType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,11 +19,11 @@ final class CurrencyRepository extends Repository<Currency> {
     protected String getInsertSql() {
         return """
                 INSERT INTO currency (
-                    type, symbol, description, format_symbol, format_symbol_pos,
+                    symbol, description, format_symbol, format_symbol_pos,
                     show_format_symbol, def, rate, rate_direction, use_th_separator,
-                    isin, registry, created, modified, uuid
+                    created, modified, uuid
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
                 """;
     }
@@ -33,7 +32,6 @@ final class CurrencyRepository extends Repository<Currency> {
     protected String getUpdateSql() {
         return """
                 UPDATE currency SET
-                    type = ?,
                     symbol = ?,
                     description = ?,
                     format_symbol = ?,
@@ -43,8 +41,6 @@ final class CurrencyRepository extends Repository<Currency> {
                     rate = ?,
                     rate_direction = ?,
                     use_th_separator = ?,
-                    isin = ?,
-                    registry = ?,
                     created = ?,
                     modified = ?
                 WHERE uuid = ?
@@ -55,7 +51,6 @@ final class CurrencyRepository extends Repository<Currency> {
     protected Currency fromResultSet(ResultSet rs) throws SQLException {
         return new Currency(
                 getUuid(rs, "uuid"),
-                getEnum(rs, "type", CurrencyType.class),
                 rs.getString("symbol"),
                 rs.getString("description"),
                 rs.getString("format_symbol"),
@@ -65,8 +60,6 @@ final class CurrencyRepository extends Repository<Currency> {
                 rs.getBigDecimal("rate"),
                 rs.getInt("rate_direction"),
                 rs.getBoolean("use_th_separator"),
-                rs.getString("isin"),
-                rs.getString("registry"),
                 rs.getLong("created"),
                 rs.getLong("modified")
         );
@@ -75,7 +68,6 @@ final class CurrencyRepository extends Repository<Currency> {
     @Override
     protected void toStatement(PreparedStatement st, Currency currency) throws SQLException {
         var index = 1;
-        setEnum(st, index++, currency.type());
         st.setString(index++, currency.symbol());
         st.setString(index++, currency.description());
         st.setString(index++, currency.formatSymbol());
@@ -85,8 +77,6 @@ final class CurrencyRepository extends Repository<Currency> {
         st.setBigDecimal(index++, currency.rate());
         st.setInt(index++, currency.direction());
         st.setBoolean(index++, currency.useThousandSeparator());
-        st.setString(index++, currency.isin());
-        st.setString(index++, currency.registry());
         st.setLong(index++, currency.created());
         st.setLong(index++, currency.modified());
         setUuid(st, index, currency.uuid());

@@ -199,7 +199,6 @@ public class Export {
     private static Element exportCurrency(Document doc, Currency currency) {
         var e = doc.createElement("Currency");
 
-        appendTextNode(e, "type", currency.type());
         appendTextNode(e, "symbol", currency.symbol());
         appendTextNode(e, "description", currency.description());
         appendTextNode(e, "formatSymbol", currency.formatSymbol());
@@ -210,8 +209,6 @@ public class Export {
         appendTextNode(e, "direction", currency.direction());
         appendTextNode(e, "useThousandSeparator", currency.useThousandSeparator());
         appendTextNode(e, "guid", currency.uuid());
-        appendTextNode(e, "isin", currency.isin());
-        appendTextNode(e, "registry", currency.registry());
         appendTextNode(e, "created", currency.created());
         appendTextNode(e, "modified", currency.modified());
 

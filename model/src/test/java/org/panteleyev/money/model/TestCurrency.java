@@ -21,7 +21,6 @@ public class TestCurrency {
 
     public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var type = CurrencyType.SECURITY;
         var symbol = randomString();
         var description = randomString();
         var formatSymbol = randomString();
@@ -31,8 +30,6 @@ public class TestCurrency {
         var rate = BaseTestUtils.randomBigDecimal();
         var direction = BaseTestUtils.randomInt();
         var useThousandSeparator = BaseTestUtils.randomBoolean();
-        var isin = randomString();
-        var registry = randomString();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -40,7 +37,6 @@ public class TestCurrency {
                 Arguments.of(
                         new Currency.Builder()
                                 .uuid(uuid)
-                                .type(CurrencyType.SECURITY)
                                 .symbol(symbol)
                                 .description(description)
                                 .formatSymbol(formatSymbol)
@@ -50,26 +46,24 @@ public class TestCurrency {
                                 .rate(rate)
                                 .direction(direction)
                                 .useThousandSeparator(useThousandSeparator)
-                                .isin(isin)
-                                .registry(registry)
                                 .created(created)
                                 .modified(modified)
                                 .build(),
                         new Currency(
-                                uuid, type, symbol, description, formatSymbol, formatSymbolPosition,
-                                showFormatSymbol, def, rate, direction, useThousandSeparator, isin, registry,
+                                uuid, symbol, description, formatSymbol, formatSymbolPosition,
+                                showFormatSymbol, def, rate, direction, useThousandSeparator,
                                 created, modified
                         )
                 ),
                 Arguments.of(
                         new Currency(
-                                uuid, type, symbol, null, null, formatSymbolPosition,
-                                showFormatSymbol, def, null, direction, useThousandSeparator, isin, registry,
+                                uuid, symbol, null, null, formatSymbolPosition,
+                                showFormatSymbol, def, null, direction, useThousandSeparator,
                                 created, modified
                         ),
                         new Currency(
-                                uuid, type, symbol, "", "", formatSymbolPosition,
-                                showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator, isin, registry,
+                                uuid, symbol, "", "", formatSymbolPosition,
+                                showFormatSymbol, def, BigDecimal.ONE, direction, useThousandSeparator,
                                 created, modified
                         )
                 )

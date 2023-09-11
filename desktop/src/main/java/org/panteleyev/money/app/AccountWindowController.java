@@ -31,6 +31,7 @@ import org.panteleyev.money.app.cells.AccountCardCell;
 import org.panteleyev.money.app.cells.AccountCategoryCell;
 import org.panteleyev.money.app.cells.AccountClosingDateCell;
 import org.panteleyev.money.app.cells.AccountCommentCell;
+import org.panteleyev.money.app.cells.AccountCurrencyCell;
 import org.panteleyev.money.app.cells.AccountInterestCell;
 import org.panteleyev.money.app.cells.AccountNameCell;
 import org.panteleyev.money.app.cells.DocumentCountCell;
@@ -218,10 +219,8 @@ final class AccountWindowController extends BaseController {
                         b.withCellFactory(x -> new AccountNameCell()).withWidthBinding(w.multiply(0.15))),
                 tableObjectColumn("Категория", b ->
                         b.withCellFactory(x -> new AccountCategoryCell()).withWidthBinding(w.multiply(0.1))),
-                tableColumn("Валюта",
-                        b -> b.withPropertyCallback(
-                                a -> cache().getCurrency(a.currencyUuid()).map(Currency::symbol).orElse("")
-                        ).withWidthBinding(w.multiply(0.05))),
+                tableObjectColumn("Валюта", b ->
+                        b.withCellFactory(x -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("Карта", b ->
                         b.withCellFactory(x -> new AccountCardCell()).withWidthBinding(w.multiply(0.1))),
                 tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->

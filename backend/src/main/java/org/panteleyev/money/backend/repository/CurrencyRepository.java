@@ -5,7 +5,6 @@
 package org.panteleyev.money.backend.repository;
 
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.CurrencyType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -16,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 
 @Repository
@@ -25,7 +23,6 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
 
     private final RowMapper<Currency> rowMapper = (rs, i) -> new Currency(
             getUuid(rs, "uuid"),
-            getEnum(rs, "type", CurrencyType.class),
             rs.getString("symbol"),
             rs.getString("description"),
             rs.getString("format_symbol"),
@@ -35,8 +32,6 @@ public class CurrencyRepository implements MoneyRepository<Currency> {
             rs.getBigDecimal("rate"),
             rs.getInt("rate_direction"),
             rs.getBoolean("use_th_separator"),
-            rs.getString("isin"),
-            rs.getString("registry"),
             rs.getLong("created"),
             rs.getLong("modified")
     );

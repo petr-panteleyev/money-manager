@@ -6,7 +6,6 @@ package org.panteleyev.money.app;
 
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.ContactType;
-import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
@@ -94,11 +93,6 @@ public final class Bundles {
             RecurrenceType.YEARLY, "Раз в год"
     ));
 
-    private static final Map<CurrencyType, String> CURRENCY_TYPE_STRINGS = new EnumMap<>(Map.of(
-            CurrencyType.CURRENCY, "Валюта",
-            CurrencyType.SECURITY, "Ценная бумага"
-    ));
-
     public static String translate(CategoryType type) {
         return CATEGORY_TYPE_STRINGS.get(type);
     }
@@ -125,10 +119,6 @@ public final class Bundles {
 
     public static String translate(RecurrenceType type) {
         return RECURRENCE_TYPE_STRINGS.get(type);
-    }
-
-    public static String translate(CurrencyType type) {
-        return CURRENCY_TYPE_STRINGS.get(type);
     }
 
     public static String translate(Month month) {

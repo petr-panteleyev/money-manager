@@ -215,6 +215,10 @@ public class DataCache {
         updateRecord(currencies, currency);
     }
 
+    public void remove(Currency currency) {
+        removeRecord(currencies, currency.uuid());
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Contacts
     ////////////////////////////////////////////////////////////////////////////

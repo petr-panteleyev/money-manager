@@ -174,6 +174,14 @@ public class MoneyDAO {
         });
     }
 
+    public void deleteCurrency(Currency currency) {
+        withNewConnection(conn -> {
+            currencyRepository.delete(conn, currency);
+            cache.remove(currency);
+        });
+    }
+
+
     ////////////////////////////////////////////////////////////////////////////
     // Contacts
     ////////////////////////////////////////////////////////////////////////////

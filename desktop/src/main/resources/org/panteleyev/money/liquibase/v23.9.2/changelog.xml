@@ -1,19 +1,27 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <!--
-  Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
   -->
+<!--suppress SqlNoDataSourceInspection -->
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
                    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
-                   logicalFilePath="masterChangelog">
+                   logicalFilePath="v23.9.2/changelog.xml">
 
-    <include file="v22.8.0/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v22.12.1/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v23.4.1/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v23.8.2/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v23.9.1/changelog.xml" relativeToChangelogFile="true"/>
-    <include file="v23.9.2/changelog.xml" relativeToChangelogFile="true"/>
+    <changeSet id="v23.9.2-alter-currency" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE currency
+                DROP COLUMN type,
+                DROP COLUMN isin,
+                DROP COLUMN registry
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

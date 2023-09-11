@@ -11,7 +11,6 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
@@ -172,7 +171,6 @@ public final class BaseTestUtils {
 
     public static Currency newCurrency(UUID uuid) {
         return new Currency.Builder()
-                .type(CurrencyType.CURRENCY)
                 .symbol(randomString())
                 .description(randomString())
                 .formatSymbol(randomString())
@@ -183,8 +181,6 @@ public final class BaseTestUtils {
                 .direction(RANDOM.nextInt(2))
                 .useThousandSeparator(RANDOM.nextBoolean())
                 .uuid(uuid)
-                .isin(randomString())
-                .registry(randomString())
                 .modified(System.currentTimeMillis())
                 .build();
     }

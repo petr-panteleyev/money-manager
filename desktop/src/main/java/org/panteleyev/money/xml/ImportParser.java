@@ -11,7 +11,6 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.CurrencyType;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
 import org.panteleyev.money.model.MoneyDocument;
@@ -245,14 +244,10 @@ class ImportParser extends DefaultHandler {
                 .uuid(UUID.fromString(tags.get("guid")))
                 .created(created)
                 .modified(modified)
-                .type(parseCurrencyType(tags.get("type")))
-                .isin(parseString(tags.get("isin")))
-                .registry(parseString(tags.get("registry")))
                 .build();
     }
 
     private static ExchangeSecurity parseExchangeSecurity(Map<String, String> tags) {
-        var cf = parseInteger(tags.get("couponFrequency"), null);
         return new ExchangeSecurity.Builder()
                 .uuid(UUID.fromString(tags.get("uuid")))
                 .secId(tags.get("secId"))
@@ -382,10 +377,6 @@ class ImportParser extends DefaultHandler {
         return rawValue == null ? defaultValue : new BigDecimal(rawValue);
     }
 
-    private static String parseString(String rawValue) {
-        return rawValue == null ? "" : rawValue;
-    }
-
     private static LocalDate parseLocalDate(String rawValue, LocalDate defaultValue) {
         return rawValue == null ? defaultValue : LocalDate.ofEpochDay(Long.parseLong(rawValue));
     }
@@ -424,10 +415,6 @@ class ImportParser extends DefaultHandler {
 
     private static PeriodicPaymentType parsePeriodicPaymentType(String rawValue) {
         return rawValue == null ? PeriodicPaymentType.MANUAL_PAYMENT : PeriodicPaymentType.valueOf(rawValue);
-    }
-
-    private static CurrencyType parseCurrencyType(String rawValue) {
-        return rawValue == null ? CurrencyType.CURRENCY : CurrencyType.valueOf(rawValue);
     }
 
     private static RecurrenceType parseRecurrenceType(String rawValue) {
