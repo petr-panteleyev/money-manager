@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -22,13 +22,13 @@ final class TransactionRepository extends Repository<Transaction> {
     protected String getInsertSql() {
         return """
                 INSERT INTO transaction (
-                    amount, credit_amount, date_day, date_month, date_year, type,
+                    amount, credit_amount, transaction_date, type,
                     comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
                     acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                     invoice_number, parent_uuid, detailed,
                     statement_date, created, modified, uuid
                 ) VALUES (
-                    ?, ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?,
@@ -43,9 +43,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 UPDATE transaction SET
                     amount = ?,
                     credit_amount = ?,
-                    date_day = ?,
-                    date_month = ?,
-                    date_year = ?,
+                    transaction_date = ?,
                     type = ?,
                     comment = ?,
                     checked = ?,
@@ -72,9 +70,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 getUuid(rs, "uuid"),
                 rs.getBigDecimal("amount"),
                 rs.getBigDecimal("credit_amount"),
-                rs.getInt("date_day"),
-                rs.getInt("date_month"),
-                rs.getInt("date_year"),
+                getLocalDate(rs, "transaction_date"),
                 getEnum(rs, "type", TransactionType.class),
                 rs.getString("comment"),
                 rs.getBoolean("checked"),
@@ -99,9 +95,7 @@ final class TransactionRepository extends Repository<Transaction> {
         var index = 1;
         st.setBigDecimal(index++, transaction.amount());
         st.setBigDecimal(index++, transaction.creditAmount());
-        st.setInt(index++, transaction.day());
-        st.setInt(index++, transaction.month());
-        st.setInt(index++, transaction.year());
+        setLocalDate(st, index++, transaction.transactionDate());
         setEnum(st, index++, transaction.type());
         st.setString(index++, transaction.comment());
         st.setBoolean(index++, transaction.checked());

@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Map.entry;
-import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
-import static org.panteleyev.money.backend.repository.RepositoryUtil.getLocalDate;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 
 @Repository
@@ -33,9 +32,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
             getUuid(rs, "uuid"),
             rs.getBigDecimal("amount"),
             rs.getBigDecimal("credit_amount"),
-            rs.getInt("date_day"),
-            rs.getInt("date_month"),
-            rs.getInt("date_year"),
+            rs.getDate("transaction_date").toLocalDate(),
             getEnum(rs, "type", TransactionType.class),
             rs.getString("comment"),
             rs.getBoolean("checked"),
@@ -49,7 +46,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
             rs.getString("invoice_number"),
             getUuid(rs, "parent_uuid"),
             rs.getBoolean("detailed"),
-            getLocalDate(rs, "statement_date"),
+            rs.getDate("statement_date").toLocalDate(),
             rs.getLong("created"),
             rs.getLong("modified")
     );
@@ -59,9 +56,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                 entry("uuid", transaction.uuid()),
                 entry("amount", transaction.amount()),
                 entry("creditAmount", transaction.creditAmount()),
-                entry("day", transaction.day()),
-                entry("month", transaction.month()),
-                entry("year", transaction.year()),
+                entry("transactionDate", Date.valueOf(transaction.transactionDate())),
                 entry("type", transaction.type().name()),
                 entry("comment", transaction.comment()),
                 entry("checked", transaction.checked()),
@@ -78,7 +73,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
         ));
         map.put("contactUuid", transaction.contactUuid());
         map.put("parentUuid", transaction.parentUuid());
-        map.put("statementDate", convert(transaction.statementDate()));
+        map.put("statementDate", Date.valueOf(transaction.statementDate()));
         return map;
     }
 
@@ -133,12 +128,12 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
     public int insertOrUpdate(Transaction transaction) {
         return jdbcTemplate.update("""
                         INSERT INTO transaction (
-                            uuid, amount, credit_amount, date_day, date_month, date_year, type, comment, checked,
+                            uuid, amount, credit_amount, transaction_date, type, comment, checked,
                             acc_debited_uuid, acc_credited_uuid, acc_debited_type, acc_credited_type,
                             acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                             invoice_number, parent_uuid, detailed, statement_date, created, modified
                         ) VALUES (
-                            :uuid, :amount, :creditAmount, :day, :month, :year, :type, :comment, :checked,
+                            :uuid, :amount, :creditAmount, :transactionDate, :type, :comment, :checked,
                             :accDebitedUuid, :accCreditedUuid, :accDebitedType, :accCreditedType,
                             :accDebitedCategoryUuid, :accCreditedCategoryUuid, :contactUuid,
                             :invoiceNumber, :parentUuid, :detailed, :statementDate, :created, :modified
@@ -147,9 +142,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             uuid = :uuid,
                             amount = :amount,
                             credit_amount = :creditAmount,
-                            date_day = :day,
-                            date_month = :month,
-                            date_year = :year,
+                            transaction_date = :transactionDate,
                             type = :type,
                             comment = :comment,
                             checked = :checked,

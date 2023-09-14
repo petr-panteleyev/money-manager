@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -67,7 +67,7 @@ public class CategoryRepository implements MoneyRepository<Category> {
         var result = jdbcTemplate.query("""
                 SELECT * FROM category WHERE uuid = :uuid
                 """, Map.of("uuid", uuid), rowMapper);
-        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     @Override

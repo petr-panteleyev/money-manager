@@ -106,7 +106,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
                 return null;
             }
 
-            long now = System.currentTimeMillis();
+            var now = System.currentTimeMillis();
 
             var builder = new Currency.Builder(currency)
                     .symbol(nameEdit.getText())

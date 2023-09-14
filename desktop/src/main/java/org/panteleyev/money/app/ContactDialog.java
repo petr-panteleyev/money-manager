@@ -102,7 +102,7 @@ final class ContactDialog extends BaseDialog<Contact> {
                 return null;
             }
 
-            long now = System.currentTimeMillis();
+            var now = System.currentTimeMillis();
 
             var builder = new Contact.Builder(contact)
                     .name(nameField.getText())

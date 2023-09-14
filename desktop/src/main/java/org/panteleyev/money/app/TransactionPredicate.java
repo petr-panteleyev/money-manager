@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -20,11 +20,12 @@ import static org.panteleyev.money.app.Bundles.translate;
 public enum TransactionPredicate implements Predicate<Transaction> {
     ALL(it -> true),
 
-    CURRENT_YEAR(it -> it.year() == LocalDate.now().getYear()),
+    CURRENT_YEAR(it -> it.transactionDate().getYear() == LocalDate.now().getYear()),
 
     CURRENT_MONTH(it -> {
         var now = LocalDate.now();
-        return it.year() == now.getYear() && it.month() == now.getMonthValue();
+        return it.transactionDate().getYear() == now.getYear()
+                && it.transactionDate().getMonthValue() == now.getMonthValue();
     }),
 
     CURRENT_WEEK(it -> {
@@ -75,7 +76,8 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     TransactionPredicate(Month month) {
         predicate = (t) -> {
             var now = LocalDate.now();
-            return t.year() == now.getYear() && t.month() == month.getValue();
+            return t.transactionDate().getYear() == now.getYear()
+                    && t.transactionDate().getMonthValue() == month.getValue();
         };
 
         description = month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault());
@@ -101,7 +103,7 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     }
 
     public static Predicate<Transaction> transactionByYear(int year) {
-        return it -> it.year() == year;
+        return it -> it.transactionDate().getYear() == year;
     }
 
     public static Predicate<Transaction> transactionByDates(LocalDate from, LocalDate to) {
@@ -109,8 +111,8 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     }
 
     private static boolean checkRange(Transaction t, LocalDate from, LocalDate to) {
-        var date = LocalDate.of(t.year(), t.month(), t.day());
-        return date.compareTo(from) >= 0 && date.compareTo(to) <= 0;
+        return t.transactionDate().compareTo(from) >= 0
+                && t.transactionDate().compareTo(to) <= 0;
     }
 
     @Override

@@ -413,8 +413,8 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void goToTransaction(Transaction transaction) {
         transactionTable.getSelectionModel().clearSelection();
-        monthFilterBox.getSelectionModel().select(transaction.month() - 1);
-        yearSpinner.getValueFactory().setValue(transaction.year());
+        monthFilterBox.getSelectionModel().select(transaction.transactionDate().getMonthValue() - 1);
+        yearSpinner.getValueFactory().setValue(transaction.transactionDate().getYear());
         transactionTable.getSelectionModel().select(transaction);
         transactionTable.scrollTo(transaction);
     }
@@ -457,8 +457,8 @@ public class MainWindowController extends BaseController implements TransactionT
         int month = monthFilterBox.getSelectionModel().getSelectedIndex() + 1;
         int year = yearSpinner.getValue();
 
-        Predicate<Transaction> filter = t -> t.month() == month
-                && t.year() == year;
+        Predicate<Transaction> filter = t -> t.transactionDate().getMonthValue() == month
+                && t.transactionDate().getYear() == year;
 //            && t.getParentId() == 0;
 
         transactionTable.setTransactionFilter(filter);

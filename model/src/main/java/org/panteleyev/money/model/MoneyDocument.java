@@ -41,7 +41,7 @@ public record MoneyDocument(
         mimeType = MoneyRecord.normalize(mimeType);
         description = MoneyRecord.normalize(description);
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }

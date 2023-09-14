@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -115,7 +115,7 @@ public class TransactionFilterBox extends HBox {
 
         // Add years from existing transactions
         cache().getTransactions().stream()
-                .map(Transaction::year)
+                .map(t -> t.transactionDate().getYear())
                 .distinct()
                 .sorted()
                 .forEach(filterChoice.getItems()::add);

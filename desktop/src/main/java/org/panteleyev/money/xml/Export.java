@@ -250,9 +250,7 @@ public class Export {
 
         appendTextNode(e, "amount", t.amount());
         appendTextNode(e, "creditAmount", t.creditAmount());
-        appendTextNode(e, "day", t.day());
-        appendTextNode(e, "month", t.month());
-        appendTextNode(e, "year", t.year());
+        appendTextNode(e, "transactionDate", t.transactionDate());
         appendTextNode(e, "type", t.type());
         appendTextNode(e, "comment", t.comment());
         appendTextNode(e, "checked", t.checked());

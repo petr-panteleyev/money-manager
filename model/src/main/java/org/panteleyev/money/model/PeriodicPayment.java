@@ -56,7 +56,7 @@ public record PeriodicPayment(
         amount = MoneyRecord.normalize(amount, BigDecimal.ZERO);
         comment = MoneyRecord.normalize(comment);
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }

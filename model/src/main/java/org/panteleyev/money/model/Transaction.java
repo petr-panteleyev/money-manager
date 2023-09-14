@@ -12,9 +12,7 @@ public record Transaction(
         UUID uuid,
         BigDecimal amount,
         BigDecimal creditAmount,
-        int day,
-        int month,
-        int year,
+        LocalDate transactionDate,
         TransactionType type,
         String comment,
         boolean checked,
@@ -73,10 +71,10 @@ public record Transaction(
         creditAmount = MoneyRecord.normalize(creditAmount, BigDecimal.ZERO);
 
         if (statementDate == null) {
-            statementDate = LocalDate.of(year, month, day);
+            statementDate = transactionDate;
         }
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }
@@ -111,9 +109,7 @@ public record Transaction(
     public static final class Builder {
         private BigDecimal amount = BigDecimal.ZERO;
         private BigDecimal creditAmount = BigDecimal.ZERO;
-        private int day;
-        private int month;
-        private int year;
+        private LocalDate transactionDate;
         private TransactionType type = TransactionType.UNDEFINED;
         private String comment = "";
         private boolean checked;
@@ -143,9 +139,7 @@ public record Transaction(
 
             this.amount = t.amount();
             this.creditAmount = t.creditAmount();
-            this.day = t.day();
-            this.month = t.month();
-            this.year = t.year();
+            this.transactionDate = t.transactionDate();
             this.type = t.type();
             this.comment = t.comment();
             this.checked = t.checked();
@@ -191,18 +185,8 @@ public record Transaction(
             return this;
         }
 
-        public Builder day(int day) {
-            this.day = day;
-            return this;
-        }
-
-        public Builder month(int month) {
-            this.month = month;
-            return this;
-        }
-
-        public Builder year(int year) {
-            this.year = year;
+        public Builder transactionDate(LocalDate transactionDate) {
+            this.transactionDate = transactionDate;
             return this;
         }
 
@@ -302,7 +286,7 @@ public record Transaction(
         }
 
         public Transaction build() {
-            return new Transaction(uuid, amount, creditAmount, day, month, year, type, comment,
+            return new Transaction(uuid, amount, creditAmount, transactionDate, type, comment,
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,

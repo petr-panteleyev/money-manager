@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql.controller;
@@ -71,7 +71,8 @@ public class CurrencyGraphQLController {
                 .def(input.def())
                 .rate(input.rate())
                 .direction(input.direction())
-                .useThousandSeparator(input.useThousandSeparator());
+                .useThousandSeparator(input.useThousandSeparator())
+                .modified(System.currentTimeMillis());
         return service.put(builder.build())
                 .orElseThrow(() -> new GraphQLUpdateException("Currency", uuid));
     }

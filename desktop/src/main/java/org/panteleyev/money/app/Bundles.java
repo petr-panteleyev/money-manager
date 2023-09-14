@@ -63,12 +63,13 @@ public final class Bundles {
 
     private static final Map<DocumentType, String> DOCUMENT_TYPE_STRINGS = new EnumMap<>(Map.of(
             DocumentType.BILL, "Счет",
-            DocumentType.CONTRACT, "Договор",
             DocumentType.RECEIPT, "Чек",
+            DocumentType.CONTRACT, "Договор",
             DocumentType.STATEMENT, "Выписка",
+            DocumentType.REPORT, "Отчёт",
             DocumentType.NOTIFICATION, "Уведомление",
-            DocumentType.PAYSLIP, "Платёжная ведомость",
             DocumentType.INVOICE, "Инвойс",
+            DocumentType.PAYSLIP, "Платёжная ведомость",
             DocumentType.OTHER, "Другое"
     ));
 

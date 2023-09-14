@@ -33,13 +33,8 @@ import java.util.stream.Stream;
 
 public class DataCache {
     private static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DATE =
-            Comparator.comparing(Transaction::year)
-                    .thenComparing(Transaction::month)
-                    .thenComparing(Transaction::day)
-                    .thenComparingLong(Transaction::created);
-
-    private static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DAY =
-            Comparator.comparingInt(Transaction::day).thenComparingLong(Transaction::created);
+            Comparator.comparing(Transaction::transactionDate)
+                    .thenComparing(Transaction::created);
 
     private static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
     private static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
@@ -328,7 +323,8 @@ public class DataCache {
 
     public List<Transaction> getTransactions(int month, int year) {
         return getTransactions().stream()
-                .filter(tr -> tr.month() == month && tr.year() == year)
+                .filter(tr -> tr.transactionDate().getMonthValue() == month
+                        && tr.transactionDate().getYear() == year)
                 .toList();
     }
 
@@ -374,10 +370,6 @@ public class DataCache {
 
     public Comparator<Transaction> getTransactionByDateComparator() {
         return COMPARE_TRANSACTION_BY_DATE;
-    }
-
-    public Comparator<Transaction> getTransactionByDayComparator() {
-        return COMPARE_TRANSACTION_BY_DAY;
     }
 
     ////////////////////////////////////////////////////////////////////////////

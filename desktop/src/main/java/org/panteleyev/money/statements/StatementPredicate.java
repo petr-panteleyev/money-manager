@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -43,10 +43,8 @@ public class StatementPredicate implements Predicate<Transaction> {
     }
 
     private boolean compareDate(LocalDate date, Transaction transaction) {
-        return (transaction.day() == date.getDayOfMonth()
-                && transaction.month() == date.getMonthValue()
-                && transaction.year() == date.getYear()
-        ) || Objects.equals(transaction.statementDate(), date);
+        return Objects.equals(transaction.transactionDate(), date)
+                || Objects.equals(transaction.statementDate(), date);
     }
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

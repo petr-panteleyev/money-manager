@@ -34,12 +34,6 @@ public record Contact(
         if (type == null) {
             throw new IllegalStateException("Contact type cannot be null");
         }
-        if (created == 0) {
-            created = System.currentTimeMillis();
-        }
-        if (modified == 0) {
-            modified = System.currentTimeMillis();
-        }
 
         phone = MoneyRecord.normalize(phone);
         mobile = MoneyRecord.normalize(mobile);
@@ -51,7 +45,7 @@ public record Contact(
         country = MoneyRecord.normalize(country);
         zip = MoneyRecord.normalize(zip);
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }
@@ -108,7 +102,7 @@ public record Contact(
 
         public Contact build() {
             return new Contact(uuid, name, type, phone, mobile, email, web, comment, street, city, country, zip,
-                iconUuid, created, modified);
+                    iconUuid, created, modified);
         }
 
         public Builder name(String name) {

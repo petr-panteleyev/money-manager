@@ -29,8 +29,8 @@ public class TestMoneyDocument {
         var mimeType = randomString();
         var size = randomInt();
         var description = randomString();
-        long created = System.currentTimeMillis();
-        long modified = created + 1000L;
+        var created = System.currentTimeMillis();
+        var modified = created + 1000L;
 
         return List.of(
                 Arguments.of(

@@ -19,6 +19,7 @@ import java.io.PrintWriter;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,7 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 
 class Reports {
     private static final String CSS_PATH = "/org/panteleyev/money/report.css";
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static String css;
 
     static void reportTransactions(List<Transaction> transactions, OutputStream out) {
@@ -43,7 +45,7 @@ class Reports {
 
             for (var t : transactions) {
                 w.print("<tr>");
-                td(w, String.format("%02d.%02d.%04d", t.day(), t.month(), t.year()));
+                td(w, DATE_FORMAT.format(t.transactionDate()));
                 td(w, cache().getAccount(t.accountDebitedUuid()).map(Account::name).orElse(""));
                 td(w, cache().getAccount(t.accountCreditedUuid()).map(Account::name).orElse(""));
                 td(w, cache().getContact(t.contactUuid()).map(Contact::name).orElse(""));

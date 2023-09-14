@@ -35,7 +35,7 @@ public record Currency(
         formatSymbol = MoneyRecord.normalize(formatSymbol);
         rate = MoneyRecord.normalize(rate, BigDecimal.ONE);
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }

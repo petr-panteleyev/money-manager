@@ -41,10 +41,8 @@ import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.test.BaseTestUtils.randomDay;
 import static org.panteleyev.money.test.BaseTestUtils.randomInt;
 import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
-import static org.panteleyev.money.test.BaseTestUtils.randomMonthNumber;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.panteleyev.money.test.BaseTestUtils.randomTransactionType;
-import static org.panteleyev.money.test.BaseTestUtils.randomYear;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestRepositories extends BaseDaoTest {
@@ -148,7 +146,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(3)
+    @Order(4)
     public void testExchangeSecurity() {
         var repository = new ExchangeSecurityRepository();
 
@@ -316,9 +314,7 @@ public class TestRepositories extends BaseDaoTest {
                 TRANSACTION_UUID,
                 randomBigDecimal(),
                 randomBigDecimal(),
-                randomDay(),
-                randomMonthNumber(),
-                randomYear(),
+                LocalDate.now(),
                 randomTransactionType(),
                 randomString(),
                 randomBoolean(),
@@ -341,9 +337,7 @@ public class TestRepositories extends BaseDaoTest {
                 TRANSACTION_UUID,
                 randomBigDecimal(),
                 randomBigDecimal(),
-                randomDay(),
-                randomMonthNumber(),
-                randomYear(),
+                LocalDate.now(),
                 randomTransactionType(),
                 randomString(),
                 randomBoolean(),
@@ -422,7 +416,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testPeriodicPayment() {
         var repository = new PeriodicPaymentRepository();
 

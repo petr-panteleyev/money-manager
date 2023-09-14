@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
@@ -30,18 +31,6 @@ final class BaseTestUtils {
     public static final String ICON_EURO = "euro.png";
 
     public static final Random RANDOM = new Random(System.currentTimeMillis());
-
-    static int randomDay() {
-        return 1 + RANDOM.nextInt(28);
-    }
-
-    static int randomMonth() {
-        return 1 + RANDOM.nextInt(12);
-    }
-
-    static int randomYear() {
-        return 1 + RANDOM.nextInt(3000);
-    }
 
     static String randomString() {
         return UUID.randomUUID().toString();
@@ -172,9 +161,7 @@ final class BaseTestUtils {
                 .uuid(uuid)
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
-                .day(randomDay())
-                .month(randomMonth())
-                .year(randomYear())
+                .transactionDate(LocalDate.now())
                 .type(randomTransactionType())
                 .comment(UUID.randomUUID().toString())
                 .checked(RANDOM.nextBoolean())

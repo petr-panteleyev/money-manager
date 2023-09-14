@@ -321,8 +321,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         creditAmountEdit.setDisable(Objects.equals(debitedCurrencyUuid, creditedCurrencyUuid));
 
         // Day
-        var trDate = LocalDate.of(transaction.year(), transaction.month(), transaction.day());
-        datePicker.setValue(trDate);
+        datePicker.setValue(transaction.transactionDate());
 
         statementDatePicker.setValue(transaction.statementDate());
 
@@ -531,9 +530,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         builder.statementDate(statementDatePicker.getValue());
 
         try {
-            builder.day(datePicker.getValue().getDayOfMonth());
-            builder.month(datePicker.getValue().getMonthValue());
-            builder.year(datePicker.getValue().getYear());
+            builder.transactionDate(datePicker.getValue());
 
             builder.amount(new BigDecimal(debitAmountEdit.getText()));
             builder.creditAmount(new BigDecimal(creditAmountEdit.getText()));

@@ -318,12 +318,18 @@ class ImportParser extends DefaultHandler {
             }
         }
 
+        var transactionDate = parseLocalDate(tags.get("transactionDate"), null);
+        if (transactionDate == null) {
+            var day = parseInt(tags.get("day"));
+            var month = parseInt(tags.get("month"));
+            var year = parseInt(tags.get("year"));
+            transactionDate = LocalDate.of(year, month, day);
+        }
+
         return new Transaction.Builder()
                 .amount(amount)
                 .creditAmount(creditAmount)
-                .day(parseInt(tags.get("day")))
-                .month(parseInt(tags.get("month")))
-                .year(parseInt(tags.get("year")))
+                .transactionDate(transactionDate)
                 .type(parseTransactionType(tags.get("type")))
                 .comment(tags.get("comment"))
                 .checked(parseBoolean(tags.get("checked"), false))

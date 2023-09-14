@@ -177,8 +177,7 @@ public class TransactionTableView extends TableView<Transaction> {
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         var w = widthProperty().subtract(20);
-        var dayComparator = mode.isFullDate() ?
-                cache().getTransactionByDateComparator() : cache().getTransactionByDayComparator();
+        var dateComparator = cache().getTransactionByDateComparator();
 
         Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
                 mode == Mode.ACCOUNT ?
@@ -188,17 +187,17 @@ public class TransactionTableView extends TableView<Transaction> {
         getColumns().setAll(List.of(
                 tableObjectColumn("День", b ->
                         b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
-                                .withComparator(dayComparator)
+                                .withComparator(dateComparator)
                                 .withWidthBinding(w.multiply(0.04))),
                 tableObjectColumn("Тип", b ->
                         b.withCellFactory(x -> new TransactionTypeCell())
                                 .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
-                                        .thenComparing(dayComparator))
+                                        .thenComparing(dateComparator))
                                 .withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Исходный счет", b ->
                         b.withCellFactory(x -> new TransactionDebitedAccountCell())
                                 .withComparator(Comparator.comparing(Transaction::accountDebitedUuid)
-                                        .thenComparing(dayComparator))
+                                        .thenComparing(dateComparator))
                                 .withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Счет получателя", b ->
                         b.withCellFactory(x -> new TransactionCreditedAccountCell()).withWidthBinding(w.multiply(0.1))),

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
@@ -7,7 +7,11 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Transaction;
 
+import java.time.format.DateTimeFormatter;
+
 public class TransactionDayCell extends TableCell<Transaction, Transaction> {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
     private final boolean fullDate;
 
     public TransactionDayCell(boolean fullDate) {
@@ -22,10 +26,9 @@ public class TransactionDayCell extends TableCell<Transaction, Transaction> {
             setText("");
         } else {
             if (fullDate) {
-                setText(String.format("%02d.%02d.%04d",
-                        transaction.day(), transaction.month(), transaction.year()));
+                setText(DATE_FORMAT.format(transaction.transactionDate()));
             } else {
-                setText(Integer.toString(transaction.day()));
+                setText(Integer.toString(transaction.transactionDate().getDayOfMonth()));
             }
         }
     }

@@ -10,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -20,8 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.model.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.model.BaseTestUtils.randomBigDecimal;
 import static org.panteleyev.money.model.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.model.BaseTestUtils.randomDay;
-import static org.panteleyev.money.model.BaseTestUtils.randomMonth;
 import static org.panteleyev.money.model.BaseTestUtils.randomTransactionType;
 
 public class TestTransaction {
@@ -30,9 +27,7 @@ public class TestTransaction {
         var uuid = UUID.randomUUID();
         var amount = randomBigDecimal();
         var creditAmount = randomBigDecimal();
-        var day = randomDay();
-        var month = randomMonth();
-        var year = BaseTestUtils.randomYear();
+        var transactionDate = LocalDate.now();
         var type = randomTransactionType();
         var comment = BaseTestUtils.randomString();
         var checked = BaseTestUtils.randomBoolean();
@@ -56,9 +51,7 @@ public class TestTransaction {
                                 .uuid(uuid)
                                 .amount(amount)
                                 .creditAmount(creditAmount)
-                                .day(day)
-                                .month(month)
-                                .year(year)
+                                .transactionDate(transactionDate)
                                 .type(type)
                                 .comment(comment)
                                 .checked(checked)
@@ -77,7 +70,7 @@ public class TestTransaction {
                                 .modified(modified)
                                 .build(),
                         new Transaction(
-                                uuid, amount, creditAmount, day, month, year,
+                                uuid, amount, creditAmount, transactionDate,
                                 type, comment, checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
@@ -87,7 +80,7 @@ public class TestTransaction {
                 ),
                 Arguments.of(
                         new Transaction(
-                                uuid, amount, creditAmount, day, month, year,
+                                uuid, amount, creditAmount, transactionDate,
                                 type, null, checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
@@ -95,7 +88,7 @@ public class TestTransaction {
                                 detailed, null, created, modified
                         ),
                         new Transaction(
-                                uuid, amount, creditAmount, day, month, year,
+                                uuid, amount, creditAmount, transactionDate,
                                 type, "", checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
@@ -118,9 +111,7 @@ public class TestTransaction {
     public void testEquals() {
         var amount = randomBigDecimal();
         var creditAmount = randomBigDecimal();
-        var day = randomDay();
-        var month = randomMonth();
-        var year = BaseTestUtils.randomYear();
+        var transactionDate = LocalDate.now();
         var type = randomTransactionType();
         var comment = UUID.randomUUID().toString();
         var checked = RANDOM.nextBoolean();
@@ -142,9 +133,7 @@ public class TestTransaction {
         var t1 = new Transaction.Builder()
                 .amount(amount)
                 .creditAmount(creditAmount)
-                .day(day)
-                .month(month)
-                .year(year)
+                .transactionDate(transactionDate)
                 .type(type)
                 .comment(comment)
                 .checked(checked)
@@ -167,9 +156,7 @@ public class TestTransaction {
         var t2 = new Transaction.Builder()
                 .amount(amount)
                 .creditAmount(creditAmount)
-                .day(day)
-                .month(month)
-                .year(year)
+                .transactionDate(transactionDate)
                 .type(type)
                 .comment(comment)
                 .checked(checked)
@@ -198,9 +185,7 @@ public class TestTransaction {
         var t1 = new Transaction.Builder()
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
-                .day(randomDay())
-                .month(randomMonth())
-                .year(BaseTestUtils.randomYear())
+                .transactionDate(LocalDate.now())
                 .type(randomTransactionType())
                 .comment(BaseTestUtils.randomString())
                 .checked(BaseTestUtils.randomBoolean())
@@ -223,9 +208,7 @@ public class TestTransaction {
 
         assertEquals(t2.amount(), t1.amount());
         assertEquals(t2.creditAmount(), t1.creditAmount());
-        assertEquals(t2.day(), t1.day());
-        assertEquals(t2.month(), t1.month());
-        assertEquals(t2.year(), t1.year());
+        assertEquals(t2.transactionDate(), t1.transactionDate());
         assertEquals(t2.type(), t1.type());
         assertEquals(t2.comment(), t1.comment());
         assertEquals(t2.checked(), !t1.checked());

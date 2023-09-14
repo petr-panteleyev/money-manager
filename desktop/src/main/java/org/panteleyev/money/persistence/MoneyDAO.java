@@ -504,9 +504,10 @@ public class MoneyDAO {
             builder.contactUuid(newContact.uuid());
         }
 
+        var now = System.currentTimeMillis();
         var transaction = builder
-                .modified(0)
-                .created(0)
+                .modified(now)
+                .created(now)
                 .build();
 
         insertTransaction(transaction);
@@ -521,7 +522,7 @@ public class MoneyDAO {
         }
 
         var transaction = builder
-                .modified(0)
+                .modified(System.currentTimeMillis())
                 .build();
 
         updateTransaction(transaction);

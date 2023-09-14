@@ -42,10 +42,10 @@ public record ExchangeSecurity(
             uuid = UUID.randomUUID();
         }
         var now = System.currentTimeMillis();
-        if (created <= 0) {
+        if (created == 0) {
             created = now;
         }
-        if (modified <= 0) {
+        if (modified == 0) {
             modified = now;
         }
     }

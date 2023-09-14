@@ -1,0 +1,91 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v23.9.4/changelog.xml">
+
+    <changeSet id="v23.9.4-transaction-date" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE transaction
+                ALTER COLUMN date_day SET DATA TYPE DATE
+                    USING make_date(date_year, date_month, date_day);
+
+            ALTER TABLE transaction
+                RENAME COLUMN date_day TO transaction_date;
+
+            ALTER TABLE transaction
+                DROP COLUMN date_year,
+                DROP COLUMN date_month;
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.4-transaction-statement-date" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE transaction
+                ALTER COLUMN statement_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(statement_date * 24 * 60 * 60) AS DATE)
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.4-document-file-date" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE document
+                ALTER COLUMN file_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(file_date * 24 * 60 * 60) AS DATE)
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.4-exchange-security-dates" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE exchange_security
+                ALTER COLUMN issue_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(issue_date * 24 * 60 * 60) AS DATE);
+            ALTER TABLE exchange_security
+                ALTER COLUMN mat_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(mat_date * 24 * 60 * 60) AS DATE);
+            ALTER TABLE exchange_security
+                ALTER COLUMN coupon_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(coupon_date * 24 * 60 * 60) AS DATE);
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.4-account-closing-date" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE account
+                ALTER COLUMN closing_date SET DATA TYPE DATE
+                    USING CAST(TO_TIMESTAMP(closing_date * 24 * 60 * 60) AS DATE)
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

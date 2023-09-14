@@ -1,13 +1,13 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.MoneyRecord;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -135,15 +135,12 @@ abstract class Repository<T extends MoneyRecord> {
     }
 
     static LocalDate getLocalDate(ResultSet set, String columnLabel) throws SQLException {
-        return set.getObject(columnLabel) == null ? null : LocalDate.ofEpochDay(set.getLong(columnLabel));
+        var date = set.getDate(columnLabel);
+        return date == null ? null : date.toLocalDate();
     }
 
     static void setLocalDate(PreparedStatement st, int index, LocalDate localDate) throws SQLException {
-        if (localDate == null) {
-            st.setNull(index, Types.INTEGER);
-        } else {
-            st.setLong(index, localDate.toEpochDay());
-        }
+        st.setDate(index, localDate == null ? null : Date.valueOf(localDate));
     }
 
     static Integer getInteger(ResultSet set, String columnLabel) throws SQLException {

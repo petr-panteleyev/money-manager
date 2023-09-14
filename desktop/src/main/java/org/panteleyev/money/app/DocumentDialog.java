@@ -133,7 +133,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
                 return null;
             }
 
-            long now = System.currentTimeMillis();
+            var now = System.currentTimeMillis();
 
             var result = new ArrayList<DocumentWithBytes>(fileInfos.size());
             for (var fileInfo : fileInfos) {

@@ -1,9 +1,10 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -21,15 +22,16 @@ final class RepositoryUtil {
     }
 
     static LocalDate getLocalDate(ResultSet set, String columnLabel) throws SQLException {
-        return set.getObject(columnLabel) == null ? null : LocalDate.ofEpochDay(set.getLong(columnLabel));
+        var date = set.getDate(columnLabel);
+        return date == null ? null : date.toLocalDate();
     }
 
     static int convert(boolean value) {
         return value ? 1 : 0;
     }
 
-    static Long convert(LocalDate localDate) {
-        return localDate == null ? null : localDate.toEpochDay();
+    static Date convert(LocalDate localDate) {
+        return localDate == null ? null : Date.valueOf(localDate);
     }
 
     static String convert(Enum<?> enumValue) {

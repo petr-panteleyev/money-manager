@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.panteleyev.money.backend.repository.RepositoryUtil.convert;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getEnum;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getLocalDate;
 import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
@@ -58,7 +59,7 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
                 "SELECT * FROM document WHERE uuid = :id",
                 Map.of("id", uuid),
                 ROW_MAPPER);
-        return queryResult.size() == 0 ?
+        return queryResult.isEmpty() ?
                 Optional.empty() :
                 Optional.of(queryResult.get(0));
     }
@@ -89,7 +90,7 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
                         Map.entry("contactUuid", document.contactUuid()),
                         Map.entry("documentType", document.documentType().name()),
                         Map.entry("fileName", document.fileName()),
-                        Map.entry("fileDate", document.date().toEpochDay()),
+                        Map.entry("fileDate", convert(document.date())),
                         Map.entry("fileSize", document.size()),
                         Map.entry("mimeType", document.mimeType()),
                         Map.entry("description", document.description()),

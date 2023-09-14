@@ -45,7 +45,7 @@ public record Account(
             throw new IllegalStateException("Account category cannot be null");
         }
 
-        long now = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
         if (created == 0) {
             created = now;
         }

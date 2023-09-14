@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -84,7 +84,7 @@ public class ContactRepository implements MoneyRepository<Contact> {
                 "SELECT * FROM contact WHERE uuid = :id",
                 Map.of("id", uuid),
                 rowMapper);
-        return queryResult.size() == 0 ?
+        return queryResult.isEmpty() ?
                 Optional.empty() :
                 Optional.of(queryResult.get(0));
 

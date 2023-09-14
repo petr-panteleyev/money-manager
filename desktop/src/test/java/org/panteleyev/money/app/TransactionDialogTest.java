@@ -223,9 +223,7 @@ public class TransactionDialogTest {
                 .accountDebitedCategoryUuid(category.uuid())
                 .accountDebitedUuid(debit.uuid())
                 .accountCreditedUuid(credit.uuid())
-                .day(now.getDayOfMonth())
-                .month(now.getMonthValue())
-                .year(now.getYear())
+                .transactionDate(now)
                 .comment(UUID.randomUUID().toString())
                 .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
                 .checked(RANDOM.nextBoolean());
@@ -266,9 +264,7 @@ public class TransactionDialogTest {
         assertEquals(expected.accountCreditedType(), actual.accountCreditedType(),
                 "Credited account category type ID is invalid");
 
-        assertEquals(expected.day(), actual.day(), "Day is invalid");
-        assertEquals(expected.month(), actual.month(), "Month is invalid");
-        assertEquals(expected.year(), actual.year(), "Year is invalid");
+        assertEquals(expected.transactionDate(), actual.transactionDate(), "Transaction date is invalid");
         assertEquals(expected.comment(), actual.comment(), "Comment is invalid");
         assertEquals(expected.checked(), actual.checked(), "Checked status is invalid");
     }
@@ -329,8 +325,7 @@ public class TransactionDialogTest {
             assertNull(builder.getUuid());
             var now = LocalDate.now();
             var resultedTransaction = builder
-                    .month(now.getMonthValue())
-                    .year(now.getYear())
+                    .transactionDate(now)
                     .build();
             assertMainFields(transaction, resultedTransaction);
             assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
@@ -362,8 +357,7 @@ public class TransactionDialogTest {
             assertEquals(newContact, builder.getNewContactName());
             var now = LocalDate.now();
             var resultedTransaction = builder
-                    .month(now.getMonthValue())
-                    .year(now.getYear())
+                    .transactionDate(now)
                     .build();
             assertMainFields(transaction, resultedTransaction);
             assertNull(resultedTransaction.contactUuid(), "Contact UUID is invalid");

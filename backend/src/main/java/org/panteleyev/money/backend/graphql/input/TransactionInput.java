@@ -13,9 +13,7 @@ import java.util.UUID;
 public record TransactionInput(
         BigDecimal amount,
         BigDecimal creditAmount,
-        int day,
-        int month,
-        int year,
+        LocalDate transactionDate,
         TransactionType type,
         String comment,
         boolean checked,

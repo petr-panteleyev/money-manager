@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -21,8 +21,8 @@ final class ContactRepository extends Repository<Contact> {
     protected String getInsertSql() {
         return """
                 INSERT INTO contact (
-                    name, type, phone, mobile, email, 
-                    web, comment, street, city, country, 
+                    name, type, phone, mobile, email,
+                    web, comment, street, city, country,
                     zip, icon_uuid, created, modified, uuid
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?

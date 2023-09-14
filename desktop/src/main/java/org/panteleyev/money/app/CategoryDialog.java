@@ -77,7 +77,7 @@ final class CategoryDialog extends BaseDialog<Category> {
                 return null;
             }
 
-            long now = System.currentTimeMillis();
+            var now = System.currentTimeMillis();
 
             var iconUuid = iconComboBox.getSelectionModel().getSelectedItem().equals(EMPTY_ICON) ?
                     null : iconComboBox.getSelectionModel().getSelectedItem().uuid();

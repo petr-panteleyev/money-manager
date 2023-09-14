@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -30,11 +30,12 @@ public record Category(
         if (type == null) {
             throw new IllegalStateException("Category type cannot be null");
         }
-        if (created <= 0) {
-            created = System.currentTimeMillis();
+        var now = System.currentTimeMillis();
+        if (created == 0) {
+            created = now;
         }
-        if (modified <= 0) {
-            modified = System.currentTimeMillis();
+        if (modified == 0) {
+            modified = now;
         }
         comment = MoneyRecord.normalize(comment);
     }

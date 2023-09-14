@@ -186,12 +186,9 @@ public class TestMoneyDAO extends BaseDaoTest {
 
         var id = UUID.randomUUID();
 
-        var now = LocalDate.now();
         var transaction = new Transaction.Builder()
                 .uuid(id)
-                .day(now.getDayOfMonth())
-                .month(now.getMonthValue())
-                .year(now.getYear())
+                .transactionDate(LocalDate.now())
                 .amount(BaseTestUtils.randomBigDecimal())
                 .accountDebitedUuid(account.uuid())
                 .accountCreditedUuid(account.uuid())
