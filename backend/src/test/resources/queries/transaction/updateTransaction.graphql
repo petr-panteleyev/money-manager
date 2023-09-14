@@ -3,6 +3,7 @@ mutation ($uuid: String!, $debitedAccountUuid: String!, $creditedAccountUuid: St
         uuid: $uuid,
         input: {
             amount: 1100.20,
+            creditAmount: 2200.40,
             day: 2,
             month: 11,
             year: 2023,
@@ -13,8 +14,6 @@ mutation ($uuid: String!, $debitedAccountUuid: String!, $creditedAccountUuid: St
             accountCreditedUuid: $creditedAccountUuid,
             contactUuid: $contactUuid,
             contactName: $contactName,
-            rate: 2.0,
-            rateDirection: 1,
             invoiceNumber: "123456",
             parentUuid: null,
             detailed: false,
@@ -23,6 +22,7 @@ mutation ($uuid: String!, $debitedAccountUuid: String!, $creditedAccountUuid: St
         transaction {
             uuid,
             amount,
+            creditAmount,
             day,
             month,
             year,
@@ -39,8 +39,6 @@ mutation ($uuid: String!, $debitedAccountUuid: String!, $creditedAccountUuid: St
                 uuid,
                 name
             },
-            rate,
-            rateDirection,
             invoiceNumber,
             parent {
                 uuid

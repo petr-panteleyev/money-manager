@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.client.dto;
@@ -14,6 +14,7 @@ import java.util.UUID;
 public record TransactionDto(
         UUID uuid,
         BigDecimal amount,
+        BigDecimal creditAmount,
         int day,
         int month,
         int year,
@@ -23,8 +24,6 @@ public record TransactionDto(
         AccountDto accountDebited,
         AccountDto accountCredited,
         Optional<ContactDto> contact,
-        BigDecimal rate,
-        int rateDirection,
         String invoiceNumber,
         Optional<TransactionDto> parent,
         boolean detailed,

@@ -269,14 +269,15 @@
             <xsd:element name="accountDebitedUuid" type="UUID"/>
             <xsd:element name="accountDebitedType" type="CategoryType"/>
             <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="creditAmount" type="xsd:decimal" minOccurs="0"/>
             <xsd:element name="checked" type="xsd:boolean"/>
             <xsd:element name="comment" type="xsd:string"/>
             <xsd:element name="contactUuid" type="UUID" minOccurs="0"/>
             <xsd:element name="day" type="Day"/>
             <xsd:element name="invoiceNumber" type="xsd:string"/>
             <xsd:element name="month" type="Month"/>
-            <xsd:element name="rate" type="xsd:decimal"/>
-            <xsd:element name="rateDirection" type="Switch"/>
+            <xsd:element name="rate" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="rateDirection" type="Switch" minOccurs="0"/>
             <xsd:element name="type" type="TransactionType"/>
             <xsd:element name="year" type="Year"/>
             <xsd:element name="guid" type="UUID"/>

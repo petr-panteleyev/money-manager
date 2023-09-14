@@ -22,17 +22,17 @@ final class TransactionRepository extends Repository<Transaction> {
     protected String getInsertSql() {
         return """
                 INSERT INTO transaction (
-                    amount, date_day, date_month, date_year, type,
+                    amount, credit_amount, date_day, date_month, date_year, type,
                     comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
                     acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
-                    rate, rate_direction, invoice_number, parent_uuid, detailed,
+                    invoice_number, parent_uuid, detailed,
                     statement_date, created, modified, uuid
                 ) VALUES (
+                    ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
-                    ?, ?, ?
+                    ?, ?, ?, ?,
+                    ?, ?, ?,
+                    ?, ?, ?, ?
                 )
                 """;
     }
@@ -42,6 +42,7 @@ final class TransactionRepository extends Repository<Transaction> {
         return """
                 UPDATE transaction SET
                     amount = ?,
+                    credit_amount = ?,
                     date_day = ?,
                     date_month = ?,
                     date_year = ?,
@@ -55,8 +56,6 @@ final class TransactionRepository extends Repository<Transaction> {
                     acc_debited_category_uuid = ?,
                     acc_credited_category_uuid = ?,
                     contact_uuid = ?,
-                    rate = ?,
-                    rate_direction = ?,
                     invoice_number = ?,
                     parent_uuid = ?,
                     detailed = ?,
@@ -72,6 +71,7 @@ final class TransactionRepository extends Repository<Transaction> {
         return new Transaction(
                 getUuid(rs, "uuid"),
                 rs.getBigDecimal("amount"),
+                rs.getBigDecimal("credit_amount"),
                 rs.getInt("date_day"),
                 rs.getInt("date_month"),
                 rs.getInt("date_year"),
@@ -85,8 +85,6 @@ final class TransactionRepository extends Repository<Transaction> {
                 getUuid(rs, "acc_debited_category_uuid"),
                 getUuid(rs, "acc_credited_category_uuid"),
                 getUuid(rs, "contact_uuid"),
-                rs.getBigDecimal("rate"),
-                rs.getInt("rate_direction"),
                 rs.getString("invoice_number"),
                 getUuid(rs, "parent_uuid"),
                 rs.getBoolean("detailed"),
@@ -100,6 +98,7 @@ final class TransactionRepository extends Repository<Transaction> {
     protected void toStatement(PreparedStatement st, Transaction transaction) throws SQLException {
         var index = 1;
         st.setBigDecimal(index++, transaction.amount());
+        st.setBigDecimal(index++, transaction.creditAmount());
         st.setInt(index++, transaction.day());
         st.setInt(index++, transaction.month());
         st.setInt(index++, transaction.year());
@@ -113,8 +112,6 @@ final class TransactionRepository extends Repository<Transaction> {
         setUuid(st, index++, transaction.accountDebitedCategoryUuid());
         setUuid(st, index++, transaction.accountCreditedCategoryUuid());
         setUuid(st, index++, transaction.contactUuid());
-        st.setBigDecimal(index++, transaction.rate());
-        st.setInt(index++, transaction.rateDirection());
         st.setString(index++, transaction.invoiceNumber());
         setUuid(st, index++, transaction.parentUuid());
         st.setBoolean(index++, transaction.detailed());

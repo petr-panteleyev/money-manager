@@ -249,6 +249,7 @@ public class Export {
         var e = doc.createElement("Transaction");
 
         appendTextNode(e, "amount", t.amount());
+        appendTextNode(e, "creditAmount", t.creditAmount());
         appendTextNode(e, "day", t.day());
         appendTextNode(e, "month", t.month());
         appendTextNode(e, "year", t.year());
@@ -262,8 +263,6 @@ public class Export {
         appendTextNode(e, "accountDebitedCategoryUuid", t.accountDebitedCategoryUuid());
         appendTextNode(e, "accountCreditedCategoryUuid", t.accountCreditedCategoryUuid());
         appendTextNode(e, "contactUuid", t.contactUuid());
-        appendTextNode(e, "rate", t.rate());
-        appendTextNode(e, "rateDirection", t.rateDirection());
         appendTextNode(e, "invoiceNumber", t.invoiceNumber());
         appendTextNode(e, "guid", t.uuid());
         appendTextNode(e, "created", t.created());

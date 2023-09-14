@@ -27,6 +27,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
@@ -300,8 +301,26 @@ class ImportParser extends DefaultHandler {
     private static Transaction parseTransaction(Map<String, String> tags) {
         var modified = parseLong(tags.get("modified"), 0L);
         var created = parseLong(tags.get("created"), modified);
+
+        var amount = new BigDecimal(tags.get("amount"));
+        var creditAmount = parseBigDecimal(tags.get("creditAmount"), null);
+        if (creditAmount == null) {
+            var rate = new BigDecimal(tags.get("rate"));
+            if (rate.compareTo(BigDecimal.ZERO) == 0 || rate.compareTo(BigDecimal.ONE) == 0) {
+                creditAmount = amount;
+            } else {
+                var rateDirection = parseInt(tags.get("rateDirection"));
+                if (rateDirection == 1) {
+                    creditAmount = amount.multiply(rate);
+                } else {
+                    creditAmount = amount.divide(rate, RoundingMode.HALF_UP);
+                }
+            }
+        }
+
         return new Transaction.Builder()
-                .amount(new BigDecimal(tags.get("amount")))
+                .amount(amount)
+                .creditAmount(creditAmount)
                 .day(parseInt(tags.get("day")))
                 .month(parseInt(tags.get("month")))
                 .year(parseInt(tags.get("year")))
@@ -315,8 +334,6 @@ class ImportParser extends DefaultHandler {
                 .accountDebitedCategoryUuid(parseUuid(tags.get("accountDebitedCategoryUuid")))
                 .accountCreditedCategoryUuid(parseUuid(tags.get("accountCreditedCategoryUuid")))
                 .contactUuid(parseUuid(tags.get("contactUuid")))
-                .rate(new BigDecimal(tags.get("rate")))
-                .rateDirection(parseInt(tags.get("rateDirection")))
                 .invoiceNumber(tags.get("invoiceNumber"))
                 .parentUuid(parseUuid(tags.get("parentUuid")))
                 .detailed(parseBoolean(tags.get("detailed"), false))

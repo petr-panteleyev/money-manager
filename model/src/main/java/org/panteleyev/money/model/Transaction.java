@@ -1,17 +1,17 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.UUID;
 
 public record Transaction(
         UUID uuid,
         BigDecimal amount,
+        BigDecimal creditAmount,
         int day,
         int month,
         int year,
@@ -25,8 +25,6 @@ public record Transaction(
         UUID accountDebitedCategoryUuid,
         UUID accountCreditedCategoryUuid,
         UUID contactUuid,
-        BigDecimal rate,
-        int rateDirection,
         String invoiceNumber,
         UUID parentUuid,
         boolean detailed,
@@ -40,6 +38,9 @@ public record Transaction(
             uuid = UUID.randomUUID();
         }
         if (amount == null) {
+            throw new IllegalStateException("Transaction amount cannot be null");
+        }
+        if (creditAmount == null) {
             throw new IllegalStateException("Transaction amount cannot be null");
         }
         if (accountDebitedUuid == null) {
@@ -69,7 +70,7 @@ public record Transaction(
         invoiceNumber = MoneyRecord.normalize(invoiceNumber);
 
         amount = MoneyRecord.normalize(amount, BigDecimal.ZERO);
-        rate = MoneyRecord.normalize(rate, BigDecimal.ONE);
+        creditAmount = MoneyRecord.normalize(creditAmount, BigDecimal.ZERO);
 
         if (statementDate == null) {
             statementDate = LocalDate.of(year, month, day);
@@ -103,26 +104,13 @@ public record Transaction(
                 .build();
     }
 
-    /**
-     * Returns amount with conversion rate applied to it.
-     *
-     * @return converted amount
-     */
-    public static BigDecimal getConvertedAmount(Transaction t) {
-        if (t.rate.compareTo(BigDecimal.ZERO) == 0 || t.rate.compareTo(BigDecimal.ONE) == 0) {
-            return t.amount;
-        }
-        return t.rateDirection == 0 ?
-                t.amount.divide(t.rate, RoundingMode.HALF_UP) :
-                t.amount.multiply(t.rate);
-    }
-
     public static BigDecimal getNegatedAmount(Transaction t) {
         return t.amount.negate();
     }
 
     public static final class Builder {
         private BigDecimal amount = BigDecimal.ZERO;
+        private BigDecimal creditAmount = BigDecimal.ZERO;
         private int day;
         private int month;
         private int year;
@@ -136,8 +124,6 @@ public record Transaction(
         private UUID accountDebitedCategoryUuid;
         private UUID accountCreditedCategoryUuid;
         private UUID contactUuid;
-        private BigDecimal rate = BigDecimal.ONE;
-        private int rateDirection;
         private String invoiceNumber = "";
         private long created = 0;
         private long modified = 0;
@@ -156,6 +142,7 @@ public record Transaction(
             }
 
             this.amount = t.amount();
+            this.creditAmount = t.creditAmount();
             this.day = t.day();
             this.month = t.month();
             this.year = t.year();
@@ -169,8 +156,6 @@ public record Transaction(
             this.accountDebitedCategoryUuid = t.accountDebitedCategoryUuid();
             this.accountCreditedCategoryUuid = t.accountCreditedCategoryUuid();
             this.contactUuid = t.contactUuid();
-            this.rate = t.rate();
-            this.rateDirection = t.rateDirection();
             this.invoiceNumber = t.invoiceNumber();
             this.created = t.created();
             this.modified = t.modified();
@@ -198,6 +183,11 @@ public record Transaction(
 
         public Builder amount(BigDecimal amount) {
             this.amount = amount;
+            return this;
+        }
+
+        public Builder creditAmount(BigDecimal creditAmount) {
+            this.creditAmount = creditAmount;
             return this;
         }
 
@@ -266,16 +256,6 @@ public record Transaction(
             return this;
         }
 
-        public Builder rate(BigDecimal rate) {
-            this.rate = rate == null ? BigDecimal.ONE : rate;
-            return this;
-        }
-
-        public Builder rateDirection(int rateDirection) {
-            this.rateDirection = rateDirection;
-            return this;
-        }
-
         public Builder invoiceNumber(String invoiceNumber) {
             this.invoiceNumber = invoiceNumber;
             return this;
@@ -322,11 +302,11 @@ public record Transaction(
         }
 
         public Transaction build() {
-            return new Transaction(uuid, amount, day, month, year, type, comment,
+            return new Transaction(uuid, amount, creditAmount, day, month, year, type, comment,
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    rate, rateDirection, invoiceNumber, parentUuid, detailed, statementDate, created, modified);
+                    invoiceNumber, parentUuid, detailed, statementDate, created, modified);
         }
     }
 }

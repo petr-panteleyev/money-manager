@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
@@ -35,7 +35,7 @@ public class TransactionAccountRequestSumCell extends TableCell<Transaction, Tra
             );
 
             var amount = transaction.accountCreditedUuid().equals(account.uuid()) ?
-                    Transaction.getConvertedAmount(transaction) :
+                    transaction.creditAmount() :
                     transaction.amount();
 
             setText(amount.setScale(2, RoundingMode.HALF_UP).toString());

@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v23.9.3/changelog.xml">
+
+    <changeSet id="v23.9.3-transaction-credit-amount" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE transaction
+                ADD COLUMN credit_amount DECIMAL(15, 6) NOT NULL DEFAULT 0;
+        </sql>
+        <rollback>
+            <sql>
+                ALTER TABLE transaction
+                    DROP COLUMN credit_amount;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.3-transaction-update-credit-amount" author="petr-panteleyev@yandex.ru">
+        <sql>
+            UPDATE transaction
+                SET credit_amount = CASE
+                    WHEN rate = 0 OR rate = 1 THEN amount
+                    WHEN rate_direction = 1 THEN amount * rate
+                    WHEN rate_direction = 0 THEN amount / rate
+                END
+        </sql>
+        <rollback>
+            <sql>
+                UPDATE transaction SET credit_amount = 0
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.3-transaction-drop-rate" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE transaction
+                DROP COLUMN rate,
+                DROP COLUMN rate_direction
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

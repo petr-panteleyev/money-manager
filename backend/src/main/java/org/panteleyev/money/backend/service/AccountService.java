@@ -70,7 +70,7 @@ public class AccountService {
                 .filter(filter)
                 .filter(t -> t.parentUuid() == null)
                 .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
-                        Transaction.getConvertedAmount(t) :
+                        t.creditAmount() :
                         Transaction.getNegatedAmount(t))
                 .reduce(initialBalance, BigDecimal::add);
     }

@@ -288,6 +288,7 @@ public final class BaseTestUtils {
         return new Transaction.Builder()
                 .uuid(uuid)
                 .amount(randomBigDecimal())
+                .creditAmount(randomBigDecimal())
                 .day(randomDay())
                 .month(randomMonthNumber())
                 .year(randomYear())
@@ -301,8 +302,6 @@ public final class BaseTestUtils {
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())
-                .rate(randomBigDecimal())
-                .rateDirection(RANDOM.nextInt(2))
                 .invoiceNumber(randomString())
                 .modified(System.currentTimeMillis())
                 .build();
@@ -311,6 +310,7 @@ public final class BaseTestUtils {
     public static Transaction newTransaction(Account accountDebited, Account accountCredited, Contact contact) {
         return new Transaction.Builder()
                 .amount(randomBigDecimal())
+                .creditAmount(randomBigDecimal())
                 .day(randomDay())
                 .month(randomMonthNumber())
                 .year(randomYear())
@@ -324,8 +324,6 @@ public final class BaseTestUtils {
                 .accountDebitedCategoryUuid(accountDebited.categoryUuid())
                 .accountCreditedCategoryUuid(accountCredited.categoryUuid())
                 .contactUuid(contact == null ? null : contact.uuid())
-                .rate(randomBigDecimal())
-                .rateDirection(RANDOM.nextInt(2))
                 .invoiceNumber(randomString())
                 .uuid(UUID.randomUUID())
                 .modified(System.currentTimeMillis())

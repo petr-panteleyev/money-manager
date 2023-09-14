@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -23,7 +23,6 @@ import org.panteleyev.money.statements.StatementRecord;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -38,8 +37,6 @@ import static org.panteleyev.money.app.Bundles.translate;
 import static org.panteleyev.money.test.BaseTestUtils.RANDOM;
 
 public class TransactionDialogTest {
-    private static final BigDecimal RATE = BigDecimal.ONE.setScale(6, RoundingMode.HALF_UP);
-
     private final Category category;
     private final Contact contact;
     private final Account account1;
@@ -185,7 +182,8 @@ public class TransactionDialogTest {
                 .orElse(""));
 
         dialog.getCommentEdit().setText(t.comment());
-        dialog.getSumEdit().setText(t.amount().toString());
+        dialog.getDebitAmountEdit().setText(t.amount().toString());
+        dialog.getCreditAmountEdit().setText(t.amount().toString());
         dialog.getCheckedCheckBox().setSelected(t.checked());
 
         var uuid = t.contactUuid();
@@ -232,12 +230,6 @@ public class TransactionDialogTest {
                 .amount(BigDecimal.valueOf(RANDOM.nextDouble()).setScale(2, RoundingMode.HALF_UP))
                 .checked(RANDOM.nextBoolean());
 
-        if (Objects.equals(debit.currencyUuid(), credit.currencyUuid())) {
-            builder.rate(BigDecimal.ONE);
-        } else {
-            builder.rate(BigDecimal.valueOf(RANDOM.nextDouble()));
-        }
-
         if (contact != null) {
             builder.contactUuid(contact.uuid());
         }
@@ -282,7 +274,7 @@ public class TransactionDialogTest {
     }
 
     private void assertStatementRecord(TransactionDialog pane, StatementRecord record) {
-        assertEquals(record.getAmount(), pane.getSumEdit().getText());
+        assertEquals(record.getAmount(), pane.getDebitAmountEdit().getText());
         assertEquals(record.getActual(), pane.getDatePicker().getValue());
     }
 
@@ -313,7 +305,6 @@ public class TransactionDialogTest {
             assertMainFields(transaction, resultedTransaction);
             assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
             assertEquals(transaction.amount(), resultedTransaction.amount(),
                     "Amount is invalid");
         }, this::failOnEmptyBuilder);
@@ -344,7 +335,6 @@ public class TransactionDialogTest {
             assertMainFields(transaction, resultedTransaction);
             assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
             assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
@@ -362,7 +352,7 @@ public class TransactionDialogTest {
             setUserInput(dialog, transaction, newContact);
             pressOkButton(dialog);
             var builder = dialog.getResultConverter().call(ButtonType.OK);
-            assertTrue(dialog.getRate1Edit().isDisabled());
+            assertTrue(dialog.getCreditAmountEdit().isDisable());
             queue.add(Optional.ofNullable(builder));
         });
 
@@ -377,7 +367,6 @@ public class TransactionDialogTest {
                     .build();
             assertMainFields(transaction, resultedTransaction);
             assertNull(resultedTransaction.contactUuid(), "Contact UUID is invalid");
-            assertEquals(RATE, resultedTransaction.rate(), "Rate is invalid");
             assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
         }, this::failOnEmptyBuilder);
     }
@@ -392,7 +381,7 @@ public class TransactionDialogTest {
             var dialog = createDialog(transaction);
             pressOkButton(dialog);
             var builder = dialog.getResultConverter().call(ButtonType.OK);
-            assertTrue(dialog.getRate1Edit().isDisabled());
+            assertTrue(dialog.getCreditAmountEdit().isDisable());
             queue.add(Optional.ofNullable(builder));
         });
 
@@ -406,7 +395,6 @@ public class TransactionDialogTest {
             assertMainFields(transaction, resultedTransaction);
             assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(transaction.rate(), resultedTransaction.rate(), "Rate is invalid");
             assertEquals(transaction.amount(), resultedTransaction.amount(), "Amount is invalid");
 
         }, this::failOnEmptyBuilder);
@@ -422,7 +410,7 @@ public class TransactionDialogTest {
             var dialog = createDialog(transaction);
             pressOkButton(dialog);
             var builder = dialog.getResultConverter().call(ButtonType.OK);
-            assertFalse(dialog.getRate1Edit().isDisabled());
+            assertFalse(dialog.getCreditAmountEdit().isDisable());
             queue.add(Optional.ofNullable(builder));
         });
 
@@ -437,8 +425,6 @@ public class TransactionDialogTest {
             assertMainFields(transaction, resultedTransaction);
             assertEquals(transaction.contactUuid(), resultedTransaction.contactUuid(),
                     "Contact UUID is invalid");
-            assertEquals(transaction.rate(), resultedTransaction.rate(),
-                    "Rate is invalid");
             assertEquals(transaction.amount(), resultedTransaction.amount(),
                     "Amount is invalid");
         }, this::failOnEmptyBuilder);

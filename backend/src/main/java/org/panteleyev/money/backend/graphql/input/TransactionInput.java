@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql.input;
@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public record TransactionInput(
         BigDecimal amount,
+        BigDecimal creditAmount,
         int day,
         int month,
         int year,
@@ -22,8 +23,6 @@ public record TransactionInput(
         UUID accountCreditedUuid,
         UUID contactUuid,
         String contactName,
-        BigDecimal rate,
-        int rateDirection,
         String invoiceNumber,
         UUID parentUuid,
         boolean detailed,

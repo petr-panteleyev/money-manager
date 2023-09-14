@@ -9,7 +9,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -71,7 +70,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
-import static org.panteleyev.money.persistence.MoneyDAO.FIELD_SCALE;
 
 public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private record AccountCard(
@@ -116,13 +114,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private final TextField debitedAccountEdit = new TextField();
     private final TextField creditedAccountEdit = new TextField();
     private final TextField contactEdit = new TextField();
-    private final TextField sumEdit = new TextField();
+    private final TextField debitAmountEdit = new TextField();
+    private final TextField creditAmountEdit = new TextField();
     private final CheckBox checkedCheckBox = new CheckBox();
     private final TextField commentEdit = new TextField();
-    private final TextField rate1Edit = new TextField();
-    private final ComboBox<String> rateDir1Combo = new ComboBox<>();
     private final TextField invoiceNumberEdit = new TextField();
-    private final Label rateAmoutLabel = new Label();
     private final Label debitedCategoryLabel = new Label();
     private final Label creditedCategoryLabel = new Label();
     private final DatePicker statementDatePicker = new DatePicker();
@@ -148,7 +144,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var invalid = false;
         try {
             new BigDecimal(value);
-            updateRateAmount();
         } catch (NumberFormatException ex) {
             invalid = true;
         }
@@ -176,14 +171,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                                 )
                         ),
                         hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING, label("Сумма"), sumEdit),
-                                vBox(SMALL_SPACING,
-                                        label("Курс"),
-                                        hBox(List.of(rate1Edit, rateDir1Combo, rateAmoutLabel), hBox -> {
-                                            hBox.setSpacing(SMALL_SPACING);
-                                            hBox.setAlignment(Pos.CENTER);
-                                        })
-                                )
+                                vBox(SMALL_SPACING, label("Дебет"), debitAmountEdit),
+                                vBox(SMALL_SPACING, label("Кредит"), creditAmountEdit)
                         ),
                         hBox(BIG_SPACING,
                                 vBox(SMALL_SPACING,
@@ -237,21 +226,14 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         contactMenuButton.setFocusTraversable(false);
 
         debitedAccountEdit.setPrefColumnCount(40);
+        creditAmountEdit.setDisable(true);
 
-        rate1Edit.setDisable(true);
-        rate1Edit.setPrefColumnCount(5);
-
-        rateDir1Combo.setDisable(true);
-
-        rateAmoutLabel.getStyleClass().add(Styles.RATE_LABEL);
         debitedCategoryLabel.getStyleClass().add(Styles.SUB_LABEL);
         creditedCategoryLabel.getStyleClass().add(Styles.SUB_LABEL);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         clearTitle();
-
-        rateDir1Combo.getItems().setAll("/", "*");
 
         TextFields.bindAutoCompletion(typeEdit,
                 new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
@@ -271,6 +253,12 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         typeEdit.focusedProperty().addListener((x, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 handleTypeFocusLoss();
+            }
+        });
+
+        debitAmountEdit.focusedProperty().addListener((x, oldValue, newValue) -> {
+            if (oldValue && !newValue) {
+                onDebitAmountEditFocusLoss();
             }
         });
 
@@ -296,7 +284,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         runLater(() -> {
             createValidationSupport();
-            sumEdit.requestFocus();
+            debitAmountEdit.requestFocus();
         });
     }
 
@@ -330,23 +318,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         var debitedCurrencyUuid = accDebited.map(Account::currencyUuid).orElse(null);
         var creditedCurrencyUuid = accCredited.map(Account::currencyUuid).orElse(null);
 
-        if (Objects.equals(debitedCurrencyUuid, creditedCurrencyUuid)) {
-            rate1Edit.setDisable(true);
-            rate1Edit.setText("");
-        } else {
-            rate1Edit.setDisable(false);
-
-            BigDecimal rate = transaction.rate();
-            if (BigDecimal.ZERO.compareTo(rate) == 0) {
-                rate = BigDecimal.ONE.setScale(FIELD_SCALE, RoundingMode.HALF_UP);
-            }
-            if (rate != null) {
-                rate1Edit.setText(rate.toString());
-                rateDir1Combo.getSelectionModel().select(transaction.rateDirection());
-            } else {
-                rate1Edit.setText("");
-            }
-        }
+        creditAmountEdit.setDisable(Objects.equals(debitedCurrencyUuid, creditedCurrencyUuid));
 
         // Day
         var trDate = LocalDate.of(transaction.year(), transaction.month(), transaction.day());
@@ -355,8 +327,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         statementDatePicker.setValue(transaction.statementDate());
 
         // Sum
-        sumEdit.setText(transaction.amount().setScale(2, RoundingMode.HALF_UP).toString());
-        updateRateAmount();
+        debitAmountEdit.setText(transaction.amount().setScale(2, RoundingMode.HALF_UP).toString());
+        creditAmountEdit.setText(transaction.creditAmount().setScale(2, RoundingMode.HALF_UP).toString());
     }
 
     TransactionDialog(Controller owner, URL css, StatementRecord record, Account account, DataCache cache) {
@@ -365,7 +337,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         datePicker.setValue(record.getActual());
 
         var amount = record.getAmountDecimal().orElse(BigDecimal.ZERO);
-        sumEdit.setText(amount.abs().setScale(2, RoundingMode.HALF_UP).toString());
+        debitAmountEdit.setText(amount.abs().setScale(2, RoundingMode.HALF_UP).toString());
 
         var accountString = account == null ? "" : account.name();
         if (amount.signum() <= 0) {
@@ -563,15 +535,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             builder.month(datePicker.getValue().getMonthValue());
             builder.year(datePicker.getValue().getYear());
 
-            builder.amount(new BigDecimal(sumEdit.getText()));
-
-            if (!rate1Edit.isDisabled()) {
-                builder.rate(new BigDecimal(rate1Edit.getText()));
-                builder.rateDirection(rateDir1Combo.getSelectionModel().getSelectedIndex());
-            } else {
-                builder.rate(BigDecimal.ONE);
-                builder.rateDirection(1);
-            }
+            builder.amount(new BigDecimal(debitAmountEdit.getText()));
+            builder.creditAmount(new BigDecimal(creditAmountEdit.getText()));
         } catch (NumberFormatException ex) {
             return false;
         }
@@ -611,13 +576,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             disable = Objects.equals(c1, c2);
         }
 
-        rate1Edit.setDisable(disable);
-        rateDir1Combo.setDisable(disable);
-
-        if (!disable && rate1Edit.getText().isEmpty()) {
-            rate1Edit.setText("1");
-            rateDir1Combo.getSelectionModel().select(0);
-        }
+        creditAmountEdit.setDisable(disable);
+        onDebitAmountEditFocusLoss();
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
@@ -679,8 +639,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
-        validation.registerValidator(sumEdit, DECIMAL_VALIDATOR);
-        validation.registerValidator(rate1Edit, false, DECIMAL_VALIDATOR);
+        validation.registerValidator(debitAmountEdit, DECIMAL_VALIDATOR);
+        validation.registerValidator(creditAmountEdit, DECIMAL_VALIDATOR);
 
         validation.initInitialDecoration();
     }
@@ -781,33 +741,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         commentSuggestions.addAll(cache.getUniqueTransactionComments());
     }
 
-    private void updateRateAmount() {
-        var amount = sumEdit.getText();
-        if (amount.isEmpty()) {
-            amount = "0";
-        }
-
-        var amountValue = new BigDecimal(amount).setScale(FIELD_SCALE, RoundingMode.HALF_UP);
-
-        var rate = rate1Edit.getText();
-        if (rate.isEmpty()) {
-            rate = "1";
-        }
-
-        var rateValue = new BigDecimal(rate).setScale(FIELD_SCALE, RoundingMode.HALF_UP);
-
-        BigDecimal total;
-
-        if (rateDir1Combo.getSelectionModel().getSelectedIndex() == 0) {
-            total = amountValue.divide(rateValue, RoundingMode.HALF_UP);
-        } else {
-            total = amountValue.multiply(rateValue);
-        }
-
-        runLater(() ->
-                rateAmoutLabel.setText("= " + total.setScale(2, RoundingMode.HALF_UP)));
-    }
-
     private void updateCategoryLabel(Label label, Named named) {
         var labelContent = switch (named) {
             case Account account -> {
@@ -840,8 +773,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     if (commentEdit.getText().isEmpty()) {
                         commentEdit.setText(it.comment());
                     }
-                    if (sumEdit.getText().isEmpty()) {
-                        sumEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
+                    if (debitAmountEdit.getText().isEmpty()) {
+                        debitAmountEdit.setText(it.amount().setScale(2, RoundingMode.HALF_UP).toString());
                     }
 
                     cache.getContact(it.contactUuid()).ifPresent(contact -> {
@@ -850,6 +783,12 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         }
                     });
                 });
+    }
+
+    private void onDebitAmountEditFocusLoss() {
+        if (creditAmountEdit.getText().isEmpty() || creditAmountEdit.isDisable()) {
+            creditAmountEdit.setText(debitAmountEdit.getText());
+        }
     }
 
     private void today() {
@@ -888,16 +827,16 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         return commentEdit;
     }
 
-    TextField getSumEdit() {
-        return sumEdit;
+    TextField getDebitAmountEdit() {
+        return debitAmountEdit;
+    }
+
+    TextField getCreditAmountEdit() {
+        return creditAmountEdit;
     }
 
     TextField getContactEdit() {
         return contactEdit;
-    }
-
-    TextField getRate1Edit() {
-        return rate1Edit;
     }
 
     CheckBox getCheckedCheckBox() {

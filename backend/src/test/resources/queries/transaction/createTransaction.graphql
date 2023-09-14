@@ -1,6 +1,7 @@
 mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactUuid: String = null, $contactName: String = null) {
     createTransaction(input: {
         amount: 1100.12,
+        creditAmount: 1100.12,
         day: 1,
         month: 10,
         year: 2022,
@@ -11,8 +12,6 @@ mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactU
         accountCreditedUuid: $creditedAccountUuid,
         contactUuid: $contactUuid,
         contactName: $contactName,
-        rate: 1.0,
-        rateDirection: 0,
         invoiceNumber: "12345",
         parentUuid: null,
         detailed: false,
@@ -21,6 +20,7 @@ mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactU
         transaction {
             uuid,
             amount,
+            creditAmount,
             day,
             month,
             year,
@@ -36,8 +36,6 @@ mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactU
             contact {
                 name
             },
-            rate,
-            rateDirection,
             invoiceNumber,
             parent {
                 uuid
@@ -58,5 +56,4 @@ mutation ($debitedAccountUuid: String!, $creditedAccountUuid: String!, $contactU
             totalWaiting
         }
     }
-
 }

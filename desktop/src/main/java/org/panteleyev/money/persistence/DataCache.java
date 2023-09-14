@@ -444,7 +444,7 @@ public class DataCache {
                 .filter(filter)
                 .filter(t -> t.parentUuid() == null)
                 .map(t -> Objects.equals(account.uuid(), t.accountCreditedUuid()) ?
-                        Transaction.getConvertedAmount(t) :
+                        t.creditAmount() :
                         Transaction.getNegatedAmount(t))
                 .reduce(initialBalance, BigDecimal::add);
     }
@@ -452,7 +452,7 @@ public class DataCache {
     public static BigDecimal calculateBalance(List<Transaction> transactions) {
         return transactions.stream()
                 .filter(t -> t.parentUuid() == null)
-                .map(Transaction::getConvertedAmount)
+                .map(Transaction::creditAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

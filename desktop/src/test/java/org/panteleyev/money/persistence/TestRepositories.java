@@ -315,6 +315,7 @@ public class TestRepositories extends BaseDaoTest {
         var insert = new Transaction(
                 TRANSACTION_UUID,
                 randomBigDecimal(),
+                randomBigDecimal(),
                 randomDay(),
                 randomMonthNumber(),
                 randomYear(),
@@ -328,8 +329,6 @@ public class TestRepositories extends BaseDaoTest {
                 CATEGORY_UUID,
                 CATEGORY_UUID,
                 CONTACT_UUID,
-                randomBigDecimal(),
-                randomInt(),
                 randomString(),
                 null,
                 randomBoolean(),
@@ -340,6 +339,7 @@ public class TestRepositories extends BaseDaoTest {
 
         var update = new Transaction(
                 TRANSACTION_UUID,
+                randomBigDecimal(),
                 randomBigDecimal(),
                 randomDay(),
                 randomMonthNumber(),
@@ -354,8 +354,6 @@ public class TestRepositories extends BaseDaoTest {
                 CATEGORY_UUID,
                 CATEGORY_UUID,
                 null,
-                randomBigDecimal(),
-                randomInt(),
                 randomString(),
                 TRANSACTION_UUID,
                 randomBoolean(),

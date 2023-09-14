@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql.controller;
@@ -72,6 +72,7 @@ public class TransactionGraphQLController {
 
         var builder = new Transaction.Builder()
                 .amount(input.amount())
+                .creditAmount(input.creditAmount())
                 .day(input.day())
                 .month(input.month())
                 .year(input.year())
@@ -84,8 +85,6 @@ public class TransactionGraphQLController {
                 .accountCreditedType(creditedAccount.type())
                 .accountDebitedCategoryUuid(debitedAccount.categoryUuid())
                 .accountCreditedCategoryUuid(creditedAccount.categoryUuid())
-                .rate(input.rate())
-                .rateDirection(input.rateDirection())
                 .invoiceNumber(input.invoiceNumber())
                 .parentUuid(input.parentUuid())
                 .detailed(input.detailed())
@@ -129,6 +128,7 @@ public class TransactionGraphQLController {
         }
 
         builder.amount(input.amount())
+                .creditAmount(input.creditAmount())
                 .day(input.day())
                 .month(input.month())
                 .year(input.year())
@@ -142,8 +142,6 @@ public class TransactionGraphQLController {
                 .accountDebitedCategoryUuid(debitedAccount.categoryUuid())
                 .accountCreditedCategoryUuid(creditedAccount.categoryUuid())
                 .contactUuid(input.contactUuid())
-                .rate(input.rate())
-                .rateDirection(input.rateDirection())
                 .invoiceNumber(input.invoiceNumber())
                 .parentUuid(input.parentUuid())
                 .detailed(input.detailed())

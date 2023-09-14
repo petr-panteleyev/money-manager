@@ -1,5 +1,5 @@
 /*
- Copyright © 2021 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -32,6 +32,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
     private final RowMapper<Transaction> rowMapper = (rs, i) -> new Transaction(
             getUuid(rs, "uuid"),
             rs.getBigDecimal("amount"),
+            rs.getBigDecimal("credit_amount"),
             rs.getInt("date_day"),
             rs.getInt("date_month"),
             rs.getInt("date_year"),
@@ -45,8 +46,6 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
             getUuid(rs, "acc_debited_category_uuid"),
             getUuid(rs, "acc_credited_category_uuid"),
             getUuid(rs, "contact_uuid"),
-            rs.getBigDecimal("rate"),
-            rs.getInt("rate_direction"),
             rs.getString("invoice_number"),
             getUuid(rs, "parent_uuid"),
             rs.getBoolean("detailed"),
@@ -59,6 +58,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
         var map = new HashMap<String, Object>(Map.ofEntries(
                 entry("uuid", transaction.uuid()),
                 entry("amount", transaction.amount()),
+                entry("creditAmount", transaction.creditAmount()),
                 entry("day", transaction.day()),
                 entry("month", transaction.month()),
                 entry("year", transaction.year()),
@@ -71,8 +71,6 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                 entry("accCreditedType", transaction.accountCreditedType().name()),
                 entry("accDebitedCategoryUuid", transaction.accountDebitedCategoryUuid()),
                 entry("accCreditedCategoryUuid", transaction.accountCreditedCategoryUuid()),
-                entry("rate", transaction.rate()),
-                entry("rateDirection", transaction.rateDirection()),
                 entry("invoiceNumber", transaction.invoiceNumber()),
                 entry("detailed", transaction.detailed()),
                 entry("created", transaction.created()),
@@ -128,26 +126,27 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                         """,
                 Map.of("uuid", uuid),
                 rowMapper);
-        return result.size() == 0 ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
     }
 
     @Override
     public int insertOrUpdate(Transaction transaction) {
         return jdbcTemplate.update("""
                         INSERT INTO transaction (
-                            uuid, amount, date_day, date_month, date_year, type, comment, checked,
+                            uuid, amount, credit_amount, date_day, date_month, date_year, type, comment, checked,
                             acc_debited_uuid, acc_credited_uuid, acc_debited_type, acc_credited_type,
-                            acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid, rate, rate_direction,
+                            acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                             invoice_number, parent_uuid, detailed, statement_date, created, modified
                         ) VALUES (
-                            :uuid, :amount, :day, :month, :year, :type, :comment, :checked,
+                            :uuid, :amount, :creditAmount, :day, :month, :year, :type, :comment, :checked,
                             :accDebitedUuid, :accCreditedUuid, :accDebitedType, :accCreditedType,
-                            :accDebitedCategoryUuid, :accCreditedCategoryUuid, :contactUuid, :rate, :rateDirection,
+                            :accDebitedCategoryUuid, :accCreditedCategoryUuid, :contactUuid,
                             :invoiceNumber, :parentUuid, :detailed, :statementDate, :created, :modified
                         )
                         ON CONFLICT (uuid) DO UPDATE SET
                             uuid = :uuid,
                             amount = :amount,
+                            credit_amount = :creditAmount,
                             date_day = :day,
                             date_month = :month,
                             date_year = :year,
@@ -161,8 +160,6 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             acc_debited_category_uuid = :accDebitedCategoryUuid,
                             acc_credited_category_uuid = :accCreditedCategoryUuid,
                             contact_uuid = :contactUuid,
-                            rate = :rate,
-                            rate_direction = :rateDirection,
                             invoice_number = :invoiceNumber,
                             parent_uuid = :parentUuid,
                             detailed = :detailed,

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -17,27 +17,32 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.model.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.model.BaseTestUtils.randomCategoryType;
+import static org.panteleyev.money.model.BaseTestUtils.randomDay;
+import static org.panteleyev.money.model.BaseTestUtils.randomMonth;
+import static org.panteleyev.money.model.BaseTestUtils.randomTransactionType;
 
 public class TestTransaction {
 
     public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var amount = BaseTestUtils.randomBigDecimal();
-        var day = BaseTestUtils.randomDay();
-        var month = BaseTestUtils.randomMonth();
+        var amount = randomBigDecimal();
+        var creditAmount = randomBigDecimal();
+        var day = randomDay();
+        var month = randomMonth();
         var year = BaseTestUtils.randomYear();
-        var type = BaseTestUtils.randomTransactionType();
+        var type = randomTransactionType();
         var comment = BaseTestUtils.randomString();
         var checked = BaseTestUtils.randomBoolean();
         var accountDebitedUuid = UUID.randomUUID();
         var accountCreditedUuid = UUID.randomUUID();
-        var accountDebitedType = BaseTestUtils.randomCategoryType();
-        var accountCreditedType = BaseTestUtils.randomCategoryType();
+        var accountDebitedType = randomCategoryType();
+        var accountCreditedType = randomCategoryType();
         var accountDebitedCategoryUuid = UUID.randomUUID();
         var accountCreditedCategoryUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
-        var rate = BaseTestUtils.randomBigDecimal();
-        var rateDirection = BaseTestUtils.randomInt();
         var invoiceNumber = BaseTestUtils.randomString();
         var parentUuid = UUID.randomUUID();
         var detailed = BaseTestUtils.randomBoolean();
@@ -50,6 +55,7 @@ public class TestTransaction {
                         new Transaction.Builder()
                                 .uuid(uuid)
                                 .amount(amount)
+                                .creditAmount(creditAmount)
                                 .day(day)
                                 .month(month)
                                 .year(year)
@@ -63,8 +69,6 @@ public class TestTransaction {
                                 .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
                                 .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
                                 .contactUuid(contactUuid)
-                                .rate(rate)
-                                .rateDirection(rateDirection)
                                 .invoiceNumber(invoiceNumber)
                                 .parentUuid(parentUuid)
                                 .detailed(detailed)
@@ -73,30 +77,30 @@ public class TestTransaction {
                                 .modified(modified)
                                 .build(),
                         new Transaction(
-                                uuid, amount, day, month, year,
+                                uuid, amount, creditAmount, day, month, year,
                                 type, comment, checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                                contactUuid, rate, rateDirection, invoiceNumber, parentUuid,
+                                contactUuid, invoiceNumber, parentUuid,
                                 detailed, statementDate, created, modified
                         )
                 ),
                 Arguments.of(
                         new Transaction(
-                                uuid, amount, day, month, year,
+                                uuid, amount, creditAmount, day, month, year,
                                 type, null, checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                                contactUuid, null, rateDirection, null, null,
+                                contactUuid, null, null,
                                 detailed, null, created, modified
                         ),
                         new Transaction(
-                                uuid, amount, day, month, year,
+                                uuid, amount, creditAmount, day, month, year,
                                 type, "", checked, accountDebitedUuid, accountCreditedUuid,
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
-                                contactUuid, BigDecimal.ONE, rateDirection, "", null,
-                                detailed, LocalDate.of(year, month, day), created, modified
+                                contactUuid, "", null,
+                                detailed, null, created, modified
                         )
                 )
         );
@@ -112,32 +116,32 @@ public class TestTransaction {
 
     @Test
     public void testEquals() {
-        var amount = BaseTestUtils.randomBigDecimal();
-        var day = BaseTestUtils.randomDay();
-        var month = BaseTestUtils.randomMonth();
+        var amount = randomBigDecimal();
+        var creditAmount = randomBigDecimal();
+        var day = randomDay();
+        var month = randomMonth();
         var year = BaseTestUtils.randomYear();
-        var type = BaseTestUtils.randomTransactionType();
+        var type = randomTransactionType();
         var comment = UUID.randomUUID().toString();
-        var checked = BaseTestUtils.RANDOM.nextBoolean();
+        var checked = RANDOM.nextBoolean();
         var accountDebitedUuid = UUID.randomUUID();
         var accountCreditedUuid = UUID.randomUUID();
-        var accountDebitedType = BaseTestUtils.randomCategoryType();
-        var accountCreditedType = BaseTestUtils.randomCategoryType();
+        var accountDebitedType = randomCategoryType();
+        var accountCreditedType = randomCategoryType();
         var accountDebitedCategoryUuid = UUID.randomUUID();
         var accountCreditedCategoryUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
-        var rate = BaseTestUtils.randomBigDecimal();
-        var rateDirection = BaseTestUtils.RANDOM.nextInt();
         var invoiceNumber = UUID.randomUUID().toString();
         var guid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
         var parentUuid = UUID.randomUUID();
-        var detailed = BaseTestUtils.RANDOM.nextBoolean();
+        var detailed = RANDOM.nextBoolean();
         var statementDate = LocalDate.now();
 
         var t1 = new Transaction.Builder()
                 .amount(amount)
+                .creditAmount(creditAmount)
                 .day(day)
                 .month(month)
                 .year(year)
@@ -151,8 +155,6 @@ public class TestTransaction {
                 .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
                 .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
                 .contactUuid(contactUuid)
-                .rate(rate)
-                .rateDirection(rateDirection)
                 .invoiceNumber(invoiceNumber)
                 .uuid(guid)
                 .created(created)
@@ -164,6 +166,7 @@ public class TestTransaction {
 
         var t2 = new Transaction.Builder()
                 .amount(amount)
+                .creditAmount(creditAmount)
                 .day(day)
                 .month(month)
                 .year(year)
@@ -177,8 +180,6 @@ public class TestTransaction {
                 .accountDebitedCategoryUuid(accountDebitedCategoryUuid)
                 .accountCreditedCategoryUuid(accountCreditedCategoryUuid)
                 .contactUuid(contactUuid)
-                .rate(rate)
-                .rateDirection(rateDirection)
                 .invoiceNumber(invoiceNumber)
                 .uuid(guid)
                 .created(created)
@@ -195,22 +196,21 @@ public class TestTransaction {
     @Test
     public void testCheck() {
         var t1 = new Transaction.Builder()
-                .amount(BaseTestUtils.randomBigDecimal())
-                .day(BaseTestUtils.randomDay())
-                .month(BaseTestUtils.randomMonth())
+                .amount(randomBigDecimal())
+                .creditAmount(randomBigDecimal())
+                .day(randomDay())
+                .month(randomMonth())
                 .year(BaseTestUtils.randomYear())
-                .type(BaseTestUtils.randomTransactionType())
+                .type(randomTransactionType())
                 .comment(BaseTestUtils.randomString())
                 .checked(BaseTestUtils.randomBoolean())
                 .accountDebitedUuid(UUID.randomUUID())
                 .accountCreditedUuid(UUID.randomUUID())
-                .accountDebitedType(BaseTestUtils.randomCategoryType())
-                .accountCreditedType(BaseTestUtils.randomCategoryType())
+                .accountDebitedType(randomCategoryType())
+                .accountCreditedType(randomCategoryType())
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())
-                .rate(BaseTestUtils.randomBigDecimal())
-                .rateDirection(BaseTestUtils.RANDOM.nextInt())
                 .invoiceNumber(BaseTestUtils.randomString())
                 .uuid(UUID.randomUUID())
                 .created(System.currentTimeMillis())
@@ -222,6 +222,7 @@ public class TestTransaction {
         var t2 = t1.check(!t1.checked());
 
         assertEquals(t2.amount(), t1.amount());
+        assertEquals(t2.creditAmount(), t1.creditAmount());
         assertEquals(t2.day(), t1.day());
         assertEquals(t2.month(), t1.month());
         assertEquals(t2.year(), t1.year());
@@ -233,8 +234,6 @@ public class TestTransaction {
         assertEquals(t2.accountDebitedType(), t1.accountDebitedType());
         assertEquals(t2.accountCreditedType(), t1.accountCreditedType());
         assertEquals(t2.contactUuid(), t1.contactUuid());
-        assertEquals(t2.rate(), t1.rate());
-        assertEquals(t2.rateDirection(), t1.rateDirection());
         assertEquals(t2.invoiceNumber(), t1.invoiceNumber());
         assertEquals(t2.parentUuid(), t1.parentUuid());
         assertEquals(t2.uuid(), t1.uuid());

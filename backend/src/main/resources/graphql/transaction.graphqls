@@ -1,11 +1,13 @@
 enum TransactionType {
     CARD_PAYMENT,
+    SBP_PAYMENT,
     CASH_PURCHASE,
     CHEQUE,
     WITHDRAWAL,
     CACHIER,
     DEPOSIT,
     TRANSFER,
+    SBP_TRANSFER,
     INTEREST,
     DIVIDEND,
     DIRECT_BILLING,
@@ -20,6 +22,7 @@ enum TransactionType {
 type Transaction {
     uuid: ID!,
     amount: BigDecimal!,
+    creditAmount: BigDecimal!,
     day: Int!,
     month: Int!,
     year: Int!,
@@ -29,8 +32,6 @@ type Transaction {
     accountDebited: Account!,
     accountCredited: Account!,
     contact: Contact,
-    rate: BigDecimal,
-    rateDirection: Int,
     invoiceNumber: String,
     parent: Transaction,
     detailed: Boolean!,
@@ -41,6 +42,7 @@ type Transaction {
 
 input TransactionInput {
     amount: BigDecimal!,
+    creditAmount: BigDecimal!,
     day: Int!,
     month: Int!,
     year: Int!,
@@ -51,8 +53,6 @@ input TransactionInput {
     accountCreditedUuid: String!,
     contactUuid: String,
     contactName: String,
-    rate: BigDecimal!,
-    rateDirection: Int!,
     invoiceNumber: String!,
     parentUuid: String,
     detailed: Boolean!,

@@ -101,6 +101,7 @@ final class BaseTestUtils {
         return new Transaction.Builder()
                 .uuid(uuid)
                 .amount(randomBigDecimal())
+                .creditAmount(randomBigDecimal())
                 .day(randomDay())
                 .month(randomMonth())
                 .year(randomYear())
@@ -114,8 +115,6 @@ final class BaseTestUtils {
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())
-                .rate(randomBigDecimal())
-                .rateDirection(RANDOM.nextInt(2))
                 .invoiceNumber(UUID.randomUUID().toString())
                 .modified(System.currentTimeMillis())
                 .build();

@@ -66,6 +66,7 @@ public class TransactionTest extends BaseSpringBootTest {
         var created = createResult.payload();
         checkObject(created.transaction(), Map.ofEntries(
                 entry("amount", new BigDecimal("1100.120000")),
+                entry("creditAmount", new BigDecimal("1100.120000")),
                 entry("day", 1),
                 entry("month", 10),
                 entry("year", 2022),
@@ -79,8 +80,6 @@ public class TransactionTest extends BaseSpringBootTest {
                         "uuid", creditedAccount.uuid()
                 )),
                 entry("contact", Optional.empty()),
-                entry("rate", new BigDecimal("1.000000")),
-                entry("rateDirection", 0),
                 entry("invoiceNumber", "12345"),
                 entry("parent", Optional.empty()),
                 entry("detailed", false),
@@ -117,6 +116,7 @@ public class TransactionTest extends BaseSpringBootTest {
         checkObject(updated.transaction(), Map.ofEntries(
                 entry("uuid", created.transaction().uuid()),
                 entry("amount", new BigDecimal("1100.200000")),
+                entry("creditAmount", new BigDecimal("2200.400000")),
                 entry("day", 2),
                 entry("month", 11),
                 entry("year", 2023),
@@ -132,8 +132,6 @@ public class TransactionTest extends BaseSpringBootTest {
                 entry("contact", Map.of(
                         "name", "Contact name"
                 )),
-                entry("rate", new BigDecimal("2.000000")),
-                entry("rateDirection", 1),
                 entry("invoiceNumber", "123456"),
                 entry("parent", Optional.empty()),
                 entry("detailed", false),
