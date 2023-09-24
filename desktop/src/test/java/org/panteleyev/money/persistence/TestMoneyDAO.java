@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -24,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
+import static org.panteleyev.money.test.BaseTestUtils.randomBoolean;
+import static org.panteleyev.money.test.BaseTestUtils.randomCardType;
 import static org.panteleyev.money.test.BaseTestUtils.randomDay;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 
@@ -155,7 +158,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(account, retrieved.orElseThrow());
 
         var update = new Account.Builder(account)
-                .accountNumber(UUID.randomUUID().toString())
+                .accountNumber(randomString())
                 .build();
 
         dao().updateAccount(update);
@@ -205,7 +208,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(transaction, retrieved.orElseThrow());
 
         var update = new Transaction.Builder(transaction)
-                .comment(UUID.randomUUID().toString())
+                .comment(randomString())
                 .build();
 
         dao().updateTransaction(update);
@@ -255,12 +258,57 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(periodic, retrieved.orElseThrow());
 
         var update = new PeriodicPayment.Builder(periodic)
-                .comment(UUID.randomUUID().toString())
+                .comment(randomString())
                 .build();
 
         dao().updatePeriodicPayment(update);
         assertEquals(update, cache().getPeriodicPayment(periodic.uuid()).orElseThrow());
         retrieved = get(repo, periodic.uuid());
+        assertEquals(update, retrieved.orElseThrow());
+    }
+
+    @Test
+    public void testCard() {
+        var repo = new CardRepository();
+
+        var category = new Category.Builder()
+                .name(randomString())
+                .type(CategoryType.BANKS_AND_CASH)
+                .uuid(UUID.randomUUID())
+                .build();
+        dao().insertCategory(category);
+
+        var account = new Account.Builder()
+                .uuid(UUID.randomUUID())
+                .name(randomString())
+                .type(category.type())
+                .categoryUuid(category.uuid())
+                .accountNumber("123456")
+                .build();
+        dao().insertAccount(account);
+
+        var card = new Card.Builder()
+                .uuid(UUID.randomUUID())
+                .accountUuid(account.uuid())
+                .type(randomCardType())
+                .number(randomString())
+                .expiration(LocalDate.now())
+                .comment(randomString())
+                .enabled(randomBoolean())
+                .build();
+
+        dao().insertCard(card);
+        assertEquals(card, cache().getCard(card.uuid()).orElseThrow());
+        var retrieved = get(repo, card.uuid());
+        assertEquals(card, retrieved.orElseThrow());
+
+        var update = new Card.Builder(card)
+                .comment(randomString())
+                .build();
+
+        dao().updateCard(update);
+        assertEquals(update, cache().getCard(card.uuid()).orElseThrow());
+        retrieved = get(repo, card.uuid());
         assertEquals(update, retrieved.orElseThrow());
     }
 }

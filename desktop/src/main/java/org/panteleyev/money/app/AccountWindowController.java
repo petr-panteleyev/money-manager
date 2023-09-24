@@ -27,7 +27,6 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.app.cells.AccountBalanceCell;
-import org.panteleyev.money.app.cells.AccountCardCell;
 import org.panteleyev.money.app.cells.AccountCategoryCell;
 import org.panteleyev.money.app.cells.AccountClosingDateCell;
 import org.panteleyev.money.app.cells.AccountCommentCell;
@@ -40,7 +39,6 @@ import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
 
 import java.io.FileOutputStream;
@@ -58,7 +56,6 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
-import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -68,6 +65,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 final class AccountWindowController extends BaseController {
@@ -218,11 +216,9 @@ final class AccountWindowController extends BaseController {
                 tableObjectColumn("Название", b ->
                         b.withCellFactory(x -> new AccountNameCell()).withWidthBinding(w.multiply(0.15))),
                 tableObjectColumn("Категория", b ->
-                        b.withCellFactory(x -> new AccountCategoryCell()).withWidthBinding(w.multiply(0.1))),
+                        b.withCellFactory(x -> new AccountCategoryCell()).withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("Валюта", b ->
                         b.withCellFactory(x -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Карта", b ->
-                        b.withCellFactory(x -> new AccountCardCell()).withWidthBinding(w.multiply(0.1))),
                 tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
                         b.withCellFactory(x -> new AccountInterestCell())
                                 .withPropertyCallback(Account::interest)

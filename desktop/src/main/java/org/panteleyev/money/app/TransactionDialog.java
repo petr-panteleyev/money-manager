@@ -9,9 +9,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -24,11 +26,12 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
 import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -59,7 +62,6 @@ import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Bundles.translate;
-import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
@@ -72,14 +74,6 @@ import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
 
 public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
-    private record AccountCard(
-            String name,
-            CategoryType type,
-            UUID accountUuid,
-            UUID categoryUuid
-    ) implements Named {
-    }
-
     private static final ToStringConverter<TransactionType> TRANSACTION_TYPE_TO_STRING =
             new ToStringConverter<>() {
                 public String toString(TransactionType obj) {
@@ -89,7 +83,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static final NamedToStringConverter<Contact> CONTACT_TO_STRING = new NamedToStringConverter<>();
     private static final NamedToStringConverter<Account> ACCOUNT_TO_STRING = new NamedToStringConverter<>();
-    private static final NamedToStringConverter<Named> NAMED_TO_STRING = new NamedToStringConverter<>();
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
@@ -102,9 +95,32 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         }
     }
 
+    private final static class CardListCell extends ListCell<Card> {
+        @Override
+        public void updateItem(Card card, boolean empty) {
+            super.updateItem(card, empty);
+            setText(null);
+            setGraphic(null);
+
+            if (empty || card == null) {
+                return;
+            }
+
+            setText(card.number());
+            setGraphic(IconManager.getCardImageView(card));
+        }
+    }
+
+
     private final DataCache cache;
 
     private UUID uuid;      // current transaction uuid if any
+    private Transaction initialTransaction = null;
+
+    // Intermediate validated values
+    private TransactionType transactionType = null;
+    private Account debitedAccount = null;
+    private Account creditedAccount = null;
 
     private final DatePicker datePicker = new DatePicker();
 
@@ -132,11 +148,12 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private final Set<TransactionType> typeSuggestions = new TreeSet<>();
     private final Set<Contact> contactSuggestions = new TreeSet<>();
-    private final Set<Named> debitedSuggestions = new TreeSet<>();
-    private final Set<Named> debitedSuggestionsAll = new TreeSet<>();
+    private final Set<Account> debitedSuggestions = new TreeSet<>();
+    private final Set<Account> debitedSuggestionsAll = new TreeSet<>();
     private final Set<Account> creditedSuggestions = new TreeSet<>();
     private final Set<Account> creditedSuggestionsAll = new TreeSet<>();
     private final Set<String> commentSuggestions = new TreeSet<>();
+    private final ComboBox<Card> cardComboBox = new ComboBox<>();
 
     private final ValidationSupport validation = new ValidationSupport();
 
@@ -157,6 +174,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         this.cache = cache;
 
         setupDatePicker();
+        setupCardComboBox();
         datePicker.setValue(lastSelectedDate);
 
         getDialogPane().setContent(
@@ -190,6 +208,15 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                                                 fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
                                                 debitedMenuButton),
                                         debitedCategoryLabel),
+                                hBoxHGrow(ALWAYS)
+                        ),
+                        fxNode(
+                                vBox(SMALL_SPACING,
+                                        label("Карта"),
+                                        hBox(0,
+                                                fxNode(cardComboBox, hBoxHGrow(ALWAYS))
+                                        ), label("")
+                                ),
                                 hBoxHGrow(ALWAYS)
                         ),
                         fxNode(
@@ -238,7 +265,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         TextFields.bindAutoCompletion(typeEdit,
                 new TransactionTypeCompletionProvider(typeSuggestions), TRANSACTION_TYPE_TO_STRING);
         TextFields.bindAutoCompletion(debitedAccountEdit,
-                new NamedCompletionProvider<>(debitedSuggestions), NAMED_TO_STRING);
+                new NamedCompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
                 new NamedCompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
@@ -270,6 +297,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         createDefaultButtons(UI);
 
         var okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
+        okButton.disableProperty().bind(validation.invalidProperty());
+
         okButton.addEventFilter(ActionEvent.ACTION, event -> {
             if (!buildTransaction()) {
                 event.consume();
@@ -292,6 +321,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         this(owner, css, cache);
 
         uuid = transaction.uuid();
+        initialTransaction = transaction;
 
         builder = new Transaction.Builder(transaction);
 
@@ -299,13 +329,18 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         // Type
         typeEdit.setText(translate(transaction.type()));
+        transactionType = transaction.type();
 
         // Accounts
         Optional<Account> accCredited = cache.getAccount(transaction.accountCreditedUuid());
+        creditedAccount = accCredited.orElse(null);
         creditedAccountEdit.setText(accCredited.map(Account::name).orElse(""));
 
         Optional<Account> accDebited = cache.getAccount(transaction.accountDebitedUuid());
+        debitedAccount = accDebited.orElse(null);
         debitedAccountEdit.setText(accDebited.map(Account::name).orElse(""));
+
+        updateCardComboBox(true);
 
         contactEdit.setText(cache.getContact(transaction.contactUuid()).map(Contact::name).orElse(""));
 
@@ -378,6 +413,34 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         datePicker.getEditor().prefColumnCountProperty().set(10);
     }
 
+    private void setupCardComboBox() {
+        cardComboBox.setEditable(false);
+        cardComboBox.setCellFactory(x -> new CardListCell());
+        cardComboBox.setButtonCell(new CardListCell());
+    }
+
+    private void updateCardComboBox(boolean initial) {
+        if (transactionType != TransactionType.CARD_PAYMENT || debitedAccount == null) {
+            cardComboBox.getItems().clear();
+        } else {
+            var selected = cardComboBox.getSelectionModel().getSelectedItem();
+            var accountCards = cache.getCardsByAccount(debitedAccount);
+            cardComboBox.getItems().setAll(accountCards);
+            if (accountCards.contains(selected)) {
+                cardComboBox.getSelectionModel().select(selected);
+            }
+
+            if (!accountCards.isEmpty() && initial) {
+                cardComboBox.getSelectionModel().clearSelection();
+                cache.getCard(initialTransaction.cardUuid()).ifPresent(card -> {
+                            cardComboBox.getSelectionModel().select(card);
+                        }
+                );
+            }
+        }
+        runLater(() -> validation.revalidate(cardComboBox));
+    }
+
     private void clearTitle() {
         setTitle("Проводка");
     }
@@ -401,13 +464,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         debitedSuggestions.add(acc);
                         creditedSuggestions.add(acc);
 
-                        if (acc.cardType() != CardType.NONE) {
-                            var cardAlias = new AccountCard(
-                                    acc.cardNumber(),
-                                    acc.type(),
-                                    acc.uuid(),
-                                    acc.categoryUuid()
-                            );
+                        var accCards = cache.getCardsByAccount(acc);
+                        for (var card : accCards) {
+                            var cardAlias = new Account.Builder(acc)
+                                    .name(card.number())
+                                    .build();
                             debitedSuggestions.add(cardAlias);
                             debitedSuggestionsAll.add(cardAlias);
                         }
@@ -491,43 +552,36 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private boolean buildTransaction() {
         // Check type id
         handleTypeFocusLoss();
+
+        debitedAccount = checkDebitedAccount().orElse(null);
+        creditedAccount = checkCreditedAccount().orElse(null);
+
         Optional<TransactionType> type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions);
         type.ifPresent(it -> builder.type(it));
 
-        var debitedAccount = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
-        if (debitedAccount.isPresent()) {
-            switch (debitedAccount.get()) {
-                case Account account -> {
-                    builder.accountDebitedUuid(account.uuid());
-                    builder.accountDebitedCategoryUuid(account.categoryUuid());
-                    builder.accountDebitedType(account.type());
-                }
-                case AccountCard card -> {
-                    builder.accountDebitedUuid(card.accountUuid());
-                    builder.accountDebitedCategoryUuid(card.categoryUuid());
-                    builder.accountDebitedType(card.type());
-                }
-                default -> {
-                }
-            }
+        if (debitedAccount != null) {
+            builder.accountDebitedUuid(debitedAccount.uuid());
+            builder.accountDebitedCategoryUuid(debitedAccount.categoryUuid());
+            builder.accountDebitedType(debitedAccount.type());
         } else {
             return false;
         }
 
-        var creditedAccount = checkTextFieldValue(creditedAccountEdit, creditedSuggestionsAll, ACCOUNT_TO_STRING);
-        if (creditedAccount.isPresent()) {
-            builder.accountCreditedUuid(creditedAccount.get().uuid());
-            builder.accountCreditedCategoryUuid(creditedAccount.get().categoryUuid());
-            builder.accountCreditedType(creditedAccount.get().type());
+        if (creditedAccount != null) {
+            builder.accountCreditedUuid(creditedAccount.uuid());
+            builder.accountCreditedCategoryUuid(creditedAccount.categoryUuid());
+            builder.accountCreditedType(creditedAccount.type());
         } else {
             return false;
         }
 
-        // builder.day(daySpinner.getValue());
-        builder.comment(commentEdit.getText());
-        builder.checked(checkedCheckBox.isSelected());
-        builder.invoiceNumber(invoiceNumberEdit.getText());
-        builder.statementDate(statementDatePicker.getValue());
+        builder.comment(commentEdit.getText())
+                .checked(checkedCheckBox.isSelected())
+                .invoiceNumber(invoiceNumberEdit.getText())
+                .statementDate(statementDatePicker.getValue());
+
+        var card = cardComboBox.getValue();
+        builder.cardUuid(card == null ? null : card.uuid());
 
         try {
             builder.transactionDate(datePicker.getValue());
@@ -542,12 +596,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         if (contactName == null || contactName.isEmpty()) {
             builder.contactUuid(null);
         } else {
-            var contact = checkTextFieldValue(contactName, contactSuggestions, CONTACT_TO_STRING);
-            if (contact.isPresent()) {
-                builder.contactUuid(contact.get().uuid());
-            } else {
-                builder.newContactName(contactName);
-            }
+            checkContact(contactName).ifPresentOrElse(contact -> builder.contactUuid(contact.uuid()),
+                    () -> builder.newContactName(contactName));
         }
 
         builder.modified(System.currentTimeMillis());
@@ -560,17 +610,10 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private void enableDisableRate() {
         boolean disable;
 
-        if (builder.getAccountCreditedUuid() == null || builder.getAccountDebitedUuid() == null) {
+        if (creditedAccount == null || debitedAccount == null) {
             disable = true;
         } else {
-            var c1 = cache.getAccount(builder.getAccountDebitedUuid())
-                    .map(Account::currencyUuid)
-                    .orElse(null);
-            var c2 = cache.getAccount(builder.getAccountCreditedUuid())
-                    .map(Account::currencyUuid)
-                    .orElse(null);
-
-            disable = Objects.equals(c1, c2);
+            disable = Objects.equals(debitedAccount.currencyUuid(), creditedAccount.currencyUuid());
         }
 
         creditAmountEdit.setDisable(disable);
@@ -609,28 +652,32 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private void createValidationSupport() {
         validation.registerValidator(typeEdit, (Control control, String value) -> {
             var type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions);
+            transactionType = type.orElse(TransactionType.UNDEFINED);
+            updateCardComboBox(false);
             return ValidationResult.fromErrorIf(control, null, type.isEmpty());
         });
 
-        validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
-            var debitedValue = checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, NAMED_TO_STRING);
-            updateCategoryLabel(debitedCategoryLabel, debitedValue.orElse(null));
+        validation.registerValidator(cardComboBox, (Control control, Card value) -> {
+            var invalid = transactionType == TransactionType.CARD_PAYMENT && value == null;
+            return ValidationResult.fromErrorIf(control, null, invalid);
+        });
 
-            switch (debitedValue.orElse(null)) {
-                case Account acc -> builder.accountDebitedUuid(acc.uuid());
-                case AccountCard card -> builder.accountDebitedUuid(card.accountUuid());
-                case null, default -> {/* do nothing */}
-            }
+        validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
+            var account = checkDebitedAccount();
+            updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
+
+            debitedAccount = account.orElse(null);
 
             enableDisableRate();
-            return ValidationResult.fromErrorIf(control, null, debitedValue.isEmpty());
+            updateCardComboBox(false);
+            return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
         validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {
-            var account = checkTextFieldValue(creditedAccountEdit, creditedSuggestionsAll, ACCOUNT_TO_STRING);
+            var account = checkCreditedAccount();
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
-            builder.accountCreditedUuid(account.map(Account::uuid).orElse(null));
+            creditedAccount = account.orElse(null);
 
             enableDisableRate();
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
@@ -738,34 +785,27 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         commentSuggestions.addAll(cache.getUniqueTransactionComments());
     }
 
-    private void updateCategoryLabel(Label label, Named named) {
-        var labelContent = switch (named) {
-            case Account account -> {
-                var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
-                yield translate(account.type()) + " | " + catName;
-            }
-            case AccountCard card -> {
-                var catName = cache.getCategory(card.categoryUuid()).map(Category::name).orElse("");
-                yield translate(card.type()) + " | " + catName;
-            }
-            case null, default -> "";
-        };
-
-        label.setText(labelContent);
+    private void updateCategoryLabel(Label label, Account account) {
+        if (account == null) {
+            label.setText("");
+        } else {
+            var catName = cache.getCategory(account.categoryUuid()).map(Category::name).orElse("");
+            label.setText(translate(account.type()) + " | " + catName);
+        }
     }
 
     private void processAutoFill() {
-        var accDebitedUuid = builder.getAccountDebitedUuid();
-        var accCreditedUuid = builder.getAccountCreditedUuid();
-
-        if (accDebitedUuid == null || accCreditedUuid == null) {
+        if (debitedAccount == null || creditedAccount == null) {
             return;
         }
+
+        var accDebitedUuid = debitedAccount.uuid();
+        var accCreditedUuid = creditedAccount.uuid();
 
         cache.getTransactions().stream()
                 .filter(it -> Objects.equals(it.accountCreditedUuid(), accCreditedUuid)
                         && Objects.equals(it.accountDebitedUuid(), accDebitedUuid))
-                .max(cache().getTransactionByDateComparator())
+                .max(cache.getTransactionByDateComparator())
                 .ifPresent(it -> {
                     if (commentEdit.getText().isEmpty()) {
                         commentEdit.setText(it.comment());
@@ -806,6 +846,18 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private void prevMonth() {
         datePicker.setValue(datePicker.getValue().minusMonths(1));
+    }
+
+    private Optional<Account> checkDebitedAccount() {
+        return checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, ACCOUNT_TO_STRING);
+    }
+
+    private Optional<Account> checkCreditedAccount() {
+        return checkTextFieldValue(creditedAccountEdit, creditedSuggestionsAll, ACCOUNT_TO_STRING);
+    }
+
+    private Optional<Contact> checkContact(String contactName) {
+        return checkTextFieldValue(contactName, contactSuggestions, CONTACT_TO_STRING);
     }
 
     TextField getTypeEdit() {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
@@ -22,9 +22,16 @@ public class TransactionDebitedAccountCell extends TableCell<Transaction, Transa
             return;
         }
 
-        cache().getAccount(transaction.accountDebitedUuid()).ifPresent(account -> {
-            setText(account.name());
-            setGraphic(IconManager.getAccountImageView(account));
-        });
+        if (transaction.cardUuid() != null) {
+            cache().getCard(transaction.cardUuid()).ifPresent(card -> {
+                setText(card.number());
+                setGraphic(IconManager.getCardImageView(card));
+            });
+        } else {
+            cache().getAccount(transaction.accountDebitedUuid()).ifPresent(account -> {
+                setText(account.name());
+                setGraphic(IconManager.getAccountImageView(account));
+            });
+        }
     }
 }

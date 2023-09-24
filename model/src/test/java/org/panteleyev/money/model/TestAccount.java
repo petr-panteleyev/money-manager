@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -35,8 +35,6 @@ public class TestAccount {
         var interest = BaseTestUtils.randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
-        var cardType = BaseTestUtils.randomCardType();
-        var cardNumber = BaseTestUtils.randomString();
         var total = BaseTestUtils.randomBigDecimal();
         var totalWaiting = BaseTestUtils.randomBigDecimal();
         var created = System.currentTimeMillis();
@@ -60,8 +58,6 @@ public class TestAccount {
                                 .interest(interest)
                                 .closingDate(closingDate)
                                 .iconUuid(iconUuid)
-                                .cardType(cardType)
-                                .cardNumber(cardNumber)
                                 .total(total)
                                 .totalWaiting(totalWaiting)
                                 .created(created)
@@ -70,22 +66,22 @@ public class TestAccount {
                         new Account(
                                 uuid, name, comment, accountNumber, openingBalance,
                                 accountLimit, currencyRate, type, categoryUuid, currencyUuid, securityUuid,
-                                enabled, interest, closingDate, iconUuid, cardType,
-                                cardNumber, total, totalWaiting, created, modified
+                                enabled, interest, closingDate, iconUuid,
+                                total, totalWaiting, created, modified
                         )
                 ),
                 Arguments.of(
                         new Account(
                                 uuid, name, null, null, null,
                                 null, null, type, categoryUuid, null, null,
-                                enabled, null, null, null, cardType,
-                                cardNumber, null, null, created, modified
+                                enabled, null, null, null,
+                                null, null, created, modified
                         ),
                         new Account(
                                 uuid, name, "", "", BigDecimal.ZERO,
                                 BigDecimal.ZERO, BigDecimal.ONE, type, categoryUuid, null, null,
-                                enabled, BigDecimal.ZERO, null, null, cardType,
-                                cardNumber, BigDecimal.ZERO, BigDecimal.ZERO, created, modified
+                                enabled, BigDecimal.ZERO, null, null,
+                                BigDecimal.ZERO, BigDecimal.ZERO, created, modified
                         )
                 )
         );
@@ -114,8 +110,6 @@ public class TestAccount {
         var interest = BaseTestUtils.randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
-        var cardType = CardType.MASTERCARD;
-        var cardNumber = UUID.randomUUID().toString();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -134,8 +128,6 @@ public class TestAccount {
                 .interest(interest)
                 .closingDate(closingDate)
                 .iconUuid(iconUuid)
-                .cardType(cardType)
-                .cardNumber(cardNumber)
                 .uuid(uuid)
                 .created(created)
                 .modified(modified)
@@ -155,8 +147,6 @@ public class TestAccount {
                 .interest(interest)
                 .closingDate(closingDate)
                 .iconUuid(iconUuid)
-                .cardType(cardType)
-                .cardNumber(cardNumber)
                 .uuid(uuid)
                 .created(created)
                 .modified(modified)
@@ -208,8 +198,6 @@ public class TestAccount {
                 .interest(BaseTestUtils.randomBigDecimal())
                 .closingDate(LocalDate.now())
                 .iconUuid(UUID.randomUUID())
-                .cardType(CardType.VISA)
-                .cardNumber(UUID.randomUUID().toString())
                 .uuid(UUID.randomUUID())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
@@ -232,8 +220,6 @@ public class TestAccount {
                 .interest(original.interest())
                 .closingDate(original.closingDate())
                 .iconUuid(original.iconUuid())
-                .cardType(original.cardType())
-                .cardNumber(original.cardNumber())
                 .uuid(original.uuid())
                 .created(original.created())
                 .modified(original.modified())

@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -42,6 +43,7 @@ import static org.panteleyev.money.persistence.BaseDaoTest.ICON_DOLLAR;
 import static org.panteleyev.money.persistence.BaseDaoTest.ICON_EURO;
 import static org.panteleyev.money.persistence.BaseDaoTest.ICON_JAVA;
 import static org.panteleyev.money.test.BaseTestUtils.newAccount;
+import static org.panteleyev.money.test.BaseTestUtils.newCard;
 import static org.panteleyev.money.test.BaseTestUtils.newCategory;
 import static org.panteleyev.money.test.BaseTestUtils.newContact;
 import static org.panteleyev.money.test.BaseTestUtils.newCurrency;
@@ -98,6 +100,9 @@ public class TestImportExport {
             PeriodicPaymentType.MANUAL_PAYMENT, ACCOUNT_2, ACCOUNT_3, CONTACT_2
     );
 
+    private static final Card CARD_1 = newCard(ACCOUNT_1);
+    private static final Card CARD_2 = newCard(ACCOUNT_3);
+
     private final MoneyDAO dao = Mockito.mock(MoneyDAO.class);
 
     @BeforeEach
@@ -128,6 +133,7 @@ public class TestImportExport {
                                         newTransaction(ACCOUNT_1, ACCOUNT_3),
                                         newTransaction(ACCOUNT_1, ACCOUNT_2));
                                 getPeriodicPayments().addAll(PAYMENT_1, PAYMENT_2);
+                                getCards().addAll(CARD_1, CARD_2);
                             }
                         }
                 )
@@ -152,6 +158,7 @@ public class TestImportExport {
             assertEquals(cache.getExchangeSecurities(), imp.getExchangeSecurities());
             assertEquals(cache.getTransactions(), imp.getTransactions());
             assertEquals(cache.getPeriodicPayments(), imp.getPeriodicPayments());
+            assertEquals(cache.getCards(), imp.getCards());
 
             // Get blobs
             var actualBlobs = new ArrayList<BlobContent>();

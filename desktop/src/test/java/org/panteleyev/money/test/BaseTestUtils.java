@@ -5,6 +5,7 @@
 package org.panteleyev.money.test;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -105,8 +106,6 @@ public final class BaseTestUtils {
                 .enabled(RANDOM.nextBoolean())
                 .interest(randomBigDecimal())
                 .closingDate(LocalDate.now())
-                .cardType(randomCardType())
-                .cardNumber(randomString())
                 .uuid(UUID.randomUUID())
                 .modified(System.currentTimeMillis())
                 .build();
@@ -127,8 +126,6 @@ public final class BaseTestUtils {
                 .interest(randomBigDecimal())
                 .closingDate(LocalDate.now())
                 .iconUuid(icon.uuid())
-                .cardType(randomCardType())
-                .cardNumber(randomString())
                 .uuid(UUID.randomUUID())
                 .modified(System.currentTimeMillis())
                 .build();
@@ -375,6 +372,22 @@ public final class BaseTestUtils {
                 .dayOfMonth(randomDay())
                 .amount(randomBigDecimal())
                 .comment(randomString())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static Card newCard(
+            Account account
+    ) {
+        return new Card.Builder()
+                .uuid(UUID.randomUUID())
+                .accountUuid(account.uuid())
+                .type(randomCardType())
+                .number(randomString())
+                .expiration(LocalDate.now())
+                .comment(randomString())
+                .enabled(randomBoolean())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();

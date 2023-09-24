@@ -5,6 +5,7 @@
 package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -67,6 +68,11 @@ public class Export {
         var accountRoot = XMLUtils.appendElement(rootElement, "Accounts");
         for (var account : cache.getAccounts()) {
             accountRoot.appendChild(exportAccount(doc, account));
+        }
+
+        var cardRoot = XMLUtils.appendElement(rootElement, "Cards");
+        for (var card : cache.getCards()) {
+            cardRoot.appendChild(exportCard(doc, card));
         }
 
         var categoryRoot = XMLUtils.appendElement(rootElement, "Categories");
@@ -163,8 +169,6 @@ public class Export {
         appendTextNode(e, "interest", account.interest());
         appendTextNode(e, "closingDate", account.closingDate());
         appendTextNode(e, "iconUuid", account.iconUuid());
-        appendTextNode(e, "cardType", account.cardType());
-        appendTextNode(e, "cardNumber", account.cardNumber());
         appendTextNode(e, "total", account.total());
         appendTextNode(e, "totalWaiting", account.totalWaiting());
         appendTextNode(e, "guid", account.uuid());
@@ -268,6 +272,7 @@ public class Export {
         appendTextNode(e, "parentUuid", t.parentUuid());
         appendTextNode(e, "detailed", t.detailed());
         appendTextNode(e, "statementDate", t.statementDate());
+        appendTextNode(e, "cardUuid", t.cardUuid());
 
         return e;
     }
@@ -306,6 +311,22 @@ public class Export {
         appendTextNode(e, "comment", payment.comment());
         appendTextNode(e, "created", payment.created());
         appendTextNode(e, "modified", payment.modified());
+
+        return e;
+    }
+
+    private static Element exportCard(Document doc, Card card) {
+        var e = doc.createElement("Card");
+
+        appendTextNode(e, "uuid", card.uuid());
+        appendTextNode(e, "accountUuid", card.accountUuid());
+        appendTextNode(e, "type", card.type());
+        appendTextNode(e, "number", card.number());
+        appendTextNode(e, "expiration", card.expiration());
+        appendTextNode(e, "comment", card.comment());
+        appendTextNode(e, "enabled", card.enabled());
+        appendTextNode(e, "created", card.created());
+        appendTextNode(e, "modified", card.modified());
 
         return e;
     }

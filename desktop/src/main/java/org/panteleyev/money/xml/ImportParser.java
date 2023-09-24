@@ -5,6 +5,7 @@
 package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -47,6 +48,7 @@ class ImportParser extends DefaultHandler {
         Icon(ImportParser::parseIcon),
         Category(ImportParser::parseCategory),
         Account(ImportParser::parseAccount),
+        Card(ImportParser::parseCard),
         Currency(ImportParser::parseCurrency),
         ExchangeSecurity(ImportParser::parseExchangeSecurity),
         Contact(ImportParser::parseContact),
@@ -80,6 +82,7 @@ class ImportParser extends DefaultHandler {
     private final List<Icon> icons = new ArrayList<>();
     private final List<Category> categories = new ArrayList<>();
     private final List<Account> accounts = new ArrayList<>();
+    private final List<Card> cards = new ArrayList<>();
     private final List<Contact> contacts = new ArrayList<>();
     private final List<Currency> currencies = new ArrayList<>();
     private final List<ExchangeSecurity> exchangeSecurities = new ArrayList<>();
@@ -91,6 +94,7 @@ class ImportParser extends DefaultHandler {
             Map.entry(Tag.Icon, icons),
             Map.entry(Tag.Category, categories),
             Map.entry(Tag.Account, accounts),
+            Map.entry(Tag.Card, cards),
             Map.entry(Tag.Currency, currencies),
             Map.entry(Tag.ExchangeSecurity, exchangeSecurities),
             Map.entry(Tag.Contact, contacts),
@@ -112,6 +116,10 @@ class ImportParser extends DefaultHandler {
 
     public List<Account> getAccounts() {
         return accounts;
+    }
+
+    public List<Card> getCards() {
+        return cards;
     }
 
     public List<Contact> getContacts() {
@@ -218,8 +226,6 @@ class ImportParser extends DefaultHandler {
                 .interest(parseBigDecimal(tags.get("interest")))
                 .closingDate(parseLocalDate(tags.get("closingDate"), null))
                 .iconUuid(parseUuid(tags.get("iconUuid")))
-                .cardType(parseCardType(tags.get("cardType")))
-                .cardNumber(tags.get("cardNumber"))
                 .total(parseBigDecimal(tags.get("total")))
                 .totalWaiting(parseBigDecimal(tags.get("totalWaiting")))
                 .uuid(UUID.fromString(tags.get("guid")))
@@ -345,6 +351,7 @@ class ImportParser extends DefaultHandler {
                 .detailed(parseBoolean(tags.get("detailed"), false))
                 .uuid(UUID.fromString(tags.get("guid")))
                 .statementDate(parseLocalDate(tags.get("statementDate"), null))
+                .cardUuid(parseUuid(tags.get("cardUuid")))
                 .created(created)
                 .modified(modified)
                 .build();
@@ -383,6 +390,22 @@ class ImportParser extends DefaultHandler {
                 .accountCreditedUuid(parseUuid(tags.get("accountCreditedUuid")))
                 .contactUuid(parseUuid(tags.get("contactUuid")))
                 .comment(tags.get("comment"))
+                .created(created)
+                .modified(modified)
+                .build();
+    }
+
+    private static Card parseCard(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
+        return new Card.Builder()
+                .uuid(UUID.fromString(tags.get("uuid")))
+                .accountUuid(UUID.fromString(tags.get("accountUuid")))
+                .type(parseCardType(tags.get("type")))
+                .number(tags.get("number"))
+                .expiration(parseLocalDate(tags.get("expiration"), LocalDate.now()))
+                .comment(tags.get("comment"))
+                .enabled(parseBoolean(tags.get("enabled"), true))
                 .created(created)
                 .modified(modified)
                 .build();

@@ -5,7 +5,6 @@
 package org.panteleyev.money.persistence;
 
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.CategoryType;
 
 import java.sql.PreparedStatement;
@@ -24,13 +23,13 @@ final class AccountRepository extends Repository<Account> {
                 INSERT INTO account (
                     name, comment, number, opening,
                     account_limit, rate, type, category_uuid, currency_uuid, security_uuid,
-                    enabled, interest, closing_date, icon_uuid, card_type,
-                    card_number, total, total_waiting, created, modified, uuid
+                    enabled, interest, closing_date, icon_uuid,
+                    total, total_waiting, created, modified, uuid
                 ) VALUES (
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?
+                    ?, ?, ?, ?,
+                    ?, ?, ?, ?
                 )
                 """;
     }
@@ -53,8 +52,6 @@ final class AccountRepository extends Repository<Account> {
                     interest = ?,
                     closing_date = ?,
                     icon_uuid = ?,
-                    card_type = ?,
-                    card_number = ?,
                     total = ?,
                     total_waiting = ?,
                     created = ?,
@@ -81,8 +78,6 @@ final class AccountRepository extends Repository<Account> {
                 rs.getBigDecimal("interest"),
                 getLocalDate(rs, "closing_date"),
                 getUuid(rs, "icon_uuid"),
-                getEnum(rs, "card_type", CardType.class),
-                rs.getString("card_number"),
                 rs.getBigDecimal("total"),
                 rs.getBigDecimal("total_waiting"),
                 rs.getLong("created"),
@@ -107,8 +102,6 @@ final class AccountRepository extends Repository<Account> {
         st.setBigDecimal(index++, account.interest());
         setLocalDate(st, index++, account.closingDate());
         setUuid(st, index++, account.iconUuid());
-        st.setString(index++, account.cardType().name());
-        st.setString(index++, account.cardNumber());
         st.setBigDecimal(index++, account.total());
         st.setBigDecimal(index++, account.totalWaiting());
         st.setLong(index++, account.created());

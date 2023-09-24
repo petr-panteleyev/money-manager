@@ -5,6 +5,7 @@
 package org.panteleyev.money.xml;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -38,6 +39,7 @@ public class Import {
     private final List<Icon> icons;
     private final List<Category> categories;
     private final List<Account> accounts;
+    private final List<Card> cards;
     private final List<Contact> contacts;
     private final List<Currency> currencies;
     private final List<ExchangeSecurity> exchangeSecurities;
@@ -53,6 +55,7 @@ public class Import {
         icons = importParser.getIcons();
         categories = importParser.getCategories();
         accounts = importParser.getAccounts();
+        cards = importParser.getCards();
         contacts = importParser.getContacts();
         currencies = importParser.getCurrencies();
         exchangeSecurities = importParser.getExchangeSecurities();
@@ -73,6 +76,10 @@ public class Import {
 
     public List<Account> getAccounts() {
         return accounts;
+    }
+
+    public List<Card> getCards() {
+        return cards;
     }
 
     public List<Contact> getContacts() {

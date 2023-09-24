@@ -47,6 +47,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
             getUuid(rs, "parent_uuid"),
             rs.getBoolean("detailed"),
             rs.getDate("statement_date").toLocalDate(),
+            getUuid(rs, "card_uuid"),
             rs.getLong("created"),
             rs.getLong("modified")
     );
@@ -74,6 +75,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
         map.put("contactUuid", transaction.contactUuid());
         map.put("parentUuid", transaction.parentUuid());
         map.put("statementDate", Date.valueOf(transaction.statementDate()));
+        map.put("cardUuid", transaction.cardUuid());
         return map;
     }
 
@@ -131,12 +133,12 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             uuid, amount, credit_amount, transaction_date, type, comment, checked,
                             acc_debited_uuid, acc_credited_uuid, acc_debited_type, acc_credited_type,
                             acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
-                            invoice_number, parent_uuid, detailed, statement_date, created, modified
+                            invoice_number, parent_uuid, detailed, statement_date, card_uuid, created, modified
                         ) VALUES (
                             :uuid, :amount, :creditAmount, :transactionDate, :type, :comment, :checked,
                             :accDebitedUuid, :accCreditedUuid, :accDebitedType, :accCreditedType,
                             :accDebitedCategoryUuid, :accCreditedCategoryUuid, :contactUuid,
-                            :invoiceNumber, :parentUuid, :detailed, :statementDate, :created, :modified
+                            :invoiceNumber, :parentUuid, :detailed, :statementDate, :cardUuid, :created, :modified
                         )
                         ON CONFLICT (uuid) DO UPDATE SET
                             uuid = :uuid,
@@ -157,6 +159,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                             parent_uuid = :parentUuid,
                             detailed = :detailed,
                             statement_date = :statementDate,
+                            card_uuid = :cardUuid,
                             modified = :modified
                         """,
                 toMap(transaction)

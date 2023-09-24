@@ -1,10 +1,8 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql.input;
-
-import org.panteleyev.money.model.CardType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -23,8 +21,6 @@ public record AccountInput(
         BigDecimal interest,
         LocalDate closingDate,
         UUID iconUuid,
-        CardType cardType,
-        String cardNumber,
         BigDecimal total,
         BigDecimal totalWaiting
 ) {

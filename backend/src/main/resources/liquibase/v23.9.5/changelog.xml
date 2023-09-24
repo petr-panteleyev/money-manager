@@ -1,0 +1,88 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v23.9.5/changelog.xml">
+
+    <changeSet id="v23.9.5-card" author="petr-panteleyev@yandex.ru">
+        <sql>
+            CREATE TABLE card (
+                uuid                    UUID            NOT NULL PRIMARY KEY,
+                account_uuid            UUID            NOT NULL,
+                type                    VARCHAR         NOT NULL,
+                number                  VARCHAR         NOT NULL,
+                expiration              DATE            NOT NULL,
+                comment                 VARCHAR         NOT NULL,
+                enabled                 BOOLEAN         NOT NULL,
+                created                 BIGINT          NOT NULL,
+                modified                BIGINT          NOT NULL,
+
+                CONSTRAINT card_account_uuid_fk FOREIGN KEY (account_uuid)
+                    REFERENCES account (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT
+            )
+        </sql>
+        <rollback>
+            <sql>
+                DROP TABLE card
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.5-transaction" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE transaction
+                ADD COLUMN card_uuid UUID;
+
+            ALTER TABLE transaction
+                ADD CONSTRAINT transaction_card_uuid_fk FOREIGN KEY (card_uuid)
+                    REFERENCES card (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT;
+        </sql>
+        <rollback>
+            <sql>
+                ALTER TABLE transaction
+                    DROP COLUMN card_uuid;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.5-fill-card-table" author="petr-panteleyev@yandex.ru">
+        <sql>
+            INSERT INTO card (uuid, account_uuid, type, number, expiration, comment, enabled, created, modified)
+            SELECT gen_random_uuid () uuid
+                , a.uuid account_uuid
+                , a.card_type type
+                , a.card_number number
+                , a.closing_date expiration
+                , '' comment
+                , a.enabled enabled
+                , a.created created
+                , a.created modified
+            FROM account a WHERE a.card_number  != '' AND a.closing_date IS NOT NULL
+        </sql>
+        <rollback>
+            <sql>
+                TRUNCATE TABLE card
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="v23.9.5-account" author="petr-panteleyev@yandex.ru">
+        <sql>
+            ALTER TABLE account
+                DROP COLUMN card_type,
+                DROP COLUMN card_number;
+        </sql>
+        <rollback>
+            <sql>
+                SELECT 1
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

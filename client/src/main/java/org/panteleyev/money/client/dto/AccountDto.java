@@ -1,10 +1,8 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.client.dto;
-
-import org.panteleyev.money.model.CardType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,8 +23,6 @@ public record AccountDto(
         BigDecimal interest,
         Optional<LocalDate> closingDate,
         Optional<IconDto> icon,
-        CardType cardType,
-        String cardNumber,
         BigDecimal total,
         BigDecimal totalWaiting,
         long created,

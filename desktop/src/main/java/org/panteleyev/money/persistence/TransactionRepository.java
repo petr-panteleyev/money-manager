@@ -26,13 +26,13 @@ final class TransactionRepository extends Repository<Transaction> {
                     comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
                     acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                     invoice_number, parent_uuid, detailed,
-                    statement_date, created, modified, uuid
+                    statement_date, card_uuid, created, modified, uuid
                 ) VALUES (
                     ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?, ?
+                    ?, ?, ?, ?, ?
                 )
                 """;
     }
@@ -58,6 +58,7 @@ final class TransactionRepository extends Repository<Transaction> {
                     parent_uuid = ?,
                     detailed = ?,
                     statement_date = ?,
+                    card_uuid = ?,
                     created = ?,
                     modified = ?
                 WHERE uuid = ?
@@ -85,6 +86,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 getUuid(rs, "parent_uuid"),
                 rs.getBoolean("detailed"),
                 getLocalDate(rs, "statement_date"),
+                getUuid(rs, "card_uuid"),
                 rs.getLong("created"),
                 rs.getLong("modified")
         );
@@ -110,6 +112,7 @@ final class TransactionRepository extends Repository<Transaction> {
         setUuid(st, index++, transaction.parentUuid());
         st.setBoolean(index++, transaction.detailed());
         setLocalDate(st, index++, transaction.statementDate());
+        setUuid(st, index++, transaction.cardUuid());
         st.setLong(index++, transaction.created());
         st.setLong(index++, transaction.modified());
         setUuid(st, index, transaction.uuid());

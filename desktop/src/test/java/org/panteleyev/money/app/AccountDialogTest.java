@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
@@ -34,8 +33,6 @@ public class AccountDialogTest {
     private static final String ACCOUNT_COMMENT = UUID.randomUUID().toString();
     private static final String ACCOUNT_NUMBER = UUID.randomUUID().toString();
     private static final BigDecimal ACCOUNT_INTEREST = BigDecimal.TEN;
-    private static final CardType ACCOUNT_CARD_TYPE = CardType.VISA;
-    private static final String ACCOUNT_CARD_NUMBER = UUID.randomUUID().toString();
     private static final BigDecimal ACCOUNT_CREDIT = BigDecimal.ONE.setScale(6, RoundingMode.HALF_UP);
 
     private final Currency curr_1 = new Currency.Builder()
@@ -122,8 +119,6 @@ public class AccountDialogTest {
         dialog.getCommentEdit().setText(ACCOUNT_COMMENT);
         dialog.getAccountNumberEdit().setText(ACCOUNT_NUMBER);
         dialog.getInterestEdit().setText(ACCOUNT_INTEREST.toString());
-        dialog.getCardTypeComboBox().getSelectionModel().select(ACCOUNT_CARD_TYPE);
-        dialog.getCardNumberEdit().setText(ACCOUNT_CARD_NUMBER);
         dialog.getCurrencyEdit().setText(curr_1.symbol());
         dialog.getCreditEdit().setText(ACCOUNT_CREDIT.toString());
     }
@@ -134,8 +129,6 @@ public class AccountDialogTest {
         dialog.getCommentEdit().setText(account.comment());
         dialog.getAccountNumberEdit().setText(account.accountNumber());
         dialog.getInterestEdit().setText(account.interest().toString());
-        dialog.getCardTypeComboBox().getSelectionModel().select(account.cardType());
-        dialog.getCardNumberEdit().setText(account.cardNumber());
         dialog.getCurrencyEdit().setText(curr_2.symbol());
         dialog.getCreditEdit().setText(account.accountLimit().toString());
         dialog.getOpeningBalanceEdit().setText(account.openingBalance().toString());
@@ -161,8 +154,6 @@ public class AccountDialogTest {
         assertEquals(category.uuid(), account.categoryUuid());
         assertEquals(category.type(), account.type());
         assertEquals(ACCOUNT_INTEREST.stripTrailingZeros(), account.interest().stripTrailingZeros());
-        assertEquals(ACCOUNT_CARD_TYPE, account.cardType());
-        assertEquals(ACCOUNT_CARD_NUMBER, account.cardNumber());
         assertEquals(ACCOUNT_CREDIT, account.accountLimit());
         assertTrue(account.enabled());
         assertEquals(curr_1.uuid(), account.currencyUuid());
@@ -195,6 +186,5 @@ public class AccountDialogTest {
         assertEquals(acc_2.openingBalance().stripTrailingZeros(), account.openingBalance().stripTrailingZeros());
         assertEquals(acc_2.accountLimit().stripTrailingZeros(), account.accountLimit().stripTrailingZeros());
         assertTrue(account.enabled());
-        assertEquals(acc_2.cardType(), account.cardType());
     }
 }

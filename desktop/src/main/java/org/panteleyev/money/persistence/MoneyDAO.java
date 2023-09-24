@@ -6,6 +6,7 @@ package org.panteleyev.money.persistence;
 
 import javafx.application.Platform;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -45,6 +46,7 @@ public class MoneyDAO {
     private final DocumentRepository documentRepository = new DocumentRepository();
     private final PeriodicPaymentRepository periodicPaymentRepository = new PeriodicPaymentRepository();
     private final ExchangeSecurityRepository exchangeSecurityRepository = new ExchangeSecurityRepository();
+    private final CardRepository cardRepository = new CardRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -180,7 +182,6 @@ public class MoneyDAO {
             cache.remove(currency);
         });
     }
-
 
     ////////////////////////////////////////////////////////////////////////////
     // Contacts
@@ -332,6 +333,35 @@ public class MoneyDAO {
         cache.update(security);
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Cards
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertCard(Card card) {
+        withNewConnection(conn -> {
+            cardRepository.insert(conn, card);
+            cache.add(card);
+        });
+    }
+
+    public void updateCard(Card card) {
+        withNewConnection(conn -> {
+            updateCard(conn, card);
+        });
+    }
+
+    public void updateCard(Connection conn, Card card) {
+        cardRepository.update(conn, card);
+        cache.update(card);
+    }
+
+    public void deleteCard(Card card) {
+        withNewConnection(conn -> {
+            cache.remove(card);
+            cardRepository.delete(conn, card);
+        });
+    }
+
     /**
      * This method recalculates total values for all involved accounts.
      *
@@ -386,6 +416,11 @@ public class MoneyDAO {
             var accountList = accountRepository.getAll(conn);
             progress.accept("done\n");
 
+
+            progress.accept("    cards...");
+            var cardList = cardRepository.getAll(conn);
+            progress.accept("done\n");
+
             progress.accept("    transactions... ");
             var transactionList = transactionRepository.getAll(conn);
             progress.accept("done\n");
@@ -411,6 +446,7 @@ public class MoneyDAO {
                 cache.getContacts().setAll(contactList);
                 cache.getCurrencies().setAll(currencyList);
                 cache.getAccounts().setAll(accountList);
+                cache.getCards().setAll(cardList);
                 cache.getTransactions().setAll(transactionList);
                 cache.getPeriodicPayments().setAll(periodicPaymentsList);
                 cache.getExchangeSecurities().setAll(exchangeSecuritiesList);
@@ -452,6 +488,10 @@ public class MoneyDAO {
             accountRepository.insert(conn, BATCH_SIZE, imp.getAccounts());
             progress.accept("done\n");
 
+            progress.accept("    cards...");
+            cardRepository.insert(conn, BATCH_SIZE, imp.getCards());
+            progress.accept("done\n");
+
             progress.accept("    contacts... ");
             contactRepository.insert(conn, BATCH_SIZE, imp.getContacts());
             progress.accept("done\n");
@@ -470,10 +510,6 @@ public class MoneyDAO {
             progress.accept("    periodic payments...");
             periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
             progress.accept("done\n");
-
-//            progress.accept("    securities...");
-//            exchangeSecurityRepository.insert(conn, BATCH_SIZE, imp.get());
-//            progress.accept("done\n");
 
             progress.accept("done\n");
 

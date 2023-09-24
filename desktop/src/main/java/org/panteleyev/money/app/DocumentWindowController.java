@@ -183,8 +183,8 @@ public class DocumentWindowController extends BaseController {
     public void onCreateDocument(ActionEvent event) {
         var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null);
         d.showAndWait().ifPresent(documents -> {
-            for (DocumentWithBytes(MoneyDocument document, byte[] bytes) : documents) {
-                dao().insertDocument(document, bytes);
+            for (var docWithBytes : documents) {
+                dao().insertDocument(docWithBytes.document(), docWithBytes.bytes());
             }
         });
     }
@@ -238,7 +238,7 @@ public class DocumentWindowController extends BaseController {
 
     private void onDragOver(DragEvent event) {
         var dragBoard = event.getDragboard();
-        if (dragBoard.hasFiles() && dragBoard.getFiles().size() > 0) {
+        if (dragBoard.hasFiles() && !dragBoard.getFiles().isEmpty()) {
             event.acceptTransferModes(TransferMode.COPY);
         }
         event.consume();
@@ -249,12 +249,12 @@ public class DocumentWindowController extends BaseController {
         var dragBoard = event.getDragboard();
         if (dragBoard.hasFiles()) {
             var files = dragBoard.getFiles();
-            if (files.size() > 0) {
+            if (!files.isEmpty()) {
                 success = true;
                 var d = new DocumentDialog(this, documentOwner, settings().getDialogCssFileUrl(), null, files);
                 d.showAndWait().ifPresent(documents -> {
-                    for (DocumentWithBytes(MoneyDocument document, byte[] bytes) : documents) {
-                        dao().insertDocument(document, bytes);
+                    for (var docWithBytes : documents) {
+                        dao().insertDocument(docWithBytes.document(), docWithBytes.bytes());
                     }
                 });
             }

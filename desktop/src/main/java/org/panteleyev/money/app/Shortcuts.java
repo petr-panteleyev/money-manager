@@ -16,6 +16,7 @@ import static javafx.scene.input.KeyCode.DIGIT4;
 import static javafx.scene.input.KeyCode.DIGIT5;
 import static javafx.scene.input.KeyCode.DIGIT6;
 import static javafx.scene.input.KeyCode.DIGIT7;
+import static javafx.scene.input.KeyCode.DIGIT8;
 import static javafx.scene.input.KeyCode.E;
 import static javafx.scene.input.KeyCode.F;
 import static javafx.scene.input.KeyCode.H;
@@ -44,6 +45,7 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_5 = new KeyCodeCombination(DIGIT5, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_6 = new KeyCodeCombination(DIGIT6, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_7 = new KeyCodeCombination(DIGIT7, SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_8 = new KeyCodeCombination(DIGIT8, SHORTCUT_DOWN);
 
     public static final KeyCodeCombination SHORTCUT_ALT_UP = new KeyCodeCombination(UP, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_RIGHT = new KeyCodeCombination(RIGHT, SHORTCUT_DOWN, ALT_DOWN);

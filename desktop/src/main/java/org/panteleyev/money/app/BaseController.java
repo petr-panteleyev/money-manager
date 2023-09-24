@@ -32,6 +32,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_4;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_8;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
@@ -81,16 +82,18 @@ public class BaseController extends Controller {
                 x -> getController(MainWindowController.class));
         var accountsMenuItem = menuItem("Счета...", SHORTCUT_1,
                 x -> getController(AccountWindowController.class));
-        var statementMenuItem = menuItem("Выписки...", SHORTCUT_2,
+        var cardsMenuItem = menuItem("Карты...", SHORTCUT_2,
+                x -> getController(CardWindowController.class));
+        var statementMenuItem = menuItem("Выписки...", SHORTCUT_3,
                 x -> getController(StatementWindowController.class));
-        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_3, x -> getRequestController());
-        var chartsMenuItem = menuItem("Доходы и расходы...", SHORTCUT_4,
+        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_4, x -> getRequestController());
+        var chartsMenuItem = menuItem("Доходы и расходы...", SHORTCUT_5,
                 x -> getController(IncomesAndExpensesWindowController.class));
-        var currenciesMenuItem = menuItem("Валюты...", SHORTCUT_5,
+        var currenciesMenuItem = menuItem("Валюты...", SHORTCUT_6,
                 x -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = menuItem("Категории...", SHORTCUT_6,
+        var categoriesMenuItem = menuItem("Категории...", SHORTCUT_7,
                 x -> getController(CategoryWindowController.class));
-        var contactsMenuItem = menuItem("Контакты...", SHORTCUT_7,
+        var contactsMenuItem = menuItem("Контакты...", SHORTCUT_8,
                 x -> getController(ContactListWindowController.class));
         var documentsMenuItem = menuItem("Документы...", SHORTCUT_ALT_U,
                 x -> getDocumentController(null));
@@ -99,6 +102,7 @@ public class BaseController extends Controller {
 
         if (dbOpenProperty != null) {
             accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
+            cardsMenuItem.disableProperty().bind(dbOpenProperty.not());
             statementMenuItem.disableProperty().bind(dbOpenProperty.not());
             requestsMenuItem.disableProperty().bind(dbOpenProperty.not());
             currenciesMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -113,6 +117,8 @@ public class BaseController extends Controller {
                 transactionsMenuItem,
                 new SeparatorMenuItem(),
                 accountsMenuItem,
+                cardsMenuItem,
+                new SeparatorMenuItem(),
                 statementMenuItem,
                 requestsMenuItem,
                 chartsMenuItem,

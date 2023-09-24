@@ -14,8 +14,6 @@ mutation ($uuid: String!, $categoryUuid: String!, $currencyUuid: String!) {
             interest: 1.3,
             closingDate: null,
             iconUuid: null,
-            cardType: MASTERCARD,
-            cardNumber: "1234 5678",
             total: 110.0,
             totalWaiting: 20.0
         }) {
@@ -40,8 +38,6 @@ mutation ($uuid: String!, $categoryUuid: String!, $currencyUuid: String!) {
         icon {
             uuid
         },
-        cardType,
-        cardNumber,
         total,
         totalWaiting,
         created,

@@ -21,8 +21,6 @@ query {
         icon {
             uuid
         },
-        cardType,
-        cardNumber,
         total,
         totalWaiting,
         created,

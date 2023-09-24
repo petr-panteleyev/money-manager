@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.panteleyev.money.app.Images;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Icon;
 
@@ -23,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.Images.getCardTypeIcon;
 
 public class IconManager {
     public static final int ICON_SIZE = 16;
@@ -78,6 +80,10 @@ public class IconManager {
         }
 
         return getImageView(uuid);
+    }
+
+    public static ImageView getCardImageView(Card card) {
+        return new ImageView(getCardTypeIcon(card.type()));
     }
 
     public static void setupComboBox(ComboBox<Icon> comboBox) {

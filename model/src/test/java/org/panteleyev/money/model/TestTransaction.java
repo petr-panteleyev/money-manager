@@ -42,6 +42,7 @@ public class TestTransaction {
         var parentUuid = UUID.randomUUID();
         var detailed = BaseTestUtils.randomBoolean();
         var statementDate = LocalDate.now();
+        var cardUuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -66,6 +67,7 @@ public class TestTransaction {
                                 .parentUuid(parentUuid)
                                 .detailed(detailed)
                                 .statementDate(statementDate)
+                                .cardUuid(cardUuid)
                                 .created(created)
                                 .modified(modified)
                                 .build(),
@@ -75,7 +77,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, invoiceNumber, parentUuid,
-                                detailed, statementDate, created, modified
+                                detailed, statementDate, cardUuid, created, modified
                         )
                 ),
                 Arguments.of(
@@ -85,7 +87,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, null, null,
-                                detailed, null, created, modified
+                                detailed, null, cardUuid, created, modified
                         ),
                         new Transaction(
                                 uuid, amount, creditAmount, transactionDate,
@@ -93,7 +95,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, "", null,
-                                detailed, null, created, modified
+                                detailed, null, cardUuid, created, modified
                         )
                 )
         );

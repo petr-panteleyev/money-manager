@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
@@ -15,7 +15,6 @@ import static org.panteleyev.money.app.Styles.EXPIRED;
 
 public class AccountClosingDateCell extends TableCell<Account, Account> {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-    private static final DateTimeFormatter CARD_FORMATTER = DateTimeFormatter.ofPattern("MM/yy");
 
     private final int delta;
 
@@ -39,8 +38,7 @@ public class AccountClosingDateCell extends TableCell<Account, Account> {
             if (LocalDate.now().until(account.closingDate(), ChronoUnit.DAYS) < delta) {
                 getStyleClass().add(EXPIRED);
             }
-            var formatter = account.cardNumber().isBlank() ? FORMATTER : CARD_FORMATTER;
-            setText(LocalDate.EPOCH.equals(account.closingDate()) ? "" : formatter.format(account.closingDate()));
+            setText(LocalDate.EPOCH.equals(account.closingDate()) ? "" : FORMATTER.format(account.closingDate()));
         }
     }
 }

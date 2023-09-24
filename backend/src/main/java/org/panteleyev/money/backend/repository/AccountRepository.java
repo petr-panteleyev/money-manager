@@ -5,7 +5,6 @@
 package org.panteleyev.money.backend.repository;
 
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.CategoryType;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -44,8 +43,6 @@ public class AccountRepository implements MoneyRepository<Account> {
             rs.getBigDecimal("interest"),
             getLocalDate(rs, "closing_date"),
             getUuid(rs, "icon_uuid"),
-            getEnum(rs, "card_type", CardType.class),
-            rs.getString("card_number"),
             rs.getBigDecimal("total"),
             rs.getBigDecimal("total_waiting"),
             rs.getLong("created"),
@@ -65,8 +62,6 @@ public class AccountRepository implements MoneyRepository<Account> {
                 entry("categoryUuid", account.categoryUuid()),
                 entry("enabled", account.enabled()),
                 entry("interest", account.interest()),
-                entry("cardType", convert(account.cardType())),
-                entry("cardNumber", account.cardNumber()),
                 entry("total", account.total()),
                 entry("totalWaiting", account.totalWaiting()),
                 entry("created", account.created()),
@@ -106,11 +101,11 @@ public class AccountRepository implements MoneyRepository<Account> {
                         INSERT INTO account (
                             uuid, name, comment, number, opening, account_limit, rate, type,
                             category_uuid, currency_uuid, enabled, interest, closing_date, icon_uuid,
-                            card_type, card_number, total, total_waiting, created, modified
+                            total, total_waiting, created, modified
                         ) VALUES (
                             :uuid, :name, :comment, :number, :opening, :accountLimit, :rate, :type,
                             :categoryUuid, :currencyUuid, :enabled, :interest, :closingDate, :iconUuid,
-                            :cardType, :cardNumber, :total, :totalWaiting, :created, :modified
+                            :total, :totalWaiting, :created, :modified
                         )
                         ON CONFLICT (uuid) DO UPDATE SET
                             name = :name,
@@ -126,8 +121,6 @@ public class AccountRepository implements MoneyRepository<Account> {
                             interest = :interest,
                             closing_date = :closingDate,
                             icon_uuid = :iconUuid,
-                            card_type = :cardType,
-                            card_number = :cardNumber,
                             total = :total,
                             total_waiting = :totalWaiting,
                             modified = :modified

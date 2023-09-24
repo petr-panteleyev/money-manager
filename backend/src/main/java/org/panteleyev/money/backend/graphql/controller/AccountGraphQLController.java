@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.graphql.controller;
@@ -72,8 +72,6 @@ public class AccountGraphQLController {
                 .interest(input.interest())
                 .closingDate(input.closingDate())
                 .iconUuid(input.iconUuid())
-                .cardType(input.cardType())
-                .cardNumber(input.cardNumber())
                 .total(input.total())
                 .totalWaiting(input.totalWaiting())
                 .build();
@@ -104,8 +102,6 @@ public class AccountGraphQLController {
                 .interest(input.interest())
                 .closingDate(input.closingDate())
                 .iconUuid(input.iconUuid())
-                .cardType(input.cardType())
-                .cardNumber(input.cardNumber())
                 .total(input.total())
                 .totalWaiting(input.totalWaiting())
                 .modified(System.currentTimeMillis())

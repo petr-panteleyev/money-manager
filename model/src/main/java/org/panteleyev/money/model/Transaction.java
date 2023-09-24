@@ -27,6 +27,7 @@ public record Transaction(
         UUID parentUuid,
         boolean detailed,
         LocalDate statementDate,
+        UUID cardUuid,
         long created,
         long modified
 ) implements MoneyRecord {
@@ -128,6 +129,7 @@ public record Transaction(
         private boolean detailed = false;
         private String newContactName;
         private LocalDate statementDate;
+        private UUID cardUuid;
 
         public Builder() {
         }
@@ -157,22 +159,19 @@ public record Transaction(
             this.detailed = t.detailed();
             this.uuid = t.uuid();
             this.statementDate = t.statementDate();
+            this.cardUuid = t.cardUuid();
         }
 
         public UUID getUuid() {
             return this.uuid;
         }
 
+        public UUID getCardUuid() {
+            return this.uuid;
+        }
+
         public String getNewContactName() {
             return newContactName;
-        }
-
-        public UUID getAccountDebitedUuid() {
-            return this.accountDebitedUuid;
-        }
-
-        public UUID getAccountCreditedUuid() {
-            return this.accountCreditedUuid;
         }
 
         public Builder amount(BigDecimal amount) {
@@ -285,12 +284,17 @@ public record Transaction(
             return this;
         }
 
+        public Builder cardUuid(UUID cardUuid) {
+            this.cardUuid = cardUuid;
+            return this;
+        }
+
         public Transaction build() {
             return new Transaction(uuid, amount, creditAmount, transactionDate, type, comment,
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    invoiceNumber, parentUuid, detailed, statementDate, created, modified);
+                    invoiceNumber, parentUuid, detailed, statementDate, cardUuid, created, modified);
         }
     }
 }

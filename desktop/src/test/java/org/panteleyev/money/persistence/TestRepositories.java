@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
@@ -58,6 +59,7 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
     private static final UUID DOCUMENT_UUID = UUID.randomUUID();
     private static final UUID PERIODIC_PAYMENT_UUID = UUID.randomUUID();
+    private static final UUID CARD_UUID = UUID.randomUUID();
 
     @BeforeAll
     public static void init() {
@@ -270,8 +272,6 @@ public class TestRepositories extends BaseDaoTest {
                 randomBigDecimal(),
                 LocalDate.now(),
                 ICON_UUID,
-                randomCardType(),
-                randomString(),
                 randomBigDecimal(),
                 randomBigDecimal(),
                 System.currentTimeMillis(),
@@ -294,8 +294,6 @@ public class TestRepositories extends BaseDaoTest {
                 randomBigDecimal(),
                 LocalDate.now(),
                 null,
-                randomCardType(),
-                randomString(),
                 randomBigDecimal(),
                 randomBigDecimal(),
                 System.currentTimeMillis(),
@@ -307,6 +305,38 @@ public class TestRepositories extends BaseDaoTest {
 
     @Test
     @Order(7)
+    public void testCard() {
+        var repository = new CardRepository();
+
+        var insert = new Card(
+                CARD_UUID,
+                ACCOUNT_UUID,
+                randomCardType(),
+                randomString(),
+                LocalDate.now(),
+                randomString(),
+                randomBoolean(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        var update = new Card(
+                CARD_UUID,
+                ACCOUNT_UUID,
+                randomCardType(),
+                randomString(),
+                LocalDate.now(),
+                randomString(),
+                randomBoolean(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        insertAndUpdate(repository, insert, update);
+    }
+
+    @Test
+    @Order(8)
     public void testTransaction() {
         var repository = new TransactionRepository();
 
@@ -329,6 +359,7 @@ public class TestRepositories extends BaseDaoTest {
                 null,
                 randomBoolean(),
                 LocalDate.now(),
+                CARD_UUID,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -352,6 +383,7 @@ public class TestRepositories extends BaseDaoTest {
                 TRANSACTION_UUID,
                 randomBoolean(),
                 LocalDate.now(),
+                null,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -360,7 +392,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     public void testDocument() {
         var repository = new DocumentRepository();
 
@@ -396,7 +428,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(9)
+    @Order(10)
     public void testDocumentContent() {
         var repository = new DocumentRepository();
 
@@ -416,7 +448,7 @@ public class TestRepositories extends BaseDaoTest {
     }
 
     @Test
-    @Order(10)
+    @Order(11)
     public void testPeriodicPayment() {
         var repository = new PeriodicPaymentRepository();
 

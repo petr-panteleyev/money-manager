@@ -7,6 +7,7 @@ package org.panteleyev.money.persistence;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -51,6 +52,7 @@ public class DataCache {
     private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
     private final ObservableList<PeriodicPayment> periodicPayments = FXCollections.observableArrayList();
     private final ObservableList<ExchangeSecurity> exchangeSecurities = FXCollections.observableArrayList();
+    private final ObservableList<Card> cards = FXCollections.observableArrayList();
 
     public void clear() {
         icons.clear();
@@ -62,6 +64,7 @@ public class DataCache {
         transactions.clear();
         periodicPayments.clear();
         exchangeSecurities.clear();
+        cards.clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -420,6 +423,37 @@ public class DataCache {
         removeRecord(exchangeSecurities, exchangeSecurity.uuid());
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Cards
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<Card> getCard(UUID uuid) {
+        return getRecord(cards, uuid);
+    }
+
+    public ObservableList<Card> getCards() {
+        return cards;
+    }
+
+
+    public void add(Card card) {
+        cards.add(card);
+    }
+
+    public void update(Card card) {
+        updateRecord(cards, card);
+    }
+
+    public void remove(Card card) {
+        removeRecord(cards, card.uuid());
+    }
+
+    public List<Card> getCardsByAccount(Account account) {
+        return cards.stream()
+                .filter(c -> Objects.equals(account.uuid(), c.accountUuid()))
+                .toList();
+    }
 
     /**
      * Calculates balance of all transactions related to the specified account.

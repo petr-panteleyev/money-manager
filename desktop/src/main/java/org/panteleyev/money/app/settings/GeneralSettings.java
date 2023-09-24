@@ -27,6 +27,7 @@ final class GeneralSettings {
         ACCOUNT_CLOSING_DAY_DELTA("accountClosingDayDelta", 10),
         PERIODIC_PAYMENT_DAY_DELTA("periodicPaymentDayDelta", 5),
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts", false),
+        SHOW_DEACTIVATED_CARDS("showDeactivatedCards", false),
         LAST_STATEMENT_DIR("lastStatementDir", ""),
         LAST_EXPORT_DIR("lastExportDir", ""),
         LAST_REPORT_DIR("lastReportDir", "");

@@ -5,6 +5,7 @@
 package org.panteleyev.money.app;
 
 import org.panteleyev.money.model.Account;
+import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
@@ -49,6 +50,15 @@ public final class Predicates {
     public static Predicate<Contact> contactByName(String name) {
         return name.isBlank() ?
                 contact -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
+    }
+
+    public static Predicate<Card> activeCard(boolean active) {
+        return card -> card.enabled() == active;
+    }
+
+    public static Predicate<Card> cardByNumber(String number) {
+        return number.isBlank() ?
+                card -> true : card -> card.number().toLowerCase().contains(number.toLowerCase());
     }
 
     private Predicates() {

@@ -20,8 +20,6 @@ type Account {
     interest: BigDecimal,
     closingDate: Date,
     icon: Icon,
-    cardType: CardType,
-    cardNumber: String,
     total: BigDecimal!,
     totalWaiting: BigDecimal!,
     created: Long!,
@@ -41,8 +39,6 @@ input AccountInput {
     interest: BigDecimal!,
     closingDate: Date,
     iconUuid: String,
-    cardType: CardType!,
-    cardNumber: String!,
     total: BigDecimal!,
     totalWaiting: BigDecimal!
 }

@@ -24,8 +24,6 @@ public record Account(
         BigDecimal interest,
         LocalDate closingDate,
         UUID iconUuid,
-        CardType cardType,
-        String cardNumber,
         BigDecimal total,
         BigDecimal totalWaiting,
         long created,
@@ -55,7 +53,6 @@ public record Account(
 
         comment = MoneyRecord.normalize(comment);
         accountNumber = MoneyRecord.normalize(accountNumber);
-        cardNumber = MoneyRecord.normalize(cardNumber);
 
         openingBalance = MoneyRecord.normalize(openingBalance, BigDecimal.ZERO);
         accountLimit = MoneyRecord.normalize(accountLimit, BigDecimal.ZERO);
@@ -84,10 +81,6 @@ public record Account(
         return account.accountNumber().replaceAll(" ", "");
     }
 
-    public static String getCardNumberNoSpaces(Account account) {
-        return account.cardNumber().replaceAll(" ", "");
-    }
-
     public static BigDecimal getBalance(Account account) {
         return account.openingBalance().add(account.accountLimit()).add(account.total());
     }
@@ -107,8 +100,6 @@ public record Account(
         private BigDecimal interest = BigDecimal.ZERO;
         private LocalDate closingDate = null;
         private UUID iconUuid = null;
-        private CardType cardType = CardType.NONE;
-        private String cardNumber = "";
         private BigDecimal total = BigDecimal.ZERO;
         private BigDecimal totalWaiting = BigDecimal.ZERO;
         private UUID uuid = null;
@@ -137,8 +128,6 @@ public record Account(
             interest = account.interest();
             closingDate = account.closingDate();
             iconUuid = account.iconUuid();
-            cardType = account.cardType();
-            cardNumber = account.cardNumber();
             uuid = account.uuid();
             created = account.created();
             modified = account.modified();
@@ -153,7 +142,7 @@ public record Account(
         public Account build() {
             return new Account(uuid, name, comment, accountNumber, openingBalance,
                     accountLimit, currencyRate, type, categoryUuid,
-                    currencyUuid, securityUuid, enabled, interest, closingDate, iconUuid, cardType, cardNumber,
+                    currencyUuid, securityUuid, enabled, interest, closingDate, iconUuid,
                     total, totalWaiting, created, modified);
         }
 
@@ -224,16 +213,6 @@ public record Account(
 
         public Builder iconUuid(UUID iconUuid) {
             this.iconUuid = iconUuid;
-            return this;
-        }
-
-        public Builder cardType(CardType cardType) {
-            this.cardType = cardType;
-            return this;
-        }
-
-        public Builder cardNumber(String cardNumber) {
-            this.cardNumber = cardNumber;
             return this;
         }
 

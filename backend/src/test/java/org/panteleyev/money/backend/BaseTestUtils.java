@@ -5,7 +5,6 @@
 package org.panteleyev.money.backend;
 
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
@@ -21,7 +20,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
@@ -43,11 +41,6 @@ final class BaseTestUtils {
     static CategoryType randomCategoryType() {
         int index = RANDOM.nextInt(CategoryType.values().length);
         return CategoryType.values()[index];
-    }
-
-    static CardType randomCardType() {
-        int index = RANDOM.nextInt(CardType.values().length);
-        return CardType.values()[index];
     }
 
     static ContactType randomContactType() {
@@ -93,8 +86,6 @@ final class BaseTestUtils {
                 .enabled(RANDOM.nextBoolean())
                 .interest(randomBigDecimal())
                 .closingDate(LocalDate.now())
-                .cardType(randomCardType())
-                .cardNumber(randomString())
                 .created(created)
                 .modified(modifed)
                 .build();

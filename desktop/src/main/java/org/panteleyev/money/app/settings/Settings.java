@@ -99,6 +99,14 @@ public final class Settings {
         generalSettings.put(GeneralSettings.Setting.SHOW_DEACTIVATED_ACCOUNTS, show);
     }
 
+    public boolean getShowDeactivatedCards() {
+        return generalSettings.get(GeneralSettings.Setting.SHOW_DEACTIVATED_CARDS);
+    }
+
+    public void setShowDeactivatedCards(boolean show) {
+        generalSettings.put(GeneralSettings.Setting.SHOW_DEACTIVATED_CARDS, show);
+    }
+
     public int getAutoCompleteLength() {
         return generalSettings.get(GeneralSettings.Setting.AUTO_COMPLETE_LENGTH);
     }

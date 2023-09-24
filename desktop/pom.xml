@@ -126,9 +126,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgs>--enable-preview</compilerArgs>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -188,7 +185,6 @@
                     <destination>target/dist</destination>
                     <javaOptions>
                         <option>-Xms128m</option>
-                        <option>--enable-preview</option>
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                     </javaOptions>
@@ -231,7 +227,6 @@
                         <configuration>
                             <options>
                                 <option>-Xms128m</option>
-                                <option>--enable-preview</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                                 <option>-Dprofile=${profile}</option>
@@ -244,7 +239,6 @@
                         <configuration>
                             <options>
                                 <option>-Xms128m</option>
-                                <option>--enable-preview</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
                                 <option>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</option>

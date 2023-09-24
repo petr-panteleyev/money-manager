@@ -61,6 +61,7 @@ public class MoneyApplication extends Application {
 
     public static void uncaughtException(Throwable e) {
         LOGGER.log(Level.SEVERE, "Uncaught exception", e);
+        e.printStackTrace();
         Platform.runLater(() -> {
             var alert = new Alert(Alert.AlertType.ERROR, e.toString());
             alert.showAndWait();

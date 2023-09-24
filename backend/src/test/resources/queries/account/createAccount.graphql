@@ -12,8 +12,6 @@ mutation ($categoryUuid: String!, $currencyUuid: String!) {
         interest: 1.2,
         closingDate: "2022-02-03",
         iconUuid: null,
-        cardType: NONE,
-        cardNumber: "",
         total: 100.0,
         totalWaiting: 0.0
     }) {
@@ -38,8 +36,6 @@ mutation ($categoryUuid: String!, $currencyUuid: String!) {
         icon {
             uuid
         },
-        cardType,
-        cardNumber,
         total,
         totalWaiting,
         created,

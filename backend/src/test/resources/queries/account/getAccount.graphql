@@ -21,8 +21,6 @@ query ($uuid: String!) {
         icon {
             uuid
         },
-        cardType,
-        cardNumber,
         total,
         totalWaiting,
         created,

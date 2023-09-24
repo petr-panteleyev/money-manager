@@ -21,7 +21,6 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
@@ -105,11 +104,6 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField interestEdit = new TextField();
     private final DatePicker closingDatePicker = new DatePicker();
     private final ComboBox<Icon> iconComboBox = new ComboBox<>();
-    private final ComboBox<CardType> cardTypeComboBox = comboBox(CardType.values(),
-            b -> b.withDefaultString("-")
-                    .withImageConverter(Images::getCardTypeIcon)
-                    .withHandler(event -> onCardTypeSelected()));
-    private final TextField cardNumberEdit = new TextField();
 
     private final Collection<Category> categories;
 
@@ -146,8 +140,6 @@ class AccountDialog extends BaseDialog<Account> {
                                 gridRow(label("Валюта:"), currencyEdit, currencyMenuButton),
                                 gridRow(label("Проценты:"), gridCell(interestEdit, 2, 1)),
                                 gridRow(label("Дата закрытия:"), gridCell(closingDatePicker, 2, 1)),
-                                gridRow(label("Тип карты:"), gridCell(cardTypeComboBox, 2, 1)),
-                                gridRow(label("Номер карты:"), gridCell(cardNumberEdit, 2, 1)),
                                 gridRow(SKIP, gridCell(activeCheckBox, 2, 1))
                         ), b -> b.withStyle(Styles.GRID_PANE)
                 )
@@ -172,8 +164,6 @@ class AccountDialog extends BaseDialog<Account> {
             interestEdit.setText("0.0");
             closingDatePicker.setValue(null);
             iconComboBox.getSelectionModel().select(EMPTY_ICON);
-            cardTypeComboBox.getSelectionModel().select(CardType.NONE);
-            cardNumberEdit.setText("");
 
             if (initialCategory != null) {
                 typeComboBox.getSelectionModel().select(initialCategory.type());
@@ -194,8 +184,6 @@ class AccountDialog extends BaseDialog<Account> {
             interestEdit.setText(account.interest().toString());
             closingDatePicker.setValue(account.closingDate());
             iconComboBox.getSelectionModel().select(cache.getIcon(account.iconUuid()).orElse(EMPTY_ICON));
-            cardTypeComboBox.getSelectionModel().select(account.cardType());
-            cardNumberEdit.setText(account.cardNumber());
 
             typeComboBox.getSelectionModel().select(account.type());
             categoryComboBox.getSelectionModel()
@@ -211,7 +199,6 @@ class AccountDialog extends BaseDialog<Account> {
             }
             currencyEdit.setText(currencyOrSecurity.toString());
         }
-        onCardTypeSelected();
         setupCurrencyMenuButton();
 
         setResultConverter((ButtonType b) -> {
@@ -237,8 +224,6 @@ class AccountDialog extends BaseDialog<Account> {
                     .interest(new BigDecimal(interestEdit.getText()))
                     .closingDate(closingDatePicker.getValue())
                     .iconUuid(uconUuid)
-                    .cardType(cardTypeComboBox.getSelectionModel().getSelectedItem())
-                    .cardNumber(cardNumberEdit.getText())
                     .modified(now);
 
             var selectedCurrencyOrSecurity = findCurrencyOrSecurity(currencyEdit.getText())
@@ -279,12 +264,6 @@ class AccountDialog extends BaseDialog<Account> {
         }
 
         setupCurrencyMenuButton();
-    }
-
-    private void onCardTypeSelected() {
-        cardNumberEdit.setDisable(
-                cardTypeComboBox.getSelectionModel().getSelectedItem() == CardType.NONE
-        );
     }
 
     private void createValidationSupport() {
@@ -356,14 +335,6 @@ class AccountDialog extends BaseDialog<Account> {
 
     TextField getInterestEdit() {
         return interestEdit;
-    }
-
-    ComboBox<CardType> getCardTypeComboBox() {
-        return cardTypeComboBox;
-    }
-
-    TextField getCardNumberEdit() {
-        return cardNumberEdit;
     }
 
     TextField getCreditEdit() {

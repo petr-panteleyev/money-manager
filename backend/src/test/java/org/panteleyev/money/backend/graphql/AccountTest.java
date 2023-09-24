@@ -25,8 +25,6 @@ import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.createCategor
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.createCurrency;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.loadQuery;
 import static org.panteleyev.money.backend.graphql.GraphQLTestUtil.newClient;
-import static org.panteleyev.money.model.CardType.MASTERCARD;
-import static org.panteleyev.money.model.CardType.NONE;
 import static org.panteleyev.money.model.CategoryType.BANKS_AND_CASH;
 import static org.panteleyev.money.model.CategoryType.INCOMES;
 
@@ -67,8 +65,6 @@ public class AccountTest extends BaseSpringBootTest {
                 entry("interest", new BigDecimal("1.200000")),
                 entry("closingDate", LocalDate.of(2022, 2, 3)),
                 entry("icon", Optional.empty()),
-                entry("cardType", NONE),
-                entry("cardNumber", ""),
                 entry("total", new BigDecimal("100.000000")),
                 entry("totalWaiting", new BigDecimal("0.000000"))
         ));
@@ -109,8 +105,6 @@ public class AccountTest extends BaseSpringBootTest {
                 entry("interest", new BigDecimal("1.300000")),
                 entry("closingDate", Optional.empty()),
                 entry("icon", Optional.empty()),
-                entry("cardType", MASTERCARD),
-                entry("cardNumber", "1234 5678"),
                 entry("total", new BigDecimal("110.000000")),
                 entry("totalWaiting", new BigDecimal("20.000000"))
         ));
