@@ -12,6 +12,12 @@ import javafx.stage.Stage;
 import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.WindowManager;
+import org.panteleyev.money.app.account.AccountWindowController;
+import org.panteleyev.money.app.card.CardWindowController;
+import org.panteleyev.money.app.category.CategoryWindowController;
+import org.panteleyev.money.app.contact.ContactListWindowController;
+import org.panteleyev.money.app.currency.CurrencyWindowController;
+import org.panteleyev.money.app.document.DocumentWindowController;
 import org.panteleyev.money.app.exchange.SecuritiesWindowController;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.MoneyRecord;
@@ -153,7 +159,7 @@ public class BaseController extends Controller {
                 menuItem("О программе", x -> new AboutDialog(this).showAndWait()));
     }
 
-    static <T extends BaseController> T getController(Class<T> clazz) {
+    protected static <T extends BaseController> T getController(Class<T> clazz) {
         @SuppressWarnings("unchecked")
         T controller = (T) WINDOW_MANAGER.find(clazz).orElseGet(() -> {
             try {
@@ -173,7 +179,7 @@ public class BaseController extends Controller {
         getRequestController(null);
     }
 
-    static void getRequestController(Account account) {
+    protected static void getRequestController(Account account) {
         var controller = (RequestWindowController) WINDOW_MANAGER
                 .find(RequestWindowController.class, c -> ((RequestWindowController) c).thisAccount(account)).orElseGet(() -> {
                     try {
@@ -188,7 +194,7 @@ public class BaseController extends Controller {
         stage.toFront();
     }
 
-    static DocumentWindowController getDocumentController(MoneyRecord owner) {
+    public static DocumentWindowController getDocumentController(MoneyRecord owner) {
         var controller = (DocumentWindowController) WINDOW_MANAGER
                 .find(DocumentWindowController.class, c -> ((DocumentWindowController) c).thisOwner(owner))
                 .orElseGet(() -> new DocumentWindowController(owner));
@@ -200,7 +206,7 @@ public class BaseController extends Controller {
     }
 
     // Actions
-    static Action searchAction(Consumer<ActionEvent> handler) {
+    protected static Action searchAction(Consumer<ActionEvent> handler) {
         return actionBuilder("Поиск", handler)
                 .accelerator(SHORTCUT_F)
                 .build();

@@ -18,6 +18,8 @@ import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.AccountSelectionBox;
 import org.panteleyev.money.app.filters.ContactFilterBox;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.app.transaction.TransactionPredicate;
+import org.panteleyev.money.app.transaction.TransactionTableView;
 import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Contact;
@@ -50,7 +52,7 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
-import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
+import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByAccount;
 
 class RequestWindowController extends BaseController {
     private final Account account;
@@ -184,7 +186,7 @@ class RequestWindowController extends BaseController {
         new ReportFileDialog().show(getStage(), ReportType.TRANSACTIONS).ifPresent(selected -> {
             try (var outputStream = new FileOutputStream(selected)) {
                 var transactions = cache().getTransactions(getTransactionFilter())
-                        .sorted(cache().getTransactionByDateComparator())
+                        .sorted(Comparators.transactionsByDate())
                         .toList();
                 Reports.reportTransactions(transactions, outputStream);
             } catch (IOException ex) {

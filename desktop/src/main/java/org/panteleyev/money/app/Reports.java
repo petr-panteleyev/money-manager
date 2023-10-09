@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 
-class Reports {
+public class Reports {
     private static final String CSS_PATH = "/org/panteleyev/money/report.css";
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static String css;
@@ -58,7 +58,7 @@ class Reports {
         }
     }
 
-    static void reportAccounts(List<Account> accounts, OutputStream out) {
+    public static void reportAccounts(List<Account> accounts, OutputStream out) {
         loadCss();
         try (var w = new PrintWriter(out)) {
             printHeader(w, "Счета");

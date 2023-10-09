@@ -10,6 +10,7 @@ import javafx.stage.FileChooser;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
 
+import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
 public final class Constants {
@@ -25,6 +26,8 @@ public final class Constants {
             new FileChooser.ExtensionFilter("Файлы ZIP", "*.zip");
     public static final FileChooser.ExtensionFilter FILTER_HTML_FILES =
             new FileChooser.ExtensionFilter("Файлы HTML", "*.html");
+
+    public static final DateTimeFormatter FULL_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private Constants() {
     }

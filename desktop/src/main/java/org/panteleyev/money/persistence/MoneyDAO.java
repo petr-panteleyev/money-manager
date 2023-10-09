@@ -131,6 +131,13 @@ public class MoneyDAO {
         });
     }
 
+    public void deleteDocument(MoneyDocument document) {
+        withNewConnection(conn -> {
+            cache.remove(document);
+            documentRepository.delete(conn, document);
+        });
+    }
+
     public byte[] getDocumentBytes(MoneyDocument document) {
         try (var conn = dataSource.get().getConnection()) {
             return documentRepository.getBytes(conn, document.uuid())

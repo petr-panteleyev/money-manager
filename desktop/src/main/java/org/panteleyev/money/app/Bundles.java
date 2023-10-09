@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.app;
 
+import org.panteleyev.money.app.transaction.TransactionPredicate;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.DocumentType;

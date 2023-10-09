@@ -5,12 +5,14 @@
 package org.panteleyev.money.app.exchange;
 
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.moex.Moex;
@@ -18,6 +20,7 @@ import org.panteleyev.moex.model.MoexMarketData;
 import org.panteleyev.moex.model.MoexSecurity;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.cells.ExchangeSecurityValueCell;
+import org.panteleyev.money.app.exchange.cells.ExchangeTypeCell;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.math.BigDecimal;
@@ -59,8 +62,9 @@ public class SecuritiesWindowController extends BaseController {
     );
 
     private final FilteredList<ExchangeSecurity> filteredList = cache().getExchangeSecurities().filtered(x -> true);
+    private final SortedList<ExchangeSecurity> sortedList = filteredList.sorted();
 
-    private final TableView<ExchangeSecurity> tableView = new TableView<>(filteredList);
+    private final TableView<ExchangeSecurity> tableView = new TableView<>(sortedList);
 
 
     private final Moex moex = new Moex();
@@ -95,11 +99,19 @@ public class SecuritiesWindowController extends BaseController {
 
     private void setupTable() {
         var w = tableView.widthProperty().subtract(20);
+
+        TableColumn<ExchangeSecurity, String> codeColumn = tableColumn("Код", b ->
+                b.withPropertyCallback(ExchangeSecurity::secId)
+                        .withComparator(String::compareTo)
+                        .withWidthBinding(w.multiply(0.1)));
+
         tableView.getColumns().setAll(List.of(
-                tableColumn("Код", b ->
-                        b.withPropertyCallback(ExchangeSecurity::secId).withWidthBinding(w.multiply(0.1))),
-                tableColumn("Тип", b ->
-                        b.withPropertyCallback(ExchangeSecurity::typeName).withWidthBinding(w.multiply(0.2))),
+                codeColumn,
+                tableObjectColumn("Тип", b ->
+                        b.withCellFactory(x -> new ExchangeTypeCell())
+                                .withComparator(Comparator.comparing(ExchangeSecurity::typeName)
+                                        .thenComparing(ExchangeSecurity::secId))
+                                .withWidthBinding(w.multiply(0.2))),
                 tableColumn("Название", b ->
                         b.withPropertyCallback(ExchangeSecurity::shortName).withWidthBinding(w.multiply(0.1))),
                 tableColumn("Полное название", b ->
@@ -111,6 +123,9 @@ public class SecuritiesWindowController extends BaseController {
                 tableObjectColumn("Стоимость", b ->
                         b.withCellFactory(f -> new ExchangeSecurityValueCell()).withWidthBinding(w.multiply(0.1)))
         ));
+        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+        tableView.getSortOrder().add(codeColumn);
+        tableView.sort();
     }
 
     private MenuBar createMenuBar() {

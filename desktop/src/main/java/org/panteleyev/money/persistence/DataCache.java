@@ -21,7 +21,6 @@ import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -33,16 +32,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class DataCache {
-    private static final Comparator<Transaction> COMPARE_TRANSACTION_BY_DATE =
-            Comparator.comparing(Transaction::transactionDate)
-                    .thenComparing(Transaction::created);
-
-    private static final Comparator<Category> COMPARE_CATEGORY_BY_NAME = Comparator.comparing(Category::name);
-    private static final Comparator<Category> COMPARE_CATEGORY_BY_TYPE =
-            (o1, o2) -> o1.type().toString().compareToIgnoreCase(o2.type().toString());
-
-    private final static Comparator<Account> COMPARE_ACCOUNT_BY_NAME = Comparator.comparing(Account::name);
-
     private final ObservableList<Icon> icons = FXCollections.observableArrayList();
     private final ObservableList<MoneyDocument> documents = FXCollections.observableArrayList();
     private final ObservableList<Category> categories = FXCollections.observableArrayList();
@@ -134,6 +123,10 @@ public class DataCache {
         updateRecord(documents, document);
     }
 
+    public void remove(MoneyDocument document) {
+        removeRecord(documents, document.uuid());
+    }
+
     public long getDocumentCount(MoneyRecord owner) {
         return documents.stream()
                 .filter(doc -> doc.ownerUuid().equals(owner.uuid()))
@@ -179,14 +172,6 @@ public class DataCache {
 
     public void update(Category category) {
         updateRecord(categories, category);
-    }
-
-    public Comparator<Category> getCategoryByNameComparator() {
-        return COMPARE_CATEGORY_BY_NAME;
-    }
-
-    public Comparator<Category> getCategoryByTypeComparator() {
-        return COMPARE_CATEGORY_BY_TYPE;
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -284,18 +269,6 @@ public class DataCache {
         removeRecord(accounts, account.uuid());
     }
 
-    public Comparator<Account> getAccountByNameComparator() {
-        return COMPARE_ACCOUNT_BY_NAME;
-    }
-
-    public Comparator<Account> getAccountByCategoryComparator() {
-        return (a1, a2) -> {
-            var c1 = getCategory(a1.categoryUuid()).map(Category::name).orElse("");
-            var c2 = getCategory(a2.categoryUuid()).map(Category::name).orElse("");
-            return c1.compareTo(c2);
-        };
-    }
-
     ////////////////////////////////////////////////////////////////////////////
     // Transactions
     ////////////////////////////////////////////////////////////////////////////
@@ -369,10 +342,6 @@ public class DataCache {
 
     public void remove(Transaction transaction) {
         removeRecord(transactions, transaction.uuid());
-    }
-
-    public Comparator<Transaction> getTransactionByDateComparator() {
-        return COMPARE_TRANSACTION_BY_DATE;
     }
 
     ////////////////////////////////////////////////////////////////////////////

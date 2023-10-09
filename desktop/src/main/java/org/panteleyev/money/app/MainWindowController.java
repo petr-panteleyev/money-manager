@@ -39,6 +39,7 @@ import org.panteleyev.money.app.dialogs.ExportFileFialog;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.icons.IconWindowController;
 import org.panteleyev.money.app.settings.SettingsDialog;
+import org.panteleyev.money.app.transaction.TransactionTableView;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionDetail;
@@ -122,7 +123,7 @@ public class MainWindowController extends BaseController implements TransactionT
     private final ListChangeListener<Account> accountListener =
             change -> Platform.runLater(this::reloadTransactions);
 
-    static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
+    public static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
         try {
             new BigDecimal(value);
@@ -379,7 +380,7 @@ public class MainWindowController extends BaseController implements TransactionT
             try (var outputStream = new FileOutputStream(selected)) {
                 var filter = transactionTable.getTransactionFilter();
                 var transactions = cache().getTransactions(filter)
-                        .sorted(cache().getTransactionByDateComparator())
+                        .sorted(Comparators.transactionsByDate())
                         .toList();
                 Reports.reportTransactions(transactions, outputStream);
                 settings().update(opt -> opt.setLastReportDir(selected.getParent()));

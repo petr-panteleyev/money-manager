@@ -28,6 +28,8 @@ import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.dialogs.StatementFileDialog;
+import org.panteleyev.money.app.transaction.TransactionDialog;
+import org.panteleyev.money.app.transaction.TransactionTableView;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
@@ -63,7 +65,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
 
-class StatementWindowController extends BaseController {
+public class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
     private final TransactionTableView transactionTable
             = new TransactionTableView(this, TransactionTableView.Mode.STATEMENT);

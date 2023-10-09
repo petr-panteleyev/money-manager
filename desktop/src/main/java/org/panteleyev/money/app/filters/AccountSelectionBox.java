@@ -11,8 +11,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.Bundles;
+import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.Predicates;
-import org.panteleyev.money.app.TransactionPredicate;
+import org.panteleyev.money.app.transaction.TransactionPredicate;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
@@ -26,10 +27,10 @@ import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByUuid;
-import static org.panteleyev.money.app.TransactionPredicate.transactionByAccount;
-import static org.panteleyev.money.app.TransactionPredicate.transactionByCategory;
 import static org.panteleyev.money.app.icons.IconManager.ACCOUNT_TO_IMAGE;
 import static org.panteleyev.money.app.icons.IconManager.CATEGORY_TO_IMAGE;
+import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByAccount;
+import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByCategory;
 
 public class AccountSelectionBox extends HBox {
     private final ComboBox<CategoryType> categoryTypeBox =
@@ -40,12 +41,12 @@ public class AccountSelectionBox extends HBox {
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
     private final ComboBox<Category> categoryBox = comboBox(
-            filteredCategories.sorted(cache().getCategoryByNameComparator()),
+            filteredCategories.sorted(Comparators.categoriesByName()),
             b -> b.withDefaultString("Все категории")
                     .withStringConverter(Category::name)
                     .withImageConverter(CATEGORY_TO_IMAGE));
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
-    private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(cache().getAccountByNameComparator()),
+    private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(Comparators.accountsByName()),
             b -> b.withDefaultString("Все счета")
                     .withStringConverter(Account::name)
                     .withImageConverter(ACCOUNT_TO_IMAGE));

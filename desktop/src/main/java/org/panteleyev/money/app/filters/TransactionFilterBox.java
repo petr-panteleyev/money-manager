@@ -15,15 +15,15 @@ import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
-import org.panteleyev.money.app.TransactionPredicate;
+import org.panteleyev.money.app.transaction.TransactionPredicate;
 import org.panteleyev.money.model.Transaction;
 
 import java.time.LocalDate;
 import java.util.function.Predicate;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.app.TransactionPredicate.transactionByDates;
-import static org.panteleyev.money.app.TransactionPredicate.transactionByYear;
+import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByDates;
+import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByYear;
 
 public class TransactionFilterBox extends HBox {
     private final ChoiceBox<Object> filterChoice = new ChoiceBox<>();
