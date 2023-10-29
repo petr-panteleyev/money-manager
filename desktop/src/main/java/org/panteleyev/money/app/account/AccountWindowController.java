@@ -9,7 +9,6 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -19,27 +18,17 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.PredicateProperty;
-import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.ReportType;
 import org.panteleyev.money.app.Reports;
-import org.panteleyev.money.app.account.cells.AccountBalanceCell;
-import org.panteleyev.money.app.account.cells.AccountCategoryCell;
-import org.panteleyev.money.app.account.cells.AccountClosingDateCell;
-import org.panteleyev.money.app.account.cells.AccountCommentCell;
-import org.panteleyev.money.app.account.cells.AccountCurrencyCell;
-import org.panteleyev.money.app.account.cells.AccountInterestCell;
-import org.panteleyev.money.app.account.cells.AccountNameCell;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
-import org.panteleyev.money.app.cells.DocumentCountCell;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.AccountNameFilterBox;
 import org.panteleyev.money.app.filters.CategorySelectionBox;
@@ -50,7 +39,6 @@ import org.panteleyev.money.model.Transaction;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,8 +48,6 @@ import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -75,9 +61,6 @@ import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class AccountWindowController extends BaseController {
-    private static final int NAME_COLUMN_INDEX = 0;
-    private static final int CATEGORY_COLUMN_INDEX = 1;
-
     // Filters
     private final CategorySelectionBox categorySelectionBox = new CategorySelectionBox();
     private final AccountNameFilterBox accountNameFilterBox = new AccountNameFilterBox();
@@ -93,14 +76,7 @@ public final class AccountWindowController extends BaseController {
 
     // Items
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(filterProperty.get());
-    private final SortedList<Account> sortedList = filteredAccounts.sorted();
-    private final TableView<Account> tableView = new TableView<>(
-            sortedList
-//            filteredAccounts.sorted(
-//                    cache().getAccountByCategoryComparator()
-//                            .thenComparing(cache().getAccountByNameComparator())
-//            )
-    );
+    private final TableView<Account> tableView = new AccountTableView(filteredAccounts.sorted());
 
     @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Category> categoryListener = c -> Platform.runLater(() -> {
@@ -131,7 +107,6 @@ public final class AccountWindowController extends BaseController {
             .accelerator(SHORTCUT_R).build();
 
     public AccountWindowController() {
-        setupTableColumns();
         createContextMenu();
 
         // Tool box
@@ -219,46 +194,6 @@ public final class AccountWindowController extends BaseController {
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
         return menuBar;
-    }
-
-    private void setupTableColumns() {
-        var w = tableView.widthProperty().subtract(20);
-        tableView.getColumns().setAll(List.of(
-                tableObjectColumn("Название", b ->
-                        b.withCellFactory(x -> new AccountNameCell())
-                                .withComparator(Comparators.accountsByName())
-                                .withWidthBinding(w.multiply(0.15))),
-                tableObjectColumn("Категория", b ->
-                        b.withCellFactory(x -> new AccountCategoryCell())
-                                .withComparator(Comparators.accountsByCategory(cache()))
-                                .withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn("Валюта", b ->
-                        b.withCellFactory(x -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
-                tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
-                        b.withCellFactory(x -> new AccountInterestCell())
-                                .withPropertyCallback(Account::interest)
-                                .withWidthBinding(w.multiply(0.03))),
-                tableObjectColumn("До", b ->
-                        b.withCellFactory(x -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()))
-                                .withComparator(Comparators.accountsByClosingDate())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Комментарий", b ->
-                        b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.29))),
-                tableObjectColumn("Баланс", b ->
-                        b.withCellFactory(x -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn("Ожидает", b ->
-                        b.withCellFactory(x -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn("", b ->
-                        b.withCellFactory(x -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
-        ));
-
-        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
-
-        tableView.getSortOrder().addAll(List.of(
-                tableView.getColumns().get(CATEGORY_COLUMN_INDEX),
-                tableView.getColumns().get(NAME_COLUMN_INDEX)
-        ));
-        tableView.sort();
     }
 
     private void createContextMenu() {
@@ -394,5 +329,4 @@ public final class AccountWindowController extends BaseController {
             controller.onCreateDocument(event);
         });
     }
-
 }

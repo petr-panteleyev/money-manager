@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -14,7 +14,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>23.10.1</revision>
+        <revision>24.3.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
@@ -26,7 +26,7 @@
         <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.5.0</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
-        <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.6.3</jpackageMavenPluginVersion>
         <flattenMavenPluginVersion>1.4.1</flattenMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>21</javaFxVersion>
@@ -35,11 +35,10 @@
         <controlsFxVersion>11.1.2</controlsFxVersion>
         <jsoupVersion>1.15.3</jsoupVersion>
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
-        <postgresVersion>42.5.1</postgresVersion>
+        <postgresVersion>42.7.2</postgresVersion>
         <freemarkerVersion>2.3.32</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
         <jUnitVersion>5.9.1</jUnitVersion>
-        <mockitoVersion>4.5.1</mockitoVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
@@ -158,12 +157,6 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>${jUnitVersion}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockitoVersion}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

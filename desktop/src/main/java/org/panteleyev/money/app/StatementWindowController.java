@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -254,6 +254,9 @@ public class StatementWindowController extends BaseController {
                     .filter(new StatementPredicate(account, record, ignoreExecutionDate.isSelected()))
                     .toList());
         }
+
+        // TODO: sort via table comparator
+        statement.records().sort((o1, o2) -> o2.getActual().compareTo(o1.getActual()));
 
         Platform.runLater(() -> {
             var selected = statementTable.getSelectionModel().getSelectedItem();

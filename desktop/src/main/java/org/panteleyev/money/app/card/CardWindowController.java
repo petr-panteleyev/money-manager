@@ -6,7 +6,6 @@ package org.panteleyev.money.app.card;
 
 import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,16 +16,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.BaseController;
-import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
-import org.panteleyev.money.app.cells.CardAccountCell;
-import org.panteleyev.money.app.cells.CardCategoryCell;
-import org.panteleyev.money.app.cells.CardExpirationDateCell;
-import org.panteleyev.money.app.cells.CardNumberCell;
 import org.panteleyev.money.app.filters.CardNumberFilterBox;
 import org.panteleyev.money.model.Card;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,8 +30,6 @@ import static org.panteleyev.fx.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -60,16 +51,13 @@ public final class CardWindowController extends BaseController {
             ));
 
     private final FilteredList<Card> filteredList = cache().getCards().filtered(filterProperty.get());
-    private final SortedList<Card> sortedList = filteredList.sorted();
-    private final TableView<Card> table = new TableView<>(sortedList);
+    private final TableView<Card> tableView = new CardTableView(filteredList.sorted());
 
     public CardWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
                 this::onCreateCard, this::onEditCard, e -> {},
-                table.getSelectionModel().selectedItemProperty().isNull()
+                tableView.getSelectionModel().selectedItemProperty().isNull()
         );
-
-        setupTable();
 
         var menuBar = menuBar(
                 newMenu("Файл",
@@ -97,12 +85,12 @@ public final class CardWindowController extends BaseController {
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
-        table.setContextMenu(new ContextMenu(
+        tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
                 createContextMenuItem(crudActionsHolder.getUpdateAction())
         ));
 
-        var pane = new BorderPane(table,
+        var pane = new BorderPane(tableView,
                 fxNode(
                         hBox(List.of(cardNumberFilterBox.getTextField() /*, typeBox*/), b -> {
                             b.setSpacing(BIG_SPACING);
@@ -116,7 +104,6 @@ public final class CardWindowController extends BaseController {
         self.setPrefSize(600.0, 400.0);
 
         filteredList.predicateProperty().bind(filterProperty);
-        sortedList.comparatorProperty().bind(table.comparatorProperty());
 
         setupWindow(self);
         settings().loadStageDimensions(this);
@@ -125,32 +112,12 @@ public final class CardWindowController extends BaseController {
     }
 
     private Optional<Card> getSelectedCard() {
-        return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
+        return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
     }
 
     @Override
     public String getTitle() {
         return "Карты";
-    }
-
-    private void setupTable() {
-        var w = table.widthProperty().subtract(20);
-        table.getColumns().setAll(List.of(
-                tableObjectColumn("Номер", b ->
-                        b.withCellFactory(x -> new CardNumberCell()).withWidthBinding(w.multiply(0.2))
-                                .withComparator(Comparator.comparing(Card::number))),
-                tableObjectColumn("Категория", b ->
-                        b.withCellFactory(x -> new CardCategoryCell()).withWidthBinding(w.multiply(0.1))
-                                .withComparator(Comparators.cardsByCategory(cache()))),
-                tableObjectColumn("Счёт", b ->
-                        b.withCellFactory(x -> new CardAccountCell()).withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn("До", b ->
-                        b.withCellFactory(x -> new CardExpirationDateCell(settings().getAccountClosingDayDelta()))
-                                .withWidthBinding(w.multiply(0.1))
-                                .withComparator(Comparator.comparing(Card::expiration))),
-                tableColumn("Комментарий", b ->
-                        b.withPropertyCallback(Card::comment).withWidthBinding(w.multiply(0.4)))
-        ));
     }
 
     private void resetFilter() {

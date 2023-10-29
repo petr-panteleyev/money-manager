@@ -4,39 +4,34 @@
  */
 package org.panteleyev.money.app.currency;
 
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.model.Currency;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class CurrencyWindowController extends BaseController {
-    private final SortedList<Currency> sortedList = cache().getCurrencies().sorted();
-    private final TableView<Currency> table = new TableView<>(sortedList);
+    private final TableView<Currency> tableView = new CurrencyTableView(cache().getCurrencies().sorted());
 
     public CurrencyWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
                 this::onCreateCurrency, this::onEditCurrency, this::onDeleteCurrency,
-                table.getSelectionModel().selectedItemProperty().isNull()
+                tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
         var menuBar = menuBar(
@@ -54,10 +49,8 @@ public final class CurrencyWindowController extends BaseController {
         );
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
-        setupCurrencyColumns();
-
         // Context Menu
-        table.setContextMenu(new ContextMenu(
+        tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
                 createMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
@@ -65,7 +58,7 @@ public final class CurrencyWindowController extends BaseController {
         ));
 
         var root = new BorderPane(
-                new BorderPane(table, null, null, null, null),
+                new BorderPane(tableView, null, null, null, null),
                 menuBar, null, null, null
         );
 
@@ -79,7 +72,7 @@ public final class CurrencyWindowController extends BaseController {
     }
 
     private Optional<Currency> getSelectedCurrency() {
-        return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
+        return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
     }
 
     private void onCreateCurrency(ActionEvent event) {
@@ -103,22 +96,5 @@ public final class CurrencyWindowController extends BaseController {
                                 dao().deleteCurrency(currency);
                             }
                         }));
-    }
-
-    private void setupCurrencyColumns() {
-        var w = table.widthProperty().subtract(20);
-        TableColumn<Currency, String> nameColumn = tableColumn("Название", b ->
-                b.withPropertyCallback(Currency::symbol)
-                        .withComparator(String::compareTo)
-                        .withWidthBinding(w.multiply(0.2)));
-
-        table.getColumns().setAll(List.of(
-                nameColumn,
-                tableColumn("Описание", b ->
-                        b.withPropertyCallback(Currency::description).withWidthBinding(w.multiply(0.8)))
-        ));
-        sortedList.comparatorProperty().bind(table.comparatorProperty());
-        table.getSortOrder().add(nameColumn);
-        table.sort();
     }
 }

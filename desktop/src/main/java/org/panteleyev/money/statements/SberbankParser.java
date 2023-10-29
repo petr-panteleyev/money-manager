@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -108,7 +108,8 @@ class SberbankParser implements Parser {
 
     @Override
     public StatementType detectType(String content) {
-        if (content.contains("HTML_DEBIT_RUS_REPORT") || content.contains("HTML_CREDIT_RUS_REPORT")) {
+        if (content.contains("HTML_DEBIT_RUS_REPORT") || content.contains("HTML_CREDIT_RUS_REPORT")
+                || content.contains("HTML_DEBIT_RUS_HISTORY")) {
             return StatementType.SBERBANK_HTML;
         } else {
             return StatementType.UNKNOWN;

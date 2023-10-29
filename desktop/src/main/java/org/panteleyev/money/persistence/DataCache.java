@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -421,6 +421,7 @@ public class DataCache {
     public List<Card> getCardsByAccount(Account account) {
         return cards.stream()
                 .filter(c -> Objects.equals(account.uuid(), c.accountUuid()))
+                .filter(Card::enabled)
                 .toList();
     }
 

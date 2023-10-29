@@ -1,15 +1,12 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
-import org.mockito.stubbing.Answer;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
@@ -37,8 +34,6 @@ import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.panteleyev.money.persistence.BaseDaoTest.ICON_DOLLAR;
 import static org.panteleyev.money.persistence.BaseDaoTest.ICON_EURO;
 import static org.panteleyev.money.persistence.BaseDaoTest.ICON_JAVA;
@@ -103,15 +98,12 @@ public class TestImportExport {
     private static final Card CARD_1 = newCard(ACCOUNT_1);
     private static final Card CARD_2 = newCard(ACCOUNT_3);
 
-    private final MoneyDAO dao = Mockito.mock(MoneyDAO.class);
-
-    @BeforeEach
-    public void init() {
-        when(dao.getDocumentBytes(any(MoneyDocument.class))).thenAnswer((Answer<byte[]>) invocation -> {
-            var document = (MoneyDocument) invocation.getArgument(0);
+    private final MoneyDAO dao = new MoneyDAO(new DataCache()) {
+        @Override
+        public byte[] getDocumentBytes(MoneyDocument document) {
             return BLOBS.get(document.uuid());
-        });
-    }
+        }
+    };
 
     public static List<Arguments> importExportData() {
         return List.of(

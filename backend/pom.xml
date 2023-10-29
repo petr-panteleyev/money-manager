@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -19,7 +19,7 @@
     <name>Backend</name>
 
     <properties>
-        <revision>23.10.1</revision>
+        <revision>24.3.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
@@ -30,7 +30,7 @@
         <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.5.2</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.5.1</postgresVersion>
+        <postgresVersion>42.7.2</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <springDocsVersion>1.6.15</springDocsVersion>
         <caffeineVersion>3.1.1</caffeineVersion>

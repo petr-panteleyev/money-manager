@@ -6,7 +6,6 @@ package org.panteleyev.money.app.category;
 
 import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Insets;
@@ -20,10 +19,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
-import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
-import org.panteleyev.money.app.category.cells.CategoryNameCell;
-import org.panteleyev.money.app.category.cells.CategoryTypeCell;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.CategoryType;
 
@@ -38,8 +34,6 @@ import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.fx.MenuFactory.newMenu;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
@@ -58,13 +52,12 @@ public final class CategoryWindowController extends BaseController {
     private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
-    private final SortedList<Category> sortedList = filteredList.sorted();
-    private final TableView<Category> table = new TableView<>(sortedList);
+    private final TableView<Category> tableView = new CategoryTableView(filteredList.sorted());
 
     public CategoryWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
                 this::onCreateCategory, this::onEditCategory, e -> {},
-                table.getSelectionModel().selectedItemProperty().isNull()
+                tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
         var menuBar = menuBar(
@@ -85,32 +78,14 @@ public final class CategoryWindowController extends BaseController {
         menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
-        table.setContextMenu(new ContextMenu(
+        tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
                 createContextMenuItem(crudActionsHolder.getUpdateAction())
         ));
 
-        // Table
-        var w = table.widthProperty().subtract(20);
-        table.getColumns().setAll(List.of(
-                tableObjectColumn("Тип",
-                        b -> b.withCellFactory(x -> new CategoryTypeCell())
-                                .withComparator(Comparators.categoriesByType()
-                                        .thenComparing(Comparators.categoriesByName()))
-                                .withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn("Название",
-                        b -> b.withCellFactory(x -> new CategoryNameCell())
-                                .withComparator(Comparators.categoriesByName())
-                                .withWidthBinding(w.multiply(0.4))),
-                tableColumn("Комментарий",
-                        b -> b.withPropertyCallback(Category::comment).withWidthBinding(w.multiply(0.4)))
-        ));
-        sortedList.comparatorProperty().bind(table.comparatorProperty());
-        table.getSortOrder().add(table.getColumns().get(0));
+        tableView.setOnMouseClicked(this::onTableMouseClick);
 
-        table.setOnMouseClicked(this::onTableMouseClick);
-
-        var pane = new BorderPane(table,
+        var pane = new BorderPane(tableView,
                 fxNode(
                         hBox(List.of(searchField, typeBox), b -> {
                             b.setSpacing(BIG_SPACING);
@@ -132,7 +107,7 @@ public final class CategoryWindowController extends BaseController {
     }
 
     private Optional<Category> getSelectedCategory() {
-        return Optional.ofNullable(table.getSelectionModel().getSelectedItem());
+        return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
     }
 
     @Override
