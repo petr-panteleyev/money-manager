@@ -35,7 +35,7 @@
         <controlsFxVersion>11.1.2</controlsFxVersion>
         <jsoupVersion>1.15.3</jsoupVersion>
         <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
-        <postgresVersion>42.5.1</postgresVersion>
+        <postgresVersion>42.7.2</postgresVersion>
         <freemarkerVersion>2.3.32</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
         <jUnitVersion>5.9.1</jUnitVersion>
