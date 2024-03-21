@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -12,7 +12,7 @@ import static org.panteleyev.money.app.icons.IconManager.ICON_SIZE;
 public final class Images {
     private static final String BASE_PACKAGE = "org/panteleyev/money/images/";
 
-    public static final Image APP_ICON = image("icon48.png");
+    public static final Image APP_ICON = image("icon48.png", 48);
     public static final Image WARNING = image("warning-16.png");
     public static final Image EMPTY = image("empty.png");
     public static final Image SEARCH = image("search.png");
@@ -34,6 +34,10 @@ public final class Images {
 
     private static Image image(String name) {
         return new Image(BASE_PACKAGE + name, ICON_SIZE, ICON_SIZE, true, true);
+    }
+
+    private static Image image(String name, int size) {
+        return new Image(BASE_PACKAGE + name, size, size, true, true);
     }
 
     private Images() {

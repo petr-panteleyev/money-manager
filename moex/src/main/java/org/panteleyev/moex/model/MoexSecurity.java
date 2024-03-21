@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.moex.model;
@@ -123,7 +123,7 @@ public record MoexSecurity(
         }
 
         public Builder faceValue(String faceValue) {
-            this.faceValue = new BigDecimal(faceValue);
+            this.faceValue = faceValue.isEmpty()? BigDecimal.ZERO : new BigDecimal(faceValue);
             return this;
         }
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -10,7 +10,11 @@ import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import static org.panteleyev.fx.BoxFactory.vBox;
 import static org.panteleyev.fx.FxUtils.fxString;
@@ -34,6 +38,10 @@ final class AboutDialog extends BaseDialog<Object> {
 
     static final String APP_TITLE = "Money Manager";
 
+    private static final ZoneId LOCAL_TIME_ZONE = TimeZone.getDefault().toZoneId();
+    private static final DateTimeFormatter TIMESTAMP_PARSER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssVV");
+    private static final DateTimeFormatter LOCAL_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
+
     private static final String RUNTIME = System.getProperty("java.vm.version") + " " + System.getProperty("os.arch");
     private static final String VM = System.getProperty("java.vm.name") + " by " + System.getProperty("java.vm.vendor");
     private static final BuildInformation BUILD = BuildInformation.load();
@@ -49,10 +57,13 @@ final class AboutDialog extends BaseDialog<Object> {
         var aboutLabel = label(fxString(APP_TITLE, " ") + BUILD.version());
         aboutLabel.getStyleClass().add(STYLE_ABOUT_LABEL);
 
+        var timestamp = ZonedDateTime.parse(BUILD.timestamp(), TIMESTAMP_PARSER)
+                .withZoneSameInstant(LOCAL_TIME_ZONE);
+
         var vBox = vBox(BIG_SPACING,
                 vBox(SMALL_SPACING,
                         aboutLabel,
-                        label("Built on " + BUILD.timestamp())
+                        label("Built on " + LOCAL_FORMATTER.format(timestamp))
                 ),
                 vBox(SMALL_SPACING,
                         label("Runtime version: " + RUNTIME),
