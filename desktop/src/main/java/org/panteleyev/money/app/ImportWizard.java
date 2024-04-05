@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -66,7 +66,7 @@ final class ImportWizard extends BaseDialog<Object> {
 
             var warningLabel = createWarningLabel();
 
-            addRow(0, fileNameEdit, button("...", x -> onBrowse()));
+            addRow(0, fileNameEdit, button("...", _ -> onBrowse()));
 
             addRow(3, warningLabel);
             addRow(4, warningCheck);
@@ -84,8 +84,10 @@ final class ImportWizard extends BaseDialog<Object> {
         }
 
         private Label createWarningLabel() {
-            var label = label("Внимание!\nИмпортирование полного дампа полностью уничтожит\n" +
-                    "все существующие записи в базе.");
+            var label = label("""
+                    Внимание!
+                    Импортирование полного дампа полностью уничтожит
+                    все существующие записи в базе.""");
             label.setWrapText(true);
             return label;
         }
@@ -142,7 +144,7 @@ final class ImportWizard extends BaseDialog<Object> {
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
                 }
-            }).handle((x, t) -> {
+            }).handle((_, t) -> {
                 if (t != null) {
                     MoneyApplication.uncaughtException(t.getCause() != null ? t.getCause() : t);
                 }

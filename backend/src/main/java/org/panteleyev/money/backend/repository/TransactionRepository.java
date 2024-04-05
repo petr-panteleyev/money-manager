@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -28,7 +28,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 public class TransactionRepository implements MoneyRepository<Transaction> {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Transaction> rowMapper = (rs, i) -> new Transaction(
+    private final RowMapper<Transaction> rowMapper = (rs, _) -> new Transaction(
             getUuid(rs, "uuid"),
             rs.getBigDecimal("amount"),
             rs.getBigDecimal("credit_amount"),
@@ -123,7 +123,7 @@ public class TransactionRepository implements MoneyRepository<Transaction> {
                         """,
                 Map.of("uuid", uuid),
                 rowMapper);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.getFirst());
     }
 
     @Override

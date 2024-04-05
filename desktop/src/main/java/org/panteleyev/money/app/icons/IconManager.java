@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.icons;
@@ -87,7 +87,7 @@ public class IconManager {
     }
 
     public static void setupComboBox(ComboBox<Icon> comboBox) {
-        comboBox.setCellFactory(p -> new IconListCell());
+        comboBox.setCellFactory(_ -> new IconListCell());
         comboBox.setButtonCell(new IconListCell());
 
         comboBox.getItems().clear();

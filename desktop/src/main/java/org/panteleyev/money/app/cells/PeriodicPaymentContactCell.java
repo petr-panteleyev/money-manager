@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
@@ -7,7 +7,6 @@ package org.panteleyev.money.app.cells;
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.PeriodicPayment;
-import org.panteleyev.money.model.Transaction;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 

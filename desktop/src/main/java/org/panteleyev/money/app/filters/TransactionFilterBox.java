@@ -39,7 +39,7 @@ public class TransactionFilterBox extends HBox {
             new PredicateProperty<>(TransactionPredicate.CURRENT_MONTH);
 
     private final EventHandler<ActionEvent> updateHandler =
-            event -> predicateProperty.set(getTransactionFilter());
+            _ -> predicateProperty.set(getTransactionFilter());
 
     public TransactionFilterBox() {
         this(false, false);
@@ -106,7 +106,7 @@ public class TransactionFilterBox extends HBox {
     }
 
     public void setFilterYears() {
-        filterChoice.setOnAction(x -> {});
+        filterChoice.setOnAction(_ -> {});
 
         // remove existing years
         if (filterYearsIndex < filterChoice.getItems().size()) {

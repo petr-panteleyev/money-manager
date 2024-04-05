@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.contact;
@@ -23,7 +23,7 @@ final class ContactTableView extends TableView<Contact> {
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
                 tableObjectColumn("Имя", b ->
-                        b.withCellFactory(x -> new ContactNameCell())
+                        b.withCellFactory(_ -> new ContactNameCell())
                                 .withComparator(Comparator.comparing(Contact::name))
                                 .withWidthBinding(w.multiply(0.4))),
                 tableColumn("Тип", b ->

@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.exchange;
@@ -51,7 +51,7 @@ public class SecuritiesWindowController extends BaseController {
     private static final ExchangeGroup ALL_ITEMS = new ExchangeGroup("", "Все типы");
 
     private final ChoiceBox<Object> groupBox = choiceBox(List.of(),
-            b -> b.withHandler(event -> updatePredicate())
+            b -> b.withHandler(_ -> updatePredicate())
                     .withStringConverter(object -> {
                         if (object instanceof ExchangeGroup group) {
                             return group.title();
@@ -61,7 +61,7 @@ public class SecuritiesWindowController extends BaseController {
                     })
     );
 
-    private final FilteredList<ExchangeSecurity> filteredList = cache().getExchangeSecurities().filtered(x -> true);
+    private final FilteredList<ExchangeSecurity> filteredList = cache().getExchangeSecurities().filtered(_ -> true);
     private final SortedList<ExchangeSecurity> sortedList = filteredList.sorted();
 
     private final TableView<ExchangeSecurity> tableView = new TableView<>(sortedList);
@@ -83,7 +83,7 @@ public class SecuritiesWindowController extends BaseController {
         root.setPrefSize(600.0, 400.0);
 
         groupBox.getSelectionModel().select(0);
-        groupBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
+        groupBox.valueProperty().addListener((_, _, _) -> updatePredicate());
         setupGroupBox();
 
         tableView.setContextMenu(createContextMenu());
@@ -108,7 +108,7 @@ public class SecuritiesWindowController extends BaseController {
         tableView.getColumns().setAll(List.of(
                 codeColumn,
                 tableObjectColumn("Тип", b ->
-                        b.withCellFactory(x -> new ExchangeTypeCell())
+                        b.withCellFactory(_ -> new ExchangeTypeCell())
                                 .withComparator(Comparator.comparing(ExchangeSecurity::typeName)
                                         .thenComparing(ExchangeSecurity::secId))
                                 .withWidthBinding(w.multiply(0.2))),
@@ -121,7 +121,7 @@ public class SecuritiesWindowController extends BaseController {
                 tableColumn("Гос. регистрация", b ->
                         b.withPropertyCallback(ExchangeSecurity::regNumber).withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Стоимость", b ->
-                        b.withCellFactory(f -> new ExchangeSecurityValueCell()).withWidthBinding(w.multiply(0.1)))
+                        b.withCellFactory(_ -> new ExchangeSecurityValueCell()).withWidthBinding(w.multiply(0.1)))
         ));
         sortedList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.getSortOrder().add(codeColumn);
@@ -156,7 +156,7 @@ public class SecuritiesWindowController extends BaseController {
                 .flatMap(moex::getSecurity).ifPresent(moexSecurity -> {
                     var security = buildExchangeSecurity(moexSecurity, null);
 
-                    new ExchangeSecurityDialog(this, security).showAndWait().ifPresent(value -> {
+                    new ExchangeSecurityDialog(this, security).showAndWait().ifPresent(_ -> {
                         dao().insertExchangeSecurity(security);
                         setupGroupBox();
                     });
@@ -207,7 +207,7 @@ public class SecuritiesWindowController extends BaseController {
     private void onUpdateSecurity(ActionEvent ignored) {
         getSelected().ifPresent(selected -> moex.getSecurity(selected.secId()).ifPresent(moexSecurity -> {
             var updated = buildExchangeSecurity(moexSecurity, selected.uuid());
-            new ExchangeSecurityDialog(this, updated).showAndWait().ifPresent(value -> {
+            new ExchangeSecurityDialog(this, updated).showAndWait().ifPresent(_ -> {
                 dao().updateExchangeSecurity(updated);
                 setupGroupBox();
             });
@@ -218,7 +218,7 @@ public class SecuritiesWindowController extends BaseController {
         var selected = groupBox.getSelectionModel().getSelectedItem();
         if (selected instanceof ExchangeGroup group) {
             if (group == ALL_ITEMS) {
-                filteredList.setPredicate(x -> true);
+                filteredList.setPredicate(_ -> true);
             } else {
                 filteredList.setPredicate(security -> Objects.equals(security.group(), group.type()));
             }

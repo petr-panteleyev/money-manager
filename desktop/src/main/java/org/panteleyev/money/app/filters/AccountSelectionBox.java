@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -39,13 +39,13 @@ public class AccountSelectionBox extends HBox {
                             .withStringConverter(Bundles::translate)
             );
 
-    private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(c -> true);
+    private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(_ -> true);
     private final ComboBox<Category> categoryBox = comboBox(
             filteredCategories.sorted(Comparators.categoriesByName()),
             b -> b.withDefaultString("Все категории")
                     .withStringConverter(Category::name)
                     .withImageConverter(CATEGORY_TO_IMAGE));
-    private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(a -> true);
+    private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(_ -> true);
     private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(Comparators.accountsByName()),
             b -> b.withDefaultString("Все счета")
                     .withStringConverter(Account::name)
@@ -63,12 +63,12 @@ public class AccountSelectionBox extends HBox {
         accountBox.setVisibleRowCount(20);
 
         categoryTypeBox.setOnAction(
-                event -> setupCategoryBox(getSelectedCategoryType().orElse(null))
+                _ -> setupCategoryBox(getSelectedCategoryType().orElse(null))
         );
         categoryBox.setOnAction(
-                event -> setupAccountBox(getSelectedCategory().orElse(null))
+                _ -> setupAccountBox(getSelectedCategory().orElse(null))
         );
-        accountBox.setOnAction(event -> updatePredicate());
+        accountBox.setOnAction(_ -> updatePredicate());
 
         Platform.runLater(this::reset);
     }
@@ -84,7 +84,7 @@ public class AccountSelectionBox extends HBox {
     private void setupCategoryBox(CategoryType type) {
         var selectedAccount = getSelectedAccount();
 
-        filteredCategories.setPredicate(type == null ? c -> true : c -> c.type() == type);
+        filteredCategories.setPredicate(type == null ? _ -> true : c -> c.type() == type);
 
         categoryBox.setValue(null);
         categoryBox.getSelectionModel().select(null);
@@ -98,7 +98,7 @@ public class AccountSelectionBox extends HBox {
         var selectedAccount = getSelectedAccount();
 
         filteredAccounts.setPredicate(
-                category == null ? a -> true : a -> a.categoryUuid().equals(category.uuid())
+                category == null ? _ -> true : a -> a.categoryUuid().equals(category.uuid())
         );
 
         accountBox.setValue(null);
@@ -125,14 +125,14 @@ public class AccountSelectionBox extends HBox {
         return getSelectedAccount().map(a -> transactionByAccount(a.uuid()))
                 .orElseGet(() -> getSelectedCategory().map(c -> transactionByCategory(c.uuid()))
                         .orElseGet(() -> getSelectedCategoryType().map(TransactionPredicate::transactionByCategoryType)
-                                .orElse(x -> true)));
+                                .orElse(_ -> true)));
     }
 
     public Predicate<Account> getAccountFilter() {
         return getSelectedAccount().map(a -> accountByUuid(a.uuid()))
                 .orElseGet(() -> getSelectedCategory().map(c -> accountByCategory(c.uuid()))
                         .orElseGet(() -> getSelectedCategoryType().map(Predicates::accountByCategoryType)
-                                .orElse(x -> true)));
+                                .orElse(_ -> true)));
     }
 
     private void updatePredicate() {

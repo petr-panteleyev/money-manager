@@ -1,11 +1,10 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.category.cells;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.model.Category;
 
 import static org.panteleyev.money.app.Bundles.translate;

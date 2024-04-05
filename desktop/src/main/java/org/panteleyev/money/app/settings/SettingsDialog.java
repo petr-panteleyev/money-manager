@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -115,17 +115,15 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                 titledPane("Элементы управления",
                                         gridPane(List.of(
                                                 gridRow(label("Текст:"), controlsFontField,
-                                                        button(ELLIPSIS,
-                                                                actionEvent -> onFontSelected(controlsFontField))),
+                                                        button(ELLIPSIS, _ -> onFontSelected(controlsFontField))),
                                                 gridRow(label("Меню:"), menuFontField,
-                                                        button(ELLIPSIS, actionEvent -> onFontSelected(menuFontField)))
+                                                        button(ELLIPSIS, _ -> onFontSelected(menuFontField)))
                                         ), b -> b.withStyle(GRID_PANE))
                                 ),
                                 titledPane("Таблицы",
                                         gridPane(List.of(
                                                         gridRow(cellFontField,
-                                                                button(ELLIPSIS,
-                                                                        actionEvent -> onFontSelected(cellFontField)))
+                                                                button(ELLIPSIS, _ -> onFontSelected(cellFontField)))
                                                 ), b -> b.withStyle(GRID_PANE)
                                         )
                                 ),
@@ -133,7 +131,7 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                         gridPane(List.of(
                                                         gridRow(dialogLabelFontField,
                                                                 button(ELLIPSIS,
-                                                                        actionEvent -> onFontSelected(dialogLabelFontField)))
+                                                                        _ -> onFontSelected(dialogLabelFontField)))
                                                 ), b -> b.withStyle(GRID_PANE)
                                         )
                                 )

@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.dialogs;
@@ -86,9 +86,9 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
             b -> b.withStringConverter(Bundles::translate));
     private final ChoiceBox<RecurrenceType> recurrenceTypeBox = choiceBox(RecurrenceType.values(),
             b -> b.withStringConverter(Bundles::translate)
-                    .withHandler(event -> onRecurrenceSelected())
+                    .withHandler(_ -> onRecurrenceSelected())
     );
-    private final ComboBox<Integer> dayComboBox = comboBox(IntStream.range(1, 29).boxed().toList(), b -> {});
+    private final ComboBox<Integer> dayComboBox = comboBox(IntStream.range(1, 29).boxed().toList(), _ -> {});
     private final ChoiceBox<Month> monthChoiceBox = choiceBox(Month.values(),
             b -> b.withStringConverter(Bundles::translate));
     private final TextField commentEdit = new TextField();
@@ -192,19 +192,19 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
         validation.registerValidator(nameEdit, (Control control, String value) ->
                 ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
-        validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
+        validation.registerValidator(debitedAccountEdit, (Control control, String _) -> {
             var account = checkTextFieldValue(debitedAccountEdit, debitedSuggestions, ACCOUNT_TO_STRING);
             builder.accountDebitedUuid(account.map(Account::uuid).orElse(null));
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
-        validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {
+        validation.registerValidator(creditedAccountEdit, (Control control, String _) -> {
             var account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
             builder.accountCreditedUuid(account.map(Account::uuid).orElse(null));
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
-        validation.registerValidator(contactEdit, (Control control, String value) -> {
+        validation.registerValidator(contactEdit, (Control control, String _) -> {
             var contact = checkTextFieldValue(contactEdit, contactSuggestions, CONTACT_TO_STRING);
             builder.contactUuid(contact.map(Contact::uuid).orElse(null));
             return ValidationResult.fromErrorIf(control, null, contact.isEmpty());
@@ -237,7 +237,7 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
                         accounts.forEach(acc -> {
                             creditedSuggestions.add(acc);
                             creditedMenuButton.getItems().add(
-                                    menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                                    menuItem("  - " + acc.name(), _ -> onCreditedAccountSelected(acc)));
                         });
                     }
                 });
@@ -261,8 +261,8 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
                 .forEach(acc -> {
                     var title = "[" + acc.name() + "]";
 
-                    debitedMenuButton.getItems().add(menuItem(title, event -> onDebitedAccountSelected(acc)));
-                    creditedMenuButton.getItems().add(menuItem(title, event -> onCreditedAccountSelected(acc)));
+                    debitedMenuButton.getItems().add(menuItem(title, _ -> onDebitedAccountSelected(acc)));
+                    creditedMenuButton.getItems().add(menuItem(title, _ -> onCreditedAccountSelected(acc)));
 
                     debitedSuggestions.add(acc);
                     creditedSuggestions.add(acc);
@@ -304,9 +304,9 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
                             var title = "  " + prefix + " " + acc.name();
 
                             debitedMenuButton.getItems().add(
-                                    menuItem(title, event -> onDebitedAccountSelected(acc)));
+                                    menuItem(title, _ -> onDebitedAccountSelected(acc)));
                             creditedMenuButton.getItems().add(
-                                    menuItem(title, event -> onCreditedAccountSelected(acc)));
+                                    menuItem(title, _ -> onCreditedAccountSelected(acc)));
 
                             debitedSuggestions.add(acc);
                             creditedSuggestions.add(acc);
@@ -327,7 +327,7 @@ public class PeriodicPaymentDialog extends BaseDialog<PeriodicPayment> {
         cache.getContacts().stream()
                 .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
                 .forEach(x -> {
-                    contactMenuButton.getItems().add(menuItem(x.name(), event -> onContactSelected(x)));
+                    contactMenuButton.getItems().add(menuItem(x.name(), _ -> onContactSelected(x)));
                     contactSuggestions.add(x);
                 });
 

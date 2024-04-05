@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -78,7 +78,7 @@ class RequestWindowController extends BaseController {
 
         var uncheckedOnlyCheckBox = new CheckBox("Только неотмеченные");
         uncheckedOnlyCheckBox.selectedProperty().addListener(
-                (v, old, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : t -> true)
+                (_, _, newValue) -> uncheckedPredicate.set(newValue ? t -> !t.checked() : _ -> true)
         );
 
         filterProperty = PredicateProperty.and(List.of(
@@ -110,7 +110,7 @@ class RequestWindowController extends BaseController {
         sumField.setEditable(false);
         sumField.setFocusTraversable(false);
 
-        filterProperty.addListener((x, y, newValue) -> onUpdateFilter());
+        filterProperty.addListener((_, _, _) -> onUpdateFilter());
 
         transactionFilterBox.setTransactionFilter(TransactionPredicate.CURRENT_MONTH);
 
@@ -125,7 +125,7 @@ class RequestWindowController extends BaseController {
         bindAutoCompletion(contactFilterBox.getTextField(), new StringCompletionProvider(contactSuggestions));
         setupContactMenu();
 
-        table.selectedTransactions().addListener((ListChangeListener<Transaction>) change ->
+        table.selectedTransactions().addListener((ListChangeListener<Transaction>) _ ->
                 sumField.setText(
                         DataCache.calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
                 ));
@@ -154,13 +154,13 @@ class RequestWindowController extends BaseController {
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
                 newMenu("Файл",
-                        menuItem("Отчет...", SHORTCUT_ALT_R, event -> onReport()),
+                        menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
                 createMenu("Правка", table.getActions()),
                 newMenu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );

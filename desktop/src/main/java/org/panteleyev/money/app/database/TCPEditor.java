@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -53,7 +53,7 @@ final class TCPEditor extends VBox {
                         .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
         ));
 
-        VBox.setMargin(getChildren().get(0), new Insets(10.0, 10.0, 10.0, 10.0));
+        VBox.setMargin(getChildren().getFirst(), new Insets(10.0, 10.0, 10.0, 10.0));
     }
 
     TextField getSchemaEdit() {

@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.card;
@@ -139,7 +139,7 @@ final class CardDialog extends BaseDialog<Card> {
     }
 
     private void createValidationSupport() {
-        validation.registerValidator(accountEdit, (Control control, String value) -> {
+        validation.registerValidator(accountEdit, (Control control, String _) -> {
             var account = checkTextFieldValue(accountEdit.getText(), accountSuggestionsAll, ACCOUNT_TO_STRING);
             builder.accountUuid(account.map(Account::uuid).orElse(null));
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
@@ -164,7 +164,7 @@ final class CardDialog extends BaseDialog<Card> {
                     if (account.enabled()) {
                         accountSuggestions.add(account);
                         accountMenuButton.getItems().add(
-                                menuItem(account.name(), event -> onAccountSelected(account))
+                                menuItem(account.name(), _ -> onAccountSelected(account))
                         );
                     }
                 });

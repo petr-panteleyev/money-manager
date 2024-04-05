@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -96,7 +96,7 @@ final class PeriodicPaymentWindowController extends BaseController {
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableObjectColumn("Сумма",
-                        b -> b.withCellFactory(x -> new PeriodicPaymentSumCell())
+                        b -> b.withCellFactory(_ -> new PeriodicPaymentSumCell())
                                 .withWidthBinding(w.multiply(0.03))
                 ),
                 tableColumn("Тип",
@@ -112,23 +112,23 @@ final class PeriodicPaymentWindowController extends BaseController {
                                 .withWidthBinding(w.multiply(0.02))
                 ),
                 tableObjectColumn("Месяц",
-                        b -> b.withCellFactory(x -> new PeriodicPaymentMonthCell())
+                        b -> b.withCellFactory(_ -> new PeriodicPaymentMonthCell())
                                 .withWidthBinding(w.multiply(0.05))
                 ),
                 tableObjectColumn("Исходный счет",
-                        b -> b.withCellFactory(x -> new PeriodicPaymentDebitedAccountCell())
+                        b -> b.withCellFactory(_ -> new PeriodicPaymentDebitedAccountCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableObjectColumn("Счет получателя",
-                        b -> b.withCellFactory(x -> new PeriodicPaymentCreditedAccountCell())
+                        b -> b.withCellFactory(_ -> new PeriodicPaymentCreditedAccountCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableObjectColumn("Контрагент",
-                        b -> b.withCellFactory(x -> new PeriodicPaymentContactCell())
+                        b -> b.withCellFactory(_ -> new PeriodicPaymentContactCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableObjectColumn("Следующий\nплатёж", b ->
-                        b.withCellFactory(x -> new PeriodicPaymentNextDateCell(settings().getPeriodicPaymentDayDelta()))
+                        b.withCellFactory(_ -> new PeriodicPaymentNextDateCell(settings().getPeriodicPaymentDayDelta()))
                                 .withWidthBinding(w.multiply(0.05))),
                 tableColumn("Комментарий",
                         b -> b.withPropertyCallback(PeriodicPayment::comment)
@@ -175,6 +175,6 @@ final class PeriodicPaymentWindowController extends BaseController {
                         ButtonType.CANCEL
                 ).showAndWait()
                         .filter(response -> response == ButtonType.OK)
-                        .ifPresent(b -> dao().deletePeriodicPayment(periodicPayment)));
+                        .ifPresent(_ -> dao().deletePeriodicPayment(periodicPayment)));
     }
 }

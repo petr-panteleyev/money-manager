@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.icons;
@@ -76,7 +76,7 @@ public final class IconWindowController extends BaseController {
 
         var menuBar = menuBar(
                 newMenu("Файл",
-                        menuItem("Загрузить", SHORTCUT_U, event -> onUpload()),
+                        menuItem("Загрузить", SHORTCUT_U, _ -> onUpload()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
@@ -88,7 +88,7 @@ public final class IconWindowController extends BaseController {
         iconFlow.setPadding(new Insets(20));
 
         iconList.setAll(cache().getIcons());
-        iconList.addListener((ListChangeListener<Icon>) change -> updateIconFlow());
+        iconList.addListener((ListChangeListener<Icon>) _ -> updateIconFlow());
 
         var root = new BorderPane();
         root.setPrefSize(600.0, 400.0);

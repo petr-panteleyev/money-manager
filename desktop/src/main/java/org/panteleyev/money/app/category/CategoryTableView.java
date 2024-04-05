@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.category;
@@ -23,12 +23,12 @@ final class CategoryTableView extends TableView<Category> {
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
                 tableObjectColumn("Тип",
-                        b -> b.withCellFactory(x -> new CategoryTypeCell())
+                        b -> b.withCellFactory(_ -> new CategoryTypeCell())
                                 .withComparator(Comparators.categoriesByType()
                                         .thenComparing(Comparators.categoriesByName()))
                                 .withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("Название",
-                        b -> b.withCellFactory(x -> new CategoryNameCell())
+                        b -> b.withCellFactory(_ -> new CategoryNameCell())
                                 .withComparator(Comparators.categoriesByName())
                                 .withWidthBinding(w.multiply(0.4))),
                 tableColumn("Комментарий",

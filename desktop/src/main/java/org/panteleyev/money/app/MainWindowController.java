@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -120,8 +120,7 @@ public class MainWindowController extends BaseController implements TransactionT
                     this::goToTransaction, this::goToTransaction);
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Account> accountListener =
-            change -> Platform.runLater(this::reloadTransactions);
+    private final ListChangeListener<Account> accountListener = _ -> Platform.runLater(this::reloadTransactions);
 
     public static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
         boolean invalid = false;
@@ -151,11 +150,11 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private MenuBar createMainMenu() {
         // Main menu
-        var fileConnectMenuItem = menuItem("Соединение...", event -> onOpenConnection());
-        var fileExitMenuItem = menuItem("Выход", event -> onExit());
-        var exportMenuItem = menuItem("Экспорт...", SHORTCUT_ALT_E, event -> xmlDump());
-        var importMenuItem = menuItem("Импорт...", SHORTCUT_ALT_I, event -> onImport());
-        var reportMenuItem = menuItem("Отчет...", SHORTCUT_ALT_R, event -> onReport());
+        var fileConnectMenuItem = menuItem("Соединение...", _ -> onOpenConnection());
+        var fileExitMenuItem = menuItem("Выход", _ -> onExit());
+        var exportMenuItem = menuItem("Экспорт...", SHORTCUT_ALT_E, _ -> xmlDump());
+        var importMenuItem = menuItem("Импорт...", SHORTCUT_ALT_I, _ -> onImport());
+        var reportMenuItem = menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport());
 
         var fileMenu = newMenu("Файл",
                 fileConnectMenuItem,
@@ -172,19 +171,19 @@ public class MainWindowController extends BaseController implements TransactionT
         var editMenu = createMenu("Правка", transactionTable.getActions());
 
         var viewMenu = newMenu("Вид",
-                menuItem("Текущий месяц", SHORTCUT_ALT_UP, x -> onCurrentMonth()),
+                menuItem("Текущий месяц", SHORTCUT_ALT_UP, _ -> onCurrentMonth()),
                 new SeparatorMenuItem(),
-                menuItem("Следующий месяц", SHORTCUT_ALT_RIGHT, x -> onNextMonth()),
-                menuItem("Предыдущий месяц", SHORTCUT_ALT_LEFT, x -> onPrevMonth())
+                menuItem("Следующий месяц", SHORTCUT_ALT_RIGHT, _ -> onNextMonth()),
+                menuItem("Предыдущий месяц", SHORTCUT_ALT_LEFT, _ -> onPrevMonth())
         );
 
         var profilesMenuItem = menuItem("Профили...", SHORTCUT_ALT_P,
-                x -> profileManager.getEditor().showAndWait());
+                _ -> profileManager.getEditor().showAndWait());
 
         var optionsMenuItem = menuItem("Настройки...",
-                SHORTCUT_ALT_S, x -> onOptions());
+                SHORTCUT_ALT_S, _ -> onOptions());
         var iconWindowMenuItem = menuItem("Значки...",
-                x -> onIconWindow());
+                _ -> onIconWindow());
 
         var toolsMenu = newMenu("Сервис",
                 profilesMenuItem,
@@ -193,7 +192,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 new SeparatorMenuItem(),
                 optionsMenuItem,
                 new SeparatorMenuItem(),
-                menuItem("Создать ярлык приложения (Linux)", a -> onCreateDesktopEntry())
+                menuItem("Создать ярлык приложения (Linux)", _ -> onCreateDesktopEntry())
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
@@ -217,7 +216,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
         var transactionTab = new BorderPane();
 
-        monthFilterBox.setOnAction(event -> onMonthChanged());
+        monthFilterBox.setOnAction(_ -> onMonthChanged());
         monthFilterBox.setFocusTraversable(false);
 
         var transactionCountLabel = label("");
@@ -245,7 +244,7 @@ public class MainWindowController extends BaseController implements TransactionT
         SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
                 .IntegerSpinnerValueFactory(1970, 2050);
         yearSpinner.setValueFactory(valueFactory);
-        yearSpinner.valueProperty().addListener((x, y, z) -> Platform.runLater(this::reloadTransactions));
+        yearSpinner.valueProperty().addListener((_, _, _) -> Platform.runLater(this::reloadTransactions));
         yearSpinner.setFocusTraversable(false);
 
         transactionTable.setOnCheckTransaction(this::onCheckTransaction);

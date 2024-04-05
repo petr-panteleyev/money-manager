@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.service;
@@ -52,7 +52,7 @@ public class AccountService {
         var result = new ArrayList<Account>(accountIds.size());
         for (UUID uuid : accountIds) {
             accountRepository.get(uuid).ifPresent(account -> {
-                var total = calculateBalance(account, false, t -> true);
+                var total = calculateBalance(account, false, _ -> true);
                 var waiting = calculateBalance(account, false, t -> !t.checked());
                 put(account.updateBalance(total, waiting)).ifPresent(result::add);
             });

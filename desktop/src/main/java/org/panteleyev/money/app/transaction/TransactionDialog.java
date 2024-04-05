@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.transaction;
@@ -275,19 +275,19 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
-        creditedAccountEdit.focusedProperty().addListener((x, oldValue, newValue) -> {
+        creditedAccountEdit.focusedProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 processAutoFill();
             }
         });
 
-        typeEdit.focusedProperty().addListener((x, oldValue, newValue) -> {
+        typeEdit.focusedProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 handleTypeFocusLoss();
             }
         });
 
-        debitAmountEdit.focusedProperty().addListener((x, oldValue, newValue) -> {
+        debitAmountEdit.focusedProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue && !newValue) {
                 onDebitAmountEditFocusLoss();
             }
@@ -419,7 +419,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private void setupCardComboBox() {
         cardComboBox.setEditable(false);
-        cardComboBox.setCellFactory(x -> new CardListCell());
+        cardComboBox.setCellFactory(_ -> new CardListCell());
         cardComboBox.setButtonCell(new CardListCell());
     }
 
@@ -462,8 +462,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                     if (acc.enabled()) {
                         var title = "[" + acc.name() + "]";
 
-                        debitedMenuButton.getItems().add(menuItem(title, event -> onDebitedAccountSelected(acc)));
-                        creditedMenuButton.getItems().add(menuItem(title, event -> onCreditedAccountSelected(acc)));
+                        debitedMenuButton.getItems().add(menuItem(title, _ -> onDebitedAccountSelected(acc)));
+                        creditedMenuButton.getItems().add(menuItem(title, _ -> onCreditedAccountSelected(acc)));
 
                         debitedSuggestions.add(acc);
                         creditedSuggestions.add(acc);
@@ -517,9 +517,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                                 var title = "  " + prefix + " " + acc.name();
 
                                 debitedMenuButton.getItems().add(
-                                        menuItem(title, event -> onDebitedAccountSelected(acc)));
+                                        menuItem(title, _ -> onDebitedAccountSelected(acc)));
                                 creditedMenuButton.getItems().add(
-                                        menuItem(title, event -> onCreditedAccountSelected(acc)));
+                                        menuItem(title, _ -> onCreditedAccountSelected(acc)));
 
                                 debitedSuggestions.add(acc);
                                 creditedSuggestions.add(acc);
@@ -654,7 +654,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void createValidationSupport() {
-        validation.registerValidator(typeEdit, (Control control, String value) -> {
+        validation.registerValidator(typeEdit, (Control control, String _) -> {
             var type = checkTransactionTypeFieldValue(typeEdit, typeSuggestions);
             transactionType = type.orElse(TransactionType.UNDEFINED);
             updateCardComboBox(false);
@@ -666,7 +666,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             return ValidationResult.fromErrorIf(control, null, invalid);
         });
 
-        validation.registerValidator(debitedAccountEdit, (Control control, String value) -> {
+        validation.registerValidator(debitedAccountEdit, (Control control, String _) -> {
             var account = checkDebitedAccount();
             updateCategoryLabel(debitedCategoryLabel, account.orElse(null));
 
@@ -677,7 +677,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             return ValidationResult.fromErrorIf(control, null, account.isEmpty());
         });
 
-        validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {
+        validation.registerValidator(creditedAccountEdit, (Control control, String _) -> {
             var account = checkCreditedAccount();
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
@@ -700,7 +700,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         cache.getContacts().stream()
                 .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
                 .forEach(x -> {
-                    contactMenuButton.getItems().add(menuItem(x.name(), event -> onContactSelected(x)));
+                    contactMenuButton.getItems().add(menuItem(x.name(), _ -> onContactSelected(x)));
                     contactSuggestions.add(x);
                 });
 
@@ -716,7 +716,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
                 typeMenuButton.getItems().add(
-                        menuItem(translate(x), event -> onTransactionTypeSelected(x)));
+                        menuItem(translate(x), _ -> onTransactionTypeSelected(x)));
                 typeSuggestions.add(x);
             }
         });
@@ -745,7 +745,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
                         accounts.forEach(acc -> {
                             debitedMenuButton.getItems().add(
-                                    menuItem("  + " + acc.name(), events -> onDebitedAccountSelected(acc)));
+                                    menuItem("  + " + acc.name(), _ -> onDebitedAccountSelected(acc)));
                             debitedSuggestionsAll.add(acc);
                             debitedSuggestions.add(acc);
                         });
@@ -770,7 +770,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                             creditedSuggestionsAll.add(acc);
                             creditedSuggestions.add(acc);
                             creditedMenuButton.getItems().add(
-                                    menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                                    menuItem("  - " + acc.name(), _ -> onCreditedAccountSelected(acc)));
                         });
                     }
                 });

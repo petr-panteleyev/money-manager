@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.transaction;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 import static org.panteleyev.money.app.Bundles.translate;
 
 public enum TransactionPredicate implements Predicate<Transaction> {
-    ALL(it -> true),
+    ALL(_ -> true),
 
     CURRENT_YEAR(it -> it.transactionDate().getYear() == LocalDate.now().getYear()),
 
@@ -111,8 +111,8 @@ public enum TransactionPredicate implements Predicate<Transaction> {
     }
 
     private static boolean checkRange(Transaction t, LocalDate from, LocalDate to) {
-        return t.transactionDate().compareTo(from) >= 0
-                && t.transactionDate().compareTo(to) <= 0;
+        return !t.transactionDate().isBefore(from)
+                && !t.transactionDate().isAfter(to);
     }
 
     @Override

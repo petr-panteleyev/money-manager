@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -153,7 +153,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var toolBar = hBox(5.0,
                 filterBox,
-                button("Сбросить фильтр", x -> filterBox.reset())
+                button("Сбросить фильтр", _ -> filterBox.reset())
         );
 
         var statusBar = createStatusBar();
@@ -164,7 +164,7 @@ class IncomesAndExpensesWindowController extends BaseController {
         BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
         BorderPane.setMargin(statusBar, new Insets(5.0, 5.0, 5.0, 5.0));
 
-        filterBox.predicateProperty().addListener((x, y, newValue) -> onRefresh());
+        filterBox.predicateProperty().addListener((_, _, _) -> onRefresh());
 
         filterBox.reset();
 
@@ -182,7 +182,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
                 newMenu("Файл",
-                        menuItem("Отчет...", event -> onReport()),
+                        menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
@@ -241,9 +241,9 @@ class IncomesAndExpensesWindowController extends BaseController {
                 .peek(t -> {
                     // TODO: currency conversion rates
                     catSum.compute(catUuidFunc.apply(t),
-                            (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
+                            (_, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
                     accSum.compute(accUuidFunc.apply(t),
-                            (x, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
+                            (_, sum) -> sum == null ? t.amount() : sum.add(t.amount()));
                 })
                 .collect(groupingBy(t -> cache().getCategory(catUuidFunc.apply(t)).orElseThrow(),
                         groupingBy(t -> cache().getAccount(accUuidFunc.apply(t)).orElseThrow(),
@@ -287,8 +287,8 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var w = reportTable.widthProperty().subtract(20);
         reportTable.getColumns().addAll(List.of(
-                treeTableColumn("", x -> new NodeTextCell(), w.multiply(0.85)),
-                treeTableColumn("", x -> new NodeAmountCell(), w.multiply(0.15))
+                treeTableColumn("", _ -> new NodeTextCell(), w.multiply(0.85)),
+                treeTableColumn("", _ -> new NodeAmountCell(), w.multiply(0.15))
         ));
     }
 

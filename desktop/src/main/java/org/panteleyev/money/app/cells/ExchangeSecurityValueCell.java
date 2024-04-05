@@ -1,12 +1,11 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.cells;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
-import javafx.scene.text.TextAlignment;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import static org.panteleyev.money.app.exchange.Definitions.STOCK_BONDS;

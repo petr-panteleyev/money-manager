@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.transaction;
@@ -89,7 +89,7 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Controller owner;
     private final Mode mode;
 
-    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (x, y) -> {
+    private BiConsumer<List<Transaction>, Boolean> checkTransactionConsumer = (_, _) -> {
     };
     private final TransactionDetailsCallback transactionDetailsCallback;
 
@@ -97,13 +97,13 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Consumer<Transaction> transactionUpdatedCallback;
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Contact> contactChangeLister = change -> Platform.runLater(this::redraw);
+    private final ListChangeListener<Contact> contactChangeLister = _ -> Platform.runLater(this::redraw);
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Category> categoryChangeLister = change -> Platform.runLater(this::redraw);
+    private final ListChangeListener<Category> categoryChangeLister = _ -> Platform.runLater(this::redraw);
 
     // Transaction filter
-    private final PredicateProperty<Transaction> transactionPredicateProperty = new PredicateProperty<>(x -> false);
+    private final PredicateProperty<Transaction> transactionPredicateProperty = new PredicateProperty<>(_ -> false);
 
     private final FilteredList<Transaction> filteredList = new FilteredList<>(cache().getTransactions());
 
@@ -125,11 +125,11 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Action transactionDetailsAction = actionBuilder("Детали...", this::onTransactionDetails)
             .disableBinding(disableBinding)
             .build();
-    private final Action checkTransactionAction = actionBuilder("Отметить", e -> onCheckTransactions(true))
+    private final Action checkTransactionAction = actionBuilder("Отметить", _ -> onCheckTransactions(true))
             .accelerator(SHORTCUT_K)
             .disableBinding(disableBinding)
             .build();
-    private final Action uncheckTransactionAction = actionBuilder("Снять отметку", e -> onCheckTransactions(false))
+    private final Action uncheckTransactionAction = actionBuilder("Снять отметку", _ -> onCheckTransactions(false))
             .accelerator(SHORTCUT_U)
             .disableBinding(disableBinding)
             .build();
@@ -137,15 +137,11 @@ public class TransactionTableView extends TableView<Transaction> {
     private final Collection<Action> actions;
 
     public TransactionTableView(Controller owner, Mode mode) {
-        this(owner, mode, null, null, x -> {
-        }, x -> {
-        });
+        this(owner, mode, null, null, _ -> {}, _ -> {});
     }
 
     public TransactionTableView(Controller owner, Account account) {
-        this(owner, Mode.ACCOUNT, account, null, x -> {
-        }, x -> {
-        });
+        this(owner, Mode.ACCOUNT, account, null, _ -> {}, _ -> {});
     }
 
     public TransactionTableView(Controller owner,
@@ -172,7 +168,7 @@ public class TransactionTableView extends TableView<Transaction> {
         this.transactionAddedCallback = transactionAddedCallback;
         this.transactionUpdatedCallback = transactionUpdatedCallback;
 
-        setRowFactory(x -> new TransactionRow());
+        setRowFactory(_ -> new TransactionRow());
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -180,46 +176,46 @@ public class TransactionTableView extends TableView<Transaction> {
 
         Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
                 mode == Mode.ACCOUNT ?
-                        x -> new TransactionAccountRequestSumCell(account) :
-                        x -> new TransactionSumCell();
+                        _ -> new TransactionAccountRequestSumCell(account) :
+                        _ -> new TransactionSumCell();
 
         TableColumn<Transaction, Transaction> dayColumn = tableObjectColumn("День", b ->
-                b.withCellFactory(x -> new TransactionDayCell(mode.isFullDate()))
+                b.withCellFactory(_ -> new TransactionDayCell(mode.isFullDate()))
                         .withComparator(Comparators.transactionsByDate())
                         .withWidthBinding(w.multiply(0.04)));
 
         getColumns().setAll(List.of(
                 dayColumn,
                 tableObjectColumn("Тип", b ->
-                        b.withCellFactory(x -> new TransactionTypeCell())
+                        b.withCellFactory(_ -> new TransactionTypeCell())
                                 .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
                                         .thenComparing(Comparators.transactionsByDate()))
                                 .withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Исходный счет", b ->
-                        b.withCellFactory(x -> new TransactionDebitedAccountCell())
+                        b.withCellFactory(_ -> new TransactionDebitedAccountCell())
                                 .withComparator(Comparators.transactionsByDebitedAccountName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
                                 .withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Счет получателя", b ->
-                        b.withCellFactory(x -> new TransactionCreditedAccountCell())
+                        b.withCellFactory(_ -> new TransactionCreditedAccountCell())
                                 .withComparator(Comparators.transactionsByCreditedAccountName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
                                 .withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Контрагент", b ->
-                        b.withCellFactory(x -> new TransactionContactCell())
+                        b.withCellFactory(_ -> new TransactionContactCell())
                                 .withComparator(Comparators.transactionsByContactName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
                                 .withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("Комментарий", b ->
-                        b.withCellFactory(x -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
+                        b.withCellFactory(_ -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
                 tableObjectColumn("Сумма", b ->
                         b.withCellFactory(sumCellFactory)
                                 .withComparator(Comparator.comparing(Transaction::getSignedAmount))
                                 .withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("", b ->
-                        b.withCellFactory(x -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03))),
+                        b.withCellFactory(_ -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03))),
                 tableObjectColumn("", b ->
-                        b.withCellFactory(x -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
+                        b.withCellFactory(_ -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
         ));
 
         getSortOrder().add(dayColumn);
@@ -303,8 +299,8 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     private void redraw() {
-        getColumns().get(0).setVisible(false);
-        getColumns().get(0).setVisible(true);
+        getColumns().getFirst().setVisible(false);
+        getColumns().getFirst().setVisible(true);
     }
 
     void onTransactionDetails(ActionEvent ignored) {

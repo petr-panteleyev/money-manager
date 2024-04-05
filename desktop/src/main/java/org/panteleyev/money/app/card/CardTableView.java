@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.card;
@@ -28,15 +28,15 @@ final class CardTableView extends TableView<Card> {
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
                 tableObjectColumn("Номер", b ->
-                        b.withCellFactory(x -> new CardNumberCell()).withWidthBinding(w.multiply(0.2))
+                        b.withCellFactory(_ -> new CardNumberCell()).withWidthBinding(w.multiply(0.2))
                                 .withComparator(Comparator.comparing(Card::number))),
                 tableObjectColumn("Категория", b ->
-                        b.withCellFactory(x -> new CardCategoryCell()).withWidthBinding(w.multiply(0.1))
+                        b.withCellFactory(_ -> new CardCategoryCell()).withWidthBinding(w.multiply(0.1))
                                 .withComparator(Comparators.cardsByCategory(cache()))),
                 tableObjectColumn("Счёт", b ->
-                        b.withCellFactory(x -> new CardAccountCell()).withWidthBinding(w.multiply(0.2))),
+                        b.withCellFactory(_ -> new CardAccountCell()).withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("До", b ->
-                        b.withCellFactory(x -> new CardExpirationDateCell(settings().getAccountClosingDayDelta()))
+                        b.withCellFactory(_ -> new CardExpirationDateCell(settings().getAccountClosingDayDelta()))
                                 .withWidthBinding(w.multiply(0.1))
                                 .withComparator(Comparator.comparing(Card::expiration))),
                 tableColumn("Комментарий", b ->

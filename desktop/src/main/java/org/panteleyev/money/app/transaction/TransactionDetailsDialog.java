@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.transaction;
@@ -66,7 +66,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
                 tableColumn("Комментарий", b ->
                         b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
                 tableObjectColumn("Сумма", b ->
-                        b.withCellFactory(x -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
+                        b.withCellFactory(_ -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         detailsTable.setItems(details);
@@ -84,7 +84,7 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
         getDialogPane().getButtonTypes().add(ButtonType.OK);
         getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
 
-        detailsTable.getSelectionModel().selectedItemProperty().addListener((x, oldValue, newValue) -> {
+        detailsTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue != newValue) {
                 detailEditor.setTransactionDetail(newValue);
             }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright &copy; 2021-2023 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -25,7 +25,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 public class CategoryRepository implements MoneyRepository<Category> {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Category> rowMapper = (rs, i) -> new Category(
+    private final RowMapper<Category> rowMapper = (rs, _) -> new Category(
             getUuid(rs, "uuid"),
             rs.getString("name"),
             rs.getString("comment"),
@@ -67,7 +67,7 @@ public class CategoryRepository implements MoneyRepository<Category> {
         var result = jdbcTemplate.query("""
                 SELECT * FROM category WHERE uuid = :uuid
                 """, Map.of("uuid", uuid), rowMapper);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.getFirst());
     }
 
     @Override

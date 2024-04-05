@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.account;
@@ -36,31 +36,31 @@ final class AccountTableView extends TableView<Account> {
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
                 tableObjectColumn("Название", b ->
-                        b.withCellFactory(x -> new AccountNameCell())
+                        b.withCellFactory(_ -> new AccountNameCell())
                                 .withComparator(Comparators.accountsByName())
                                 .withWidthBinding(w.multiply(0.15))),
                 tableObjectColumn("Категория", b ->
-                        b.withCellFactory(x -> new AccountCategoryCell())
+                        b.withCellFactory(_ -> new AccountCategoryCell())
                                 .withComparator(Comparators.accountsByCategory(cache()))
                                 .withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("Валюта", b ->
-                        b.withCellFactory(x -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
+                        b.withCellFactory(_ -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
                 tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
-                        b.withCellFactory(x -> new AccountInterestCell())
+                        b.withCellFactory(_ -> new AccountInterestCell())
                                 .withPropertyCallback(Account::interest)
                                 .withWidthBinding(w.multiply(0.03))),
                 tableObjectColumn("До", b ->
-                        b.withCellFactory(x -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()))
+                        b.withCellFactory(_ -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()))
                                 .withComparator(Comparators.accountsByClosingDate())
                                 .withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("Комментарий", b ->
-                        b.withCellFactory(x -> new AccountCommentCell()).withWidthBinding(w.multiply(0.29))),
+                        b.withCellFactory(_ -> new AccountCommentCell()).withWidthBinding(w.multiply(0.29))),
                 tableObjectColumn("Баланс", b ->
-                        b.withCellFactory(x -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
+                        b.withCellFactory(_ -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("Ожидает", b ->
-                        b.withCellFactory(x -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1))),
+                        b.withCellFactory(_ -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1))),
                 tableObjectColumn("", b ->
-                        b.withCellFactory(x -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
+                        b.withCellFactory(_ -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
         ));
 
         list.comparatorProperty().bind(comparatorProperty());

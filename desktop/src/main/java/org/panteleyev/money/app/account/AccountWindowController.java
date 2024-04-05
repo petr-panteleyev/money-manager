@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.account;
@@ -65,7 +65,7 @@ public final class AccountWindowController extends BaseController {
     private final CategorySelectionBox categorySelectionBox = new CategorySelectionBox();
     private final AccountNameFilterBox accountNameFilterBox = new AccountNameFilterBox();
     private final PredicateProperty<Account> showDeactivatedAccounts =
-            new PredicateProperty<>(settings().getShowDeactivatedAccounts() ? a -> true : activeAccount(true));
+            new PredicateProperty<>(settings().getShowDeactivatedAccounts() ? _ -> true : activeAccount(true));
 
     private final PredicateProperty<Account> filterProperty =
             PredicateProperty.and(List.of(
@@ -79,13 +79,13 @@ public final class AccountWindowController extends BaseController {
     private final TableView<Account> tableView = new AccountTableView(filteredAccounts.sorted());
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Category> categoryListener = c -> Platform.runLater(() -> {
-        tableView.getColumns().get(0).setVisible(false);
-        tableView.getColumns().get(0).setVisible(true);
+    private final ListChangeListener<Category> categoryListener = _ -> Platform.runLater(() -> {
+        tableView.getColumns().getFirst().setVisible(false);
+        tableView.getColumns().getFirst().setVisible(true);
     });
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Transaction> transactionListener = c -> Platform.runLater(tableView::refresh);
+    private final ListChangeListener<Transaction> transactionListener = _ -> Platform.runLater(tableView::refresh);
 
     // Actions
     private final BooleanBinding disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
@@ -94,7 +94,7 @@ public final class AccountWindowController extends BaseController {
             this::onNewAccount, this::onEditAccount, this::onDeleteAccount, disableBinding
     );
 
-    private final Action searchAction = searchAction(e -> accountNameFilterBox.getTextField().requestFocus());
+    private final Action searchAction = searchAction(_ -> accountNameFilterBox.getTextField().requestFocus());
     private final Action attachDocumentAction = actionBuilder("Прикрепить документ...", this::onAttachDocument)
             .disableBinding(disableBinding).build();
     private final Action documentsAction = actionBuilder("Документы...", this::onDocuments)
@@ -145,7 +145,7 @@ public final class AccountWindowController extends BaseController {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
         var activateAccountMenuItem = menuItem("Деактивировать",
-                event -> onActivateDeactivateAccount(),
+                _ -> onActivateDeactivateAccount(),
                 disableBinding);
 
         var editMenu = newMenu("Правка",
@@ -167,7 +167,7 @@ public final class AccountWindowController extends BaseController {
                 createMenuItem(refreshBalanceAction)
         );
 
-        editMenu.setOnShowing(event -> getSelectedAccount()
+        editMenu.setOnShowing(_ -> getSelectedAccount()
                 .ifPresent(account -> activateAccountMenuItem.setText(
                         account.enabled() ? "Деактивировать" : "Активировать")
                 )
@@ -175,7 +175,7 @@ public final class AccountWindowController extends BaseController {
 
         var menuBar = menuBar(
                 newMenu("Файл",
-                        menuItem("Отчет...", SHORTCUT_ALT_R, event -> onReport()),
+                        menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)),
                 editMenu,
@@ -185,7 +185,7 @@ public final class AccountWindowController extends BaseController {
                                 event -> {
                                     var selected = ((CheckMenuItem) event.getSource()).isSelected();
                                     settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
-                                    showDeactivatedAccounts.set(selected ? a -> true : activeAccount(true));
+                                    showDeactivatedAccounts.set(selected ? _ -> true : activeAccount(true));
                                 }
                         )
                 ),
@@ -200,7 +200,7 @@ public final class AccountWindowController extends BaseController {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
         var activateAccountMenuItem = menuItem("Деактивировать",
-                event -> onActivateDeactivateAccount(),
+                _ -> onActivateDeactivateAccount(),
                 disableBinding);
 
         var contextMenu = new ContextMenu(
@@ -222,7 +222,7 @@ public final class AccountWindowController extends BaseController {
                 createContextMenuItem(refreshBalanceAction)
         );
 
-        contextMenu.setOnShowing(event -> getSelectedAccount()
+        contextMenu.setOnShowing(_ -> getSelectedAccount()
                 .ifPresent(account -> activateAccountMenuItem.setText(
                         account.enabled() ? "Деактивировать" : "Активировать")
                 )
@@ -271,7 +271,7 @@ public final class AccountWindowController extends BaseController {
                         ButtonType.CANCEL)
                         .showAndWait()
                         .filter(response -> response == ButtonType.OK)
-                        .ifPresent(b -> dao().deleteAccount(account));
+                        .ifPresent(_ -> dao().deleteAccount(account));
             }
         });
     }
@@ -313,7 +313,7 @@ public final class AccountWindowController extends BaseController {
 
     private void onUpdateBalance(ActionEvent ignored) {
         tableView.getItems().forEach(account -> {
-            var total = cache().calculateBalance(account, false, t -> true);
+            var total = cache().calculateBalance(account, false, _ -> true);
             var waiting = cache().calculateBalance(account, false, t -> !t.checked());
             dao().updateAccount(account.updateBalance(total, waiting));
         });

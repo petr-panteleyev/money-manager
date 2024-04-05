@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -47,7 +47,7 @@ import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
 
-    protected final Action ACTION_CLOSE = new Action("Закрыть", event -> onClose());
+    protected final Action ACTION_CLOSE = new Action("Закрыть", _ -> onClose());
 
     protected BaseController() {
         super(settings().getMainCssFilePath());
@@ -72,7 +72,7 @@ public class BaseController extends Controller {
 
     Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
         var securitiesMenuItem = menuItem("Ценные бумаги...",
-                x -> getController(SecuritiesWindowController.class));
+                _ -> getController(SecuritiesWindowController.class));
 
         if (dbOpenProperty != null) {
             securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -85,26 +85,27 @@ public class BaseController extends Controller {
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
         var transactionsMenuItem = menuItem("Проводки...", SHORTCUT_0,
-                x -> getController(MainWindowController.class));
+                _ -> getController(MainWindowController.class));
         var accountsMenuItem = menuItem("Счета...", SHORTCUT_1,
-                x -> getController(AccountWindowController.class));
+                _ -> getController(AccountWindowController.class));
         var cardsMenuItem = menuItem("Карты...", SHORTCUT_2,
-                x -> getController(CardWindowController.class));
+                _ -> getController(CardWindowController.class));
         var statementMenuItem = menuItem("Выписки...", SHORTCUT_3,
-                x -> getController(StatementWindowController.class));
-        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_4, x -> getRequestController());
+                _ -> getController(StatementWindowController.class));
+        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_4,
+                _ -> getRequestController());
         var chartsMenuItem = menuItem("Доходы и расходы...", SHORTCUT_5,
-                x -> getController(IncomesAndExpensesWindowController.class));
+                _ -> getController(IncomesAndExpensesWindowController.class));
         var currenciesMenuItem = menuItem("Валюты...", SHORTCUT_6,
-                x -> getController(CurrencyWindowController.class));
+                _ -> getController(CurrencyWindowController.class));
         var categoriesMenuItem = menuItem("Категории...", SHORTCUT_7,
-                x -> getController(CategoryWindowController.class));
+                _ -> getController(CategoryWindowController.class));
         var contactsMenuItem = menuItem("Контакты...", SHORTCUT_8,
-                x -> getController(ContactListWindowController.class));
+                _ -> getController(ContactListWindowController.class));
         var documentsMenuItem = menuItem("Документы...", SHORTCUT_ALT_U,
-                x -> getDocumentController(null));
+                _ -> getDocumentController(null));
         var periodicPaymentsMenuItem = menuItem("Периодические платежи...", SHORTCUT_SHIFT_P,
-                x -> getController(PeriodicPaymentWindowController.class));
+                _ -> getController(PeriodicPaymentWindowController.class));
 
         if (dbOpenProperty != null) {
             accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -137,7 +138,7 @@ public class BaseController extends Controller {
                 periodicPaymentsMenuItem
         );
 
-        menu.setOnShowing(event -> {
+        menu.setOnShowing(_ -> {
             var lastIndex = menu.getItems().indexOf(periodicPaymentsMenuItem);
             menu.getItems().remove(lastIndex + 1, menu.getItems().size());
 
@@ -146,8 +147,7 @@ public class BaseController extends Controller {
             if (!accountControllers.isEmpty()) {
                 menu.getItems().add(new SeparatorMenuItem());
                 accountControllers.forEach(c ->
-                        menu.getItems().add(menuItem(c.getTitle(), x ->
-                                c.getStage().toFront())));
+                        menu.getItems().add(menuItem(c.getTitle(), _ -> c.getStage().toFront())));
             }
         });
 
@@ -156,7 +156,7 @@ public class BaseController extends Controller {
 
     protected Menu createHelpMenu() {
         return newMenu("Справка",
-                menuItem("О программе", x -> new AboutDialog(this).showAndWait()));
+                menuItem("О программе", _ -> new AboutDialog(this).showAndWait()));
     }
 
     protected static <T extends BaseController> T getController(Class<T> clazz) {

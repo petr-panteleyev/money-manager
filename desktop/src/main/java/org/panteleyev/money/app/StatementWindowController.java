@@ -75,9 +75,9 @@ public class StatementWindowController extends BaseController {
     private final CheckBox ignoreExecutionDate = new CheckBox("Игнорировать дату исполнения");
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Account> accountListener = c -> Platform.runLater(this::setupAccountComboBox);
+    private final ListChangeListener<Account> accountListener = _ -> Platform.runLater(this::setupAccountComboBox);
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Transaction> transactionListener = c -> calculateTransactions();
+    private final ListChangeListener<Transaction> transactionListener = _ -> calculateTransactions();
 
     private Statement statement = null;
 
@@ -95,7 +95,7 @@ public class StatementWindowController extends BaseController {
         var hBox = hBox(5.0,
                 label("Счёт:"),
                 accountComboBox,
-                button("Очистить", x -> onClear()),
+                button("Очистить", _ -> onClear()),
                 ignoreExecutionDate,
                 filler1,
                 balanceBox
@@ -128,7 +128,7 @@ public class StatementWindowController extends BaseController {
         cache().getTransactions().addListener(new WeakListChangeListener<>(transactionListener));
 
         accountComboBox.getSelectionModel()
-                .selectedItemProperty().addListener((prop, oldValue, newValue) -> calculateTransactions(newValue));
+                .selectedItemProperty().addListener((_, _, newValue) -> calculateTransactions(newValue));
 
         setupWindow(root);
         setupAccountComboBox();
@@ -158,18 +158,18 @@ public class StatementWindowController extends BaseController {
     private MenuBar createMainMenu() {
         var menuBar = menuBar(
                 newMenu("Файл",
-                        menuItem("Открыть...", SHORTCUT_O, event -> onBrowse()),
+                        menuItem("Открыть...", SHORTCUT_O, _ -> onBrowse()),
                         new SeparatorMenuItem(),
-                        menuItem("Отчет...", event -> onReport()),
+                        menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
                 newMenu("Правка",
                         menuItem("Добавить...", SHORTCUT_N,
-                                event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
+                                _ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
                         new SeparatorMenuItem(),
-                        menuItem("Отметить", SHORTCUT_K, event -> onCheckStatementRecord(true)),
-                        menuItem("Снять отметку", SHORTCUT_U, event -> onCheckStatementRecord(false))
+                        menuItem("Отметить", SHORTCUT_K, _ -> onCheckStatementRecord(true)),
+                        menuItem("Снять отметку", SHORTCUT_U, _ -> onCheckStatementRecord(false))
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -295,17 +295,17 @@ public class StatementWindowController extends BaseController {
     private TableView<StatementRecord> createStatementTable() {
         var tableView = new TableView<StatementRecord>();
 
-        tableView.setRowFactory(x -> new StatementRow());
+        tableView.setRowFactory(_ -> new StatementRow());
 
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().addAll(List.of(
                 tableColumn("Дата", (TableColumnBuilder<StatementRecord, LocalDate> b) ->
-                        b.withCellFactory(x -> new LocalDateCell<>())
+                        b.withCellFactory(_ -> new LocalDateCell<>())
                                 .withPropertyCallback(StatementRecord::getActual)
                                 .withWidthBinding(w.multiply(0.05))),
                 tableColumn("Дата исп.", (TableColumnBuilder<StatementRecord,
                         LocalDate> b) ->
-                        b.withCellFactory(x -> new LocalDateCell<>())
+                        b.withCellFactory(_ -> new LocalDateCell<>())
                                 .withPropertyCallback(StatementRecord::getExecution)
                                 .withWidthBinding(w.multiply(0.05))),
                 tableColumn("Описание", b ->
@@ -317,15 +317,15 @@ public class StatementWindowController extends BaseController {
                 tableColumn("Страна", b ->
                         b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("Сумма", b ->
-                        b.withCellFactory(x -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
+                        b.withCellFactory(_ -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
         ));
 
         var menu = new ContextMenu();
         menu.getItems().addAll(menuItem("Добавить...",
-                event -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
+                _ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)));
         tableView.setContextMenu(menu);
 
-        tableView.getSelectionModel().selectedItemProperty().addListener((x, y, newValue) ->
+        tableView.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) ->
                 onStatementRecordSelected(newValue));
 
         return tableView;

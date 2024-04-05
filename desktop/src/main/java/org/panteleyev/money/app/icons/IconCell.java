@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.icons;
@@ -16,7 +16,7 @@ class IconCell extends BorderPane {
     IconCell(Icon icon, IconWindowController parent) {
         this.icon = icon;
 
-        setOnMouseClicked(event -> parent.onSelect(this));
+        setOnMouseClicked(_ -> parent.onSelect(this));
 
         setCenter(new ImageView(getImage(icon.uuid())));
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.contact;
@@ -45,14 +45,14 @@ public final class ContactListWindowController extends BaseController {
             b -> b.withDefaultString("Все типы")
                     .withStringConverter(Bundles::translate)
     );
-    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
+    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 
-    private final FilteredList<Contact> filteredList = cache().getContacts().filtered(x -> true);
+    private final FilteredList<Contact> filteredList = cache().getContacts().filtered(_ -> true);
     private final TableView<Contact> tableView = new ContactTableView(filteredList.sorted());
 
     public ContactListWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
-                this::onCreateContact, this::onEditContact, event -> {},
+                this::onCreateContact, this::onEditContact, _ -> {},
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
@@ -68,7 +68,7 @@ public final class ContactListWindowController extends BaseController {
                         createMenuItem(searchAction(this::onSearch))
                 ),
                 newMenu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );
@@ -93,7 +93,7 @@ public final class ContactListWindowController extends BaseController {
 
         typeBox.getSelectionModel().select(0);
 
-        typeBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
+        typeBox.valueProperty().addListener((_, _, _) -> updatePredicate());
 
         reloadContacts();
         setupWindow(self);
@@ -118,7 +118,7 @@ public final class ContactListWindowController extends BaseController {
     private Predicate<Contact> getPredicate() {
         // Type
         var type = typeBox.getSelectionModel().getSelectedItem();
-        Predicate<Contact> filter = type == null ? x -> true : x -> x.type() == type;
+        Predicate<Contact> filter = type == null ? _ -> true : x -> x.type() == type;
 
         // Name
         var search = searchField.getText().toLowerCase();

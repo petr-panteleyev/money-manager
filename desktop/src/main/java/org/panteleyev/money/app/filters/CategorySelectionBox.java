@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -45,14 +45,14 @@ public class CategorySelectionBox extends HBox {
     private final PredicateProperty<Account> accountFilterProperty = new PredicateProperty<>();
 
     @SuppressWarnings("FieldCanBeLocal")
-    private final ListChangeListener<Category> categoryListener = change ->
+    private final ListChangeListener<Category> categoryListener = _ ->
             Platform.runLater(this::onTypeChanged);
 
     private final EventHandler<ActionEvent> categoryTypeHandler =
-            event -> onTypeChanged();
+            _ -> onTypeChanged();
 
     private final EventHandler<ActionEvent> categoryHandler =
-            event -> accountFilterProperty.set(getAccountFilter());
+            _ -> accountFilterProperty.set(getAccountFilter());
 
     public CategorySelectionBox() {
         super(5.0);
@@ -94,7 +94,7 @@ public class CategorySelectionBox extends HBox {
     }
 
     public void setupCategoryTypesBox() {
-        categoryTypeChoiceBox.setOnAction(event -> {});
+        categoryTypeChoiceBox.setOnAction(_ -> {});
 
         categoryTypeChoiceBox.getItems().setAll(
                 TypeListItem.of("Счета, наличные, карты",
@@ -126,13 +126,13 @@ public class CategorySelectionBox extends HBox {
         return getSelectedCategory().map(c -> accountByCategory(c.uuid()))
                 .orElseGet(() -> {
                     var selectedTypes = getSelectedCategoryTypes();
-                    return selectedTypes.isEmpty() ? a -> false :
+                    return selectedTypes.isEmpty() ? _ -> false :
                             accountByCategoryType(selectedTypes);
                 });
     }
 
     private void onTypeChanged() {
-        categoryChoiceBox.setOnAction(x -> {});
+        categoryChoiceBox.setOnAction(_ -> {});
 
         if (!(categoryTypeChoiceBox.getSelectionModel().getSelectedItem() instanceof TypeListItem typeListItem)) {
             return;
@@ -146,10 +146,10 @@ public class CategorySelectionBox extends HBox {
                 );
 
         if (!items.isEmpty()) {
-            items.add(0, new Separator());
+            items.addFirst(new Separator());
         }
 
-        items.add(0, "Все категории");
+        items.addFirst("Все категории");
 
         categoryChoiceBox.setItems(items);
         categoryChoiceBox.getSelectionModel().selectFirst();

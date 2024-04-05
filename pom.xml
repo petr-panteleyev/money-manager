@@ -14,31 +14,30 @@
     <name>Parent</name>
 
     <properties>
-        <revision>24.3.2</revision>
+        <revision>24.4.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>22</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.11.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.0.0</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.5.0</mavenDependencyPluginVersion>
+        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.6.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.6.3</jpackageMavenPluginVersion>
         <flattenMavenPluginVersion>1.4.1</flattenMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>22</javaFxVersion>
+        <javaFxVersion>21.0.2</javaFxVersion>
         <javaFxHelpersVersion>1.13.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
-        <controlsFxVersion>11.1.2</controlsFxVersion>
+        <controlsFxVersion>11.2.1</controlsFxVersion>
         <jsoupVersion>1.15.3</jsoupVersion>
-        <mysqlConnectorVersion>8.0.28</mysqlConnectorVersion>
         <postgresVersion>42.7.2</postgresVersion>
         <freemarkerVersion>2.3.32</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
-        <jUnitVersion>5.9.1</jUnitVersion>
+        <jUnitVersion>5.10.2</jUnitVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>

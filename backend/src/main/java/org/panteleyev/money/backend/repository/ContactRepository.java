@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -25,7 +25,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 public class ContactRepository implements MoneyRepository<Contact> {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Contact> rowMapper = (rs, i) -> new Contact(
+    private final RowMapper<Contact> rowMapper = (rs, _) -> new Contact(
             getUuid(rs, "uuid"),
             rs.getString("name"),
             getEnum(rs, "type", ContactType.class),
@@ -86,7 +86,7 @@ public class ContactRepository implements MoneyRepository<Contact> {
                 rowMapper);
         return queryResult.isEmpty() ?
                 Optional.empty() :
-                Optional.of(queryResult.get(0));
+                Optional.of(queryResult.getFirst());
 
     }
 

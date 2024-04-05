@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.document;
@@ -61,7 +61,7 @@ import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 public class DocumentWindowController extends BaseController {
     private final MoneyRecord documentOwner;
 
-    private final FilteredList<MoneyDocument> filteredList = cache().getDocuments().filtered(x -> true);
+    private final FilteredList<MoneyDocument> filteredList = cache().getDocuments().filtered(_ -> true);
     private final SortedList<MoneyDocument> sortedList = filteredList.sorted();
     private final TableView<MoneyDocument> table = new TableView<>(sortedList);
 
@@ -103,11 +103,10 @@ public class DocumentWindowController extends BaseController {
                         new SeparatorMenuItem(),
                         createMenuItem(crudActionsHolder.getDeleteAction()),
                         new SeparatorMenuItem(),
-                        menuItem("Открыть", SHORTCUT_O, event -> onOpenDocument()),
-                        menuItem("Сохранить...", SHORTCUT_S, event -> onDownload()),
+                        menuItem("Открыть", SHORTCUT_O, _ -> onOpenDocument()),
+                        menuItem("Сохранить...", SHORTCUT_S, _ -> onDownload()),
                         new SeparatorMenuItem(),
-                        menuItem("Обработать выписку", SHORTCUT_R,
-                                event -> onOpenStatement())
+                        menuItem("Обработать выписку", SHORTCUT_R, _ -> onOpenStatement())
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -121,10 +120,10 @@ public class DocumentWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 createContextMenuItem(crudActionsHolder.getDeleteAction()),
                 new SeparatorMenuItem(),
-                menuItem("Открыть", SHORTCUT_O, event -> onOpenDocument()),
-                menuItem("Сохранить...", SHORTCUT_S, event -> onDownload()),
+                menuItem("Открыть", SHORTCUT_O, _ -> onOpenDocument()),
+                menuItem("Сохранить...", SHORTCUT_S, _ -> onDownload()),
                 new SeparatorMenuItem(),
-                menuItem("Обработать выписку", event -> onOpenStatement())
+                menuItem("Обработать выписку", _ -> onOpenStatement())
         ));
 
         // Toolbar
@@ -136,7 +135,7 @@ public class DocumentWindowController extends BaseController {
         var w = table.widthProperty().subtract(20);
 
         var dateColumn = tableObjectColumn("Дата", (TableColumnBuilder<MoneyDocument, MoneyDocument> b) ->
-                b.withCellFactory(x -> new DocumentDateCell())
+                b.withCellFactory(_ -> new DocumentDateCell())
                         .withComparator(Comparator.comparing(MoneyDocument::date))
                         .withWidthBinding(w.multiply(0.15))
         );
@@ -144,7 +143,7 @@ public class DocumentWindowController extends BaseController {
         table.getColumns().setAll(List.of(
                 tableColumn("Контрагент", b ->
                         b.withPropertyCallback(MoneyDocument::contactUuid)
-                                .withCellFactory(x -> new DocumentContactNameCell())
+                                .withCellFactory(_ -> new DocumentContactNameCell())
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableColumn("Файл", b ->
@@ -156,7 +155,7 @@ public class DocumentWindowController extends BaseController {
                                 .withWidthBinding(w.multiply(0.1))
                 ),
                 tableObjectColumn("Размер", b ->
-                        b.withCellFactory(x -> new DocumentSizeCell())
+                        b.withCellFactory(_ -> new DocumentSizeCell())
                                 .withComparator(Comparator.comparingInt(MoneyDocument::size))
                                 .withWidthBinding(w.multiply(0.05))),
                 tableColumn("Описание", b ->
@@ -244,11 +243,11 @@ public class DocumentWindowController extends BaseController {
 
     private void onDeleteDocument(ActionEvent event) {
         getSelectedDocument().ifPresent(document -> {
-                new Alert(Alert.AlertType.CONFIRMATION, "Вы уверены?", ButtonType.OK,
-                        ButtonType.CANCEL)
-                        .showAndWait()
-                        .filter(response -> response == ButtonType.OK)
-                        .ifPresent(b -> dao().deleteDocument(document));
+            new Alert(Alert.AlertType.CONFIRMATION, "Вы уверены?", ButtonType.OK,
+                    ButtonType.CANCEL)
+                    .showAndWait()
+                    .filter(response -> response == ButtonType.OK)
+                    .ifPresent(_ -> dao().deleteDocument(document));
         });
     }
 

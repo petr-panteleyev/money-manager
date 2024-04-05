@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.account;
@@ -99,7 +99,7 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
     private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values(),
-            b -> b.withHandler(event -> onCategoryTypeSelected())
+            b -> b.withHandler(_ -> onCategoryTypeSelected())
                     .withStringConverter(Bundles::translate));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final TextField currencyEdit = new TextField();
@@ -294,7 +294,7 @@ class AccountDialog extends BaseDialog<Account> {
         for (var currency : cache.getCurrencies()) {
             var item = new CurrencyOrSecurity(currency);
             currencyMenuButton.getItems().add(
-                    menuItem(item.toString(), actionEvent -> onCurrencyOrSecuritySelected(item))
+                    menuItem(item.toString(), _ -> onCurrencyOrSecuritySelected(item))
             );
             currencySuggestions.add(new CurrencyOrSecurity(currency));
         }
@@ -307,7 +307,7 @@ class AccountDialog extends BaseDialog<Account> {
                     var item = new CurrencyOrSecurity(security);
                     currencySuggestions.add(item);
                     currencyMenuButton.getItems().add(
-                            menuItem(item.toString(), actionEvent -> onCurrencyOrSecuritySelected(item))
+                            menuItem(item.toString(), _ -> onCurrencyOrSecuritySelected(item))
                     );
                 }
             }

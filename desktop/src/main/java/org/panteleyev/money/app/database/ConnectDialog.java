@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -85,7 +85,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
             }
         });
 
-        cb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        cb.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             defaultCheck.setSelected(Objects.equals(profileManager.getDefaultProfile().orElse(null), newValue));
             autoConnectCheck.setSelected(defaultCheck.isSelected() && profileManager.getAutoConnect());
         });

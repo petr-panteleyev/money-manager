@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.category;
@@ -49,14 +49,14 @@ public final class CategoryWindowController extends BaseController {
             b -> b.withDefaultString("Все типы")
                     .withStringConverter(Bundles::translate)
     );
-    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, s -> updatePredicate());
+    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 
-    private final FilteredList<Category> filteredList = cache().getCategories().filtered(x -> true);
+    private final FilteredList<Category> filteredList = cache().getCategories().filtered(_ -> true);
     private final TableView<Category> tableView = new CategoryTableView(filteredList.sorted());
 
     public CategoryWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
-                this::onCreateCategory, this::onEditCategory, e -> {},
+                this::onCreateCategory, this::onEditCategory, _ -> {},
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
@@ -71,7 +71,7 @@ public final class CategoryWindowController extends BaseController {
                         createMenuItem(searchAction(this::onSearch))
                 ),
                 newMenu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );
@@ -98,7 +98,7 @@ public final class CategoryWindowController extends BaseController {
         var self = new BorderPane(pane, menuBar, null, null, null);
         self.setPrefSize(600.0, 400.0);
 
-        typeBox.valueProperty().addListener((x, y, newValue) -> updatePredicate());
+        typeBox.valueProperty().addListener((_, _, _) -> updatePredicate());
 
         setupWindow(self);
         settings().loadStageDimensions(this);
@@ -118,7 +118,7 @@ public final class CategoryWindowController extends BaseController {
     private Predicate<Category> getPredicate() {
         // Type
         var type = typeBox.getSelectionModel().getSelectedItem();
-        Predicate<Category> filter = type == null ? x -> true : x -> x.type() == type;
+        Predicate<Category> filter = type == null ? _ -> true : x -> x.type() == type;
 
         // Name
         var search = searchField.getText().toLowerCase();

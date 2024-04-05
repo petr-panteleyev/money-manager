@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.document;
@@ -98,7 +98,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
 
         setupContactMenu();
 
-        var browseButton = button("...", event -> onBrowse());
+        var browseButton = button("...", _ -> onBrowse());
         browseButton.setDisable(document != null || !files.isEmpty());
         getDialogPane().setContent(
                 gridPane(List.of(
@@ -174,7 +174,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
         validation.registerValidator(nameEdit, (Control control, String value) ->
                 ValidationResult.fromErrorIf(control, null, value.isEmpty()));
 
-        validation.registerValidator(contactEdit, (Control control, String value) -> {
+        validation.registerValidator(contactEdit, (Control control, String _) -> {
             var contact = cache().getContacts().stream()
                     .filter(c -> c.name().equals(contactEdit.getText()))
                     .findFirst();
@@ -218,7 +218,7 @@ final class DocumentDialog extends BaseDialog<List<DocumentWithBytes>> {
         cache().getContacts().stream()
                 .sorted((c1, c2) -> c1.name().compareToIgnoreCase(c2.name()))
                 .forEach(x -> {
-                    contactMenuButton.getItems().add(menuItem(x.name(), event -> onContactSelected(x)));
+                    contactMenuButton.getItems().add(menuItem(x.name(), _ -> onContactSelected(x)));
                     contactSuggestions.add(x);
                 });
 

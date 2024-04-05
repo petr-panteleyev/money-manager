@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -43,12 +43,12 @@ class RBAParser implements Parser {
         var accountNumber = "";
 
         if (!ofxStatement.getAccountStatements().isEmpty()) {
-            var statement = ofxStatement.getAccountStatements().get(0);
+            var statement = ofxStatement.getAccountStatements().getFirst();
             transactionList = statement.getBankTransactionList();
             accountNumber = statement.getAccountInfo().accountNumber();
         } else if (!ofxStatement.getCreditCardStatements().isEmpty()) {
-            var statement = ofxStatement.getCreditCardStatements().get(0);
-            transactionList = ofxStatement.getCreditCardStatements().get(0).getBankTransactionList();
+            var statement = ofxStatement.getCreditCardStatements().getFirst();
+            transactionList = ofxStatement.getCreditCardStatements().getFirst().getBankTransactionList();
             accountNumber = statement.getAccountInfo().accountNumber();
         }
 

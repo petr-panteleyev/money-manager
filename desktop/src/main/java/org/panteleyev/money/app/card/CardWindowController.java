@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.card;
@@ -42,7 +42,7 @@ import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 public final class CardWindowController extends BaseController {
     private final CardNumberFilterBox cardNumberFilterBox = new CardNumberFilterBox();
     private final PredicateProperty<Card> showDeactivatedCards =
-            new PredicateProperty<>(settings().getShowDeactivatedCards() ? a -> true : activeCard(true));
+            new PredicateProperty<>(settings().getShowDeactivatedCards() ? _ -> true : activeCard(true));
 
     private final PredicateProperty<Card> filterProperty =
             PredicateProperty.and(List.of(
@@ -55,7 +55,7 @@ public final class CardWindowController extends BaseController {
 
     public CardWindowController() {
         var crudActionsHolder = new CrudActionsHolder(
-                this::onCreateCard, this::onEditCard, e -> {},
+                this::onCreateCard, this::onEditCard, _ -> {},
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
@@ -75,10 +75,10 @@ public final class CardWindowController extends BaseController {
                                 event -> {
                                     var selected = ((CheckMenuItem) event.getSource()).isSelected();
                                     settings().update(opt -> opt.setShowDeactivatedCards(selected));
-                                    showDeactivatedCards.set(selected ? a -> true : activeCard(true));
+                                    showDeactivatedCards.set(selected ? _ -> true : activeCard(true));
                                 }
                         ),
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, event -> resetFilter())),
+                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()
         );

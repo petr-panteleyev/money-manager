@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -53,7 +53,7 @@ final class GeneralSettings {
 
     @SuppressWarnings("unchecked")
     <T> T get(Setting key) {
-        return (T) settings.computeIfAbsent(key, k -> key.getDefaultValue());
+        return (T) settings.computeIfAbsent(key, _ -> key.getDefaultValue());
     }
 
     void put(Setting key, Object value) {

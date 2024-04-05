@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -135,7 +135,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private ListView<ConnectionProfile> initProfileListView() {
         var listView = new ListView<ConnectionProfile>();
 
-        listView.setCellFactory(param -> {
+        listView.setCellFactory(_ -> {
             TextFieldListCell<ConnectionProfile> cell = new TextFieldListCell<>();
             cell.setConverter(new ReadOnlyStringConverter<>() {
                 @Override
@@ -147,7 +147,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
         });
 
         listView.getSelectionModel().selectedItemProperty()
-                .addListener((observable, oldValue, newValue) -> onProfileSelected(newValue));
+                .addListener((_, _, newValue) -> onProfileSelected(newValue));
 
         listView.addEventFilter(MouseEvent.ANY, event -> {
             if (profileNameValidation.isInvalid()) {
@@ -165,7 +165,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
                 new Alert(CONFIRMATION, "Вы уверены?", OK, CANCEL)
                         .showAndWait()
                         .filter(response -> response == OK)
-                        .ifPresent(b -> {
+                        .ifPresent(_ -> {
                             profileManager.deleteProfile(selected);
                             profileManager.saveProfiles();
                             profileListView.getItems().remove(selected);
@@ -208,7 +208,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
 
         alert.showAndWait()
                 .filter(response -> response == YES)
-                .ifPresent(b -> {
+                .ifPresent(_ -> {
                     var profile = buildConnectionProfile();
 
                     var ex = profileManager.getResetDatabaseCallback().apply(profile);

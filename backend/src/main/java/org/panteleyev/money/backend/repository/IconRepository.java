@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -21,7 +21,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 public class IconRepository implements MoneyRepository<Icon> {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Icon> rowMapper = (rs, i) -> new Icon(
+    private final RowMapper<Icon> rowMapper = (rs, _) -> new Icon(
             getUuid(rs, "uuid"),
             rs.getString("name"),
             rs.getBytes("bytes"),
@@ -79,6 +79,6 @@ public class IconRepository implements MoneyRepository<Icon> {
         var result = jdbcTemplate.query("""
                 SELECT * FROM icon WHERE uuid = :uuid
                 """, Map.of("uuid", uuid), rowMapper);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.getFirst());
     }
 }

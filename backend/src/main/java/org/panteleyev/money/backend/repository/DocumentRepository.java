@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -23,7 +23,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 
 @Repository
 public class DocumentRepository implements MoneyRepository<MoneyDocument> {
-    private static final RowMapper<MoneyDocument> ROW_MAPPER = (rs, i) -> new MoneyDocument(
+    private static final RowMapper<MoneyDocument> ROW_MAPPER = (rs, _) -> new MoneyDocument(
             getUuid(rs, "uuid"),
             getUuid(rs, "owner_uuid"),
             getUuid(rs, "contact_uuid"),
@@ -61,7 +61,7 @@ public class DocumentRepository implements MoneyRepository<MoneyDocument> {
                 ROW_MAPPER);
         return queryResult.isEmpty() ?
                 Optional.empty() :
-                Optional.of(queryResult.get(0));
+                Optional.of(queryResult.getFirst());
     }
 
     @Override

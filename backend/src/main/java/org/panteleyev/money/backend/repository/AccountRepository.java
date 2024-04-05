@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.repository;
@@ -27,7 +27,7 @@ import static org.panteleyev.money.backend.repository.RepositoryUtil.getUuid;
 public class AccountRepository implements MoneyRepository<Account> {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    private final RowMapper<Account> rowMapper = (rs, i) -> new Account(
+    private final RowMapper<Account> rowMapper = (rs, _) -> new Account(
             getUuid(rs, "uuid"),
             rs.getString("name"),
             rs.getString("comment"),
@@ -92,7 +92,7 @@ public class AccountRepository implements MoneyRepository<Account> {
         var result = jdbcTemplate.query("""
                 SELECT * FROM account WHERE uuid = :uuid
                 """, Map.of("uuid", uuid), rowMapper);
-        return result.isEmpty() ? Optional.empty() : Optional.of(result.get(0));
+        return result.isEmpty() ? Optional.empty() : Optional.of(result.getFirst());
     }
 
     @Override
@@ -132,7 +132,7 @@ public class AccountRepository implements MoneyRepository<Account> {
     public int getCount(boolean inactive) {
         return jdbcTemplate.query("SELECT COUNT(uuid) FROM account" + (inactive ? "" : " WHERE enabled=true"),
                 Map.of(),
-                (rs, i) -> rs.getInt(1)
-        ).get(0);
+                (rs, _) -> rs.getInt(1)
+        ).getFirst();
     }
 }

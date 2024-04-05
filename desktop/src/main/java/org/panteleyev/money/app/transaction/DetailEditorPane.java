@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.transaction;
@@ -104,23 +104,23 @@ final class DetailEditorPane extends BorderPane {
 
         var filler = new Region();
 
-        var clearButton = button("Очистить", x -> clear());
+        var clearButton = button("Очистить", _ -> clear());
         clearButton.setCancelButton(true);
 
-        var addButton = button("Добавить", x -> buildTransactionDetail()
+        var addButton = button("Добавить", _ -> buildTransactionDetail()
                 .ifPresent(t -> {
                     parent.addRecord(t);
                     clear();
                 }));
 
-        var updateButton = button("Изменить", x -> buildTransactionDetail()
+        var updateButton = button("Изменить", _ -> buildTransactionDetail()
                 .ifPresent(t -> {
                     parent.updateRecord(t);
                     clear();
                 })
         );
 
-        var deleteButton = button("Удалить", x -> {
+        var deleteButton = button("Удалить", _ -> {
             if (transactionDetail != null) {
                 parent.deleteRecord(transactionDetail);
                 clear();
@@ -170,8 +170,7 @@ final class DetailEditorPane extends BorderPane {
                 .sorted((a1, a2) -> a1.name().compareToIgnoreCase(a2.name()))
                 .forEach(acc -> {
                     creditedMenuButton.getItems().add(
-                            menuItem('[' + acc.name() + ']',
-                                    event -> onCreditedAccountSelected(acc)));
+                            menuItem('[' + acc.name() + ']', _ -> onCreditedAccountSelected(acc)));
                     creditedSuggestions.add(acc);
                 });
 
@@ -205,7 +204,7 @@ final class DetailEditorPane extends BorderPane {
                                 .forEach(acc -> {
                                     creditedMenuButton.getItems().add(
                                             menuItem("  " + prefix + ' ' + acc.name(),
-                                                    event -> onCreditedAccountSelected(acc)));
+                                                    _ -> onCreditedAccountSelected(acc)));
                                     creditedSuggestions.add(acc);
                                 });
                     }
@@ -285,7 +284,7 @@ final class DetailEditorPane extends BorderPane {
     }
 
     private void createValidationSupport() {
-        validation.registerValidator(creditedAccountEdit, (Control control, String value) -> {
+        validation.registerValidator(creditedAccountEdit, (Control control, String _) -> {
             var account = checkTextFieldValue(creditedAccountEdit, creditedSuggestions, ACCOUNT_TO_STRING);
             updateCategoryLabel(creditedCategoryLabel, account.orElse(null));
 
@@ -316,7 +315,7 @@ final class DetailEditorPane extends BorderPane {
                         accounts.forEach(acc -> {
                             creditedSuggestions.add(acc);
                             creditedMenuButton.getItems().add(
-                                    menuItem("  - " + acc.name(), event -> onCreditedAccountSelected(acc)));
+                                    menuItem("  - " + acc.name(), _ -> onCreditedAccountSelected(acc)));
                         });
                     }
                 });

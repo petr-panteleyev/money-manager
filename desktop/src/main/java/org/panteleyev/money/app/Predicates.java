@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -27,7 +27,7 @@ public final class Predicates {
 
     public static Predicate<Account> accountByName(String name) {
         return name.isBlank() ?
-                account -> true : account -> account.name().toLowerCase().contains(name.toLowerCase());
+                _ -> true : account -> account.name().toLowerCase().contains(name.toLowerCase());
     }
 
     public static Predicate<Account> accountByCategory(UUID uuid) {
@@ -49,7 +49,7 @@ public final class Predicates {
 
     public static Predicate<Contact> contactByName(String name) {
         return name.isBlank() ?
-                contact -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
+                _ -> true : contact -> contact.name().toLowerCase().contains(name.toLowerCase());
     }
 
     public static Predicate<Card> activeCard(boolean active) {
@@ -58,7 +58,7 @@ public final class Predicates {
 
     public static Predicate<Card> cardByNumber(String number) {
         return number.isBlank() ?
-                card -> true : card -> card.number().toLowerCase().contains(number.toLowerCase());
+                _ -> true : card -> card.number().toLowerCase().contains(number.toLowerCase());
     }
 
     private Predicates() {
