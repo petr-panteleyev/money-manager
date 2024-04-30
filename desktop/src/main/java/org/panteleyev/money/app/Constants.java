@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -26,6 +26,10 @@ public final class Constants {
             new FileChooser.ExtensionFilter("Файлы ZIP", "*.zip");
     public static final FileChooser.ExtensionFilter FILTER_HTML_FILES =
             new FileChooser.ExtensionFilter("Файлы HTML", "*.html");
+    public static final FileChooser.ExtensionFilter FILTER_SBER_ONLINE_BROKER_DEALS =
+            new FileChooser.ExtensionFilter("Брокерские сделки - Сбербанк-Онлайн", "*.xlsx");
+    public static final FileChooser.ExtensionFilter FILTER_RAIF_ONLINE_BROKER_DEALS =
+            new FileChooser.ExtensionFilter("Брокерские сделки - Raiffeisen", "*.xlsx");
 
     public static final DateTimeFormatter FULL_DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 

@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,11 @@ abstract class Repository<T extends MoneyRecord> {
 
     static void setLocalDate(PreparedStatement st, int index, LocalDate localDate) throws SQLException {
         st.setDate(index, localDate == null ? null : Date.valueOf(localDate));
+    }
+
+    static LocalDateTime getLocalDateTime(ResultSet set, String columnLabel) throws SQLException {
+        var date = set.getTimestamp(columnLabel);
+        return date == null ? null : date.toLocalDateTime();
     }
 
     static Integer getInteger(ResultSet set, String columnLabel) throws SQLException {

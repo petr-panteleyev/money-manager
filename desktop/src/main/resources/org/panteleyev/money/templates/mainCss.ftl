@@ -38,6 +38,11 @@
     -fx-font-size: ${tableCellFontSize};
 }
 
+.tree-table-cell {
+    -fx-font-family: "${tableCellFontFamily}";
+    -fx-font-size: ${tableCellFontSize};
+}
+
 .groupCell {
     -fx-font-weight: bold;
 }

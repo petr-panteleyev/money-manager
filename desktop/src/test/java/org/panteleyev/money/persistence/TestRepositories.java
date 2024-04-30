@@ -23,6 +23,10 @@ import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.investment.InvestmentDealType;
+import org.panteleyev.money.model.investment.InvestmentMarketType;
+import org.panteleyev.money.model.investment.InvestmentOperationType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -41,6 +45,7 @@ import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
 import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
 import static org.panteleyev.money.test.BaseTestUtils.randomDay;
 import static org.panteleyev.money.test.BaseTestUtils.randomInt;
+import static org.panteleyev.money.test.BaseTestUtils.randomLocalDateTime;
 import static org.panteleyev.money.test.BaseTestUtils.randomMonth;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 import static org.panteleyev.money.test.BaseTestUtils.randomTransactionType;
@@ -60,6 +65,7 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID DOCUMENT_UUID = UUID.randomUUID();
     private static final UUID PERIODIC_PAYMENT_UUID = UUID.randomUUID();
     private static final UUID CARD_UUID = UUID.randomUUID();
+    private static final UUID INVESTMENT_UUID = UUID.randomUUID();
 
     @BeforeAll
     public static void init() {
@@ -485,6 +491,71 @@ public class TestRepositories extends BaseDaoTest {
         );
 
         insertAndUpdate(repository, insert, update);
+    }
+
+    @Test
+    @Order(12)
+    public void testInvestment() {
+        var repository = new InvestmentDealRepository();
+
+        var insert = new InvestmentDeal(
+                INVESTMENT_UUID,
+                ACCOUNT_UUID,
+                null,
+                null,
+                randomString(),
+                randomLocalDateTime(),
+                randomLocalDateTime(),
+                InvestmentMarketType.STOCK_MARKET,
+                InvestmentOperationType.PURCHASE,
+                10,
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                InvestmentDealType.NORMAL,
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        insert(repository, insert);
+
+        var update = new InvestmentDeal(
+                insert.uuid(),
+                insert.accountUuid(),
+                EXCHANGE_SECURITY_UUID,
+                CURRENCY_UUID,
+                insert.dealNumber(),
+                insert.dealDate(),
+                insert.accountingDate(),
+                InvestmentMarketType.STOCK_MARKET,
+                InvestmentOperationType.PURCHASE,
+                10,
+                insert.price(),
+                insert.aci(),
+                insert.dealVolume(),
+                insert.rate(),
+                insert.exchangeFee(),
+                insert.brokerFee(),
+                insert.amount(),
+                InvestmentDealType.NORMAL,
+                insert.created(),
+                System.currentTimeMillis()
+        );
+
+        insert(repository, update);
+    }
+
+    private static <T extends MoneyRecord> void insert(Repository<T> repository, T insert) {
+        dao().withNewConnection(conn -> {
+            var uuid = insert.uuid();
+
+            repository.insert(conn, insert);
+            assertEquals(insert, repository.get(conn, uuid).orElseThrow());
+        });
     }
 
     private static <T extends MoneyRecord> void insertAndUpdate(Repository<T> repository, T insert, T update) {

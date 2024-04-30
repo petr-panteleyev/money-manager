@@ -5,13 +5,14 @@
 package org.panteleyev.money.model;
 
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
 public sealed interface MoneyRecord
-        permits Account, Card, Category, Contact, Currency, Icon, Transaction, MoneyDocument, PeriodicPayment, ExchangeSecurity {
+        permits Account, Card, Category, Contact, Currency, Icon, Transaction, MoneyDocument, PeriodicPayment, ExchangeSecurity, InvestmentDeal {
 
     UUID uuid();
 

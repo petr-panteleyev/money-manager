@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.test;
@@ -21,13 +21,19 @@ import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.investment.InvestmentDealType;
+import org.panteleyev.money.model.investment.InvestmentMarketType;
+import org.panteleyev.money.model.investment.InvestmentOperationType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
 
@@ -80,6 +86,10 @@ public final class BaseTestUtils {
     public static ContactType randomContactType() {
         int index = RANDOM.nextInt(ContactType.values().length);
         return ContactType.values()[index];
+    }
+
+    public static LocalDateTime randomLocalDateTime() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
     public static TransactionType randomTransactionType() {
@@ -388,6 +398,34 @@ public final class BaseTestUtils {
                 .expiration(LocalDate.now())
                 .comment(randomString())
                 .enabled(randomBoolean())
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static InvestmentDeal newInvestment(
+            Account account,
+            ExchangeSecurity security,
+            Currency currency
+    ) {
+        return new InvestmentDeal.Builder()
+                .accountUuid(account.uuid())
+                .securityUuid(security.uuid())
+                .currencyUuid(currency.uuid())
+                .dealNumber(randomString())
+                .dealDate(randomLocalDateTime())
+                .accountingDate(randomLocalDateTime())
+                .marketType(InvestmentMarketType.STOCK_MARKET)
+                .operationType(InvestmentOperationType.PURCHASE)
+                .securityAmount(randomInt())
+                .price(randomBigDecimal())
+                .aci(randomBigDecimal())
+                .dealVolume(randomBigDecimal())
+                .rate(randomBigDecimal())
+                .exchangeFee(randomBigDecimal())
+                .brokerFee(randomBigDecimal())
+                .amount(randomBigDecimal())
+                .dealType(InvestmentDealType.NORMAL)
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();

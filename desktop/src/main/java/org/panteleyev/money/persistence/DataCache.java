@@ -18,6 +18,7 @@ import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -42,6 +43,7 @@ public class DataCache {
     private final ObservableList<PeriodicPayment> periodicPayments = FXCollections.observableArrayList();
     private final ObservableList<ExchangeSecurity> exchangeSecurities = FXCollections.observableArrayList();
     private final ObservableList<Card> cards = FXCollections.observableArrayList();
+    private final ObservableList<InvestmentDeal> investmentDeals = FXCollections.observableArrayList();
 
     public void clear() {
         icons.clear();
@@ -54,6 +56,7 @@ public class DataCache {
         periodicPayments.clear();
         exchangeSecurities.clear();
         cards.clear();
+        investmentDeals.clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -392,7 +395,6 @@ public class DataCache {
         removeRecord(exchangeSecurities, exchangeSecurity.uuid());
     }
 
-
     ////////////////////////////////////////////////////////////////////////////
     // Cards
     ////////////////////////////////////////////////////////////////////////////
@@ -423,6 +425,18 @@ public class DataCache {
                 .filter(c -> Objects.equals(account.uuid(), c.accountUuid()))
                 .filter(Card::enabled)
                 .toList();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Investments
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<InvestmentDeal> getInvestment(UUID uuid) {
+        return getRecord(investmentDeals, uuid);
+    }
+
+    public ObservableList<InvestmentDeal> getInvestmentDeals() {
+        return investmentDeals;
     }
 
     /**

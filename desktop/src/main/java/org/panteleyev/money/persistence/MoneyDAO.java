@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -15,6 +15,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -47,6 +48,7 @@ public class MoneyDAO {
     private final PeriodicPaymentRepository periodicPaymentRepository = new PeriodicPaymentRepository();
     private final ExchangeSecurityRepository exchangeSecurityRepository = new ExchangeSecurityRepository();
     private final CardRepository cardRepository = new CardRepository();
+    private final InvestmentDealRepository investmentDealRepository = new InvestmentDealRepository();
 
     public static final int FIELD_SCALE = 6;
 
@@ -369,6 +371,22 @@ public class MoneyDAO {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Cards
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertInvestments(List<InvestmentDeal> investmentDeals) {
+        withNewConnection(conn -> {
+            investmentDealRepository.insert(conn, BATCH_SIZE, investmentDeals);
+            var investmentList = investmentDealRepository.getAll(conn);
+            CompletableFuture.supplyAsync(() -> {
+                cache.getInvestmentDeals().setAll(investmentList);
+                return null;
+            }, Platform::runLater);
+        });
+    }
+
+
     /**
      * This method recalculates total values for all involved accounts.
      *
@@ -440,8 +458,12 @@ public class MoneyDAO {
             var periodicPaymentsList = periodicPaymentRepository.getAll(conn);
             progress.accept("done\n");
 
-            progress.accept("    periodic secirities...");
+            progress.accept("    securities...");
             var exchangeSecuritiesList = exchangeSecurityRepository.getAll(conn);
+            progress.accept("done\n");
+
+            progress.accept("    investments...");
+            var investmentList = investmentDealRepository.getAll(conn);
             progress.accept("done\n");
 
             progress.accept("done\n");
@@ -457,6 +479,7 @@ public class MoneyDAO {
                 cache.getTransactions().setAll(transactionList);
                 cache.getPeriodicPayments().setAll(periodicPaymentsList);
                 cache.getExchangeSecurities().setAll(exchangeSecuritiesList);
+                cache.getInvestmentDeals().setAll(investmentList);
                 return null;
             }, executor);
         });
@@ -516,6 +539,10 @@ public class MoneyDAO {
 
             progress.accept("    periodic payments...");
             periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
+            progress.accept("done\n");
+
+            progress.accept("    investment deals...");
+            investmentDealRepository.insert(conn, BATCH_SIZE, imp.getInvestmentDeals());
             progress.accept("done\n");
 
             progress.accept("done\n");

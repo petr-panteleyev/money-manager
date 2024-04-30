@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -14,6 +14,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 import org.w3c.dom.Document;
@@ -108,6 +109,11 @@ public class Export {
         var periodicPaymentRoot = XMLUtils.appendElement(rootElement, "PeriodicPayments");
         for (var payment : cache.getPeriodicPayments()) {
             periodicPaymentRoot.appendChild(exportPeriodicPayment(doc, payment));
+        }
+
+        var investmentRoot = XMLUtils.appendElement(rootElement, "InvestmentDeals");
+        for (var investment: cache.getInvestmentDeals()) {
+            investmentRoot.appendChild(exportInvestment(doc, investment));
         }
 
         XMLUtils.writeDocument(doc, out);
@@ -327,6 +333,33 @@ public class Export {
         appendTextNode(e, "enabled", card.enabled());
         appendTextNode(e, "created", card.created());
         appendTextNode(e, "modified", card.modified());
+
+        return e;
+    }
+
+    private static Element exportInvestment(Document doc, InvestmentDeal investmentDeal) {
+        var e = doc.createElement("InvestmentDeal");
+
+        appendTextNode(e, "uuid", investmentDeal.uuid());
+        appendTextNode(e, "accountUuid", investmentDeal.accountUuid());
+        appendTextNode(e, "securityUuid", investmentDeal.securityUuid());
+        appendTextNode(e, "currencyUuid", investmentDeal.currencyUuid());
+        appendTextNode(e, "dealNumber", investmentDeal.dealNumber());
+        appendTextNode(e, "dealDate", investmentDeal.dealDate());
+        appendTextNode(e, "accountingDate", investmentDeal.accountingDate());
+        appendTextNode(e, "marketType", investmentDeal.marketType());
+        appendTextNode(e, "operationType", investmentDeal.operationType());
+        appendTextNode(e, "securityAmount", investmentDeal.securityAmount());
+        appendTextNode(e, "price", investmentDeal.price());
+        appendTextNode(e, "aci", investmentDeal.aci());
+        appendTextNode(e, "dealVolume", investmentDeal.dealVolume());
+        appendTextNode(e, "rate", investmentDeal.rate());
+        appendTextNode(e, "exchangeFee", investmentDeal.exchangeFee());
+        appendTextNode(e, "brokerFee", investmentDeal.brokerFee());
+        appendTextNode(e, "amount", investmentDeal.amount());
+        appendTextNode(e, "dealType", investmentDeal.dealType());
+        appendTextNode(e, "created", investmentDeal.created());
+        appendTextNode(e, "modified", investmentDeal.modified());
 
         return e;
     }

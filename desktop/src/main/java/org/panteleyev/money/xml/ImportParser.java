@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -22,6 +22,10 @@ import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.investment.InvestmentDealType;
+import org.panteleyev.money.model.investment.InvestmentMarketType;
+import org.panteleyev.money.model.investment.InvestmentOperationType;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -30,6 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +59,8 @@ class ImportParser extends DefaultHandler {
         Contact(ImportParser::parseContact),
         Transaction(ImportParser::parseTransaction),
         Document(ImportParser::parseDocument),
-        PeriodicPayment(ImportParser::parsePeriodicPayment);
+        PeriodicPayment(ImportParser::parsePeriodicPayment),
+        InvestmentDeal(ImportParser::parseInvestmentDeal);
 
         Tag(Function<Map<String, String>, MoneyRecord> parseMethod) {
             this.parseMethod = parseMethod;
@@ -89,6 +95,7 @@ class ImportParser extends DefaultHandler {
     private final List<Transaction> transactions = new ArrayList<>();
     private final List<MoneyDocument> documents = new ArrayList<>();
     private final List<PeriodicPayment> periodicPayments = new ArrayList<>();
+    private final List<InvestmentDeal> investmentDeals = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
             Map.entry(Tag.Icon, icons),
@@ -100,7 +107,8 @@ class ImportParser extends DefaultHandler {
             Map.entry(Tag.Contact, contacts),
             Map.entry(Tag.Transaction, transactions),
             Map.entry(Tag.Document, documents),
-            Map.entry(Tag.PeriodicPayment, periodicPayments)
+            Map.entry(Tag.PeriodicPayment, periodicPayments),
+            Map.entry(Tag.InvestmentDeal, investmentDeals)
     );
 
     private Map<String, String> tags = null;
@@ -144,6 +152,10 @@ class ImportParser extends DefaultHandler {
 
     public List<PeriodicPayment> getPeriodicPayments() {
         return periodicPayments;
+    }
+
+    public List<InvestmentDeal> getInvestments() {
+        return investmentDeals;
     }
 
     @Override
@@ -411,6 +423,33 @@ class ImportParser extends DefaultHandler {
                 .build();
     }
 
+    private  static InvestmentDeal parseInvestmentDeal(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
+        return new InvestmentDeal.Builder()
+                .uuid(parseUuid(tags.get("uuid")))
+                .accountUuid(parseUuid(tags.get("accountUuid")))
+                .securityUuid(parseUuid(tags.get("securityUuid")))
+                .currencyUuid(parseUuid(tags.get("currencyUuid")))
+                .dealNumber(tags.get("dealNumber"))
+                .dealDate(parseLocalDateTime(tags.get("dealDate")))
+                .accountingDate(parseLocalDateTime(tags.get("accountingDate")))
+                .marketType(InvestmentMarketType.valueOf(tags.get("marketType")))
+                .operationType(InvestmentOperationType.valueOf(tags.get("operationType")))
+                .securityAmount(parseInteger(tags.get("securityAmount"), 0))
+                .price(parseBigDecimal(tags.get("price")))
+                .aci(parseBigDecimal(tags.get("aci")))
+                .dealVolume(parseBigDecimal(tags.get("dealVolume")))
+                .rate(parseBigDecimal(tags.get("rate")))
+                .exchangeFee(parseBigDecimal(tags.get("exchangeFee")))
+                .brokerFee(parseBigDecimal(tags.get("brokerFee")))
+                .amount(parseBigDecimal(tags.get("amount")))
+                .dealType(InvestmentDealType.valueOf(tags.get("dealType")))
+                .created(created)
+                .modified(modified)
+                .build();
+    }
+
     private static UUID parseUuid(String value) {
         return value == null ? null : UUID.fromString(value);
     }
@@ -425,6 +464,10 @@ class ImportParser extends DefaultHandler {
 
     private static LocalDate parseLocalDate(String rawValue, LocalDate defaultValue) {
         return rawValue == null ? defaultValue : LocalDate.ofEpochDay(Long.parseLong(rawValue));
+    }
+
+    private static LocalDateTime parseLocalDateTime(String rawValue) {
+        return rawValue == null ? null : LocalDateTime.parse(rawValue, XMLUtils.DATE_TIME_FORMATTER);
     }
 
     private static boolean parseBoolean(String rawValue, boolean defaultValue) {

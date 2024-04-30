@@ -19,6 +19,7 @@ import org.panteleyev.money.app.contact.ContactListWindowController;
 import org.panteleyev.money.app.currency.CurrencyWindowController;
 import org.panteleyev.money.app.document.DocumentWindowController;
 import org.panteleyev.money.app.exchange.SecuritiesWindowController;
+import org.panteleyev.money.app.investment.InvestmentWindowController;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.MoneyRecord;
 
@@ -73,13 +74,17 @@ public class BaseController extends Controller {
     Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
         var securitiesMenuItem = menuItem("Ценные бумаги...",
                 _ -> getController(SecuritiesWindowController.class));
+        var investmentsMenuItem = menuItem("Инвестиции...",
+                _ -> getController(InvestmentWindowController.class));
 
         if (dbOpenProperty != null) {
             securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
+            investmentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
         return newMenu("Портфель",
-                securitiesMenuItem
+                securitiesMenuItem,
+                investmentsMenuItem
         );
     }
 

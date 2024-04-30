@@ -44,7 +44,8 @@ final class AccountTableView extends TableView<Account> {
                                 .withComparator(Comparators.accountsByCategory(cache()))
                                 .withWidthBinding(w.multiply(0.2))),
                 tableObjectColumn("Валюта", b ->
-                        b.withCellFactory(_ -> new AccountCurrencyCell()).withWidthBinding(w.multiply(0.05))),
+                        b.withCellFactory(_ -> new AccountCurrencyCell())
+                                .withWidthBinding(w.multiply(0.05))),
                 tableColumn("%%", (TableColumnBuilder<Account, BigDecimal> b) ->
                         b.withCellFactory(_ -> new AccountInterestCell())
                                 .withPropertyCallback(Account::interest)

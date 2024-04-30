@@ -1,5 +1,5 @@
 <!--
-  Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 
@@ -151,6 +151,20 @@
                     </xsd:complexType>
                     <xsd:unique name="PeriodicPaymentUniqueUUID">
                         <xsd:selector xpath="PeriodicPayment"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="InvestmentDeals" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="InvestmentDeal"
+                                         type="InvestmentDeal"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="InvestmentDealUniqueUUID">
+                        <xsd:selector xpath="InvestmentDeal"/>
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
@@ -353,6 +367,31 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="InvestmentDeal">
+        <xsd:all>
+            <xsd:element name="uuid" type="UUID"/>
+            <xsd:element name="accountUuid" type="UUID"/>
+            <xsd:element name="securityUuid" type="UUID" minOccurs="0"/>
+            <xsd:element name="currencyUuid" type="UUID" minOccurs="0"/>
+            <xsd:element name="dealNumber" type="xsd:string"/>
+            <xsd:element name="dealDate" type="xsd:string"/>
+            <xsd:element name="accountingDate" type="xsd:string"/>
+            <xsd:element name="marketType" type="InvestmentMarketType"/>
+            <xsd:element name="operationType" type="InvestmentOperationType"/>
+            <xsd:element name="securityAmount" type="xsd:int"/>
+            <xsd:element name="price" type="xsd:decimal"/>
+            <xsd:element name="aci" type="xsd:decimal"/>
+            <xsd:element name="dealVolume" type="xsd:decimal"/>
+            <xsd:element name="rate" type="xsd:decimal"/>
+            <xsd:element name="exchangeFee" type="xsd:decimal"/>
+            <xsd:element name="brokerFee" type="xsd:decimal"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="dealType" type="InvestmentDealType"/>
+            <xsd:element name="created" type="Timestamp"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:simpleType name="UUID">
         <xsd:restriction base="xsd:string">
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
@@ -477,6 +516,28 @@
             <xsd:enumeration value="MASTERCARD"/>
             <xsd:enumeration value="MIR"/>
             <xsd:enumeration value="AMEX"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="InvestmentOperationType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="UNKNOWN"/>
+            <xsd:enumeration value="PURCHASE"/>
+            <xsd:enumeration value="SELL"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="InvestmentMarketType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="UNKNOWN"/>
+            <xsd:enumeration value="STOCK_MARKET"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="InvestmentDealType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="UNKNOWN"/>
+            <xsd:enumeration value="NORMAL"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -5,4 +5,5 @@
 module org.panteleyev.money.model {
     exports org.panteleyev.money.model;
     exports org.panteleyev.money.model.exchange;
+    exports org.panteleyev.money.model.investment;
 }

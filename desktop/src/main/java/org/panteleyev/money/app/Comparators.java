@@ -4,11 +4,13 @@
  */
 package org.panteleyev.money.app;
 
+import org.panteleyev.money.app.investment.InvestmentSummaryTreeData;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.persistence.DataCache;
 
 import java.util.Comparator;
@@ -50,6 +52,13 @@ public final class Comparators {
             Comparator.comparing(Transaction::transactionDate)
                     .thenComparing(Transaction::created);
 
+    private static final Comparator<InvestmentDeal> INVESTMENT_DEAL_BY_DEAL_DATE =
+            Comparator.comparing(InvestmentDeal::dealDate)
+                    .thenComparing(InvestmentDeal::created);
+
+    private static final Comparator<InvestmentSummaryTreeData> INVESTMENT_SUMMARY_TREE_DATA_BY_PERCENTAGE =
+            Comparator.comparing(InvestmentSummaryTreeData::percentage);
+
     public static Comparator<Category> categoriesByName() {
         return CATEGORIES_BY_NAME;
     }
@@ -64,6 +73,10 @@ public final class Comparators {
 
     public static Comparator<Account> accountsByClosingDate() {
         return ACCOUNTS_BY_CLOSING_DATE;
+    }
+
+    public static Comparator<InvestmentSummaryTreeData> investmentSummaryTreeDataByPercentage() {
+        return INVESTMENT_SUMMARY_TREE_DATA_BY_PERCENTAGE;
     }
 
     public static Comparator<Account> accountsByCategory(DataCache cache) {
@@ -116,5 +129,9 @@ public final class Comparators {
                     .orElse("");
             return name1.compareTo(name2);
         };
+    }
+
+    public static Comparator<InvestmentDeal> investmentDealByDealDate() {
+        return INVESTMENT_DEAL_BY_DEAL_DATE;
     }
 }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -41,7 +41,7 @@ public final class Bundles {
     ));
 
     private static final Map<TransactionType, String> TRANSACTION_TYPE_STRINGS = new EnumMap<>(Map.ofEntries(
-            entry(TransactionType.CARD_PAYMENT, "Оплата по карте"),
+            entry(TransactionType.CARD_PAYMENT, "Оплата картой"),
             entry(TransactionType.SBP_PAYMENT, "Платеж через СБП"),
             entry(TransactionType.CASH_PURCHASE, "Покупка за наличные"),
             entry(TransactionType.CHEQUE, "Чек"),

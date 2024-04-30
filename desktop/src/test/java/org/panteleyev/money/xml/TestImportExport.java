@@ -18,6 +18,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
 
@@ -46,6 +47,7 @@ import static org.panteleyev.money.test.BaseTestUtils.newDocument;
 import static org.panteleyev.money.test.BaseTestUtils.newExchangeSecurity;
 import static org.panteleyev.money.test.BaseTestUtils.newExchangeSecurityShare;
 import static org.panteleyev.money.test.BaseTestUtils.newIcon;
+import static org.panteleyev.money.test.BaseTestUtils.newInvestment;
 import static org.panteleyev.money.test.BaseTestUtils.newPeriodicPayment;
 import static org.panteleyev.money.test.BaseTestUtils.newTransaction;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
@@ -98,6 +100,9 @@ public class TestImportExport {
     private static final Card CARD_1 = newCard(ACCOUNT_1);
     private static final Card CARD_2 = newCard(ACCOUNT_3);
 
+    private static final InvestmentDeal INVESTMENT_DEAL_1 =newInvestment(ACCOUNT_1, EXCHANGE_SECURITY_1, CURRENCY_1);
+    private static final InvestmentDeal INVESTMENT_DEAL_2 =newInvestment(ACCOUNT_2, EXCHANGE_SECURITY_2, CURRENCY_2);
+
     private final MoneyDAO dao = new MoneyDAO(new DataCache()) {
         @Override
         public byte[] getDocumentBytes(MoneyDocument document) {
@@ -126,6 +131,7 @@ public class TestImportExport {
                                         newTransaction(ACCOUNT_1, ACCOUNT_2));
                                 getPeriodicPayments().addAll(PAYMENT_1, PAYMENT_2);
                                 getCards().addAll(CARD_1, CARD_2);
+                                getInvestmentDeals().addAll(INVESTMENT_DEAL_1, INVESTMENT_DEAL_2);
                             }
                         }
                 )
@@ -151,6 +157,7 @@ public class TestImportExport {
             assertEquals(cache.getTransactions(), imp.getTransactions());
             assertEquals(cache.getPeriodicPayments(), imp.getPeriodicPayments());
             assertEquals(cache.getCards(), imp.getCards());
+            assertEquals(cache.getInvestmentDeals(), imp.getInvestmentDeals());
 
             // Get blobs
             var actualBlobs = new ArrayList<BlobContent>();

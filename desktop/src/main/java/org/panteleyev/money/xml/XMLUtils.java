@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.xml;
@@ -18,11 +18,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.UUID;
 
 public final class XMLUtils {
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
     public static void appendTextNode(Element e, String name, String value) {
         if (value == null) {
             return;
@@ -45,6 +49,10 @@ public final class XMLUtils {
         appendTextNode(e, name, Boolean.toString(value));
     }
 
+    public static void appendTextNode(Element e, String name, int value) {
+        appendTextNode(e, name, Integer.toString(value));
+    }
+
     public static void appendTextNode(Element e, String name, long value) {
         appendTextNode(e, name, Long.toString(value));
     }
@@ -58,6 +66,12 @@ public final class XMLUtils {
     public static void appendTextNode(Element e, String name, LocalDate value) {
         if (value != null) {
             appendTextNode(e, name, value.toEpochDay());
+        }
+    }
+
+    public static void appendTextNode(Element e, String name, LocalDateTime value) {
+        if (value != null) {
+            appendTextNode(e, name, DATE_TIME_FORMATTER.format(value));
         }
     }
 

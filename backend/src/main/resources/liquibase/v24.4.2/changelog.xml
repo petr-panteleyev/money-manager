@@ -1,0 +1,54 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v24.4.2/changelog.xml">
+
+    <changeSet id="v24.4.2-investment-deal" author="petr-panteleyev@yandex.ru">
+        <sql>
+            CREATE TABLE investment_deal (
+                uuid                    UUID            NOT NULL PRIMARY KEY,
+                account_uuid            UUID            NOT NULL,
+                security_uuid           UUID,
+                currency_uuid           UUID,
+                deal_number             VARCHAR         NOT NULL,
+                deal_date               TIMESTAMP       NOT NULL,
+                accounting_date         TIMESTAMP       NOT NULL,
+                market_type             VARCHAR         NOT NULL,
+                operation_type          VARCHAR         NOT NULL,
+                security_amount         INT             NOT NULL,
+                price                   DECIMAL(15, 6)  NOT NULL,
+                aci                     DECIMAL(15, 6)  NOT NULL,
+                deal_volume             DECIMAL(15, 6)  NOT NULL,
+                rate                    DECIMAL(15, 6)  NOT NULL,
+                exchange_fee            DECIMAL(15, 6)  NOT NULL,
+                broker_fee              DECIMAL(15, 6)  NOT NULL,
+                amount                  DECIMAL(15, 6)  NOT NULL,
+                deal_type               VARCHAR         NOT NULL,
+                created                 BIGINT          NOT NULL,
+                modified                BIGINT          NOT NULL,
+
+                UNIQUE(account_uuid, deal_number),
+
+                CONSTRAINT investment_account_uuid_fk FOREIGN KEY (account_uuid)
+                    REFERENCES account (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                CONSTRAINT investment_security_uuid_fk FOREIGN KEY (security_uuid)
+                    REFERENCES exchange_security (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT,
+                CONSTRAINT investment_currency_uuid_fk FOREIGN KEY (currency_uuid)
+                    REFERENCES currency (uuid) ON DELETE RESTRICT ON UPDATE RESTRICT
+            )
+        </sql>
+        <rollback>
+            <sql>
+                DROP TABLE investment_deal
+            </sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
