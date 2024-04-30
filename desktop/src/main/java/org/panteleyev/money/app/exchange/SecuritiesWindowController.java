@@ -166,10 +166,6 @@ public class SecuritiesWindowController extends BaseController {
     private ExchangeSecurity buildExchangeSecurity(MoexSecurity moexSecurity, UUID uuid) {
         var marketData = getMarketData(moexSecurity);
 
-        var marketValue = getMarketData(moexSecurity)
-                .map(MoexMarketData::marketPrice)
-                .orElse(BigDecimal.ZERO);
-
         var builder = new ExchangeSecurity.Builder()
                 .secId(moexSecurity.secId())
                 .name(moexSecurity.name())
@@ -184,13 +180,19 @@ public class SecuritiesWindowController extends BaseController {
                 .groupName(moexSecurity.groupName())
                 .type(moexSecurity.type())
                 .typeName(moexSecurity.typeName())
-                .marketValue(marketValue)
+                .marketValue(marketData
+                        .map(MoexMarketData::marketPrice)
+                        .orElse(BigDecimal.ZERO))
                 .couponValue(moexSecurity.couponValue())
                 .couponPercent(moexSecurity.couponPercent())
                 .couponDate(moexSecurity.couponDate())
                 .couponFrequency(moexSecurity.couponFrequency())
-                .accruedInterest(marketData.map(MoexMarketData::accruedInterest).orElse(null))
-                .couponPeriod(marketData.map(MoexMarketData::couponPeriod).orElse(null));
+                .accruedInterest(marketData
+                        .map(MoexMarketData::accruedInterest)
+                        .orElse(null))
+                .couponPeriod(marketData
+                        .map(MoexMarketData::couponPeriod)
+                        .orElse(null));
 
         if (uuid != null) {
             builder.uuid(uuid);

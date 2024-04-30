@@ -14,6 +14,7 @@ import org.panteleyev.money.model.investment.InvestmentOperationType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,14 +54,24 @@ public class InvestmentSummaryPane extends BorderPane {
         var totalValueOfAll = BigDecimal.ZERO;
         var result = new ArrayList<InvestmentSummary>();
 
+        var today = LocalDate.now();
+
         for (var summary : summaries.values()) {
             if (summary.securityAmount() == 0) {
                 continue;
             }
 
+            var security = cache().getExchangeSecurity(summary.securityUuid()).orElse(null);
+            if (security == null) {
+                continue;
+            }
+            if (security.matDate() != null && security.matDate().isBefore(today)) {
+                continue;
+            }
+
             var averagePrice = summary.totalPurchaseValue()
                     .divide(new BigDecimal(summary.totalPurchaseAmount()), RoundingMode.HALF_UP);
-            var totalValue = calculateTotalValue(summary.securityUuid(), summary.securityAmount());
+            var totalValue = calculateTotalValue(security, summary.securityAmount());
 
             totalValueOfAll = totalValueOfAll.add(totalValue);
 
@@ -86,14 +97,12 @@ public class InvestmentSummaryPane extends BorderPane {
         )).toList();
     }
 
-    private static BigDecimal calculateTotalValue(UUID securityUuid, int amount) {
-        return cache().getExchangeSecurity(securityUuid).map(security -> {
-            var currentValue = security.group().equals(STOCK_BONDS) ?
-                    security.faceValue().multiply(security.marketValue()).divide(ONE_HUNDRED, RoundingMode.HALF_UP) :
-                    security.marketValue();
+    private static BigDecimal calculateTotalValue(ExchangeSecurity security, int amount) {
+        var currentValue = security.group().equals(STOCK_BONDS) ?
+                security.faceValue().multiply(security.marketValue()).divide(ONE_HUNDRED, RoundingMode.HALF_UP) :
+                security.marketValue();
 
-            return currentValue.multiply(BigDecimal.valueOf(amount));
-        }).orElse(BigDecimal.ZERO);
+        return currentValue.multiply(BigDecimal.valueOf(amount));
     }
 
     private static InvestmentSummary add(InvestmentSummary summary, InvestmentDeal deal) {

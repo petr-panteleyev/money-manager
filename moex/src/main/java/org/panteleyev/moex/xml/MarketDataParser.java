@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.moex.xml;
@@ -9,6 +9,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import javax.xml.xpath.XPathConstants;
+import java.util.Optional;
 
 import static org.panteleyev.moex.xml.ParserUtil.parseInt;
 import static org.panteleyev.moex.xml.ParserUtil.parseNumber;
@@ -23,10 +24,13 @@ public class MarketDataParser extends BaseParser {
     public MarketDataParser() {
     }
 
-    public MoexMarketData parse(Document document) throws Exception {
+    public Optional<MoexMarketData> parse(Document document) throws Exception {
         var builder = new MoexMarketData.Builder();
 
         var securities = (Element) xPath().compile(SECURITY_XPATH).evaluate(document, XPathConstants.NODE);
+        if (securities == null) {
+            return Optional.empty();
+        }
 
         builder.accruedInterest(parseNumber(securities.getAttribute("ACCRUEDINT")))
                 .couponPeriod(parseInt(securities.getAttribute("COUPONPERIOD")));
@@ -43,6 +47,6 @@ public class MarketDataParser extends BaseParser {
                 .marketPriceToday(parseNumber(marketData.getAttribute("MARKETPRICETODAY")))
         ;
 
-        return builder.build();
+        return Optional.of(builder.build());
     }
 }

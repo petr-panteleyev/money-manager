@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.moex;
@@ -59,7 +59,7 @@ public class Moex {
         }
     }
 
-    public List<MoexMarket> getMargets(MoexEngine engine) {
+    public List<MoexMarket> getMarkets(MoexEngine engine) {
         var response = client.getMarkets(engine);
         if (response.statusCode() != 200) {
             throw new RuntimeException("Request failed");
@@ -116,7 +116,7 @@ public class Moex {
             var docBuilder = docBuilderFactory.newDocumentBuilder();
             var document = docBuilder.parse(inputStream);
 
-            return Optional.of(new MarketDataParser().parse(document));
+            return new MarketDataParser().parse(document);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -153,19 +153,5 @@ public class Moex {
                     titleAttr.getValue()
             ));
         }
-    }
-
-    public static void main(String[] args) {
-        var moex = new Moex();
-
-        var sber = moex.getSecurity("SBERAAA").get();
-        System.out.println(sber);
-        var sberData = moex.getMarketData(sber.secId(), sber.engine(), sber.market(), sber.primaryBoard()).get();
-        System.out.println(sberData);
-
-//        var bond = moex.getSecurity("RU000A105SD9").get();
-//        System.out.println(bond);
-//        var bondData = moex.getMarketData(bond.secId(), bond.engine(), bond.market(), bond.primaryBoard()).get();
-//        System.out.println(bondData);
     }
 }
