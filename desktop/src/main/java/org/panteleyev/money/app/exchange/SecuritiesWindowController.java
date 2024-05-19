@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.app.exchange;
 
+import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
@@ -12,6 +13,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
@@ -136,7 +139,9 @@ public class SecuritiesWindowController extends BaseController {
                 newMenu("Правка",
                         menuItem("Добавить...", SHORTCUT_N, this::onAddSecurity),
                         menuItem("Обновить...", SHORTCUT_U, this::onUpdateSecurity,
-                                tableView.getSelectionModel().selectedItemProperty().isNull())
+                                tableView.getSelectionModel().selectedItemProperty().isNull()),
+                        new SeparatorMenuItem(),
+                        menuItem("Обновить все котировки", this::onUpdateAllValues)
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -181,7 +186,7 @@ public class SecuritiesWindowController extends BaseController {
                 .type(moexSecurity.type())
                 .typeName(moexSecurity.typeName())
                 .marketValue(marketData
-                        .map(MoexMarketData::marketPrice)
+                        .map(MoexMarketData::last)
                         .orElse(BigDecimal.ZERO))
                 .couponValue(moexSecurity.couponValue())
                 .couponPercent(moexSecurity.couponPercent())
@@ -214,6 +219,15 @@ public class SecuritiesWindowController extends BaseController {
                 setupGroupBox();
             });
         }));
+    }
+
+    private void onUpdateAllValues(ActionEvent ignored) {
+        cache().getExchangeSecurities()
+                .forEach(sec -> CompletableFuture.supplyAsync(() -> moex.getSecurity(sec.secId()).orElse(null))
+                        .thenAcceptAsync(moexSecurity -> {
+                            var updated = buildExchangeSecurity(moexSecurity, sec.uuid());
+                            dao().updateExchangeSecurity(updated);
+                        }, Platform::runLater));
     }
 
     private void updatePredicate() {

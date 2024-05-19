@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.moex.client;
@@ -20,46 +20,43 @@ public class MoexClient {
     private static final String SECURITIES = "/securities";
     private static final String XML = ".xml";
 
-    public HttpResponse<InputStream> getEngines() {
+    public HttpResponse<InputStream> getEngines(HttpClient httpClient) {
         try {
             var request = HttpRequest.newBuilder()
                     .uri(new URI(BASE_URL + ENGINES + XML))
                     .GET()
                     .build();
-            var client = HttpClient.newHttpClient();
-            return client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public HttpResponse<InputStream> getMarkets(MoexEngine engine) {
+    public HttpResponse<InputStream> getMarkets(HttpClient httpClient, MoexEngine engine) {
         try {
             var request = HttpRequest.newBuilder()
                     .uri(new URI(BASE_URL + ENGINES + "/" + engine.name() + MARKETS + XML))
                     .GET()
                     .build();
-            var client = HttpClient.newHttpClient();
-            return client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public HttpResponse<InputStream> getSecurity(String securityId) {
+    public HttpResponse<InputStream> getSecurity(HttpClient httpClient, String securityId) {
         try {
             var request = HttpRequest.newBuilder()
                     .uri(new URI(BASE_URL + SECURITIES + "/" + securityId + XML + "?iss.meta=off"))
                     .GET()
                     .build();
-            var client = HttpClient.newHttpClient();
-            return client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public HttpResponse<InputStream> getMarketData(String securityId, String engine, String market, String board) {
+    public HttpResponse<InputStream> getMarketData(HttpClient httpClient, String securityId, String engine, String market, String board) {
         try {
             var request = HttpRequest.newBuilder()
                     .uri(new URI(BASE_URL
@@ -69,8 +66,7 @@ public class MoexClient {
                             + SECURITIES + "/" + securityId + XML + "?iss.meta=off"))
                     .GET()
                     .build();
-            var client = HttpClient.newHttpClient();
-            return client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            return httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
