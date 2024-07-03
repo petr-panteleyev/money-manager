@@ -72,13 +72,14 @@ import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
+import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -156,7 +157,7 @@ public class MainWindowController extends BaseController implements TransactionT
         var importMenuItem = menuItem("Импорт...", SHORTCUT_ALT_I, _ -> onImport());
         var reportMenuItem = menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport());
 
-        var fileMenu = newMenu("Файл",
+        var fileMenu = menu("Файл",
                 fileConnectMenuItem,
                 new SeparatorMenuItem(),
                 importMenuItem,
@@ -170,7 +171,7 @@ public class MainWindowController extends BaseController implements TransactionT
 
         var editMenu = createMenu("Правка", transactionTable.getActions());
 
-        var viewMenu = newMenu("Вид",
+        var viewMenu = menu("Вид",
                 menuItem("Текущий месяц", SHORTCUT_ALT_UP, _ -> onCurrentMonth()),
                 new SeparatorMenuItem(),
                 menuItem("Следующий месяц", SHORTCUT_ALT_RIGHT, _ -> onNextMonth()),
@@ -185,14 +186,14 @@ public class MainWindowController extends BaseController implements TransactionT
         var iconWindowMenuItem = menuItem("Значки...",
                 _ -> onIconWindow());
 
-        var toolsMenu = newMenu("Сервис",
+        var toolsMenu = menu("Сервис",
                 profilesMenuItem,
                 new SeparatorMenuItem(),
                 iconWindowMenuItem,
                 new SeparatorMenuItem(),
                 optionsMenuItem,
-                new SeparatorMenuItem(),
-                menuItem("Создать ярлык приложения (Linux)", _ -> onCreateDesktopEntry())
+                isLinux() ? new SeparatorMenuItem() : null,
+                isLinux() ? menuItem("Создать ярлык приложения", _ -> onCreateDesktopEntry()) : null
         );
 
         var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
@@ -509,7 +510,7 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private void onCreateDesktopEntry() {
-        if (!Utility.isLinux()) {
+        if (!isLinux()) {
             return;
         }
         Utility.getExecutablePath().ifPresent(command -> {

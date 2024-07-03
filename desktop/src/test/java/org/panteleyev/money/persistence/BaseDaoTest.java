@@ -25,7 +25,7 @@ public class BaseDaoTest {
 
     public static boolean setupAndSkip() {
         try {
-            container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.5"))
+            container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.12"))
                     .withLogConsumer(outputFrame -> {
                         var logMessage = outputFrame.getUtf8String();
                         switch (outputFrame.getType()) {
