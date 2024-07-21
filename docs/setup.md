@@ -1,16 +1,16 @@
-# Setup Database
+# Настройка базы данных
 
-1. Create user
+1. Создать пользователя
 
 ```postgresql
 create role <username> with login password '<password>';
 ```
 
-2. Create schema
+2. Создать схему
 
 ```postgresql
 create schema <schema> authorization <username>;
 ```
 
-3. Create connection profile using schema and user setup
+3. В приложении создать профиль соединения с параметрами, указанными в предыдущих пунктах
 

@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -75,7 +75,7 @@ public final class IconWindowController extends BaseController {
         super(new Stage(), settings().getMainCssFilePath());
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         menuItem("Загрузить", SHORTCUT_U, _ -> onUpload()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)

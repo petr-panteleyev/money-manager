@@ -40,9 +40,9 @@ import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
@@ -181,7 +181,7 @@ class IncomesAndExpensesWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)

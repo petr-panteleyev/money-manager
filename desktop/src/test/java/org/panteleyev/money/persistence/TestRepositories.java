@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.persistence;
@@ -23,6 +23,8 @@ import org.panteleyev.money.model.PeriodicPaymentType;
 import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.model.investment.InvestmentDealType;
 import org.panteleyev.money.model.investment.InvestmentMarketType;
@@ -66,6 +68,7 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID PERIODIC_PAYMENT_UUID = UUID.randomUUID();
     private static final UUID CARD_UUID = UUID.randomUUID();
     private static final UUID INVESTMENT_UUID = UUID.randomUUID();
+    private static final UUID EXCHANGE_SECURITY_SPLIT_UUID = UUID.randomUUID();
 
     @BeforeAll
     public static void init() {
@@ -547,6 +550,36 @@ public class TestRepositories extends BaseDaoTest {
         );
 
         insert(repository, update);
+    }
+
+    @Test
+    @Order(13)
+    public void testExchangeSecuritySplit() {
+        var repository = new ExchangeSecuritySplitRepository();
+
+        var insert = new ExchangeSecuritySplit(
+                EXCHANGE_SECURITY_SPLIT_UUID,
+                EXCHANGE_SECURITY_UUID,
+                ExchangeSecuritySplitType.REVERSE_SPLIT,
+                LocalDate.now(),
+                randomBigDecimal(),
+                randomString(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis()
+        );
+
+        var update = new ExchangeSecuritySplit(
+                insert.uuid(),
+                EXCHANGE_SECURITY_UUID,
+                ExchangeSecuritySplitType.REVERSE_SPLIT,
+                LocalDate.now(),
+                randomBigDecimal(),
+                randomString(),
+                insert.created(),
+                System.currentTimeMillis()
+        );
+
+        insertAndUpdate(repository, insert, update);
     }
 
     private static <T extends MoneyRecord> void insert(Repository<T> repository, T insert) {

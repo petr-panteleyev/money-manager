@@ -27,9 +27,9 @@ import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -60,16 +60,16 @@ public final class CardWindowController extends BaseController {
         );
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         createMenuItem(crudActionsHolder.getCreateAction()),
                         createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),
                         createMenuItem(searchAction(this::onSearch))
                 ),
-                newMenu("Вид",
+                menu("Вид",
                         checkMenuItem("Показывать неактивные карты",
                                 settings().getShowDeactivatedCards(), SHORTCUT_H,
                                 event -> {

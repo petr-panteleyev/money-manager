@@ -7,7 +7,7 @@
     <xsd:annotation>
         <xsd:documentation xml:lang="en">
             Money Database export file schema.
-            Copyright (C) 2017-2023 Petr Panteleyev
+            Copyright (C) 2017-2024 Petr Panteleyev
         </xsd:documentation>
     </xsd:annotation>
 
@@ -165,6 +165,20 @@
                     </xsd:complexType>
                     <xsd:unique name="InvestmentDealUniqueUUID">
                         <xsd:selector xpath="InvestmentDeal"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="ExchangeSecuritySplits" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="ExchangeSecuritySplit"
+                                         type="ExchangeSecuritySplit"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="ExchangeSecuritySplitUUID">
+                        <xsd:selector xpath="ExchangeSecuritySplit"/>
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
@@ -392,6 +406,19 @@
         </xsd:all>
     </xsd:complexType>
 
+    <xsd:complexType name="ExchangeSecuritySplit">
+        <xsd:all>
+            <xsd:element name="uuid" type="UUID"/>
+            <xsd:element name="securityUuid" type="UUID"/>
+            <xsd:element name="type" type="ExchangeSecuritySplitType"/>
+            <xsd:element name="date" type="xsd:long"/>
+            <xsd:element name="rate" type="xsd:decimal"/>
+            <xsd:element name="comment" type="xsd:string"/>
+            <xsd:element name="created" type="Timestamp"/>
+            <xsd:element name="modified" type="Timestamp"/>
+        </xsd:all>
+    </xsd:complexType>
+
     <xsd:simpleType name="UUID">
         <xsd:restriction base="xsd:string">
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
@@ -555,6 +582,13 @@
             <xsd:enumeration value="OCTOBER"/>
             <xsd:enumeration value="NOVEMBER"/>
             <xsd:enumeration value="DECEMBER"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="ExchangeSecuritySplitType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="SPLIT"/>
+            <xsd:enumeration value="REVERSE_SPLIT"/>
         </xsd:restriction>
     </xsd:simpleType>
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.currency;
@@ -18,8 +18,8 @@ import org.panteleyev.money.model.Currency;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -35,10 +35,10 @@ public final class CurrencyWindowController extends BaseController {
         );
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         createMenuItem(crudActionsHolder.getCreateAction()),
                         createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),

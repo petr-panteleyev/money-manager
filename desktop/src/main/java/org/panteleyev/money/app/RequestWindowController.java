@@ -44,9 +44,9 @@ import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
 import static org.panteleyev.fx.FxUtils.SKIP;
 import static org.panteleyev.fx.FxUtils.fxNode;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -153,13 +153,13 @@ class RequestWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
                 createMenu("Правка", table.getActions()),
-                newMenu("Вид",
+                menu("Вид",
                         menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()

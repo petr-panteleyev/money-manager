@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.1</version>
         <relativePath/>
     </parent>
 
@@ -19,7 +19,7 @@
     <name>Backend</name>
 
     <properties>
-        <revision>24.7.1</revision>
+        <revision>24.7.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>22</java.version>
         <maven.compiler.release>22</maven.compiler.release>
@@ -30,12 +30,12 @@
         <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.6.3</jpackageMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.7.2</postgresVersion>
+        <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
-        <springDocsVersion>1.6.15</springDocsVersion>
-        <caffeineVersion>3.1.1</caffeineVersion>
+        <springDocsVersion>1.7.0</springDocsVersion>
+        <caffeineVersion>3.1.8</caffeineVersion>
         <graphqlJavaExtendedScalarsVersion>19.1</graphqlJavaExtendedScalarsVersion>
-        <restAssuredVersion>5.3.0</restAssuredVersion>
+        <restAssuredVersion>5.4.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
@@ -161,6 +161,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${mavenResourcePluginVersion}</version>
+                <configuration>
+                    <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

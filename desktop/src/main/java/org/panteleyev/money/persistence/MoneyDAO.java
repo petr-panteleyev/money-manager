@@ -15,6 +15,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.xml.BlobContent;
 import org.panteleyev.money.xml.Import;
@@ -49,12 +50,11 @@ public class MoneyDAO {
     private final ExchangeSecurityRepository exchangeSecurityRepository = new ExchangeSecurityRepository();
     private final CardRepository cardRepository = new CardRepository();
     private final InvestmentDealRepository investmentDealRepository = new InvestmentDealRepository();
-
-    public static final int FIELD_SCALE = 6;
+    private final ExchangeSecuritySplitRepository exchangeSecuritySplitRepository = new ExchangeSecuritySplitRepository();
 
     private static final int BATCH_SIZE = 1000;
 
-    public static final Consumer<String> IGNORE_PROGRESS = x -> {};
+    public static final Consumer<String> IGNORE_PROGRESS = _ -> {};
 
     public MoneyDAO(DataCache cache) {
         this.cache = cache;
@@ -372,7 +372,7 @@ public class MoneyDAO {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // Cards
+    // Investment deals
     ////////////////////////////////////////////////////////////////////////////
 
     public void insertInvestments(List<InvestmentDeal> investmentDeals) {
@@ -386,6 +386,30 @@ public class MoneyDAO {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Exchange security splits
+    ////////////////////////////////////////////////////////////////////////////
+
+    public void insertExchangeSecuritySplit(ExchangeSecuritySplit split) {
+        withNewConnection(conn -> {
+            exchangeSecuritySplitRepository.insert(conn, split);
+            cache.add(split);
+        });
+    }
+
+    public void updateExchangeSecuritySplit(ExchangeSecuritySplit split) {
+        withNewConnection(conn -> {
+            exchangeSecuritySplitRepository.update(conn, split);
+            cache.update(split);
+        });
+    }
+
+    public void deleteExchangeSecuritySplit(ExchangeSecuritySplit split) {
+        withNewConnection(conn -> {
+            cache.remove(split);
+            exchangeSecuritySplitRepository.delete(conn, split);
+        });
+    }
 
     /**
      * This method recalculates total values for all involved accounts.
@@ -466,6 +490,10 @@ public class MoneyDAO {
             var investmentList = investmentDealRepository.getAll(conn);
             progress.accept("done\n");
 
+            progress.accept("    security splits...");
+            var exchangeSecuritySplitsList = exchangeSecuritySplitRepository.getAll(conn);
+            progress.accept("done\n");
+
             progress.accept("done\n");
 
             CompletableFuture.supplyAsync(() -> {
@@ -480,6 +508,7 @@ public class MoneyDAO {
                 cache.getPeriodicPayments().setAll(periodicPaymentsList);
                 cache.getExchangeSecurities().setAll(exchangeSecuritiesList);
                 cache.getInvestmentDeals().setAll(investmentList);
+                cache.getExchangeSecuritySplits().setAll(exchangeSecuritySplitsList);
                 return null;
             }, executor);
         });
@@ -491,70 +520,74 @@ public class MoneyDAO {
     }
 
     public void importFullDump(Import imp, Consumer<String> progress) {
-        progress.accept("Recreating tables... ");
+        progress.accept("Создание таблиц... ");
         createTables();
-        progress.accept("done\n");
+        progress.accept("выполнено\n");
 
         withNewConnection(conn -> {
-            progress.accept("Importing data...\n");
+            progress.accept("Импорт данных...\n");
 
-            progress.accept("    icons... ");
+            progress.accept("    значки... ");
             iconRepository.insert(conn, BATCH_SIZE, imp.getIcons());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
             progress.accept("    categories... ");
             categoryRepository.insert(conn, BATCH_SIZE, imp.getCategories());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    currencies... ");
+            progress.accept("    валюты... ");
             currencyRepository.insert(conn, BATCH_SIZE, imp.getCurrencies());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    securities... ");
+            progress.accept("    ценные бумаги... ");
             exchangeSecurityRepository.insert(conn, BATCH_SIZE, imp.getExchangeSecurities());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    accounts... ");
+            progress.accept("    счета... ");
             accountRepository.insert(conn, BATCH_SIZE, imp.getAccounts());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    cards...");
+            progress.accept("    карты...");
             cardRepository.insert(conn, BATCH_SIZE, imp.getCards());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    contacts... ");
+            progress.accept("    контакты... ");
             contactRepository.insert(conn, BATCH_SIZE, imp.getContacts());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    transactions... ");
+            progress.accept("    проводки... ");
             transactionRepository.insert(conn, BATCH_SIZE,
                     imp.getTransactions().stream().filter(t -> t.parentUuid() == null).toList());
             transactionRepository.insert(conn, BATCH_SIZE,
                     imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    documents...");
+            progress.accept("    документы...");
             documentRepository.insert(conn, BATCH_SIZE, imp.getDocuments());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    periodic payments...");
+            progress.accept("    периодические платежи...");
             periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("    investment deals...");
+            progress.accept("    инвестиционные сделки...");
             investmentDealRepository.insert(conn, BATCH_SIZE, imp.getInvestmentDeals());
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
 
-            progress.accept("done\n");
+            progress.accept("    сплиты ценных бумаг...");
+            exchangeSecuritySplitRepository.insert(conn, BATCH_SIZE, imp.getExchangeSecuritySplits());
+            progress.accept("выполнено\n");
 
-            progress.accept("Importing blobs...");
+            progress.accept("выполнено\n");
+
+            progress.accept("Импорт файлов...");
             BlobContent blobContent;
             while ((blobContent = imp.getNextBlobContent()) != null) {
                 if (blobContent.type() == BlobContent.BlobType.DOCUMENT) {
                     documentRepository.insertBytes(conn, blobContent.uuid(), blobContent.bytes());
                 }
             }
-            progress.accept("done\n");
+            progress.accept("выполнено\n");
         });
     }
 

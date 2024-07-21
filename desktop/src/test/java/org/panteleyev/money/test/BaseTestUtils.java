@@ -21,6 +21,8 @@ import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.model.investment.InvestmentDealType;
 import org.panteleyev.money.model.investment.InvestmentMarketType;
@@ -32,6 +34,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
@@ -426,6 +429,21 @@ public final class BaseTestUtils {
                 .brokerFee(randomBigDecimal())
                 .amount(randomBigDecimal())
                 .dealType(InvestmentDealType.NORMAL)
+                .created(System.currentTimeMillis())
+                .modified(System.currentTimeMillis())
+                .build();
+    }
+
+    public static ExchangeSecuritySplit newExchangeSecuritySplit(
+            ExchangeSecurity exchangeSecurity
+    ) {
+        return new ExchangeSecuritySplit.Builder()
+                .uuid(UUID.randomUUID())
+                .securityUuid(exchangeSecurity.uuid())
+                .type(ExchangeSecuritySplitType.REVERSE_SPLIT)
+                .rate(randomBigDecimal())
+                .date(LocalDate.now())
+                .comment(randomString())
                 .created(System.currentTimeMillis())
                 .modified(System.currentTimeMillis())
                 .build();

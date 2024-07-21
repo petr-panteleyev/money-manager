@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.GridBuilder.columnConstraints;
+import static org.panteleyev.fx.grid.ColumnConstraintsBuilder.columnConstraints;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
@@ -50,7 +50,8 @@ final class TCPEditor extends VBox {
                         gridRow(label("База данных:"), gridCell(databaseNameEdit, 3, 1)),
                         gridRow(label("Схема:"), gridCell(schemaEdit, 2, 1), resetSchemaButton)
                 ), b -> b.withStyle(GRID_PANE)
-                        .withConstraints(columnConstraints(Priority.NEVER), columnConstraints(Priority.ALWAYS))
+                        .withConstraints(columnConstraints(bld -> bld.withHgrow(Priority.ALWAYS)),
+                                columnConstraints(bld -> bld.withHgrow(Priority.ALWAYS)))
         ));
 
         VBox.setMargin(getChildren().getFirst(), new Insets(10.0, 10.0, 10.0, 10.0));

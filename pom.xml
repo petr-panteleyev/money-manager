@@ -14,7 +14,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>24.7.1</revision>
+        <revision>24.7.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>22</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -34,10 +34,10 @@
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
         <jsoupVersion>1.15.3</jsoupVersion>
-        <postgresVersion>42.7.2</postgresVersion>
-        <freemarkerVersion>2.3.32</freemarkerVersion>
+        <postgresVersion>42.7.3</postgresVersion>
+        <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
-        <apachePoiVersion>5.2.5</apachePoiVersion>
+        <apachePoiVersion>5.3.0</apachePoiVersion>
         <jUnitVersion>5.10.2</jUnitVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
@@ -188,6 +188,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${mavenResourcePluginVersion}</version>
+                    <configuration>
+                        <propertiesEncoding>${project.build.sourceEncoding}</propertiesEncoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

@@ -17,6 +17,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.fx.FxFactory;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
@@ -29,11 +30,10 @@ import java.util.function.Predicate;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxFactory.newSearchField;
 import static org.panteleyev.fx.FxUtils.fxNode;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
 import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
@@ -49,7 +49,7 @@ public final class CategoryWindowController extends BaseController {
             b -> b.withDefaultString("Все типы")
                     .withStringConverter(Bundles::translate)
     );
-    private final TextField searchField = newSearchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
+    private final TextField searchField = FxFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(_ -> true);
     private final TableView<Category> tableView = new CategoryTableView(filteredList.sorted());
@@ -61,16 +61,16 @@ public final class CategoryWindowController extends BaseController {
         );
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         createMenuItem(crudActionsHolder.getCreateAction()),
                         createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),
                         createMenuItem(searchAction(this::onSearch))
                 ),
-                newMenu("Вид",
+                menu("Вид",
                         menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
                 createWindowMenu(),
                 createHelpMenu()

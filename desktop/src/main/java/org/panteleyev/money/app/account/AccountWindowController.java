@@ -45,9 +45,9 @@ import java.util.Optional;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -148,7 +148,7 @@ public final class AccountWindowController extends BaseController {
                 _ -> onActivateDeactivateAccount(),
                 disableBinding);
 
-        var editMenu = newMenu("Правка",
+        var editMenu = menu("Правка",
                 createMenuItem(crudActionsHolder.getCreateAction()),
                 createMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
@@ -174,12 +174,12 @@ public final class AccountWindowController extends BaseController {
         );
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)),
                 editMenu,
-                newMenu("Вид",
+                menu("Вид",
                         checkMenuItem("Показывать неактивные счета",
                                 settings().getShowDeactivatedAccounts(), SHORTCUT_H,
                                 event -> {

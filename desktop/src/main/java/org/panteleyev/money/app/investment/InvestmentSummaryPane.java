@@ -9,6 +9,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.scene.layout.BorderPane;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.model.investment.InvestmentOperationType;
 
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.exchange.Definitions.STOCK_BONDS;
@@ -47,9 +50,17 @@ public class InvestmentSummaryPane extends BorderPane {
     private List<InvestmentSummary> calculateSummary(List<InvestmentDeal> deals) {
         var summaries = new HashMap<UUID, InvestmentSummary>();
 
-        for (var deal : deals) {
-            summaries.compute(deal.securityUuid(), (_, summary) -> add(summary, deal));
-        }
+        Stream.concat(
+                deals.stream(),
+                cache().getExchangeSecuritySplits().stream()
+        ).sorted(new DealAnsSplitComparator()).forEach(obj -> {
+            var securityUuid = switch (obj) {
+                case InvestmentDeal deal -> deal.securityUuid();
+                case ExchangeSecuritySplit split -> split.securityUuid();
+                default -> throw new IllegalStateException("Wrong object in the combined stream");
+            };
+            summaries.compute(securityUuid, (_, summary) -> add(summary, obj));
+        });
 
         var totalValueOfAll = BigDecimal.ZERO;
         var result = new ArrayList<InvestmentSummary>();
@@ -57,7 +68,7 @@ public class InvestmentSummaryPane extends BorderPane {
         var today = LocalDate.now();
 
         for (var summary : summaries.values()) {
-            if (summary.securityAmount() == 0) {
+            if (summary.securityAmount().compareTo(BigDecimal.ZERO) == 0) {
                 continue;
             }
 
@@ -70,7 +81,7 @@ public class InvestmentSummaryPane extends BorderPane {
             }
 
             var averagePrice = summary.totalPurchaseValue()
-                    .divide(new BigDecimal(summary.totalPurchaseAmount()), RoundingMode.HALF_UP);
+                    .divide(summary.totalPurchaseAmount(), RoundingMode.HALF_UP);
             var totalValue = calculateTotalValue(security, summary.securityAmount());
 
             totalValueOfAll = totalValueOfAll.add(totalValue);
@@ -97,47 +108,68 @@ public class InvestmentSummaryPane extends BorderPane {
         )).toList();
     }
 
-    private static BigDecimal calculateTotalValue(ExchangeSecurity security, int amount) {
+    private static BigDecimal calculateTotalValue(ExchangeSecurity security, BigDecimal amount) {
         var currentValue = security.group().equals(STOCK_BONDS) ?
                 security.faceValue().multiply(security.marketValue()).divide(ONE_HUNDRED, RoundingMode.HALF_UP) :
                 security.marketValue();
 
-        return currentValue.multiply(BigDecimal.valueOf(amount));
+        return currentValue.multiply(amount);
     }
 
-    private static InvestmentSummary add(InvestmentSummary summary, InvestmentDeal deal) {
-        var amountInc = deal.operationType() == InvestmentOperationType.PURCHASE ?
-                deal.securityAmount() : -deal.securityAmount();
-        var totalPurchaseAmountInc = deal.operationType() == InvestmentOperationType.PURCHASE ?
-                deal.securityAmount() : 0;
-        var totalPurchaseValueInc = deal.operationType() == InvestmentOperationType.PURCHASE ?
-                deal.amount() : BigDecimal.ZERO;
+    private static InvestmentSummary add(InvestmentSummary summary, Object object) {
+        if (object instanceof InvestmentDeal deal) {
+            var amountInc = BigDecimal.valueOf(deal.operationType() == InvestmentOperationType.PURCHASE ?
+                    deal.securityAmount() : -deal.securityAmount());
+            var totalPurchaseAmountInc = deal.operationType() == InvestmentOperationType.PURCHASE ?
+                    BigDecimal.valueOf(deal.securityAmount()) : BigDecimal.ZERO;
+            var totalPurchaseValueInc = deal.operationType() == InvestmentOperationType.PURCHASE ?
+                    deal.amount() : BigDecimal.ZERO;
 
-        if (summary == null) {
+            if (summary == null) {
+                return new InvestmentSummary(
+                        deal.securityUuid(),
+                        BigDecimal.ZERO,
+                        amountInc,
+                        BigDecimal.ZERO,
+                        BigDecimal.ZERO,
+                        deal.exchangeFee(),
+                        deal.brokerFee(),
+                        totalPurchaseAmountInc,
+                        totalPurchaseValueInc
+                );
+            } else {
+                return new InvestmentSummary(
+                        deal.securityUuid(),
+                        BigDecimal.ZERO,
+                        summary.securityAmount().add(amountInc),
+                        BigDecimal.ZERO,
+                        BigDecimal.ZERO,
+                        summary.totalExchangeFee().add(deal.exchangeFee()),
+                        summary.totalBrokerFee().add(deal.brokerFee()),
+                        summary.totalPurchaseAmount().add(totalPurchaseAmountInc),
+                        summary.totalPurchaseValue().add(totalPurchaseValueInc)
+                );
+            }
+        } else if (object instanceof ExchangeSecuritySplit split) {
             return new InvestmentSummary(
-                    deal.securityUuid(),
+                    summary.securityUuid(),
+                    summary.averagePrice(),
+                    correctAmount(summary.securityAmount(), split),
                     BigDecimal.ZERO,
-                    amountInc,
                     BigDecimal.ZERO,
-                    BigDecimal.ZERO,
-                    deal.exchangeFee(),
-                    deal.brokerFee(),
-                    totalPurchaseAmountInc,
-                    totalPurchaseValueInc
+                    summary.totalExchangeFee(),
+                    summary.totalBrokerFee(),
+                    correctAmount(summary.totalPurchaseAmount(), split),
+                    summary.totalPurchaseValue()
             );
         } else {
-            return new InvestmentSummary(
-                    deal.securityUuid(),
-                    BigDecimal.ZERO,
-                    summary.securityAmount() + amountInc,
-                    BigDecimal.ZERO,
-                    BigDecimal.ZERO,
-                    summary.totalExchangeFee().add(deal.exchangeFee()),
-                    summary.totalBrokerFee().add(deal.brokerFee()),
-                    summary.totalPurchaseAmount() + totalPurchaseAmountInc,
-                    summary.totalPurchaseValue().add(totalPurchaseValueInc)
-            );
+            throw new IllegalStateException("Wrong object");
         }
+    }
+
+    private static BigDecimal correctAmount(BigDecimal amount, ExchangeSecuritySplit split) {
+        return (split.type() == ExchangeSecuritySplitType.SPLIT ?
+                amount.multiply(split.rate()) : amount.divide(split.rate(), RoundingMode.HALF_UP));
     }
 
     private void onDealsChanged() {

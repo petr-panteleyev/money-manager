@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -30,14 +30,15 @@ public final class ApplicationFiles {
         SETTINGS("settings.xml"),
         WINDOWS("windows.xml"),
         COLORS("colors.xml"),
-        FONTS("fonts.xml");
+        FONTS("fonts.xml"),
+        LOCK("money-manager.lck");
 
         static final Set<AppFile> CONFIG_FILES = Set.of(
                 PROFILES, SETTINGS, WINDOWS, COLORS, FONTS
         );
 
         static final Set<AppFile> DATA_FILES = Set.of(
-                MAIN_CSS, DIALOG_CSS, ABOUT_DIALOG_CSS
+                MAIN_CSS, DIALOG_CSS, ABOUT_DIALOG_CSS, LOCK
         );
 
         private final String fileName;
@@ -129,6 +130,20 @@ public final class ApplicationFiles {
             // Do nothing
         } catch (IOException ex) {
             throw new RuntimeException(name + " directory cannot be created");
+        }
+    }
+
+    public boolean lock() {
+        var lockFile = fileMap.get(AppFile.LOCK).toFile();
+        try {
+            if (lockFile.createNewFile()) {
+                lockFile.deleteOnExit();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException ex) {
+            return true;
         }
     }
 }

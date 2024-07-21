@@ -7,13 +7,13 @@
 Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на [JDK 22](https://jdk.java.net/22/).
 
 ```shell script
-mvn clean install
+./mvnw clean install
 ```
 
 ## Как запустить
 
 ```shell script
-mvn -pl desktop javafx:run
+./mvnw -pl desktop javafx:run
 ```
 
 Чтобы открыть конкретный профиль соединения добавьте ```-Dprofile=<profile>``` к командной строке.
@@ -25,7 +25,7 @@ mvn -pl desktop javafx:run
 * Выполните команду:
 
 ```shell script
-mvn -pl desktop jpackage:jpackage
+./mvnw -pl desktop jpackage:jpackage
 ```
 
 Пакет для установки будет находиться в каталоге ```desktop/target/dist```.

@@ -28,6 +28,8 @@ public final class Constants {
             new FileChooser.ExtensionFilter("Файлы HTML", "*.html");
     public static final FileChooser.ExtensionFilter FILTER_SBER_ONLINE_BROKER_DEALS =
             new FileChooser.ExtensionFilter("Брокерские сделки - Сбербанк-Онлайн", "*.xlsx");
+    public static final FileChooser.ExtensionFilter FILTER_SBER_ONLINE_BROKER_DEALS_HTML =
+            new FileChooser.ExtensionFilter("Брокерские сделки - Сбербанк", "*.html");
     public static final FileChooser.ExtensionFilter FILTER_RAIF_ONLINE_BROKER_DEALS =
             new FileChooser.ExtensionFilter("Брокерские сделки - Raiffeisen", "*.xlsx");
 

@@ -3,7 +3,7 @@
 hide circle
 skinparam linetype ortho
 
-entity Icon {
+entity icon {
     * uuid: UUID
     --
     * name: VARCHAR
@@ -12,7 +12,7 @@ entity Icon {
     * modified: BIGINT
 }
 
-entity Category {
+entity category {
     * uuid : UUID
     --
     * name : VARCHAR
@@ -23,12 +23,12 @@ entity Category {
     icon_uuid : UUID <<FK>>
 }
 
-entity Currency {
+entity currency {
     * uuid: UUID
     --
-    * symbol : VARCHAR(255)
-    * description : VARCHAR(255)
-    * format_symbol : VARCHAR(255)
+    * symbol : VARCHAR
+    * description : VARCHAR
+    * format_symbol : VARCHAR
     * format_symbol_pos : INT
     * show_format_symbol : BOOLEAN
     * def : BOOLEAN
@@ -39,7 +39,7 @@ entity Currency {
     * modified : BIGINT
 }
 
-entity Contact {
+entity contact {
     * uuid: UUID
     --
     * name : VARCHAR
@@ -58,16 +58,16 @@ entity Contact {
     icon_uuid : UUID <<FK>>
 }
 
-entity Document {
+entity document {
     * uuid : UUID
     --
     * contact_uuid : UUID <<FK>>
-    * document_type : VARCHAR(255)
-    * file_name : VARCHAR(255)
+    * document_type : VARCHAR
+    * file_name : VARCHAR
     * file_date : BIGINT
     * file_size : INT
-    * mime_type : VARCHAR(255)
-    * description : VARCHAR(255)
+    * mime_type : VARCHAR
+    * description : VARCHAR
     * compressed : BOOLEAN
     * created : BIGINT
     * modified : BIGINT
@@ -75,7 +75,7 @@ entity Document {
     content : BYTEA
 }
 
-entity Account {
+entity account {
     * uuid : UUID
     --
     * name : VARCHAR
@@ -93,31 +93,32 @@ entity Account {
     * total : DECIMAL(15,6)
     * total_waiting : DECIMAL(15,6)
     * created : BIGINT
-    * modified : bigint
-    currency_uuid : UUID
+    * modified : BIGINT
+    currency_uuid : UUID <<FK>>
+    security_uuid : UUID <<FK>>
     closing_date : BIGINT
     icon_uuid : UUID <<FK>>
 }
 
-entity Transaction {
+entity transaction {
     * uuid : UUID
     --
     * amount : DECIMAL(15, 6)
     * date_day : INT
     * date_month : INT
     * date_year : INT
-    * type : VARCHAR(255)
-    * comment : VARCHAR(255)
+    * type : VARCHAR
+    * comment : VARCHAR
     * checked : BOOLEAN
     * acc_debited_uuid : UUID <<FK>>
     * acc_credited_uuid : UUID <<FK>>
-    * acc_debited_type : VARCHAR(255)
-    * acc_credited_type : VARCHAR(255)
+    * acc_debited_type : VARCHAR
+    * acc_credited_type : VARCHAR
     * acc_debited_category_uuid  : UUID <<FK>>
     * acc_credited_category_uuid : UUID <<FK>>
     * rate : DECIMAL(15, 6)
     * rate_direction : INT
-    * invoice_number : VARCHAR(255)
+    * invoice_number : VARCHAR
     * detailed : BOOLEAN
     * statement_date : BIGINT
     * created : BIGINT
@@ -126,19 +127,109 @@ entity Transaction {
     parent_uuid : UUID <<FK>>
 }
 
-Icon ||--|{ Category
-Icon ||--|{ Contact
-Icon ||--|{ Account
+entity exchange_security {
+    * uuid : UUID
+    --
+    * sec_id : VARCHAR
+    * name : VARCHAR
+    * short_name : VARCHAR
+    * isin : VARCHAR
+    * reg_number : VARCHAR
+    * face_value : DECIMAL(15, 6)
+    * issue_date : DATE
+    mat_date : DATE
+    days_to_redemption : INT
+    * group_type : VARCHAR
+    * group_name : VARCHAR
+    * type : VARCHAR
+    * type_name : VARCHAR
+    * market_value : DECIMAL(15, 6)
+    coupon_value : DECIMAL(15, 6)
+    coupon_percent : DECIMAL(15, 6)
+    coupon_date : DATE
+    coupon_frequency : INT
+    accrued_interest : DECIMAL(15, 6)
+    coupon_period : INT
+    * created : BIGINT
+    * modified : BIGINT
+}
 
-Currency ||--|{ Account
+entity exchange_security_split {
+    * uuid
+    --
+    * security_uuid : UUID <<FK>>
+    * split_type : VARCHAR
+    * split_date : DATE
+    * rate : DECIMAL(15, 6)
+    * comment : VARCHAR
+    * created : BIGINT
+    * modified : BIGINT
+}
 
-Contact ||--|{ Document
+entity investment_deal {
+    * uuid : UUID
+    --
+    * account_uuid : UUID <<FK>>
+    security_uuid : UUID <<FK>>
+    currency_uuid : UUID <<FK>>
+    * deal_number : VARCHAR
+    * deal_date : TIMESTAMP
+    * accounting_date : TIMESTAMP
+    * market_type : VARCHAR
+    * operation_type : VARCHAR
+    * security_amount : INT
+    * price : DECIMAL(15, 6)
+    * aci : DECIMAL(15, 6)
+    * deal_volume : DECIMAL(15, 6)
+    * rate : DECIMAL(15, 6)
+    * exchange_fee : DECIMAL(15, 6)
+    * broker_fee : DECIMAL(15, 6)
+    * amount : DECIMAL(15, 6)
+    * deal_type : VARCHAR
+    * created : BIGINT
+    * modified : BIGINT
+}
 
-Category ||--|{ Account
-Category ||--|{ Transaction
+entity periodic {
+    * uuid : UUID
+    --
+    * name : VARCHAR
+    * payment_type : VARCHAR
+    * recurrence_type : VARCHAR
+    * amount : DECIMAL(15, 6)
+    * day_of_month : INT
+    * month : INT
+    * account_debited_uuid : UUID <<FK>>
+    * account_credited_uuid : UUID <<FK>>
+    * contact_uuid : UUID <<FK>>
+    * comment : VARCHAR
+    * created : BIGINT
+    * modified : BIGINT
+}
 
-Account ||--|{ Transaction
+icon ||--|{ category
+icon ||--|{ contact
+icon ||--|{ account
 
-Transaction ||--|{ Transaction
+currency |o--|{ account
+exchange_security |o--|{ account
+
+contact ||--|{ document
+
+category ||--|{ account
+category ||--|{ transaction
+
+account ||--|{ transaction
+
+transaction ||--|{ transaction
+
+exchange_security ||--o{ exchange_security_split
+
+investment_deal }o--|| account
+investment_deal ||--o| currency
+investment_deal ||--o| exchange_security
+
+periodic }o--|| account
+periodic }o--|| contact
 
 @enduml

@@ -22,6 +22,8 @@ import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.model.investment.InvestmentDealType;
 import org.panteleyev.money.model.investment.InvestmentMarketType;
@@ -60,7 +62,8 @@ class ImportParser extends DefaultHandler {
         Transaction(ImportParser::parseTransaction),
         Document(ImportParser::parseDocument),
         PeriodicPayment(ImportParser::parsePeriodicPayment),
-        InvestmentDeal(ImportParser::parseInvestmentDeal);
+        InvestmentDeal(ImportParser::parseInvestmentDeal),
+        ExchangeSecuritySplit(ImportParser::parseExchangeSecuritySplit);
 
         Tag(Function<Map<String, String>, MoneyRecord> parseMethod) {
             this.parseMethod = parseMethod;
@@ -96,6 +99,7 @@ class ImportParser extends DefaultHandler {
     private final List<MoneyDocument> documents = new ArrayList<>();
     private final List<PeriodicPayment> periodicPayments = new ArrayList<>();
     private final List<InvestmentDeal> investmentDeals = new ArrayList<>();
+    private final List<ExchangeSecuritySplit> exchangeSecuritySplits = new ArrayList<>();
 
     private final Map<Tag, List<? extends MoneyRecord>> RECORD_LISTS = Map.ofEntries(
             Map.entry(Tag.Icon, icons),
@@ -108,7 +112,8 @@ class ImportParser extends DefaultHandler {
             Map.entry(Tag.Transaction, transactions),
             Map.entry(Tag.Document, documents),
             Map.entry(Tag.PeriodicPayment, periodicPayments),
-            Map.entry(Tag.InvestmentDeal, investmentDeals)
+            Map.entry(Tag.InvestmentDeal, investmentDeals),
+            Map.entry(Tag.ExchangeSecuritySplit, exchangeSecuritySplits)
     );
 
     private Map<String, String> tags = null;
@@ -156,6 +161,10 @@ class ImportParser extends DefaultHandler {
 
     public List<InvestmentDeal> getInvestments() {
         return investmentDeals;
+    }
+
+    public List<ExchangeSecuritySplit> getExchangeSecuritySplits() {
+        return exchangeSecuritySplits;
     }
 
     @Override
@@ -450,6 +459,22 @@ class ImportParser extends DefaultHandler {
                 .build();
     }
 
+    private static ExchangeSecuritySplit parseExchangeSecuritySplit(Map<String, String> tags) {
+        var modified = parseLong(tags.get("modified"), 0L);
+        var created = parseLong(tags.get("created"), modified);
+
+        return new ExchangeSecuritySplit.Builder()
+                .uuid(parseUuid(tags.get("uuid")))
+                .securityUuid(parseUuid(tags.get("securityUuid")))
+                .type(parseExchangeSecuritySplitType(tags.get("type")))
+                .date(parseLocalDate(tags.get("date"), LocalDate.now()))
+                .rate(parseBigDecimal(tags.get("rate")))
+                .comment(tags.get("comment"))
+                .created(created)
+                .modified(modified)
+                .build();
+    }
+
     private static UUID parseUuid(String value) {
         return value == null ? null : UUID.fromString(value);
     }
@@ -508,6 +533,10 @@ class ImportParser extends DefaultHandler {
 
     private static RecurrenceType parseRecurrenceType(String rawValue) {
         return rawValue == null ? RecurrenceType.MONTHLY : RecurrenceType.valueOf(rawValue);
+    }
+
+    private static ExchangeSecuritySplitType parseExchangeSecuritySplitType(String rawValue) {
+        return rawValue == null ? ExchangeSecuritySplitType.SPLIT : ExchangeSecuritySplitType.valueOf(rawValue);
     }
 
     private static Month parseMonthName(String rawValue) {

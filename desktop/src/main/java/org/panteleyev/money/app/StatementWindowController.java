@@ -52,9 +52,9 @@ import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
 import static org.panteleyev.fx.ButtonFactory.button;
 import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
@@ -157,14 +157,14 @@ public class StatementWindowController extends BaseController {
 
     private MenuBar createMainMenu() {
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         menuItem("Открыть...", SHORTCUT_O, _ -> onBrowse()),
                         new SeparatorMenuItem(),
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         menuItem("Добавить...", SHORTCUT_N,
                                 _ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
                         new SeparatorMenuItem(),

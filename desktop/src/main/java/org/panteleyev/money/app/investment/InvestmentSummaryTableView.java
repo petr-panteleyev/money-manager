@@ -100,7 +100,7 @@ public class InvestmentSummaryTableView extends TreeTableView<InvestmentSummaryT
                 continue;
             }
 
-            var groupTotalAmount = 0;
+            var groupTotalAmount = BigDecimal.ZERO;
             var groupPercentage = BigDecimal.ZERO;
             var groupTotalValue = BigDecimal.ZERO;
             var groupChange = BigDecimal.ZERO;
@@ -123,13 +123,13 @@ public class InvestmentSummaryTableView extends TreeTableView<InvestmentSummaryT
                         summary.averagePrice(),
                         summary.totalValue(),
                         summary.totalValue().subtract(summary.averagePrice()
-                                .multiply(BigDecimal.valueOf(summary.securityAmount()))),
+                                .multiply(summary.securityAmount())),
                         summary.percentage(),
                         summary.totalExchangeFee(),
                         summary.totalBrokerFee()
                 );
 
-                groupTotalAmount += data.securityAmount();
+                groupTotalAmount = groupTotalAmount.add(data.securityAmount());
                 groupPercentage = groupPercentage.add(data.percentage());
                 groupTotalValue = groupTotalValue.add(data.totalValue());
                 groupChange = groupChange.add(data.change());

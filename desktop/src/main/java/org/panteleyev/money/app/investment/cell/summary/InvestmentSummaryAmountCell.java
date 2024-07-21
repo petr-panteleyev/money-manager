@@ -8,6 +8,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TreeTableCell;
 import org.panteleyev.money.app.investment.InvestmentSummaryTreeData;
 
+import java.math.BigDecimal;
+
 public class InvestmentSummaryAmountCell extends TreeTableCell<InvestmentSummaryTreeData, InvestmentSummaryTreeData> {
     @Override
     protected void updateItem(InvestmentSummaryTreeData summary, boolean empty) {
@@ -17,7 +19,12 @@ public class InvestmentSummaryAmountCell extends TreeTableCell<InvestmentSummary
             setText("");
         } else {
             setAlignment(Pos.CENTER_RIGHT);
-            setText(Integer.toString(summary.securityAmount()));
+            setText(format(summary.securityAmount()));
         }
+    }
+
+    // TODO: make utility maybe
+    private String format(BigDecimal value) {
+        return value.stripTrailingZeros().toPlainString();
     }
 }

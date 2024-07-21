@@ -35,9 +35,9 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.fx.choicebox.ChoiceBoxBuilder.choiceBox;
@@ -133,10 +133,10 @@ public class SecuritiesWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         return menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         menuItem("Добавить...", SHORTCUT_N, this::onAddSecurity),
                         menuItem("Обновить...", SHORTCUT_U, this::onUpdateSecurity,
                                 tableView.getSelectionModel().selectedItemProperty().isNull()),
@@ -152,6 +152,9 @@ public class SecuritiesWindowController extends BaseController {
         return new ContextMenu(
                 menuItem("Добавить...", this::onAddSecurity),
                 menuItem("Обновить...", this::onUpdateSecurity,
+                        tableView.getSelectionModel().selectedItemProperty().isNull()),
+                new SeparatorMenuItem(),
+                menuItem("Сплиты...", this::onSplits,
                         tableView.getSelectionModel().selectedItemProperty().isNull())
         );
     }
@@ -219,6 +222,10 @@ public class SecuritiesWindowController extends BaseController {
                 setupGroupBox();
             });
         }));
+    }
+
+    private void onSplits(ActionEvent ignored) {
+        getSelected().ifPresent(selected -> new ExchangeSecuritySplitsDialog(this, selected).showAndWait());
     }
 
     private void onUpdateAllValues(ActionEvent ignored) {

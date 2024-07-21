@@ -44,6 +44,10 @@ public class MoneyApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         files().initialize();
+        if (!files().lock()) {
+            return;
+        }
+
         settings().load();
 
         var logProperties = LOG_PROPERTIES.replace("%FILE_PATTERN%",

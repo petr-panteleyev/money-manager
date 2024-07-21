@@ -14,6 +14,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import javax.xml.XMLConstants;
@@ -48,6 +49,7 @@ public class Import {
     private final List<MoneyDocument> documents;
     private final List<PeriodicPayment> periodicPayments;
     private final List<InvestmentDeal> investmentDeals;
+    private final List<ExchangeSecuritySplit> exchangeSecuritySplits;
 
     private final ZipInputStream zipInputStream;
 
@@ -65,6 +67,7 @@ public class Import {
         documents = importParser.getDocuments();
         periodicPayments = importParser.getPeriodicPayments();
         investmentDeals = importParser.getInvestments();
+        exchangeSecuritySplits = importParser.getExchangeSecuritySplits();
 
         this.zipInputStream = zipInputStream;
     }
@@ -111,6 +114,10 @@ public class Import {
 
     public List<InvestmentDeal> getInvestmentDeals() {
         return investmentDeals;
+    }
+
+    public List<ExchangeSecuritySplit> getExchangeSecuritySplits() {
+        return exchangeSecuritySplits;
     }
 
     public static Import doImport(ZipInputStream inStream) {

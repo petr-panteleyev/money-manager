@@ -131,7 +131,7 @@ final class DetailEditorPane extends BorderPane {
                 clearButton, deleteButton, updateButton, addButton);
         row3.setAlignment(Pos.CENTER_LEFT);
 
-        setCenter(new VBox(Styles.BIG_SPACING,
+        setCenter(vBox(Styles.BIG_SPACING,
                 hBox(Styles.BIG_SPACING,
                         creditedBox, commentBox, sumBox),
                 row3));

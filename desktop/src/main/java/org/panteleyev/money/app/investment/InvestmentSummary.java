@@ -10,13 +10,13 @@ import java.util.UUID;
 public record InvestmentSummary(
         UUID securityUuid,
         BigDecimal averagePrice,
-        int securityAmount,
+        BigDecimal securityAmount,
         BigDecimal totalValue,
         BigDecimal percentage,
         BigDecimal totalExchangeFee,
         BigDecimal totalBrokerFee,
         // Доп. данные для рассчета
-        int totalPurchaseAmount,
+        BigDecimal totalPurchaseAmount,
         BigDecimal totalPurchaseValue
 ) {
     public InvestmentSummary withPercentage(BigDecimal percentage) {

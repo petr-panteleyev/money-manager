@@ -10,7 +10,7 @@ public record InvestmentSummaryTreeData (
     String groupName,
     String securityId,
     String instrumentName,
-    int securityAmount,
+    BigDecimal securityAmount,
     BigDecimal averagePrice,
     BigDecimal totalValue,
     BigDecimal change,

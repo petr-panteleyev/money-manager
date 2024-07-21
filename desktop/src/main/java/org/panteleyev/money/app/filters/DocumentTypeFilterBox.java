@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.filters;
@@ -14,6 +14,8 @@ import org.panteleyev.money.app.ToStringConverter;
 import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.MoneyDocument;
 
+import java.util.Arrays;
+
 public class DocumentTypeFilterBox {
     private final PredicateProperty<MoneyDocument> predicateProperty = new PredicateProperty<>();
 
@@ -25,7 +27,7 @@ public class DocumentTypeFilterBox {
                 new Separator()
         );
         typeBox.getItems().addAll(
-                DocumentType.values()
+                Arrays.asList(DocumentType.values())
         );
         typeBox.setConverter(new ToStringConverter<>() {
             @Override

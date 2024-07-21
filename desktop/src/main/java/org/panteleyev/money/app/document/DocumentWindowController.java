@@ -44,9 +44,9 @@ import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.BoxFactory.hBox;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.MoneyApplication.showDocument;
@@ -94,10 +94,10 @@ public class DocumentWindowController extends BaseController {
         }
 
         var menuBar = menuBar(
-                newMenu("Файл",
+                menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
-                newMenu("Правка",
+                menu("Правка",
                         createMenuItem(crudActionsHolder.getCreateAction()),
                         createMenuItem(crudActionsHolder.getUpdateAction()),
                         new SeparatorMenuItem(),

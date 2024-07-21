@@ -18,6 +18,7 @@ import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.math.BigDecimal;
@@ -44,6 +45,7 @@ public class DataCache {
     private final ObservableList<ExchangeSecurity> exchangeSecurities = FXCollections.observableArrayList();
     private final ObservableList<Card> cards = FXCollections.observableArrayList();
     private final ObservableList<InvestmentDeal> investmentDeals = FXCollections.observableArrayList();
+    private final ObservableList<ExchangeSecuritySplit> exchangeSecuritySplits = FXCollections.observableArrayList();
 
     public void clear() {
         icons.clear();
@@ -57,6 +59,7 @@ public class DataCache {
         exchangeSecurities.clear();
         cards.clear();
         investmentDeals.clear();
+        exchangeSecuritySplits.clear();
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -437,6 +440,30 @@ public class DataCache {
 
     public ObservableList<InvestmentDeal> getInvestmentDeals() {
         return investmentDeals;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Exchange Security Splits
+    ////////////////////////////////////////////////////////////////////////////
+
+    public Optional<ExchangeSecuritySplit> getExchangeSecuritySplit(UUID uuid) {
+        return getRecord(exchangeSecuritySplits, uuid);
+    }
+
+    public ObservableList<ExchangeSecuritySplit> getExchangeSecuritySplits() {
+        return exchangeSecuritySplits;
+    }
+
+    public void add(ExchangeSecuritySplit split) {
+        exchangeSecuritySplits.add(split);
+    }
+
+    public void update(ExchangeSecuritySplit split) {
+        updateRecord(exchangeSecuritySplits, split);
+    }
+
+    public void remove(ExchangeSecuritySplit split) {
+        removeRecord(exchangeSecuritySplits, split.uuid());
     }
 
     /**

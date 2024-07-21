@@ -14,6 +14,7 @@ import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 import org.panteleyev.money.persistence.DataCache;
 import org.panteleyev.money.persistence.MoneyDAO;
@@ -116,19 +117,27 @@ public class Export {
             investmentRoot.appendChild(exportInvestment(doc, investment));
         }
 
+        var exchangeSecuritySplitRoot = XMLUtils.appendElement(rootElement, "ExchangeSecuritySplits");
+        for (var split: cache.getExchangeSecuritySplits()) {
+            exchangeSecuritySplitRoot.appendChild(exportExchangeSecuritySplit(doc, split));
+        }
+
         XMLUtils.writeDocument(doc, out);
         out.closeEntry();
+        out.flush();
     }
 
     private void exportDocuments(ZipOutputStream out) throws IOException {
         out.putNextEntry(new ZipEntry(DOCUMENTS_ZIP_DIRECTORY));
         out.closeEntry();
+        out.flush();
 
         for (var document : cache.getDocuments()) {
             out.putNextEntry(new ZipEntry(DOCUMENTS_ZIP_DIRECTORY + document.uuid()));
             var bytes = dao.getDocumentBytes(document);
             out.write(bytes);
             out.closeEntry();
+            out.flush();
         }
     }
 
@@ -360,6 +369,21 @@ public class Export {
         appendTextNode(e, "dealType", investmentDeal.dealType());
         appendTextNode(e, "created", investmentDeal.created());
         appendTextNode(e, "modified", investmentDeal.modified());
+
+        return e;
+    }
+
+    private static Element exportExchangeSecuritySplit(Document doc, ExchangeSecuritySplit split) {
+        var e = doc.createElement("ExchangeSecuritySplit");
+
+        appendTextNode(e, "uuid", split.uuid());
+        appendTextNode(e, "securityUuid", split.securityUuid());
+        appendTextNode(e, "type", split.type());
+        appendTextNode(e, "date", split.date());
+        appendTextNode(e, "rate", split.rate());
+        appendTextNode(e, "comment", split.comment());
+        appendTextNode(e, "created", split.created());
+        appendTextNode(e, "modified", split.modified());
 
         return e;
     }

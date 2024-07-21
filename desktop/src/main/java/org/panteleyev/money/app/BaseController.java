@@ -28,8 +28,8 @@ import java.util.function.Consumer;
 
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
+import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.MenuFactory.newMenu;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
@@ -82,7 +82,7 @@ public class BaseController extends Controller {
             investmentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
-        return newMenu("Портфель",
+        return menu("Портфель",
                 securitiesMenuItem,
                 investmentsMenuItem
         );
@@ -125,7 +125,7 @@ public class BaseController extends Controller {
             periodicPaymentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
-        var menu = newMenu("Окно",
+        var menu = menu("Окно",
                 transactionsMenuItem,
                 new SeparatorMenuItem(),
                 accountsMenuItem,
@@ -160,7 +160,7 @@ public class BaseController extends Controller {
     }
 
     protected Menu createHelpMenu() {
-        return newMenu("Справка",
+        return menu("Справка",
                 menuItem("О программе", _ -> new AboutDialog(this).showAndWait()));
     }
 
