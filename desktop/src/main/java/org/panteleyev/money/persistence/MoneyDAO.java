@@ -531,7 +531,7 @@ public class MoneyDAO {
             iconRepository.insert(conn, BATCH_SIZE, imp.getIcons());
             progress.accept("выполнено\n");
 
-            progress.accept("    categories... ");
+            progress.accept("    категории... ");
             categoryRepository.insert(conn, BATCH_SIZE, imp.getCategories());
             progress.accept("выполнено\n");
 
@@ -581,8 +581,7 @@ public class MoneyDAO {
             progress.accept("выполнено\n");
 
             progress.accept("Импорт файлов...");
-            BlobContent blobContent;
-            while ((blobContent = imp.getNextBlobContent()) != null) {
+            for (var blobContent : imp.getBlobs()) {
                 if (blobContent.type() == BlobContent.BlobType.DOCUMENT) {
                     documentRepository.insertBytes(conn, blobContent.uuid(), blobContent.bytes());
                 }

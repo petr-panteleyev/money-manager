@@ -6,9 +6,12 @@ package org.panteleyev.money.xml;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.Attributes;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -26,6 +29,7 @@ import java.util.UUID;
 
 public final class XMLUtils {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static void appendTextNode(Element e, String name, String value) {
         if (value == null) {
@@ -106,6 +110,62 @@ public final class XMLUtils {
         var element = parent.getOwnerDocument().createElement(name);
         parent.appendChild(element);
         return element;
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, String value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value);
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, long value) throws XMLStreamException {
+        writer.writeAttribute(name, Long.toString(value));
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, boolean value) throws XMLStreamException {
+        writer.writeAttribute(name, Boolean.toString(value));
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, byte[] value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, Base64.getEncoder().encodeToString(value));
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, UUID value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value.toString());
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, BigDecimal value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value.toString());
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, Integer value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, Integer.toString(value));
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, LocalDate value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value.format(DATE_FORMATTER));
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, LocalDateTime value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value.format(DATE_TIME_FORMATTER));
+        }
+    }
+
+    public static void createAttribute(XMLStreamWriter writer, String name, Enum<?> value) throws XMLStreamException {
+        if (value != null) {
+            writer.writeAttribute(name, value.name());
+        }
     }
 
     public static Element createDocument(String rootElementName) {

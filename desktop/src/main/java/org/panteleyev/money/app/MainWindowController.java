@@ -36,6 +36,7 @@ import org.panteleyev.money.app.database.ConnectDialog;
 import org.panteleyev.money.app.database.ConnectionProfile;
 import org.panteleyev.money.app.database.ConnectionProfileManager;
 import org.panteleyev.money.app.dialogs.ExportFileFialog;
+import org.panteleyev.money.app.dialogs.ProgressDialog;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.icons.IconWindowController;
 import org.panteleyev.money.app.settings.SettingsDialog;
@@ -47,6 +48,7 @@ import org.panteleyev.money.persistence.MoneyDAO;
 import org.panteleyev.money.xml.Export;
 import org.postgresql.ds.PGSimpleDataSource;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -64,7 +66,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Predicate;
-import java.util.zip.ZipOutputStream;
 
 import static javafx.scene.control.Alert.AlertType.ERROR;
 import static javafx.scene.control.Alert.AlertType.WARNING;
@@ -360,14 +361,26 @@ public class MainWindowController extends BaseController implements TransactionT
 
     private void xmlDump() {
         new ExportFileFialog().showExportDialog(getStage()).ifPresent(selected -> {
+            var progressDialog = new ProgressDialog(this, "Экспорт");
+            progressDialog.disableClose(true);
+            progressDialog.append("Экспортируем файл " + selected.getName() + "...\n");
+
             CompletableFuture.runAsync(() -> {
-                try (var outputStream = new ZipOutputStream(new FileOutputStream(selected))) {
-                    new Export().doExport(outputStream);
+                try (var outputStream = new FileOutputStream(selected);
+                     var bufferedOutputStream = new BufferedOutputStream(outputStream))
+                {
+                    new Export().doExport(bufferedOutputStream,
+                            event -> progressDialog.append(event.buildEventString()));
                     settings().update(opt -> opt.setLastExportDir(selected.getParent()));
                 } catch (IOException ex) {
                     throw new UncheckedIOException(ex);
                 }
-            });
+            }).thenRunAsync(() -> {
+                progressDialog.append("Экспорт завершен\n");
+                progressDialog.disableClose(false);
+            }, Platform::runLater);
+
+            progressDialog.showAndWait();
         });
     }
 

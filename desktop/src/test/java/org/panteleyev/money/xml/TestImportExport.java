@@ -27,12 +27,9 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -147,10 +144,10 @@ public class TestImportExport {
     @ParameterizedTest
     @MethodSource("importExportData")
     public void testExportAndImport(DataCache cache) throws IOException {
-        try (var out = new ByteArrayOutputStream(); var zipOut = new ZipOutputStream(out)) {
-            new Export(cache, dao).doExport(zipOut);
+        try (var out = new ByteArrayOutputStream()) {
+            new Export(cache, dao).doExport(out, _ -> {});
 
-            var imp = Import.doImport(new ZipInputStream(new ByteArrayInputStream(out.toByteArray())));
+            var imp = Import.doImport(new ByteArrayInputStream(out.toByteArray()));
 
             // Assert data
             assertEquals(cache.getIcons(), imp.getIcons());
@@ -166,11 +163,9 @@ public class TestImportExport {
             assertEquals(cache.getInvestmentDeals(), imp.getInvestmentDeals());
             assertEquals(cache.getExchangeSecuritySplits(), imp.getExchangeSecuritySplits());
 
-            // Get blobs
-            var actualBlobs = new ArrayList<BlobContent>();
-            BlobContent blobContent;
-            while ((blobContent = imp.getNextBlobContent()) != null) {
-                actualBlobs.add(blobContent);
+            // Blobs
+            var actualBlobs = imp.getBlobs();
+            for (var blobContent : imp.getBlobs()) {
                 assertArrayEquals(BLOBS.get(blobContent.uuid()), blobContent.bytes());
             }
 

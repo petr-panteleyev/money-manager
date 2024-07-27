@@ -28,34 +28,6 @@
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
-                <xsd:element name="Accounts">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:element name="Account"
-                                         type="Account"
-                                         minOccurs="0"
-                                         maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                    <xsd:unique name="AccountUniqueUUID">
-                        <xsd:selector xpath="Account"/>
-                        <xsd:field xpath="./guid"/>
-                    </xsd:unique>
-                </xsd:element>
-                <xsd:element name="Cards" minOccurs="0">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:element name="Card"
-                                         type="Card"
-                                         minOccurs="0"
-                                         maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                    <xsd:unique name="CardUniqueUUID">
-                        <xsd:selector xpath="Card"/>
-                        <xsd:field xpath="./uuid"/>
-                    </xsd:unique>
-                </xsd:element>
                 <xsd:element name="Categories">
                     <xsd:complexType>
                         <xsd:sequence>
@@ -67,21 +39,7 @@
                     </xsd:complexType>
                     <xsd:unique name="CategoryUniqueUUID">
                         <xsd:selector xpath="Category"/>
-                        <xsd:field xpath="./guid"/>
-                    </xsd:unique>
-                </xsd:element>
-                <xsd:element name="Contacts">
-                    <xsd:complexType>
-                        <xsd:sequence>
-                            <xsd:element name="Contact"
-                                         type="Contact"
-                                         minOccurs="0"
-                                         maxOccurs="unbounded"/>
-                        </xsd:sequence>
-                    </xsd:complexType>
-                    <xsd:unique name="ContactUniqueUUID">
-                        <xsd:selector xpath="Contact"/>
-                        <xsd:field xpath="./guid"/>
+                        <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
                 <xsd:element name="Currencies">
@@ -95,7 +53,7 @@
                     </xsd:complexType>
                     <xsd:unique name="CurrencyUniqueUUID">
                         <xsd:selector xpath="Currency"/>
-                        <xsd:field xpath="./guid"/>
+                        <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
                 <xsd:element name="ExchangeSecurities" minOccurs="0">
@@ -112,6 +70,48 @@
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
+                <xsd:element name="Accounts">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Account"
+                                         type="Account"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="AccountUniqueUUID">
+                        <xsd:selector xpath="Account"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Cards" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Card"
+                                         type="Card"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="CardUniqueUUID">
+                        <xsd:selector xpath="Card"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
+                <xsd:element name="Contacts">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="Contact"
+                                         type="Contact"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="ContactUniqueUUID">
+                        <xsd:selector xpath="Contact"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
                 <xsd:element name="Transactions">
                     <xsd:complexType>
                         <xsd:sequence>
@@ -123,20 +123,20 @@
                     </xsd:complexType>
                     <xsd:unique name="TransactionUniqueUUID">
                         <xsd:selector xpath="Transaction"/>
-                        <xsd:field xpath="./guid"/>
+                        <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
-                <xsd:element name="Documents">
+                <xsd:element name="MoneyDocuments">
                     <xsd:complexType>
                         <xsd:sequence>
-                            <xsd:element name="Document"
-                                         type="Document"
+                            <xsd:element name="MoneyDocument"
+                                         type="MoneyDocument"
                                          minOccurs="0"
                                          maxOccurs="unbounded"/>
                         </xsd:sequence>
                     </xsd:complexType>
-                    <xsd:unique name="DocumentUniqueUUID">
-                        <xsd:selector xpath="Document"/>
+                    <xsd:unique name="MoneyDocumentUniqueUUID">
+                        <xsd:selector xpath="MoneyDocument"/>
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
@@ -182,246 +182,254 @@
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
+                <xsd:element name="Blobs" minOccurs="0">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="BlobContent"
+                                         type="BlobContent"
+                                         minOccurs="0"
+                                         maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                    <xsd:unique name="BlobUUID">
+                        <xsd:selector xpath="Blob"/>
+                        <xsd:field xpath="./uuid"/>
+                    </xsd:unique>
+                </xsd:element>
             </xsd:sequence>
         </xsd:complexType>
     </xsd:element>
 
     <xsd:complexType name="Icon">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="bytes" type="xsd:string"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="bytes" type="xsd:string"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Account">
-        <xsd:all>
-            <xsd:element name="accountLimit" type="xsd:decimal"/>
-            <xsd:element name="categoryUuid" type="UUID"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="accountNumber" type="xsd:string"/>
-            <xsd:element name="currencyUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="securityUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="currencyRate" type="xsd:decimal"/>
-            <xsd:element name="enabled" type="xsd:boolean"/>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="openingBalance" type="xsd:decimal"/>
-            <xsd:element name="type" type="CategoryType"/>
-            <xsd:element name="interest" type="xsd:decimal"/>
-            <xsd:element name="closingDate" type="xsd:long" minOccurs="0"/>
-            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="cardType" type="CardType" minOccurs="0"/>
-            <xsd:element name="cardNumber" type="xsd:string" minOccurs="0"/>
-            <xsd:element name="total" type="xsd:decimal"/>
-            <xsd:element name="totalWaiting" type="xsd:decimal"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="accountLimit" type="xsd:decimal"/>
+        <xsd:attribute name="categoryUuid" type="UUID"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="accountNumber" type="xsd:string"/>
+        <xsd:attribute name="currencyUuid" type="UUID"/>
+        <xsd:attribute name="securityUuid" type="UUID"/>
+        <xsd:attribute name="currencyRate" type="xsd:decimal"/>
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="openingBalance" type="xsd:decimal"/>
+        <xsd:attribute name="type" type="CategoryType"/>
+        <xsd:attribute name="interest" type="xsd:decimal"/>
+        <xsd:attribute name="closingDate" type="LocalDate"/>
+        <xsd:attribute name="iconUuid" type="UUID"/>
+        <xsd:attribute name="cardType" type="CardType"/>
+        <xsd:attribute name="cardNumber" type="xsd:string"/>
+        <xsd:attribute name="total" type="xsd:decimal"/>
+        <xsd:attribute name="totalWaiting" type="xsd:decimal"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Category">
-        <xsd:all>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="type" type="CategoryType"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="type" type="CategoryType"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="iconUuid" type="UUID"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Contact">
-        <xsd:all>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="type" type="ContactType"/>
-            <xsd:element name="email" type="xsd:string"/>
-            <xsd:element name="web" type="xsd:string"/>
-            <xsd:element name="mobile" type="xsd:string"/>
-            <xsd:element name="phone" type="xsd:string"/>
-            <xsd:element name="street" type="xsd:string"/>
-            <xsd:element name="city" type="xsd:string"/>
-            <xsd:element name="country" type="xsd:string"/>
-            <xsd:element name="zip" type="xsd:string"/>
-            <xsd:element name="iconUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="type" type="ContactType"/>
+        <xsd:attribute name="email" type="xsd:string"/>
+        <xsd:attribute name="web" type="xsd:string"/>
+        <xsd:attribute name="mobile" type="xsd:string"/>
+        <xsd:attribute name="phone" type="xsd:string"/>
+        <xsd:attribute name="street" type="xsd:string"/>
+        <xsd:attribute name="city" type="xsd:string"/>
+        <xsd:attribute name="country" type="xsd:string"/>
+        <xsd:attribute name="zip" type="xsd:string"/>
+        <xsd:attribute name="iconUuid" type="UUID"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Currency">
-        <xsd:all>
-            <xsd:element name="default" type="xsd:boolean"/>
-            <xsd:element name="description" type="xsd:string"/>
-            <xsd:element name="direction" type="Switch"/>
-            <xsd:element name="formatSymbol" type="xsd:string"/>
-            <xsd:element name="formatSymbolPosition" type="Switch"/>
-            <xsd:element name="rate" type="xsd:decimal"/>
-            <xsd:element name="showFormatSymbol" type="xsd:boolean"/>
-            <xsd:element name="symbol" type="xsd:string"/>
-            <xsd:element name="useThousandSeparator" type="xsd:boolean"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-            <xsd:element name="type" type="CurrencyType" minOccurs="0"/>
-            <xsd:element name="isin" type="xsd:string" minOccurs="0"/>
-            <xsd:element name="registry" type="xsd:string" minOccurs="0"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="def" type="xsd:boolean"/>
+        <xsd:attribute name="description" type="xsd:string"/>
+        <xsd:attribute name="direction" type="Switch"/>
+        <xsd:attribute name="formatSymbol" type="xsd:string"/>
+        <xsd:attribute name="formatSymbolPosition" type="Switch"/>
+        <xsd:attribute name="rate" type="xsd:decimal"/>
+        <xsd:attribute name="showFormatSymbol" type="xsd:boolean"/>
+        <xsd:attribute name="symbol" type="xsd:string"/>
+        <xsd:attribute name="useThousandSeparator" type="xsd:boolean"/>
+        <xsd:attribute name="type" type="CurrencyType"/>
+        <xsd:attribute name="isin" type="xsd:string"/>
+        <xsd:attribute name="registry" type="xsd:string"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="ExchangeSecurity">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="secId" type="xsd:string"/>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="shortName" type="xsd:string"/>
-            <xsd:element name="isin" type="xsd:string"/>
-            <xsd:element name="regNumber" type="xsd:string"/>
-            <xsd:element name="faceValue" type="xsd:decimal"/>
-            <xsd:element name="issueDate" type="Timestamp"/>
-            <xsd:element name="matDate" type="Timestamp" minOccurs="0"/>
-            <xsd:element name="daysToRedemption" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="group" type="xsd:string"/>
-            <xsd:element name="groupName" type="xsd:string"/>
-            <xsd:element name="type" type="xsd:string"/>
-            <xsd:element name="typeName" type="xsd:string"/>
-            <xsd:element name="marketValue" type="xsd:decimal"/>
-            <xsd:element name="couponValue" type="xsd:decimal" minOccurs="0"/>
-            <xsd:element name="couponPercent" type="xsd:decimal" minOccurs="0"/>
-            <xsd:element name="couponDate" type="Timestamp" minOccurs="0"/>
-            <xsd:element name="couponFrequency" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="accruedInterest" type="xsd:decimal" minOccurs="0"/>
-            <xsd:element name="couponPeriod" type="xsd:int" minOccurs="0"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="secId" type="xsd:string"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="shortName" type="xsd:string"/>
+        <xsd:attribute name="isin" type="xsd:string"/>
+        <xsd:attribute name="regNumber" type="xsd:string"/>
+        <xsd:attribute name="faceValue" type="xsd:decimal"/>
+        <xsd:attribute name="issueDate" type="LocalDate"/>
+        <xsd:attribute name="matDate" type="LocalDate"/>
+        <xsd:attribute name="daysToRedemption" type="xsd:int"/>
+        <xsd:attribute name="group" type="xsd:string"/>
+        <xsd:attribute name="groupName" type="xsd:string"/>
+        <xsd:attribute name="type" type="xsd:string"/>
+        <xsd:attribute name="typeName" type="xsd:string"/>
+        <xsd:attribute name="marketValue" type="xsd:decimal"/>
+        <xsd:attribute name="couponValue" type="xsd:decimal"/>
+        <xsd:attribute name="couponPercent" type="xsd:decimal"/>
+        <xsd:attribute name="couponDate" type="LocalDate"/>
+        <xsd:attribute name="couponFrequency" type="xsd:int"/>
+        <xsd:attribute name="accruedInterest" type="xsd:decimal"/>
+        <xsd:attribute name="couponPeriod" type="xsd:int"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Transaction">
-        <xsd:all>
-            <xsd:element name="accountCreditedCategoryUuid" type="UUID"/>
-            <xsd:element name="accountCreditedUuid" type="UUID"/>
-            <xsd:element name="accountCreditedType" type="CategoryType"/>
-            <xsd:element name="accountDebitedCategoryUuid" type="UUID"/>
-            <xsd:element name="accountDebitedUuid" type="UUID"/>
-            <xsd:element name="accountDebitedType" type="CategoryType"/>
-            <xsd:element name="amount" type="xsd:decimal"/>
-            <xsd:element name="creditAmount" type="xsd:decimal" minOccurs="0"/>
-            <xsd:element name="checked" type="xsd:boolean"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="contactUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="transactionDate" type="xsd:long" minOccurs="0"/>
-            <xsd:element name="day" type="Day" minOccurs="0"/>
-            <xsd:element name="invoiceNumber" type="xsd:string"/>
-            <xsd:element name="month" type="Month" minOccurs="0"/>
-            <xsd:element name="rate" type="xsd:decimal" minOccurs="0"/>
-            <xsd:element name="rateDirection" type="Switch" minOccurs="0"/>
-            <xsd:element name="type" type="TransactionType"/>
-            <xsd:element name="year" type="Year" minOccurs="0"/>
-            <xsd:element name="guid" type="UUID"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-            <xsd:element name="parentUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="detailed" type="xsd:boolean"/>
-            <xsd:element name="statementDate" type="xsd:long"/>
-            <xsd:element name="cardUuid" type="UUID" minOccurs="0"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="accountCreditedCategoryUuid" type="UUID"/>
+        <xsd:attribute name="accountCreditedUuid" type="UUID"/>
+        <xsd:attribute name="accountCreditedType" type="CategoryType"/>
+        <xsd:attribute name="accountDebitedCategoryUuid" type="UUID"/>
+        <xsd:attribute name="accountDebitedUuid" type="UUID"/>
+        <xsd:attribute name="accountDebitedType" type="CategoryType"/>
+        <xsd:attribute name="amount" type="xsd:decimal"/>
+        <xsd:attribute name="creditAmount" type="xsd:decimal"/>
+        <xsd:attribute name="checked" type="xsd:boolean"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="contactUuid" type="UUID"/>
+        <xsd:attribute name="transactionDate" type="LocalDate"/>
+        <xsd:attribute name="day" type="Day"/>
+        <xsd:attribute name="invoiceNumber" type="xsd:string"/>
+        <xsd:attribute name="month" type="Month"/>
+        <xsd:attribute name="rate" type="xsd:decimal"/>
+        <xsd:attribute name="rateDirection" type="Switch"/>
+        <xsd:attribute name="type" type="TransactionType"/>
+        <xsd:attribute name="year" type="Year"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
+        <xsd:attribute name="parentUuid" type="UUID"/>
+        <xsd:attribute name="detailed" type="xsd:boolean"/>
+        <xsd:attribute name="statementDate" type="LocalDate"/>
+        <xsd:attribute name="cardUuid" type="UUID"/>
     </xsd:complexType>
 
-    <xsd:complexType name="Document">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="ownerUuid" type="UUID"/>
-            <xsd:element name="contactUuid" type="UUID"/>
-            <xsd:element name="type" type="DocumentType"/>
-            <xsd:element name="fileName" type="xsd:string"/>
-            <xsd:element name="date" type="xsd:long"/>
-            <xsd:element name="size" type="xsd:int"/>
-            <xsd:element name="mimeType" type="xsd:string"/>
-            <xsd:element name="description" type="xsd:string"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+    <xsd:complexType name="MoneyDocument">
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="ownerUuid" type="UUID"/>
+        <xsd:attribute name="contactUuid" type="UUID"/>
+        <xsd:attribute name="documentType" type="DocumentType"/>
+        <xsd:attribute name="fileName" type="xsd:string"/>
+        <xsd:attribute name="date" type="LocalDate"/>
+        <xsd:attribute name="size" type="xsd:int"/>
+        <xsd:attribute name="mimeType" type="xsd:string"/>
+        <xsd:attribute name="description" type="xsd:string"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="PeriodicPayment">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="name" type="xsd:string"/>
-            <xsd:element name="paymentType" type="PeriodicPaymentType"/>
-            <xsd:element name="recurrenceType" type = "RecurrenceType"/>
-            <xsd:element name="amount" type="xsd:decimal"/>
-            <xsd:element name="dayOfMonth" type="xsd:int"/>
-            <xsd:element name="month" type="MonthName"/>
-            <xsd:element name="accountDebitedUuid" type="UUID"/>
-            <xsd:element name="accountCreditedUuid" type="UUID"/>
-            <xsd:element name="contactUuid" type="UUID"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="name" type="xsd:string"/>
+        <xsd:attribute name="paymentType" type="PeriodicPaymentType"/>
+        <xsd:attribute name="recurrenceType" type="RecurrenceType"/>
+        <xsd:attribute name="amount" type="xsd:decimal"/>
+        <xsd:attribute name="dayOfMonth" type="xsd:int"/>
+        <xsd:attribute name="month" type="MonthName"/>
+        <xsd:attribute name="accountDebitedUuid" type="UUID"/>
+        <xsd:attribute name="accountCreditedUuid" type="UUID"/>
+        <xsd:attribute name="contactUuid" type="UUID"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="Card">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="accountUuid" type="UUID"/>
-            <xsd:element name="type" type="CardType"/>
-            <xsd:element name="number" type="xsd:string"/>
-            <xsd:element name="expiration" type="xsd:long"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="enabled" type="xsd:boolean"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="accountUuid" type="UUID"/>
+        <xsd:attribute name="type" type="CardType"/>
+        <xsd:attribute name="number" type="xsd:string"/>
+        <xsd:attribute name="expiration" type="LocalDate"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="enabled" type="xsd:boolean"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="InvestmentDeal">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="accountUuid" type="UUID"/>
-            <xsd:element name="securityUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="currencyUuid" type="UUID" minOccurs="0"/>
-            <xsd:element name="dealNumber" type="xsd:string"/>
-            <xsd:element name="dealDate" type="xsd:string"/>
-            <xsd:element name="accountingDate" type="xsd:string"/>
-            <xsd:element name="marketType" type="InvestmentMarketType"/>
-            <xsd:element name="operationType" type="InvestmentOperationType"/>
-            <xsd:element name="securityAmount" type="xsd:int"/>
-            <xsd:element name="price" type="xsd:decimal"/>
-            <xsd:element name="aci" type="xsd:decimal"/>
-            <xsd:element name="dealVolume" type="xsd:decimal"/>
-            <xsd:element name="rate" type="xsd:decimal"/>
-            <xsd:element name="exchangeFee" type="xsd:decimal"/>
-            <xsd:element name="brokerFee" type="xsd:decimal"/>
-            <xsd:element name="amount" type="xsd:decimal"/>
-            <xsd:element name="dealType" type="InvestmentDealType"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="accountUuid" type="UUID"/>
+        <xsd:attribute name="securityUuid" type="UUID"/>
+        <xsd:attribute name="currencyUuid" type="UUID"/>
+        <xsd:attribute name="dealNumber" type="xsd:string"/>
+        <xsd:attribute name="dealDate" type="LocalDateTime"/>
+        <xsd:attribute name="accountingDate" type="LocalDateTime"/>
+        <xsd:attribute name="marketType" type="InvestmentMarketType"/>
+        <xsd:attribute name="operationType" type="InvestmentOperationType"/>
+        <xsd:attribute name="securityAmount" type="xsd:int"/>
+        <xsd:attribute name="price" type="xsd:decimal"/>
+        <xsd:attribute name="aci" type="xsd:decimal"/>
+        <xsd:attribute name="dealVolume" type="xsd:decimal"/>
+        <xsd:attribute name="rate" type="xsd:decimal"/>
+        <xsd:attribute name="exchangeFee" type="xsd:decimal"/>
+        <xsd:attribute name="brokerFee" type="xsd:decimal"/>
+        <xsd:attribute name="amount" type="xsd:decimal"/>
+        <xsd:attribute name="dealType" type="InvestmentDealType"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
     </xsd:complexType>
 
     <xsd:complexType name="ExchangeSecuritySplit">
-        <xsd:all>
-            <xsd:element name="uuid" type="UUID"/>
-            <xsd:element name="securityUuid" type="UUID"/>
-            <xsd:element name="type" type="ExchangeSecuritySplitType"/>
-            <xsd:element name="date" type="xsd:long"/>
-            <xsd:element name="rate" type="xsd:decimal"/>
-            <xsd:element name="comment" type="xsd:string"/>
-            <xsd:element name="created" type="Timestamp"/>
-            <xsd:element name="modified" type="Timestamp"/>
-        </xsd:all>
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="securityUuid" type="UUID"/>
+        <xsd:attribute name="type" type="ExchangeSecuritySplitType"/>
+        <xsd:attribute name="date" type="LocalDate"/>
+        <xsd:attribute name="rate" type="xsd:decimal"/>
+        <xsd:attribute name="comment" type="xsd:string"/>
+        <xsd:attribute name="created" type="Timestamp"/>
+        <xsd:attribute name="modified" type="Timestamp"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="BlobContent">
+        <xsd:attribute name="uuid" type="UUID"/>
+        <xsd:attribute name="type" type="BlobType"/>
+        <xsd:attribute name="bytes" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:simpleType name="UUID">
         <xsd:restriction base="xsd:string">
             <xsd:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="LocalDate">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="LocalDateTime">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -522,7 +530,7 @@
             <xsd:enumeration value="CARD_PAYMENT"/>
         </xsd:restriction>
     </xsd:simpleType>
-    
+
     <xsd:simpleType name="CurrencyType">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="CURRENCY"/>
@@ -589,6 +597,12 @@
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="SPLIT"/>
             <xsd:enumeration value="REVERSE_SPLIT"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="BlobType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="DOCUMENT"/>
         </xsd:restriction>
     </xsd:simpleType>
 

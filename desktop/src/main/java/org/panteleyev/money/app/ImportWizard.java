@@ -135,7 +135,7 @@ final class ImportWizard extends BaseDialog<Object> {
                 }
 
                 progress.accept("Reading file... ");
-                try (var input = new ZipInputStream(new FileInputStream(file))) {
+                try (var input = new FileInputStream(file)) {
                     var imp = Import.doImport(input);
                     progress.accept("done\n\n");
                     dao().importFullDump(imp, progress);

@@ -22,8 +22,8 @@ public final class Constants {
 
     public static final FileChooser.ExtensionFilter FILTER_STATEMENT_FILES =
             new FileChooser.ExtensionFilter("Выписки", "*.ofx", "*.html", "*.htm");
-    public static final FileChooser.ExtensionFilter FILTER_ZIP_FILES =
-            new FileChooser.ExtensionFilter("Файлы ZIP", "*.zip");
+    public static final FileChooser.ExtensionFilter FILTER_XML_FILES =
+            new FileChooser.ExtensionFilter("Файлы XML", "*.xml");
     public static final FileChooser.ExtensionFilter FILTER_HTML_FILES =
             new FileChooser.ExtensionFilter("Файлы HTML", "*.html");
     public static final FileChooser.ExtensionFilter FILTER_SBER_ONLINE_BROKER_DEALS =

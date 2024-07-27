@@ -26,4 +26,5 @@ open module org.panteleyev.money {
 
     requires org.postgresql.jdbc;
     requires liquibase.core;
+    requires org.apache.commons.lang3;
 }
