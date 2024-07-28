@@ -16,7 +16,7 @@
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-backend</artifactId>
     <version>${revision}</version>
-    <name>Backend</name>
+    <name>Money Manager Backend</name>
 
     <properties>
         <revision>24.7.3</revision>
