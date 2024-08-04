@@ -1,10 +1,13 @@
 # Money Manager
 
+[![JDK](https://www.panteleyev.org/badges/java-22.svg)](https://jdk.java.net/22/)
+[![License](https://www.panteleyev.org/badges/license.svg)](LICENSE)
+
 Программа для учета расходов и сверки выписок.
 
 ## Как собрать
 
-Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на [JDK 22](https://jdk.java.net/22/).
+Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 22.
 
 ```shell script
 ./mvnw clean install
@@ -13,7 +16,7 @@
 ## Как запустить
 
 ```shell script
-./mvnw -pl desktop javafx:run
+./mvnw -pl desktop/app javafx:run
 ```
 
 Чтобы открыть конкретный профиль соединения добавьте ```-Dprofile=<profile>``` к командной строке.
@@ -25,10 +28,10 @@
 * Выполните команду:
 
 ```shell script
-./mvnw -pl desktop jpackage:jpackage
+./mvnw -pl desktop/app jpackage:jpackage
 ```
 
-Пакет для установки будет находиться в каталоге ```desktop/target/dist```.
+Пакет для установки будет находиться в каталоге ```desktop/app/target/dist```.
 
 ## Поддержка
 

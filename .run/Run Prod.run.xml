@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run Prod" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="org.panteleyev.money.MoneyApplication" />
-    <module name="money-manager-desktop" />
+    <module name="money-manager-desktop-parent" />
     <option name="VM_PARAMETERS" value="--add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls -Dprofile=Prod -Xms128m" />
     <extension name="coverage">
       <pattern>
