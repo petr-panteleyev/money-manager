@@ -28,6 +28,10 @@
             <artifactId>money-manager-desktop-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -4,96 +4,68 @@
  */
 package org.panteleyev.money.desktop.commons.xml;
 
-import org.xml.sax.Attributes;
+import org.panteleyev.commons.xml.StartElementWrapper;
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 
-import javax.xml.stream.XMLStreamWriter;
+import javax.xml.namespace.QName;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.RecordComponent;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.DATE_FORMATTER;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.DATE_TIME_FORMATTER;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.createAttribute;
-
-@SuppressWarnings("rawtypes")
 public final class RecordSerializer {
     private static final Map<Class<? extends Record>, Map<String, Method>> ACCESSOR_MAP = new ConcurrentHashMap<>();
     private static final Map<Class<? extends Record>, Constructor<?>> CONSTRUCTOR_MAP = new ConcurrentHashMap<>();
 
-    private static final String TYPE_STRING = "java.lang.String";
-    private static final String TYPE_BIG_DECIMAL = "java.math.BigDecimal";
-    private static final String TYPE_BOOLEAN = "java.lang.Boolean";
     private static final String TYPE_BOOL = "boolean";
-    private static final String TYPE_INTEGER = "java.lang.Integer";
     private static final String TYPE_INT = "int";
-    private static final String TYPE_LONG = "java.lang.Long";
-    private static final String TYPE_LONG_P = "long";
-    private static final String TYPE_UUID = "java.util.UUID";
-    private static final String TYPE_LOCAL_DATE = "java.time.LocalDate";
-    private static final String TYPE_LOCAL_DATE_TIME = "java.time.LocalDateTime";
-    private static final String TYPE_BYTE_ARRAY = "byte[]";
+    private static final String TYPE_LONG = "long";
+    private static final String TYPE_DOUBLE = "double";
 
-    public static void serialize(XMLStreamWriter writer, Record rec) {
+    public static void serialize(XMLStreamWriterWrapper wrapper, Record rec) {
         try {
-            var clazz = rec.getClass();
-            var methodMap = ACCESSOR_MAP.computeIfAbsent(clazz, _ -> new HashMap<>());
+            var type = rec.getClass();
+            var methodMap = ACCESSOR_MAP.computeIfAbsent(type, _ -> new HashMap<>());
 
-            writer.writeStartElement(clazz.getSimpleName());
-
-            for (var component : clazz.getRecordComponents()) {
-                var name = component.getName();
-                var method = methodMap.computeIfAbsent(name, _ -> component.getAccessor());
-                var value = method.invoke(rec);
-                if (value != null) {
-                    addAttribute(writer, name, value);
+            wrapper.element(new QName(type.getSimpleName()), () -> {
+                for (var component : type.getRecordComponents()) {
+                    var name = component.getName();
+                    var method = methodMap.computeIfAbsent(name, _ -> component.getAccessor());
+                    try {
+                        var value = method.invoke(rec);
+                        if (value != null) {
+                            addAttribute(wrapper, new QName(name), value);
+                        }
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
-            }
-
-            writer.writeEndElement();
+            });
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private static void addAttribute(XMLStreamWriter writer, String name, Object value) throws Exception {
+    private static void addAttribute(XMLStreamWriterWrapper wrapper, QName name, Object value) {
         if (value.getClass().isArray()) {
-            createAttribute(writer, name, (byte[]) value);
+            wrapper.attribute(name, Base64.getEncoder().encodeToString((byte[])value));
         } else {
-            switch (value) {
-                case UUID uuid -> createAttribute(writer, name, uuid);
-                case String string -> createAttribute(writer, name, string);
-                case Integer integerValue -> createAttribute(writer, name, integerValue);
-                case Boolean booleanValue -> createAttribute(writer, name, booleanValue);
-                case Long longValue -> createAttribute(writer, name, longValue);
-                case LocalDate localDate -> createAttribute(writer, name, localDate);
-                case LocalDateTime localDateTime -> createAttribute(writer, name, localDateTime);
-                case BigDecimal bigDecimal -> createAttribute(writer, name, bigDecimal);
-                case Enum<?> enumValue -> createAttribute(writer, name, enumValue);
-                default ->
-                        throw new IllegalArgumentException("Unsupported component type: " + value.getClass().getName());
-            }
+            wrapper.attribute(name, value);
         }
     }
 
-    public static <T extends Record> T deserializeRecord(Attributes attributes, Class<T> recordClass) {
+    public static <T extends Record> T deserializeRecord(StartElementWrapper element, Class<T> recordClass) {
         var components = recordClass.getRecordComponents();
         var arguments = new Object[components.length];
 
         var constructor = CONSTRUCTOR_MAP.computeIfAbsent(recordClass, RecordSerializer::getCanonicalConstructor);
 
         for (var i = 0; i < components.length; i++) {
-            var stringValue = attributes.getValue(components[i].getName());
-            arguments[i] = getValueFromString(components[i].getType(), stringValue);
+            arguments[i] = getComponentValue(element, new QName(components[i].getName()), components[i].getType());
         }
 
         try {
@@ -101,6 +73,22 @@ public final class RecordSerializer {
             return (T) constructor.newInstance(arguments);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    private static Object getComponentValue(StartElementWrapper element, QName qName, Class<?> type) {
+        if (type.isPrimitive()) {
+            var typeName = type.getTypeName();
+
+            return switch (typeName) {
+                case TYPE_INT -> element.getAttributeValue(qName, 0);
+                case TYPE_LONG -> element.getAttributeValue(qName, 0L);
+                case TYPE_BOOL -> element.getAttributeValue(qName, false);
+                case TYPE_DOUBLE -> element.getAttributeValue(qName, 0.0);
+                default -> throw new IllegalArgumentException("Unsupported type: " + typeName);
+            };
+        } else {
+            return element.getAttributeValue(qName, type).orElse(null);
         }
     }
 
@@ -112,38 +100,6 @@ public final class RecordSerializer {
             return recordClass.getDeclaredConstructor(argTypes);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        }
-    }
-
-    private static Object getValueFromString(Class type, String stringValue) {
-        return stringValue == null ? fromNull(type) : fromString(type, stringValue);
-    }
-
-    static Object fromNull(Class type) {
-        return type.isPrimitive() ?
-                (Objects.equals(type.getTypeName(), TYPE_BOOL) ? false : 0) : null;
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    static Object fromString(Class type, String stringValue) {
-        if (type.isEnum()) {
-            return Enum.valueOf(type, stringValue);
-        } else {
-            return switch (type.getTypeName()) {
-                case TYPE_STRING -> stringValue;
-                case TYPE_INT -> Integer.parseInt(stringValue);
-                case TYPE_INTEGER -> Integer.valueOf(stringValue);
-                case TYPE_LONG_P -> Long.parseLong(stringValue);
-                case TYPE_LONG -> Long.valueOf(stringValue);
-                case TYPE_BOOL -> Boolean.parseBoolean(stringValue);
-                case TYPE_BOOLEAN -> Boolean.valueOf(stringValue);
-                case TYPE_BIG_DECIMAL -> new BigDecimal(stringValue);
-                case TYPE_UUID -> UUID.fromString(stringValue);
-                case TYPE_LOCAL_DATE -> LocalDate.parse(stringValue, DATE_FORMATTER);
-                case TYPE_LOCAL_DATE_TIME -> LocalDateTime.parse(stringValue, DATE_TIME_FORMATTER);
-                case TYPE_BYTE_ARRAY -> Base64.getDecoder().decode(stringValue);
-                default -> throw new IllegalArgumentException("Unsupported type: " + type.getTypeName());
-            };
         }
     }
 

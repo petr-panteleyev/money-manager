@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.app;
 
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -11,6 +12,8 @@ import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.statements.Statement;
 
+import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
@@ -24,10 +27,9 @@ import java.util.List;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.desktop.commons.xml.RecordSerializer.serialize;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.TRANSFORMER_FACTORY;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.XML_OUTPUT_FACTORY;
 
 public class Reports {
+    public static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     public record TransactionReportRecord(
@@ -60,26 +62,23 @@ public class Reports {
     }
 
     static void reportTransactions(List<Transaction> transactions, OutputStream out) {
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            var writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(byteArrayOutputStream);
-            writer.writeStartDocument();
-            writer.writeStartElement("TransactionReportRecords");
+        try (var outputStream = new ByteArrayOutputStream();
+             var wrapper = XMLStreamWriterWrapper.newInstance(outputStream))
+        {
+            wrapper.document(new QName("TransactionReportRecords"), () -> {
+                for (var t : transactions) {
+                    serialize(wrapper, new TransactionReportRecord(
+                            DATE_FORMAT.format(t.transactionDate()),
+                            cache().getAccount(t.accountDebitedUuid()).map(Account::name).orElse(""),
+                            cache().getAccount(t.accountCreditedUuid()).map(Account::name).orElse(""),
+                            cache().getContact(t.contactUuid()).map(Contact::name).orElse(""),
+                            t.comment(),
+                            formatAmount(Transaction.getSignedAmount(t))
+                    ));
+                }
+            });
 
-            for (var t : transactions) {
-                serialize(writer, new TransactionReportRecord(
-                        DATE_FORMAT.format(t.transactionDate()),
-                        cache().getAccount(t.accountDebitedUuid()).map(Account::name).orElse(""),
-                        cache().getAccount(t.accountCreditedUuid()).map(Account::name).orElse(""),
-                        cache().getContact(t.contactUuid()).map(Contact::name).orElse(""),
-                        t.comment(),
-                        formatAmount(Transaction.getSignedAmount(t))
-                ));
-            }
-
-            writer.writeEndElement();
-            writer.writeEndDocument();
-
-            try (var byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+            try (var byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
                 transform(byteArrayInputStream, out, "TransactionReport.xsl");
             }
         } catch (Exception ex) {
@@ -88,27 +87,24 @@ public class Reports {
     }
 
     public static void reportAccounts(List<Account> accounts, OutputStream out) {
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            var writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(byteArrayOutputStream);
-            writer.writeStartDocument();
-            writer.writeStartElement("AccountReportRecords");
+        try (var outputStream = new ByteArrayOutputStream();
+             var wrapper = XMLStreamWriterWrapper.newInstance(outputStream))
+        {
+            wrapper.document(new QName("AccountReportRecords"), () -> {
+                for (var a : accounts) {
+                    serialize(wrapper, new AccountReportRecord(
+                            a.name(),
+                            cache().getCategory(a.categoryUuid()).map(Category::name).orElse(""),
+                            cache().getCurrency(a.currencyUuid()).map(Currency::symbol).orElse(""),
+                            formatAmount(a.interest()),
+                            a.closingDate() == null ? "" : a.closingDate().toString(),
+                            a.comment(),
+                            Account.getBalance(a).toString()
+                    ));
+                }
+            });
 
-            for (var a : accounts) {
-                serialize(writer, new AccountReportRecord(
-                        a.name(),
-                        cache().getCategory(a.categoryUuid()).map(Category::name).orElse(""),
-                        cache().getCurrency(a.currencyUuid()).map(Currency::symbol).orElse(""),
-                        formatAmount(a.interest()),
-                        a.closingDate() == null ? "" : a.closingDate().toString(),
-                        a.comment(),
-                        Account.getBalance(a).toString()
-                ));
-            }
-
-            writer.writeEndElement();
-            writer.writeEndDocument();
-
-            try (var byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+            try (var byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
                 transform(byteArrayInputStream, out, "AccountReport.xsl");
             }
         } catch (Exception ex) {
@@ -117,24 +113,21 @@ public class Reports {
     }
 
     static void reportStatement(Statement statement, OutputStream out) {
-        try (var byteArrayOutputStream = new ByteArrayOutputStream()) {
-            var writer = XML_OUTPUT_FACTORY.createXMLStreamWriter(byteArrayOutputStream);
-            writer.writeStartDocument();
-            writer.writeStartElement("StatementReportRecords");
+        try (var outputStream = new ByteArrayOutputStream();
+             var wrapper = XMLStreamWriterWrapper.newInstance(outputStream))
+        {
+            wrapper.document(new QName("StatementReportRecords"), () -> {
+                for (var r : statement.records()) {
+                    serialize(wrapper, new StatementReportRecord(
+                            r.getActual().toString(),
+                            r.getExecution().toString(),
+                            r.getDescription(),
+                            formatAmount(r.getAmountDecimal().orElse(BigDecimal.ZERO))
+                    ));
+                }
+            });
 
-            for (var r : statement.records()) {
-                serialize(writer, new StatementReportRecord(
-                        r.getActual().toString(),
-                        r.getExecution().toString(),
-                        r.getDescription(),
-                        formatAmount(r.getAmountDecimal().orElse(BigDecimal.ZERO))
-                ));
-            }
-
-            writer.writeEndElement();
-            writer.writeEndDocument();
-
-            try (var byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
+            try (var byteArrayInputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
                 transform(byteArrayInputStream, out, "StatementReport.xsl");
             }
         } catch (Exception ex) {

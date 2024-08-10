@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.desktop.export;
 
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
@@ -18,7 +19,7 @@ import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import javax.xml.XMLConstants;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.stax.StAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
@@ -111,21 +112,30 @@ public class Import {
         return blobs;
     }
 
-    public static Import doImport(InputStream inputStream) {
+    public static void validate(InputStream inputStream) {
         try {
-            var importParser = new ImportParser();
-
             if (moneySchema == null) {
                 var factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 moneySchema = factory.newSchema(Import.class.getResource(SCHEMA));
             }
 
-            var factory = SAXParserFactory.newInstance();
-            factory.setSchema(moneySchema);
-            factory.setValidating(false);
-            var parser = factory.newSAXParser();
+            var validator = moneySchema.newValidator();
+            try (var wrapper = XMLEventReaderWrapper.newInstance(inputStream)) {
+                validator.validate(new StAXSource(wrapper.getReader()));
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
-            parser.parse(inputStream, importParser);
+    public static Import doImport(InputStream inputStream) {
+        try (var reader = XMLEventReaderWrapper.newInstance(inputStream)) {
+            var importParser = new ImportParser();
+
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
+                event.asStartElement().ifPresent(importParser::onStartElement);
+            }
             return new Import(importParser);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

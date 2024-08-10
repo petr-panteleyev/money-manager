@@ -6,9 +6,9 @@ module org.panteleyev.money.desktop.commons {
     exports org.panteleyev.money.desktop.commons;
     exports org.panteleyev.money.desktop.commons.xml;
 
-    requires java.xml;
-
     requires javafx.base;
 
     requires org.panteleyev.money.model;
+    requires org.panteleyev.commons;
+    requires java.xml;
 }

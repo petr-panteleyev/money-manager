@@ -19,16 +19,16 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>24.8.1</revision>
+        <revision>24.8.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>22</java.version>
         <maven.compiler.release>22</maven.compiler.release>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.3.0</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
-        <jpackageMavenPluginVersion>1.6.3</jpackageMavenPluginVersion>
+        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
+        <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>

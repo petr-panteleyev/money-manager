@@ -129,7 +129,10 @@ public class TestImportExport {
         try (var out = new ByteArrayOutputStream()) {
             new Export(cache, documentProvider).doExport(out, _ -> {});
 
-            var imp = Import.doImport(new ByteArrayInputStream(out.toByteArray()));
+            var bytes = out.toByteArray();
+
+            Import.validate(new ByteArrayInputStream(bytes));
+            var imp = Import.doImport(new ByteArrayInputStream(bytes));
 
             // Assert data
             assertEquals(cache.getIcons(), imp.getIcons());

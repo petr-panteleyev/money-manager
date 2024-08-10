@@ -12,7 +12,6 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -27,6 +26,8 @@ import org.panteleyev.money.desktop.export.Import;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -34,7 +35,6 @@ import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NEXT;
 import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.ButtonFactory.radioButton;
 import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -47,7 +47,6 @@ final class ImportWizard extends BaseDialog<Object> {
 
     private static class StartPage extends GridPane {
         private final Window owner;
-        private final ToggleGroup btnGroup = new ToggleGroup();
         final TextField fileNameEdit = createFileNameEdit();
         final CheckBox warningCheck = createWarningCheckBox();
 
@@ -60,17 +59,12 @@ final class ImportWizard extends BaseDialog<Object> {
 
             getStyleClass().add(Styles.GRID_PANE);
 
-
-            var partialImportRadio = radioButton("Импорт записей", btnGroup, true);
-
             var warningLabel = createWarningLabel();
 
             addRow(0, fileNameEdit, button("...", _ -> onBrowse()));
+            addRow(1, warningLabel);
+            addRow(2, warningCheck);
 
-            addRow(3, warningLabel);
-            addRow(4, warningCheck);
-
-            GridPane.setColumnSpan(partialImportRadio, 2);
             GridPane.setColumnSpan(warningLabel, 2);
             GridPane.setColumnSpan(warningCheck, 2);
         }
@@ -133,6 +127,14 @@ final class ImportWizard extends BaseDialog<Object> {
                     throw new RuntimeException("File not found");
                 }
 
+                progress.accept("Валидация... ");
+                try (var input = new FileInputStream(file)) {
+                    Import.validate(input);
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
+                }
+                progress.accept("выполнено\n\n");
+
                 progress.accept("Чтение файла... ");
                 try (var input = new FileInputStream(file)) {
                     var imp = Import.doImport(input);
@@ -140,8 +142,8 @@ final class ImportWizard extends BaseDialog<Object> {
                     dao().importFullDump(imp, progress);
                     progress.accept("\n");
                     dao().preload(Platform::runLater, progress);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
+                } catch (IOException ex) {
+                    throw new UncheckedIOException(ex);
                 }
             }).handle((_, t) -> {
                 if (t != null) {

@@ -3,7 +3,6 @@
  SPDX-License-Identifier: BSD-2-Clause
  */
 open module org.panteleyev.money {
-    requires java.base;
     requires java.sql;
     requires java.naming;
     requires java.net.http;
@@ -14,6 +13,7 @@ open module org.panteleyev.money {
     requires org.panteleyev.fx;
     requires org.panteleyev.ofx;
     requires org.panteleyev.moex;
+    requires org.panteleyev.commons;
     requires org.panteleyev.freedesktop;
     requires org.panteleyev.money.model;
     requires org.panteleyev.money.desktop.commons;

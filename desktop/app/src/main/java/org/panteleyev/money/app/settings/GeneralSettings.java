@@ -4,23 +4,21 @@
  */
 package org.panteleyev.money.app.settings;
 
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
+import org.panteleyev.commons.xml.XMLStreamWriterWrapper;
+
+import javax.xml.namespace.QName;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Objects.requireNonNull;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.appendObjectTextNode;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.createDocument;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.getBooleanNodeValue;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.getIntNodeValue;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.getStringNodeValue;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.readDocument;
-import static org.panteleyev.money.desktop.commons.xml.XMLUtils.writeDocument;
 
 final class GeneralSettings {
-    private static final String ROOT = "settings";
+    private static final QName ROOT = new QName("settings");
 
     enum Setting {
         AUTO_COMPLETE_LENGTH("autoCompleteLength", 3),
@@ -32,20 +30,26 @@ final class GeneralSettings {
         LAST_EXPORT_DIR("lastExportDir", ""),
         LAST_REPORT_DIR("lastReportDir", "");
 
-        private final String elementName;
+        private final QName elementName;
         private final Object defaultValue;
 
         Setting(String elementName, Object defaultValue) {
-            this.elementName = elementName;
+            this.elementName = new QName(elementName);
             this.defaultValue = defaultValue;
         }
 
-        public String getElementName() {
+        public QName getElementName() {
             return elementName;
         }
 
         public Object getDefaultValue() {
             return defaultValue;
+        }
+
+        static Optional<Setting> of(QName name) {
+            return Arrays.stream(values())
+                    .filter(v -> v.getElementName().equals(name))
+                    .findAny();
         }
     }
 
@@ -61,24 +65,36 @@ final class GeneralSettings {
     }
 
     void save(OutputStream out) {
-        var root = createDocument(ROOT);
-        for (var key : Setting.values()) {
-            appendObjectTextNode(root, key.getElementName(), get(key));
+        try (var wrapper = XMLStreamWriterWrapper.newInstance(out)) {
+            wrapper.document(ROOT, () -> {
+                for (var key : Setting.values()) {
+                    wrapper.textElement(key.getElementName(), get(key));
+                }
+            });
         }
-        writeDocument(root.getOwnerDocument(), out);
     }
 
     void load(InputStream in) {
-        var rootElement = readDocument(in);
+        try (var reader = XMLEventReaderWrapper.newInstance(in)) {
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
+                event.asStartElement().flatMap(element -> Setting.of(element.getName()))
+                        .ifPresent(setting -> reader.getElementText().flatMap(text -> parseValue(setting, text))
+                                .ifPresent(value -> put(setting, value)));
+            }
+        }
+    }
 
-        for (var key : Setting.values()) {
-            var value = switch (key.getDefaultValue()) {
-                case Integer _ -> getIntNodeValue(rootElement, key.getElementName());
-                case String _ -> getStringNodeValue(rootElement, key.getElementName());
-                case Boolean _ -> getBooleanNodeValue(rootElement, key.getElementName());
+    private static Optional<Object> parseValue(Setting setting, String text) {
+        try {
+            return switch (setting.getDefaultValue()) {
+                case Integer _ -> Optional.of(Integer.parseInt(text));
+                case Boolean _ -> Optional.of(Boolean.parseBoolean(text));
+                case String _ -> Optional.of(text);
                 default -> Optional.empty();
             };
-            value.ifPresent(x -> settings.put(key, x));
+        } catch (NumberFormatException ex) {
+            return Optional.empty();
         }
     }
 }

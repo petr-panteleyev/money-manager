@@ -14,7 +14,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>24.8.1</revision>
+        <revision>24.8.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>22</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -22,16 +22,17 @@
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.4.1</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.2.5</mavenSurefirePluginVersion>
-        <mavenDependencyPluginVersion>3.6.1</mavenDependencyPluginVersion>
+        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
+        <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
         <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
         <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
-        <flattenMavenPluginVersion>1.4.1</flattenMavenPluginVersion>
+        <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>22.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.17.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
+        <javaCommonsVersion>1.3.0</javaCommonsVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
         <jsoupVersion>1.15.3</jsoupVersion>
         <postgresVersion>42.7.3</postgresVersion>
@@ -69,6 +70,11 @@
                 <groupId>org.panteleyev</groupId>
                 <artifactId>freedesktop</artifactId>
                 <version>${javaFreeDesktopVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>commons</artifactId>
+                <version>${javaCommonsVersion}</version>
             </dependency>
             <dependency>
                 <groupId>org.controlsfx</groupId>

@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.desktop.export;
 
+import org.panteleyev.commons.xml.StartElementWrapper;
 import org.panteleyev.money.desktop.commons.xml.RecordSerializer;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
@@ -17,10 +18,6 @@ import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.panteleyev.money.desktop.commons.xml.RecordSerializer.deserializeRecord;
-
-class ImportParser extends DefaultHandler {
+class ImportParser {
     enum Tag {
         Icon(ImportParser::parseIcon),
         Category(ImportParser::parseCategory),
@@ -46,13 +41,13 @@ class ImportParser extends DefaultHandler {
         ExchangeSecuritySplit(ImportParser::parseExchangeSecuritySplit),
         BlobContent(ImportParser::parseBlob);
 
-        Tag(Function<Attributes, ?> parseMethod) {
+        Tag(Function<StartElementWrapper, ?> parseMethod) {
             this.parseMethod = parseMethod;
         }
 
-        private final Function<Attributes, ?> parseMethod;
+        private final Function<StartElementWrapper, ?> parseMethod;
 
-        Function<Attributes, ?> getParseMethod() {
+        Function<StartElementWrapper, ?> getParseMethod() {
             return parseMethod;
         }
 
@@ -147,71 +142,63 @@ class ImportParser extends DefaultHandler {
         return blobs;
     }
 
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        super.startElement(uri, localName, qName, attributes);
-
-        Tag.getTag(qName).ifPresent(tag -> {
+    public void onStartElement(StartElementWrapper element) {
+        Tag.getTag(element.getName().getLocalPart()).ifPresent(tag -> {
             var list = RECORD_LISTS.get(tag);
-            var record = tag.getParseMethod().apply(attributes);
+            var record = tag.getParseMethod().apply(element);
             ((List<Object>) list).add(record);
         });
     }
 
-    @Override
-    public void error(SAXParseException e) throws SAXException {
-        throw e;
+    private static Icon parseIcon(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Icon.class);
     }
 
-    private static Icon parseIcon(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Icon.class);
+    private static Category parseCategory(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Category.class);
     }
 
-    private static Category parseCategory(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Category.class);
+    private static Account parseAccount(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Account.class);
     }
 
-    private static Account parseAccount(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Account.class);
+    private static Currency parseCurrency(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Currency.class);
     }
 
-    private static Currency parseCurrency(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Currency.class);
+    private static ExchangeSecurity parseExchangeSecurity(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, ExchangeSecurity.class);
     }
 
-    private static ExchangeSecurity parseExchangeSecurity(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, ExchangeSecurity.class);
+    private static Contact parseContact(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Contact.class);
     }
 
-    private static Contact parseContact(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Contact.class);
+    private static Transaction parseTransaction(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Transaction.class);
     }
 
-    private static Transaction parseTransaction(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Transaction.class);
+    private static MoneyDocument parseDocument(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, MoneyDocument.class);
     }
 
-    private static MoneyDocument parseDocument(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, MoneyDocument.class);
+    private static PeriodicPayment parsePeriodicPayment(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, PeriodicPayment.class);
     }
 
-    private static PeriodicPayment parsePeriodicPayment(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, PeriodicPayment.class);
+    private static Card parseCard(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, Card.class);
     }
 
-    private static Card parseCard(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, Card.class);
+    private static InvestmentDeal parseInvestmentDeal(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, InvestmentDeal.class);
     }
 
-    private static InvestmentDeal parseInvestmentDeal(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, InvestmentDeal.class);
+    private static ExchangeSecuritySplit parseExchangeSecuritySplit(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, ExchangeSecuritySplit.class);
     }
 
-    private static ExchangeSecuritySplit parseExchangeSecuritySplit(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, ExchangeSecuritySplit.class);
-    }
-
-    private static BlobContent parseBlob(Attributes attributes) {
-        return RecordSerializer.deserializeRecord(attributes, BlobContent.class);
+    private static BlobContent parseBlob(StartElementWrapper element) {
+        return RecordSerializer.deserializeRecord(element, BlobContent.class);
     }
 }

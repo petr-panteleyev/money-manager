@@ -24,6 +24,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
         </dependency>
