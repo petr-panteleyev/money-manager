@@ -32,6 +32,8 @@ import java.util.Objects;
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class SberbankBrokerHtmlReportParser {
+    private static final String DEAL_COMPLETED = "И";
+
     private static final int DEAL_TABLE_COLUMN_COUNT = 16;
 
     private static final int CELL_INDEX_DEAL_DATE = 0;
@@ -47,6 +49,7 @@ public class SberbankBrokerHtmlReportParser {
     private static final int CELL_INDEX_BROKER_FEE = 11;
     private static final int CELL_INDEX_EXCHANGE_FEE = 12;
     private static final int CELL_INDEX_DEAL_NUMBER = 13;
+    private static final int CELL_INDEX_DEAL_STATUS = 15;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -84,6 +87,11 @@ public class SberbankBrokerHtmlReportParser {
                     .toList();
 
             for (var row : rows) {
+                var dealStatus = row.get(CELL_INDEX_DEAL_STATUS).text();
+                if (!dealStatus.contains(DEAL_COMPLETED)) {
+                    continue;
+                }
+
                 var currencyName = row.get(CELL_INDEX_CURRENCY_NAME).text();
                 var currencyUuid = cache().getCurrencies().stream()
                         .filter(x -> Objects.equals(x.symbol(), currencyName))

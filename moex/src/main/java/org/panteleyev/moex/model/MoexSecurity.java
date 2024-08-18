@@ -51,8 +51,8 @@ public record MoexSecurity(
         private String typeName = "";
         private String group = "";
         private String groupName = "";
-        private BigDecimal couponValue = BigDecimal.ZERO;
-        private BigDecimal couponPercent = BigDecimal.ZERO;
+        private BigDecimal couponValue = null;
+        private BigDecimal couponPercent = null;
         private LocalDate couponDate = null;
         private Integer couponFrequency = null;
 
@@ -85,6 +85,10 @@ public record MoexSecurity(
         public Builder secId(String secId) {
             this.secId = secId;
             return this;
+        }
+
+        public String secId() {
+            return secId;
         }
 
         public Builder engine(String engine) {
@@ -122,27 +126,23 @@ public record MoexSecurity(
             return this;
         }
 
-        public Builder faceValue(String faceValue) {
-            this.faceValue = faceValue.isEmpty()? BigDecimal.ZERO : new BigDecimal(faceValue);
+        public Builder faceValue(BigDecimal faceValue) {
+            this.faceValue = faceValue;
             return this;
         }
 
-        public Builder issueDate(String issueDate) {
-            this.issueDate = parseDate(issueDate);
+        public Builder issueDate(LocalDate issueDate) {
+            this.issueDate = issueDate;
             return this;
         }
 
-        public Builder matDate(String matDate) {
-            this.matDate = parseDate(matDate);
+        public Builder matDate(LocalDate matDate) {
+            this.matDate = matDate;
             return this;
         }
 
-        public Builder daysToRedemption(String daysToRedemption) {
-            try {
-                this.daysToRedemption = Integer.parseInt(daysToRedemption);
-            } catch (Exception ex) {
-                this.daysToRedemption = null;
-            }
+        public Builder daysToRedemption(Integer daysToRedemption) {
+            this.daysToRedemption = daysToRedemption;
             return this;
         }
 
@@ -166,23 +166,23 @@ public record MoexSecurity(
             return this;
         }
 
-        public Builder couponValue(String couponValue) {
-            this.couponValue = parseNumber(couponValue);
+        public Builder couponValue(BigDecimal couponValue) {
+            this.couponValue = couponValue;
             return this;
         }
 
-        public Builder couponPercent(String couponPercent) {
-            this.couponPercent = parseNumber(couponPercent);
+        public Builder couponPercent(BigDecimal couponPercent) {
+            this.couponPercent = couponPercent;
             return this;
         }
 
-        public Builder couponDate(String couponDate) {
-            this.couponDate = parseDate(couponDate);
+        public Builder couponDate(LocalDate couponDate) {
+            this.couponDate = couponDate;
             return this;
         }
 
-        public Builder couponFrequency(String couponFrequency) {
-            this.couponFrequency = parseInt(couponFrequency);
+        public Builder couponFrequency(Integer couponFrequency) {
+            this.couponFrequency = couponFrequency;
             return this;
         }
     }

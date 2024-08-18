@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+  Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -16,4 +16,11 @@
     <artifactId>money-manager-moex</artifactId>
     <packaging>jar</packaging>
     <name>Moscow Exchange</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.panteleyev</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+    </dependencies>
 </project>

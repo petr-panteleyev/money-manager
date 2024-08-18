@@ -6,6 +6,7 @@ package org.panteleyev.money.app.account;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
@@ -189,6 +190,7 @@ public final class AccountWindowController extends BaseController {
                                 }
                         )
                 ),
+                createPortfolioMenu(),
                 createWindowMenu(),
                 createHelpMenu()
         );

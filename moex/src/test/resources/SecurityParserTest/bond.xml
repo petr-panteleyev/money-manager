@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data id="description">
+        <rows>
+            <row name="SECID" title="Код ценной бумаги" value="RU000A105SD9" type="string" sort_order="1" is_hidden="0"
+                 precision=""/>
+            <row name="NAME" title="Полное наименование" value="Сбербанк ПАО 001Р-SBER42" type="string" sort_order="3"
+                 is_hidden="0" precision=""/>
+            <row name="SHORTNAME" title="Краткое наименование" value="Сбер Sb42R" type="string" sort_order="4"
+                 is_hidden="0" precision=""/>
+            <row name="REGNUMBER" title="Номер государственной регистрации" value="4B02-582-01481-B-001P" type="string"
+                 sort_order="5" is_hidden="0" precision=""/>
+            <row name="ISIN" title="ISIN код" value="RU000A105SD9" type="string" sort_order="6" is_hidden="0"
+                 precision=""/>
+            <row name="ISSUEDATE" title="Дата начала торгов" value="2023-02-03" type="date" sort_order="7" is_hidden="0"
+                 precision=""/>
+            <row name="MATDATE" title="Дата погашения" value="2025-03-02" type="date" sort_order="8" is_hidden="0"
+                 precision=""/>
+            <row name="INITIALFACEVALUE" title="Первоначальная номинальная стоимость" value="1000" type="number"
+                 sort_order="10" is_hidden="0" precision="2"/>
+            <row name="FACEUNIT" title="Валюта номинала" value="SUR" type="string" sort_order="11" is_hidden="0"
+                 precision=""/>
+            <row name="LATNAME" title="Английское наименование" value="Sber 001P-SBER42" type="string" sort_order="12"
+                 is_hidden="1" precision=""/>
+            <row name="STARTDATEMOEX" title="Дата начала торгов на Московской Бирже" value="2023-02-03" type="date"
+                 sort_order="13" is_hidden="0" precision=""/>
+            <row name="PROGRAMREGISTRYNUMBER" title="Государственный регистрационный номер программы облигации"
+                 value="401481B001P02E" type="string" sort_order="19" is_hidden="0" precision=""/>
+            <row name="LISTLEVEL" title="Уровень листинга" value="3" type="number" sort_order="23" is_hidden="0"
+                 precision="0"/>
+            <row name="DAYSTOREDEMPTION" title="Дней до погашения" value="201" type="number" sort_order="25"
+                 is_hidden="0" precision="0"/>
+            <row name="ISSUESIZE" title="Объем выпуска" value="62000000" type="number" sort_order="26" is_hidden="0"
+                 precision="0"/>
+            <row name="FACEVALUE" title="Номинальная стоимость" value="1000" type="number" sort_order="27" is_hidden="0"
+                 precision="2"/>
+            <row name="ISQUALIFIEDINVESTORS" title="Бумаги для квалифицированных инвесторов" value="0" type="boolean"
+                 sort_order="28" is_hidden="0" precision="0"/>
+            <row name="COUPONFREQUENCY" title="Периодичность выплаты купона в год" value="2" type="number"
+                 sort_order="30" is_hidden="0" precision="0"/>
+            <row name="COUPONDATE" title="Дата выплаты купона" value="2024-09-01" type="date" sort_order="31"
+                 is_hidden="0" precision=""/>
+            <row name="COUPONPERCENT" title="Ставка купона, %" value="8.8" type="number" sort_order="32" is_hidden="0"
+                 precision="2"/>
+            <row name="COUPONVALUE" title="Сумма купона, в валюте номинала" value="43.88" type="number" sort_order="33"
+                 is_hidden="0" precision="2"/>
+            <row name="TYPENAME" title="Вид/категория ценной бумаги" value="Биржевая облигация" type="string"
+                 sort_order="9000" is_hidden="0" precision=""/>
+            <row name="GROUP" title="Код типа инструмента" value="stock_bonds" type="string" sort_order="9001"
+                 is_hidden="1" precision=""/>
+            <row name="TYPE" title="Тип бумаги" value="exchange_bond" type="string" sort_order="10000" is_hidden="1"
+                 precision=""/>
+            <row name="GROUPNAME" title="Типа инструмента" value="Облигации" type="string" sort_order="10011"
+                 is_hidden="1" precision=""/>
+            <row name="EMITTER_ID" title="Код эмитента" value="484" type="number" sort_order="11000" is_hidden="1"
+                 precision=""/>
+        </rows>
+    </data>
+    <data id="boards">
+        <rows>
+            <row secid="RU000A105SD9" boardid="TQCB" title="Т+: Облигации - безадрес." board_group_id="58" market_id="2"
+                 market="bonds" engine_id="1" engine="stock" is_traded="1" decimals="2" history_from="2023-02-03"
+                 history_till="2024-08-12" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="1"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="LIQB" title="Продажа обеспечения бирж.рынок - безадрес."
+                 board_group_id="120" market_id="36" market="mamc" engine_id="1" engine="stock" is_traded="1"
+                 decimals="2" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid=""/>
+            <row secid="RU000A105SD9" boardid="RPEY" title="РЕПО в ин.валюте (CNY) - адрес." board_group_id="2"
+                 market_id="3" market="repo" engine_id="1" engine="stock" is_traded="1" decimals="6" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="RPEU" title="РЕПО в ин. валюте (USD) - адрес." board_group_id="94"
+                 market_id="3" market="repo" engine_id="1" engine="stock" is_traded="1" decimals="6" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="RPEO" title="РЕПО в ин. валюте (EUR) - адрес." board_group_id="90"
+                 market_id="3" market="repo" engine_id="1" engine="stock" is_traded="1" decimals="6" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="EUR"/>
+            <row secid="RU000A105SD9" boardid="PSOB" title="РПС: Облигации - адрес." board_group_id="284" market_id="4"
+                 market="ndm" engine_id="1" engine="stock" is_traded="1" decimals="2" history_from="2023-02-03"
+                 history_till="2024-08-08" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="PSAU" title="Размещение - адрес." board_group_id="107" market_id="4"
+                 market="ndm" engine_id="1" engine="stock" is_traded="0" decimals="2" history_from="2023-01-31"
+                 history_till="2023-02-08" listed_from="2023-01-31" listed_till="2023-02-08" is_primary="0"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="PTOB" title="РПС с ЦК: Облигации - адрес." board_group_id="282"
+                 market_id="4" market="ndm" engine_id="1" engine="stock" is_traded="1" decimals="2"
+                 history_from="2023-02-03" history_till="2024-07-01" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="CTOB" title="РПС с ЦК Нерезиденты: Облигации - адрес."
+                 board_group_id="1062" market_id="1015" market="nonresndm" engine_id="1" engine="stock" is_traded="1"
+                 decimals="2" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="CPMO" title="РЕПО-M Нерезиденты - адрес." board_group_id="1071"
+                 market_id="1017" market="nonresrepo" engine_id="1" engine="stock" is_traded="1" decimals="4"
+                 history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="CPEU" title="РЕПО-M Нерезиденты (USD) - адрес." board_group_id="1073"
+                 market_id="1017" market="nonresrepo" engine_id="1" engine="stock" is_traded="1" decimals="6"
+                 history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="CPEO" title="РЕПО-M Нерезиденты (EUR) - адрес." board_group_id="1075"
+                 market_id="1017" market="nonresrepo" engine_id="1" engine="stock" is_traded="1" decimals="6"
+                 history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="EUR"/>
+            <row secid="RU000A105SD9" boardid="CPEY" title="РЕПО-M Нерезиденты (CNY) - адрес." board_group_id="1077"
+                 market_id="1017" market="nonresrepo" engine_id="1" engine="stock" is_traded="1" decimals="6"
+                 history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="OCBR" title="OTC: Облигации с ЦК - двусторонние" board_group_id="1017"
+                 market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1" decimals="4"
+                 history_from="2023-04-04" history_till="2024-07-12" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="OCBU" title="OTC: Облигации с ЦК (USD) - двусторонние"
+                 board_group_id="1019" market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="OCBY" title="OTC: Облигации с ЦК (CNY) - двусторонние"
+                 board_group_id="1204" market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="OCAR" title="OTC: Облигации с ЦК адрес. - двусторонние"
+                 board_group_id="1263" market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-04-10" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="OCAY" title="OTC: Облигации с ЦК адрес. (CNY) - двусторонние"
+                 board_group_id="1265" market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-04-10" listed_till="2024-08-13"
+                 is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="OCAU" title="OTC: Облигации с ЦК адрес. (USD) - двусторонние"
+                 board_group_id="1267" market_id="1014" market="ndm" engine_id="1012" engine="otc" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-04-10" listed_till="2024-08-13"
+                 is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="RPMO" title="РЕПО-М - адрес." board_group_id="201" market_id="3"
+                 market="repo" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from="2023-02-03"
+                 history_till="2023-06-08" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="EQRP" title="РЕПО с ЦК 1 день - безадрес." board_group_id="50"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4"
+                 history_from="2023-02-06" history_till="2024-07-30" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="EQRD" title="РЕПО с ЦК 1 день (USD) - безадрес." board_group_id="92"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="EQRE" title="РЕПО с ЦК 1 день (EUR) - безадрес." board_group_id="93"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="EUR"/>
+            <row secid="RU000A105SD9" boardid="EQRY" title="РЕПО с ЦК 1 день (CNY) - безадрес." board_group_id="152"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="EQWP" title="РЕПО с ЦК 7 дн. - безадрес." board_group_id="76"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4"
+                 history_from="2024-05-13" history_till="2024-05-13" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="EQWD" title="РЕПО с ЦК 7 дней (USD) - безадрес." board_group_id="78"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="EQWE" title="РЕПО с ЦК 7 дней (EUR) - безадрес." board_group_id="79"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="EUR"/>
+            <row secid="RU000A105SD9" boardid="EQWY" title="РЕПО с ЦК 7 дней (CNY) - безадрес." board_group_id="1116"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="LIQR" title="РЕПО с ЦК: Урегулирование - безадрес." board_group_id="148"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from=""
+                 history_till="" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid=""/>
+            <row secid="RU000A105SD9" boardid="PSRP" title="РЕПО с ЦК - адрес." board_group_id="65" market_id="27"
+                 market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from="2023-02-08"
+                 history_till="2024-06-06" listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0"
+                 currencyid="RUB"/>
+            <row secid="RU000A105SD9" boardid="PSRD" title="РЕПО с ЦК (USD) - адрес." board_group_id="91" market_id="27"
+                 market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from="" history_till=""
+                 listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="USD"/>
+            <row secid="RU000A105SD9" boardid="PSRE" title="РЕПО с ЦК (EUR) - адрес." board_group_id="96" market_id="27"
+                 market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4" history_from="" history_till=""
+                 listed_from="2023-02-03" listed_till="2024-08-13" is_primary="0" currencyid="EUR"/>
+            <row secid="RU000A105SD9" boardid="PSRY" title="РЕПО с ЦК (CNY) - адрес." board_group_id="153"
+                 market_id="27" market="ccp" engine_id="1" engine="stock" is_traded="1" decimals="4"
+                 history_from="2023-05-22" history_till="2023-05-22" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid="CNY"/>
+            <row secid="RU000A105SD9" boardid="CIQR" title="Урегулирование РЕПО с ЦК Нерезиденты - безадрес."
+                 board_group_id="1080" market_id="1019" market="nonresccp" engine_id="1" engine="stock" is_traded="1"
+                 decimals="4" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid=""/>
+            <row secid="RU000A105SD9" boardid="CIQB" title="Урегулирование с ЦК Нерезиденты - безадрес."
+                 board_group_id="1082" market_id="36" market="mamc" engine_id="1" engine="stock" is_traded="1"
+                 decimals="2" history_from="" history_till="" listed_from="2023-02-03" listed_till="2024-08-13"
+                 is_primary="0" currencyid=""/>
+            <row secid="RU000A105SD9" boardid="QBND" title="Квоты" board_group_id="1280" market_id="1279" market="bonds"
+                 engine_id="1282" engine="quotes" is_traded="1" decimals="4" history_from="" history_till=""
+                 listed_from="2023-06-05" listed_till="2024-08-13" is_primary="0" currencyid=""/>
+        </rows>
+    </data>
+</document>

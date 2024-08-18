@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data id="securities">
+        <rows>
+            <row SECID="SBER" BOARDID="TQBR" SHORTNAME="Сбербанк" PREVPRICE="280.74" LOTSIZE="10" FACEVALUE="3"
+                 STATUS="A" BOARDNAME="Т+: Акции и ДР - безадрес." DECIMALS="2" SECNAME="Сбербанк России ПАО ао"
+                 REMARKS="" MARKETCODE="FNDT" INSTRID="EQIN" SECTORID="" MINSTEP="0.01" PREVWAPRICE="279.76"
+                 FACEUNIT="SUR" PREVDATE="2024-08-12" ISSUESIZE="21586948000" ISIN="RU0009029540" LATNAME="Sberbank"
+                 REGNUMBER="10301481B" PREVLEGALCLOSEPRICE="280.23" CURRENCYID="SUR" SECTYPE="1" LISTLEVEL="1"
+                 SETTLEDATE="2024-08-14"/>
+        </rows>
+    </data>
+    <data id="marketdata">
+        <rows>
+            <row SECID="SBER" BOARDID="TQBR" BID="281.52" BIDDEPTH="" OFFER="281.55" OFFERDEPTH="" SPREAD="0.03"
+                 BIDDEPTHT="267422" OFFERDEPTHT="442906" OPEN="281.05" LOW="280.42" HIGH="282.41" LAST="281.54"
+                 LASTCHANGE="-0.02" LASTCHANGEPRCNT="-0.01" QTY="104" VALUE="292801.60" VALUE_USD="3255.25"
+                 WAPRICE="281.51" LASTCNGTOLASTWAPRICE="1.78" WAPTOPREVWAPRICEPRCNT="0.63" WAPTOPREVWAPRICE="1.75"
+                 CLOSEPRICE="" MARKETPRICETODAY="" MARKETPRICE="279.72" LASTTOPREVPRICE="0.28" NUMTRADES="49140"
+                 VOLTODAY="11753930" VALTODAY="3308758520" VALTODAY_USD="36785442" ETFSETTLEPRICE="" TRADINGSTATUS="T"
+                 UPDATETIME="15:30:04" LASTBID="" LASTOFFER="" LCLOSEPRICE="" LCURRENTPRICE="281.71" MARKETPRICE2=""
+                 NUMBIDS="" NUMOFFERS="" CHANGE="0.8" TIME="15:30:04" HIGHBID="" LOWOFFER=""
+                 PRICEMINUSPREVWAPRICE="1.78" OPENPERIODPRICE="281.05" SEQNUM="20240813154504"
+                 SYSTIME="2024-08-13 15:45:04" CLOSINGAUCTIONPRICE="" CLOSINGAUCTIONVOLUME=""
+                 ISSUECAPITALIZATION="6078236948360" ISSUECAPITALIZATION_UPDATETIME="15:44:59" ETFSETTLECURRENCY=""
+                 VALTODAY_RUR="3308758520" TRADINGSESSION="1" TRENDISSUECAPITALIZATION="17917166840"/>
+        </rows>
+    </data>
+    <data id="dataversion">
+        <rows>
+            <row data_version="8188" seqnum="20240813154500"/>
+        </rows>
+    </data>
+    <data id="marketdata_yields">
+        <rows>
+        </rows>
+    </data>
+</document>

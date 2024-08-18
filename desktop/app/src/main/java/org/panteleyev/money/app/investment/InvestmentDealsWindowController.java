@@ -6,7 +6,6 @@ package org.panteleyev.money.app.investment;
 
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import org.panteleyev.money.app.BaseController;
@@ -22,27 +21,19 @@ import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.MenuFactory.menu;
 import static org.panteleyev.fx.MenuFactory.menuBar;
 import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.TabFactory.tab;
 import static org.panteleyev.money.app.Constants.FILTER_RAIF_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS_HTML;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
-public class InvestmentWindowController extends BaseController {
-    public InvestmentWindowController() {
+public class InvestmentDealsWindowController extends BaseController {
+    private final InvestmentDealsPane dealsPane = new InvestmentDealsPane();
 
-        var tabPane = new TabPane();
-
+    public InvestmentDealsWindowController() {
         var self = new BorderPane(
-                tabPane,
+                dealsPane,
                 createMenu(), null, null, null
-        );
-
-
-        tabPane.getTabs().addAll(
-                tab("Сделки", new InvestmentDealsPane()),
-                tab("Портфель", new InvestmentSummaryPane())
         );
 
         setupWindow(self);

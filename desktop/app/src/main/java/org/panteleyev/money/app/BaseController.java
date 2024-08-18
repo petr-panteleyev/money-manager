@@ -19,7 +19,8 @@ import org.panteleyev.money.app.contact.ContactListWindowController;
 import org.panteleyev.money.app.currency.CurrencyWindowController;
 import org.panteleyev.money.app.document.DocumentWindowController;
 import org.panteleyev.money.app.exchange.SecuritiesWindowController;
-import org.panteleyev.money.app.investment.InvestmentWindowController;
+import org.panteleyev.money.app.investment.InvestmentDealsWindowController;
+import org.panteleyev.money.app.investment.InvestmentSummaryWindowController;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.MoneyRecord;
 
@@ -71,19 +72,28 @@ public class BaseController extends Controller {
         return createWindowMenu(null);
     }
 
-    Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
+    protected Menu createPortfolioMenu() {
+        return createPortfolioMenu(null);
+    }
+
+    protected Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
         var securitiesMenuItem = menuItem("Ценные бумаги...",
                 _ -> getController(SecuritiesWindowController.class));
+        var investmentDealsMenuItem = menuItem("Инвестиционные сделки...",
+                _ -> getController(InvestmentDealsWindowController.class));
         var investmentsMenuItem = menuItem("Инвестиции...",
-                _ -> getController(InvestmentWindowController.class));
+                _ -> getController(InvestmentSummaryWindowController.class));
 
         if (dbOpenProperty != null) {
+            investmentDealsMenuItem.disableProperty().bind(dbOpenProperty.not());
             securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
             investmentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
         return menu("Портфель",
                 securitiesMenuItem,
+                new SeparatorMenuItem(),
+                investmentDealsMenuItem,
                 investmentsMenuItem
         );
     }

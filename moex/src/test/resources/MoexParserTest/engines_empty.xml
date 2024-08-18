@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data id="engines">
+        <metadata>
+            <columns>
+                <column name="id" type="int32"/>
+                <column name="name" type="string" bytes="45" max_size="0"/>
+                <column name="title" type="string" bytes="765" max_size="0"/>
+            </columns>
+        </metadata>
+        <rows>
+        </rows>
+    </data>
+</document>

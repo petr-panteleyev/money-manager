@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data id="engines">
+        <metadata>
+            <columns>
+                <column name="id" type="int32"/>
+                <column name="name" type="string" bytes="45" max_size="0"/>
+                <column name="title" type="string" bytes="765" max_size="0"/>
+            </columns>
+        </metadata>
+        <rows>
+            <row id="1" name="stock" title="Фондовый рынок и рынок депозитов"/>
+            <row id="2" name="state" title="Рынок ГЦБ (размещение)"/>
+            <row id="3" name="currency" title="Валютный рынок"/>
+            <row id="4" name="futures" title="Срочный рынок"/>
+            <row id="5" name="commodity" title="Товарный рынок"/>
+            <row id="6" name="interventions" title="Товарные интервенции"/>
+            <row id="7" name="offboard" title="ОТС-система"/>
+            <row id="9" name="agro" title="Агро"/>
+            <row id="1012" name="otc" title="ОТС с ЦК"/>
+            <row id="1282" name="quotes" title="Квоты"/>
+            <row id="1326" name="money" title="Денежный рынок"/>
+        </rows>
+    </data>
+</document>

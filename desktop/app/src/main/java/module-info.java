@@ -22,7 +22,9 @@ open module org.panteleyev.money {
     requires org.panteleyev.money.desktop.persistence;
 
     requires org.controlsfx.controls;
+    requires org.postgresql.jdbc;
 
+    requires org.jsoup;
     requires freemarker;
     requires org.apache.poi.poi;
     requires org.apache.poi.ooxml;

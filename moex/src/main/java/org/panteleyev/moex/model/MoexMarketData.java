@@ -50,6 +50,10 @@ public record MoexMarketData(
             return this;
         }
 
+        public String getSecId() {
+            return secId;
+        }
+
         public Builder boardId(String boardId) {
             this.boardId = boardId;
             return this;

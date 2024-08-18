@@ -10,20 +10,18 @@ import org.panteleyev.moex.model.MoexMarket;
 import org.panteleyev.moex.model.MoexMarketData;
 import org.panteleyev.moex.model.MoexSecurity;
 import org.panteleyev.moex.xml.MarketDataParser;
+import org.panteleyev.moex.xml.MoexParser;
 import org.panteleyev.moex.xml.SecurityParser;
 
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.events.StartElement;
 import java.net.http.HttpClient;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class Moex {
     private final MoexClient client = new MoexClient();
+    private final MoexParser parser = new MoexParser();
+    private final SecurityParser securityParser = new SecurityParser();
+    private final MarketDataParser marketDataParser = new MarketDataParser();
 
     public List<MoexEngine> getEngines() {
         try (var httpClient = HttpClient.newHttpClient()) {
@@ -32,24 +30,8 @@ public class Moex {
                 throw new RuntimeException("Request failed");
             }
 
-            var result = new ArrayList<MoexEngine>();
-
             try (var inputStream = response.body()) {
-                var factory = XMLInputFactory.newInstance();
-                var eventReader = factory.createXMLEventReader(inputStream);
-
-                while (eventReader.hasNext()) {
-                    var event = eventReader.nextEvent();
-
-                    if (event.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                        var startElement = event.asStartElement();
-                        if ("row".equals(startElement.getName().getLocalPart())) {
-                            parseEngine(startElement).ifPresent(result::add);
-                        }
-                    }
-                }
-
-                return result;
+                return parser.getEngines(inputStream);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -63,24 +45,8 @@ public class Moex {
                 throw new RuntimeException("Request failed");
             }
 
-            var result = new ArrayList<MoexMarket>();
-
             try (var inputStream = response.body()) {
-                var factory = XMLInputFactory.newInstance();
-                var eventReader = factory.createXMLEventReader(inputStream);
-
-                while (eventReader.hasNext()) {
-                    var event = eventReader.nextEvent();
-
-                    if (event.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                        var startElement = event.asStartElement();
-                        if ("row".equals(startElement.getName().getLocalPart())) {
-                            parseMarket(engine, startElement).ifPresent(result::add);
-                        }
-                    }
-                }
-
-                return result;
+                return parser.getMarkets(inputStream, engine);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -95,11 +61,7 @@ public class Moex {
             }
 
             try (var inputStream = response.body()) {
-                var docBuilderFactory = DocumentBuilderFactory.newInstance();
-                var docBuilder = docBuilderFactory.newDocumentBuilder();
-                var document = docBuilder.parse(inputStream);
-
-                return new SecurityParser().parseSecurity(document);
+                return securityParser.parseSecurity(inputStream);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -114,47 +76,10 @@ public class Moex {
             }
 
             try (var inputStream = response.body()) {
-                var docBuilderFactory = DocumentBuilderFactory.newInstance();
-                var docBuilder = docBuilderFactory.newDocumentBuilder();
-                var document = docBuilder.parse(inputStream);
-
-                return new MarketDataParser().parse(document);
+                return marketDataParser.parseMarketData(inputStream);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
-        }
-    }
-
-    private Optional<MoexEngine> parseEngine(StartElement element) {
-        var idAttr = element.getAttributeByName(new QName("id"));
-        var nameAttr = element.getAttributeByName(new QName("name"));
-        var titleAttr = element.getAttributeByName(new QName("title"));
-
-        if (idAttr == null || nameAttr == null || titleAttr == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new MoexEngine(
-                    Integer.parseInt(idAttr.getValue()),
-                    nameAttr.getValue(),
-                    titleAttr.getValue()
-            ));
-        }
-    }
-
-    private Optional<MoexMarket> parseMarket(MoexEngine engine, StartElement element) {
-        var idAttr = element.getAttributeByName(new QName("id"));
-        var nameAttr = element.getAttributeByName(new QName("NAME"));
-        var titleAttr = element.getAttributeByName(new QName("title"));
-
-        if (idAttr == null || nameAttr == null || titleAttr == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new MoexMarket(
-                    Integer.parseInt(idAttr.getValue()),
-                    engine,
-                    nameAttr.getValue(),
-                    titleAttr.getValue()
-            ));
         }
     }
 }

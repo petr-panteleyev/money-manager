@@ -4,49 +4,80 @@
  */
 package org.panteleyev.moex.xml;
 
+import org.panteleyev.commons.xml.XMLEventReaderWrapper;
 import org.panteleyev.moex.model.MoexMarketData;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import javax.xml.xpath.XPathConstants;
+import javax.xml.namespace.QName;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
 
-import static org.panteleyev.moex.xml.ParserUtil.parseInt;
-import static org.panteleyev.moex.xml.ParserUtil.parseNumber;
+public class MarketDataParser {
+    private static final QName DATA = new QName("data");
+    private static final QName ROW = new QName("row");
 
-public class MarketDataParser extends BaseParser {
-    private static final String SECURITY_XPATH = "/document/data[@id='securities']/rows/row[1]";
-    private static final String ACCRUEDINT_XPATH = "/document/data[@id='securities']/rows/row[1]/@ACCRUEDINT";
-    private static final String COUPONPERIOD_XPATH = "/document/data[@id='securities']/rows/row[1]/@COUPONPERIOD";
-
-    private static final String MARKET_DATA_XPATH = "/document/data[@id='marketdata']/rows/row[1]";
+    private static final QName ATTR_ID = new QName("id");
+    private static final QName ATTR_ACCRUEDINT = new QName("ACCRUEDINT");
+    private static final QName ATTR_COUPONPERIOD = new QName("COUPONPERIOD");
+    private static final QName ATTR_SECID = new QName("SECID");
+    private static final QName ATTR_BOARDID = new QName("BOARDID");
+    private static final QName ATTR_OPEN = new QName("OPEN");
+    private static final QName ATTR_LOW = new QName("LOW");
+    private static final QName ATTR_HIGH = new QName("HIGH");
+    private static final QName ATTR_LAST = new QName("LAST");
+    private static final QName ATTR_MARKETPRICE = new QName("MARKETPRICE");
+    private static final QName ATTR_MARKETPRICETODAY = new QName("MARKETPRICETODAY");
 
     public MarketDataParser() {
     }
 
-    public Optional<MoexMarketData> parse(Document document) throws Exception {
-        var builder = new MoexMarketData.Builder();
+    public Optional<MoexMarketData> parseMarketData(InputStream inputStream) {
+        try (var reader = XMLEventReaderWrapper.newInstance(inputStream)) {
+            var builder = new MoexMarketData.Builder();
 
-        var securities = (Element) xPath().compile(SECURITY_XPATH).evaluate(document, XPathConstants.NODE);
-        if (securities == null) {
+            while (reader.hasNext()) {
+                var event = reader.nextEvent();
+
+                event.ifStartElement(DATA, e -> Objects.equals(e.getAttributeValue(ATTR_ID, ""), "securities"), _ -> {
+                    while (reader.hasNext()) {
+                        var securitiesEvent = reader.nextEvent();
+                        if (securitiesEvent.isEndElement(DATA)) {
+                            break;
+                        }
+
+                        securitiesEvent.ifStartElement(ROW, row -> {
+                            builder.accruedInterest(row.getAttributeValue(ATTR_ACCRUEDINT, BigDecimal.class).orElse(null))
+                                    .couponPeriod(row.getAttributeValue(ATTR_COUPONPERIOD, Integer.class).orElse(null));
+                        });
+                    }
+                });
+
+                event.ifStartElement(DATA, e -> Objects.equals(e.getAttributeValue(ATTR_ID, ""), "marketdata"), _ -> {
+                    while (reader.hasNext()) {
+                        var marketDataEvent = reader.nextEvent();
+                        if (marketDataEvent.isEndElement(DATA)) {
+                            break;
+                        }
+
+                        marketDataEvent.ifStartElement(ROW, row -> {
+                            builder.secId(row.getAttributeValue(ATTR_SECID).orElseThrow())
+                                    .boardId(row.getAttributeValue(ATTR_BOARDID).orElseThrow())
+                                    .open(row.getAttributeValue(ATTR_OPEN, BigDecimal.class).orElse(null))
+                                    .low(row.getAttributeValue(ATTR_LOW, BigDecimal.class).orElse(null))
+                                    .high(row.getAttributeValue(ATTR_HIGH, BigDecimal.class).orElse(null))
+                                    .last(row.getAttributeValue(ATTR_LAST, BigDecimal.class).orElse(null))
+                                    .marketPrice(row.getAttributeValue(ATTR_MARKETPRICE, BigDecimal.class).orElse(null))
+                                    .marketPriceToday(row.getAttributeValue(ATTR_MARKETPRICETODAY, BigDecimal.class)
+                                            .orElse(null));
+                        });
+                    }
+                });
+            }
+
+            return builder.getSecId() == null ? Optional.empty() : Optional.of(builder.build());
+        } catch (Exception ex) {
             return Optional.empty();
         }
-
-        builder.accruedInterest(parseNumber(securities.getAttribute("ACCRUEDINT")))
-                .couponPeriod(parseInt(securities.getAttribute("COUPONPERIOD")));
-
-        var marketData = (Element) xPath().compile(MARKET_DATA_XPATH).evaluate(document, XPathConstants.NODE);
-
-        builder.secId(marketData.getAttribute("SECID"))
-                .boardId(marketData.getAttribute("BOARDID"))
-                .open(parseNumber(marketData.getAttribute("OPEN")))
-                .low(parseNumber(marketData.getAttribute("LOW")))
-                .high(parseNumber(marketData.getAttribute("HIGH")))
-                .last(parseNumber(marketData.getAttribute("LAST")))
-                .marketPrice(parseNumber(marketData.getAttribute("MARKETPRICE")))
-                .marketPriceToday(parseNumber(marketData.getAttribute("MARKETPRICETODAY")))
-        ;
-
-        return Optional.of(builder.build());
     }
 }

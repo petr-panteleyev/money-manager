@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <data id="markets">
+        <metadata>
+            <columns>
+                <column name="id" type="int32"/>
+                <column name="NAME" type="string" bytes="45" max_size="0"/>
+                <column name="title" type="string" bytes="765" max_size="0"/>
+            </columns>
+        </metadata>
+        <rows>
+            <row id="5" NAME="index" title="Индексы фондового рынка"/>
+            <row id="1" NAME="shares" title="Рынок акций"/>
+            <row id="2" NAME="bonds" title="Рынок облигаций"/>
+            <row id="4" NAME="ndm" title="Режим переговорных сделок"/>
+            <row id="29" NAME="otc" title="ОТС"/>
+            <row id="27" NAME="ccp" title="РЕПО с ЦК"/>
+            <row id="1015" NAME="nonresndm" title="Режим переговорных сделок (нерезиденты)"/>
+            <row id="1017" NAME="nonresrepo" title="Рынок РЕПО (нерезиденты)"/>
+            <row id="1019" NAME="nonresccp" title="Рынок РЕПО с ЦК (нерезиденты)"/>
+            <row id="25" NAME="classica" title="Classica"/>
+        </rows>
+    </data>
+</document>
