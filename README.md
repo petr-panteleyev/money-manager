@@ -1,7 +1,7 @@
 # Money Manager
 
-[![JDK](https://www.panteleyev.org/badges/java-22.svg)](https://jdk.java.net/22/)
-[![License](https://www.panteleyev.org/badges/license.svg)](LICENSE)
+[![JDK](docs/badges/java.svg)](https://jdk.java.net/22/)
+[![License](docs/badges/license.svg)](LICENSE)
 
 Программа для учета расходов и сверки выписок.
 

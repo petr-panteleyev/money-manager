@@ -16,7 +16,6 @@ import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.RecordEditorCallback;
-import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.transaction.cells.TransactionDetailSumCell;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Transaction;
@@ -32,6 +31,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
 public final class TransactionDetailsDialog extends BaseDialog<List<TransactionDetail>> implements RecordEditorCallback<TransactionDetail> {
     private final ObservableList<TransactionDetail> details = FXCollections.observableArrayList();
@@ -71,9 +71,9 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         detailsTable.setItems(details);
 
-        var hBox = hBox(Styles.BIG_SPACING, label("Разница:"), deltaLabel);
-        var vBox = vBox(Styles.BIG_SPACING, hBox, detailEditor);
-        VBox.setMargin(hBox, new Insets(Styles.BIG_SPACING, 0, 0, 0));
+        var hBox = hBox(BIG_SPACING, label("Разница:"), deltaLabel);
+        var vBox = vBox(BIG_SPACING, hBox, detailEditor);
+        VBox.setMargin(hBox, new Insets(BIG_SPACING, 0, 0, 0));
 
         var content = new BorderPane();
         content.setCenter(detailsTable);

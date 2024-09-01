@@ -6,12 +6,10 @@ package org.panteleyev.money.app.account;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -58,6 +56,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
@@ -122,7 +121,7 @@ public final class AccountWindowController extends BaseController {
                 createMainMenu(), null, null, null
         );
 
-        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(hBox, BIG_INSETS);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

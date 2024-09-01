@@ -11,6 +11,7 @@ import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.Comparator;
@@ -51,6 +52,9 @@ public final class Comparators {
     private static final Comparator<Transaction> TRANSACTION_BY_DATE =
             Comparator.comparing(Transaction::transactionDate)
                     .thenComparing(Transaction::created);
+
+    private static final Comparator<ExchangeSecurity> EXCHANGE_SECURITY_BY_SHORT_NAME =
+            Comparator.comparing(ExchangeSecurity::shortName);
 
     private static final Comparator<InvestmentDeal> INVESTMENT_DEAL_BY_DEAL_DATE =
             Comparator.comparing(InvestmentDeal::dealDate)
@@ -129,6 +133,10 @@ public final class Comparators {
                     .orElse("");
             return name1.compareTo(name2);
         };
+    }
+
+    public static Comparator<ExchangeSecurity> exchangeSecurityByShortName() {
+        return EXCHANGE_SECURITY_BY_SHORT_NAME;
     }
 
     public static Comparator<InvestmentDeal> investmentDealByDealDate() {

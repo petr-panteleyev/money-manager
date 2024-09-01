@@ -7,6 +7,7 @@ package org.panteleyev.money.model.investment;
 import org.panteleyev.money.model.MoneyRecord;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -48,6 +49,10 @@ public record InvestmentDeal(
         exchangeFee = MoneyRecord.normalize(exchangeFee, BigDecimal.ONE);
         brokerFee = MoneyRecord.normalize(brokerFee, BigDecimal.ONE);
         amount = MoneyRecord.normalize(amount, BigDecimal.ONE);
+    }
+
+    public LocalDate getDate() {
+        return dealDate.toLocalDate();
     }
 
     public static class Builder {

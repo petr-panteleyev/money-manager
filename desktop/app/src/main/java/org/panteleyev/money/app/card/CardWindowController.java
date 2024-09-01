@@ -7,7 +7,6 @@ package org.panteleyev.money.app.card;
 import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
@@ -36,6 +35,7 @@ import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Predicates.activeCard;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
@@ -96,7 +96,7 @@ public final class CardWindowController extends BaseController {
                             b.setSpacing(BIG_SPACING);
                             b.setAlignment(Pos.CENTER_LEFT);
                         }),
-                        b -> BorderPane.setMargin(b, new Insets(5.0, 5.0, 5.0, 5.0))
+                        b -> BorderPane.setMargin(b, BIG_INSETS)
                 ),
                 null, null, null);
 

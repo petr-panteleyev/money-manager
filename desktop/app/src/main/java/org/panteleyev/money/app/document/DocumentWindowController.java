@@ -7,7 +7,6 @@ package org.panteleyev.money.app.document;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -56,6 +55,7 @@ import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_S;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public class DocumentWindowController extends BaseController {
@@ -129,7 +129,7 @@ public class DocumentWindowController extends BaseController {
         // Toolbar
         var toolBar = hBox(5.0, contactFilterBox.getTextField(), documentTypeFilterBox.getNode());
         toolBar.setAlignment(Pos.CENTER_LEFT);
-        BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(toolBar, BIG_INSETS);
 
         // Table
         var w = table.widthProperty().subtract(20);

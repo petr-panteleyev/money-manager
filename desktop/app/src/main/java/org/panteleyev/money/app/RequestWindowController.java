@@ -5,7 +5,6 @@
 package org.panteleyev.money.app;
 
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.MenuBar;
@@ -52,6 +51,8 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
+import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.transaction.TransactionPredicate.transactionByAccount;
 
 class RequestWindowController extends BaseController {
@@ -89,7 +90,7 @@ class RequestWindowController extends BaseController {
                 uncheckedPredicate
         ));
 
-        var filterBox = hBox(5.0,
+        var filterBox = hBox(BIG_SPACING,
                 account == null ? accBox : SKIP,
                 transactionFilterBox,
                 label("Контрагент:"),
@@ -101,7 +102,7 @@ class RequestWindowController extends BaseController {
         );
 
         filterBox.setAlignment(Pos.CENTER_LEFT);
-        BorderPane.setMargin(filterBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(filterBox, BIG_INSETS);
 
         var centerBox = new BorderPane();
         centerBox.setTop(filterBox);

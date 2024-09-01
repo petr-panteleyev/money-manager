@@ -4,9 +4,11 @@
  */
 package org.panteleyev.money.app.investment;
 
+import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountingDateCell;
@@ -21,20 +23,22 @@ import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityAmountCel
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityNameCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityTypeCell;
+import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
 import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
 import static org.panteleyev.money.app.Comparators.investmentDealByDealDate;
+import static org.panteleyev.money.app.GlobalContext.cache;
 
 final class InvestmentDealsTableView extends TableView<InvestmentDeal> {
-    private static final int DEAL_DATE_COLUMN_INDEX = 3;
+    private final FilteredList<InvestmentDeal> filteredList = new FilteredList<>(cache().getInvestmentDeals());
+    private final PredicateProperty<InvestmentDeal> dealPredicateProperty = new PredicateProperty<>(_ -> false);
 
-    public InvestmentDealsTableView(SortedList<InvestmentDeal> list) {
-        super(list);
-
+    public InvestmentDealsTableView(FilteredList<InvestmentDeal> list) {
         var w = widthProperty().subtract(20);
 
         TableColumn<InvestmentDeal, InvestmentDeal> dealDateColumn = tableObjectColumn("Дата заключ.", b ->
@@ -85,7 +89,11 @@ final class InvestmentDealsTableView extends TableView<InvestmentDeal> {
                                 .withWidthBinding(w.multiply(0.05)))
         ));
 
-        list.comparatorProperty().bind(comparatorProperty());
+        filteredList.predicateProperty().bind(dealPredicateProperty);
+
+        var sortedList = filteredList.sorted();
+        sortedList.comparatorProperty().bind(comparatorProperty());
+        setItems(sortedList);
 
         getSortOrder().addAll(List.of(
                 dealDateColumn
@@ -93,5 +101,9 @@ final class InvestmentDealsTableView extends TableView<InvestmentDeal> {
         dealDateColumn.setSortType(TableColumn.SortType.DESCENDING);
 
         sort();
+    }
+
+    public void setTransactionFilter(Predicate<InvestmentDeal> filter) {
+        dealPredicateProperty.set(filter);
     }
 }

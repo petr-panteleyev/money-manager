@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.geometry.Insets;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SeparatorMenuItem;
@@ -38,6 +37,7 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class ContactListWindowController extends BaseController {
@@ -83,7 +83,7 @@ public final class ContactListWindowController extends BaseController {
 
         // Toolbox
         var hBox = hBox(5, searchField, typeBox);
-        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(hBox, BIG_INSETS);
 
         var self = new BorderPane(
                 new BorderPane(tableView, hBox, null, null, null),

@@ -8,7 +8,6 @@ import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
@@ -46,6 +45,7 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 
 public class SecuritiesWindowController extends BaseController {
     private record ExchangeGroup(String type, String title) {
@@ -75,7 +75,7 @@ public class SecuritiesWindowController extends BaseController {
     public SecuritiesWindowController() {
         // Toolbox
         var hBox = hBox(5, groupBox);
-        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(hBox, BIG_INSETS);
 
         setupTable();
 

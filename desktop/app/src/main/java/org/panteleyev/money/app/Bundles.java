@@ -4,6 +4,7 @@
  */
 package org.panteleyev.money.app;
 
+import org.panteleyev.money.app.investment.InvestmentDealPredicate;
 import org.panteleyev.money.app.transaction.TransactionPredicate;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.ContactType;
@@ -84,6 +85,16 @@ public final class Bundles {
             "LAST_YEAR", "Последний год"
     );
 
+    private static final Map<String, String> INVESTMENT_DEAL_PREDICATE_STRINGS = Map.of(
+            "ALL", "Все сделки",
+            "CURRENT_MONTH", "Текущий месяц",
+            "CURRENT_WEEK", "Текущая неделя",
+            "CURRENT_YEAR", "Текущий год",
+            "LAST_MONTH", "Последний месяц",
+            "LAST_QUARTER", "Последний квартал",
+            "LAST_YEAR", "Последний год"
+    );
+
     private static final Map<PeriodicPaymentType, String> PERIODIC_PAYMENT_TYPE_STRINGS = new EnumMap<>(Map.of(
             PeriodicPaymentType.MANUAL_PAYMENT, "Ручной платёж",
             PeriodicPaymentType.AUTO_PAYMENT, "Автоплатеж",
@@ -113,6 +124,10 @@ public final class Bundles {
 
     public static String translate(TransactionPredicate predicate) {
         return TRANSACTION_PREDICATE_STRINGS.get(predicate.name());
+    }
+
+    public static String translate(InvestmentDealPredicate predicate) {
+        return INVESTMENT_DEAL_PREDICATE_STRINGS.get(predicate.name());
     }
 
     public static String translate(PeriodicPaymentType type) {

@@ -5,7 +5,6 @@
 package org.panteleyev.money.app.database;
 
 import javafx.event.ActionEvent;
-import javafx.geometry.Insets;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -24,6 +23,7 @@ import static org.panteleyev.fx.grid.ColumnConstraintsBuilder.columnConstraints;
 import static org.panteleyev.fx.grid.GridBuilder.gridCell;
 import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.money.app.Styles.DOUBLE_INSETS;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_DATABASE;
 import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_SCHEMA;
@@ -54,7 +54,7 @@ final class TCPEditor extends VBox {
                                 columnConstraints(bld -> bld.withHgrow(Priority.ALWAYS)))
         ));
 
-        VBox.setMargin(getChildren().getFirst(), new Insets(10.0, 10.0, 10.0, 10.0));
+        VBox.setMargin(getChildren().getFirst(), DOUBLE_INSETS);
     }
 
     TextField getSchemaEdit() {

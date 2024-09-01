@@ -92,6 +92,8 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_S;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
+import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
 public class MainWindowController extends BaseController implements TransactionTableView.TransactionDetailsCallback {
     public static final ResourceBundle UI = new ListResourceBundle() {
@@ -234,7 +236,7 @@ public class MainWindowController extends BaseController implements TransactionT
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         transactionTab.setTop(hBox);
-        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(hBox, BIG_INSETS);
 
         transactionTab.setCenter(transactionTable);
 
@@ -258,8 +260,8 @@ public class MainWindowController extends BaseController implements TransactionT
         self.setCenter(transactionTab);
         self.setBottom(new HBox(progressLabel, progressBar));
 
-        HBox.setMargin(progressLabel, new Insets(0.0, 0.0, 0.0, 5.0));
-        HBox.setMargin(progressBar, new Insets(0.0, 0.0, 0.0, 5.0));
+        HBox.setMargin(progressLabel, new Insets(0.0, 0.0, 0.0, BIG_SPACING));
+        HBox.setMargin(progressBar, new Insets(0.0, 0.0, 0.0, BIG_SPACING));
 
         progressLabel.setVisible(false);
         progressBar.setVisible(false);

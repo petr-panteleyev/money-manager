@@ -21,7 +21,6 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
@@ -42,6 +41,7 @@ import static org.panteleyev.money.app.Constants.FULL_DATE_FORMAT;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
+import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
 public class ExchangeSecuritySplitsDialog extends BaseDialog<ExchangeSecuritySplit> {
     private final TableView<ExchangeSecuritySplit> table;
@@ -131,15 +131,13 @@ public class ExchangeSecuritySplitsDialog extends BaseDialog<ExchangeSecuritySpl
         var deleteButton = button("Удалить", this::onDeleteSplit);
         deleteButton.disableProperty().bind(table.getSelectionModel().selectedItemProperty().isNull());
 
-        var editRow = hBox(Styles.BIG_SPACING, datePicker, typeComboBox, rateEdit);
-        VBox.setMargin(editRow, new Insets(Styles.BIG_SPACING, 0, 0, 0));
+        var editRow = hBox(BIG_SPACING, datePicker, typeComboBox, rateEdit);
+        VBox.setMargin(editRow, new Insets(BIG_SPACING, 0, 0, 0));
 
-        var buttonRow = hBox(Styles.BIG_SPACING, clearButton, deleteButton, updateButton, addButton);
+        var buttonRow = hBox(BIG_SPACING, clearButton, deleteButton, updateButton, addButton);
         buttonRow.setAlignment(Pos.CENTER_LEFT);
 
-        pane.setCenter(
-                vBox(Styles.BIG_SPACING, editRow, buttonRow)
-        );
+        pane.setCenter(vBox(BIG_SPACING, editRow, buttonRow));
 
         clear();
 

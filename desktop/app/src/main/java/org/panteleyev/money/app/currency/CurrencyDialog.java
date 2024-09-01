@@ -33,6 +33,7 @@ import static org.panteleyev.fx.grid.GridBuilder.gridPane;
 import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
+import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 
 final class CurrencyDialog extends BaseDialog<Currency> {
@@ -62,7 +63,7 @@ final class CurrencyDialog extends BaseDialog<Currency> {
                                 gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo,
                                         formatSymbolPositionChoice), hBox -> {
                                     hBox.setAlignment(CENTER_LEFT);
-                                    HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, 5.0));
+                                    HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, BIG_SPACING));
                                 })),
                                 gridRow(SKIP, thousandSeparatorCheck),
                                 gridRow(SKIP, defaultCheck)

@@ -4,7 +4,6 @@
  */
 package org.panteleyev.money.app;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -47,6 +46,7 @@ import static org.panteleyev.fx.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.CREDIT;
 import static org.panteleyev.money.app.Styles.DEBIT;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
@@ -161,8 +161,8 @@ class IncomesAndExpensesWindowController extends BaseController {
         var root = new BorderPane(new BorderPane(reportTable, toolBar, null, statusBar, null),
                 createMenuBar(), null, null, null);
 
-        BorderPane.setMargin(toolBar, new Insets(5.0, 5.0, 5.0, 5.0));
-        BorderPane.setMargin(statusBar, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(toolBar, BIG_INSETS);
+        BorderPane.setMargin(statusBar, BIG_INSETS);
 
         filterBox.predicateProperty().addListener((_, _, _) -> onRefresh());
 

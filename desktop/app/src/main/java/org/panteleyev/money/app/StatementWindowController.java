@@ -7,7 +7,6 @@ package org.panteleyev.money.app;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.WeakListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
@@ -30,10 +29,10 @@ import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.dialogs.StatementFileDialog;
 import org.panteleyev.money.app.transaction.TransactionDialog;
 import org.panteleyev.money.app.transaction.TransactionTableView;
+import org.panteleyev.money.desktop.commons.ReadOnlyNamedConverter;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.desktop.commons.ReadOnlyNamedConverter;
 import org.panteleyev.money.statements.RawStatementData;
 import org.panteleyev.money.statements.Statement;
 import org.panteleyev.money.statements.StatementParser;
@@ -64,6 +63,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
+import static org.panteleyev.money.app.Styles.BIG_INSETS;
 
 public class StatementWindowController extends BaseController {
     private final TableView<StatementRecord> statementTable = createStatementTable();
@@ -103,7 +103,7 @@ public class StatementWindowController extends BaseController {
         HBox.setHgrow(filler1, Priority.ALWAYS);
 
         hBox.setAlignment(Pos.CENTER_LEFT);
-        BorderPane.setMargin(hBox, new Insets(5.0, 5.0, 5.0, 5.0));
+        BorderPane.setMargin(hBox, BIG_INSETS);
 
         var splitPane = new SplitPane(statementTable, transactionTable);
         splitPane.setOrientation(Orientation.VERTICAL);

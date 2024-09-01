@@ -23,6 +23,7 @@ import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.panteleyev.fx.LabelFactory.label;
@@ -104,6 +105,9 @@ final class ContactDialog extends BaseDialog<Contact> {
 
             var now = System.currentTimeMillis();
 
+            var selectedIcon = iconComboBox.getSelectionModel().getSelectedItem();
+            var iconUuid = Objects.equals(selectedIcon, EMPTY_ICON) ? null : selectedIcon.uuid();
+
             var builder = new Contact.Builder(contact)
                     .name(nameField.getText())
                     .type(typeBox.getSelectionModel().getSelectedItem())
@@ -116,7 +120,7 @@ final class ContactDialog extends BaseDialog<Contact> {
                     .city(cityField.getText())
                     .country(countryField.getText())
                     .zip(zipField.getText())
-                    .iconUuid(iconComboBox.getSelectionModel().getSelectedItem().uuid())
+                    .iconUuid(iconUuid)
                     .modified(now);
 
             if (contact == null) {
