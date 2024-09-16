@@ -1,5 +1,5 @@
 /*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2023-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.exchange;
@@ -36,6 +36,8 @@ class SecurityCodeDialog extends BaseDialog<String> {
 
         setResultConverter((ButtonType b) -> b == ButtonType.OK ? codeField.getText() : null);
         createDefaultButtons(UI, validation.invalidProperty());
+
+        Platform.runLater(codeField::requestFocus);
         Platform.runLater(this::createValidationSupport);
     }
 

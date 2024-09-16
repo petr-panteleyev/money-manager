@@ -124,7 +124,10 @@ public class SberbankBrokerHtmlReportParser {
                         .accountingDate(LocalDate.parse(row.get(CELL_INDEX_ACCOUNTING_DATE).text(), DATE_FORMATTER).atStartOfDay())
                         .marketType(InvestmentMarketType.STOCK_MARKET) // TODO: parse from table
                         .operationType(InvestmentOperationType.fromTitle(row.get(CELL_INDEX_OPERATION_TYPE).text()))
-                        .securityAmount(Integer.parseInt(row.get(CELL_INDEX_SECURITY_AMOUNT).text()))
+                        .securityAmount(Integer.parseInt(
+                                row.get(CELL_INDEX_SECURITY_AMOUNT).text()
+                                        .replace(" ", "")
+                        ))
                         .price(parseBigDecimal(row, CELL_INDEX_PRICE))
                         .aci(aci)
                         .dealVolume(dealVolume)

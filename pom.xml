@@ -14,9 +14,9 @@
     <name>Parent</name>
 
     <properties>
-        <revision>24.9.1</revision>
+        <revision>24.9.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>22</maven.compiler.release>
+        <maven.compiler.release>23</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
@@ -29,7 +29,7 @@
         <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>22.0.1</javaFxVersion>
+        <javaFxVersion>23</javaFxVersion>
         <javaFxHelpersVersion>1.17.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <javaCommonsVersion>1.4.0</javaCommonsVersion>

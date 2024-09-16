@@ -44,14 +44,10 @@ public class MoneyApplication extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         files().initialize();
-        if (!files().lock()) {
-            return;
-        }
-
         settings().load();
 
         var logProperties = LOG_PROPERTIES.replace("%FILE_PATTERN%",
-                files().getLogDirectory().resolve("MoneyManager.log").toString());
+                files().getLogDirectory().resolve("MoneyManager.log").toString().replace("\\", "/"));
         try (var inputStream = new ByteArrayInputStream(logProperties.getBytes(UTF_8))) {
             LogManager.getLogManager().readConfiguration(inputStream);
         }
