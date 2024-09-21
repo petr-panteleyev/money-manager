@@ -26,14 +26,11 @@ public final class ApplicationFiles {
         SETTINGS("settings.xml"),
         WINDOWS("windows.xml"),
         COLORS("colors.xml"),
-        FONTS("fonts.xml"),
-        LOCK("money-manager.lck");
+        FONTS("fonts.xml");
 
         static final Set<AppFile> CONFIG_FILES = Set.of(
                 PROFILES, SETTINGS, WINDOWS, COLORS, FONTS
         );
-
-        static final Set<AppFile> DATA_FILES = Set.of(LOCK);
 
         private final String fileName;
 
@@ -72,9 +69,6 @@ public final class ApplicationFiles {
 
         for (var appFile : AppFile.CONFIG_FILES) {
             fileMap.put(appFile, configDirectory.resolve(appFile.getFileName()));
-        }
-        for (var appFile : AppFile.DATA_FILES) {
-            fileMap.put(appFile, dataDirectory.resolve(appFile.getFileName()));
         }
     }
 
@@ -116,20 +110,6 @@ public final class ApplicationFiles {
             // Do nothing
         } catch (IOException ex) {
             throw new RuntimeException(name + " directory cannot be created");
-        }
-    }
-
-    public boolean lock() {
-        var lockFile = fileMap.get(AppFile.LOCK).toFile();
-        try {
-            if (lockFile.createNewFile()) {
-                lockFile.deleteOnExit();
-                return true;
-            } else {
-                return false;
-            }
-        } catch (IOException ex) {
-            return true;
         }
     }
 }

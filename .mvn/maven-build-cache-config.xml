@@ -44,6 +44,7 @@
                 <goalsList artifactId="maven-install-plugin">
                     <goals>
                         <goal>install</goal>
+                        <goal>install-file</goal>
                     </goals>
                 </goalsList>
             </goalsLists>
