@@ -78,12 +78,6 @@
                         <configuration>
                             <type>APP_IMAGE</type>
                             <icon>../icons/icon48.png</icon>
-                            <javaOptions>
-                                <option>-Dsun.java2d.opengl=true</option>
-                                <option>-Xms128m</option>
-                                <option>--add-exports</option>
-                                <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
-                            </javaOptions>
                         </configuration>
                     </plugin>
                 </plugins>
