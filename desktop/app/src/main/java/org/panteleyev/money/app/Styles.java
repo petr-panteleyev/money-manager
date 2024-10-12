@@ -30,6 +30,7 @@ public final class Styles {
 
     // About Dialog
     public static final String STYLE_ABOUT_LABEL = "aboutLabel";
+    public static final String STYLE_ABOUT_ICON = "aboutIcon";
 
     // Transaction Editor
     public static final String RATE_LABEL = "rateLabel";

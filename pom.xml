@@ -14,7 +14,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>24.9.2.1</revision>
+        <revision>24.10.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>22</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -25,7 +25,7 @@
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
-        <javaFxPluginVersion>0.0.8</javaFxPluginVersion>
+        <mavenExecPluginVersion>3.4.1</mavenExecPluginVersion>
         <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
@@ -224,9 +224,9 @@
                     <version>${jpackageMavenPluginVersion}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.openjfx</groupId>
-                    <artifactId>javafx-maven-plugin</artifactId>
-                    <version>${javaFxPluginVersion}</version>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>${mavenExecPluginVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

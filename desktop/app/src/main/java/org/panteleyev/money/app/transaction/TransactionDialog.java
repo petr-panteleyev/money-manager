@@ -19,6 +19,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
@@ -50,6 +52,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -67,11 +70,11 @@ import static org.panteleyev.fx.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Bundles.translate;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_SHIFT_LEFT;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_SHIFT_RIGHT;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_CLOSE_BRACKET;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_OPEN_BRACKET;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_BACK_SLASH;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_CLOSE_BRACKET;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_OPEN_BRACKET;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
@@ -385,11 +388,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private void setupDatePicker() {
-        var tomorrowKey = SHORTCUT_ALT_RIGHT;
-        var yesterdayKey = SHORTCUT_ALT_LEFT;
-        var todayKey = SHORTCUT_ALT_UP;
-        var nextMonthKey = SHORTCUT_ALT_SHIFT_RIGHT;
-        var prevMonthKey = SHORTCUT_ALT_SHIFT_LEFT;
+        var tomorrowKey = SHORTCUT_CLOSE_BRACKET;
+        var yesterdayKey = SHORTCUT_OPEN_BRACKET;
+        var todayKey = SHORTCUT_BACK_SLASH;
+        var nextMonthKey = SHORTCUT_ALT_CLOSE_BRACKET;
+        var prevMonthKey = SHORTCUT_ALT_OPEN_BRACKET;
 
         var tooltipText = String.format("""
                         %s - следующий день
@@ -405,12 +408,30 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
         datePicker.setTooltip(new Tooltip(tooltipText));
 
-        var accelerators = getDialogPane().getScene().getAccelerators();
-        accelerators.put(tomorrowKey, this::tomorrow);
-        accelerators.put(yesterdayKey, this::yesterday);
-        accelerators.put(todayKey, this::today);
-        accelerators.put(nextMonthKey, this::nextMonth);
-        accelerators.put(prevMonthKey, this::prevMonth);
+        Map<KeyCodeCombination, Runnable> accelerators = Map.of(
+                tomorrowKey, this::tomorrow,
+                yesterdayKey, this::yesterday,
+                todayKey, this::today,
+                nextMonthKey, this::nextMonth,
+                prevMonthKey, this::prevMonth
+        );
+
+        getDialogPane().addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+            for (var a : accelerators.entrySet()) {
+                if (a.getKey().match(keyEvent)) {
+                    a.getValue().run();
+                    keyEvent.consume();
+                }
+            }
+        });
+
+//        getDialogPane().getScene().getAccelerators().putAll(Map.of(
+//                tomorrowKey, this::tomorrow,
+//                yesterdayKey, this::yesterday,
+//                todayKey, this::today,
+//                nextMonthKey, this::nextMonth,
+//                prevMonthKey, this::prevMonth
+//        ));
 
         datePicker.setEditable(false);
         datePicker.getEditor().prefColumnCountProperty().set(10);
@@ -435,10 +456,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
             if (!accountCards.isEmpty() && initial) {
                 cardComboBox.getSelectionModel().clearSelection();
-                cache.getCard(initialTransaction.cardUuid()).ifPresent(card -> {
-                            cardComboBox.getSelectionModel().select(card);
-                        }
-                );
+                cache.getCard(initialTransaction.cardUuid())
+                        .ifPresent(card -> cardComboBox.getSelectionModel().select(card));
             }
         }
         runLater(() -> validation.revalidate(cardComboBox));
@@ -632,12 +651,6 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private Optional<TransactionType> checkTransactionTypeFieldValue(String value, Collection<TransactionType> items) {
         return items.stream()
                 .filter(it -> TRANSACTION_TYPE_TO_STRING.toString(it).equals(value)).findFirst();
-    }
-
-    private <T extends Named> Optional<T> checkTextFieldValue(TextField field,
-                                                              Collection<T> items,
-                                                              StringConverter<T> converter) {
-        return checkTextFieldValue(field.getText(), items, converter);
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(TextField field,
@@ -852,11 +865,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private Optional<Account> checkDebitedAccount() {
-        return checkTextFieldValue(debitedAccountEdit, debitedSuggestionsAll, ACCOUNT_TO_STRING);
+        return checkTextFieldValue(debitedAccountEdit.getText(), debitedSuggestionsAll, ACCOUNT_TO_STRING);
     }
 
     private Optional<Account> checkCreditedAccount() {
-        return checkTextFieldValue(creditedAccountEdit, creditedSuggestionsAll, ACCOUNT_TO_STRING);
+        return checkTextFieldValue(creditedAccountEdit.getText(), creditedSuggestionsAll, ACCOUNT_TO_STRING);
     }
 
     private Optional<Contact> checkContact(String contactName) {

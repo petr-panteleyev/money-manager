@@ -12,7 +12,7 @@ import static org.panteleyev.money.app.icons.IconManager.ICON_SIZE;
 public final class Images {
     private static final String BASE_PACKAGE = "org/panteleyev/money/images/";
 
-    public static final Image APP_ICON = image("icon48.png", 48);
+    public static final Image APP_ICON = image("money.png", 256);
     public static final Image WARNING = image("warning-16.png");
     public static final Image EMPTY = image("empty.png");
     public static final Image SEARCH = image("search.png");

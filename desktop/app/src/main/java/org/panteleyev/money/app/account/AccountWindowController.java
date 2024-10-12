@@ -193,7 +193,6 @@ public final class AccountWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
         return menuBar;
     }
 

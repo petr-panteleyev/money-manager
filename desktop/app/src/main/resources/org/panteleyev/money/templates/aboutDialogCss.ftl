@@ -19,3 +19,8 @@
     -fx-font-size: ${dialogLabelFontSize + 2};
     -fx-font-weight: bold;
 }
+
+.aboutIcon {
+    -fx-fit-width: 48;
+    -fx-fit-height: 48;
+}

@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2024 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.database;
@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 import static org.panteleyev.money.app.GlobalContext.files;
 
 public final class ConnectionProfileManager {
-    private static final String PROFILE_PROPERTY = "profile";
-    private static final String NO_AUTO_PROPERTY = "noauto";
+    private static final String PROFILE_PROPERTY = "money.profile";
+    private static final String NO_AUTO_PROPERTY = "money.noauto";
 
     private boolean autoConnect = false;
     private ConnectionProfile defaultProfile = null;
@@ -124,7 +124,7 @@ public final class ConnectionProfileManager {
         }
 
         var profileName = System.getProperty(PROFILE_PROPERTY);
-        if (profileName != null) {
+        if (profileName != null && !profileName.isBlank()) {
             return Optional.ofNullable(get(profileName));
         }
 

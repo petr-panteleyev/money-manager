@@ -16,10 +16,10 @@
 ## Как запустить
 
 ```shell script
-./mvnw -pl desktop/app javafx:run
+./mvnw -pl desktop/app exec:exec
 ```
 
-Чтобы открыть конкретный профиль соединения добавьте ```-Dprofile=<profile>``` к командной строке.
+Чтобы открыть конкретный профиль соединения добавьте ```-Dmoney.profile=<profile>``` к командной строке.
 
 ## Установка
 

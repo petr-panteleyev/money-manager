@@ -72,7 +72,6 @@ public final class ContactListWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context menu
         tableView.setContextMenu(new ContextMenu(

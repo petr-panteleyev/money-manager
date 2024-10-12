@@ -22,6 +22,7 @@ import static org.panteleyev.fx.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
+import static org.panteleyev.money.app.Styles.STYLE_ABOUT_ICON;
 import static org.panteleyev.money.app.Styles.STYLE_ABOUT_LABEL;
 
 final class AboutDialog extends BaseDialog<Object> {
@@ -50,7 +51,9 @@ final class AboutDialog extends BaseDialog<Object> {
         super(owner, settings().getAboutDialogCssFileUrl());
 
         setHeaderText(APP_TITLE);
-        setGraphic(new ImageView(Images.APP_ICON));
+        var iconView = new ImageView(Images.APP_ICON);
+        iconView.getStyleClass().add(STYLE_ABOUT_ICON);
+        setGraphic(iconView);
 
         setTitle("About " + APP_TITLE);
 

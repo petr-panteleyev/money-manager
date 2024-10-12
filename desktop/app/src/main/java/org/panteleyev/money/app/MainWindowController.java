@@ -86,12 +86,12 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_E;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_I;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_LEFT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_P;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_RIGHT;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_S;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_UP;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_BACK_SLASH;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_CLOSE_BRACKET;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_OPEN_BRACKET;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
@@ -175,10 +175,10 @@ public class MainWindowController extends BaseController implements TransactionT
         var editMenu = createMenu("Правка", transactionTable.getActions());
 
         var viewMenu = menu("Вид",
-                menuItem("Текущий месяц", SHORTCUT_ALT_UP, _ -> onCurrentMonth()),
+                menuItem("Текущий месяц", SHORTCUT_BACK_SLASH, _ -> onCurrentMonth()),
                 new SeparatorMenuItem(),
-                menuItem("Следующий месяц", SHORTCUT_ALT_RIGHT, _ -> onNextMonth()),
-                menuItem("Предыдущий месяц", SHORTCUT_ALT_LEFT, _ -> onPrevMonth())
+                menuItem("Следующий месяц", SHORTCUT_CLOSE_BRACKET, _ -> onNextMonth()),
+                menuItem("Предыдущий месяц", SHORTCUT_OPEN_BRACKET, _ -> onPrevMonth())
         );
 
         var profilesMenuItem = menuItem("Профили...", SHORTCUT_ALT_P,
@@ -204,7 +204,6 @@ public class MainWindowController extends BaseController implements TransactionT
                 createWindowMenu(dbOpenProperty), createHelpMenu());
 
         menuBar.setUseSystemMenuBar(true);
-        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         iconWindowMenuItem.disableProperty().bind(dbOpenProperty.not());
 

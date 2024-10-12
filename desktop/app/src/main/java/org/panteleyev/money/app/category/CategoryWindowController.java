@@ -75,7 +75,6 @@ public final class CategoryWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        menuBar.getMenus().forEach(menu -> menu.disableProperty().bind(getStage().focusedProperty().not()));
 
         // Context Menu
         tableView.setContextMenu(new ContextMenu(
