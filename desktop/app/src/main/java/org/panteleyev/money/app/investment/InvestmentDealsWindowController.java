@@ -1,5 +1,5 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.investment;
@@ -35,6 +35,7 @@ import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_O;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
@@ -92,7 +93,7 @@ public class InvestmentDealsWindowController extends BaseController {
     private MenuBar createMenu() {
         return menuBar(
                 menu("Файл",
-                        menuItem("Загрузить сделки", _ -> onLoadInvestmentDeals()),
+                        menuItem("Загрузить сделки", SHORTCUT_O, _ -> onLoadInvestmentDeals()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),

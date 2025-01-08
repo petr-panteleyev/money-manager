@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2018-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -108,7 +108,8 @@ class SberbankParser implements Parser {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Override
-    public StatementType detectType(String content) {
+    public StatementType detectType(RawStatementData data) {
+        var content = data.getContent();
         if (content.contains("HTML_DEBIT_RUS_REPORT") || content.contains("HTML_CREDIT_RUS_REPORT")
                 || content.contains("HTML_DEBIT_RUS_HISTORY")) {
             return StatementType.SBERBANK_HTML;
@@ -118,8 +119,8 @@ class SberbankParser implements Parser {
     }
 
     @Override
-    public Statement parse(String content, DataCache cache) {
-        try (var inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
+    public Statement parse(RawStatementData data, DataCache cache) {
+        try (var inputStream = new ByteArrayInputStream(data.getBytes())) {
             return parseCreditCardHtml(inputStream, cache);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -7,5 +7,6 @@ package org.panteleyev.money.statements;
 public enum StatementType {
     UNKNOWN,
     OFX,
-    SBERBANK_HTML
+    SBERBANK_HTML,
+    RBA_CSV
 }

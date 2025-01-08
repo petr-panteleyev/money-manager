@@ -20,8 +20,9 @@ cp -f $LAUNCH_DIR/../desktop/icons/icon.png $INSTALL_DIR
 echo "
 #!/bin/sh
 $JAVA_HOME/bin/java --module-path $INSTALL_DIR/jars \\
+  -Djavafx.autoproxy.disable=true \\
   --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \\
-  --module org.panteleyev.money/org.panteleyev.money.MoneyApplication
+  --module org.panteleyev.money/org.panteleyev.money.MoneyApplication \\
 " > $INSTALL_DIR/money-manager.sh
 
 chmod +x $INSTALL_DIR/money-manager.sh

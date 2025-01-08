@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2020-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -21,7 +21,7 @@ public final class Constants {
     };
 
     public static final FileChooser.ExtensionFilter FILTER_STATEMENT_FILES =
-            new FileChooser.ExtensionFilter("Выписки", "*.ofx", "*.html", "*.htm");
+            new FileChooser.ExtensionFilter("Выписки", "*.ofx", "*.html", "*.htm", "*.csv");
     public static final FileChooser.ExtensionFilter FILTER_XML_FILES =
             new FileChooser.ExtensionFilter("Файлы XML", "*.xml");
     public static final FileChooser.ExtensionFilter FILTER_HTML_FILES =

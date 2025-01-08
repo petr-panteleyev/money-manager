@@ -1,5 +1,5 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 module org.panteleyev.money.desktop.statements {
@@ -8,6 +8,7 @@ module org.panteleyev.money.desktop.statements {
     requires java.logging;
 
     requires org.jsoup;
+    requires org.apache.commons.csv;
 
     requires javafx.base;
 

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -7,7 +7,7 @@ package org.panteleyev.money.statements;
 import org.panteleyev.money.desktop.commons.DataCache;
 
 interface Parser {
-    StatementType detectType(String content);
+    StatementType detectType(RawStatementData data);
 
-    Statement parse(String content, DataCache cache);
+    Statement parse(RawStatementData data, DataCache cache);
 }

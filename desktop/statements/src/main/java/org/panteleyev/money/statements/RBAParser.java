@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2018-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -18,16 +18,16 @@ import java.util.ArrayList;
 
 class RBAParser implements Parser {
     @Override
-    public StatementType detectType(String content) {
-        if (content.contains("<?OFX")) {
+    public StatementType detectType(RawStatementData data) {
+        if (data.getContent().contains("<?OFX")) {
             return StatementType.OFX;
         } else {
             return StatementType.UNKNOWN;
         }
     }
 
-    public Statement parse(String content, DataCache cache) {
-        try (var inputStream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8))) {
+    public Statement parse(RawStatementData data, DataCache cache) {
+        try (var inputStream = new ByteArrayInputStream(data.getBytes())) {
             return parseOfx(inputStream, cache);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);

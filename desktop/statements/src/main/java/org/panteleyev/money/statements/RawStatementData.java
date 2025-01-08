@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -7,26 +7,34 @@ package org.panteleyev.money.statements;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class RawStatementData {
-    private final String content;
+    private final byte[] bytes;
 
     public RawStatementData(File file) {
         try {
-            var bytes = Files.readAllBytes(file.toPath());
-            content = new String(bytes, StandardCharsets.UTF_8);
+            bytes = Files.readAllBytes(file.toPath());
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
     }
 
     public RawStatementData(byte[] bytes) {
-        this.content = new String(bytes, StandardCharsets.UTF_8);
+        this.bytes = bytes;
+    }
+
+    public byte[] getBytes() {
+        return bytes;
     }
 
     public String getContent() {
-        return content;
+        return getContent(StandardCharsets.UTF_8);
+    }
+
+    public String getContent(Charset charset) {
+        return new String(bytes, charset);
     }
 }

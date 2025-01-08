@@ -179,6 +179,10 @@
             <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
         </dependency>
@@ -266,6 +270,7 @@
                         <option>-Xms128m</option>
                         <option>--add-exports</option>
                         <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                        <option>-Djavafx.autoproxy.disable=true</option>
                     </javaOptions>
                 </configuration>
             </plugin>
@@ -287,6 +292,8 @@
                         <argument>javafx.base/com.sun.javafx.event=org.controlsfx.controls</argument>
                         <argument>--module-path</argument>
                         <modulepath/>
+                        <argument>-Djavafx.autoproxy.disable=true</argument>
+<!--                        <argument>-Dprism.verbose=true</argument> -->
                         <argument>-Dmoney.profile=${money.profile}</argument>
                         <argument>-Dmoney.noauto=${money.noauto}</argument>
                         <argument>--module</argument>
