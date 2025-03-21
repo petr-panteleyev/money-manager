@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driverClassName: org.postgresql.Driver
+    username: money
+    password: money
+    hikari:
+      schema: money
+
+server:
+  port: 1710
+
+logging:
+  level:
+    root: INFO

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2022-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+  Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.1</version>
+        <version>3.4.3</version>
         <relativePath/>
     </parent>
 
@@ -19,20 +19,20 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>25.1.1</revision>
+        <revision>25.3.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>23</java.version>
-        <maven.compiler.release>23</maven.compiler.release>
+        <java.version>24</java.version>
+        <maven.compiler.release>24</maven.compiler.release>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
-        <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
+        <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
+        <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
-        <springDocsVersion>1.7.0</springDocsVersion>
+        <springDocsVersion>2.8.5</springDocsVersion>
         <caffeineVersion>3.1.8</caffeineVersion>
         <graphqlJavaExtendedScalarsVersion>19.1</graphqlJavaExtendedScalarsVersion>
         <restAssuredVersion>5.4.0</restAssuredVersion>
@@ -102,7 +102,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springDocsVersion}</version>
         </dependency>
         <dependency>
@@ -186,6 +186,13 @@
                 <configuration>
                     <outputDirectory>${project.build.directory}/jar</outputDirectory>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.panteleyev</groupId>

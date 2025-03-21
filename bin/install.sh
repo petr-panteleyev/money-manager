@@ -20,7 +20,15 @@ cp -f $LAUNCH_DIR/../desktop/icons/icon.png $INSTALL_DIR
 echo "
 #!/bin/sh
 $JAVA_HOME/bin/java --module-path $INSTALL_DIR/jars \\
-  -Djavafx.autoproxy.disable=true \\
+  -XX:NewRatio=1 \\
+  -Xms500m \\
+  -Xmx500m \\
+  -XX:+UnlockExperimentalVMOptions \\
+  -XX:+UseCompactObjectHeaders \\
+  -XX:+AutoCreateSharedArchive \\
+  -XX:SharedArchiveFile=\$TMP/money-manager.jsa \\
+  --enable-native-access=javafx.graphics \\
+  --sun-misc-unsafe-memory-access=allow \\
   --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \\
   --module org.panteleyev.money/org.panteleyev.money.MoneyApplication \\
 " > $INSTALL_DIR/money-manager.sh

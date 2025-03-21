@@ -14,23 +14,23 @@
     <name>Parent</name>
 
     <properties>
-        <revision>25.1.1</revision>
+        <revision>25.3.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>23</maven.compiler.release>
+        <maven.compiler.release>24</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.13.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.3.1</mavenSurefirePluginVersion>
+        <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
-        <mavenExecPluginVersion>3.4.1</mavenExecPluginVersion>
-        <jpackageMavenPluginVersion>1.6.5</jpackageMavenPluginVersion>
+        <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
+        <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>23.0.1</javaFxVersion>
-        <javaFxHelpersVersion>1.17.0</javaFxHelpersVersion>
+        <javaFxVersion>24</javaFxVersion>
+        <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <javaCommonsVersion>1.4.0</javaCommonsVersion>
         <controlsFxVersion>11.2.1</controlsFxVersion>
@@ -41,7 +41,7 @@
         <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
         <apachePoiVersion>5.3.0</apachePoiVersion>
-        <jUnitVersion>5.10.2</jUnitVersion>
+        <jUnitVersion>5.12.1</jUnitVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>

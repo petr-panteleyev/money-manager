@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -368,8 +368,8 @@ public class MainWindowController extends BaseController implements TransactionT
 
             CompletableFuture.runAsync(() -> {
                 try (var outputStream = new FileOutputStream(selected);
-                     var bufferedOutputStream = new BufferedOutputStream(outputStream))
-                {
+                     var bufferedOutputStream = new BufferedOutputStream(outputStream)
+                ) {
                     new Export(cache(), dao()).doExport(bufferedOutputStream,
                             event -> progressDialog.append(event.buildEventString()));
                     settings().update(opt -> opt.setLastExportDir(selected.getParent()));

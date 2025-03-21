@@ -1,5 +1,5 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.service;
@@ -10,10 +10,15 @@ import org.panteleyev.money.backend.repository.TransactionRepository;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static org.panteleyev.money.backend.util.JsonUtil.objectMapper;
+import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class TransactionService {
@@ -34,6 +39,17 @@ public class TransactionService {
 
     public Optional<Transaction> put(Transaction transaction) {
         return ServiceUtil.put(transactionRepository, transaction);
+    }
+
+    public List<Transaction> getAll() {
+        return transactionRepository.getAll();
+    }
+
+    @Transactional(readOnly = true)
+    public void streamAll(OutputStream out) {
+        try (var stream = transactionRepository.getStream()) {
+            writeStreamAsJsonArray(objectMapper, stream, out);
+        }
     }
 
     public List<Transaction> getByYearAndMonth(int year, int month) {

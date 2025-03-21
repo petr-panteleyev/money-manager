@@ -1,16 +1,14 @@
 spring:
+  profiles:
+    active: test
   application:
     name: @project.name@
     version: @project.version@
   liquibase:
     change-log: classpath:liquibase/masterChangelog.xml
   datasource:
-    url: ${DATABASE_URL}
+    url: jdbc:postgresql://localhost:5432/postgres
     driverClassName: org.postgresql.Driver
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
-    hikari:
-      schema: ${DATABASE_SCHEMA}
 
 server:
   port: ${SERVER_PORT:8080}

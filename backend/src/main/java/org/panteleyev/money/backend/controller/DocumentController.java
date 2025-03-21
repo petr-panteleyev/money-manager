@@ -1,13 +1,11 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.panteleyev.money.backend.repository.DocumentRepository;
 import org.panteleyev.money.backend.service.DocumentService;
 import org.panteleyev.money.model.MoneyDocument;
 import org.springframework.http.MediaType;
@@ -21,32 +19,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.DOCUMENT_ROOT;
-import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
 @Tag(name = "Documents")
 @Controller
 @RequestMapping(DOCUMENT_ROOT)
 @CrossOrigin
 public class DocumentController {
-    private final DocumentRepository repository;
     private final DocumentService service;
-    private final ObjectMapper objectMapper;
 
-    public DocumentController(DocumentRepository repository, DocumentService service, ObjectMapper objectMapper) {
-        this.repository = repository;
+    public DocumentController(DocumentService service) {
         this.service = service;
-        this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all documents")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<MoneyDocument>> getCurrencies() {
-        return ResponseEntity.ok(repository.getAll());
+        return ResponseEntity.ok(service.getAll());
     }
 
     @Operation(summary = "Get document")
@@ -77,11 +69,6 @@ public class DocumentController {
     @Operation(summary = "Get all documents as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getDocumentStream() {
-        StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = repository.getStream()) {
-                writeStreamAsJsonArray(objectMapper, stream, out);
-            }
-        };
-        return ResponseEntity.accepted().body(body);
+        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

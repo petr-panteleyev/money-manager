@@ -1,13 +1,13 @@
 # Money Manager
 
-![JDK](docs/badges/java.svg)
+![JDK](docs/badges/java-24.svg)
 [![License](docs/badges/license.svg)](LICENSE)
 
 Программа для учета расходов и сверки выписок.
 
 ## Как собрать
 
-Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 23.
+Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 24.
 
 ```shell script
 ./mvnw clean install
@@ -22,10 +22,6 @@
 Чтобы открыть конкретный профиль соединения добавьте ```-Dmoney.profile=<profile>``` к командной строке.
 
 ## Установка
-
-Чтобы собрать пакет для установки приложения выполните следующие шаги:
-* На Microsoft Windows: установите [WiX Toolset](https://wixtoolset.org/releases/), добавьте каталог с утилитами в переменную окружения ```PATH```
-* Выполните команду:
 
 ```shell script
 ./mvnw -pl desktop/app jpackage:jpackage

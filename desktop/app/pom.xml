@@ -266,11 +266,16 @@
                         <modulePath>target/jmods</modulePath>
                     </modulePaths>
                     <destination>target/dist</destination>
+                    <removeDestination>true</removeDestination>
                     <javaOptions>
-                        <option>-Xms128m</option>
-                        <option>--add-exports</option>
-                        <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
-                        <option>-Djavafx.autoproxy.disable=true</option>
+                        <javaOption>-XX:NewRatio=1</javaOption>
+                        <javaOption>-Xms500m</javaOption>
+                        <javaOption>-Xmx500m</javaOption>
+                        <javaOption>--enable-native-access=javafx.graphics</javaOption>
+                        <javaOption>--sun-misc-unsafe-memory-access=allow</javaOption>
+                        <javaOption>--add-exports</javaOption>
+                        <javaOption>javafx.base/com.sun.javafx.event=org.controlsfx.controls</javaOption>
+                        <javaOption>-Djavafx.autoproxy.disable=true</javaOption>
                     </javaOptions>
                 </configuration>
             </plugin>
@@ -279,27 +284,30 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>run</id>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-XX:NewRatio=1</argument>
+                                <argument>-Xms500m</argument>
+                                <argument>-Xmx500m</argument>
+                                <argument>--enable-native-access=javafx.graphics</argument>
+                                <argument>--sun-misc-unsafe-memory-access=allow</argument>
+                                <argument>--add-exports</argument>
+                                <argument>javafx.base/com.sun.javafx.event=org.controlsfx.controls</argument>
+                                <argument>--module-path</argument>
+                                <modulepath/>
+                                <argument>-Dmoney.profile=${money.profile}</argument>
+                                <argument>-Dmoney.noauto=${money.noauto}</argument>
+                                <argument>--module</argument>
+                                <argument>${appModule}/${appMainClass}</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <executable>java</executable>
-                    <arguments>
-                        <argument>-Xms128m</argument>
-                        <argument>--add-exports</argument>
-                        <argument>javafx.base/com.sun.javafx.event=org.controlsfx.controls</argument>
-                        <argument>--module-path</argument>
-                        <modulepath/>
-                        <argument>-Djavafx.autoproxy.disable=true</argument>
-<!--                        <argument>-Dprism.verbose=true</argument> -->
-                        <argument>-Dmoney.profile=${money.profile}</argument>
-                        <argument>-Dmoney.noauto=${money.noauto}</argument>
-                        <argument>--module</argument>
-                        <argument>${appModule}/${appMainClass}</argument>
-                    </arguments>
-                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -1,23 +1,26 @@
 /*
- Copyright © 2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
-package org.panteleyev.money.backend.controller;
+package org.panteleyev.money.backend.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.core.util.ObjectMapperFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.util.stream.Stream;
 
-final class JsonUtil {
-    static <T> void writeStreamAsJsonArray(
+public final class JsonUtil {
+    public static final ObjectMapper objectMapper = new ObjectMapper();
+
+    public static <T> void writeStreamAsJsonArray(
             ObjectMapper mapper,
             Stream<T> stream,
             OutputStream outputStream
-    ) throws IOException {
+    ) {
         try (var generator = mapper.getFactory().createGenerator(outputStream)) {
             generator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT)
                     .disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
@@ -31,6 +34,8 @@ final class JsonUtil {
                 }
             });
             generator.writeEndArray();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
         }
     }
 

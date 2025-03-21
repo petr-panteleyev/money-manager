@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;

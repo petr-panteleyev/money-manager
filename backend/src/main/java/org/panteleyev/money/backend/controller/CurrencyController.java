@@ -4,10 +4,8 @@
  */
 package org.panteleyev.money.backend.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.panteleyev.money.backend.repository.CurrencyRepository;
 import org.panteleyev.money.backend.service.CurrencyService;
 import org.panteleyev.money.model.Currency;
 import org.springframework.http.MediaType;
@@ -21,32 +19,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.CURRENCY_ROOT;
-import static org.panteleyev.money.backend.controller.JsonUtil.writeStreamAsJsonArray;
 
 @Tag(name = "Currencies")
 @Controller
 @CrossOrigin
 @RequestMapping(CURRENCY_ROOT)
 public class CurrencyController {
-    private final CurrencyRepository repository;
     private final CurrencyService service;
-    private final ObjectMapper objectMapper;
 
-    public CurrencyController(CurrencyRepository repository, CurrencyService service, ObjectMapper objectMapper) {
-        this.repository = repository;
+    public CurrencyController(CurrencyService service) {
         this.service = service;
-        this.objectMapper = objectMapper;
     }
 
     @Operation(summary = "Get all currencies")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Currency>> getCurrencies() {
-        return ResponseEntity.ok(repository.getAll());
+        return ResponseEntity.ok(service.getAll());
     }
 
     @Operation(summary = "Get currency")
@@ -77,11 +69,6 @@ public class CurrencyController {
     @Operation(summary = "Get all currencies as stream")
     @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<StreamingResponseBody> getTransactionStream() {
-        StreamingResponseBody body = (OutputStream out) -> {
-            try (var stream = repository.getStream()) {
-                writeStreamAsJsonArray(objectMapper, stream, out);
-            }
-        };
-        return ResponseEntity.accepted().body(body);
+        return ResponseEntity.accepted().body(service::streamAll);
     }
 }
