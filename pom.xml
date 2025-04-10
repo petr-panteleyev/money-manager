@@ -40,7 +40,7 @@
         <postgresVersion>42.7.3</postgresVersion>
         <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
-        <apachePoiVersion>5.3.0</apachePoiVersion>
+        <apachePoiVersion>5.4.0</apachePoiVersion>
         <jUnitVersion>5.12.1</jUnitVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
