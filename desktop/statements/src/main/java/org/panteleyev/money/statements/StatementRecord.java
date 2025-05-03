@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -56,8 +56,8 @@ public final class StatementRecord {
                     .orElse(null);
 
 
-            return new StatementRecord(actual, execution, description, counterParty, place, country, currency, currencyUuid, amount,
-                    accountCurrency, accountCurrencyUuid, accountAmount);
+            return new StatementRecord(actual, execution, description, counterParty, place, country, currency,
+                    currencyUuid, amount, accountCurrency, accountCurrencyUuid, accountAmount);
         }
 
         public Builder actual(LocalDate actual) {
@@ -94,6 +94,11 @@ public final class StatementRecord {
             this.description = description;
             return this;
         }
+
+        public Builder currency(String currency) {
+            this.currency = currency;
+            return this;
+        }
     }
 
     private final LocalDate actual;
@@ -116,10 +121,11 @@ public final class StatementRecord {
     // associated transactions
     private final List<Transaction> transactions = new ArrayList<>();
 
-    private StatementRecord(LocalDate actual, LocalDate execution, String description, String counterParty, String place,
-                           String country, String currency, UUID currencyUuid, String amount, String accountCurrency,
-                           UUID accountCurrencyUuid,
-                           String accountAmount) {
+    private StatementRecord(LocalDate actual, LocalDate execution, String description, String counterParty,
+            String place,
+            String country, String currency, UUID currencyUuid, String amount, String accountCurrency,
+            UUID accountCurrencyUuid,
+            String accountAmount) {
         this.actual = actual;
         this.execution = execution;
         this.description = description;

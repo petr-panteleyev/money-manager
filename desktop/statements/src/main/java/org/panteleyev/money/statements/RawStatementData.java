@@ -4,8 +4,10 @@
  */
 package org.panteleyev.money.statements;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +19,15 @@ public class RawStatementData {
     public RawStatementData(File file) {
         try {
             bytes = Files.readAllBytes(file.toPath());
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public RawStatementData(InputStream inputStream) {
+        try (var byteStream = new ByteArrayOutputStream()) {
+            inputStream.transferTo(byteStream);
+            bytes = byteStream.toByteArray();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

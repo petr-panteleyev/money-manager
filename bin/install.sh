@@ -23,8 +23,6 @@ $JAVA_HOME/bin/java --module-path $INSTALL_DIR/jars \\
   -XX:NewRatio=1 \\
   -Xms500m \\
   -Xmx500m \\
-  -XX:+UnlockExperimentalVMOptions \\
-  -XX:+UseCompactObjectHeaders \\
   -XX:+AutoCreateSharedArchive \\
   -XX:SharedArchiveFile=\$TMP/money-manager.jsa \\
   --enable-native-access=javafx.graphics \\

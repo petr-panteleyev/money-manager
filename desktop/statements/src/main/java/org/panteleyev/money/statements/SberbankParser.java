@@ -119,7 +119,7 @@ class SberbankParser implements Parser {
     }
 
     @Override
-    public Statement parse(RawStatementData data, DataCache cache) {
+    public Statement parse(RawStatementData data, DataCache cache, StatementType type) {
         try (var inputStream = new ByteArrayInputStream(data.getBytes())) {
             return parseCreditCardHtml(inputStream, cache);
         } catch (IOException ex) {

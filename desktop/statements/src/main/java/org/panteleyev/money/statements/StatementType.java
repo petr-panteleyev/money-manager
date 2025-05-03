@@ -8,5 +8,6 @@ public enum StatementType {
     UNKNOWN,
     OFX,
     SBERBANK_HTML,
-    RBA_CSV
+    RBA_CSV_OLD,
+    RBA_CSV_NEW
 }

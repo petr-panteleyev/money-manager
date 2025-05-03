@@ -9,5 +9,5 @@ import org.panteleyev.money.desktop.commons.DataCache;
 interface Parser {
     StatementType detectType(RawStatementData data);
 
-    Statement parse(RawStatementData data, DataCache cache);
+    Statement parse(RawStatementData data, DataCache cache, StatementType type);
 }

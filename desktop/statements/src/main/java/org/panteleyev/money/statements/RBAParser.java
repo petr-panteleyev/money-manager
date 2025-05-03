@@ -26,7 +26,8 @@ class RBAParser implements Parser {
         }
     }
 
-    public Statement parse(RawStatementData data, DataCache cache) {
+    @Override
+    public Statement parse(RawStatementData data, DataCache cache, StatementType type) {
         try (var inputStream = new ByteArrayInputStream(data.getBytes())) {
             return parseOfx(inputStream, cache);
         } catch (IOException ex) {

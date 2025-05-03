@@ -12,18 +12,13 @@ import java.util.Optional;
 public final class StatementParser {
     private static final List<Parser> PARSERS = List.of(new RBAParser(), new SberbankParser(), new RbaCsvParser());
 
-    private static Optional<Parser> getParser(RawStatementData data) {
+    public static Optional<Statement> parse(RawStatementData data, DataCache cache) {
         for (var parser : PARSERS) {
             var type = parser.detectType(data);
             if (type != StatementType.UNKNOWN) {
-                return Optional.of(parser);
+                return Optional.of(parser.parse(data, cache, type));
             }
         }
         return Optional.empty();
-    }
-
-    public static Optional<Statement> parse(RawStatementData data, DataCache cache) {
-        return getParser(data)
-                .map(parser -> parser.parse(data, cache));
     }
 }
