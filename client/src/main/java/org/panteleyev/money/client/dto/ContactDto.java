@@ -6,7 +6,6 @@ package org.panteleyev.money.client.dto;
 
 import org.panteleyev.money.model.ContactType;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public record ContactDto(
@@ -22,7 +21,7 @@ public record ContactDto(
         String city,
         String country,
         String zip,
-        Optional<IconDto> icon,
+        IconDto icon,
         long created,
         long modified
 ) implements MoneyDto {

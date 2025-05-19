@@ -1,0 +1,160 @@
+openapi: "3.0.0"
+
+info:
+  title: Проводки
+  version: 1.0.0
+
+paths:
+  /transactions:
+    get:
+      summary: Получить все проводки
+      operationId: getTransactions
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionFlatDto'
+  /transactions/stream:
+    get:
+      summary: Получить все проводки в потоке
+      operationId: getTransactionsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /transactions/{uuid}:
+    get:
+      summary: Получить проводку
+      operationId: getTransactionByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionFlatDto'
+        "404":
+          description: Проводка не найдена
+    put:
+      summary: Записать проводку
+      operationId: putTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionFlatDto'
+
+components:
+  schemas:
+    TransactionType:
+      type: string
+      description: Тип проводки
+      enum:
+        - CARD_PAYMENT
+        - SBP_PAYMENT
+        - CASH_PURCHASE
+        - CHEQUE
+        - WITHDRAWAL
+        - CACHIER
+        - DEPOSIT
+        - TRANSFER
+        - SBP_TRANSFER
+        - INTEREST
+        - DIVIDEND
+        - DIRECT_BILLING
+        - CHARGE
+        - FEE
+        - INCOME
+        - PURCHASE
+        - SALE
+        - REFUND
+        - UNDEFINED
+    TransactionFlatDto:
+      type: object
+      required:
+        - uuid
+        - amount
+        - creditAmount
+        - transactionDate
+        - type
+        - comment
+        - checked
+        - accountDebitedUuid
+        - accountCreditedUuid
+        - accountDebitedType
+        - accountCreditedType
+        - accountDebitedCategoryUuid
+        - accountCreditedCategoryUuid
+        - invoiceNumber
+        - detailed
+        - statementDate
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        amount:
+          type: number
+        creditAmount:
+          type: number
+        transactionDate:
+          type: string
+          format: date
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        comment:
+          type: string
+        checked:
+          type: boolean
+        accountDebitedUuid:
+          type: uuid
+        accountCreditedUuid:
+          type: uuid
+        accountDebitedType:
+          $ref: './categories.yml#/components/schemas/CategoryType'
+        accountCreditedType:
+          $ref: './categories.yml#/components/schemas/CategoryType'
+        accountDebitedCategoryUuid:
+          type: uuid
+        accountCreditedCategoryUuid:
+          type: uuid
+        contactUuid:
+          type: uuid
+        invoiceNumber:
+          type: string
+        parentUuid:
+          type: uuid
+        detailed:
+          type: boolean
+        statementDate:
+          type: string
+          format: date
+        cardUuid:
+          type: uuid
+        created:
+          type: long
+        modified:
+          type: long

@@ -24,10 +24,10 @@ import java.util.UUID;
 
 import static org.panteleyev.money.backend.WebmoneyApplication.DOCUMENT_ROOT;
 
-@Tag(name = "Documents")
-@Controller
-@RequestMapping(DOCUMENT_ROOT)
-@CrossOrigin
+//@Tag(name = "Documents")
+//@Controller
+//@RequestMapping(DOCUMENT_ROOT)
+//@CrossOrigin
 public class DocumentController {
     private final DocumentService service;
 
@@ -35,40 +35,40 @@ public class DocumentController {
         this.service = service;
     }
 
-    @Operation(summary = "Get all documents")
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<MoneyDocument>> getCurrencies() {
-        return ResponseEntity.ok(service.getAll());
-    }
-
-    @Operation(summary = "Get document")
-    @GetMapping(
-            value = "/{uuid}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<MoneyDocument> getDocument(@PathVariable("uuid") UUID uuid) {
-        return ResponseEntity.of(service.get(uuid));
-    }
-
-    @Operation(summary = "Insert or update document")
-    @PutMapping(
-            value = "/{uuid}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<MoneyDocument> putDocument(@PathVariable UUID uuid, @RequestBody MoneyDocument document) {
-        if (!uuid.equals(document.uuid())) {
-            return ResponseEntity.badRequest().build();
-        } else {
-            return service.put(document)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.internalServerError().build());
-        }
-    }
-
-    @Operation(summary = "Get all documents as stream")
-    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<StreamingResponseBody> getDocumentStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
-    }
+//    @Operation(summary = "Get all documents")
+//    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<MoneyDocument>> getCurrencies() {
+//        return ResponseEntity.ok(service.getAll());
+//    }
+//
+//    @Operation(summary = "Get document")
+//    @GetMapping(
+//            value = "/{uuid}",
+//            produces = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public ResponseEntity<MoneyDocument> getDocument(@PathVariable("uuid") UUID uuid) {
+//        return ResponseEntity.of(service.get(uuid));
+//    }
+//
+//    @Operation(summary = "Insert or update document")
+//    @PutMapping(
+//            value = "/{uuid}",
+//            consumes = MediaType.APPLICATION_JSON_VALUE,
+//            produces = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public ResponseEntity<MoneyDocument> putDocument(@PathVariable UUID uuid, @RequestBody MoneyDocument document) {
+//        if (!uuid.equals(document.uuid())) {
+//            return ResponseEntity.badRequest().build();
+//        } else {
+//            return service.put(document)
+//                    .map(ResponseEntity::ok)
+//                    .orElse(ResponseEntity.internalServerError().build());
+//        }
+//    }
+//
+//    @Operation(summary = "Get all documents as stream")
+//    @GetMapping(value = "/stream", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//    public ResponseEntity<StreamingResponseBody> getDocumentStream() {
+//        return ResponseEntity.accepted().body(service::streamAll);
+//    }
 }

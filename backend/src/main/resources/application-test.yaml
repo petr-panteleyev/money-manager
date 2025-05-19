@@ -6,6 +6,11 @@ spring:
     password: money_test
     hikari:
       schema: money_test
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 server:
   port: 1705

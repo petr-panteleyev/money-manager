@@ -1,20 +1,22 @@
 /*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
 
-import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.ContactType;
-import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.DocumentType;
-import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
-import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.TransactionType;
+import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CardFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CardType;
+import org.panteleyev.money.backend.openapi.dto.CategoryFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CategoryType;
+import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
+import org.panteleyev.money.backend.openapi.dto.ContactType;
+import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
+import org.panteleyev.money.backend.openapi.dto.DocumentFlatDto;
+import org.panteleyev.money.backend.openapi.dto.DocumentType;
+import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
+import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
+import org.panteleyev.money.backend.openapi.dto.TransactionType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -24,7 +26,7 @@ import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
 
-final class BaseTestUtils {
+public final class BaseTestUtils {
     public static final String ICON_DOLLAR = "dollar.png";
     public static final String ICON_EURO = "euro.png";
 
@@ -32,6 +34,10 @@ final class BaseTestUtils {
 
     static String randomString() {
         return UUID.randomUUID().toString();
+    }
+
+    static boolean randomBoolean() {
+        return RANDOM.nextBoolean();
     }
 
     static BigDecimal randomBigDecimal() {
@@ -43,19 +49,19 @@ final class BaseTestUtils {
         return CategoryType.values()[index];
     }
 
+    static CardType randomCardType() {
+        int index = RANDOM.nextInt(CardType.values().length);
+        return CardType.values()[index];
+    }
+
     static ContactType randomContactType() {
         int index = RANDOM.nextInt(ContactType.values().length);
         return ContactType.values()[index];
     }
 
     static TransactionType randomTransactionType() {
-        while (true) {
-            int index = RANDOM.nextInt(TransactionType.values().length);
-            var type = TransactionType.values()[index];
-            if (!type.isSeparator()) {
-                return type;
-            }
-        }
+        int index = RANDOM.nextInt(TransactionType.values().length);
+        return TransactionType.values()[index];
     }
 
     static DocumentType randomDocumentType() {
@@ -63,143 +69,192 @@ final class BaseTestUtils {
         return DocumentType.values()[index];
     }
 
-    static Account newAccount(
-            UUID uuid,
-            UUID categoryUuid,
-            UUID currencyUuid,
-            UUID iconUuid,
-            long created,
-            long modifed
-    ) {
-        return new Account.Builder()
-                .uuid(uuid)
-                .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .accountNumber(UUID.randomUUID().toString())
-                .openingBalance(randomBigDecimal())
-                .accountLimit(randomBigDecimal())
-                .currencyRate(randomBigDecimal())
-                .type(randomCategoryType())
-                .categoryUuid(categoryUuid)
-                .currencyUuid(currencyUuid)
-                .iconUuid(iconUuid)
-                .enabled(RANDOM.nextBoolean())
-                .interest(randomBigDecimal())
-                .closingDate(LocalDate.now())
-                .created(created)
-                .modified(modifed)
-                .build();
-    }
+    //
+    // Icon
+    //
 
-    static Category newCategory(UUID uuid, UUID iconUuid, long created, long modified) {
-        return new Category.Builder()
-                .name(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .type(randomCategoryType())
-                .iconUuid(iconUuid)
-                .uuid(uuid)
-                .created(created)
-                .modified(modified)
-                .build();
-    }
-
-    static Currency newCurrency(UUID uuid, long created, long modified) {
-        return new Currency.Builder()
-                .symbol(UUID.randomUUID().toString())
-                .description(UUID.randomUUID().toString())
-                .formatSymbol(UUID.randomUUID().toString())
-                .formatSymbolPosition(RANDOM.nextInt(2))
-                .showFormatSymbol(RANDOM.nextBoolean())
-                .def(RANDOM.nextBoolean())
-                .rate(randomBigDecimal())
-                .direction(RANDOM.nextInt(2))
-                .useThousandSeparator(RANDOM.nextBoolean())
-                .uuid(uuid)
-                .created(created)
-                .modified(modified)
-                .build();
-    }
-
-    static Contact newContact(UUID uuid, UUID iconUuid, long created, long modified) {
-        return new Contact.Builder()
-                .name(UUID.randomUUID().toString())
-                .type(randomContactType())
-                .phone(UUID.randomUUID().toString())
-                .mobile(UUID.randomUUID().toString())
-                .email(UUID.randomUUID().toString())
-                .web(UUID.randomUUID().toString())
-                .comment(UUID.randomUUID().toString())
-                .street(UUID.randomUUID().toString())
-                .city(UUID.randomUUID().toString())
-                .country(UUID.randomUUID().toString())
-                .zip(UUID.randomUUID().toString())
-                .iconUuid(iconUuid)
-                .uuid(uuid)
-                .created(created)
-                .modified(modified)
-                .build();
-    }
-
-    static Transaction newTransaction(
-            UUID uuid,
-            UUID accountUuid,
-            UUID categoryUuid,
-            UUID contactUuid,
-            long created,
-            long modified
-    ) {
-        return new Transaction.Builder()
-                .uuid(uuid)
-                .amount(randomBigDecimal())
-                .creditAmount(randomBigDecimal())
-                .transactionDate(LocalDate.now())
-                .type(randomTransactionType())
-                .comment(UUID.randomUUID().toString())
-                .checked(RANDOM.nextBoolean())
-                .accountDebitedUuid(accountUuid)
-                .accountCreditedUuid(accountUuid)
-                .accountDebitedType(randomCategoryType())
-                .accountCreditedType(randomCategoryType())
-                .accountDebitedCategoryUuid(categoryUuid)
-                .accountCreditedCategoryUuid(categoryUuid)
-                .contactUuid(contactUuid)
-                .invoiceNumber(UUID.randomUUID().toString())
-                .created(created)
-                .modified(modified)
-                .build();
-    }
-
-    static MoneyDocument newDocument(
-            UUID uuid,
-            UUID ownerUuid,
-            UUID contactUuid,
-            long created,
-            long modified
-    ) {
-        return new MoneyDocument.Builder()
-                .uuid(uuid)
-                .ownerUuid(ownerUuid)
-                .contactUuid(contactUuid)
-                .documentType(randomDocumentType())
-                .fileName(randomString())
-                .date(LocalDate.now())
-                .size(RANDOM.nextInt())
-                .mimeType(randomString())
-                .description(randomString())
-                .created(created)
-                .modified(modified)
-                .build();
-    }
-
-    static Icon newIcon(UUID uuid, String name, long created, long updated) {
+    public static IconFlatDto newIconFlatDto(UUID uuid, String name, long created, long updated) {
         try (var inputStream = BaseTestUtils.class.getResourceAsStream("/images/" + name)) {
             if (inputStream == null) {
                 throw new IllegalStateException("Cannot retrieve test resource");
             }
             var bytes = inputStream.readAllBytes();
-            return new Icon(uuid, name, bytes, created, updated);
+            var dto = new IconFlatDto();
+            dto.setUuid(uuid);
+            dto.setName(name);
+            dto.setBytes(bytes);
+            dto.setCreated(created);
+            dto.setModified(updated);
+            return dto;
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
+    }
+
+    //
+    // Category
+    //
+
+    public static CategoryFlatDto newCategoryFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
+        var dto = new CategoryFlatDto();
+        dto.setUuid(uuid);
+        dto.setName(randomString());
+        dto.setComment(randomString());
+        dto.setType(randomCategoryType());
+        dto.setIconUuid(iconUuid);
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Account
+    //
+
+    public static AccountFlatDto newAccountFlatDto(UUID uuid, CategoryFlatDto category, CurrencyFlatDto currency,
+            IconFlatDto icon, long created, long modified)
+    {
+        var dto = new AccountFlatDto();
+        dto.setUuid(uuid);
+        dto.setName(randomString());
+        dto.setComment(randomString());
+        dto.setAccountNumber(randomString());
+        dto.setOpeningBalance(randomBigDecimal());
+        dto.setAccountLimit(randomBigDecimal());
+        dto.setCurrencyRate(randomBigDecimal());
+        dto.setType(category.getType());
+        dto.setCategoryUuid(category.getUuid());
+        dto.setCurrencyUuid(currency == null ? null : currency.getUuid());
+        // TODO: exchange security
+        dto.setEnabled(RANDOM.nextBoolean());
+        dto.setInterest(randomBigDecimal());
+        dto.setClosingDate(LocalDate.now());
+        dto.setIconUuid(icon == null ? null : icon.getUuid());
+        dto.setTotal(randomBigDecimal());
+        dto.setTotalWaiting(randomBigDecimal());
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Card
+    //
+
+    public static CardFlatDto newCardFlatDto(UUID uuid, UUID accountUuid, long created, long modified) {
+        var dto = new CardFlatDto();
+        dto.setUuid(uuid);
+        dto.setAccountUuid(accountUuid);
+        dto.setType(randomCardType());
+        dto.setNumber(randomString());
+        dto.setExpiration(LocalDate.now());
+        dto.setComment(randomString());
+        dto.setEnabled(RANDOM.nextBoolean());
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Currency
+    //
+
+    public static CurrencyFlatDto newCurrencyFlatDto(UUID uuid, long created, long modified) {
+        var dto = new CurrencyFlatDto();
+        dto.setUuid(uuid);
+        dto.setSymbol(randomString());
+        dto.setDescription(randomString());
+        dto.setFormatSymbol(randomString());
+        dto.setFormatSymbolPosition(RANDOM.nextInt(2));
+        dto.setShowFormatSymbol(RANDOM.nextBoolean());
+        dto.setDef(RANDOM.nextBoolean());
+        dto.setRate(randomBigDecimal());
+        dto.setDirection(RANDOM.nextInt(2));
+        dto.setUseThousandSeparator(RANDOM.nextBoolean());
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Contact
+    //
+
+    public static ContactFlatDto newContactFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
+        var dto = new ContactFlatDto();
+        dto.setUuid(uuid);
+        dto.setName(randomString());
+        dto.setType(randomContactType());
+        dto.setComment(randomString());
+        dto.setPhone(randomString());
+        dto.setMobile(randomString());
+        dto.setEmail(randomString());
+        dto.setWeb(randomString());
+        dto.setStreet(randomString());
+        dto.setCity(randomString());
+        dto.setCountry(randomString());
+        dto.setZip(randomString());
+        dto.setIconUuid(iconUuid);
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Transaction
+    //
+
+    public static TransactionFlatDto newTransactionFlatDto(
+            UUID uuid,
+            AccountFlatDto debitedAccount,
+            AccountFlatDto creditedAccount,
+            ContactFlatDto contact,
+            CardFlatDto card,
+            long created,
+            long modified)
+    {
+        var dto = new TransactionFlatDto();
+        dto.setUuid(uuid);
+        dto.setAmount(randomBigDecimal());
+        dto.setCreditAmount(randomBigDecimal());
+        dto.setTransactionDate(LocalDate.now());
+        dto.setType(randomTransactionType());
+        dto.setComment(randomString());
+        dto.setChecked(randomBoolean());
+        dto.setAccountDebitedUuid(debitedAccount.getUuid());
+        dto.setAccountCreditedUuid(creditedAccount.getUuid());
+        dto.setAccountDebitedType(debitedAccount.getType());
+        dto.setAccountCreditedType(creditedAccount.getType());
+        dto.setAccountDebitedCategoryUuid(debitedAccount.getCategoryUuid());
+        dto.setAccountCreditedCategoryUuid(creditedAccount.getCategoryUuid());
+        dto.setContactUuid(contact == null ? null : contact.getUuid());
+        dto.setInvoiceNumber(randomString());
+        dto.setParentUuid(null);                // TODO: later
+        dto.setDetailed(randomBoolean());
+        dto.setStatementDate(LocalDate.now());
+        dto.setCardUuid(card == null ? null : card.getUuid());
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
+    }
+
+    //
+    // Document
+    //
+
+    public static DocumentFlatDto newDocumentFlatDto(UUID uuid, ContactFlatDto contact, long created, long modified) {
+        var dto = new DocumentFlatDto();
+        dto.setUuid(uuid);
+        dto.setOwnerUuid(null);
+        dto.setContactUuid(contact.getUuid());
+        dto.setDocumentType(randomDocumentType());
+        dto.setFileName(randomString());
+        dto.setFileDate(LocalDate.now());
+        dto.setFileSize(RANDOM.nextInt(100000));
+        dto.setMimeType(randomString());
+        dto.setDescription(randomString());
+        dto.setCreated(created);
+        dto.setModified(modified);
+        return dto;
     }
 }

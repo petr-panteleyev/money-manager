@@ -4,9 +4,9 @@
  */
 package org.panteleyev.money.backend.service;
 
+import org.panteleyev.money.backend.openapi.dto.CategoryFlatDto;
 import org.panteleyev.money.backend.repository.CategoryRepository;
-import org.panteleyev.money.model.Category;
-import org.springframework.cache.Cache;
+import org.panteleyev.money.backend.repository.IconRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,29 +21,37 @@ import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 @Service
 public class CategoryService {
     private final CategoryRepository repository;
-    private final Cache cache;
+    private final IconRepository iconRepository;
+    private final EntityToDtoConverter converter;
 
-    public CategoryService(CategoryRepository repository, Cache categoryCache) {
+    public CategoryService(
+            CategoryRepository repository,
+            IconRepository iconRepository,
+            EntityToDtoConverter converter)
+    {
         this.repository = repository;
-        this.cache = categoryCache;
+        this.iconRepository = iconRepository;
+        this.converter = converter;
     }
 
-    public List<Category> getAll() {
-        return repository.getAll();
+    public List<CategoryFlatDto> getAll() {
+        return repository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
     @Transactional(readOnly = true)
     public void streamAll(OutputStream out) {
-        try (var stream = repository.getStream()) {
-            writeStreamAsJsonArray(objectMapper, stream, out);
+        try (var stream = repository.streamAll()) {
+            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
         }
     }
 
-    public Optional<Category> get(UUID uuid) {
-        return ServiceUtil.get(repository, cache, uuid);
+    public Optional<CategoryFlatDto> get(UUID uuid) {
+        return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public Optional<Category> put(Category category) {
-        return ServiceUtil.put(repository, cache, category);
+    public CategoryFlatDto put(CategoryFlatDto category) {
+        var iconEntity = category.getIconUuid() == null ?
+                null : iconRepository.getReferenceById(category.getIconUuid());
+        return converter.entityToFlatDto(repository.save(converter.dtoToEntity(category, iconEntity)));
     }
 }

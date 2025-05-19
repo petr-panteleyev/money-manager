@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.3</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -19,7 +19,7 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>25.5.1</revision>
+        <revision>25.5.2-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>24</java.version>
         <maven.compiler.release>24</maven.compiler.release>
@@ -32,7 +32,7 @@
         <!-- Dependencies -->
         <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
-        <springDocsVersion>2.8.5</springDocsVersion>
+        <springDocsVersion>2.8.8</springDocsVersion>
         <caffeineVersion>3.1.8</caffeineVersion>
         <graphqlJavaExtendedScalarsVersion>19.1</graphqlJavaExtendedScalarsVersion>
         <restAssuredVersion>5.4.0</restAssuredVersion>
@@ -64,6 +64,10 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
@@ -73,10 +77,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-graphql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -104,11 +104,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springDocsVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.graphql-java</groupId>
-            <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>${graphqlJavaExtendedScalarsVersion}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -151,12 +146,51 @@
             <groupId>org.panteleyev.money</groupId>
             <artifactId>money-manager-client</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.12.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpecRootDirectory>
+                                ${project.basedir}/src/main/resources/openapi
+                            </inputSpecRootDirectory>
+                            <generatorName>spring</generatorName>
+                            <apiPackage>org.panteleyev.money.backend.openapi.api</apiPackage>
+                            <modelPackage>org.panteleyev.money.backend.openapi.dto</modelPackage>
+                            <typeMappings>
+                                <typeMapping>uuid=java.util.UUID</typeMapping>
+                                <typeMapping>string+binary=StreamingResponseBody</typeMapping>
+                            </typeMappings>
+                            <importMappings>
+                                <importMapping>
+                                    StreamingResponseBody=org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
+                                </importMapping>
+                            </importMappings>
+                            <supportingFilesToGenerate>
+                                ApiUtil.java
+                            </supportingFilesToGenerate>
+                            <configOptions>
+                                <delegatePattern>true</delegatePattern>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <openApiNullable>false</openApiNullable>
+                                <useBeanValidation>false</useBeanValidation>
+                                <useResponseEntity>true</useResponseEntity>
+<!--                                <useSwaggerUI>true</useSwaggerUI>-->
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

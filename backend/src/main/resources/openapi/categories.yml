@@ -1,0 +1,106 @@
+openapi: "3.0.0"
+
+info:
+  title: Категории
+  version: 1.0.0
+
+paths:
+  /categories:
+    get:
+      summary: Получить все категории
+      operationId: getCategories
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryFlatDto'
+  /categories/stream:
+    get:
+      summary: Получить все категории в потоке
+      operationId: getCategoriesAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /categories/{uuid}:
+    get:
+      summary: Получить категорию
+      operationId: getCategoryByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryFlatDto'
+        "404":
+          description: Категория не найдена
+    put:
+      summary: Записать категорию
+      operationId: putCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryFlatDto'
+
+components:
+  schemas:
+    CategoryType:
+      type: string
+      description: Тип категории
+      enum:
+        - BANKS_AND_CASH
+        - INCOMES
+        - EXPENSES
+        - DEBTS
+        - PORTFOLIO
+        - ASSETS
+        - STARTUP
+    CategoryFlatDto:
+      type: object
+      required:
+        - uuid
+        - name
+        - comment
+        - type
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        name:
+          type: string
+        comment:
+          type: string
+        type:
+          $ref: '#/components/schemas/CategoryType'
+        iconUuid:
+          type: uuid
+        created:
+          type: long
+        modified:
+          type: long

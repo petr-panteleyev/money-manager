@@ -4,9 +4,8 @@
  */
 package org.panteleyev.money.backend.service;
 
+import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
 import org.panteleyev.money.backend.repository.IconRepository;
-import org.panteleyev.money.model.Icon;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,29 +20,29 @@ import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 @Service
 public class IconService {
     private final IconRepository repository;
-    private final Cache cache;
+    private final EntityToDtoConverter converter;
 
-    public IconService(IconRepository repository, Cache iconCache) {
+    public IconService(IconRepository repository, EntityToDtoConverter converter) {
         this.repository = repository;
-        this.cache = iconCache;
+        this.converter = converter;
     }
 
-    public List<Icon> getAll() {
-        return repository.getAll();
+    public List<IconFlatDto> getAll() {
+        return repository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
     @Transactional(readOnly = true)
     public void streamAll(OutputStream out) {
-        try (var stream = repository.getStream()) {
-            writeStreamAsJsonArray(objectMapper, stream, out);
+        try (var stream = repository.streamAll()) {
+            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
         }
     }
 
-    public Optional<Icon> get(UUID uuid) {
-        return ServiceUtil.get(repository, cache, uuid);
+    public Optional<IconFlatDto> get(UUID uuid) {
+        return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public Optional<Icon> put(Icon icon) {
-        return ServiceUtil.put(repository, cache, icon);
+    public IconFlatDto put(IconFlatDto icon) {
+        return converter.entityToFlatDto(repository.save(converter.dtoToEntity(icon)));
     }
 }

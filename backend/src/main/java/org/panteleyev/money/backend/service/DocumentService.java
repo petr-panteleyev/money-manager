@@ -4,9 +4,9 @@
  */
 package org.panteleyev.money.backend.service;
 
+import org.panteleyev.money.backend.openapi.dto.DocumentFlatDto;
+import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.backend.repository.DocumentRepository;
-import org.panteleyev.money.model.MoneyDocument;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,29 +21,37 @@ import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 @Service
 public class DocumentService {
     private final DocumentRepository repository;
-    private final Cache cache;
+    private final ContactRepository contactRepository;
+    private final EntityToDtoConverter converter;
 
-    public DocumentService(DocumentRepository repository, Cache documentCache) {
+    public DocumentService(
+            DocumentRepository repository,
+            ContactRepository contactRepository,
+            EntityToDtoConverter converter)
+    {
         this.repository = repository;
-        this.cache = documentCache;
+        this.contactRepository = contactRepository;
+        this.converter = converter;
     }
 
-    public Optional<MoneyDocument> get(UUID uuid) {
-        return ServiceUtil.get(repository, cache, uuid);
+    public Optional<DocumentFlatDto> get(UUID uuid) {
+        return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public List<MoneyDocument> getAll() {
-        return repository.getAll();
+    public List<DocumentFlatDto> getAll() {
+        return repository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
     @Transactional(readOnly = true)
     public void streamAll(OutputStream out) {
-        try (var stream = repository.getStream()) {
-            writeStreamAsJsonArray(objectMapper, stream, out);
+        try (var stream = repository.streamAll()) {
+            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
         }
     }
 
-    public Optional<MoneyDocument> put(MoneyDocument document) {
-        return ServiceUtil.put(repository, cache, document);
+    @Transactional
+    public DocumentFlatDto put(DocumentFlatDto document) {
+        var contact = contactRepository.getReferenceById(document.getContactUuid());
+        return converter.entityToFlatDto(repository.save(converter.dtoToEntity(document, contact)));
     }
 }

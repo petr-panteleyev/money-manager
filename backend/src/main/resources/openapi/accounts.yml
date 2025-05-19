@@ -1,0 +1,130 @@
+openapi: "3.0.0"
+
+info:
+  title: Счета
+  version: 1.0.0
+
+paths:
+  /accounts:
+    get:
+      summary: Получить все счета
+      operationId: getAccounts
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountFlatDto'
+  /accounts/stream:
+    get:
+      summary: Получить все счета в потоке
+      operationId: getAccountsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /accounts/{uuid}:
+    get:
+      summary: Получить счёт
+      operationId: getAccountByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountFlatDto'
+        "404":
+          description: Счёт не найден
+    put:
+      summary: Записать счёт
+      operationId: putAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountFlatDto'
+
+components:
+  schemas:
+    AccountFlatDto:
+      type: object
+      required:
+        - uuid
+        - name
+        - comment
+        - accountNumber
+        - openingBalance
+        - accountLimit
+        - currencyRate
+        - type
+        - categoryUuid
+        - enabled
+        - interest
+        - total
+        - totalWaiting
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        name:
+          type: string
+        comment:
+          type: string
+        accountNumber:
+          type: string
+        openingBalance:
+          type: number
+        accountLimit:
+          type: number
+        currencyRate:
+          type: number
+        type:
+          $ref: './categories.yml#/components/schemas/CategoryType'
+        categoryUuid:
+          type: uuid
+        currencyUuid:
+          type: uuid
+        securityUuid:
+          type: uuid
+        enabled:
+          type: boolean
+        interest:
+          type: number
+        closingDate:
+          type: string
+          format: date
+        iconUuid:
+          type: uuid
+        total:
+          type: number
+        totalWaiting:
+          type: number
+        created:
+          type: long
+        modified:
+          type: long
+

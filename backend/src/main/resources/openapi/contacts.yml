@@ -1,0 +1,126 @@
+openapi: "3.1.0"
+
+info:
+  title: Контакты
+  version: 1.0.0
+
+paths:
+  /contacts:
+    get:
+      summary: Получить все контакты
+      operationId: getContacts
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactFlatDto'
+  /contacts/stream:
+    get:
+      summary: Получить все контакты в потоке
+      operationId: getContactsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /contacts/{uuid}:
+    get:
+      summary: Получить контакт
+      operationId: getContactByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactFlatDto'
+    put:
+      summary: Записать контакт
+      operationId: putContact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactFlatDto'
+components:
+  schemas:
+    ContactType:
+      type: string
+      description: Тип контакта
+      enum:
+        - PERSONAL
+        - CLIENT
+        - SUPPLIER
+        - EMPLOYEE
+        - EMPLOYER
+        - SERVICE
+    ContactFlatDto:
+      type: object
+      required:
+        - uuid
+        - name
+        - type
+        - phone
+        - mobile
+        - email
+        - web
+        - comment
+        - street
+        - city
+        - country
+        - zip
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/ContactType'
+        comment:
+          type: string
+        phone:
+          type: string
+        mobile:
+          type: string
+        email:
+          type: string
+        web:
+          type: string
+        street:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        zip:
+          type: string
+        iconUuid:
+          type: uuid
+        created:
+          type: long
+        modified:
+          type: long

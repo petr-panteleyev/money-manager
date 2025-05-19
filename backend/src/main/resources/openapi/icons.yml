@@ -1,0 +1,90 @@
+openapi: "3.0.0"
+
+info:
+  title: Значки
+  version: 1.0.0
+
+paths:
+  /icons:
+    get:
+      summary: Получить все значки
+      operationId: getIcons
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IconFlatDto'
+  /icons/stream:
+    get:
+      summary: Получить все значки в потоке
+      operationId: getIconsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /icons/{uuid}:
+    get:
+      summary: Получить значок
+      operationId: getIconByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IconFlatDto'
+        "404":
+          description: Значок не найден
+    put:
+      summary: Записать значок
+      operationId: putIcon
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IconFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IconFlatDto'
+
+components:
+  schemas:
+    IconFlatDto:
+      type: object
+      required:
+        - uuid
+        - name
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        name:
+          type: string
+        bytes:
+          type: string
+          format: byte
+        created:
+          type: long
+        modified:
+          type: long

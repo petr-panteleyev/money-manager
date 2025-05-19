@@ -1,0 +1,121 @@
+openapi: "3.0.0"
+
+info:
+  title: Документы
+  version: 1.0.0
+
+paths:
+  /documents:
+    get:
+      summary: Получить все документы
+      operationId: getDocuments
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentFlatDto'
+  /documents/stream:
+    get:
+      summary: Получить все документы в потоке
+      operationId: getDocumentsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /documents/{uuid}:
+    get:
+      summary: Получить документ
+      operationId: getDocumentByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentFlatDto'
+        "404":
+          description: Документ не найден
+    put:
+      summary: Записать документ
+      operationId: putDocument
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentFlatDto'
+
+components:
+  schemas:
+    DocumentType:
+      type: string
+      enum:
+        - BILL
+        - RECEIPT
+        - CONTRACT
+        - STATEMENT
+        - REPORT
+        - NOTIFICATION
+        - INVOICE
+        - PAYSLIP
+        - OTHER
+    DocumentFlatDto:
+      type: object
+      required:
+        - uuid
+        - contactUuid
+        - documentType
+        - fileName
+        - fileDate
+        - fileSize
+        - mimeType
+        - description
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        ownerUuid:
+          type: uuid
+        contactUuid:
+          type: uuid
+        documentType:
+          $ref: '#/components/schemas/DocumentType'
+        fileName:
+          type: string
+        fileDate:
+          type: string
+          format: date
+        fileSize:
+          type: integer
+        mimeType:
+          type: string
+        description:
+          type: string
+        created:
+          type: long
+        modified:
+          type: long
+

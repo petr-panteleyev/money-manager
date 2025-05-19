@@ -14,6 +14,7 @@ public class WebmoneyApplication {
 	public static final String VERSION_ROOT = "/version";
 	public static final String UI_ROOT = "/ui";
 	public static final String ACCOUNT_ROOT = API_ROOT + "/accounts";
+	public static final String CARD_ROOT = API_ROOT + "/cards";
 	public static final String CATEGORY_ROOT = API_ROOT + "/categories";
 	public static final String CURRENCY_ROOT = API_ROOT + "/currencies";
 	public static final String CONTACT_ROOT = API_ROOT + "/contacts";

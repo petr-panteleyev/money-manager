@@ -4,9 +4,8 @@
  */
 package org.panteleyev.money.backend.service;
 
+import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
 import org.panteleyev.money.backend.repository.CurrencyRepository;
-import org.panteleyev.money.model.Currency;
-import org.springframework.cache.Cache;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,29 +20,30 @@ import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 @Service
 public class CurrencyService {
     private final CurrencyRepository repository;
-    private final Cache cache;
+    private final EntityToDtoConverter converter;
 
-    public CurrencyService(CurrencyRepository repository, Cache currencyCache) {
+    public CurrencyService(CurrencyRepository repository, EntityToDtoConverter converter) {
         this.repository = repository;
-        this.cache = currencyCache;
+        this.converter = converter;
     }
 
-    public List<Currency> getAll() {
-        return repository.getAll();
+    public List<CurrencyFlatDto> getAll() {
+        return repository.findAll().stream().map(converter::entityToFlatDto)
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public void streamAll(OutputStream out) {
-        try (var stream = repository.getStream()) {
-            writeStreamAsJsonArray(objectMapper, stream, out);
+        try (var stream = repository.streamAll()) {
+            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
         }
     }
 
-    public Optional<Currency> get(UUID uuid) {
-        return ServiceUtil.get(repository, cache, uuid);
+    public Optional<CurrencyFlatDto> get(UUID uuid) {
+        return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public Optional<Currency> put(Currency currency) {
-        return ServiceUtil.put(repository, cache, currency);
+    public CurrencyFlatDto put(CurrencyFlatDto currency) {
+        return converter.entityToFlatDto(repository.save(converter.dtoToEntity(currency)));
     }
 }

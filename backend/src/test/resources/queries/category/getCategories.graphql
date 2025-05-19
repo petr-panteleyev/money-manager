@@ -1,9 +1,0 @@
-query {
-    categories {
-        uuid, name, type, comment,
-        icon {
-            uuid
-        },
-        created, modified
-    }
-}

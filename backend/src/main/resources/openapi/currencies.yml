@@ -1,0 +1,108 @@
+openapi: "3.0.0"
+
+info:
+  title: Валюты
+  version: 1.0.0
+
+paths:
+  /currencies:
+    get:
+      summary: Получить все валюты
+      operationId: getCurrencies
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CurrencyFlatDto'
+  /currencies/stream:
+    get:
+      summary: Получить все валюты в потоке
+      operationId: getCurrenciesAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /currencies/{uuid}:
+    get:
+      summary: Получить валюту
+      operationId: getCurrencyByUuid
+      parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyFlatDto'
+    put:
+      summary: Записать валюту
+      operationId: putCurrency
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrencyFlatDto'
+components:
+  schemas:
+    CurrencyFlatDto:
+      type: object
+      required:
+        - uuid
+        - symbol
+        - description
+        - formatSymbol
+        - formatSymbolPosition
+        - showFormatSymbol
+        - def
+        - rate
+        - direction
+        - useThousandSeparator
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        symbol:
+          type: string
+        description:
+          type: string
+        formatSymbol:
+          type: string
+        formatSymbolPosition:
+          type: int
+        showFormatSymbol:
+          type: boolean
+        def:
+          type: boolean
+        rate:
+          type: decimal
+        direction:
+          type: int
+        useThousandSeparator:
+          type: boolean
+        created:
+          type: long
+        modified:
+          type: long

@@ -1,0 +1,111 @@
+openapi: "3.0.0"
+
+info:
+  title: Карты
+  version: 1.0.0
+
+paths:
+  /cards:
+    get:
+      summary: Получить все карты
+      operationId: getCards
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardFlatDto'
+  /cards/stream:
+    get:
+      summary: Получить все карты в потоке
+      operationId: getCardsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /cards/{uuid}:
+    get:
+      summary: Получить карту
+      operationId: getCardByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFlatDto'
+        "404":
+          description: Карта не найдена
+    put:
+      summary: Записать карту
+      operationId: putCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardFlatDto'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFlatDto'
+
+components:
+  schemas:
+    CardType:
+      type: string
+      enum:
+        - NONE
+        - VISA
+        - MASTERCARD
+        - MIR
+        - AMEX
+    CardFlatDto:
+      type: object
+      required:
+        - uuid
+        - accountUuid
+        - type
+        - number
+        - expiration
+        - comment
+        - enabled
+        - created
+        - modified
+      properties:
+        uuid:
+          type: uuid
+        accountUuid:
+          type: uuid
+        type:
+          $ref: '#/components/schemas/CardType'
+        number:
+          type: string
+        expiration:
+          type: string
+          format: date
+        comment:
+          type: string
+        enabled:
+          type: boolean
+        created:
+          type: long
+        modified:
+          type: long
