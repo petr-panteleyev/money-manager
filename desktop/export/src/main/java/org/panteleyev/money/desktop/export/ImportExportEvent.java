@@ -1,5 +1,5 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.export;
@@ -23,7 +23,6 @@ public record ImportExportEvent(ImportExportEventType type, int level) {
         CONTACTS("контакты"),
         TRANSACTIONS("проводки"),
         DOCUMENTS("документы"),
-        PERIODIC_PAYMENTS("периодические платежи"),
         INVESTMENTS_DEALS("инвестиционные сделки"),
         EXCHANGE_SECURITY_SPLITS("сплиты ценных бумаг"),
         BLOBS("файлы");

@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.persistence;
@@ -15,12 +15,7 @@ import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.DocumentType;
-import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
-import org.panteleyev.money.model.PeriodicPayment;
-import org.panteleyev.money.model.PeriodicPaymentType;
-import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
@@ -30,12 +25,9 @@ import org.panteleyev.money.model.investment.InvestmentDealType;
 import org.panteleyev.money.model.investment.InvestmentMarketType;
 import org.panteleyev.money.model.investment.InvestmentOperationType;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -380,102 +372,6 @@ public class TestRepositories extends BaseDaoTest {
                 BaseTestUtils.randomBoolean(),
                 LocalDate.now(),
                 null,
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-        );
-
-        insertAndUpdate(repository, insert, update);
-    }
-
-    @Test
-    @Order(9)
-    public void testDocument() {
-        var repository = new DocumentRepository();
-
-        var insert = new MoneyDocument(
-                DOCUMENT_UUID,
-                ACCOUNT_UUID,
-                CONTACT_UUID,
-                DocumentType.CONTRACT,
-                BaseTestUtils.randomString(),
-                LocalDate.now(),
-                BaseTestUtils.randomInt(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-        );
-
-        var update = new MoneyDocument(
-                DOCUMENT_UUID,
-                ACCOUNT_UUID,
-                CONTACT_UUID,
-                DocumentType.CONTRACT,
-                BaseTestUtils.randomString(),
-                LocalDate.now(),
-                BaseTestUtils.randomInt(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-        );
-
-        insertAndUpdate(repository, insert, update);
-    }
-
-    @Test
-    @Order(10)
-    public void testDocumentContent() {
-        var repository = new DocumentRepository();
-
-        try (var inputStream = getClass().getResourceAsStream("/icons/" + ICON_DOLLAR)) {
-            var bytes = inputStream.readAllBytes();
-
-            dao.withNewConnection(conn -> {
-                repository.insertBytes(conn, DOCUMENT_UUID, bytes);
-
-                var actual = repository.getBytes(conn, DOCUMENT_UUID)
-                        .orElseThrow();
-                assertArrayEquals(bytes, actual);
-            });
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-    }
-
-    @Test
-    @Order(11)
-    public void testPeriodicPayment() {
-        var repository = new PeriodicPaymentRepository();
-
-        var insert = new PeriodicPayment(
-                PERIODIC_PAYMENT_UUID,
-                BaseTestUtils.randomString(),
-                PeriodicPaymentType.CARD_PAYMENT,
-                RecurrenceType.MONTHLY,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomDay(),
-                BaseTestUtils.randomMonth(),
-                ACCOUNT_UUID,
-                ACCOUNT_UUID,
-                CONTACT_UUID,
-                BaseTestUtils.randomString(),
-                System.currentTimeMillis(),
-                System.currentTimeMillis()
-        );
-
-        var update = new PeriodicPayment(
-                PERIODIC_PAYMENT_UUID,
-                BaseTestUtils.randomString(),
-                PeriodicPaymentType.MANUAL_PAYMENT,
-                RecurrenceType.MONTHLY,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomDay(),
-                BaseTestUtils.randomMonth(),
-                ACCOUNT_UUID,
-                ACCOUNT_UUID,
-                CONTACT_UUID,
-                BaseTestUtils.randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );

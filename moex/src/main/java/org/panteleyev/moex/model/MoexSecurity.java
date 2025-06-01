@@ -1,15 +1,11 @@
 /*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2023-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.moex.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-import static org.panteleyev.moex.xml.ParserUtil.parseDate;
-import static org.panteleyev.moex.xml.ParserUtil.parseNumber;
-import static org.panteleyev.moex.xml.ParserUtil.parseInt;
 
 public record MoexSecurity(
         String secId,

@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.currency;
@@ -49,9 +49,6 @@ public class CurrencyDialogTest {
         dialog.getDefaultCheck().setSelected(CURRENCY.def());
     }
 
-    private void setupDialogUpdate(CurrencyDialog dialog) {
-    }
-
     @Test
     public void testNewCurrency() throws Exception {
         var queue = new ArrayBlockingQueue<Currency>(1);
@@ -76,7 +73,6 @@ public class CurrencyDialogTest {
 
         Platform.runLater(() -> {
             var dialog = new CurrencyDialog(null, null, CURRENCY);
-            setupDialogUpdate(dialog);
             var category = dialog.getResultConverter().call(ButtonType.OK);
             queue.add(category);
         });

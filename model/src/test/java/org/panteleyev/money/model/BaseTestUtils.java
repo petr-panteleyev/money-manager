@@ -57,11 +57,6 @@ final class BaseTestUtils {
         }
     }
 
-    static DocumentType randomDocumentType() {
-        int index = RANDOM.nextInt(DocumentType.values().length);
-        return DocumentType.values()[index];
-    }
-
     static Currency newCurrency() {
         return newCurrency(UUID.randomUUID());
     }

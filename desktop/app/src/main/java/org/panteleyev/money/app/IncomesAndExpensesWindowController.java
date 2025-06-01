@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -180,7 +180,7 @@ class IncomesAndExpensesWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
-        var menuBar = menuBar(
+        return menuBar(
                 menu("Файл",
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
@@ -189,7 +189,6 @@ class IncomesAndExpensesWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        return menuBar;
     }
 
     private Node createStatusBar() {

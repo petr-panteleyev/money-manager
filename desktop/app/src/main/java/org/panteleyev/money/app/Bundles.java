@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -8,9 +8,6 @@ import org.panteleyev.money.app.investment.InvestmentDealPredicate;
 import org.panteleyev.money.app.transaction.TransactionPredicate;
 import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.ContactType;
-import org.panteleyev.money.model.DocumentType;
-import org.panteleyev.money.model.PeriodicPaymentType;
-import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.TransactionType;
 
 import java.time.Month;
@@ -63,18 +60,6 @@ public final class Bundles {
             entry(TransactionType.UNDEFINED, "Неизвестно")
     ));
 
-    private static final Map<DocumentType, String> DOCUMENT_TYPE_STRINGS = new EnumMap<>(Map.of(
-            DocumentType.BILL, "Счет",
-            DocumentType.RECEIPT, "Чек",
-            DocumentType.CONTRACT, "Договор",
-            DocumentType.STATEMENT, "Выписка",
-            DocumentType.REPORT, "Отчёт",
-            DocumentType.NOTIFICATION, "Уведомление",
-            DocumentType.INVOICE, "Инвойс",
-            DocumentType.PAYSLIP, "Платёжная ведомость",
-            DocumentType.OTHER, "Другое"
-    ));
-
     private static final Map<String, String> TRANSACTION_PREDICATE_STRINGS = Map.of(
             "ALL", "Все проводки",
             "CURRENT_MONTH", "Текущий месяц",
@@ -95,17 +80,6 @@ public final class Bundles {
             "LAST_YEAR", "Последний год"
     );
 
-    private static final Map<PeriodicPaymentType, String> PERIODIC_PAYMENT_TYPE_STRINGS = new EnumMap<>(Map.of(
-            PeriodicPaymentType.MANUAL_PAYMENT, "Ручной платёж",
-            PeriodicPaymentType.AUTO_PAYMENT, "Автоплатеж",
-            PeriodicPaymentType.CARD_PAYMENT, "Платёж с карты"
-    ));
-
-    private static final Map<RecurrenceType, String> RECURRENCE_TYPE_STRINGS = new EnumMap<>(Map.of(
-            RecurrenceType.MONTHLY, "Раз в месяц",
-            RecurrenceType.YEARLY, "Раз в год"
-    ));
-
     public static String translate(CategoryType type) {
         return CATEGORY_TYPE_STRINGS.get(type);
     }
@@ -118,24 +92,12 @@ public final class Bundles {
         return TRANSACTION_TYPE_STRINGS.get(type);
     }
 
-    public static String translate(DocumentType type) {
-        return DOCUMENT_TYPE_STRINGS.get(type);
-    }
-
     public static String translate(TransactionPredicate predicate) {
         return TRANSACTION_PREDICATE_STRINGS.get(predicate.name());
     }
 
     public static String translate(InvestmentDealPredicate predicate) {
         return INVESTMENT_DEAL_PREDICATE_STRINGS.get(predicate.name());
-    }
-
-    public static String translate(PeriodicPaymentType type) {
-        return PERIODIC_PAYMENT_TYPE_STRINGS.get(type);
-    }
-
-    public static String translate(RecurrenceType type) {
-        return RECURRENCE_TYPE_STRINGS.get(type);
     }
 
     public static String translate(Month month) {

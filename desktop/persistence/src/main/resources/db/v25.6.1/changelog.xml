@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright © 2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
+  SPDX-License-Identifier: BSD-2-Clause
+  -->
+<!--suppress SqlNoDataSourceInspection -->
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+                   logicalFilePath="v25.6.1/changelog.xml">
+
+    <changeSet id="v25.6.1-drop-periodic" author="petr-panteleyev@yandex.ru">
+        <sql>
+            DROP TABLE IF EXISTS periodic
+        </sql>
+    </changeSet>
+
+    <changeSet id="v25.6.1-drop-document" author="petr-panteleyev@yandex.ru">
+        <sql>
+            DROP TABLE IF EXISTS document
+        </sql>
+    </changeSet>
+</databaseChangeLog>

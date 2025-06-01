@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <!--
-  Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+  Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
@@ -21,4 +21,5 @@
     <include file="v23.9.5/changelog.xml" relativeToChangelogFile="true"/>
     <include file="v24.4.2/changelog.xml" relativeToChangelogFile="true"/>
     <include file="v24.7.2/changelog.xml" relativeToChangelogFile="true"/>
+    <include file="v25.6.1/changelog.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

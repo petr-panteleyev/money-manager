@@ -1,5 +1,5 @@
 /*
- Copyright © 2020 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.ofx;
@@ -19,16 +19,16 @@ public class CreditCardStatementList {
 
     public AccountInfo getAccountInfo() {
         return creditCardStatementList.isEmpty() ?
-                new AccountInfo() : creditCardStatementList.get(0).creditCardAccountFrom();
+                new AccountInfo() : creditCardStatementList.getFirst().creditCardAccountFrom();
     }
 
     public BankTransactionList getBankTransactionList() {
         return creditCardStatementList.isEmpty() ?
-                new BankTransactionList() : creditCardStatementList.get(0).bankTransactionList();
+                new BankTransactionList() : creditCardStatementList.getFirst().bankTransactionList();
     }
 
     public PendingTransactionList getPendingTransactionList() {
         return creditCardStatementList.isEmpty() ?
-                new PendingTransactionList() : creditCardStatementList.get(0).pendingTransactionList();
+                new PendingTransactionList() : creditCardStatementList.getFirst().pendingTransactionList();
     }
 }

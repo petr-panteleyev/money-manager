@@ -9,7 +9,6 @@ import org.panteleyev.money.backend.domain.CardEntity;
 import org.panteleyev.money.backend.domain.CategoryEntity;
 import org.panteleyev.money.backend.domain.ContactEntity;
 import org.panteleyev.money.backend.domain.CurrencyEntity;
-import org.panteleyev.money.backend.domain.DocumentEntity;
 import org.panteleyev.money.backend.domain.IconEntity;
 import org.panteleyev.money.backend.domain.TransactionEntity;
 import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
@@ -20,8 +19,6 @@ import org.panteleyev.money.backend.openapi.dto.CategoryType;
 import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
 import org.panteleyev.money.backend.openapi.dto.ContactType;
 import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
-import org.panteleyev.money.backend.openapi.dto.DocumentFlatDto;
-import org.panteleyev.money.backend.openapi.dto.DocumentType;
 import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
 import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
 import org.panteleyev.money.backend.openapi.dto.TransactionType;
@@ -337,48 +334,6 @@ public class EntityToDtoConverter {
                 .setDetailed(dto.getDetailed())
                 .setStatementDate(dto.getStatementDate())
                 .setCard(card)
-                .setCreated(dto.getCreated())
-                .setModified(dto.getModified());
-    }
-
-    //
-    // Document
-    //
-
-    public DocumentFlatDto entityToFlatDto(DocumentEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        var dto = new DocumentFlatDto();
-        dto.setUuid(entity.getUuid());
-        dto.setOwnerUuid(entity.getOwnerUuid());
-        dto.setContactUuid(entity.getContact().getUuid());
-        dto.setDocumentType(DocumentType.fromValue(entity.getDocumentType()));
-        dto.setFileName(entity.getFileName());
-        dto.setFileDate(entity.getFileDate());
-        dto.setFileSize(entity.getFileSize());
-        dto.setMimeType(entity.getMimeType());
-        dto.setDescription(entity.getDescription());
-        dto.setCreated(entity.getCreated());
-        dto.setModified(entity.getModified());
-        return dto;
-    }
-
-    public DocumentEntity dtoToEntity(DocumentFlatDto dto, ContactEntity contact) {
-        if (dto == null) {
-            return null;
-        }
-        return new DocumentEntity()
-                .setUuid(dto.getUuid())
-                .setOwnerUuid(dto.getOwnerUuid())
-                .setContact(contact)
-                .setDocumentType(dto.getDocumentType().name())
-                .setFileName(dto.getFileName())
-                .setFileDate(dto.getFileDate())
-                .setFileSize(dto.getFileSize())
-                .setMimeType(dto.getMimeType())
-                .setDescription(dto.getDescription())
                 .setCreated(dto.getCreated())
                 .setModified(dto.getModified());
     }

@@ -1,5 +1,5 @@
 /*
- Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2022-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.client;
@@ -9,7 +9,6 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.Transaction;
 
 import java.net.URI;
@@ -32,7 +31,6 @@ public class MoneyClient {
 
     private static final String API_ACCOUNTS = "/accounts";
     private static final String API_TRANSACTIONS = "/transactions";
-    private static final String API_DOCUMENTS = "/documents";
 
     private final Client<Icon> iconClient;
     private final Client<Currency> currencyClient;
@@ -40,7 +38,6 @@ public class MoneyClient {
     private final Client<Category> categoryClient;
     private final Client<Account> accountClient;
     private final Client<Transaction> transactionClient;
-    private final Client<MoneyDocument> documentClient;
 
     /**
      * Money client builder.
@@ -108,8 +105,6 @@ public class MoneyClient {
                 httpClient, Account.class, streamingChunkSize);
         transactionClient = new Client<>(URI.create(baseUrl + API_TRANSACTIONS),
                 httpClient, Transaction.class, streamingChunkSize);
-        documentClient = new Client<>(URI.create(baseUrl + API_DOCUMENTS),
-                httpClient, MoneyDocument.class, streamingChunkSize);
     }
 
     /* Icons */
@@ -212,23 +207,6 @@ public class MoneyClient {
 
     public Transaction putTransaction(Transaction transaction) {
         return transactionClient.put(transaction);
-    }
-
-    /* Documents */
-    public List<MoneyDocument> getDocuments() {
-        return documentClient.getAll();
-    }
-
-    public void consumeDocumentStream(Consumer<List<MoneyDocument>> listConsumer) {
-        documentClient.getAllAsStream(listConsumer);
-    }
-
-    public Optional<MoneyDocument> getDocument(UUID uuid) {
-        return documentClient.get(uuid);
-    }
-
-    public MoneyDocument putDocument(MoneyDocument document) {
-        return documentClient.put(document);
     }
 }
 

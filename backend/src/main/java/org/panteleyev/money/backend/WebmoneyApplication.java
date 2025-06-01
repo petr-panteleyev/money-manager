@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.backend;
@@ -20,7 +20,6 @@ public class WebmoneyApplication {
 	public static final String CONTACT_ROOT = API_ROOT + "/contacts";
 	public static final String TRANSACTION_ROOT = API_ROOT + "/transactions";
 	public static final String ICON_ROOT = API_ROOT + "/icons";
-	public static final String DOCUMENT_ROOT = API_ROOT + "/documents";
 
 	public static void main(String[] args) {
 		SpringApplication.run(WebmoneyApplication.class, args);

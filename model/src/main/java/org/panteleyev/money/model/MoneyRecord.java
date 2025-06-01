@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.model;
@@ -13,8 +13,8 @@ import java.math.RoundingMode;
 import java.util.UUID;
 
 public sealed interface MoneyRecord permits
-        Account, Card, Category, Contact, Currency, Icon, Transaction, MoneyDocument,
-        PeriodicPayment, ExchangeSecurity, InvestmentDeal, ExchangeSecuritySplit {
+        Account, Card, Category, Contact, Currency, Icon, Transaction,
+        ExchangeSecurity, InvestmentDeal, ExchangeSecuritySplit {
 
     UUID uuid();
 

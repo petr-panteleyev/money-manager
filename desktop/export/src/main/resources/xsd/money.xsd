@@ -126,7 +126,7 @@
                         <xsd:field xpath="./uuid"/>
                     </xsd:unique>
                 </xsd:element>
-                <xsd:element name="MoneyDocuments">
+                <xsd:element name="MoneyDocuments" minOccurs="0">
                     <xsd:complexType>
                         <xsd:sequence>
                             <xsd:element name="MoneyDocument"

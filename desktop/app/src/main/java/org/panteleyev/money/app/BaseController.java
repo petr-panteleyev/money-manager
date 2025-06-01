@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -17,12 +17,10 @@ import org.panteleyev.money.app.card.CardWindowController;
 import org.panteleyev.money.app.category.CategoryWindowController;
 import org.panteleyev.money.app.contact.ContactListWindowController;
 import org.panteleyev.money.app.currency.CurrencyWindowController;
-import org.panteleyev.money.app.document.DocumentWindowController;
 import org.panteleyev.money.app.exchange.SecuritiesWindowController;
 import org.panteleyev.money.app.investment.InvestmentDealsWindowController;
 import org.panteleyev.money.app.investment.InvestmentSummaryWindowController;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.MoneyRecord;
 
 import java.util.Collection;
 import java.util.function.Consumer;
@@ -41,9 +39,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_5;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_8;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_U;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_SHIFT_P;
 import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class BaseController extends Controller {
@@ -117,10 +113,6 @@ public class BaseController extends Controller {
                 _ -> getController(CategoryWindowController.class));
         var contactsMenuItem = menuItem("Контакты...", SHORTCUT_8,
                 _ -> getController(ContactListWindowController.class));
-        var documentsMenuItem = menuItem("Документы...", SHORTCUT_ALT_U,
-                _ -> getDocumentController(null));
-        var periodicPaymentsMenuItem = menuItem("Периодические платежи...", SHORTCUT_SHIFT_P,
-                _ -> getController(PeriodicPaymentWindowController.class));
 
         if (dbOpenProperty != null) {
             accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
@@ -131,8 +123,6 @@ public class BaseController extends Controller {
             categoriesMenuItem.disableProperty().bind(dbOpenProperty.not());
             contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
             chartsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            documentsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            periodicPaymentsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
         var menu = menu("Окно",
@@ -147,14 +137,11 @@ public class BaseController extends Controller {
                 new SeparatorMenuItem(),
                 currenciesMenuItem,
                 categoriesMenuItem,
-                contactsMenuItem,
-                new SeparatorMenuItem(),
-                documentsMenuItem,
-                periodicPaymentsMenuItem
+                contactsMenuItem
         );
 
         menu.setOnShowing(_ -> {
-            var lastIndex = menu.getItems().indexOf(periodicPaymentsMenuItem);
+            var lastIndex = menu.getItems().indexOf(contactsMenuItem);
             menu.getItems().remove(lastIndex + 1, menu.getItems().size());
 
             var accountControllers = WINDOW_MANAGER.getControllerStream(RequestWindowController.class)
@@ -196,28 +183,18 @@ public class BaseController extends Controller {
 
     protected static void getRequestController(Account account) {
         var controller = (RequestWindowController) WINDOW_MANAGER
-                .find(RequestWindowController.class, c -> ((RequestWindowController) c).thisAccount(account)).orElseGet(() -> {
-                    try {
-                        return new RequestWindowController(account);
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
-                });
+                .find(RequestWindowController.class, c -> ((RequestWindowController) c).thisAccount(account)).orElseGet(
+                        () -> {
+                            try {
+                                return new RequestWindowController(account);
+                            } catch (Exception ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
 
         var stage = controller.getStage();
         stage.show();
         stage.toFront();
-    }
-
-    public static DocumentWindowController getDocumentController(MoneyRecord owner) {
-        var controller = (DocumentWindowController) WINDOW_MANAGER
-                .find(DocumentWindowController.class, c -> ((DocumentWindowController) c).thisOwner(owner))
-                .orElseGet(() -> new DocumentWindowController(owner));
-
-        var stage = controller.getStage();
-        stage.show();
-        stage.toFront();
-        return controller;
     }
 
     // Actions

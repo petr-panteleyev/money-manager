@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2018-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.export;
@@ -12,8 +12,6 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
-import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
@@ -35,8 +33,6 @@ class ImportParser {
         ExchangeSecurity(ImportParser::parseExchangeSecurity),
         Contact(ImportParser::parseContact),
         Transaction(ImportParser::parseTransaction),
-        MoneyDocument(ImportParser::parseDocument),
-        PeriodicPayment(ImportParser::parsePeriodicPayment),
         InvestmentDeal(ImportParser::parseInvestmentDeal),
         ExchangeSecuritySplit(ImportParser::parseExchangeSecuritySplit),
         BlobContent(ImportParser::parseBlob);
@@ -68,8 +64,6 @@ class ImportParser {
     private final List<Currency> currencies = new ArrayList<>();
     private final List<ExchangeSecurity> exchangeSecurities = new ArrayList<>();
     private final List<Transaction> transactions = new ArrayList<>();
-    private final List<MoneyDocument> documents = new ArrayList<>();
-    private final List<PeriodicPayment> periodicPayments = new ArrayList<>();
     private final List<InvestmentDeal> investmentDeals = new ArrayList<>();
     private final List<ExchangeSecuritySplit> exchangeSecuritySplits = new ArrayList<>();
     private final List<BlobContent> blobs = new ArrayList<>();
@@ -83,8 +77,6 @@ class ImportParser {
             Map.entry(Tag.ExchangeSecurity, exchangeSecurities),
             Map.entry(Tag.Contact, contacts),
             Map.entry(Tag.Transaction, transactions),
-            Map.entry(Tag.MoneyDocument, documents),
-            Map.entry(Tag.PeriodicPayment, periodicPayments),
             Map.entry(Tag.InvestmentDeal, investmentDeals),
             Map.entry(Tag.ExchangeSecuritySplit, exchangeSecuritySplits),
             Map.entry(Tag.BlobContent, blobs)
@@ -120,14 +112,6 @@ class ImportParser {
 
     public List<Transaction> getTransactions() {
         return transactions;
-    }
-
-    public List<MoneyDocument> getDocuments() {
-        return documents;
-    }
-
-    public List<PeriodicPayment> getPeriodicPayments() {
-        return periodicPayments;
     }
 
     public List<InvestmentDeal> getInvestments() {
@@ -176,14 +160,6 @@ class ImportParser {
 
     private static Transaction parseTransaction(StartElementWrapper element) {
         return RecordSerializer.deserializeRecord(element, Transaction.class);
-    }
-
-    private static MoneyDocument parseDocument(StartElementWrapper element) {
-        return RecordSerializer.deserializeRecord(element, MoneyDocument.class);
-    }
-
-    private static PeriodicPayment parsePeriodicPayment(StartElementWrapper element) {
-        return RecordSerializer.deserializeRecord(element, PeriodicPayment.class);
     }
 
     private static Card parseCard(StartElementWrapper element) {

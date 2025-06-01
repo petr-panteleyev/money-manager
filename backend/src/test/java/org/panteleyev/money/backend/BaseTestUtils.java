@@ -12,8 +12,6 @@ import org.panteleyev.money.backend.openapi.dto.CategoryType;
 import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
 import org.panteleyev.money.backend.openapi.dto.ContactType;
 import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
-import org.panteleyev.money.backend.openapi.dto.DocumentFlatDto;
-import org.panteleyev.money.backend.openapi.dto.DocumentType;
 import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
 import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
 import org.panteleyev.money.backend.openapi.dto.TransactionType;
@@ -62,11 +60,6 @@ public final class BaseTestUtils {
     static TransactionType randomTransactionType() {
         int index = RANDOM.nextInt(TransactionType.values().length);
         return TransactionType.values()[index];
-    }
-
-    static DocumentType randomDocumentType() {
-        int index = RANDOM.nextInt(DocumentType.values().length);
-        return DocumentType.values()[index];
     }
 
     //
@@ -233,26 +226,6 @@ public final class BaseTestUtils {
         dto.setDetailed(randomBoolean());
         dto.setStatementDate(LocalDate.now());
         dto.setCardUuid(card == null ? null : card.getUuid());
-        dto.setCreated(created);
-        dto.setModified(modified);
-        return dto;
-    }
-
-    //
-    // Document
-    //
-
-    public static DocumentFlatDto newDocumentFlatDto(UUID uuid, ContactFlatDto contact, long created, long modified) {
-        var dto = new DocumentFlatDto();
-        dto.setUuid(uuid);
-        dto.setOwnerUuid(null);
-        dto.setContactUuid(contact.getUuid());
-        dto.setDocumentType(randomDocumentType());
-        dto.setFileName(randomString());
-        dto.setFileDate(LocalDate.now());
-        dto.setFileSize(RANDOM.nextInt(100000));
-        dto.setMimeType(randomString());
-        dto.setDescription(randomString());
         dto.setCreated(created);
         dto.setModified(modified);
         return dto;

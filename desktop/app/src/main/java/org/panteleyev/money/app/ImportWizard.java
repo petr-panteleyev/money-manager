@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -101,7 +101,7 @@ final class ImportWizard extends BaseDialog<Object> {
     }
 
     private static class ProgressPage extends BorderPane {
-        SimpleBooleanProperty inProgressProperty = new SimpleBooleanProperty();
+        final SimpleBooleanProperty inProgressProperty = new SimpleBooleanProperty();
 
         private final TextArea textArea = createTextArea();
 

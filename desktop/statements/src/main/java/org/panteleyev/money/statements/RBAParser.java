@@ -1,5 +1,5 @@
 /*
- Copyright © 2018-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2018-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.statements;
@@ -13,7 +13,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 class RBAParser implements Parser {

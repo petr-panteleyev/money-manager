@@ -1,5 +1,5 @@
 /*
- Copyright © 2020 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.ofx;
@@ -9,11 +9,11 @@ import java.util.List;
 public record AccountStatementList(List<AccountStatement> accountStatementList) {
     public AccountInfo getAccountInfo() {
         return accountStatementList.isEmpty() ?
-                new AccountInfo() : accountStatementList.get(0).bankAccountFrom();
+                new AccountInfo() : accountStatementList.getFirst().bankAccountFrom();
     }
 
     public BankTransactionList getBankTransactionList() {
         return accountStatementList.isEmpty() ?
-                new BankTransactionList() : accountStatementList.get(0).bankTransactionList();
+                new BankTransactionList() : accountStatementList.getFirst().bankTransactionList();
     }
 }

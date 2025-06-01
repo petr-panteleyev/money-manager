@@ -1,5 +1,5 @@
 /*
- Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2024-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 module org.panteleyev.money.desktop.statements {

@@ -1,13 +1,11 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.investment.cell.summary;
 
 import javafx.geometry.Pos;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TreeTableCell;
-import org.panteleyev.money.app.investment.InvestmentSummary;
 import org.panteleyev.money.app.investment.InvestmentSummaryTreeData;
 
 import java.math.RoundingMode;
@@ -21,7 +19,7 @@ public class InvestmentSummaryPercentageCell extends TreeTableCell<InvestmentSum
             setText("");
         } else {
             setAlignment(Pos.CENTER_RIGHT);
-            setText(summary.percentage().setScale(2, RoundingMode.HALF_EVEN).toString() + "%");
+            setText(summary.percentage().setScale(2, RoundingMode.HALF_EVEN) + "%");
         }
     }
 }

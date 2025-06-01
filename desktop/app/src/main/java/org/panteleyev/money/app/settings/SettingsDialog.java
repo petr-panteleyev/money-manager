@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -61,7 +61,6 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
 
     private final ChoiceBox<Integer> autoCompleteLength = new ChoiceBox<>(observableArrayList(2, 3, 4, 5));
     private final TextField accountClosingDayDeltaEdit = new TextField();
-    private final TextField periodicPaymentDayDeltaEdit = new TextField();
 
     private final TextField controlsFontField = new TextField();
     private final TextField menuFontField = new TextField();
@@ -106,8 +105,7 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                 tab("Общие", false, gridPane(
                         List.of(
                                 gridRow(label("Длина префикса автодополнения:"), autoCompleteLength),
-                                gridRow(label("Дней до закрытия счета:"), accountClosingDayDeltaEdit),
-                                gridRow(label("Дней до периодического платежа:"), periodicPaymentDayDeltaEdit)
+                                gridRow(label("Дней до закрытия счета:"), accountClosingDayDeltaEdit)
                         ), b -> b.withStyle(GRID_PANE))
                 ),
                 tab("Шрифты", false,
@@ -165,14 +163,12 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
 
         autoCompleteLength.getSelectionModel().select(Integer.valueOf(settings.getAutoCompleteLength()));
         accountClosingDayDeltaEdit.setText(Integer.toString(settings.getAccountClosingDayDelta()));
-        periodicPaymentDayDeltaEdit.setText(Integer.toString(settings.getPeriodicPaymentDayDelta()));
 
         setResultConverter((ButtonType param) -> {
             if (param == ButtonType.OK) {
                 settings.update(opt -> {
                     opt.setAutoCompleteLength(autoCompleteLength.getValue());
                     opt.setAccountClosingDayDelta(Integer.parseInt(accountClosingDayDeltaEdit.getText()));
-                    opt.setPeriodicPaymentDayDelta(Integer.parseInt(periodicPaymentDayDeltaEdit.getText()));
                     // Fonts
                     opt.setFont(CONTROLS_FONT, (Font) controlsFontField.getUserData());
                     opt.setFont(MENU_FONT, (Font) menuFontField.getUserData());
@@ -195,7 +191,6 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
 
     private void createValidationSupport() {
         validation.registerValidator(accountClosingDayDeltaEdit, DELTA_VALIDATOR);
-        validation.registerValidator(periodicPaymentDayDeltaEdit, DELTA_VALIDATOR);
         validation.initInitialDecoration();
     }
 

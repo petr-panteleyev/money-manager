@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright &copy; 2020-2022 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.ofx;
@@ -128,11 +128,11 @@ public class TestCreditCardStatement {
             assertNotNull(creditCardStatement);
             assertEquals(1, creditCardStatement.size());
 
-            var r1 = creditCardStatement.get(0);
+            var r1 = creditCardStatement.getFirst();
             var statementList = r1.getCreditCardStatementList();
             assertEquals(1, statementList.size());
 
-            var statement = statementList.get(0);
+            var statement = statementList.getFirst();
 
             assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();
@@ -174,11 +174,11 @@ public class TestCreditCardStatement {
             assertNotNull(creditCardStatement);
             assertEquals(1, creditCardStatement.size());
 
-            var r1 = creditCardStatement.get(0);
+            var r1 = creditCardStatement.getFirst();
             var statementList = r1.getCreditCardStatementList();
             assertEquals(1, statementList.size());
 
-            var statement = statementList.get(0);
+            var statement = statementList.getFirst();
 
             assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();
@@ -213,11 +213,11 @@ public class TestCreditCardStatement {
             assertNotNull(creditCardStatement);
             assertEquals(1, creditCardStatement.size());
 
-            var r1 = creditCardStatement.get(0);
+            var r1 = creditCardStatement.getFirst();
             var statementList = r1.getCreditCardStatementList();
             assertEquals(1, statementList.size());
 
-            var statement = statementList.get(0);
+            var statement = statementList.getFirst();
 
             assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.creditCardAccountFrom();

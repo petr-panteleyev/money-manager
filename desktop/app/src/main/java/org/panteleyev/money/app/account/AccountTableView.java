@@ -1,5 +1,5 @@
 /*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2023-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.account;
@@ -15,7 +15,6 @@ import org.panteleyev.money.app.account.cells.AccountCommentCell;
 import org.panteleyev.money.app.account.cells.AccountCurrencyCell;
 import org.panteleyev.money.app.account.cells.AccountInterestCell;
 import org.panteleyev.money.app.account.cells.AccountNameCell;
-import org.panteleyev.money.app.cells.DocumentCountCell;
 import org.panteleyev.money.model.Account;
 
 import java.math.BigDecimal;
@@ -55,13 +54,11 @@ final class AccountTableView extends TableView<Account> {
                                 .withComparator(Comparators.accountsByClosingDate())
                                 .withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("Комментарий", b ->
-                        b.withCellFactory(_ -> new AccountCommentCell()).withWidthBinding(w.multiply(0.29))),
+                        b.withCellFactory(_ -> new AccountCommentCell()).withWidthBinding(w.multiply(0.3))),
                 tableObjectColumn("Баланс", b ->
-                        b.withCellFactory(_ -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.1))),
+                        b.withCellFactory(_ -> new AccountBalanceCell(true)).withWidthBinding(w.multiply(0.11))),
                 tableObjectColumn("Ожидает", b ->
-                        b.withCellFactory(_ -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn("", b ->
-                        b.withCellFactory(_ -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
+                        b.withCellFactory(_ -> new AccountBalanceCell(false)).withWidthBinding(w.multiply(0.11)))
         ));
 
         list.comparatorProperty().bind(comparatorProperty());

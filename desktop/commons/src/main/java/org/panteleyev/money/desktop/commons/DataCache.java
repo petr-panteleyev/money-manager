@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2019-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.commons;
@@ -13,9 +13,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
 import org.panteleyev.money.model.MoneyRecord;
-import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
@@ -35,13 +33,11 @@ import java.util.stream.Stream;
 
 public class DataCache {
     private final ObservableList<Icon> icons = FXCollections.observableArrayList();
-    private final ObservableList<MoneyDocument> documents = FXCollections.observableArrayList();
     private final ObservableList<Category> categories = FXCollections.observableArrayList();
     private final ObservableList<Contact> contacts = FXCollections.observableArrayList();
     private final ObservableList<Currency> currencies = FXCollections.observableArrayList();
     private final ObservableList<Account> accounts = FXCollections.observableArrayList();
     private final ObservableList<Transaction> transactions = FXCollections.observableArrayList();
-    private final ObservableList<PeriodicPayment> periodicPayments = FXCollections.observableArrayList();
     private final ObservableList<ExchangeSecurity> exchangeSecurities = FXCollections.observableArrayList();
     private final ObservableList<Card> cards = FXCollections.observableArrayList();
     private final ObservableList<InvestmentDeal> investmentDeals = FXCollections.observableArrayList();
@@ -49,22 +45,20 @@ public class DataCache {
 
     public void clear() {
         icons.clear();
-        documents.clear();
         categories.clear();
         contacts.clear();
         currencies.clear();
         accounts.clear();
         transactions.clear();
-        periodicPayments.clear();
         exchangeSecurities.clear();
         cards.clear();
         investmentDeals.clear();
         exchangeSecuritySplits.clear();
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Generic methods
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public <T extends MoneyRecord> Optional<T> getRecord(Collection<T> collection, UUID uuid) {
         return collection.stream().filter(r -> r.uuid().equals(uuid)).findAny();
@@ -89,9 +83,9 @@ public class DataCache {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Icons
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Icon> getIcon(UUID uuid) {
         return getRecord(icons, uuid);
@@ -109,46 +103,9 @@ public class DataCache {
         updateRecord(icons, icon);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Documents
-    ////////////////////////////////////////////////////////////////////////////
-
-    public Optional<MoneyDocument> getDocument(UUID uuid) {
-        return getRecord(documents, uuid);
-    }
-
-    public ObservableList<MoneyDocument> getDocuments() {
-        return documents;
-    }
-
-    public void add(MoneyDocument document) {
-        documents.add(document);
-    }
-
-    public void update(MoneyDocument document) {
-        updateRecord(documents, document);
-    }
-
-    public void remove(MoneyDocument document) {
-        removeRecord(documents, document.uuid());
-    }
-
-    public long getDocumentCount(MoneyRecord owner) {
-        return documents.stream()
-                .filter(doc -> doc.ownerUuid().equals(owner.uuid()))
-                .count();
-    }
-
-    public Set<String> getUniqueDocumentDescriptions() {
-        return getDocuments().stream()
-                .map(MoneyDocument::description)
-                .filter(c -> !c.isEmpty())
-                .collect(Collectors.toSet());
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Categories
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Category> getCategory(UUID uuid) {
         return getRecord(categories, uuid);
@@ -180,9 +137,9 @@ public class DataCache {
         updateRecord(categories, category);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Currency
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Currency> getCurrency(UUID uuid) {
         return getRecord(currencies, uuid);
@@ -208,9 +165,9 @@ public class DataCache {
         removeRecord(currencies, currency.uuid());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Contacts
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Contact> getContact(UUID uuid) {
         return getRecord(contacts, uuid);
@@ -228,9 +185,9 @@ public class DataCache {
         updateRecord(contacts, contact);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Accounts
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Account> getAccount(UUID uuid) {
         return getRecord(accounts, uuid);
@@ -275,9 +232,9 @@ public class DataCache {
         removeRecord(accounts, account.uuid());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Transactions
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Transaction> getTransaction(UUID uuid) {
         return getRecord(transactions, uuid);
@@ -350,33 +307,9 @@ public class DataCache {
         removeRecord(transactions, transaction.uuid());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Periodic Payments
-    ////////////////////////////////////////////////////////////////////////////
-
-    public Optional<PeriodicPayment> getPeriodicPayment(UUID uuid) {
-        return getRecord(periodicPayments, uuid);
-    }
-
-    public ObservableList<PeriodicPayment> getPeriodicPayments() {
-        return periodicPayments;
-    }
-
-    public void add(PeriodicPayment periodicPayment) {
-        periodicPayments.add(periodicPayment);
-    }
-
-    public void update(PeriodicPayment periodicPayment) {
-        updateRecord(periodicPayments, periodicPayment);
-    }
-
-    public void remove(PeriodicPayment periodicPayment) {
-        removeRecord(periodicPayments, periodicPayment.uuid());
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Exchange Securities
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<ExchangeSecurity> getExchangeSecurity(UUID uuid) {
         return getRecord(exchangeSecurities, uuid);
@@ -398,9 +331,9 @@ public class DataCache {
         removeRecord(exchangeSecurities, exchangeSecurity.uuid());
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Cards
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<Card> getCard(UUID uuid) {
         return getRecord(cards, uuid);
@@ -430,9 +363,9 @@ public class DataCache {
                 .toList();
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Investments
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<InvestmentDeal> getInvestment(UUID uuid) {
         return getRecord(investmentDeals, uuid);
@@ -442,9 +375,9 @@ public class DataCache {
         return investmentDeals;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Exchange Security Splits
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public Optional<ExchangeSecuritySplit> getExchangeSecuritySplit(UUID uuid) {
         return getRecord(exchangeSecuritySplits, uuid);

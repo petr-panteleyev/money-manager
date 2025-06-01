@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -23,7 +23,6 @@ final class GeneralSettings {
     enum Setting {
         AUTO_COMPLETE_LENGTH("autoCompleteLength", 3),
         ACCOUNT_CLOSING_DAY_DELTA("accountClosingDayDelta", 10),
-        PERIODIC_PAYMENT_DAY_DELTA("periodicPaymentDayDelta", 5),
         SHOW_DEACTIVATED_ACCOUNTS("showDeactivatedAccounts", false),
         SHOW_DEACTIVATED_CARDS("showDeactivatedCards", false),
         LAST_STATEMENT_DIR("lastStatementDir", ""),

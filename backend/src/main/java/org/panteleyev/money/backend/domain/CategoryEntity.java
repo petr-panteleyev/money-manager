@@ -5,14 +5,11 @@
 package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.panteleyev.money.model.CategoryType;
 
 import java.util.Objects;
 import java.util.UUID;

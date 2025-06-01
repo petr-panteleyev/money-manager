@@ -1,5 +1,5 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.persistence;
@@ -12,12 +12,7 @@ import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.DocumentType;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
-import org.panteleyev.money.model.PeriodicPayment;
-import org.panteleyev.money.model.PeriodicPaymentType;
-import org.panteleyev.money.model.RecurrenceType;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
@@ -353,45 +348,7 @@ public final class BaseTestUtils {
         }
     }
 
-    public static MoneyDocument newDocument(DocumentType type) {
-        return new MoneyDocument.Builder()
-                .uuid(UUID.randomUUID())
-                .ownerUuid(UUID.randomUUID())
-                .contactUuid(UUID.randomUUID())
-                .documentType(type)
-                .fileName(randomString())
-                .mimeType(randomString())
-                .description(randomString())
-                .date(LocalDate.now())
-                .created(System.currentTimeMillis())
-                .modified(System.currentTimeMillis())
-                .build();
-    }
-
-    public static PeriodicPayment newPeriodicPayment(
-            PeriodicPaymentType paymentType,
-            Account accountDebited,
-            Account accountCredited,
-            Contact contact
-    ) {
-        return new PeriodicPayment.Builder()
-                .name(randomString())
-                .paymentType(paymentType)
-                .recurrenceType(RecurrenceType.MONTHLY)
-                .accountDebitedUuid(accountDebited.uuid())
-                .accountCreditedUuid(accountCredited.uuid())
-                .contactUuid(contact.uuid())
-                .dayOfMonth(randomDay())
-                .amount(randomBigDecimal())
-                .comment(randomString())
-                .created(System.currentTimeMillis())
-                .modified(System.currentTimeMillis())
-                .build();
-    }
-
-    public static Card newCard(
-            Account account
-    ) {
+    public static Card newCard(Account account) {
         return new Card.Builder()
                 .uuid(UUID.randomUUID())
                 .accountUuid(account.uuid())
@@ -408,8 +365,8 @@ public final class BaseTestUtils {
     public static InvestmentDeal newInvestment(
             Account account,
             ExchangeSecurity security,
-            Currency currency
-    ) {
+            Currency currency)
+    {
         return new InvestmentDeal.Builder()
                 .accountUuid(account.uuid())
                 .securityUuid(security.uuid())
@@ -434,8 +391,8 @@ public final class BaseTestUtils {
     }
 
     public static ExchangeSecuritySplit newExchangeSecuritySplit(
-            ExchangeSecurity exchangeSecurity
-    ) {
+            ExchangeSecurity exchangeSecurity)
+    {
         return new ExchangeSecuritySplit.Builder()
                 .uuid(UUID.randomUUID())
                 .securityUuid(exchangeSecurity.uuid())

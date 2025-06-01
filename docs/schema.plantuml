@@ -58,23 +58,6 @@ entity contact {
     icon_uuid : UUID <<FK>>
 }
 
-entity document {
-    * uuid : UUID
-    --
-    * contact_uuid : UUID <<FK>>
-    * document_type : VARCHAR
-    * file_name : VARCHAR
-    * file_date : BIGINT
-    * file_size : INT
-    * mime_type : VARCHAR
-    * description : VARCHAR
-    * compressed : BOOLEAN
-    * created : BIGINT
-    * modified : BIGINT
-    owner_uuid : UUID
-    content : BYTEA
-}
-
 entity account {
     * uuid : UUID
     --
@@ -190,31 +173,12 @@ entity investment_deal {
     * modified : BIGINT
 }
 
-entity periodic {
-    * uuid : UUID
-    --
-    * name : VARCHAR
-    * payment_type : VARCHAR
-    * recurrence_type : VARCHAR
-    * amount : DECIMAL(15, 6)
-    * day_of_month : INT
-    * month : INT
-    * account_debited_uuid : UUID <<FK>>
-    * account_credited_uuid : UUID <<FK>>
-    * contact_uuid : UUID <<FK>>
-    * comment : VARCHAR
-    * created : BIGINT
-    * modified : BIGINT
-}
-
 icon ||--|{ category
 icon ||--|{ contact
 icon ||--|{ account
 
 currency |o--|{ account
 exchange_security |o--|{ account
-
-contact ||--|{ document
 
 category ||--|{ account
 category ||--|{ transaction
@@ -228,8 +192,5 @@ exchange_security ||--o{ exchange_security_split
 investment_deal }o--|| account
 investment_deal ||--o| currency
 investment_deal ||--o| exchange_security
-
-periodic }o--|| account
-periodic }o--|| contact
 
 @enduml

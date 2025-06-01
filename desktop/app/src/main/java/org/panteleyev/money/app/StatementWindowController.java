@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -156,7 +156,7 @@ public class StatementWindowController extends BaseController {
     }
 
     private MenuBar createMainMenu() {
-        var menuBar = menuBar(
+        return menuBar(
                 menu("Файл",
                         menuItem("Открыть...", SHORTCUT_O, _ -> onBrowse()),
                         new SeparatorMenuItem(),
@@ -174,7 +174,6 @@ public class StatementWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        return menuBar;
     }
 
     private void setupAccountComboBox() {

@@ -1,13 +1,11 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.desktop.persistence;
 
 import javafx.application.Platform;
 import org.panteleyev.money.desktop.commons.DataCache;
-import org.panteleyev.money.desktop.commons.DocumentProvider;
-import org.panteleyev.money.desktop.export.BlobContent;
 import org.panteleyev.money.desktop.export.Import;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
@@ -15,8 +13,6 @@ import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.MoneyDocument;
-import org.panteleyev.money.model.PeriodicPayment;
 import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
@@ -37,7 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class MoneyDAO implements DocumentProvider {
+public class MoneyDAO {
     private final DataCache cache;
     private final AtomicReference<DataSource> dataSource = new AtomicReference<>();
     // Repositories
@@ -47,8 +43,6 @@ public class MoneyDAO implements DocumentProvider {
     private final CurrencyRepository currencyRepository = new CurrencyRepository();
     private final TransactionRepository transactionRepository = new TransactionRepository();
     private final IconRepository iconRepository = new IconRepository();
-    private final DocumentRepository documentRepository = new DocumentRepository();
-    private final PeriodicPaymentRepository periodicPaymentRepository = new PeriodicPaymentRepository();
     private final ExchangeSecurityRepository exchangeSecurityRepository = new ExchangeSecurityRepository();
     private final CardRepository cardRepository = new CardRepository();
     private final InvestmentDealRepository investmentDealRepository = new InvestmentDealRepository();
@@ -62,9 +56,10 @@ public class MoneyDAO implements DocumentProvider {
         this.cache = cache;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Generic methods
-    ////////////////////////////////////////////////////////////////////////////
+    //
+    //    Generic methods
+    //
+
     public void withNewConnection(Consumer<Connection> consumer) {
         try (var connection = dataSource.get().getConnection()) {
             try {
@@ -96,9 +91,9 @@ public class MoneyDAO implements DocumentProvider {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Icons
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertIcon(Icon icon) {
         withNewConnection(conn -> {
@@ -114,47 +109,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Documents
-    ////////////////////////////////////////////////////////////////////////////
-
-    public void insertDocument(MoneyDocument document, byte[] bytes) {
-        withNewConnection(conn -> {
-            documentRepository.insert(conn, document);
-            if (bytes != null) {
-                documentRepository.insertBytes(conn, document.uuid(), bytes);
-            }
-            cache.add(document);
-        });
-    }
-
-    public void updateDocument(MoneyDocument document) {
-        withNewConnection(conn -> {
-            documentRepository.update(conn, document);
-            cache.update(document);
-        });
-    }
-
-    public void deleteDocument(MoneyDocument document) {
-        withNewConnection(conn -> {
-            cache.remove(document);
-            documentRepository.delete(conn, document);
-        });
-    }
-
-    @Override
-    public byte[] getDocumentBytes(MoneyDocument document) {
-        try (var conn = dataSource.get().getConnection()) {
-            return documentRepository.getBytes(conn, document.uuid())
-                    .orElseThrow(() -> new IllegalStateException("Document content not found"));
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Categories
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertCategory(Category category) {
         withNewConnection(conn -> {
@@ -170,9 +127,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Currency
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertCurrency(Currency currency) {
         withNewConnection(conn -> {
@@ -195,9 +152,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Contacts
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertContact(Contact contact) {
         withNewConnection(conn -> {
@@ -213,9 +170,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Accounts
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertAccount(Account account) {
         withNewConnection(conn -> {
@@ -242,9 +199,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Transactions
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertTransaction(Transaction transaction) {
         withNewConnection(conn -> {
@@ -294,38 +251,9 @@ public class MoneyDAO implements DocumentProvider {
         );
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    // Periodic Payments
-    ////////////////////////////////////////////////////////////////////////////
-
-    public void insertPeriodicPayment(PeriodicPayment periodicPayment) {
-        withNewConnection(conn -> {
-            periodicPaymentRepository.insert(conn, periodicPayment);
-            cache.add(periodicPayment);
-        });
-    }
-
-    public void updatePeriodicPayment(PeriodicPayment periodicPayment) {
-        withNewConnection(conn -> {
-            updatePeriodicPayment(conn, periodicPayment);
-        });
-    }
-
-    public void updatePeriodicPayment(Connection conn, PeriodicPayment periodicPayment) {
-        periodicPaymentRepository.update(conn, periodicPayment);
-        cache.update(periodicPayment);
-    }
-
-    public void deletePeriodicPayment(PeriodicPayment periodicPayment) {
-        withNewConnection(conn -> {
-            cache.remove(periodicPayment);
-            periodicPaymentRepository.delete(conn, periodicPayment);
-        });
-    }
-
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Exchange Securities
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertExchangeSecurity(ExchangeSecurity security) {
         withNewConnection(conn -> {
@@ -345,9 +273,9 @@ public class MoneyDAO implements DocumentProvider {
         cache.update(security);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Cards
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertCard(Card card) {
         withNewConnection(conn -> {
@@ -374,9 +302,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Investment deals
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertInvestments(List<InvestmentDeal> investmentDeals) {
         withNewConnection(conn -> {
@@ -389,9 +317,9 @@ public class MoneyDAO implements DocumentProvider {
         });
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    //
     // Exchange security splits
-    ////////////////////////////////////////////////////////////////////////////
+    //
 
     public void insertExchangeSecuritySplit(ExchangeSecuritySplit split) {
         withNewConnection(conn -> {
@@ -477,14 +405,6 @@ public class MoneyDAO implements DocumentProvider {
             var transactionList = transactionRepository.getAll(conn);
             progress.accept("done\n");
 
-            progress.accept("    documents...");
-            var documentList = documentRepository.getAll(conn);
-            progress.accept("done\n");
-
-            progress.accept("    periodic payments...");
-            var periodicPaymentsList = periodicPaymentRepository.getAll(conn);
-            progress.accept("done\n");
-
             progress.accept("    securities...");
             var exchangeSecuritiesList = exchangeSecurityRepository.getAll(conn);
             progress.accept("done\n");
@@ -501,14 +421,12 @@ public class MoneyDAO implements DocumentProvider {
 
             CompletableFuture.supplyAsync(() -> {
                 cache.getIcons().setAll(iconList);
-                cache.getDocuments().setAll(documentList);
                 cache.getCategories().setAll(categoryList);
                 cache.getContacts().setAll(contactList);
                 cache.getCurrencies().setAll(currencyList);
                 cache.getAccounts().setAll(accountList);
                 cache.getCards().setAll(cardList);
                 cache.getTransactions().setAll(transactionList);
-                cache.getPeriodicPayments().setAll(periodicPaymentsList);
                 cache.getExchangeSecurities().setAll(exchangeSecuritiesList);
                 cache.getInvestmentDeals().setAll(investmentList);
                 cache.getExchangeSecuritySplits().setAll(exchangeSecuritySplitsList);
@@ -565,14 +483,6 @@ public class MoneyDAO implements DocumentProvider {
                     imp.getTransactions().stream().filter(t -> t.parentUuid() != null).toList());
             progress.accept("выполнено\n");
 
-            progress.accept("    документы...");
-            documentRepository.insert(conn, BATCH_SIZE, imp.getDocuments());
-            progress.accept("выполнено\n");
-
-            progress.accept("    периодические платежи...");
-            periodicPaymentRepository.insert(conn, BATCH_SIZE, imp.getPeriodicPayments());
-            progress.accept("выполнено\n");
-
             progress.accept("    инвестиционные сделки...");
             investmentDealRepository.insert(conn, BATCH_SIZE, imp.getInvestmentDeals());
             progress.accept("выполнено\n");
@@ -581,14 +491,6 @@ public class MoneyDAO implements DocumentProvider {
             exchangeSecuritySplitRepository.insert(conn, BATCH_SIZE, imp.getExchangeSecuritySplits());
             progress.accept("выполнено\n");
 
-            progress.accept("выполнено\n");
-
-            progress.accept("Импорт файлов...");
-            for (var blobContent : imp.getBlobs()) {
-                if (blobContent.type() == BlobContent.BlobType.DOCUMENT) {
-                    documentRepository.insertBytes(conn, blobContent.uuid(), blobContent.bytes());
-                }
-            }
             progress.accept("выполнено\n");
         });
     }

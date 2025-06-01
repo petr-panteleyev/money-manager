@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.settings;
@@ -153,14 +153,6 @@ public final class Settings {
 
     public void setAccountClosingDayDelta(int delta) {
         generalSettings.put(GeneralSettings.Setting.ACCOUNT_CLOSING_DAY_DELTA, delta);
-    }
-
-    public int getPeriodicPaymentDayDelta() {
-        return generalSettings.get(GeneralSettings.Setting.PERIODIC_PAYMENT_DAY_DELTA);
-    }
-
-    public void setPeriodicPaymentDayDelta(int delta) {
-        generalSettings.put(GeneralSettings.Setting.PERIODIC_PAYMENT_DAY_DELTA, delta);
     }
 
     public Font getFont(FontName option) {

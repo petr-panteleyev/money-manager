@@ -23,11 +23,8 @@ import javafx.util.Callback;
 import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.PredicateProperty;
-import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
-import org.panteleyev.money.app.actions.DocumentActionsHolder;
-import org.panteleyev.money.app.cells.DocumentCountCell;
 import org.panteleyev.money.app.transaction.cells.TransactionAccountRequestSumCell;
 import org.panteleyev.money.app.transaction.cells.TransactionCheckCell;
 import org.panteleyev.money.app.transaction.cells.TransactionCommentCell;
@@ -118,9 +115,6 @@ public class TransactionTableView extends TableView<Transaction> {
             this::onCreateTransaction, this::onEditTransaction, this::onDeleteTransaction,
             disableBinding
     );
-    private final DocumentActionsHolder documentActionsHolder = new DocumentActionsHolder(
-            this::onDocuments, this::onAttachDocument, disableBinding
-    );
 
     private final Action transactionDetailsAction = actionBuilder("Детали...", this::onTransactionDetails)
             .disableBinding(disableBinding)
@@ -145,19 +139,21 @@ public class TransactionTableView extends TableView<Transaction> {
     }
 
     public TransactionTableView(Controller owner,
-                                Mode mode,
-                                TransactionDetailsCallback transactionDetailsCallback,
-                                Consumer<Transaction> transactionAddedCallback,
-                                Consumer<Transaction> transactionUpdatedCallback) {
+            Mode mode,
+            TransactionDetailsCallback transactionDetailsCallback,
+            Consumer<Transaction> transactionAddedCallback,
+            Consumer<Transaction> transactionUpdatedCallback)
+    {
         this(owner, mode, null, transactionDetailsCallback, transactionAddedCallback, transactionUpdatedCallback);
     }
 
     TransactionTableView(Controller owner,
-                         Mode mode,
-                         Account account,
-                         TransactionDetailsCallback transactionDetailsCallback,
-                         Consumer<Transaction> transactionAddedCallback,
-                         Consumer<Transaction> transactionUpdatedCallback) {
+            Mode mode,
+            Account account,
+            TransactionDetailsCallback transactionDetailsCallback,
+            Consumer<Transaction> transactionAddedCallback,
+            Consumer<Transaction> transactionUpdatedCallback)
+    {
         this.owner = owner;
         this.mode = mode;
         if (mode == Mode.ACCOUNT && account == null) {
@@ -195,17 +191,17 @@ public class TransactionTableView extends TableView<Transaction> {
                         b.withCellFactory(_ -> new TransactionDebitedAccountCell())
                                 .withComparator(Comparators.transactionsByDebitedAccountName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.1))),
+                                .withWidthBinding(w.multiply(0.11))),
                 tableObjectColumn("Счет получателя", b ->
                         b.withCellFactory(_ -> new TransactionCreditedAccountCell())
                                 .withComparator(Comparators.transactionsByCreditedAccountName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.1))),
+                                .withWidthBinding(w.multiply(0.11))),
                 tableObjectColumn("Контрагент", b ->
                         b.withCellFactory(_ -> new TransactionContactCell())
                                 .withComparator(Comparators.transactionsByContactName(cache())
                                         .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.2))),
+                                .withWidthBinding(w.multiply(0.21))),
                 tableObjectColumn("Комментарий", b ->
                         b.withCellFactory(_ -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
                 tableObjectColumn("Сумма", b ->
@@ -213,9 +209,7 @@ public class TransactionTableView extends TableView<Transaction> {
                                 .withComparator(Comparator.comparing(Transaction::getSignedAmount))
                                 .withWidthBinding(w.multiply(0.05))),
                 tableObjectColumn("", b ->
-                        b.withCellFactory(_ -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03))),
-                tableObjectColumn("", b ->
-                        b.withCellFactory(_ -> new DocumentCountCell<>()).withWidthBinding(w.multiply(0.03)))
+                        b.withCellFactory(_ -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03)))
         ));
 
         getSortOrder().add(dayColumn);
@@ -259,9 +253,6 @@ public class TransactionTableView extends TableView<Transaction> {
         if (mode != Mode.STATEMENT) {
             actionList.addAll(List.of(
                     transactionDetailsAction,
-                    ACTION_SEPARATOR,
-                    documentActionsHolder.getAttachDocumentAction(),
-                    documentActionsHolder.getDocumentsAction(),
                     ACTION_SEPARATOR
             ));
         }
@@ -384,17 +375,6 @@ public class TransactionTableView extends TableView<Transaction> {
                         .findAny()
                         .ifPresent(t -> getSelectionModel().select(t));
             }
-        });
-    }
-
-    private void onDocuments(ActionEvent event) {
-        getSelectedTransaction().ifPresent(BaseController::getDocumentController);
-    }
-
-    private void onAttachDocument(ActionEvent event) {
-        getSelectedTransaction().ifPresent(transaction -> {
-            var controller = BaseController.getDocumentController(transaction);
-            controller.onCreateDocument(event);
         });
     }
 }

@@ -1,15 +1,13 @@
 # Money Manager
 
-![JDK](docs/badges/java-24.svg)
-[![License](docs/badges/license.svg)](LICENSE)
-
 Программа для учета расходов и сверки выписок.
 
 ## Как собрать
 
-Убедитесь, что переменная окружения ```JAVA_HOME``` указывает на JDK 24.
+Для сборки проекта требуется JDK 24+.
 
 ```shell script
+export JAVA_HOME=/path/to/jdk24
 ./mvnw clean install
 ```
 

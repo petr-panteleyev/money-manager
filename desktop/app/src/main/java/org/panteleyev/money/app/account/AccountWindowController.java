@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.account;
@@ -95,10 +95,6 @@ public final class AccountWindowController extends BaseController {
     );
 
     private final Action searchAction = searchAction(_ -> accountNameFilterBox.getTextField().requestFocus());
-    private final Action attachDocumentAction = actionBuilder("Прикрепить документ...", this::onAttachDocument)
-            .disableBinding(disableBinding).build();
-    private final Action documentsAction = actionBuilder("Документы...", this::onDocuments)
-            .disableBinding(disableBinding).build();
     private final Action copyNameAction = actionBuilder("Копировать название", this::onCopyName)
             .accelerator(SHORTCUT_C).disableBinding(disableBinding).build();
     private final Action transactionsAction = actionBuilder("Проводки...", this::onShowTransactions)
@@ -122,8 +118,6 @@ public final class AccountWindowController extends BaseController {
         );
 
         BorderPane.setMargin(hBox, BIG_INSETS);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         categorySelectionBox.setupCategoryTypesBox();
 
@@ -161,9 +155,6 @@ public final class AccountWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 createMenuItem(transactionsAction),
                 new SeparatorMenuItem(),
-                createMenuItem(attachDocumentAction),
-                createMenuItem(documentsAction),
-                new SeparatorMenuItem(),
                 createMenuItem(refreshBalanceAction)
         );
 
@@ -173,7 +164,7 @@ public final class AccountWindowController extends BaseController {
                 )
         );
 
-        var menuBar = menuBar(
+        return menuBar(
                 menu("Файл",
                         menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
                         new SeparatorMenuItem(),
@@ -193,7 +184,6 @@ public final class AccountWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-        return menuBar;
     }
 
     private void createContextMenu() {
@@ -208,9 +198,6 @@ public final class AccountWindowController extends BaseController {
                 createContextMenuItem(crudActionsHolder.getUpdateAction()),
                 new SeparatorMenuItem(),
                 createContextMenuItem(crudActionsHolder.getDeleteAction()),
-                new SeparatorMenuItem(),
-                createContextMenuItem(attachDocumentAction),
-                createContextMenuItem(documentsAction),
                 new SeparatorMenuItem(),
                 createContextMenuItem(copyNameAction),
                 activateAccountMenuItem,
@@ -316,17 +303,6 @@ public final class AccountWindowController extends BaseController {
             var total = cache().calculateBalance(account, false, _ -> true);
             var waiting = cache().calculateBalance(account, false, t -> !t.checked());
             dao().updateAccount(account.updateBalance(total, waiting));
-        });
-    }
-
-    private void onDocuments(ActionEvent ignored) {
-        getSelectedAccount().ifPresent(BaseController::getDocumentController);
-    }
-
-    private void onAttachDocument(ActionEvent event) {
-        getSelectedAccount().ifPresent(account -> {
-            var controller = getDocumentController(account);
-            controller.onCreateDocument(event);
         });
     }
 }

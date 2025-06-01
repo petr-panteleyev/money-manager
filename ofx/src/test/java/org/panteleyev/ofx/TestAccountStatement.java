@@ -1,5 +1,5 @@
 /*
- Copyright © 2020-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.ofx;
@@ -71,11 +71,11 @@ public class TestAccountStatement {
             assertTrue(creditCardStatement.isEmpty());
 
 
-            var r1 = accountStatement.get(0);
+            var r1 = accountStatement.getFirst();
             var statementList = r1.accountStatementList();
             assertEquals(1, statementList.size());
 
-            var statement = statementList.get(0);
+            var statement = statementList.getFirst();
 
             assertEquals(STATEMENT_CURRENCY, statement.currency());
             var accountInfo = statement.bankAccountFrom();

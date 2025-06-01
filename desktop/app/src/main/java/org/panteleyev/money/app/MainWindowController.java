@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -123,7 +123,6 @@ public class MainWindowController extends BaseController implements TransactionT
             new TransactionTableView(this, TransactionTableView.Mode.SUMMARY, this,
                     this::goToTransaction, this::goToTransaction);
 
-    @SuppressWarnings("FieldCanBeLocal")
     private final ListChangeListener<Account> accountListener = _ -> Platform.runLater(this::reloadTransactions);
 
     public static final Validator<String> BIG_DECIMAL_VALIDATOR = (Control control, String value) -> {
@@ -370,7 +369,7 @@ public class MainWindowController extends BaseController implements TransactionT
                 try (var outputStream = new FileOutputStream(selected);
                      var bufferedOutputStream = new BufferedOutputStream(outputStream)
                 ) {
-                    new Export(cache(), dao()).doExport(bufferedOutputStream,
+                    new Export(cache()).doExport(bufferedOutputStream,
                             event -> progressDialog.append(event.buildEventString()));
                     settings().update(opt -> opt.setLastExportDir(selected.getParent()));
                 } catch (IOException ex) {

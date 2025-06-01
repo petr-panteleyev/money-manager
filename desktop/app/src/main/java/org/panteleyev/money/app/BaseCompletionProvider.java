@@ -1,5 +1,5 @@
 /*
- Copyright © 2019-2022 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2019-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -37,7 +37,7 @@ public abstract class BaseCompletionProvider<T> implements Callback<AutoCompleti
                 .filter(it -> getElementString(it).toLowerCase().contains(stripped))
                 .toList();
 
-        if (result.size() == 1 && getElementString(result.get(0)).equals(userText)) {
+        if (result.size() == 1 && getElementString(result.getFirst()).equals(userText)) {
             /* If there is a single case sensitive match then no suggestions must be shown. */
             return List.of();
         } else {

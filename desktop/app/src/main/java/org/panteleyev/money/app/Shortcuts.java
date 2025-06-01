@@ -1,5 +1,5 @@
 /*
- Copyright © 2021-2024 Petr Panteleyev <petr@panteleyev.org>
+ Copyright © 2021-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app;
@@ -64,9 +64,6 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_ALT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_R = new KeyCodeCombination(R, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_S = new KeyCodeCombination(S, SHORTCUT_DOWN, ALT_DOWN);
-    public static final KeyCodeCombination SHORTCUT_ALT_U = new KeyCodeCombination(U, SHORTCUT_DOWN, ALT_DOWN);
-
-    public static final KeyCodeCombination SHORTCUT_SHIFT_P = new KeyCodeCombination(P, SHORTCUT_DOWN, SHIFT_DOWN);
 
     public static final KeyCodeCombination SHORTCUT_C = new KeyCodeCombination(C, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(E, SHORTCUT_DOWN);
@@ -76,7 +73,6 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(N, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_O = new KeyCodeCombination(O, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_R = new KeyCodeCombination(R, SHORTCUT_DOWN);
-    public static final KeyCodeCombination SHORTCUT_S = new KeyCodeCombination(S, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_T = new KeyCodeCombination(T, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_U = new KeyCodeCombination(U, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_DELETE = new KeyCodeCombination(DELETE, SHORTCUT_DOWN);

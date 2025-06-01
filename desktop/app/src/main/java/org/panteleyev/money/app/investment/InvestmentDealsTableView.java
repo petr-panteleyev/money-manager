@@ -1,11 +1,10 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.investment;
 
 import javafx.collections.transformation.FilteredList;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.panteleyev.fx.PredicateProperty;
@@ -23,7 +22,6 @@ import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityAmountCel
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityNameCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityTypeCell;
-import org.panteleyev.money.model.Transaction;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.List;
