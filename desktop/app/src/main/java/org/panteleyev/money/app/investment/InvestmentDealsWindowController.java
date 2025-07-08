@@ -124,7 +124,7 @@ public class InvestmentDealsWindowController extends BaseController {
                 if (Objects.equals(filter, FILTER_SBER_ONLINE_BROKER_DEALS)) {
                     investments = new SberbankBrokerReportParser().parse(inputStream);
                 } else if (Objects.equals(filter, FILTER_SBER_ONLINE_BROKER_DEALS_HTML)) {
-                    investments = new SberbankBrokerHtmlReportParser().parse(inputStream);
+                    investments = new SberbankBrokerHtmlReportParser().parse(selected.getName(), inputStream);
                 } else if (Objects.equals(filter, FILTER_RAIF_ONLINE_BROKER_DEALS)) {
                     var fileName = selected.getName();
                     var underscoreIndex = fileName.indexOf('_');

@@ -1,5 +1,5 @@
 /*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money.app.investment;
@@ -54,13 +54,13 @@ public class SberbankBrokerHtmlReportParser {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-    public List<InvestmentDeal> parse(InputStream inputStream) {
+    public List<InvestmentDeal> parse(String fileName, InputStream inputStream) {
         var result = new ArrayList<InvestmentDeal>();
 
         try {
             var document = Jsoup.parse(inputStream, StandardCharsets.UTF_8.name(), "");
 
-            var accountName = parseAccountName(document);
+            var accountName = parseAccountName(fileName);
             var accountUuid = cache().getAccounts().stream()
                     .filter(x -> Objects.equals(x.name(), accountName))
                     .map(Account::uuid)
@@ -121,7 +121,8 @@ public class SberbankBrokerHtmlReportParser {
                         .currencyUuid(currencyUuid)
                         .dealNumber(row.get(CELL_INDEX_DEAL_NUMBER).text())
                         .dealDate(LocalDateTime.of(dealDate, dealTime))
-                        .accountingDate(LocalDate.parse(row.get(CELL_INDEX_ACCOUNTING_DATE).text(), DATE_FORMATTER).atStartOfDay())
+                        .accountingDate(LocalDate.parse(row.get(CELL_INDEX_ACCOUNTING_DATE).text(),
+                                DATE_FORMATTER).atStartOfDay())
                         .marketType(InvestmentMarketType.STOCK_MARKET) // TODO: parse from table
                         .operationType(InvestmentOperationType.fromTitle(row.get(CELL_INDEX_OPERATION_TYPE).text()))
                         .securityAmount(Integer.parseInt(
@@ -153,6 +154,11 @@ public class SberbankBrokerHtmlReportParser {
         }
         var titleString = titles.getFirst().text().split(" ");
         return titleString[titleString.length - 1];
+    }
+
+    private String parseAccountName(String fileName) {
+        var index = fileName.indexOf('_');
+        return index != -1 ? fileName.substring(0, index) : "";
     }
 
     private boolean checkForDealsTable(Element table) {

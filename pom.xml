@@ -14,7 +14,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>25.6.1</revision>
+        <revision>25.7.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>

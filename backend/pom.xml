@@ -19,7 +19,7 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>25.6.1</revision>
+        <revision>25.7.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>24</java.version>
         <maven.compiler.release>24</maven.compiler.release>
@@ -33,8 +33,6 @@
         <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>
         <springDocsVersion>2.8.8</springDocsVersion>
-        <caffeineVersion>3.1.8</caffeineVersion>
-        <graphqlJavaExtendedScalarsVersion>19.1</graphqlJavaExtendedScalarsVersion>
         <restAssuredVersion>5.4.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
@@ -104,11 +102,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springDocsVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeineVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
