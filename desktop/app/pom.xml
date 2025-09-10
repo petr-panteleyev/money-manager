@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+  Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
     <parent>
         <groupId>org.panteleyev.money</groupId>
         <artifactId>money-manager-desktop-parent</artifactId>
-        <version>${revision}</version>
     </parent>
 
     <artifactId>money-manager-desktop</artifactId>
@@ -290,6 +289,7 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
+                            <longModulepath>false</longModulepath>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
                                 <argument>-Xms500m</argument>
@@ -299,7 +299,7 @@
                                 <argument>--add-exports</argument>
                                 <argument>javafx.base/com.sun.javafx.event=org.controlsfx.controls</argument>
                                 <argument>--module-path</argument>
-                                <modulepath/>
+                                <argument>target/jmods</argument>
                                 <argument>-Dmoney.profile=${money.profile}</argument>
                                 <argument>-Dmoney.noauto=${money.noauto}</argument>
                                 <argument>--module</argument>

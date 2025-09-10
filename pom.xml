@@ -3,9 +3,9 @@
   Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
   SPDX-License-Identifier: BSD-2-Clause
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
 
     <groupId>org.panteleyev.money</groupId>
     <artifactId>money-manager-parent</artifactId>
@@ -14,7 +14,6 @@
     <name>Parent</name>
 
     <properties>
-        <revision>25.7.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>24</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -25,9 +24,9 @@
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.7.1</mavenDependencyPluginVersion>
-        <mavenExecPluginVersion>3.5.0</mavenExecPluginVersion>
+        <mavenExecPluginVersion>3.5.1</mavenExecPluginVersion>
         <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
-        <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
+        <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>24.0.1</javaFxVersion>
         <javaFxHelpersVersion>1.20.0</javaFxHelpersVersion>
@@ -46,14 +45,14 @@
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
 
-    <modules>
-        <module>model</module>
-        <module>ofx</module>
-        <module>moex</module>
-        <module>desktop</module>
-        <module>backend</module>
-        <module>client</module>
-    </modules>
+    <subprojects>
+        <subproject>model</subproject>
+        <subproject>ofx</subproject>
+        <subproject>moex</subproject>
+        <subproject>desktop</subproject>
+        <subproject>backend</subproject>
+        <subproject>client</subproject>
+    </subprojects>
 
     <dependencyManagement>
         <dependencies>
@@ -212,6 +211,10 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${mavenCleanPluginVersion}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${mavenCompilerPluginVersion}</version>
@@ -244,31 +247,31 @@
             </plugins>
         </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flattenMavenPluginVersion}</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>flatten-maven-plugin</artifactId>-->
+<!--                <version>${flattenMavenPluginVersion}</version>-->
+<!--                <configuration>-->
+<!--                    <updatePomFile>true</updatePomFile>-->
+<!--                    <flattenMode>resolveCiFriendliesOnly</flattenMode>-->
+<!--                </configuration>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>flatten</id>-->
+<!--                        <phase>process-resources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>flatten</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                    <execution>-->
+<!--                        <id>flatten.clean</id>-->
+<!--                        <phase>clean</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>clean</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 </project>
