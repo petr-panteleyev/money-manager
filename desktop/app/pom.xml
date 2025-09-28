@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
+  Copyright © 2017-2025 Petr Panteleyev
   SPDX-License-Identifier: BSD-2-Clause
   -->
 <project xmlns="http://maven.apache.org/POM/4.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -267,14 +267,15 @@
                     <destination>target/dist</destination>
                     <removeDestination>true</removeDestination>
                     <javaOptions>
-                        <javaOption>-XX:NewRatio=1</javaOption>
-                        <javaOption>-Xms500m</javaOption>
-                        <javaOption>-Xmx500m</javaOption>
-                        <javaOption>--enable-native-access=javafx.graphics</javaOption>
-                        <javaOption>--sun-misc-unsafe-memory-access=allow</javaOption>
-                        <javaOption>--add-exports</javaOption>
-                        <javaOption>javafx.base/com.sun.javafx.event=org.controlsfx.controls</javaOption>
-                        <javaOption>-Djavafx.autoproxy.disable=true</javaOption>
+                        <option>-XX:NewRatio=1</option>
+                        <option>-Xms500m</option>
+                        <option>-Xmx500m</option>
+                        <option>-XX:+UseCompactObjectHeaders</option>
+                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>--sun-misc-unsafe-memory-access=allow</option>
+                        <option>--add-exports</option>
+                        <option>javafx.base/com.sun.javafx.event=org.controlsfx.controls</option>
+                        <option>-Djavafx.autoproxy.disable=true</option>
                     </javaOptions>
                 </configuration>
             </plugin>
@@ -294,6 +295,7 @@
                                 <argument>-XX:NewRatio=1</argument>
                                 <argument>-Xms500m</argument>
                                 <argument>-Xmx500m</argument>
+                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <argument>--add-exports</argument>

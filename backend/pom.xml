@@ -20,14 +20,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>24</java.version>
-        <maven.compiler.release>24</maven.compiler.release>
+        <java.version>25</java.version>
+        <maven.compiler.release>25</maven.compiler.release>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
-        <mavenSurefirePluginVersion>3.5.2</mavenSurefirePluginVersion>
-        <jpackageMavenPluginVersion>1.6.6</jpackageMavenPluginVersion>
+        <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
+        <jpackageMavenPluginVersion>1.7.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.7.3</postgresVersion>
         <liquibaseVersion>4.20.0</liquibaseVersion>

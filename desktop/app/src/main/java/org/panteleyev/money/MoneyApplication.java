@@ -1,5 +1,5 @@
 /*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
+ Copyright © 2017-2025 Petr Panteleyev
  SPDX-License-Identifier: BSD-2-Clause
  */
 package org.panteleyev.money;
@@ -67,7 +67,7 @@ public class MoneyApplication extends Application {
         });
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         Application.launch(MoneyApplication.class, args);
     }
 

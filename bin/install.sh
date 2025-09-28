@@ -23,8 +23,7 @@ $JAVA_HOME/bin/java --module-path $INSTALL_DIR/jars \\
   -XX:NewRatio=1 \\
   -Xms500m \\
   -Xmx500m \\
-  -XX:+AutoCreateSharedArchive \\
-  -XX:SharedArchiveFile=\$TMP/money-manager.jsa \\
+  -XX:+UseCompactObjectHeaders \\
   --enable-native-access=javafx.graphics \\
   --sun-misc-unsafe-memory-access=allow \\
   --add-exports javafx.base/com.sun.javafx.event=org.controlsfx.controls \\
