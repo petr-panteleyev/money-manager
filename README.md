@@ -8,13 +8,13 @@
 
 ```shell script
 export JAVA_HOME=/path/to/jdk25
-./mvnw clean verify
+./mvnw clean install
 ```
 
 ## Как запустить
 
 ```shell script
-./mvnw -pl desktop/app exec:exec
+./mvnw -pl desktop/app exec:exec@run
 ```
 
 Чтобы открыть конкретный профиль соединения добавьте ```-Dmoney.profile=<profile>``` к командной строке.
