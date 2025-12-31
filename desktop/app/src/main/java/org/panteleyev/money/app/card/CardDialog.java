@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.card;
 
 import javafx.application.Platform;
@@ -36,12 +34,13 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
-import static org.panteleyev.fx.grid.GridBuilder.gridCell;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -57,9 +56,10 @@ final class CardDialog extends BaseDialog<Card> {
     private final TextField commentEdit = new TextField();
     private final CheckBox enabledCheckBox = new CheckBox("Активна");
     private final DatePicker expritationDatePicker = new DatePicker();
-    private final ComboBox<CardType> typeComboBox = comboBox(CardType.values(),
-            b -> b.withDefaultString("-")
-                    .withImageConverter(Images::getCardTypeIcon));
+
+    private final ComboBox<CardType> typeComboBox = comboBox(CardType.asList(), _ -> comboBoxListCell("-",
+            Object::toString, Images::getCardTypeIcon, null
+    ));
 
     private final Set<Account> accountSuggestions = new TreeSet<>();
     private final Set<Account> accountSuggestionsAll = new TreeSet<>();
@@ -89,7 +89,9 @@ final class CardDialog extends BaseDialog<Card> {
                         gridRow(label("Exp:"), gridCell(expritationDatePicker, 2, 1)),
                         gridRow(label("Описание:"), gridCell(commentEdit, 2, 1)),
                         gridRow(label(""), gridCell(enabledCheckBox, 2, 1))
-                ), b -> b.withStyle(Styles.GRID_PANE)
+                ),
+                List.of(),
+                List.of(Styles.GRID_PANE)
         ));
 
         if (card == null) {
@@ -150,8 +152,9 @@ final class CardDialog extends BaseDialog<Card> {
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
-                                                              Collection<T> items,
-                                                              StringConverter<T> converter) {
+            Collection<T> items,
+            StringConverter<T> converter)
+    {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 

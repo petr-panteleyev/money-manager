@@ -1,8 +1,9 @@
-/*
- Copyright © 2017-2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
+
+import java.util.Arrays;
+import java.util.List;
 
 public enum ContactType {
     PERSONAL,
@@ -10,5 +11,10 @@ public enum ContactType {
     SUPPLIER,
     EMPLOYEE,
     EMPLOYER,
-    SERVICE
+    SERVICE;
+
+
+    public static List<ContactType> asList() {
+        return Arrays.asList(values());
+    }
 }

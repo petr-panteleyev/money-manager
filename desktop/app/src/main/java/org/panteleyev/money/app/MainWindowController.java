@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
@@ -75,12 +73,12 @@ import static javafx.scene.control.ButtonType.YES;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -152,65 +150,68 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private MenuBar createMainMenu() {
-        // Main menu
-        var fileConnectMenuItem = menuItem("Соединение...", _ -> onOpenConnection());
-        var fileExitMenuItem = menuItem("Выход", _ -> onExit());
-        var exportMenuItem = menuItem("Экспорт...", SHORTCUT_ALT_E, _ -> xmlDump());
-        var importMenuItem = menuItem("Импорт...", SHORTCUT_ALT_I, _ -> onImport());
-        var reportMenuItem = menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport());
-
-        var fileMenu = menu("Файл",
-                fileConnectMenuItem,
-                new SeparatorMenuItem(),
-                importMenuItem,
-                exportMenuItem,
-                new SeparatorMenuItem(),
-                reportMenuItem,
-                new SeparatorMenuItem(),
-                createMenuItem(ACTION_CLOSE),
-                new SeparatorMenuItem(),
-                fileExitMenuItem);
-
-        var editMenu = createMenu("Правка", transactionTable.getActions());
-
-        var viewMenu = menu("Вид",
-                menuItem("Текущий месяц", SHORTCUT_BACK_SLASH, _ -> onCurrentMonth()),
-                new SeparatorMenuItem(),
-                menuItem("Следующий месяц", SHORTCUT_CLOSE_BRACKET, _ -> onNextMonth()),
-                menuItem("Предыдущий месяц", SHORTCUT_OPEN_BRACKET, _ -> onPrevMonth())
-        );
-
-        var profilesMenuItem = menuItem("Профили...", SHORTCUT_ALT_P,
-                _ -> profileManager.getEditor().showAndWait());
-
-        var optionsMenuItem = menuItem("Настройки...",
-                SHORTCUT_ALT_S, _ -> onOptions());
-        var iconWindowMenuItem = menuItem("Значки...",
-                _ -> onIconWindow());
-
-        var toolsMenu = menu("Сервис",
-                profilesMenuItem,
-                new SeparatorMenuItem(),
-                iconWindowMenuItem,
-                new SeparatorMenuItem(),
-                optionsMenuItem,
-                isLinux() ? new SeparatorMenuItem() : null,
-                isLinux() ? menuItem("Создать ярлык приложения", _ -> onCreateDesktopEntry()) : null
-        );
-
-        var menuBar = new MenuBar(fileMenu, editMenu, viewMenu, toolsMenu,
+        return apply(menuBar(
+                menu("Файл",
+                        menuItem("Соединение...", _ -> onOpenConnection()),
+                        new SeparatorMenuItem(),
+                        apply(menuItem("Импорт..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_I);
+                            menuItem.setOnAction(_ -> onImport());
+                            menuItem.disableProperty().bind(dbOpenProperty.not());
+                        }),
+                        apply(menuItem("Экспорт..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_E);
+                            menuItem.setOnAction(_ -> xmlDump());
+                            menuItem.disableProperty().bind(dbOpenProperty.not());
+                        }),
+                        new SeparatorMenuItem(),
+                        apply(menuItem("Отчет..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_R);
+                            menuItem.setOnAction(_ -> onReport());
+                            menuItem.disableProperty().bind(dbOpenProperty.not());
+                        }),
+                        new SeparatorMenuItem(),
+                        createMenuItem(ACTION_CLOSE),
+                        new SeparatorMenuItem(),
+                        menuItem("Выход", _ -> onExit())
+                ),
+                createMenu("Правка", transactionTable.getActions()),
+                menu("Вид",
+                        apply(menuItem("Текущий месяц"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_BACK_SLASH);
+                            menuItem.setOnAction(_ -> onCurrentMonth());
+                        }),
+                        new SeparatorMenuItem(),
+                        apply(menuItem("Следующий месяц"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_CLOSE_BRACKET);
+                            menuItem.setOnAction(_ -> onNextMonth());
+                        }),
+                        apply(menuItem("Предыдущий месяц"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_OPEN_BRACKET);
+                            menuItem.setOnAction(_ -> onPrevMonth());
+                        })
+                ),
+                menu("Сервис",
+                        apply(menuItem("Профили..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_P);
+                            menuItem.setOnAction(_ -> profileManager.getEditor().showAndWait());
+                        }),
+                        new SeparatorMenuItem(),
+                        apply(menuItem("Значки..."), menuItem -> {
+                            menuItem.setOnAction(_ -> onIconWindow());
+                            menuItem.disableProperty().bind(dbOpenProperty.not());
+                        }),
+                        new SeparatorMenuItem(),
+                        apply(menuItem("Настройки..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_S);
+                            menuItem.setOnAction(_ -> onOptions());
+                        }),
+                        isLinux() ? new SeparatorMenuItem() : null,
+                        isLinux() ? menuItem("Создать ярлык приложения", _ -> onCreateDesktopEntry()) : null
+                ),
                 createPortfolioMenu(dbOpenProperty),
-                createWindowMenu(dbOpenProperty), createHelpMenu());
-
-        menuBar.setUseSystemMenuBar(true);
-
-        iconWindowMenuItem.disableProperty().bind(dbOpenProperty.not());
-
-        exportMenuItem.disableProperty().bind(dbOpenProperty.not());
-        importMenuItem.disableProperty().bind(dbOpenProperty.not());
-        reportMenuItem.disableProperty().bind(dbOpenProperty.not());
-
-        return menuBar;
+                createWindowMenu(dbOpenProperty), createHelpMenu()
+        ), mb -> mb.setUseSystemMenuBar(true));
     }
 
     private void initialize() {
@@ -224,14 +225,13 @@ public class MainWindowController extends BaseController implements TransactionT
         var transactionCountLabel = label("");
         transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
 
-        var hBox = hBox(5.0,
+        var hBox = apply(hBox(5.0,
                 monthFilterBox,
                 yearSpinner,
-                fxNode(new Region(), hBoxHGrow(Priority.ALWAYS)),
+                apply(new Region(), r -> HBox.setHgrow(r, Priority.ALWAYS)),
                 label("Transactions:"),
                 transactionCountLabel
-        );
-        hBox.setAlignment(Pos.CENTER_LEFT);
+        ), b -> b.setAlignment(Pos.CENTER_LEFT));
 
         transactionTab.setTop(hBox);
         BorderPane.setMargin(hBox, BIG_INSETS);

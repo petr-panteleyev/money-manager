@@ -1,14 +1,11 @@
-/*
- Copyright © 2024-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import org.panteleyev.fx.PredicateProperty;
-import org.panteleyev.fx.TableColumnBuilder;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountingDateCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAciCell;
@@ -27,8 +24,9 @@ import org.panteleyev.money.model.investment.InvestmentDeal;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.Comparators.investmentDealByDealDate;
 import static org.panteleyev.money.app.GlobalContext.cache;
 
@@ -39,52 +37,66 @@ final class InvestmentDealsTableView extends TableView<InvestmentDeal> {
     public InvestmentDealsTableView(FilteredList<InvestmentDeal> list) {
         var w = widthProperty().subtract(20);
 
-        TableColumn<InvestmentDeal, InvestmentDeal> dealDateColumn = tableObjectColumn("Дата заключ.", b ->
-                b.withCellFactory(_ -> new InvestmentDealDateCell())
-                        .withComparator(investmentDealByDealDate())
-                        .withWidthBinding(w.multiply(0.05)));
+        TableColumn<InvestmentDeal, InvestmentDeal> dealDateColumn = apply(tableObjectColumn("Дата заключ."), c -> {
+            c.setCellFactory(_ -> new InvestmentDealDateCell());
+            c.comparator(investmentDealByDealDate());
+            c.widthBinding(w.multiply(0.05));
+        });
 
         getColumns().setAll(List.of(
-                tableObjectColumn("Счёт", b ->
-                        b.withCellFactory(_ -> new InvestmentAccountCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableColumn("Сделка", (TableColumnBuilder<InvestmentDeal, String> b) ->
-                        b.withPropertyCallback(InvestmentDeal::dealNumber)
-                                .withWidthBinding(w.multiply(0.05))),
+                apply(tableObjectColumn("Счёт"), c -> {
+                    c.setCellFactory(_ -> new InvestmentAccountCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableStringColumn("Сделка"), c -> {
+                    c.valueConverter(InvestmentDeal::dealNumber);
+                    c.widthBinding(w.multiply(0.05));
+                }),
                 dealDateColumn,
-                tableObjectColumn("Дата расчёта", b ->
-                        b.withCellFactory(_ -> new InvestmentAccountingDateCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Инструмент", b ->
-                        b.withCellFactory(_ -> new InvestmentSecurityCell())
-                                .withWidthBinding(w.multiply(0.08))),
-                tableObjectColumn("Название", b ->
-                        b.withCellFactory(_ -> new InvestmentSecurityNameCell())
-                                .withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn("Тип", b ->
-                        b.withCellFactory(_ -> new InvestmentSecurityTypeCell())
-                                .withWidthBinding(w.multiply(0.15))),
-                tableObjectColumn("Кол-во", b ->
-                        b.withCellFactory(_ -> new InvestmentSecurityAmountCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Цена", b ->
-                        b.withCellFactory(_ -> new InvestmentPriceCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("НКД", b ->
-                        b.withCellFactory(_ -> new InvestmentAciCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Объём сделки", b ->
-                        b.withCellFactory(_ -> new InvestmentDealVolumeCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Комм. биржи", b ->
-                        b.withCellFactory(_ -> new InvestmentExchangeFeeCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Комм. брокера", b ->
-                        b.withCellFactory(_ -> new InvestmentBrokerFeeCell())
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Общая сумма", b ->
-                        b.withCellFactory(_ -> new InvestmentAmountCell())
-                                .withWidthBinding(w.multiply(0.05)))
+                apply(tableObjectColumn("Дата расчёта"), c -> {
+                    c.setCellFactory(_ -> new InvestmentAccountingDateCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Инструмент"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSecurityCell());
+                    c.widthBinding(w.multiply(0.08));
+                }),
+                apply(tableObjectColumn("Название"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSecurityNameCell());
+                    c.widthBinding(w.multiply(0.2));
+                }),
+                apply(tableObjectColumn("Тип"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSecurityTypeCell());
+                    c.widthBinding(w.multiply(0.15));
+                }),
+                apply(tableObjectColumn("Кол-во"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSecurityAmountCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Цена"), c -> {
+                    c.setCellFactory(_ -> new InvestmentPriceCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("НКД"), c -> {
+                    c.setCellFactory(_ -> new InvestmentAciCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Объём сделки"), c -> {
+                    c.setCellFactory(_ -> new InvestmentDealVolumeCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Комм. биржи"), c -> {
+                    c.setCellFactory(_ -> new InvestmentExchangeFeeCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Комм. брокера"), c -> {
+                    c.setCellFactory(_ -> new InvestmentBrokerFeeCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Общая сумма"), c -> {
+                    c.setCellFactory(_ -> new InvestmentAmountCell());
+                    c.widthBinding(w.multiply(0.05));
+                })
         ));
 
         filteredList.predicateProperty().bind(dealPredicateProperty);

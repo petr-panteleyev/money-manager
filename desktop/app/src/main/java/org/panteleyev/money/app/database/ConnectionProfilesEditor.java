@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.database;
 
 import javafx.application.Platform;
@@ -43,8 +41,8 @@ import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
-import static org.panteleyev.fx.ButtonFactory.buttonType;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.factories.ButtonFactory.buttonType;
+import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;

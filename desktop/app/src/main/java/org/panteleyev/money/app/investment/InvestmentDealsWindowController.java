@@ -1,7 +1,5 @@
-/*
- Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import javafx.geometry.Insets;
@@ -24,11 +22,12 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Constants.FILTER_RAIF_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS_HTML;
@@ -58,18 +57,19 @@ public class InvestmentDealsWindowController extends BaseController {
 
         dealFilterBox.setFilterYears(cache().getInvestmentDeals());
 
-        var filterBox = hBox(
-                List.of(
-                        label("Ценные бумаги:"),
-                        securitySelectionBox,
-                        label("Даты:"),
-                        dealFilterBox
-                ), b -> {
-                    b.setAlignment(Pos.CENTER_LEFT);
-                    b.setSpacing(BIG_SPACING);
-                    HBox.setMargin(securitySelectionBox, new Insets(0, BIG_SPACING, 0, 0));
+        var filterBox = apply(hBox(
+                        List.of(
+                                label("Ценные бумаги:"),
+                                securitySelectionBox,
+                                label("Даты:"),
+                                dealFilterBox
+                        )), box -> {
+                    box.setAlignment(Pos.CENTER_LEFT);
+                    box.setSpacing(BIG_SPACING);
                 }
         );
+
+        HBox.setMargin(securitySelectionBox, new Insets(0, BIG_SPACING, 0, 0));
 
         var mainPane = new BorderPane(
                 tableView, filterBox, null, null, null
@@ -93,7 +93,8 @@ public class InvestmentDealsWindowController extends BaseController {
     private MenuBar createMenu() {
         return menuBar(
                 menu("Файл",
-                        menuItem("Загрузить сделки", SHORTCUT_O, _ -> onLoadInvestmentDeals()),
+                        apply(menuItem("Загрузить сделки", _ -> onLoadInvestmentDeals()),
+                                item -> item.setAccelerator(SHORTCUT_O)),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),

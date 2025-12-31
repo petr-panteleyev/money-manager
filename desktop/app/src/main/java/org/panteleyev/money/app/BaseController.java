@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.beans.property.BooleanProperty;
@@ -27,8 +25,9 @@ import java.util.function.Consumer;
 
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_0;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_1;
@@ -43,7 +42,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
 import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class BaseController extends Controller {
-    static final WindowManager WINDOW_MANAGER = WindowManager.newInstance();
+    static final WindowManager WINDOW_MANAGER = WindowManager.windowManager();
 
     protected final Action ACTION_CLOSE = new Action("Закрыть", _ -> onClose());
 
@@ -73,46 +72,66 @@ public class BaseController extends Controller {
     }
 
     protected Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
-        var securitiesMenuItem = menuItem("Ценные бумаги...",
-                _ -> getController(SecuritiesWindowController.class));
-        var investmentDealsMenuItem = menuItem("Инвестиционные сделки...",
-                _ -> getController(InvestmentDealsWindowController.class));
-        var investmentsMenuItem = menuItem("Инвестиции...",
-                _ -> getController(InvestmentSummaryWindowController.class));
-
-        if (dbOpenProperty != null) {
-            investmentDealsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
-            investmentsMenuItem.disableProperty().bind(dbOpenProperty.not());
-        }
-
         return menu("Портфель",
-                securitiesMenuItem,
+                apply(menuItem("Ценные бумаги..."), menuItem -> {
+                    menuItem.setOnAction(_ -> getController(SecuritiesWindowController.class));
+                    if (dbOpenProperty != null) {
+                        menuItem.disableProperty().bind(dbOpenProperty.not());
+                    }
+                }),
                 new SeparatorMenuItem(),
-                investmentDealsMenuItem,
-                investmentsMenuItem
+                apply(menuItem("Инвестиционные сделки..."), menuItem -> {
+                    menuItem.setOnAction(_ -> getController(InvestmentDealsWindowController.class));
+                    if (dbOpenProperty != null) {
+                        menuItem.disableProperty().bind(dbOpenProperty.not());
+                    }
+                }),
+                apply(menuItem("Инвестиции..."), menuItem -> {
+                    menuItem.setOnAction(_ -> getController(InvestmentSummaryWindowController.class));
+                    if (dbOpenProperty != null) {
+                        menuItem.disableProperty().bind(dbOpenProperty.not());
+                    }
+                })
         );
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = menuItem("Проводки...", SHORTCUT_0,
-                _ -> getController(MainWindowController.class));
-        var accountsMenuItem = menuItem("Счета...", SHORTCUT_1,
-                _ -> getController(AccountWindowController.class));
-        var cardsMenuItem = menuItem("Карты...", SHORTCUT_2,
-                _ -> getController(CardWindowController.class));
-        var statementMenuItem = menuItem("Выписки...", SHORTCUT_3,
-                _ -> getController(StatementWindowController.class));
-        var requestsMenuItem = menuItem("Запросы...", SHORTCUT_4,
-                _ -> getRequestController());
-        var chartsMenuItem = menuItem("Доходы и расходы...", SHORTCUT_5,
-                _ -> getController(IncomesAndExpensesWindowController.class));
-        var currenciesMenuItem = menuItem("Валюты...", SHORTCUT_6,
-                _ -> getController(CurrencyWindowController.class));
-        var categoriesMenuItem = menuItem("Категории...", SHORTCUT_7,
-                _ -> getController(CategoryWindowController.class));
-        var contactsMenuItem = menuItem("Контакты...", SHORTCUT_8,
-                _ -> getController(ContactListWindowController.class));
+        var transactionsMenuItem = apply(menuItem("Проводки..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_0);
+            menuItem.setOnAction(_ -> getController(MainWindowController.class));
+        });
+        var accountsMenuItem = apply(menuItem("Счета..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_1);
+            menuItem.setOnAction(_ -> getController(AccountWindowController.class));
+        });
+        var cardsMenuItem = apply(menuItem("Карты..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_2);
+            menuItem.setOnAction(_ -> getController(CardWindowController.class));
+        });
+        var statementMenuItem = apply(menuItem("Выписки..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_3);
+            menuItem.setOnAction(_ -> getController(StatementWindowController.class));
+        });
+        var requestsMenuItem = apply(menuItem("Запросы..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_4);
+            menuItem.setOnAction(_ -> getRequestController());
+        });
+        var chartsMenuItem = apply(menuItem("Доходы и расходы..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_5);
+            menuItem.setOnAction(_ -> getController(IncomesAndExpensesWindowController.class));
+        });
+        var currenciesMenuItem = apply(menuItem("Валюты..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_6);
+            menuItem.setOnAction(_ -> getController(CurrencyWindowController.class));
+        });
+        var categoriesMenuItem = apply(menuItem("Категории..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_7);
+            menuItem.setOnAction(_ -> getController(CategoryWindowController.class));
+        });
+        var contactsMenuItem = apply(menuItem("Контакты..."), menuItem -> {
+            menuItem.setAccelerator(SHORTCUT_8);
+            menuItem.setOnAction(_ -> getController(ContactListWindowController.class));
+        });
 
         if (dbOpenProperty != null) {
             accountsMenuItem.disableProperty().bind(dbOpenProperty.not());

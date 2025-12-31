@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.card;
 
 import javafx.application.Platform;
@@ -10,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -23,12 +22,12 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.MenuFactory.checkMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -59,30 +58,6 @@ public final class CardWindowController extends BaseController {
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
-        var menuBar = menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
-                menu("Правка",
-                        createMenuItem(crudActionsHolder.getCreateAction()),
-                        createMenuItem(crudActionsHolder.getUpdateAction()),
-                        new SeparatorMenuItem(),
-                        createMenuItem(searchAction(this::onSearch))
-                ),
-                menu("Вид",
-                        checkMenuItem("Показывать неактивные карты",
-                                settings().getShowDeactivatedCards(), SHORTCUT_H,
-                                event -> {
-                                    var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                                    settings().update(opt -> opt.setShowDeactivatedCards(selected));
-                                    showDeactivatedCards.set(selected ? _ -> true : activeCard(true));
-                                }
-                        ),
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
-                createWindowMenu(),
-                createHelpMenu()
-        );
-
         // Context Menu
         tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
@@ -90,16 +65,17 @@ public final class CardWindowController extends BaseController {
         ));
 
         var pane = new BorderPane(tableView,
-                fxNode(
-                        hBox(List.of(cardNumberFilterBox.getTextField() /*, typeBox*/), b -> {
-                            b.setSpacing(BIG_SPACING);
-                            b.setAlignment(Pos.CENTER_LEFT);
-                        }),
-                        b -> BorderPane.setMargin(b, BIG_INSETS)
+                apply(
+                        hBox(List.of(cardNumberFilterBox.getTextField()) /*, typeBox*/),
+                        box -> {
+                            box.setSpacing(BIG_SPACING);
+                            box.setAlignment(Pos.CENTER_LEFT);
+                            BorderPane.setMargin(box, BIG_INSETS);
+                        }
                 ),
                 null, null, null);
 
-        var self = new BorderPane(pane, menuBar, null, null, null);
+        var self = new BorderPane(pane, createMenuBar(crudActionsHolder), null, null, null);
         self.setPrefSize(600.0, 400.0);
 
         filteredList.predicateProperty().bind(filterProperty);
@@ -117,6 +93,36 @@ public final class CardWindowController extends BaseController {
     @Override
     public String getTitle() {
         return "Карты";
+    }
+
+    private MenuBar createMenuBar(CrudActionsHolder crudActionsHolder) {
+        return menuBar(
+                menu("Файл",
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                menu("Правка",
+                        createMenuItem(crudActionsHolder.getCreateAction()),
+                        createMenuItem(crudActionsHolder.getUpdateAction()),
+                        new SeparatorMenuItem(),
+                        createMenuItem(searchAction(this::onSearch))
+                ),
+                menu("Вид",
+                        apply(checkMenuItem("Показывать неактивные карты"), item -> {
+                            item.setSelected(settings().getShowDeactivatedCards());
+                            item.setAccelerator(SHORTCUT_H);
+                            item.setOnAction(event -> {
+                                var selected = ((CheckMenuItem) event.getSource()).isSelected();
+                                settings().update(opt -> opt.setShowDeactivatedCards(selected));
+                                showDeactivatedCards.set(selected ? _ -> true : activeCard(true));
+                            });
+                        }),
+                        apply(menuItem("Сбросить фильтр"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_C);
+                            menuItem.setOnAction(_ -> resetFilter());
+                        }),
+                        createWindowMenu(),
+                        createHelpMenu()
+                ));
     }
 
     private void resetFilter() {

@@ -1,7 +1,5 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.exchange;
 
 import javafx.application.Platform;
@@ -32,11 +30,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.Constants.FULL_DATE_FORMAT;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -98,14 +97,19 @@ public class ExchangeSecuritySplitsDialog extends BaseDialog<ExchangeSecuritySpl
     private void setupTable() {
         var w = table.widthProperty().subtract(20);
         table.getColumns().setAll(List.of(
-                tableColumn("Дата",
-                        b -> b.withPropertyCallback(s -> s.date().format(FULL_DATE_FORMAT))
-                                .withWidthBinding(w.multiply(0.33))),
-                tableColumn("Тип",
-                        b -> b.withPropertyCallback(ExchangeSecuritySplit::type).withWidthBinding(w.multiply(0.33))),
-                tableColumn("Коэффиент",
-                        b -> b.withPropertyCallback(ExchangeSecuritySplit::rate).withWidthBinding(w.multiply(0.33))))
-        );
+                apply(tableStringColumn("Дата"), c -> {
+                    c.valueConverter(s -> s.date().format(FULL_DATE_FORMAT));
+                    c.widthBinding(w.multiply(0.33));
+                }),
+                apply(tableStringColumn("Тип"), c -> {
+                    c.valueConverter(s -> s.type().toString());
+                    c.widthBinding(w.multiply(0.33));
+                }),
+                apply(tableStringColumn("Коэффиент"), c -> {
+                    c.valueConverter(s -> s.rate().toString());
+                    c.widthBinding(w.multiply(0.33));
+                })
+        ));
 
         table.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> onSplitSelected(selected));
     }

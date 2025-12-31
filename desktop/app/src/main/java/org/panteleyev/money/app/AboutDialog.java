@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.scene.control.ButtonType;
@@ -16,9 +14,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.TimeZone;
 
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.FxUtils.fxString;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.Styles.SMALL_SPACING;
@@ -57,27 +55,17 @@ final class AboutDialog extends BaseDialog<Object> {
 
         setTitle("About " + APP_TITLE);
 
-        var aboutLabel = label(fxString(APP_TITLE, " ") + BUILD.version());
+        var aboutLabel = label(string(APP_TITLE, " ") + BUILD.version());
         aboutLabel.getStyleClass().add(STYLE_ABOUT_LABEL);
 
         var timestamp = ZonedDateTime.parse(BUILD.timestamp(), TIMESTAMP_PARSER)
                 .withZoneSameInstant(LOCAL_TIME_ZONE);
 
-        var vBox = vBox(BIG_SPACING,
-                vBox(SMALL_SPACING,
-                        aboutLabel,
-                        label("Built on " + LOCAL_FORMATTER.format(timestamp))
-                ),
-                vBox(SMALL_SPACING,
-                        label("Runtime version: " + RUNTIME),
-                        label("VM: " + VM)
-                ),
-                vBox(SMALL_SPACING,
-                        label("Copyright © 2017-" + LocalDate.now().getYear() + " Petr Panteleyev")
-                )
-        );
-
-        getDialogPane().setContent(vBox);
+        getDialogPane().setContent(vBox(BIG_SPACING,
+                vBox(SMALL_SPACING, aboutLabel, label("Built on " + LOCAL_FORMATTER.format(timestamp))),
+                vBox(SMALL_SPACING, label("Runtime version: " + RUNTIME), label("VM: " + VM)),
+                vBox(SMALL_SPACING, label("Copyright © 2017-" + LocalDate.now().getYear() + " Petr Panteleyev"))
+        ));
         getDialogPane().getButtonTypes().addAll(ButtonType.OK);
     }
 }

@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.category;
 
 import javafx.application.Platform;
@@ -11,12 +9,13 @@ import javafx.event.Event;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.fx.FxFactory;
+import org.panteleyev.fx.factories.TextFieldFactory;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
@@ -28,13 +27,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.clearValueAndSelection;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -45,37 +45,18 @@ import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class CategoryWindowController extends BaseController {
-    private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.values(),
-            b -> b.withDefaultString("Все типы")
-                    .withStringConverter(Bundles::translate)
-    );
-    private final TextField searchField = FxFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
+    private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.asList(),
+            _ -> comboBoxListCell("Все типы", Bundles::translate));
+    private final TextField searchField = TextFieldFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 
     private final FilteredList<Category> filteredList = cache().getCategories().filtered(_ -> true);
     private final TableView<Category> tableView = new CategoryTableView(filteredList.sorted());
+    private final CrudActionsHolder crudActionsHolder = new CrudActionsHolder(
+            this::onCreateCategory, this::onEditCategory, _ -> {},
+            tableView.getSelectionModel().selectedItemProperty().isNull()
+    );
 
     public CategoryWindowController() {
-        var crudActionsHolder = new CrudActionsHolder(
-                this::onCreateCategory, this::onEditCategory, _ -> {},
-                tableView.getSelectionModel().selectedItemProperty().isNull()
-        );
-
-        var menuBar = menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
-                menu("Правка",
-                        createMenuItem(crudActionsHolder.getCreateAction()),
-                        createMenuItem(crudActionsHolder.getUpdateAction()),
-                        new SeparatorMenuItem(),
-                        createMenuItem(searchAction(this::onSearch))
-                ),
-                menu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
-                createWindowMenu(),
-                createHelpMenu()
-        );
-
         // Context Menu
         tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
@@ -85,16 +66,17 @@ public final class CategoryWindowController extends BaseController {
         tableView.setOnMouseClicked(this::onTableMouseClick);
 
         var pane = new BorderPane(tableView,
-                fxNode(
-                        hBox(List.of(searchField, typeBox), b -> {
-                            b.setSpacing(BIG_SPACING);
-                            b.setAlignment(Pos.CENTER_LEFT);
-                        }),
-                        b -> BorderPane.setMargin(b, BIG_INSETS)
+                apply(
+                        hBox(List.of(searchField, typeBox)),
+                        box -> {
+                            box.setSpacing(BIG_SPACING);
+                            box.setAlignment(Pos.CENTER_LEFT);
+                            BorderPane.setMargin(box, BIG_INSETS);
+                        }
                 ),
                 null, null, null);
 
-        var self = new BorderPane(pane, menuBar, null, null, null);
+        var self = new BorderPane(pane, createMenuBar(), null, null, null);
         self.setPrefSize(600.0, 400.0);
 
         typeBox.valueProperty().addListener((_, _, _) -> updatePredicate());
@@ -112,6 +94,28 @@ public final class CategoryWindowController extends BaseController {
     @Override
     public String getTitle() {
         return "Категории";
+    }
+
+    private MenuBar createMenuBar() {
+        return menuBar(
+                menu("Файл",
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                menu("Правка",
+                        createMenuItem(crudActionsHolder.getCreateAction()),
+                        createMenuItem(crudActionsHolder.getUpdateAction()),
+                        new SeparatorMenuItem(),
+                        createMenuItem(searchAction(this::onSearch))
+                ),
+                menu("Вид",
+                        apply(menuItem("Сбросить фильтр"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_C);
+                            menuItem.setOnAction(_ -> resetFilter());
+                        }),
+                        createWindowMenu(),
+                        createHelpMenu()
+                )
+        );
     }
 
     private Predicate<Category> getPredicate() {

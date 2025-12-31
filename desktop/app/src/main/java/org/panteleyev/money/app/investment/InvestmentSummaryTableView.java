@@ -1,7 +1,5 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import javafx.application.Platform;
@@ -26,7 +24,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.panteleyev.fx.TreeTableColumnBuilder.treeTableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.TreeTableFactory.treeTableObjectColumn;
 import static org.panteleyev.money.app.Comparators.investmentSummaryTreeDataByPercentage;
 import static org.panteleyev.money.app.GlobalContext.cache;
 
@@ -38,47 +37,47 @@ public class InvestmentSummaryTableView extends TreeTableView<InvestmentSummaryT
 
         var w = widthProperty().subtract(20);
 
-        percentageColumn = treeTableObjectColumn("Доля", b ->
-                b.withCellFactory(_ -> new InvestmentSummaryPercentageCell())
-                        .withComparator(investmentSummaryTreeDataByPercentage())
-                        .withWidthBinding(w.multiply(0.05))
-        );
-        percentageColumn.setSortType(TreeTableColumn.SortType.DESCENDING);
+        percentageColumn = apply(treeTableObjectColumn("Доля"), c -> {
+            c.setCellFactory(_ -> new InvestmentSummaryPercentageCell());
+            c.comparator(investmentSummaryTreeDataByPercentage());
+            c.widthBinding(w.multiply(0.05));
+            c.setSortType(TreeTableColumn.SortType.DESCENDING);
+        });
 
         getColumns().setAll(List.of(
-                treeTableObjectColumn("Инструмент", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryInstrumentCell())
-                                .withWidthBinding(w.multiply(0.2))
-                ),
-                treeTableObjectColumn("Название", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryInstrumentNameCell())
-                                .withWidthBinding(w.multiply(0.2))
-                ),
+                apply(treeTableObjectColumn("Инструмент"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryInstrumentCell());
+                    c.widthBinding(w.multiply(0.2));
+                }),
+                apply(treeTableObjectColumn("Название"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryInstrumentNameCell());
+                    c.widthBinding(w.multiply(0.2));
+                }),
                 percentageColumn,
-                treeTableObjectColumn("Кол-во", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryAmountCell())
-                                .withWidthBinding(w.multiply(0.05))
-                ),
-                treeTableObjectColumn("Ср. цена", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryAveragePriceCell())
-                                .withWidthBinding(w.multiply(0.1))
-                ),
-                treeTableObjectColumn("Тек. стоимость", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryTotalValueCell())
-                                .withWidthBinding(w.multiply(0.1))
-                ),
-                treeTableObjectColumn("Изм. стоимости", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryChangeCell())
-                                .withWidthBinding(w.multiply(0.1))
-                ),
-                treeTableObjectColumn("Комм. биржи", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryExchangeFeeCell())
-                                .withWidthBinding(w.multiply(0.1))
-                ),
-                treeTableObjectColumn("Комм. брокера", b ->
-                        b.withCellFactory(_ -> new InvestmentSummaryBrokerFeeCell())
-                                .withWidthBinding(w.multiply(0.1))
-                )
+                apply(treeTableObjectColumn("Кол-во"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryAmountCell());
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(treeTableObjectColumn("Ср. цена"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryAveragePriceCell());
+                    c.widthBinding(w.multiply(0.1));
+                }),
+                apply(treeTableObjectColumn("Тек. стоимость"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryTotalValueCell());
+                    c.widthBinding(w.multiply(0.1));
+                }),
+                apply(treeTableObjectColumn("Изм. стоимости"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryChangeCell());
+                    c.widthBinding(w.multiply(0.1));
+                }),
+                apply(treeTableObjectColumn("Комм. биржи"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryExchangeFeeCell());
+                    c.widthBinding(w.multiply(0.1));
+                }),
+                apply(treeTableObjectColumn("Комм. брокера"), c -> {
+                    c.setCellFactory(_ -> new InvestmentSummaryBrokerFeeCell());
+                    c.widthBinding(w.multiply(0.1));
+                })
         ));
 
         setRowFactory(_ -> new InvestmentSummaryRow());

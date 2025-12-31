@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
 import javafx.collections.transformation.SortedList;
@@ -12,8 +10,9 @@ import org.panteleyev.money.model.Contact;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.Bundles.translate;
 
 final class ContactTableView extends TableView<Contact> {
@@ -22,16 +21,23 @@ final class ContactTableView extends TableView<Contact> {
 
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
-                tableObjectColumn("Имя", b ->
-                        b.withCellFactory(_ -> new ContactNameCell())
-                                .withComparator(Comparator.comparing(Contact::name))
-                                .withWidthBinding(w.multiply(0.4))),
-                tableColumn("Тип", b ->
-                        b.withPropertyCallback((Contact p) -> translate(p.type())).withWidthBinding(w.multiply(0.2))),
-                tableColumn("Телефон", b ->
-                        b.withPropertyCallback(Contact::phone).withWidthBinding(w.multiply(0.2))),
-                tableColumn("E-Mail", b ->
-                        b.withPropertyCallback(Contact::email).withWidthBinding(w.multiply(0.2)))
+                apply(tableObjectColumn("Имя"), c -> {
+                    c.setCellFactory(_ -> new ContactNameCell());
+                    c.comparator(Comparator.comparing(Contact::name));
+                    c.widthBinding(w.multiply(0.4));
+                }),
+                apply(tableStringColumn("Тип"), c -> {
+                    c.valueConverter(p -> translate(p.type()));
+                    c.widthBinding(w.multiply(0.2));
+                }),
+                apply(tableStringColumn("Телефон"), c -> {
+                    c.valueConverter(Contact::phone);
+                    c.widthBinding(w.multiply(0.2));
+                }),
+                apply(tableStringColumn("E-Mail"), c -> {
+                    c.valueConverter(Contact::email);
+                    c.widthBinding(w.multiply(0.2));
+                })
         ));
         list.comparatorProperty().bind(comparatorProperty());
         getSortOrder().add(getColumns().getFirst());

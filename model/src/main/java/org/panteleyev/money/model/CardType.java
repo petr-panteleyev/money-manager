@@ -1,8 +1,9 @@
-/*
- Copyright © 2019-2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
+
+import java.util.Arrays;
+import java.util.List;
 
 public enum CardType {
     NONE("-"),
@@ -20,5 +21,9 @@ public enum CardType {
     @Override
     public String toString() {
         return typeName;
+    }
+
+    public static List<CardType> asList() {
+        return Arrays.asList(values());
     }
 }

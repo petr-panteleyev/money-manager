@@ -1,7 +1,5 @@
-/*
- Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import javafx.scene.control.MenuBar;
@@ -18,9 +16,9 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Constants.FILTER_RAIF_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS;
 import static org.panteleyev.money.app.Constants.FILTER_SBER_ONLINE_BROKER_DEALS_HTML;
@@ -28,11 +26,9 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
 public class InvestmentSummaryWindowController extends BaseController {
-    private final InvestmentSummaryPane summaryPane = new InvestmentSummaryPane();
-
     public InvestmentSummaryWindowController() {
         var self = new BorderPane(
-                summaryPane,
+                new InvestmentSummaryPane(),
                 createMenu(), null, null, null
         );
 

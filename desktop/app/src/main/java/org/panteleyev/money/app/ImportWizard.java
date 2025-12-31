@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
@@ -34,8 +32,9 @@ import java.util.function.Consumer;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.NEXT;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
@@ -77,12 +76,10 @@ final class ImportWizard extends BaseDialog<Object> {
         }
 
         private Label createWarningLabel() {
-            var label = label("""
+            return apply(label("""
                     Внимание!
                     Импортирование полного дампа полностью уничтожит
-                    все существующие записи в базе.""");
-            label.setWrapText(true);
-            return label;
+                    все существующие записи в базе."""), l -> l.setWrapText(true));
         }
 
         private CheckBox createWarningCheckBox() {

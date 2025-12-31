@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
 import javafx.application.Platform;
@@ -53,7 +51,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -175,41 +174,51 @@ public class TransactionTableView extends TableView<Transaction> {
                         _ -> new TransactionAccountRequestSumCell(account) :
                         _ -> new TransactionSumCell();
 
-        TableColumn<Transaction, Transaction> dayColumn = tableObjectColumn("День", b ->
-                b.withCellFactory(_ -> new TransactionDayCell(mode.isFullDate()))
-                        .withComparator(Comparators.transactionsByDate())
-                        .withWidthBinding(w.multiply(0.04)));
+        TableColumn<Transaction, Transaction> dayColumn = apply(tableObjectColumn("День"), c -> {
+            c.setCellFactory(_ -> new TransactionDayCell(mode.isFullDate()));
+            c.comparator(Comparators.transactionsByDate());
+            c.widthBinding(w.multiply(0.04));
+        });
 
         getColumns().setAll(List.of(
                 dayColumn,
-                tableObjectColumn("Тип", b ->
-                        b.withCellFactory(_ -> new TransactionTypeCell())
-                                .withComparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
-                                        .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.1))),
-                tableObjectColumn("Исходный счет", b ->
-                        b.withCellFactory(_ -> new TransactionDebitedAccountCell())
-                                .withComparator(Comparators.transactionsByDebitedAccountName(cache())
-                                        .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.11))),
-                tableObjectColumn("Счет получателя", b ->
-                        b.withCellFactory(_ -> new TransactionCreditedAccountCell())
-                                .withComparator(Comparators.transactionsByCreditedAccountName(cache())
-                                        .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.11))),
-                tableObjectColumn("Контрагент", b ->
-                        b.withCellFactory(_ -> new TransactionContactCell())
-                                .withComparator(Comparators.transactionsByContactName(cache())
-                                        .thenComparing(Comparators.transactionsByDate()))
-                                .withWidthBinding(w.multiply(0.21))),
-                tableObjectColumn("Комментарий", b ->
-                        b.withCellFactory(_ -> new TransactionCommentCell()).withWidthBinding(w.multiply(0.35))),
-                tableObjectColumn("Сумма", b ->
-                        b.withCellFactory(sumCellFactory)
-                                .withComparator(Comparator.comparing(Transaction::getSignedAmount))
-                                .withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("", b ->
-                        b.withCellFactory(_ -> new TransactionCheckCell()).withWidthBinding(w.multiply(0.03)))
+                apply(tableObjectColumn("Тип"), c -> {
+                    c.setCellFactory(_ -> new TransactionTypeCell());
+                    c.comparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
+                            .thenComparing(Comparators.transactionsByDate()));
+                    c.widthBinding(w.multiply(0.1));
+                }),
+                apply(tableObjectColumn("Исходный счет"), c -> {
+                    c.setCellFactory(_ -> new TransactionDebitedAccountCell());
+                    c.comparator(Comparators.transactionsByDebitedAccountName(cache())
+                            .thenComparing(Comparators.transactionsByDate()));
+                    c.widthBinding(w.multiply(0.11));
+                }),
+                apply(tableObjectColumn("Счет получателя"), c -> {
+                    c.setCellFactory(_ -> new TransactionCreditedAccountCell());
+                    c.comparator(Comparators.transactionsByCreditedAccountName(cache())
+                            .thenComparing(Comparators.transactionsByDate()));
+                    c.widthBinding(w.multiply(0.11));
+                }),
+                apply(tableObjectColumn("Контрагент"), c -> {
+                    c.setCellFactory(_ -> new TransactionContactCell());
+                    c.comparator(Comparators.transactionsByContactName(cache())
+                            .thenComparing(Comparators.transactionsByDate()));
+                    c.widthBinding(w.multiply(0.21));
+                }),
+                apply(tableObjectColumn("Комментарий"), c -> {
+                    c.setCellFactory(_ -> new TransactionCommentCell());
+                    c.widthBinding(w.multiply(0.35));
+                }),
+                apply(tableObjectColumn("Сумма"), c -> {
+                    c.setCellFactory(sumCellFactory);
+                    c.comparator(Comparator.comparing(Transaction::getSignedAmount));
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn(""), c -> {
+                    c.setCellFactory(_ -> new TransactionCheckCell());
+                    c.widthBinding(w.multiply(0.03));
+                })
         ));
 
         getSortOrder().add(dayColumn);

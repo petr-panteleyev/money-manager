@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
 import javafx.application.Platform;
@@ -15,7 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import org.panteleyev.fx.FxFactory;
+import org.panteleyev.fx.factories.TextFieldFactory;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
@@ -26,12 +24,14 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.clearValueAndSelection;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Constants.SEARCH_FIELD_FACTORY;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -41,11 +41,9 @@ import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class ContactListWindowController extends BaseController {
-    private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
-            b -> b.withDefaultString("Все типы")
-                    .withStringConverter(Bundles::translate)
-    );
-    private final TextField searchField = FxFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
+    private final ComboBox<ContactType> typeBox = comboBox(ContactType.asList(),
+            _ -> comboBoxListCell("Все типы", Bundles::translate));
+    private final TextField searchField = TextFieldFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 
     private final FilteredList<Contact> filteredList = cache().getContacts().filtered(_ -> true);
     private final TableView<Contact> tableView = new ContactTableView(filteredList.sorted());
@@ -56,23 +54,6 @@ public final class ContactListWindowController extends BaseController {
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
-        // Menu bar
-        var menuBar = menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
-                menu("Правка",
-                        createMenuItem(crudActionsHolder.getCreateAction()),
-                        createMenuItem(crudActionsHolder.getUpdateAction()),
-                        new SeparatorMenuItem(),
-                        createMenuItem(searchAction(this::onSearch))
-                ),
-                menu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
-                createWindowMenu(),
-                createHelpMenu()
-        );
-
         // Context menu
         tableView.setContextMenu(new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),
@@ -81,12 +62,30 @@ public final class ContactListWindowController extends BaseController {
         tableView.setOnMouseClicked(this::onTableMouseClick);
 
         // Toolbox
-        var hBox = hBox(5, searchField, typeBox);
-        BorderPane.setMargin(hBox, BIG_INSETS);
-
         var self = new BorderPane(
-                new BorderPane(tableView, hBox, null, null, null),
-                menuBar, null, null, null
+                new BorderPane(
+                        tableView,
+                        apply(hBox(5, searchField, typeBox), box -> BorderPane.setMargin(box, BIG_INSETS)),
+                        null, null, null),
+                menuBar(
+                        menu("Файл",
+                                createMenuItem(ACTION_CLOSE)
+                        ),
+                        menu("Правка",
+                                createMenuItem(crudActionsHolder.getCreateAction()),
+                                createMenuItem(crudActionsHolder.getUpdateAction()),
+                                new SeparatorMenuItem(),
+                                createMenuItem(searchAction(this::onSearch))
+                        ),
+                        menu("Вид",
+                                apply(menuItem("Сбросить фильтр"), menuItem -> {
+                                    menuItem.setAccelerator(SHORTCUT_ALT_C);
+                                    menuItem.setOnAction(_ -> resetFilter());
+                                }),
+                                createWindowMenu(),
+                                createHelpMenu()
+                        )),
+                null, null, null
         );
         self.setPrefSize(600.0, 400.0);
 

@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
 import javafx.application.Platform;
@@ -19,11 +17,11 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.ToStringConverter;
 import org.panteleyev.money.app.BaseCompletionProvider;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.MainWindowController;
 import org.panteleyev.money.app.Styles;
-import org.panteleyev.money.app.ToStringConverter;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.desktop.commons.DataCache;
 import org.panteleyev.money.desktop.commons.ReadOnlyNamedConverter;
@@ -43,13 +41,15 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
-import static org.panteleyev.fx.grid.GridBuilder.gridCell;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.Controller.SKIP;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -97,9 +97,9 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField creditEdit = new TextField();
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
-    private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.values(),
-            b -> b.withHandler(_ -> onCategoryTypeSelected())
-                    .withStringConverter(Bundles::translate));
+
+    private final ComboBox<CategoryType> typeComboBox = apply(comboBox(CategoryType.asList(),
+            _ -> comboBoxListCell(Bundles::translate)), cb -> cb.setOnAction(_ -> onCategoryTypeSelected()));
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final TextField currencyEdit = new TextField();
     private final MenuButton currencyMenuButton = new MenuButton();
@@ -145,7 +145,9 @@ class AccountDialog extends BaseDialog<Account> {
                                 gridRow(label("Проценты:"), gridCell(interestEdit, 2, 1)),
                                 gridRow(label("Дата закрытия:"), gridCell(closingDatePicker, 2, 1)),
                                 gridRow(SKIP, gridCell(activeCheckBox, 2, 1))
-                        ), b -> b.withStyle(Styles.GRID_PANE)
+                        ),
+                        List.of(),
+                        List.of(Styles.GRID_PANE)
                 )
         );
 
@@ -158,7 +160,8 @@ class AccountDialog extends BaseDialog<Account> {
 
         IconManager.setupComboBox(iconComboBox);
 
-        TextFields.bindAutoCompletion(currencyEdit, new CurrencyCompletionProvider(currencySuggestions), CURRENCY_TO_STRING);
+        TextFields.bindAutoCompletion(currencyEdit, new CurrencyCompletionProvider(currencySuggestions),
+                CURRENCY_TO_STRING);
 
         if (account == null) {
             nameEdit.setText("");
@@ -197,7 +200,8 @@ class AccountDialog extends BaseDialog<Account> {
             if (account.currencyUuid() != null) {
                 currencyOrSecurity = new CurrencyOrSecurity(cache.getCurrency(account.currencyUuid()).orElse(null));
             } else if (account.securityUuid() != null) {
-                currencyOrSecurity = new CurrencyOrSecurity(cache.getExchangeSecurity(account.securityUuid()).orElse(null));
+                currencyOrSecurity = new CurrencyOrSecurity(
+                        cache.getExchangeSecurity(account.securityUuid()).orElse(null));
             } else {
                 currencyOrSecurity = new CurrencyOrSecurity(null);
             }

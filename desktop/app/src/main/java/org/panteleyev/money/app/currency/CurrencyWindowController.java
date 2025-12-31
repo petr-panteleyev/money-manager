@@ -1,13 +1,12 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.currency;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -18,8 +17,8 @@ import org.panteleyev.money.model.Currency;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -34,7 +33,30 @@ public final class CurrencyWindowController extends BaseController {
                 tableView.getSelectionModel().selectedItemProperty().isNull()
         );
 
-        var menuBar = menuBar(
+        // Context Menu
+        tableView.setContextMenu(new ContextMenu(
+                createContextMenuItem(crudActionsHolder.getCreateAction()),
+                createMenuItem(crudActionsHolder.getUpdateAction()),
+                new SeparatorMenuItem(),
+                createContextMenuItem(crudActionsHolder.getDeleteAction())
+        ));
+
+        var root = new BorderPane(
+                new BorderPane(tableView, null, null, null, null),
+                createMenuBar(crudActionsHolder), null, null, null
+        );
+
+        setupWindow(root);
+        settings().loadStageDimensions(this);
+    }
+
+    @Override
+    public String getTitle() {
+        return "Валюты";
+    }
+
+    private MenuBar createMenuBar(CrudActionsHolder crudActionsHolder) {
+        return menuBar(
                 menu("Файл",
                         createMenuItem(ACTION_CLOSE)
                 ),
@@ -47,27 +69,6 @@ public final class CurrencyWindowController extends BaseController {
                 createWindowMenu(),
                 createHelpMenu()
         );
-
-        // Context Menu
-        tableView.setContextMenu(new ContextMenu(
-                createContextMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction()),
-                new SeparatorMenuItem(),
-                createContextMenuItem(crudActionsHolder.getDeleteAction())
-        ));
-
-        var root = new BorderPane(
-                new BorderPane(tableView, null, null, null, null),
-                menuBar, null, null, null
-        );
-
-        setupWindow(root);
-        settings().loadStageDimensions(this);
-    }
-
-    @Override
-    public String getTitle() {
-        return "Валюты";
     }
 
     private Optional<Currency> getSelectedCurrency() {

@@ -1,7 +1,5 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.exchange;
 
 import javafx.scene.control.ButtonType;
@@ -15,8 +13,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.panteleyev.fx.FxFactory.textField;
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.TextFieldFactory.textField;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 
@@ -62,15 +61,13 @@ public class ExchangeSecurityDialog extends BaseDialog<Object> {
     }
 
     private void addGridRow(GridPane grid, AtomicInteger rowIndex, String title, Object value) {
-        var label = label(title);
-
         var text = switch (value) {
             case LocalDate localDate -> DATE_FORMATTER.format(localDate);
             default -> value.toString();
         };
 
-        var textField = textField(text, 20);
-        textField.setEditable(false);
-        grid.addRow(rowIndex.getAndIncrement(), label, textField);
+        grid.addRow(rowIndex.getAndIncrement(),
+                label(title),
+                apply(textField(text, 20), field -> field.setEditable(false)));
     }
 }

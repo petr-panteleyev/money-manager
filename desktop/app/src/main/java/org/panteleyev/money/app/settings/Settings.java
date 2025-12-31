@@ -1,13 +1,10 @@
-/*
- Copyright © 2021-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.settings;
 
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.app.ApplicationFiles;
 import org.panteleyev.money.app.TemplateEngine;
 
@@ -19,6 +16,7 @@ import java.util.function.Consumer;
 
 import static java.util.Map.entry;
 import static javafx.application.Platform.runLater;
+import static org.panteleyev.fx.WindowManager.windowManager;
 import static org.panteleyev.money.app.TemplateEngine.templateEngine;
 
 public final class Settings {
@@ -73,7 +71,7 @@ public final class Settings {
     }
 
     private void reloadCssFile() {
-        WindowManager.newInstance().getControllers().forEach(
+        windowManager().getControllers().forEach(
                 c -> runLater(() -> c.getStage().getScene().getStylesheets().setAll(getMainCssFilePath()))
         );
     }

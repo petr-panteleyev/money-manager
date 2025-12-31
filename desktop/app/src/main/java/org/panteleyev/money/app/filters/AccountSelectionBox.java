@@ -1,7 +1,5 @@
-/*
- Copyright © 2018-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2018-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
 import javafx.application.Platform;
@@ -22,8 +20,9 @@ import org.panteleyev.money.model.Transaction;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.clearValueAndSelection;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.clearValueAndSelection;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.Predicates.accountByCategory;
 import static org.panteleyev.money.app.Predicates.accountByUuid;
@@ -34,22 +33,15 @@ import static org.panteleyev.money.app.transaction.TransactionPredicate.transact
 
 public class AccountSelectionBox extends HBox {
     private final ComboBox<CategoryType> categoryTypeBox =
-            comboBox(CategoryType.values(),
-                    b -> b.withDefaultString("Все типы")
-                            .withStringConverter(Bundles::translate)
-            );
+            comboBox(CategoryType.asList(), _ -> comboBoxListCell("Все типы", Bundles::translate));
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(_ -> true);
     private final ComboBox<Category> categoryBox = comboBox(
             filteredCategories.sorted(Comparators.categoriesByName()),
-            b -> b.withDefaultString("Все категории")
-                    .withStringConverter(Category::name)
-                    .withImageConverter(CATEGORY_TO_IMAGE));
+            _ -> comboBoxListCell("Все категории", Category::name, CATEGORY_TO_IMAGE, null));
     private final FilteredList<Account> filteredAccounts = cache().getAccounts().filtered(_ -> true);
     private final ComboBox<Account> accountBox = comboBox(filteredAccounts.sorted(Comparators.accountsByName()),
-            b -> b.withDefaultString("Все счета")
-                    .withStringConverter(Account::name)
-                    .withImageConverter(ACCOUNT_TO_IMAGE));
+            _ -> comboBoxListCell("Все счета", Account::name, ACCOUNT_TO_IMAGE, null));
     private final PredicateProperty<Transaction> predicateProperty = new PredicateProperty<>();
 
     public AccountSelectionBox() {

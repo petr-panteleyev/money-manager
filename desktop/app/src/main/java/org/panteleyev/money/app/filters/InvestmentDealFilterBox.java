@@ -1,7 +1,5 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
 import javafx.event.ActionEvent;
@@ -21,7 +19,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.Predicate;
 
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 import static org.panteleyev.money.app.investment.InvestmentDealPredicate.byDates;
 import static org.panteleyev.money.app.investment.InvestmentDealPredicate.byYear;

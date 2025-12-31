@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.currency;
 
 import javafx.application.Platform;
@@ -26,11 +24,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.Controller.SKIP;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
@@ -60,15 +59,19 @@ final class CurrencyDialog extends BaseDialog<Currency> {
                                 gridRow(label("Символ:"), nameEdit),
                                 gridRow(label("Описание:"), descrEdit),
                                 gridRow(label("Курс:"), rateEdit, rateDirectionChoice),
-                                gridRow(SKIP, hBox(List.of(showSymbolCheck, formatSymbolCombo,
-                                        formatSymbolPositionChoice), hBox -> {
-                                    hBox.setAlignment(CENTER_LEFT);
-                                    HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, BIG_SPACING));
-                                })),
+                                gridRow(SKIP,
+                                        apply(hBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice),
+                                                box -> {
+                                                    box.setAlignment(CENTER_LEFT);
+                                                    HBox.setMargin(formatSymbolPositionChoice,
+                                                            new Insets(0.0, 0.0, 0.0, BIG_SPACING));
+                                                })),
                                 gridRow(SKIP, thousandSeparatorCheck),
                                 gridRow(SKIP, defaultCheck)
 
-                        ), b -> b.withStyle(GRID_PANE)
+                        ),
+                        List.of(),
+                        List.of(GRID_PANE)
                 )
         );
 

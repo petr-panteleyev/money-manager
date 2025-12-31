@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.settings;
 
 import javafx.application.Platform;
@@ -22,14 +20,14 @@ import org.panteleyev.fx.Controller;
 import java.util.List;
 
 import static javafx.collections.FXCollections.observableArrayList;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.FxUtils.ELLIPSIS;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.TabFactory.tab;
-import static org.panteleyev.fx.TitledPaneBuilder.titledPane;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.StringFactory.ELLIPSIS;
+import static org.panteleyev.fx.factories.TabFactory.tab;
+import static org.panteleyev.fx.factories.TitledPaneFactory.titledPane;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.DOUBLE_SPACING;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
@@ -102,13 +100,13 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
         setupFontField(dialogLabelFontField, settings.getFont(DIALOG_LABEL_FONT));
 
         var tabPane = new TabPane(
-                tab("Общие", false, gridPane(
+                tab("Общие", gridPane(
                         List.of(
                                 gridRow(label("Длина префикса автодополнения:"), autoCompleteLength),
                                 gridRow(label("Дней до закрытия счета:"), accountClosingDayDeltaEdit)
-                        ), b -> b.withStyle(GRID_PANE))
+                        ), List.of(), List.of(GRID_PANE))
                 ),
-                tab("Шрифты", false,
+                tab("Шрифты",
                         vBox(DOUBLE_SPACING,
                                 titledPane("Элементы управления",
                                         gridPane(List.of(
@@ -116,45 +114,41 @@ public class SettingsDialog extends BaseDialog<ButtonType> {
                                                         button(ELLIPSIS, _ -> onFontSelected(controlsFontField))),
                                                 gridRow(label("Меню:"), menuFontField,
                                                         button(ELLIPSIS, _ -> onFontSelected(menuFontField)))
-                                        ), b -> b.withStyle(GRID_PANE))
+                                        ), List.of(), List.of(GRID_PANE))
                                 ),
                                 titledPane("Таблицы",
                                         gridPane(List.of(
-                                                        gridRow(cellFontField,
-                                                                button(ELLIPSIS, _ -> onFontSelected(cellFontField)))
-                                                ), b -> b.withStyle(GRID_PANE)
-                                        )
+                                                gridRow(cellFontField,
+                                                        button(ELLIPSIS, _ -> onFontSelected(cellFontField)))
+                                        ), List.of(), List.of(GRID_PANE))
                                 ),
                                 titledPane("Диалоги",
                                         gridPane(List.of(
-                                                        gridRow(dialogLabelFontField,
-                                                                button(ELLIPSIS,
-                                                                        _ -> onFontSelected(dialogLabelFontField)))
-                                                ), b -> b.withStyle(GRID_PANE)
-                                        )
+                                                gridRow(dialogLabelFontField,
+                                                        button(ELLIPSIS,
+                                                                _ -> onFontSelected(dialogLabelFontField)))
+                                        ), List.of(), List.of(GRID_PANE))
                                 )
                         )
                 ),
-                tab("Цвета", false,
+                tab("Цвета",
                         vBox(DOUBLE_SPACING,
                                 titledPane("Проводки",
                                         gridPane(List.of(
-                                                        gridRow(label("Дебет:"), debitColorPicker),
-                                                        gridRow(label("Кредит:"), creditColorPicker),
-                                                        gridRow(label("Перевод:"), transferColorPicker)
-                                                ), b -> b.withStyle(GRID_PANE)
-                                        )
+                                                gridRow(label("Дебет:"), debitColorPicker),
+                                                gridRow(label("Кредит:"), creditColorPicker),
+                                                gridRow(label("Перевод:"), transferColorPicker)
+                                        ), List.of(), List.of(GRID_PANE))
                                 ),
                                 titledPane("Выписки",
                                         gridPane(List.of(
-                                                        gridRow(label("Подтверждено:"),
-                                                                statementCheckedColorPicker),
-                                                        gridRow(label("Не подтверждено:"),
-                                                                statementUncheckedColorPicker),
-                                                        gridRow(label("Не найдено:"),
-                                                                statementMissingColorPicker)
-                                                ), b -> b.withStyle(GRID_PANE)
-                                        )
+                                                gridRow(label("Подтверждено:"),
+                                                        statementCheckedColorPicker),
+                                                gridRow(label("Не подтверждено:"),
+                                                        statementUncheckedColorPicker),
+                                                gridRow(label("Не найдено:"),
+                                                        statementMissingColorPicker)
+                                        ), List.of(), List.of(GRID_PANE))
                                 )
                         )
                 )

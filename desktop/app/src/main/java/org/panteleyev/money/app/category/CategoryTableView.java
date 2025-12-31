@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.category;
 
 import javafx.collections.transformation.SortedList;
@@ -13,8 +11,9 @@ import org.panteleyev.money.model.Category;
 
 import java.util.List;
 
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 
 final class CategoryTableView extends TableView<Category> {
     public CategoryTableView(SortedList<Category> list) {
@@ -22,17 +21,20 @@ final class CategoryTableView extends TableView<Category> {
 
         var w = widthProperty().subtract(20);
         getColumns().setAll(List.of(
-                tableObjectColumn("Тип",
-                        b -> b.withCellFactory(_ -> new CategoryTypeCell())
-                                .withComparator(Comparators.categoriesByType()
-                                        .thenComparing(Comparators.categoriesByName()))
-                                .withWidthBinding(w.multiply(0.2))),
-                tableObjectColumn("Название",
-                        b -> b.withCellFactory(_ -> new CategoryNameCell())
-                                .withComparator(Comparators.categoriesByName())
-                                .withWidthBinding(w.multiply(0.4))),
-                tableColumn("Комментарий",
-                        b -> b.withPropertyCallback(Category::comment).withWidthBinding(w.multiply(0.4)))
+                apply(tableObjectColumn("Тип"), c -> {
+                    c.setCellFactory(_ -> new CategoryTypeCell());
+                    c.comparator(Comparators.categoriesByType().thenComparing(Comparators.categoriesByName()));
+                    c.widthBinding(w.multiply(0.2));
+                }),
+                apply(tableObjectColumn("Название"), c -> {
+                    c.setCellFactory(_ -> new CategoryNameCell());
+                    c.comparator(Comparators.categoriesByName());
+                    c.widthBinding(w.multiply(0.4));
+                }),
+                apply(tableStringColumn("Комментарий"), c -> {
+                    c.valueConverter(Category::comment);
+                    c.widthBinding(w.multiply(0.4));
+                })
         ));
 
         list.comparatorProperty().bind(comparatorProperty());

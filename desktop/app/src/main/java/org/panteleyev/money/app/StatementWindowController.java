@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.application.Platform;
@@ -21,7 +19,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import org.panteleyev.fx.TableColumnBuilder;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.app.cells.LocalDateCell;
 import org.panteleyev.money.app.cells.StatementRow;
 import org.panteleyev.money.app.cells.StatementSumCell;
@@ -48,14 +46,15 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -158,18 +157,29 @@ public class StatementWindowController extends BaseController {
     private MenuBar createMainMenu() {
         return menuBar(
                 menu("Файл",
-                        menuItem("Открыть...", SHORTCUT_O, _ -> onBrowse()),
+                        apply(menuItem("Открыть..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_O);
+                            menuItem.setOnAction(_ -> onBrowse());
+                        }),
                         new SeparatorMenuItem(),
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
                 menu("Правка",
-                        menuItem("Добавить...", SHORTCUT_N,
-                                _ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction)),
+                        apply(menuItem("Добавить..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_N);
+                            menuItem.setOnAction(_ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction));
+                        }),
                         new SeparatorMenuItem(),
-                        menuItem("Отметить", SHORTCUT_K, _ -> onCheckStatementRecord(true)),
-                        menuItem("Снять отметку", SHORTCUT_U, _ -> onCheckStatementRecord(false))
+                        apply(menuItem("Отметить"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_K);
+                            menuItem.setOnAction(_ -> onCheckStatementRecord(true));
+                        }),
+                        apply(menuItem("Снять отметку"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_U);
+                            menuItem.setOnAction(_ -> onCheckStatementRecord(false));
+                        })
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -297,25 +307,36 @@ public class StatementWindowController extends BaseController {
 
         var w = tableView.widthProperty().subtract(20);
         tableView.getColumns().addAll(List.of(
-                tableColumn("Дата", (TableColumnBuilder<StatementRecord, LocalDate> b) ->
-                        b.withCellFactory(_ -> new LocalDateCell<>())
-                                .withPropertyCallback(StatementRecord::getActual)
-                                .withWidthBinding(w.multiply(0.05))),
-                tableColumn("Дата исп.", (TableColumnBuilder<StatementRecord,
-                        LocalDate> b) ->
-                        b.withCellFactory(_ -> new LocalDateCell<>())
-                                .withPropertyCallback(StatementRecord::getExecution)
-                                .withWidthBinding(w.multiply(0.05))),
-                tableColumn("Описание", b ->
-                        b.withPropertyCallback(StatementRecord::getDescription).withWidthBinding(w.multiply(0.5))),
-                tableColumn("Контрагент", b ->
-                        b.withPropertyCallback(StatementRecord::getCounterParty).withWidthBinding(w.multiply(0.15))),
-                tableColumn("Место", b ->
-                        b.withPropertyCallback(StatementRecord::getPlace).withWidthBinding(w.multiply(0.10))),
-                tableColumn("Страна", b ->
-                        b.withPropertyCallback(StatementRecord::getCountry).withWidthBinding(w.multiply(0.05))),
-                tableObjectColumn("Сумма", b ->
-                        b.withCellFactory(_ -> new StatementSumCell()).withWidthBinding(w.multiply(0.1)))
+                apply(TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата"), c -> {
+                    c.setCellFactory(_ -> new LocalDateCell<>());
+                    c.valueConverter(StatementRecord::getActual);
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата исп."), c -> {
+                    c.setCellFactory(_ -> new LocalDateCell<>());
+                    c.valueConverter(StatementRecord::getExecution);
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableStringColumn("Описание"), c -> {
+                    c.valueConverter(StatementRecord::getDescription);
+                    c.widthBinding(w.multiply(0.5));
+                }),
+                apply(tableStringColumn("Контрагент"), c -> {
+                    c.valueConverter(StatementRecord::getCounterParty);
+                    c.widthBinding(w.multiply(0.15));
+                }),
+                apply(tableStringColumn("Место"), c -> {
+                    c.valueConverter(StatementRecord::getPlace);
+                    c.widthBinding(w.multiply(0.10));
+                }),
+                apply(tableStringColumn("Страна"), c -> {
+                    c.valueConverter(StatementRecord::getCountry);
+                    c.widthBinding(w.multiply(0.05));
+                }),
+                apply(tableObjectColumn("Сумма"), c -> {
+                    c.setCellFactory(_ -> new StatementSumCell());
+                    c.widthBinding(w.multiply(0.1));
+                })
         ));
 
         var menu = new ContextMenu();

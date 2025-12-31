@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
 import javafx.event.ActionEvent;
@@ -21,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
@@ -28,10 +27,10 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.ToStringConverter;
 import org.panteleyev.money.app.BaseCompletionProvider;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.Styles;
-import org.panteleyev.money.app.ToStringConverter;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
@@ -61,12 +60,11 @@ import java.util.UUID;
 
 import static javafx.application.Platform.runLater;
 import static javafx.scene.layout.Priority.ALWAYS;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.Bundles.translate;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
@@ -186,67 +184,48 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         getDialogPane().setContent(
                 vBox(
                         DOUBLE_SPACING,
-                        hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING, label("Дата"),
-                                        hBox(List.of(datePicker, checkedCheckBox), hBox -> {
-                                            hBox.setSpacing(BIG_SPACING);
-                                            hBox.setAlignment(Pos.CENTER);
-                                        })
-                                )
+                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Дата"),
+                                apply(hBox(List.of(datePicker, checkedCheckBox)), box -> {
+                                    box.setSpacing(BIG_SPACING);
+                                    box.setAlignment(Pos.CENTER);
+                                }))
                         ),
                         hBox(BIG_SPACING,
                                 vBox(SMALL_SPACING, label("Дебет"), debitAmountEdit),
                                 vBox(SMALL_SPACING, label("Кредит"), creditAmountEdit)
                         ),
-                        hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING,
-                                        label("Тип"),
-                                        hBox(List.of(typeEdit, typeMenuButton), hBox -> {
-                                            hBox.setSpacing(BIG_SPACING);
-                                            hBox.setAlignment(Pos.CENTER);
-                                        })
-                                )
+                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Тип"),
+                                apply(hBox(List.of(typeEdit, typeMenuButton)), box -> {
+                                    box.setSpacing(BIG_SPACING);
+                                    box.setAlignment(Pos.CENTER);
+                                }))
                         ),
-                        fxNode(
-                                vBox(SMALL_SPACING,
-                                        label("Исходный счет"),
+                        apply(vBox(SMALL_SPACING, label("Исходный счет"),
                                         hBox(0,
-                                                fxNode(debitedAccountEdit, hBoxHGrow(ALWAYS)),
+                                                apply(debitedAccountEdit, node -> HBox.setHgrow(node, ALWAYS)),
                                                 debitedMenuButton),
                                         debitedCategoryLabel),
-                                hBoxHGrow(ALWAYS)
-                        ),
-                        fxNode(
-                                vBox(SMALL_SPACING,
+                                node -> HBox.setHgrow(node, ALWAYS)),
+                        apply(vBox(SMALL_SPACING,
                                         label("Карта"),
-                                        hBox(0,
-                                                fxNode(cardComboBox, hBoxHGrow(ALWAYS))
-                                        ), label("")
+                                        hBox(0, apply(cardComboBox, node -> HBox.setHgrow(node, ALWAYS))),
+                                        label("")
                                 ),
-                                hBoxHGrow(ALWAYS)
-                        ),
-                        fxNode(
-                                vBox(SMALL_SPACING,
-                                        label("Счет получателя"),
+                                node -> HBox.setHgrow(node, ALWAYS)),
+                        apply(vBox(SMALL_SPACING, label("Счет получателя"),
                                         hBox(0,
-                                                fxNode(creditedAccountEdit, hBoxHGrow(ALWAYS)),
+                                                apply(creditedAccountEdit, node -> HBox.setHgrow(node, ALWAYS)),
                                                 creditedMenuButton
                                         ),
                                         creditedCategoryLabel),
-                                hBoxHGrow(ALWAYS)
-                        ),
-                        fxNode(
-                                vBox(SMALL_SPACING,
-                                        label("Контрагент"),
+                                node -> HBox.setHgrow(node, ALWAYS)),
+                        apply(vBox(SMALL_SPACING, label("Контрагент"),
                                         hBox(0,
-                                                fxNode(contactEdit, hBoxHGrow(ALWAYS)),
+                                                apply(contactEdit, node -> HBox.setHgrow(node, ALWAYS)),
                                                 contactMenuButton)),
-                                hBoxHGrow(ALWAYS)
-                        ),
-                        fxNode(
-                                vBox(SMALL_SPACING, label("Комментарий"), commentEdit),
-                                hBoxHGrow(ALWAYS)
-                        ),
+                                node -> HBox.setHgrow(node, ALWAYS)),
+                        apply(vBox(SMALL_SPACING, label("Комментарий"), commentEdit),
+                                node -> HBox.setHgrow(node, ALWAYS)),
                         vBox(SMALL_SPACING, label("Счёт"), invoiceNumberEdit),
                         vBox(SMALL_SPACING, label("Дата по выписке"), statementDatePicker)
                 )
@@ -274,7 +253,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 new NamedCompletionProvider<>(debitedSuggestions), ACCOUNT_TO_STRING);
         TextFields.bindAutoCompletion(creditedAccountEdit,
                 new NamedCompletionProvider<>(creditedSuggestions), ACCOUNT_TO_STRING);
-        TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions), CONTACT_TO_STRING);
+        TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions),
+                CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
 
         creditedAccountEdit.focusedProperty().addListener((_, oldValue, newValue) -> {
@@ -643,8 +623,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
-                                                              Collection<T> items,
-                                                              StringConverter<T> converter) {
+            Collection<T> items,
+            StringConverter<T> converter)
+    {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
@@ -654,7 +635,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     }
 
     private Optional<TransactionType> checkTransactionTypeFieldValue(TextField field,
-                                                                     Collection<TransactionType> items) {
+            Collection<TransactionType> items)
+    {
         return checkTransactionTypeFieldValue(field.getText(), items);
     }
 
@@ -727,8 +709,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
             if (x.isSeparator()) {
                 typeMenuButton.getItems().add(new SeparatorMenuItem());
             } else {
-                typeMenuButton.getItems().add(
-                        menuItem(translate(x), _ -> onTransactionTypeSelected(x)));
+                typeMenuButton.getItems().add(menuItem(translate(x), _ -> onTransactionTypeSelected(x)));
                 typeSuggestions.add(x);
             }
         });

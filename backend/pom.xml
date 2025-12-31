@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright © 2022-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
-  SPDX-License-Identifier: BSD-2-Clause
-  -->
+<!-- Copyright © 2022-2025 Petr Panteleyev -->
+<!-- SPDX-License-Identifier: BSD-2-Clause -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.11</version>
+        <version>3.4.13</version>
         <relativePath/>
     </parent>
 
@@ -19,14 +17,14 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>25.11.1</revision>
+        <revision>25.12.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>25</java.version>
         <maven.compiler.release>25</maven.compiler.release>
         <!-- Plugins -->
-        <mavenResourcePluginVersion>3.3.1</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.14.0</mavenCompilerPluginVersion>
-        <mavenJarPluginVersion>3.4.2</mavenJarPluginVersion>
+        <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
+        <mavenCompilerPluginVersion>3.14.1</mavenCompilerPluginVersion>
+        <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <jpackageMavenPluginVersion>1.7.1</jpackageMavenPluginVersion>
         <!-- Dependencies -->

@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.database;
 
 import javafx.collections.FXCollections;
@@ -14,7 +12,7 @@ import org.panteleyev.fx.ToStringConverter;
 
 import java.util.Objects;
 
-import static org.panteleyev.fx.LabelFactory.label;
+import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;

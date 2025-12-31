@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
 import javafx.application.Platform;
@@ -42,18 +40,19 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.MenuFactory.checkMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Predicates.activeAccount;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
+import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
@@ -106,11 +105,10 @@ public final class AccountWindowController extends BaseController {
         createContextMenu();
 
         // Tool box
-        var hBox = hBox(5.0,
+        var hBox = apply(hBox(5.0,
                 accountNameFilterBox.getTextField(),
                 categorySelectionBox
-        );
-        hBox.setAlignment(Pos.CENTER_LEFT);
+        ), box -> box.setAlignment(Pos.CENTER_LEFT));
 
         var self = new BorderPane(
                 new BorderPane(tableView, hBox, null, null, null),
@@ -138,9 +136,10 @@ public final class AccountWindowController extends BaseController {
     private MenuBar createMainMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = menuItem("Деактивировать",
-                _ -> onActivateDeactivateAccount(),
-                disableBinding);
+        var activateAccountMenuItem = apply(menuItem("Деактивировать"), menuItem -> {
+            menuItem.setOnAction(_ -> onActivateDeactivateAccount());
+            menuItem.disableProperty().bind(disableBinding);
+        });
 
         var editMenu = menu("Правка",
                 createMenuItem(crudActionsHolder.getCreateAction()),
@@ -166,19 +165,23 @@ public final class AccountWindowController extends BaseController {
 
         return menuBar(
                 menu("Файл",
-                        menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
+                        apply(menuItem("Отчет..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_R);
+                            menuItem.setOnAction(_ -> onReport());
+                        }),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)),
                 editMenu,
                 menu("Вид",
-                        checkMenuItem("Показывать неактивные счета",
-                                settings().getShowDeactivatedAccounts(), SHORTCUT_H,
-                                event -> {
-                                    var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                                    settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
-                                    showDeactivatedAccounts.set(selected ? _ -> true : activeAccount(true));
-                                }
-                        )
+                        apply(checkMenuItem("Показывать неактивные счета"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_N);
+                            menuItem.setSelected(settings().getShowDeactivatedAccounts());
+                            menuItem.setOnAction(event -> {
+                                var selected = ((CheckMenuItem) event.getSource()).isSelected();
+                                settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
+                                showDeactivatedAccounts.set(selected ? _ -> true : activeAccount(true));
+                            });
+                        })
                 ),
                 createPortfolioMenu(),
                 createWindowMenu(),
@@ -189,9 +192,10 @@ public final class AccountWindowController extends BaseController {
     private void createContextMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = menuItem("Деактивировать",
-                _ -> onActivateDeactivateAccount(),
-                disableBinding);
+        var activateAccountMenuItem = apply(menuItem("Деактивировать"), menuItem -> {
+            menuItem.setOnAction(_ -> onActivateDeactivateAccount());
+            menuItem.disableProperty().bind(disableBinding);
+        });
 
         var contextMenu = new ContextMenu(
                 createContextMenuItem(crudActionsHolder.getCreateAction()),

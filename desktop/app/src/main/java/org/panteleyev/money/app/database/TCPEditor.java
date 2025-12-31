@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.database;
 
 import javafx.event.ActionEvent;
@@ -17,12 +15,13 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static javafx.event.ActionEvent.ACTION;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.grid.ColumnConstraintsBuilder.columnConstraints;
-import static org.panteleyev.fx.grid.GridBuilder.gridCell;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.grid.ColumnConstraintsFactory.columnConstraints;
+import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.money.app.Styles.DOUBLE_INSETS;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.database.ConnectionProfilesEditor.DEFAULT_DATABASE;
@@ -37,10 +36,11 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> resetSchemaHandler) {
-        var resetSchemaButton = button("Сбросить");
-        resetSchemaButton.setGraphic(new ImageView(Images.WARNING));
-        resetSchemaButton.disableProperty().bind(validation.invalidProperty());
-        resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
+        var resetSchemaButton = apply(button("Сбросить"), button -> {
+            button.setGraphic(new ImageView(Images.WARNING));
+            button.disableProperty().bind(validation.invalidProperty());
+            button.addEventFilter(ACTION, resetSchemaHandler::accept);
+        });
 
         getChildren().addAll(gridPane(
                 List.of(
@@ -49,9 +49,12 @@ final class TCPEditor extends VBox {
                         gridRow(label("Пароль:"), gridCell(dataBasePasswordEdit, 3, 1)),
                         gridRow(label("База данных:"), gridCell(databaseNameEdit, 3, 1)),
                         gridRow(label("Схема:"), gridCell(schemaEdit, 2, 1), resetSchemaButton)
-                ), b -> b.withStyle(GRID_PANE)
-                        .withConstraints(columnConstraints(bld -> bld.withHgrow(Priority.ALWAYS)),
-                                columnConstraints(bld -> bld.withHgrow(Priority.ALWAYS)))
+                ),
+                List.of(
+                        apply(columnConstraints(), c -> c.setHgrow(Priority.ALWAYS)),
+                        apply(columnConstraints(), c -> c.setHgrow(Priority.ALWAYS))
+                ),
+                List.of(GRID_PANE)
         ));
 
         VBox.setMargin(getChildren().getFirst(), DOUBLE_INSETS);

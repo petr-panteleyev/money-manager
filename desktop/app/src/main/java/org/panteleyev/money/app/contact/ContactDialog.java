@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
 import javafx.application.Platform;
@@ -26,11 +24,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.combobox.ComboBoxBuilder.comboBox;
-import static org.panteleyev.fx.grid.GridBuilder.gridCell;
-import static org.panteleyev.fx.grid.GridBuilder.gridPane;
-import static org.panteleyev.fx.grid.GridRowBuilder.gridRow;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
+import static org.panteleyev.fx.factories.grid.RowConstraintsFactory.rowConstraints;
 import static org.panteleyev.money.app.MainWindowController.UI;
 import static org.panteleyev.money.app.Styles.GRID_PANE;
 import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
@@ -38,8 +39,8 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 final class ContactDialog extends BaseDialog<Contact> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ComboBox<ContactType> typeBox = comboBox(ContactType.values(),
-            b -> b.withStringConverter(Bundles::translate));
+    private final ComboBox<ContactType> typeBox = comboBox(ContactType.asList(),
+            _ -> comboBoxListCell(Bundles::translate));
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();
     private final TextField mobileField = new TextField();
@@ -73,9 +74,11 @@ final class ContactDialog extends BaseDialog<Contact> {
                                 gridRow(label("Город:"), gridCell(cityField, 2, 1)),
                                 gridRow(label("Страна:"), gridCell(countryField, 2, 1)),
                                 gridRow(label("Индекс:"), gridCell(zipField, 2, 1)),
-                                gridRow(label("Комментарий:"), gridCell(commentEdit, 2, 1))
-                                        .withValignment(VPos.TOP)
-                        ), b -> b.withStyle(GRID_PANE)
+                                gridRow(List.of(label("Комментарий:"), gridCell(commentEdit, 2, 1)),
+                                        apply(rowConstraints(), rc -> rc.setValignment(VPos.TOP))
+                                )),
+                        List.of(),
+                        List.of(GRID_PANE)
                 )
         );
 

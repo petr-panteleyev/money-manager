@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.geometry.Pos;
@@ -36,14 +34,15 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.groupingBy;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
-import static org.panteleyev.fx.TreeTableFactory.treeItem;
-import static org.panteleyev.fx.TreeTableFactory.treeTableColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.TreeTableFactory.treeItem;
+import static org.panteleyev.fx.factories.TreeTableFactory.treeTableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
@@ -142,8 +141,8 @@ class IncomesAndExpensesWindowController extends BaseController {
     private final Label expenseValueText = new Label();
     private final Label balanceValueText = new Label();
 
-    private final TreeItem<TreeNode> expenseRoot = treeItem(true);
-    private final TreeItem<TreeNode> incomeRoot = treeItem(true);
+    private final TreeItem<TreeNode> expenseRoot = apply(treeItem(), item -> item.setExpanded(true));
+    private final TreeItem<TreeNode> incomeRoot = apply(treeItem(), item -> item.setExpanded(true));
 
     public IncomesAndExpensesWindowController() {
         setupReportTable();
@@ -245,14 +244,16 @@ class IncomesAndExpensesWindowController extends BaseController {
                 })
                 .collect(groupingBy(t -> cache().getCategory(catUuidFunc.apply(t)).orElseThrow(),
                         groupingBy(t -> cache().getAccount(accUuidFunc.apply(t)).orElseThrow(),
-                                groupingBy(t -> Optional.ofNullable(t.contactUuid()).flatMap(id -> cache().getContact(id))
-                                        .map(Contact::name).orElse("")))))
+                                groupingBy(
+                                        t -> Optional.ofNullable(t.contactUuid()).flatMap(id -> cache().getContact(id))
+                                                .map(Contact::name).orElse("")))))
                 .entrySet().stream()
                 .sorted(Comparator.comparing(e -> e.getKey().name()))
                 .forEach(categoryMapEntry -> {
                     var category = categoryMapEntry.getKey();
                     var categoryRoot =
-                            treeItem(new TreeNode(category.name(), catSum.get(category.uuid())), true);
+                            apply(treeItem(new TreeNode(category.name(), catSum.get(category.uuid()))),
+                                    item -> item.setExpanded(true));
                     root.getChildren().add(categoryRoot);
 
                     categoryMapEntry.getValue().entrySet().stream()
@@ -260,7 +261,8 @@ class IncomesAndExpensesWindowController extends BaseController {
                             .forEach(accountMapEntry -> {
                                 var account = accountMapEntry.getKey();
                                 var accountRoot =
-                                        treeItem(new TreeNode(account.name(), accSum.get(account.uuid())), false);
+                                        apply(treeItem(new TreeNode(account.name(), accSum.get(account.uuid()))),
+                                                item -> item.setExpanded(false));
                                 categoryRoot.getChildren().add(accountRoot);
 
                                 accountMapEntry.getValue().entrySet().stream()
@@ -271,7 +273,9 @@ class IncomesAndExpensesWindowController extends BaseController {
                                                     .map(Transaction::amount)
                                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                                            accountRoot.getChildren().add(treeItem(new TreeNode(name, sum), false));
+                                            accountRoot.getChildren().add(
+                                                    apply(treeItem(new TreeNode(name, sum)),
+                                                            item -> item.setExpanded(false)));
                                         });
                             });
                 });
@@ -285,8 +289,14 @@ class IncomesAndExpensesWindowController extends BaseController {
 
         var w = reportTable.widthProperty().subtract(20);
         reportTable.getColumns().addAll(List.of(
-                treeTableColumn("", _ -> new NodeTextCell(), w.multiply(0.85)),
-                treeTableColumn("", _ -> new NodeAmountCell(), w.multiply(0.15))
+                apply(treeTableObjectColumn(""), c -> {
+                    c.setCellFactory(_ -> new NodeTextCell());
+                    c.widthBinding(w.multiply(0.85));
+                }),
+                apply(treeTableObjectColumn(""), c -> {
+                    c.setCellFactory(_ -> new NodeAmountCell());
+                    c.widthBinding(w.multiply(0.15));
+                })
         ));
     }
 

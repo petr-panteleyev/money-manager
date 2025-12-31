@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.collections.ListChangeListener;
@@ -11,6 +9,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
@@ -38,14 +37,12 @@ import java.util.function.Predicate;
 import static javafx.scene.layout.Priority.ALWAYS;
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.hBoxHGrow;
-import static org.panteleyev.fx.FxUtils.SKIP;
-import static org.panteleyev.fx.FxUtils.fxNode;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -96,7 +93,7 @@ class RequestWindowController extends BaseController {
                 label("Контрагент:"),
                 contactFilterBox.getTextField(),
                 uncheckedOnlyCheckBox,
-                fxNode(new Region(), hBoxHGrow(ALWAYS)),
+                apply(new Region(), r -> HBox.setHgrow(r, ALWAYS)),
                 label("Сумма:"),
                 sumField
         );
@@ -128,7 +125,8 @@ class RequestWindowController extends BaseController {
 
         table.selectedTransactions().addListener((ListChangeListener<Transaction>) _ ->
                 sumField.setText(
-                        DataCache.calculateBalance(table.selectedTransactions()).setScale(2, RoundingMode.HALF_UP).toString()
+                        DataCache.calculateBalance(table.selectedTransactions())
+                                .setScale(2, RoundingMode.HALF_UP).toString()
                 ));
 
         setupWindow(root);
@@ -155,15 +153,22 @@ class RequestWindowController extends BaseController {
     private MenuBar createMenuBar() {
         return menuBar(
                 menu("Файл",
-                        menuItem("Отчет...", SHORTCUT_ALT_R, _ -> onReport()),
+                        apply(menuItem("Отчет..."), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_R);
+                            menuItem.setOnAction(_ -> onReport());
+                        }),
                         new SeparatorMenuItem(),
                         createMenuItem(ACTION_CLOSE)
                 ),
                 createMenu("Правка", table.getActions()),
                 menu("Вид",
-                        menuItem("Сбросить фильтр", SHORTCUT_ALT_C, _ -> resetFilter())),
-                createWindowMenu(),
-                createHelpMenu()
+                        apply(menuItem("Сбросить фильтр"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_ALT_C);
+                            menuItem.setOnAction(_ -> resetFilter());
+                        }),
+                        createWindowMenu(),
+                        createHelpMenu()
+                )
         );
     }
 

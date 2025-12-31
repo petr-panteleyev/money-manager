@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
 import javafx.collections.FXCollections;
@@ -25,11 +23,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.TableColumnBuilder.tableColumn;
-import static org.panteleyev.fx.TableColumnBuilder.tableObjectColumn;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
@@ -42,7 +41,8 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
     private final TableView<TransactionDetail> detailsTable = new TableView<>();
 
     public TransactionDetailsDialog(Controller owner, List<Transaction> transactions, BigDecimal totalAmount,
-                                    boolean readOnly) {
+            boolean readOnly)
+    {
         super(owner);
 
         setTitle("Детали транзакции");
@@ -60,25 +60,31 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
 
         var w = detailsTable.widthProperty().subtract(20);
         detailsTable.getColumns().setAll(List.of(
-                tableColumn("Счет получателя", b ->
-                        b.withPropertyCallback(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""))
-                                .withWidthBinding(w.multiply(0.3))),
-                tableColumn("Комментарий", b ->
-                        b.withPropertyCallback(TransactionDetail::comment).withWidthBinding(w.multiply(0.6))),
-                tableObjectColumn("Сумма", b ->
-                        b.withCellFactory(_ -> new TransactionDetailSumCell()).withWidthBinding(w.multiply(0.1)))
+                apply(tableStringColumn("Счет получателя"), c -> {
+                    c.valueConverter(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""));
+                    c.widthBinding(w.multiply(0.3));
+                }),
+                apply(tableStringColumn("Комментарий"), c -> {
+                    c.valueConverter(TransactionDetail::comment);
+                    c.widthBinding(w.multiply(0.6));
+                }),
+                apply(tableObjectColumn("Сумма"), c -> {
+                    c.setCellFactory(_ -> new TransactionDetailSumCell());
+                    c.widthBinding(w.multiply(0.1));
+                })
         ));
 
         detailsTable.setItems(details);
 
-        var hBox = hBox(BIG_SPACING, label("Разница:"), deltaLabel);
-        var vBox = vBox(BIG_SPACING, hBox, detailEditor);
-        VBox.setMargin(hBox, new Insets(BIG_SPACING, 0, 0, 0));
-
         var content = new BorderPane();
         content.setCenter(detailsTable);
         if (!readOnly) {
-            content.setBottom(vBox);
+            content.setBottom(vBox(BIG_SPACING,
+                    apply(hBox(BIG_SPACING,
+                            label("Разница:"),
+                            deltaLabel), box -> VBox.setMargin(box, new Insets(BIG_SPACING, 0, 0, 0))),
+                    detailEditor
+            ));
         }
         getDialogPane().setContent(content);
         getDialogPane().getButtonTypes().add(ButtonType.OK);

@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.icons;
 
 import javafx.collections.FXCollections;
@@ -35,9 +33,10 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.fx.MenuFactory.menu;
-import static org.panteleyev.fx.MenuFactory.menuBar;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.factories.MenuFactory.menu;
+import static org.panteleyev.fx.factories.MenuFactory.menuBar;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -74,15 +73,6 @@ public final class IconWindowController extends BaseController {
     public IconWindowController() {
         super(new Stage(), settings().getMainCssFilePath());
 
-        var menuBar = menuBar(
-                menu("Файл",
-                        menuItem("Загрузить", SHORTCUT_U, _ -> onUpload()),
-                        new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
-                ),
-                createHelpMenu()
-        );
-
         iconFlow.setVgap(20);
         iconFlow.setHgap(20);
         iconFlow.setPadding(new Insets(20));
@@ -97,7 +87,17 @@ public final class IconWindowController extends BaseController {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
 
-        root.setTop(menuBar);
+        root.setTop(menuBar(
+                menu("Файл",
+                        apply(menuItem("Загрузить"), menuItem -> {
+                            menuItem.setAccelerator(SHORTCUT_U);
+                            menuItem.setOnAction(_ -> onUpload());
+                        }),
+                        new SeparatorMenuItem(),
+                        createMenuItem(ACTION_CLOSE)
+                ),
+                createHelpMenu()
+        ));
         root.setCenter(scrollPane);
 
         scrollPane.setOnKeyPressed(keyEvent -> {

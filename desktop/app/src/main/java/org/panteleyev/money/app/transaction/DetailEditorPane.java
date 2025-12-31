@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2025 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
 import javafx.application.Platform;
@@ -23,10 +21,10 @@ import org.controlsfx.control.textfield.TextFields;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
+import org.panteleyev.fx.ToStringConverter;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.Styles;
-import org.panteleyev.money.app.ToStringConverter;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.desktop.commons.DataCache;
@@ -44,11 +42,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.panteleyev.fx.BoxFactory.hBox;
-import static org.panteleyev.fx.BoxFactory.vBox;
-import static org.panteleyev.fx.ButtonFactory.button;
-import static org.panteleyev.fx.LabelFactory.label;
-import static org.panteleyev.fx.MenuFactory.menuItem;
+import static org.panteleyev.fx.factories.BoxFactory.hBox;
+import static org.panteleyev.fx.factories.BoxFactory.vBox;
+import static org.panteleyev.fx.factories.ButtonFactory.button;
+import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 
 final class DetailEditorPane extends BorderPane {
     private static final ToStringConverter<Account> ACCOUNT_TO_STRING = new ToStringConverter<>() {
@@ -188,7 +186,8 @@ final class DetailEditorPane extends BorderPane {
     }
 
     private void setAccountMenuItemsByCategory(CategoryType categoryType, String prefix,
-                                               Set<Account> creditedSuggestions) {
+            Set<Account> creditedSuggestions)
+    {
         var categories = cache.getCategoriesByType(categoryType);
 
         categories.stream()
@@ -272,14 +271,16 @@ final class DetailEditorPane extends BorderPane {
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(String value,
-                                                              Collection<T> items,
-                                                              StringConverter<T> converter) {
+            Collection<T> items,
+            StringConverter<T> converter)
+    {
         return items.stream().filter(it -> converter.toString(it).equals(value)).findFirst();
     }
 
     private <T extends Named> Optional<T> checkTextFieldValue(TextField field,
-                                                              Collection<T> items,
-                                                              StringConverter<T> converter) {
+            Collection<T> items,
+            StringConverter<T> converter)
+    {
         return checkTextFieldValue(field.getText(), items, converter);
     }
 
