@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import org.panteleyev.fx.factories.TreeTableFactory;
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryAmountCell;
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryAveragePriceCell;
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryBrokerFeeCell;
@@ -24,61 +25,53 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.TreeTableFactory.treeTableObjectColumn;
 import static org.panteleyev.money.app.Comparators.investmentSummaryTreeDataByPercentage;
 import static org.panteleyev.money.app.GlobalContext.cache;
 
 public class InvestmentSummaryTableView extends TreeTableView<InvestmentSummaryTreeData> {
-    private final TreeTableColumn<InvestmentSummaryTreeData, InvestmentSummaryTreeData> percentageColumn;
+    private final TreeTableFactory.TreeTableObjectColumn<InvestmentSummaryTreeData> percentageColumn =
+            treeTableObjectColumn("Доля");
 
     public InvestmentSummaryTableView() {
         setShowRoot(false);
 
         var w = widthProperty().subtract(20);
 
-        percentageColumn = apply(treeTableObjectColumn("Доля"), c -> {
-            c.setCellFactory(_ -> new InvestmentSummaryPercentageCell());
-            c.comparator(investmentSummaryTreeDataByPercentage());
-            c.widthBinding(w.multiply(0.05));
-            c.setSortType(TreeTableColumn.SortType.DESCENDING);
-        });
+        percentageColumn.setCellFactory(_ -> new InvestmentSummaryPercentageCell());
+        percentageColumn.comparator(investmentSummaryTreeDataByPercentage());
+        percentageColumn.widthBinding(w.multiply(0.05));
+        percentageColumn.setSortType(TreeTableColumn.SortType.DESCENDING);
+
+        var securityColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Инструмент");
+        securityColumn.setCellFactory(_ -> new InvestmentSummaryInstrumentCell());
+        securityColumn.widthBinding(w.multiply(0.2));
+        var nameColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Название");
+        nameColumn.setCellFactory(_ -> new InvestmentSummaryInstrumentNameCell());
+        nameColumn.widthBinding(w.multiply(0.2));
+        var amountColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Кол-во");
+        amountColumn.setCellFactory(_ -> new InvestmentSummaryAmountCell());
+        amountColumn.widthBinding(w.multiply(0.05));
+        var averagePriceColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Ср. цена");
+        averagePriceColumn.setCellFactory(_ -> new InvestmentSummaryAveragePriceCell());
+        averagePriceColumn.widthBinding(w.multiply(0.1));
+        var totalValueColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Тек. стоимость");
+        totalValueColumn.setCellFactory(_ -> new InvestmentSummaryTotalValueCell());
+        totalValueColumn.widthBinding(w.multiply(0.1));
+        var changeColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Изм. стоимости");
+        changeColumn.setCellFactory(_ -> new InvestmentSummaryChangeCell());
+        changeColumn.widthBinding(w.multiply(0.1));
+        var exchangeFeeColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Комм. биржи");
+        exchangeFeeColumn.setCellFactory(_ -> new InvestmentSummaryExchangeFeeCell());
+        exchangeFeeColumn.widthBinding(w.multiply(0.1));
+        var brokerFeeColumn = TreeTableFactory.<InvestmentSummaryTreeData>treeTableObjectColumn("Комм. брокера");
+        brokerFeeColumn.setCellFactory(_ -> new InvestmentSummaryBrokerFeeCell());
+        brokerFeeColumn.widthBinding(w.multiply(0.1));
 
         getColumns().setAll(List.of(
-                apply(treeTableObjectColumn("Инструмент"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryInstrumentCell());
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                apply(treeTableObjectColumn("Название"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryInstrumentNameCell());
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                percentageColumn,
-                apply(treeTableObjectColumn("Кол-во"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryAmountCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(treeTableObjectColumn("Ср. цена"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryAveragePriceCell());
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(treeTableObjectColumn("Тек. стоимость"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryTotalValueCell());
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(treeTableObjectColumn("Изм. стоимости"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryChangeCell());
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(treeTableObjectColumn("Комм. биржи"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryExchangeFeeCell());
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(treeTableObjectColumn("Комм. брокера"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSummaryBrokerFeeCell());
-                    c.widthBinding(w.multiply(0.1));
-                })
-        ));
+                securityColumn, nameColumn, percentageColumn, amountColumn,
+                averagePriceColumn, totalValueColumn, changeColumn, exchangeFeeColumn,
+                brokerFeeColumn));
 
         setRowFactory(_ -> new InvestmentSummaryRow());
     }

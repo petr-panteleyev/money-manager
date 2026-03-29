@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
@@ -19,7 +19,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
-import org.controlsfx.control.action.Action;
+import org.panteleyev.fx.FxAction;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Comparators;
@@ -39,8 +39,7 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.FxAction.fxAction;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
@@ -50,14 +49,11 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Predicates.activeAccount;
-import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_R;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_T;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
-import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
-import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class AccountWindowController extends BaseController {
     // Filters
@@ -93,27 +89,29 @@ public final class AccountWindowController extends BaseController {
             this::onNewAccount, this::onEditAccount, this::onDeleteAccount, disableBinding
     );
 
-    private final Action searchAction = searchAction(_ -> accountNameFilterBox.getTextField().requestFocus());
-    private final Action copyNameAction = actionBuilder("Копировать название", this::onCopyName)
-            .accelerator(SHORTCUT_C).disableBinding(disableBinding).build();
-    private final Action transactionsAction = actionBuilder("Проводки...", this::onShowTransactions)
-            .accelerator(SHORTCUT_T).disableBinding(disableBinding).build();
-    private final Action refreshBalanceAction = actionBuilder("Пересчитать баланс", this::onUpdateBalance)
-            .accelerator(SHORTCUT_R).build();
+    private final FxAction searchAction = searchAction(_ -> accountNameFilterBox.getTextField().requestFocus());
+    private final FxAction copyNameAction = fxAction("Копировать название")
+            .onAction(this::onCopyName)
+            .accelerator(SHORTCUT_C)
+            .disableBinding(disableBinding);
+    private final FxAction transactionsAction = fxAction("Проводки...")
+            .onAction(this::onShowTransactions)
+            .accelerator(SHORTCUT_T)
+            .disableBinding(disableBinding);
+    private final FxAction refreshBalanceAction = fxAction("Пересчитать баланс")
+            .onAction(this::onUpdateBalance)
+            .accelerator(SHORTCUT_R);
 
     public AccountWindowController() {
         createContextMenu();
 
         // Tool box
-        var hBox = apply(hBox(5.0,
-                accountNameFilterBox.getTextField(),
-                categorySelectionBox
-        ), box -> box.setAlignment(Pos.CENTER_LEFT));
+        var hBox = hBox(5.0, accountNameFilterBox.getTextField(), categorySelectionBox);
+        hBox.setAlignment(Pos.CENTER_LEFT);
 
         var self = new BorderPane(
                 new BorderPane(tableView, hBox, null, null, null),
-                createMainMenu(), null, null, null
-        );
+                createMainMenu(), null, null, null);
 
         BorderPane.setMargin(hBox, BIG_INSETS);
 
@@ -136,25 +134,23 @@ public final class AccountWindowController extends BaseController {
     private MenuBar createMainMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = apply(menuItem("Деактивировать"), menuItem -> {
-            menuItem.setOnAction(_ -> onActivateDeactivateAccount());
-            menuItem.disableProperty().bind(disableBinding);
-        });
+        var activateAccountMenuItem = menuItem("Деактивировать", _ -> onActivateDeactivateAccount());
+        activateAccountMenuItem.disableProperty().bind(disableBinding);
 
         var editMenu = menu("Правка",
-                createMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction()),
+                crudActionsHolder.getCreateAction().createMenuItem(),
+                crudActionsHolder.getUpdateAction().createMenuItem(),
                 new SeparatorMenuItem(),
-                createMenuItem(crudActionsHolder.getDeleteAction()),
+                crudActionsHolder.getDeleteAction().createMenuItem(),
                 new SeparatorMenuItem(),
-                createMenuItem(copyNameAction),
+                copyNameAction.createMenuItem(),
                 activateAccountMenuItem,
                 new SeparatorMenuItem(),
-                createMenuItem(searchAction),
+                searchAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                createMenuItem(transactionsAction),
+                transactionsAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                createMenuItem(refreshBalanceAction)
+                refreshBalanceAction.createMenuItem()
         );
 
         editMenu.setOnShowing(_ -> getSelectedAccount()
@@ -163,26 +159,21 @@ public final class AccountWindowController extends BaseController {
                 )
         );
 
+        var reportMenuItem = menuItem("Отчет...", _ -> onReport());
+        reportMenuItem.setOnAction(_ -> onReport());
+
+        var showInactiveAccountMenuItem = checkMenuItem("Показывать неактивные счета");
+        showInactiveAccountMenuItem.setAccelerator(SHORTCUT_N);
+        showInactiveAccountMenuItem.setSelected(settings().getShowDeactivatedAccounts());
+        showInactiveAccountMenuItem.setOnAction(this::onShowInactveAccounts);
+
         return menuBar(
                 menu("Файл",
-                        apply(menuItem("Отчет..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_R);
-                            menuItem.setOnAction(_ -> onReport());
-                        }),
+                        reportMenuItem,
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)),
+                        ACTION_CLOSE.createMenuItem()),
                 editMenu,
-                menu("Вид",
-                        apply(checkMenuItem("Показывать неактивные счета"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_N);
-                            menuItem.setSelected(settings().getShowDeactivatedAccounts());
-                            menuItem.setOnAction(event -> {
-                                var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                                settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
-                                showDeactivatedAccounts.set(selected ? _ -> true : activeAccount(true));
-                            });
-                        })
-                ),
+                menu("Вид", showInactiveAccountMenuItem),
                 createPortfolioMenu(),
                 createWindowMenu(),
                 createHelpMenu()
@@ -192,25 +183,23 @@ public final class AccountWindowController extends BaseController {
     private void createContextMenu() {
         var disableBinding = tableView.getSelectionModel().selectedItemProperty().isNull();
 
-        var activateAccountMenuItem = apply(menuItem("Деактивировать"), menuItem -> {
-            menuItem.setOnAction(_ -> onActivateDeactivateAccount());
-            menuItem.disableProperty().bind(disableBinding);
-        });
+        var activateAccountMenuItem = menuItem("Деактивировать", _ -> onActivateDeactivateAccount());
+        activateAccountMenuItem.disableProperty().bind(disableBinding);
 
         var contextMenu = new ContextMenu(
-                createContextMenuItem(crudActionsHolder.getCreateAction()),
-                createContextMenuItem(crudActionsHolder.getUpdateAction()),
+                crudActionsHolder.getCreateAction().createMenuItem(),
+                crudActionsHolder.getUpdateAction().createMenuItem(),
                 new SeparatorMenuItem(),
-                createContextMenuItem(crudActionsHolder.getDeleteAction()),
+                crudActionsHolder.getDeleteAction().createMenuItem(),
                 new SeparatorMenuItem(),
-                createContextMenuItem(copyNameAction),
+                copyNameAction.createMenuItem(),
                 activateAccountMenuItem,
                 new SeparatorMenuItem(),
-                createContextMenuItem(searchAction),
+                searchAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                createContextMenuItem(transactionsAction),
+                transactionsAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                createContextMenuItem(refreshBalanceAction)
+                refreshBalanceAction.createMenuItem()
         );
 
         contextMenu.setOnShowing(_ -> getSelectedAccount()
@@ -308,5 +297,13 @@ public final class AccountWindowController extends BaseController {
             var waiting = cache().calculateBalance(account, false, t -> !t.checked());
             dao().updateAccount(account.updateBalance(total, waiting));
         });
+    }
+
+    private void onShowInactveAccounts(ActionEvent event) {
+        if (event.getSource() instanceof CheckMenuItem checkMenuItem) {
+            var selected = checkMenuItem.isSelected();
+            settings().update(opt -> opt.setShowDeactivatedAccounts(selected));
+            showDeactivatedAccounts.set(selected ? _ -> true : activeAccount(true));
+        }
     }
 }

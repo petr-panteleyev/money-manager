@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
@@ -45,16 +45,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.ButtonFactory.button;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -155,31 +151,28 @@ public class StatementWindowController extends BaseController {
     }
 
     private MenuBar createMainMenu() {
+        var openMenuItem = menuItem("Открыть...", _ -> onBrowse());
+        openMenuItem.setAccelerator(SHORTCUT_O);
+        var addMenuItem = menuItem("Добавить...", _ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction));
+        addMenuItem.setAccelerator(SHORTCUT_N);
+        var checkMenuItem = menuItem("Отметить", _ -> onCheckStatementRecord(true));
+        checkMenuItem.setAccelerator(SHORTCUT_K);
+        var uncheckMenuItem = menuItem("Снять отметку", _ -> onCheckStatementRecord(false));
+        uncheckMenuItem.setAccelerator(SHORTCUT_U);
+
         return menuBar(
                 menu("Файл",
-                        apply(menuItem("Открыть..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_O);
-                            menuItem.setOnAction(_ -> onBrowse());
-                        }),
+                        openMenuItem,
                         new SeparatorMenuItem(),
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 menu("Правка",
-                        apply(menuItem("Добавить..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_N);
-                            menuItem.setOnAction(_ -> getSelectedStatementRecord().ifPresent(this::onNewTransaction));
-                        }),
+                        addMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem("Отметить"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_K);
-                            menuItem.setOnAction(_ -> onCheckStatementRecord(true));
-                        }),
-                        apply(menuItem("Снять отметку"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_U);
-                            menuItem.setOnAction(_ -> onCheckStatementRecord(false));
-                        })
+                        checkMenuItem,
+                        uncheckMenuItem
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -306,38 +299,39 @@ public class StatementWindowController extends BaseController {
         tableView.setRowFactory(_ -> new StatementRow());
 
         var w = tableView.widthProperty().subtract(20);
-        tableView.getColumns().addAll(List.of(
-                apply(TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата"), c -> {
-                    c.setCellFactory(_ -> new LocalDateCell<>());
-                    c.valueConverter(StatementRecord::getActual);
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата исп."), c -> {
-                    c.setCellFactory(_ -> new LocalDateCell<>());
-                    c.valueConverter(StatementRecord::getExecution);
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableStringColumn("Описание"), c -> {
-                    c.valueConverter(StatementRecord::getDescription);
-                    c.widthBinding(w.multiply(0.5));
-                }),
-                apply(tableStringColumn("Контрагент"), c -> {
-                    c.valueConverter(StatementRecord::getCounterParty);
-                    c.widthBinding(w.multiply(0.15));
-                }),
-                apply(tableStringColumn("Место"), c -> {
-                    c.valueConverter(StatementRecord::getPlace);
-                    c.widthBinding(w.multiply(0.10));
-                }),
-                apply(tableStringColumn("Страна"), c -> {
-                    c.valueConverter(StatementRecord::getCountry);
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Сумма"), c -> {
-                    c.setCellFactory(_ -> new StatementSumCell());
-                    c.widthBinding(w.multiply(0.1));
-                })
-        ));
+
+        var dateColumn = TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата");
+        dateColumn.setCellFactory(_ -> new LocalDateCell<>());
+        dateColumn.valueConverter(StatementRecord::getActual);
+        dateColumn.widthBinding(w.multiply(0.05));
+
+        var execDateColumn = TableFactory.<StatementRecord, LocalDate>tableValueColumn("Дата исп.");
+        execDateColumn.setCellFactory(_ -> new LocalDateCell<>());
+        execDateColumn.valueConverter(StatementRecord::getExecution);
+        execDateColumn.widthBinding(w.multiply(0.05));
+
+        var descrColumn = TableFactory.<StatementRecord>tableStringColumn("Описание");
+        descrColumn.valueConverter(StatementRecord::getDescription);
+        descrColumn.widthBinding(w.multiply(0.5));
+
+        var counterpartyColumn = TableFactory.<StatementRecord>tableStringColumn("Контрагент");
+        counterpartyColumn.valueConverter(StatementRecord::getCounterParty);
+        counterpartyColumn.widthBinding(w.multiply(0.15));
+
+        var placeColumn = TableFactory.<StatementRecord>tableStringColumn("Место");
+        placeColumn.valueConverter(StatementRecord::getPlace);
+        placeColumn.widthBinding(w.multiply(0.10));
+
+        var countryColumn = TableFactory.<StatementRecord>tableStringColumn("Страна");
+        countryColumn.valueConverter(StatementRecord::getCountry);
+        countryColumn.widthBinding(w.multiply(0.05));
+
+        var sumColumn = TableFactory.<StatementRecord>tableObjectColumn("Сумма");
+        sumColumn.setCellFactory(_ -> new StatementSumCell());
+        sumColumn.widthBinding(w.multiply(0.1));
+
+        tableView.getColumns().addAll(List.of(dateColumn, execDateColumn, descrColumn, counterpartyColumn,
+                placeColumn, countryColumn, sumColumn));
 
         var menu = new ContextMenu();
         menu.getItems().addAll(menuItem("Добавить...",

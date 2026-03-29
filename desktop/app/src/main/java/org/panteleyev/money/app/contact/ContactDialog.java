@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
 import static org.panteleyev.fx.factories.LabelFactory.label;
@@ -61,6 +60,9 @@ final class ContactDialog extends BaseDialog<Contact> {
         nameField.setPrefColumnCount(20);
         IconManager.setupComboBox(iconComboBox);
 
+        var rowConstraints = rowConstraints();
+        rowConstraints.setValignment(VPos.TOP);
+
         getDialogPane().setContent(
                 gridPane(
                         List.of(
@@ -75,7 +77,7 @@ final class ContactDialog extends BaseDialog<Contact> {
                                 gridRow(label("Страна:"), gridCell(countryField, 2, 1)),
                                 gridRow(label("Индекс:"), gridCell(zipField, 2, 1)),
                                 gridRow(List.of(label("Комментарий:"), gridCell(commentEdit, 2, 1)),
-                                        apply(rowConstraints(), rc -> rc.setValignment(VPos.TOP))
+                                        rowConstraints
                                 )),
                         List.of(),
                         List.of(GRID_PANE)

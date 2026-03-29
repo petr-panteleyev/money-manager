@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.currency;
 
@@ -24,7 +24,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static javafx.geometry.Pos.CENTER_LEFT;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.Controller.SKIP;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
@@ -53,19 +52,17 @@ final class CurrencyDialog extends BaseDialog<Currency> {
 
         setTitle("Валюта");
 
+        var symbolBox = hBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice);
+        symbolBox.setAlignment(CENTER_LEFT);
+        HBox.setMargin(formatSymbolPositionChoice, new Insets(0.0, 0.0, 0.0, BIG_SPACING));
+
         getDialogPane().setContent(
                 gridPane(
                         List.of(
                                 gridRow(label("Символ:"), nameEdit),
                                 gridRow(label("Описание:"), descrEdit),
                                 gridRow(label("Курс:"), rateEdit, rateDirectionChoice),
-                                gridRow(SKIP,
-                                        apply(hBox(showSymbolCheck, formatSymbolCombo, formatSymbolPositionChoice),
-                                                box -> {
-                                                    box.setAlignment(CENTER_LEFT);
-                                                    HBox.setMargin(formatSymbolPositionChoice,
-                                                            new Insets(0.0, 0.0, 0.0, BIG_SPACING));
-                                                })),
+                                gridRow(SKIP, symbolBox),
                                 gridRow(SKIP, thousandSeparatorCheck),
                                 gridRow(SKIP, defaultCheck)
 

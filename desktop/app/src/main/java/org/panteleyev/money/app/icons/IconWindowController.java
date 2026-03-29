@@ -1,4 +1,4 @@
-// Copyright © 2019-2025 Petr Panteleyev
+// Copyright © 2019-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.icons;
 
@@ -32,8 +32,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
@@ -87,14 +85,15 @@ public final class IconWindowController extends BaseController {
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
 
+
+        var loadMenuItem = menuItem("Загрузить", _ -> onUpload());
+        loadMenuItem.setAccelerator(SHORTCUT_U);
+
         root.setTop(menuBar(
                 menu("Файл",
-                        apply(menuItem("Загрузить"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_U);
-                            menuItem.setOnAction(_ -> onUpload());
-                        }),
+                        loadMenuItem,
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 createHelpMenu()
         ));

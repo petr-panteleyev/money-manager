@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
@@ -60,7 +60,6 @@ import java.util.UUID;
 
 import static javafx.application.Platform.runLater;
 import static javafx.scene.layout.Priority.ALWAYS;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
@@ -181,55 +180,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         setupCardComboBox();
         datePicker.setValue(lastSelectedDate);
 
-        getDialogPane().setContent(
-                vBox(
-                        DOUBLE_SPACING,
-                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Дата"),
-                                apply(hBox(List.of(datePicker, checkedCheckBox)), box -> {
-                                    box.setSpacing(BIG_SPACING);
-                                    box.setAlignment(Pos.CENTER);
-                                }))
-                        ),
-                        hBox(BIG_SPACING,
-                                vBox(SMALL_SPACING, label("Дебет"), debitAmountEdit),
-                                vBox(SMALL_SPACING, label("Кредит"), creditAmountEdit)
-                        ),
-                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Тип"),
-                                apply(hBox(List.of(typeEdit, typeMenuButton)), box -> {
-                                    box.setSpacing(BIG_SPACING);
-                                    box.setAlignment(Pos.CENTER);
-                                }))
-                        ),
-                        apply(vBox(SMALL_SPACING, label("Исходный счет"),
-                                        hBox(0,
-                                                apply(debitedAccountEdit, node -> HBox.setHgrow(node, ALWAYS)),
-                                                debitedMenuButton),
-                                        debitedCategoryLabel),
-                                node -> HBox.setHgrow(node, ALWAYS)),
-                        apply(vBox(SMALL_SPACING,
-                                        label("Карта"),
-                                        hBox(0, apply(cardComboBox, node -> HBox.setHgrow(node, ALWAYS))),
-                                        label("")
-                                ),
-                                node -> HBox.setHgrow(node, ALWAYS)),
-                        apply(vBox(SMALL_SPACING, label("Счет получателя"),
-                                        hBox(0,
-                                                apply(creditedAccountEdit, node -> HBox.setHgrow(node, ALWAYS)),
-                                                creditedMenuButton
-                                        ),
-                                        creditedCategoryLabel),
-                                node -> HBox.setHgrow(node, ALWAYS)),
-                        apply(vBox(SMALL_SPACING, label("Контрагент"),
-                                        hBox(0,
-                                                apply(contactEdit, node -> HBox.setHgrow(node, ALWAYS)),
-                                                contactMenuButton)),
-                                node -> HBox.setHgrow(node, ALWAYS)),
-                        apply(vBox(SMALL_SPACING, label("Комментарий"), commentEdit),
-                                node -> HBox.setHgrow(node, ALWAYS)),
-                        vBox(SMALL_SPACING, label("Счёт"), invoiceNumberEdit),
-                        vBox(SMALL_SPACING, label("Дата по выписке"), statementDatePicker)
-                )
-        );
+        buildDialogPane();
 
         typeMenuButton.setFocusTraversable(false);
         checkedCheckBox.setFocusTraversable(false);
@@ -243,7 +194,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         debitedCategoryLabel.getStyleClass().add(Styles.SUB_LABEL);
         creditedCategoryLabel.getStyleClass().add(Styles.SUB_LABEL);
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /* ***********************************************************************************************************/
 
         clearTitle();
 
@@ -365,6 +316,56 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         } else {
             creditedAccountEdit.setText(accountString);
         }
+    }
+
+    private void buildDialogPane() {
+        var datePickerBox = hBox(List.of(datePicker, checkedCheckBox));
+        datePickerBox.setSpacing(BIG_SPACING);
+        datePickerBox.setAlignment(Pos.CENTER);
+
+        var typeEditBox = hBox(List.of(typeEdit, typeMenuButton));
+        typeEditBox.setSpacing(BIG_SPACING);
+        typeEditBox.setAlignment(Pos.CENTER);
+
+        var debitedAccountBox = vBox(SMALL_SPACING, label("Исходный счет"),
+                hBox(0, debitedAccountEdit, debitedMenuButton),
+                debitedCategoryLabel);
+        HBox.setHgrow(debitedAccountBox, ALWAYS);
+
+        var cardBox = vBox(SMALL_SPACING, label("Карта"), hBox(0, cardComboBox), label(""));
+        HBox.setHgrow(cardBox, ALWAYS);
+
+        var creditedAccountBox = vBox(SMALL_SPACING, label("Счет получателя"),
+                hBox(0, creditedAccountEdit, creditedMenuButton),
+                creditedCategoryLabel);
+        HBox.setHgrow(creditedAccountBox, ALWAYS);
+
+        var contactBox = vBox(SMALL_SPACING, label("Контрагент"),
+                hBox(0, contactEdit, contactMenuButton));
+        HBox.setHgrow(contactBox, ALWAYS);
+
+        var commentBox = vBox(SMALL_SPACING, label("Комментарий"), commentEdit);
+        HBox.setHgrow(commentBox, ALWAYS);
+
+        HBox.setHgrow(debitedAccountEdit, ALWAYS);
+        HBox.setHgrow(creditedAccountEdit, ALWAYS);
+        HBox.setHgrow(cardComboBox, ALWAYS);
+        HBox.setHgrow(contactEdit, ALWAYS);
+
+        getDialogPane().setContent(
+                vBox(DOUBLE_SPACING,
+                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Дата"), datePickerBox)),
+                        hBox(BIG_SPACING,
+                                vBox(SMALL_SPACING, label("Дебет"), debitAmountEdit),
+                                vBox(SMALL_SPACING, label("Кредит"), creditAmountEdit)),
+                        hBox(BIG_SPACING, vBox(SMALL_SPACING, label("Тип"), typeEditBox)),
+                        debitedAccountBox,
+                        cardBox,
+                        creditedAccountBox,
+                        contactBox,
+                        commentBox,
+                        vBox(SMALL_SPACING, label("Счёт"), invoiceNumberEdit),
+                        vBox(SMALL_SPACING, label("Дата по выписке"), statementDatePicker)));
     }
 
     private void setupDatePicker() {

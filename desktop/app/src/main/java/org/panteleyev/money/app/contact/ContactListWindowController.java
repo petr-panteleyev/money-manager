@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
@@ -23,8 +23,6 @@ import org.panteleyev.money.model.ContactType;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.ComboBoxFactory.clearValueAndSelection;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
@@ -38,7 +36,6 @@ import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
-import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class ContactListWindowController extends BaseController {
     private final ComboBox<ContactType> typeBox = comboBox(ContactType.asList(),
@@ -56,35 +53,31 @@ public final class ContactListWindowController extends BaseController {
 
         // Context menu
         tableView.setContextMenu(new ContextMenu(
-                createContextMenuItem(crudActionsHolder.getCreateAction()),
-                createContextMenuItem(crudActionsHolder.getUpdateAction())
+                crudActionsHolder.getCreateAction().createMenuItem(),
+                crudActionsHolder.getUpdateAction().createMenuItem()
         ));
         tableView.setOnMouseClicked(this::onTableMouseClick);
 
-        // Toolbox
+        var toolBar = hBox(5, searchField, typeBox);
+        BorderPane.setMargin(toolBar, BIG_INSETS);
+
+        var resetFilterMenuItem = menuItem("Сбросить фильтр", _ -> resetFilter());
+        resetFilterMenuItem.setAccelerator(SHORTCUT_ALT_C);
+
         var self = new BorderPane(
-                new BorderPane(
-                        tableView,
-                        apply(hBox(5, searchField, typeBox), box -> BorderPane.setMargin(box, BIG_INSETS)),
-                        null, null, null),
+                new BorderPane(tableView, toolBar, null, null, null),
                 menuBar(
-                        menu("Файл",
-                                createMenuItem(ACTION_CLOSE)
-                        ),
+                        menu("Файл", ACTION_CLOSE.createMenuItem()),
                         menu("Правка",
-                                createMenuItem(crudActionsHolder.getCreateAction()),
-                                createMenuItem(crudActionsHolder.getUpdateAction()),
+                                crudActionsHolder.getCreateAction().createMenuItem(),
+                                crudActionsHolder.getUpdateAction().createMenuItem(),
                                 new SeparatorMenuItem(),
-                                createMenuItem(searchAction(this::onSearch))
+                                searchAction(this::onSearch).createMenuItem()
                         ),
-                        menu("Вид",
-                                apply(menuItem("Сбросить фильтр"), menuItem -> {
-                                    menuItem.setAccelerator(SHORTCUT_ALT_C);
-                                    menuItem.setOnAction(_ -> resetFilter());
-                                }),
-                                createWindowMenu(),
-                                createHelpMenu()
-                        )),
+                        menu("Вид", resetFilterMenuItem),
+                        createWindowMenu(),
+                        createHelpMenu()
+                ),
                 null, null, null
         );
         self.setPrefSize(600.0, 400.0);

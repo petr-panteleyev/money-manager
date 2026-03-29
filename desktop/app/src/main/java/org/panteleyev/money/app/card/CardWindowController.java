@@ -1,4 +1,4 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.card;
 
@@ -21,8 +21,6 @@ import org.panteleyev.money.model.Card;
 import java.util.List;
 import java.util.Optional;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.MenuFactory.checkMenuItem;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
@@ -36,7 +34,6 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_H;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
-import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class CardWindowController extends BaseController {
     private final CardNumberFilterBox cardNumberFilterBox = new CardNumberFilterBox();
@@ -60,21 +57,16 @@ public final class CardWindowController extends BaseController {
 
         // Context Menu
         tableView.setContextMenu(new ContextMenu(
-                createContextMenuItem(crudActionsHolder.getCreateAction()),
-                createContextMenuItem(crudActionsHolder.getUpdateAction())
+                crudActionsHolder.getCreateAction().createMenuItem(),
+                crudActionsHolder.getUpdateAction().createMenuItem()
         ));
 
-        var pane = new BorderPane(tableView,
-                apply(
-                        hBox(List.of(cardNumberFilterBox.getTextField()) /*, typeBox*/),
-                        box -> {
-                            box.setSpacing(BIG_SPACING);
-                            box.setAlignment(Pos.CENTER_LEFT);
-                            BorderPane.setMargin(box, BIG_INSETS);
-                        }
-                ),
-                null, null, null);
+        var toolBar = hBox(List.of(cardNumberFilterBox.getTextField()) /*, typeBox*/);
+        toolBar.setSpacing(BIG_SPACING);
+        toolBar.setAlignment(Pos.CENTER_LEFT);
+        BorderPane.setMargin(toolBar, BIG_INSETS);
 
+        var pane = new BorderPane(tableView, toolBar, null, null, null);
         var self = new BorderPane(pane, createMenuBar(crudActionsHolder), null, null, null);
         self.setPrefSize(600.0, 400.0);
 
@@ -96,33 +88,25 @@ public final class CardWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar(CrudActionsHolder crudActionsHolder) {
+        var showInactiveCardsMenuItem = checkMenuItem("Показывать неактивные карты");
+        showInactiveCardsMenuItem.setSelected(settings().getShowDeactivatedCards());
+        showInactiveCardsMenuItem.setAccelerator(SHORTCUT_H);
+        showInactiveCardsMenuItem.setOnAction(this::onShowDeactivatedCards);
+        var resetFilterMenuItem = menuItem("Сбросить фильтр", _ -> resetFilter());
+        resetFilterMenuItem.setAccelerator(SHORTCUT_ALT_C);
+
         return menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
+                menu("Файл", ACTION_CLOSE.createMenuItem()),
                 menu("Правка",
-                        createMenuItem(crudActionsHolder.getCreateAction()),
-                        createMenuItem(crudActionsHolder.getUpdateAction()),
+                        crudActionsHolder.getCreateAction().createMenuItem(),
+                        crudActionsHolder.getUpdateAction().createMenuItem(),
                         new SeparatorMenuItem(),
-                        createMenuItem(searchAction(this::onSearch))
+                        searchAction(this::onSearch).createMenuItem()
                 ),
-                menu("Вид",
-                        apply(checkMenuItem("Показывать неактивные карты"), item -> {
-                            item.setSelected(settings().getShowDeactivatedCards());
-                            item.setAccelerator(SHORTCUT_H);
-                            item.setOnAction(event -> {
-                                var selected = ((CheckMenuItem) event.getSource()).isSelected();
-                                settings().update(opt -> opt.setShowDeactivatedCards(selected));
-                                showDeactivatedCards.set(selected ? _ -> true : activeCard(true));
-                            });
-                        }),
-                        apply(menuItem("Сбросить фильтр"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_C);
-                            menuItem.setOnAction(_ -> resetFilter());
-                        }),
-                        createWindowMenu(),
-                        createHelpMenu()
-                ));
+                menu("Вид", showInactiveCardsMenuItem, resetFilterMenuItem),
+                createWindowMenu(),
+                createHelpMenu()
+        );
     }
 
     private void resetFilter() {
@@ -141,5 +125,13 @@ public final class CardWindowController extends BaseController {
 
     private void onSearch(ActionEvent ignored) {
         cardNumberFilterBox.getTextField().requestFocus();
+    }
+
+    private void onShowDeactivatedCards(ActionEvent event) {
+        if (event.getSource() instanceof CheckMenuItem checkMenuItem) {
+            var selected = checkMenuItem.isSelected();
+            settings().update(opt -> opt.setShowDeactivatedCards(selected));
+            showDeactivatedCards.set(selected ? _ -> true : activeCard(true));
+        }
     }
 }

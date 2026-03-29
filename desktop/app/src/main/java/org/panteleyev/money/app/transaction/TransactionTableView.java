@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
@@ -18,9 +18,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.util.Callback;
-import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.FxAction;
 import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
 import org.panteleyev.money.app.transaction.cells.TransactionAccountRequestSumCell;
@@ -32,7 +33,6 @@ import org.panteleyev.money.app.transaction.cells.TransactionDayCell;
 import org.panteleyev.money.app.transaction.cells.TransactionDebitedAccountCell;
 import org.panteleyev.money.app.transaction.cells.TransactionSumCell;
 import org.panteleyev.money.app.transaction.cells.TransactionTypeCell;
-import org.panteleyev.money.app.util.MenuUtils;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
@@ -50,15 +50,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
-import static org.panteleyev.functional.Scope.apply;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
+import static org.panteleyev.fx.FxAction.ACTION_SEPARATOR;
+import static org.panteleyev.fx.FxAction.fxAction;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_K;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_U;
-import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class TransactionTableView extends TableView<Transaction> {
     public interface TransactionDetailsCallback {
@@ -115,19 +113,19 @@ public class TransactionTableView extends TableView<Transaction> {
             disableBinding
     );
 
-    private final Action transactionDetailsAction = actionBuilder("Детали...", this::onTransactionDetails)
-            .disableBinding(disableBinding)
-            .build();
-    private final Action checkTransactionAction = actionBuilder("Отметить", _ -> onCheckTransactions(true))
+    private final FxAction transactionDetailsAction = fxAction("Детали...")
+            .onAction(this::onTransactionDetails)
+            .disableBinding(disableBinding);
+    private final FxAction checkTransactionAction = fxAction("Отметить")
+            .onAction(_ -> this.onCheckTransactions(true))
             .accelerator(SHORTCUT_K)
-            .disableBinding(disableBinding)
-            .build();
-    private final Action uncheckTransactionAction = actionBuilder("Снять отметку", _ -> onCheckTransactions(false))
+            .disableBinding(disableBinding);
+    private final FxAction uncheckTransactionAction = fxAction("Снять отметку")
+            .onAction(_ -> onCheckTransactions(false))
             .accelerator(SHORTCUT_U)
-            .disableBinding(disableBinding)
-            .build();
+            .disableBinding(disableBinding);
 
-    private final Collection<Action> actions;
+    private final Collection<FxAction> actions;
 
     public TransactionTableView(Controller owner, Mode mode) {
         this(owner, mode, null, null, _ -> {}, _ -> {});
@@ -167,62 +165,7 @@ public class TransactionTableView extends TableView<Transaction> {
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        var w = widthProperty().subtract(20);
-
-        Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
-                mode == Mode.ACCOUNT ?
-                        _ -> new TransactionAccountRequestSumCell(account) :
-                        _ -> new TransactionSumCell();
-
-        TableColumn<Transaction, Transaction> dayColumn = apply(tableObjectColumn("День"), c -> {
-            c.setCellFactory(_ -> new TransactionDayCell(mode.isFullDate()));
-            c.comparator(Comparators.transactionsByDate());
-            c.widthBinding(w.multiply(0.04));
-        });
-
-        getColumns().setAll(List.of(
-                dayColumn,
-                apply(tableObjectColumn("Тип"), c -> {
-                    c.setCellFactory(_ -> new TransactionTypeCell());
-                    c.comparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
-                            .thenComparing(Comparators.transactionsByDate()));
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(tableObjectColumn("Исходный счет"), c -> {
-                    c.setCellFactory(_ -> new TransactionDebitedAccountCell());
-                    c.comparator(Comparators.transactionsByDebitedAccountName(cache())
-                            .thenComparing(Comparators.transactionsByDate()));
-                    c.widthBinding(w.multiply(0.11));
-                }),
-                apply(tableObjectColumn("Счет получателя"), c -> {
-                    c.setCellFactory(_ -> new TransactionCreditedAccountCell());
-                    c.comparator(Comparators.transactionsByCreditedAccountName(cache())
-                            .thenComparing(Comparators.transactionsByDate()));
-                    c.widthBinding(w.multiply(0.11));
-                }),
-                apply(tableObjectColumn("Контрагент"), c -> {
-                    c.setCellFactory(_ -> new TransactionContactCell());
-                    c.comparator(Comparators.transactionsByContactName(cache())
-                            .thenComparing(Comparators.transactionsByDate()));
-                    c.widthBinding(w.multiply(0.21));
-                }),
-                apply(tableObjectColumn("Комментарий"), c -> {
-                    c.setCellFactory(_ -> new TransactionCommentCell());
-                    c.widthBinding(w.multiply(0.35));
-                }),
-                apply(tableObjectColumn("Сумма"), c -> {
-                    c.setCellFactory(sumCellFactory);
-                    c.comparator(Comparator.comparing(Transaction::getSignedAmount));
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn(""), c -> {
-                    c.setCellFactory(_ -> new TransactionCheckCell());
-                    c.widthBinding(w.multiply(0.03));
-                })
-        ));
-
-        getSortOrder().add(dayColumn);
-        dayColumn.setSortType(TableColumn.SortType.DESCENDING);
+        createTableColumns(account);
 
         actions = createActions();
         createContextMenu(actions);
@@ -237,7 +180,7 @@ public class TransactionTableView extends TableView<Transaction> {
         setItems(sortedList);
     }
 
-    public Collection<Action> getActions() {
+    public Collection<FxAction> getActions() {
         return actions;
     }
 
@@ -245,8 +188,66 @@ public class TransactionTableView extends TableView<Transaction> {
         return listSizeProperty;
     }
 
-    private Collection<Action> createActions() {
-        var actionList = new ArrayList<Action>();
+    private void createTableColumns(Account account) {
+        var w = widthProperty().subtract(20);
+
+        Callback<TableColumn<Transaction, Transaction>, TableCell<Transaction, Transaction>> sumCellFactory =
+                mode == Mode.ACCOUNT ?
+                        _ -> new TransactionAccountRequestSumCell(account) :
+                        _ -> new TransactionSumCell();
+
+        var dayColumn = TableFactory.<Transaction>tableObjectColumn("День");
+        dayColumn.setCellFactory(_ -> new TransactionDayCell(mode.isFullDate()));
+        dayColumn.comparator(Comparators.transactionsByDate());
+        dayColumn.widthBinding(w.multiply(0.04));
+
+        var typeColumn = TableFactory.<Transaction>tableObjectColumn("Тип");
+        typeColumn.setCellFactory(_ -> new TransactionTypeCell());
+        typeColumn.comparator(Comparator.comparingInt((Transaction t) -> t.type().ordinal())
+                .thenComparing(Comparators.transactionsByDate()));
+        typeColumn.widthBinding(w.multiply(0.1));
+
+        var debitedAccountColumn = TableFactory.<Transaction>tableObjectColumn("Исходный счет");
+        debitedAccountColumn.setCellFactory(_ -> new TransactionDebitedAccountCell());
+        debitedAccountColumn.comparator(Comparators.transactionsByDebitedAccountName(cache())
+                .thenComparing(Comparators.transactionsByDate()));
+        debitedAccountColumn.widthBinding(w.multiply(0.11));
+
+        var creditedAccountColumn = TableFactory.<Transaction>tableObjectColumn("Счет получателя");
+        creditedAccountColumn.setCellFactory(_ -> new TransactionCreditedAccountCell());
+        creditedAccountColumn.comparator(Comparators.transactionsByCreditedAccountName(cache())
+                .thenComparing(Comparators.transactionsByDate()));
+        creditedAccountColumn.widthBinding(w.multiply(0.11));
+
+        var contactColumn = TableFactory.<Transaction>tableObjectColumn("Контрагент");
+        contactColumn.setCellFactory(_ -> new TransactionContactCell());
+        contactColumn.comparator(Comparators.transactionsByContactName(cache())
+                .thenComparing(Comparators.transactionsByDate()));
+        contactColumn.widthBinding(w.multiply(0.21));
+
+        var commentColumn = TableFactory.<Transaction>tableObjectColumn("Комментарий");
+        commentColumn.setCellFactory(_ -> new TransactionCommentCell());
+        commentColumn.widthBinding(w.multiply(0.35));
+
+        var amountColumn = TableFactory.<Transaction>tableObjectColumn("Сумма");
+        amountColumn.setCellFactory(sumCellFactory);
+        amountColumn.comparator(Comparator.comparing(Transaction::getSignedAmount));
+        amountColumn.widthBinding(w.multiply(0.05));
+
+        var checkColumn = TableFactory.<Transaction>tableObjectColumn("");
+        checkColumn.setCellFactory(_ -> new TransactionCheckCell());
+        checkColumn.widthBinding(w.multiply(0.03));
+
+        getColumns().setAll(List.of(
+                dayColumn, typeColumn, debitedAccountColumn, creditedAccountColumn,
+                contactColumn, commentColumn, amountColumn, checkColumn));
+
+        getSortOrder().add(dayColumn);
+        dayColumn.setSortType(TableColumn.SortType.DESCENDING);
+    }
+
+    private Collection<FxAction> createActions() {
+        var actionList = new ArrayList<FxAction>();
         if (mode == Mode.SUMMARY) {
             actionList.add(crudActionsHolder.getCreateAction());
         }
@@ -273,8 +274,8 @@ public class TransactionTableView extends TableView<Transaction> {
         return actionList;
     }
 
-    private void createContextMenu(Collection<? extends Action> actions) {
-        setContextMenu(MenuUtils.createContextMenu(actions));
+    private void createContextMenu(Collection<FxAction> actions) {
+        setContextMenu(FxAction.createContextMenu(actions));
     }
 
     public Predicate<Transaction> getTransactionFilter() {

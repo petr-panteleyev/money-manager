@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.exchange;
 
@@ -19,6 +19,7 @@ import org.controlsfx.validation.ValidationSupport;
 import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.model.exchange.ExchangeSecurity;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
 import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
@@ -30,12 +31,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
 import static org.panteleyev.fx.factories.ButtonFactory.button;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.Constants.FULL_DATE_FORMAT;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -96,21 +95,20 @@ public class ExchangeSecuritySplitsDialog extends BaseDialog<ExchangeSecuritySpl
 
     private void setupTable() {
         var w = table.widthProperty().subtract(20);
-        table.getColumns().setAll(List.of(
-                apply(tableStringColumn("Дата"), c -> {
-                    c.valueConverter(s -> s.date().format(FULL_DATE_FORMAT));
-                    c.widthBinding(w.multiply(0.33));
-                }),
-                apply(tableStringColumn("Тип"), c -> {
-                    c.valueConverter(s -> s.type().toString());
-                    c.widthBinding(w.multiply(0.33));
-                }),
-                apply(tableStringColumn("Коэффиент"), c -> {
-                    c.valueConverter(s -> s.rate().toString());
-                    c.widthBinding(w.multiply(0.33));
-                })
-        ));
 
+        var dateColumn = TableFactory.<ExchangeSecuritySplit>tableStringColumn("Дата");
+        dateColumn.valueConverter(s -> s.date().format(FULL_DATE_FORMAT));
+        dateColumn.widthBinding(w.multiply(0.33));
+
+        var typeColumn = TableFactory.<ExchangeSecuritySplit>tableStringColumn("Тип");
+        typeColumn.valueConverter(s -> s.type().toString());
+        typeColumn.widthBinding(w.multiply(0.33));
+
+        var rateColumn = TableFactory.<ExchangeSecuritySplit>tableStringColumn("Коэффиент");
+        rateColumn.valueConverter(s -> s.rate().toString());
+        rateColumn.widthBinding(w.multiply(0.33));
+
+        table.getColumns().setAll(List.of(dateColumn, typeColumn, rateColumn));
         table.getSelectionModel().selectedItemProperty().addListener((_, _, selected) -> onSplitSelected(selected));
     }
 

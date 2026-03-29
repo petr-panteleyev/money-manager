@@ -1,4 +1,4 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.exchange;
 
@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.TextFieldFactory.textField;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -66,8 +65,8 @@ public class ExchangeSecurityDialog extends BaseDialog<Object> {
             default -> value.toString();
         };
 
-        grid.addRow(rowIndex.getAndIncrement(),
-                label(title),
-                apply(textField(text, 20), field -> field.setEditable(false)));
+        var textField = textField(text, 20);
+        textField.setEditable(false);
+        grid.addRow(rowIndex.getAndIncrement(), label(title), textField);
     }
 }

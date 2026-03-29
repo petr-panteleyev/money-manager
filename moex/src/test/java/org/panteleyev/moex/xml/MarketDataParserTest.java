@@ -1,7 +1,5 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.moex.xml;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,6 +27,7 @@ public class MarketDataParserTest {
                                 new BigDecimal("281.54"),
                                 new BigDecimal("279.72"),
                                 null,
+                                new BigDecimal("280.23"),
                                 null,
                                 null
                         )

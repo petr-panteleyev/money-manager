@@ -1,4 +1,4 @@
-// Copyright © 2020-2025 Petr Panteleyev
+// Copyright © 2020-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.database;
 
@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static javafx.event.ActionEvent.ACTION;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.ButtonFactory.button;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.grid.ColumnConstraintsFactory.columnConstraints;
@@ -36,11 +35,13 @@ final class TCPEditor extends VBox {
     private final PasswordField dataBasePasswordEdit = new PasswordField();
 
     TCPEditor(ValidationSupport validation, Consumer<ActionEvent> resetSchemaHandler) {
-        var resetSchemaButton = apply(button("Сбросить"), button -> {
-            button.setGraphic(new ImageView(Images.WARNING));
-            button.disableProperty().bind(validation.invalidProperty());
-            button.addEventFilter(ACTION, resetSchemaHandler::accept);
-        });
+        var resetSchemaButton = button("Сбросить");
+        resetSchemaButton.setGraphic(new ImageView(Images.WARNING));
+        resetSchemaButton.disableProperty().bind(validation.invalidProperty());
+        resetSchemaButton.addEventFilter(ACTION, resetSchemaHandler::accept);
+
+        var constraints = columnConstraints();
+        constraints.setHgrow(Priority.ALWAYS);
 
         getChildren().addAll(gridPane(
                 List.of(
@@ -50,10 +51,7 @@ final class TCPEditor extends VBox {
                         gridRow(label("База данных:"), gridCell(databaseNameEdit, 3, 1)),
                         gridRow(label("Схема:"), gridCell(schemaEdit, 2, 1), resetSchemaButton)
                 ),
-                List.of(
-                        apply(columnConstraints(), c -> c.setHgrow(Priority.ALWAYS)),
-                        apply(columnConstraints(), c -> c.setHgrow(Priority.ALWAYS))
-                ),
+                List.of(constraints, constraints),
                 List.of(GRID_PANE)
         ));
 

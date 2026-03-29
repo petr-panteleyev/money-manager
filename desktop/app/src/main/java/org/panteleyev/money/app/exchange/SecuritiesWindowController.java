@@ -1,4 +1,4 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.exchange;
 
@@ -11,10 +11,11 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.fx.FxAction;
 import org.panteleyev.fx.ToStringConverter;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.moex.Moex;
 import org.panteleyev.moex.model.MoexMarketData;
 import org.panteleyev.moex.model.MoexSecurity;
@@ -31,15 +32,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.FxAction.fxAction;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.ChoiceBoxFactory.choiceBox;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -53,35 +51,39 @@ public class SecuritiesWindowController extends BaseController {
 
     private static final ExchangeGroup ALL_ITEMS = new ExchangeGroup("", "Все типы");
 
-    private final ChoiceBox<Object> groupBox = apply(choiceBox(List.of()), cb -> {
-        cb.setOnAction(_ -> updatePredicate());
-        cb.setConverter(new ToStringConverter<>() {
-            @Override
-            public String toString(Object object) {
-                if (object instanceof ExchangeGroup group) {
-                    return group.title();
-                } else {
-                    return "";
-                }
-            }
-        });
-    });
+    private final ChoiceBox<Object> groupBox = groupBox();
 
     private final FilteredList<ExchangeSecurity> filteredList = cache().getExchangeSecurities().filtered(_ -> true);
     private final SortedList<ExchangeSecurity> sortedList = filteredList.sorted();
 
     private final TableView<ExchangeSecurity> tableView = new TableView<>(sortedList);
 
+    private final FxAction addSecurityAction = fxAction("Добавить...")
+            .onAction(this::onAddSecurity)
+            .accelerator(SHORTCUT_N);
+    private final FxAction updateSecurityAction = fxAction("Обновить...")
+            .onAction(this::onUpdateSecurity)
+            .accelerator(SHORTCUT_U);
+    private final FxAction splitsAction = fxAction("Сплиты...")
+            .onAction(this::onSplits);
 
     private final Moex moex = new Moex();
 
     public SecuritiesWindowController() {
         setupTable();
 
+        updateSecurityAction.disableProperty().bind(
+                tableView.getSelectionModel().selectedItemProperty().isNull()
+        );
+        splitsAction.disableProperty().bind(
+                tableView.getSelectionModel().selectedItemProperty().isNull()
+        );
+
+        var toolBar = hBox(5, groupBox);
+        BorderPane.setMargin(toolBar, BIG_INSETS);
+
         var root = new BorderPane(
-                new BorderPane(tableView,
-                        apply(hBox(5, groupBox), box -> BorderPane.setMargin(box, BIG_INSETS)),
-                        null, null, null),
+                new BorderPane(tableView, toolBar, null, null, null),
                 createMenuBar(), null, null, null
         );
         root.setPrefSize(600.0, 400.0);
@@ -104,41 +106,39 @@ public class SecuritiesWindowController extends BaseController {
     private void setupTable() {
         var w = tableView.widthProperty().subtract(20);
 
-        TableColumn<ExchangeSecurity, String> codeColumn = apply(tableStringColumn("Код"), c -> {
-            c.valueConverter(ExchangeSecurity::secId);
-            c.comparator(String::compareTo);
-            c.widthBinding(w.multiply(0.1));
-        });
+        var codeColumn = TableFactory.<ExchangeSecurity>tableStringColumn("Код");
+        codeColumn.valueConverter(ExchangeSecurity::secId);
+        codeColumn.comparator(String::compareTo);
+        codeColumn.widthBinding(w.multiply(0.1));
 
-        tableView.getColumns().setAll(List.of(
-                codeColumn,
-                apply(tableObjectColumn("Тип"), c -> {
-                    c.setCellFactory(_ -> new ExchangeTypeCell());
-                    c.comparator(Comparator.comparing(ExchangeSecurity::typeName)
-                            .thenComparing(ExchangeSecurity::secId));
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                apply(tableStringColumn("Название"), c -> {
-                    c.valueConverter(ExchangeSecurity::shortName);
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(tableStringColumn("Полное название"), c -> {
-                    c.valueConverter(ExchangeSecurity::name);
-                    c.widthBinding(w.multiply(0.3));
-                }),
-                apply(tableStringColumn("ISIN"), c -> {
-                    c.valueConverter(ExchangeSecurity::isin);
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(tableStringColumn("Гос. регистрация"), c -> {
-                    c.valueConverter(ExchangeSecurity::regNumber);
-                    c.widthBinding(w.multiply(0.1));
-                }),
-                apply(tableObjectColumn("Стоимость"), c -> {
-                    c.setCellFactory(_ -> new ExchangeSecurityValueCell());
-                    c.widthBinding(w.multiply(0.1));
-                })
-        ));
+        var typeColumn = TableFactory.<ExchangeSecurity>tableObjectColumn("Тип");
+        typeColumn.setCellFactory(_ -> new ExchangeTypeCell());
+        typeColumn.comparator(Comparator.comparing(ExchangeSecurity::typeName)
+                .thenComparing(ExchangeSecurity::secId));
+        typeColumn.widthBinding(w.multiply(0.2));
+
+        var shortNameColumn = TableFactory.<ExchangeSecurity>tableStringColumn("Название");
+        shortNameColumn.valueConverter(ExchangeSecurity::shortName);
+        shortNameColumn.widthBinding(w.multiply(0.1));
+
+        var fullNameColumn = TableFactory.<ExchangeSecurity>tableStringColumn("Полное название");
+        fullNameColumn.valueConverter(ExchangeSecurity::name);
+        fullNameColumn.widthBinding(w.multiply(0.3));
+
+        var isinColumn = TableFactory.<ExchangeSecurity>tableStringColumn("ISIN");
+        isinColumn.valueConverter(ExchangeSecurity::isin);
+        isinColumn.widthBinding(w.multiply(0.1));
+
+        var regColumn = TableFactory.<ExchangeSecurity>tableStringColumn("Гос. регистрация");
+        regColumn.valueConverter(ExchangeSecurity::regNumber);
+        regColumn.widthBinding(w.multiply(0.1));
+
+        var valueColumn = TableFactory.<ExchangeSecurity>tableObjectColumn("Стоимость");
+        valueColumn.setCellFactory(_ -> new ExchangeSecurityValueCell());
+        valueColumn.widthBinding(w.multiply(0.1));
+
+        tableView.getColumns().setAll(List.of(codeColumn, typeColumn, shortNameColumn, fullNameColumn,
+                isinColumn, regColumn, valueColumn));
         sortedList.comparatorProperty().bind(tableView.comparatorProperty());
         tableView.getSortOrder().add(codeColumn);
         tableView.sort();
@@ -146,20 +146,10 @@ public class SecuritiesWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         return menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
+                menu("Файл", ACTION_CLOSE.createMenuItem()),
                 menu("Правка",
-                        apply(menuItem("Добавить..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_N);
-                            menuItem.setOnAction(this::onAddSecurity);
-                        }),
-                        apply(menuItem("Обновить..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_U);
-                            menuItem.setOnAction(this::onUpdateSecurity);
-                            menuItem.disableProperty().bind(
-                                    tableView.getSelectionModel().selectedItemProperty().isNull());
-                        }),
+                        addSecurityAction.createMenuItem(),
+                        updateSecurityAction.createMenuItem(),
                         new SeparatorMenuItem(),
                         menuItem("Обновить все котировки", this::onUpdateAllValues)
                 ),
@@ -170,16 +160,10 @@ public class SecuritiesWindowController extends BaseController {
 
     private ContextMenu createContextMenu() {
         return new ContextMenu(
-                menuItem("Добавить...", this::onAddSecurity),
-                apply(menuItem("Обновить..."), menuItem -> {
-                    menuItem.setOnAction(this::onUpdateSecurity);
-                    menuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-                }),
+                addSecurityAction.createMenuItem(),
+                updateSecurityAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                apply(menuItem("Сплиты..."), menuItem -> {
-                    menuItem.setOnAction(this::onSplits);
-                    menuItem.disableProperty().bind(tableView.getSelectionModel().selectedItemProperty().isNull());
-                })
+                splitsAction.createMenuItem()
         );
     }
 
@@ -198,6 +182,11 @@ public class SecuritiesWindowController extends BaseController {
     private ExchangeSecurity buildExchangeSecurity(MoexSecurity moexSecurity, UUID uuid) {
         var marketData = getMarketData(moexSecurity);
 
+        var marketValue = marketData.map(MoexMarketData::prevLegalClosePrice).orElse(null);
+        if (marketValue == null) {
+            marketValue = marketData.map(MoexMarketData::marketPrice).orElse(BigDecimal.ZERO);
+        }
+
         var builder = new ExchangeSecurity.Builder()
                 .secId(moexSecurity.secId())
                 .name(moexSecurity.name())
@@ -212,9 +201,7 @@ public class SecuritiesWindowController extends BaseController {
                 .groupName(moexSecurity.groupName())
                 .type(moexSecurity.type())
                 .typeName(moexSecurity.typeName())
-                .marketValue(marketData
-                        .map(MoexMarketData::last)
-                        .orElse(BigDecimal.ZERO))
+                .marketValue(marketValue)
                 .couponValue(moexSecurity.couponValue())
                 .couponPercent(moexSecurity.couponPercent())
                 .couponDate(moexSecurity.couponDate())
@@ -290,5 +277,21 @@ public class SecuritiesWindowController extends BaseController {
 
     private Optional<ExchangeSecurity> getSelected() {
         return Optional.ofNullable(tableView.getSelectionModel().getSelectedItem());
+    }
+
+    private ChoiceBox<Object> groupBox() {
+        var cb = choiceBox(List.of());
+        cb.setOnAction(_ -> updatePredicate());
+        cb.setConverter(new ToStringConverter<>() {
+            @Override
+            public String toString(Object object) {
+                if (object instanceof ExchangeGroup group) {
+                    return group.title();
+                } else {
+                    return "";
+                }
+            }
+        });
+        return cb;
     }
 }

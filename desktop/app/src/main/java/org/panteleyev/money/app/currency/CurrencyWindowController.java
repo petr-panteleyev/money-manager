@@ -1,4 +1,4 @@
-// Copyright © 2020-2025 Petr Panteleyev
+// Copyright © 2020-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.currency;
 
@@ -16,13 +16,11 @@ import org.panteleyev.money.model.Currency;
 
 import java.util.Optional;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
 import static org.panteleyev.money.app.GlobalContext.settings;
-import static org.panteleyev.money.app.util.MenuUtils.createContextMenuItem;
 
 public final class CurrencyWindowController extends BaseController {
     private final TableView<Currency> tableView = new CurrencyTableView(cache().getCurrencies().sorted());
@@ -35,10 +33,10 @@ public final class CurrencyWindowController extends BaseController {
 
         // Context Menu
         tableView.setContextMenu(new ContextMenu(
-                createContextMenuItem(crudActionsHolder.getCreateAction()),
-                createMenuItem(crudActionsHolder.getUpdateAction()),
+                crudActionsHolder.getCreateAction().createMenuItem(),
+                crudActionsHolder.getUpdateAction().createMenuItem(),
                 new SeparatorMenuItem(),
-                createContextMenuItem(crudActionsHolder.getDeleteAction())
+                crudActionsHolder.getDeleteAction().createMenuItem()
         ));
 
         var root = new BorderPane(
@@ -57,14 +55,12 @@ public final class CurrencyWindowController extends BaseController {
 
     private MenuBar createMenuBar(CrudActionsHolder crudActionsHolder) {
         return menuBar(
-                menu("Файл",
-                        createMenuItem(ACTION_CLOSE)
-                ),
+                menu("Файл", ACTION_CLOSE.createMenuItem()),
                 menu("Правка",
-                        createMenuItem(crudActionsHolder.getCreateAction()),
-                        createMenuItem(crudActionsHolder.getUpdateAction()),
+                        crudActionsHolder.getCreateAction().createMenuItem(),
+                        crudActionsHolder.getUpdateAction().createMenuItem(),
                         new SeparatorMenuItem(),
-                        createMenuItem(crudActionsHolder.getDeleteAction())
+                        crudActionsHolder.getDeleteAction().createMenuItem()
                 ),
                 createWindowMenu(),
                 createHelpMenu()

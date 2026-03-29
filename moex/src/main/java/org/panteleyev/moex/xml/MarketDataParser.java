@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.moex.xml;
 
 import org.panteleyev.commons.xml.XMLEventReaderWrapper;
@@ -28,6 +26,7 @@ public class MarketDataParser {
     private static final QName ATTR_LAST = new QName("LAST");
     private static final QName ATTR_MARKETPRICE = new QName("MARKETPRICE");
     private static final QName ATTR_MARKETPRICETODAY = new QName("MARKETPRICETODAY");
+    private static final QName ATTR_PREVLEGALCLOSEPRICE = new QName("PREVLEGALCLOSEPRICE");
 
     public MarketDataParser() {
     }
@@ -48,6 +47,7 @@ public class MarketDataParser {
 
                         securitiesEvent.ifStartElement(ROW, row -> {
                             builder.accruedInterest(row.getAttributeValue(ATTR_ACCRUEDINT, BigDecimal.class).orElse(null))
+                                    .prevLegalClosePrice(row.getAttributeValue(ATTR_PREVLEGALCLOSEPRICE, BigDecimal.class).orElse(null))
                                     .couponPeriod(row.getAttributeValue(ATTR_COUPONPERIOD, Integer.class).orElse(null));
                         });
                     }

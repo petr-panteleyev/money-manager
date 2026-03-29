@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
@@ -21,8 +21,6 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
@@ -41,47 +39,36 @@ import static org.panteleyev.money.app.Styles.BIG_SPACING;
 public class InvestmentDealsWindowController extends BaseController {
     private final PredicateProperty<InvestmentDeal> filterProperty;
 
-    private final ExchangeSecuritySelectionBox securitySelectionBox = new ExchangeSecuritySelectionBox();
     private final InvestmentDealFilterBox dealFilterBox = new InvestmentDealFilterBox();
 
     public InvestmentDealsWindowController() {
-        var filteredList = cache().getInvestmentDeals().filtered(dealFilterBox.getDealFilter());
-        var tableView = new InvestmentDealsTableView(filteredList);
+        var securitySelectionBox = new ExchangeSecuritySelectionBox();
 
         filterProperty = PredicateProperty.and(List.of(
                 securitySelectionBox.investmentDealPredicateProperty(),
                 dealFilterBox.predicateProperty()
         ));
-        filterProperty.addListener((_, _, _) -> tableView.setTransactionFilter(filterProperty.get()));
         dealFilterBox.setDealFilter(InvestmentDealPredicate.LAST_QUARTER);
-
         dealFilterBox.setFilterYears(cache().getInvestmentDeals());
 
-        var filterBox = apply(hBox(
-                        List.of(
-                                label("Ценные бумаги:"),
-                                securitySelectionBox,
-                                label("Даты:"),
-                                dealFilterBox
-                        )), box -> {
-                    box.setAlignment(Pos.CENTER_LEFT);
-                    box.setSpacing(BIG_SPACING);
-                }
-        );
+        var filteredList = cache().getInvestmentDeals().filtered(filterProperty);
+        filteredList.predicateProperty().bind(filterProperty);
+
+        var tableView = new InvestmentDealsTableView(filteredList);
+
+        var filterBox = hBox(List.of(
+                label("Ценные бумаги:"), securitySelectionBox,
+                label("Даты:"), dealFilterBox
+        ));
+        filterBox.setAlignment(Pos.CENTER_LEFT);
+        filterBox.setSpacing(BIG_SPACING);
 
         HBox.setMargin(securitySelectionBox, new Insets(0, BIG_SPACING, 0, 0));
 
-        var mainPane = new BorderPane(
-                tableView, filterBox, null, null, null
-        );
+        var mainPane = new BorderPane(tableView, filterBox, null, null, null);
         BorderPane.setMargin(filterBox, BIG_INSETS);
 
-        var self = new BorderPane(
-                mainPane,
-                createMenu(), null, null, null
-        );
-
-        setupWindow(self);
+        setupWindow(new BorderPane(mainPane, createMenu(), null, null, null));
         settings().loadStageDimensions(this);
     }
 
@@ -91,12 +78,14 @@ public class InvestmentDealsWindowController extends BaseController {
     }
 
     private MenuBar createMenu() {
+        var loadMenuItem = menuItem("Загрузить сделки", _ -> onLoadInvestmentDeals());
+        loadMenuItem.setAccelerator(SHORTCUT_O);
+
         return menuBar(
                 menu("Файл",
-                        apply(menuItem("Загрузить сделки", _ -> onLoadInvestmentDeals()),
-                                item -> item.setAccelerator(SHORTCUT_O)),
+                        loadMenuItem,
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 createWindowMenu(),
                 createHelpMenu()

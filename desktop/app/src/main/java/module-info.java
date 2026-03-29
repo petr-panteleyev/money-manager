@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 open module org.panteleyev.money {
     requires java.sql;
@@ -12,7 +12,6 @@ open module org.panteleyev.money {
     requires org.panteleyev.ofx;
     requires org.panteleyev.moex;
     requires org.panteleyev.commons;
-    requires org.panteleyev.functional;
     requires org.panteleyev.freedesktop;
     requires org.panteleyev.money.model;
     requires org.panteleyev.money.desktop.commons;

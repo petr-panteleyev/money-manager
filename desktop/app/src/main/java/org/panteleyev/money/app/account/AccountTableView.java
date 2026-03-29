@@ -1,4 +1,4 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
@@ -18,65 +18,57 @@ import org.panteleyev.money.model.Account;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.panteleyev.functional.Scope.apply;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 
 final class AccountTableView extends TableView<Account> {
-    private static final int NAME_COLUMN_INDEX = 0;
-    private static final int CATEGORY_COLUMN_INDEX = 1;
-
     public AccountTableView(SortedList<Account> list) {
         super(list);
 
         var w = widthProperty().subtract(20);
 
-        getColumns().setAll(List.of(
-                apply(tableObjectColumn("Название"), c -> {
-                    c.setCellFactory(_ -> new AccountNameCell());
-                    c.comparator(Comparators.accountsByName());
-                    c.widthBinding(w.multiply(0.15));
-                }),
-                apply(tableObjectColumn("Категория"), c -> {
-                    c.setCellFactory(_ -> new AccountCategoryCell());
-                    c.comparator(Comparators.accountsByCategory(cache()));
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                apply(tableObjectColumn("Валюта"), c -> {
-                    c.setCellFactory(_ -> new AccountCurrencyCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(TableFactory.<Account, BigDecimal>tableValueColumn("%%"), c -> {
-                    c.setCellFactory(_ -> new AccountInterestCell());
-                    c.valueConverter(Account::interest);
-                    c.widthBinding(w.multiply(0.03));
-                }),
-                apply(tableObjectColumn("До"), c -> {
-                    c.setCellFactory(_ -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()));
-                    c.comparator(Comparators.accountsByClosingDate());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Комментарий"), c -> {
-                    c.setCellFactory(_ -> new AccountCommentCell());
-                    c.widthBinding(w.multiply(0.3));
-                }),
-                apply(tableObjectColumn("Баланс"), c -> {
-                    c.setCellFactory(_ -> new AccountBalanceCell(true));
-                    c.widthBinding(w.multiply(0.11));
-                }),
-                apply(tableObjectColumn("Ожидает"), c -> {
-                    c.setCellFactory(_ -> new AccountBalanceCell(false));
-                    c.widthBinding(w.multiply(0.11));
-                })
-        ));
+        var nameColumn = TableFactory.<Account>tableObjectColumn("Название");
+        nameColumn.setCellFactory(_ -> new AccountNameCell());
+        nameColumn.comparator(Comparators.accountsByName());
+        nameColumn.widthBinding(w.multiply(0.15));
+
+        var categoryColumn = TableFactory.<Account>tableObjectColumn("Категория");
+        categoryColumn.setCellFactory(_ -> new AccountCategoryCell());
+        categoryColumn.comparator(Comparators.accountsByCategory(cache()));
+        categoryColumn.widthBinding(w.multiply(0.2));
+
+        var currencyColumn = TableFactory.<Account>tableObjectColumn("Валюта");
+        currencyColumn.setCellFactory(_ -> new AccountCurrencyCell());
+        currencyColumn.widthBinding(w.multiply(0.05));
+
+        var interestColumn = TableFactory.<Account, BigDecimal>tableValueColumn("%%");
+        interestColumn.setCellFactory(_ -> new AccountInterestCell());
+        interestColumn.valueConverter(Account::interest);
+        interestColumn.widthBinding(w.multiply(0.03));
+
+        var closingDateColumn = TableFactory.<Account>tableObjectColumn("До");
+        closingDateColumn.setCellFactory(_ -> new AccountClosingDateCell(settings().getAccountClosingDayDelta()));
+        closingDateColumn.comparator(Comparators.accountsByClosingDate());
+        closingDateColumn.widthBinding(w.multiply(0.05));
+
+        var commentColumn = TableFactory.<Account>tableObjectColumn("Комментарий");
+        commentColumn.setCellFactory(_ -> new AccountCommentCell());
+        commentColumn.widthBinding(w.multiply(0.3));
+
+        var balanceColumn = TableFactory.<Account>tableObjectColumn("Баланс");
+        balanceColumn.setCellFactory(_ -> new AccountBalanceCell(true));
+        balanceColumn.widthBinding(w.multiply(0.11));
+
+        var waitingColumn = TableFactory.<Account>tableObjectColumn("Ожидает");
+        waitingColumn.setCellFactory(_ -> new AccountBalanceCell(false));
+        waitingColumn.widthBinding(w.multiply(0.11));
+
+        getColumns().setAll(List.of(nameColumn, categoryColumn, currencyColumn, interestColumn,
+                closingDateColumn, commentColumn, balanceColumn, waitingColumn));
 
         list.comparatorProperty().bind(comparatorProperty());
 
-        getSortOrder().addAll(List.of(
-                getColumns().get(CATEGORY_COLUMN_INDEX),
-                getColumns().get(NAME_COLUMN_INDEX)
-        ));
+        getSortOrder().addAll(List.of(categoryColumn, nameColumn));
         sort();
     }
 }

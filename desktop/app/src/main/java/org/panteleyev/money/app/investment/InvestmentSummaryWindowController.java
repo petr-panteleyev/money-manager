@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
@@ -15,7 +15,6 @@ import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Objects;
 
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
@@ -46,7 +45,7 @@ public class InvestmentSummaryWindowController extends BaseController {
                 menu("Файл",
                         menuItem("Загрузить сделки", _ -> onLoadInvestmentDeals()),
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 createWindowMenu(),
                 createHelpMenu()

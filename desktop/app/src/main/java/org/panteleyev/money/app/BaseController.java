@@ -1,14 +1,17 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.KeyCodeCombination;
 import javafx.stage.Stage;
-import org.controlsfx.control.action.Action;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.FxAction;
 import org.panteleyev.fx.WindowManager;
 import org.panteleyev.money.app.account.AccountWindowController;
 import org.panteleyev.money.app.card.CardWindowController;
@@ -20,12 +23,7 @@ import org.panteleyev.money.app.investment.InvestmentDealsWindowController;
 import org.panteleyev.money.app.investment.InvestmentSummaryWindowController;
 import org.panteleyev.money.model.Account;
 
-import java.util.Collection;
-import java.util.function.Consumer;
-
-import static org.controlsfx.control.action.ActionUtils.ACTION_SEPARATOR;
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.FxAction.fxAction;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.money.app.GlobalContext.settings;
@@ -39,12 +37,11 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_6;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_7;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_8;
 import static org.panteleyev.money.app.Shortcuts.SHORTCUT_F;
-import static org.panteleyev.money.app.actions.ActionBuilder.actionBuilder;
 
 public class BaseController extends Controller {
     static final WindowManager WINDOW_MANAGER = WindowManager.windowManager();
 
-    protected final Action ACTION_CLOSE = new Action("Закрыть", _ -> onClose());
+    protected final FxAction ACTION_CLOSE = fxAction("Закрыть").onAction(_ -> onClose());
 
     protected BaseController() {
         super(settings().getMainCssFilePath());
@@ -72,90 +69,53 @@ public class BaseController extends Controller {
     }
 
     protected Menu createPortfolioMenu(BooleanProperty dbOpenProperty) {
+        var securitiesMenuItem = menuItem("Ценные бумаги...", _ -> getController(SecuritiesWindowController.class));
+        if (dbOpenProperty != null) {
+            securitiesMenuItem.disableProperty().bind(dbOpenProperty.not());
+        }
+
+        var dealsMenuItem = menuItem("Инвестиционные сделки...",
+                _ -> getController(InvestmentDealsWindowController.class));
+        if (dbOpenProperty != null) {
+            dealsMenuItem.disableProperty().bind(dbOpenProperty.not());
+        }
+
+        var investmentsMenuItem = menuItem("Инвестиции...",
+                _ -> getController(InvestmentSummaryWindowController.class));
+        if (dbOpenProperty != null) {
+            investmentsMenuItem.disableProperty().bind(dbOpenProperty.not());
+        }
+
         return menu("Портфель",
-                apply(menuItem("Ценные бумаги..."), menuItem -> {
-                    menuItem.setOnAction(_ -> getController(SecuritiesWindowController.class));
-                    if (dbOpenProperty != null) {
-                        menuItem.disableProperty().bind(dbOpenProperty.not());
-                    }
-                }),
+                securitiesMenuItem,
                 new SeparatorMenuItem(),
-                apply(menuItem("Инвестиционные сделки..."), menuItem -> {
-                    menuItem.setOnAction(_ -> getController(InvestmentDealsWindowController.class));
-                    if (dbOpenProperty != null) {
-                        menuItem.disableProperty().bind(dbOpenProperty.not());
-                    }
-                }),
-                apply(menuItem("Инвестиции..."), menuItem -> {
-                    menuItem.setOnAction(_ -> getController(InvestmentSummaryWindowController.class));
-                    if (dbOpenProperty != null) {
-                        menuItem.disableProperty().bind(dbOpenProperty.not());
-                    }
-                })
-        );
+                dealsMenuItem,
+                investmentsMenuItem);
     }
 
     Menu createWindowMenu(BooleanProperty dbOpenProperty) {
-        var transactionsMenuItem = apply(menuItem("Проводки..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_0);
-            menuItem.setOnAction(_ -> getController(MainWindowController.class));
-        });
-        var accountsMenuItem = apply(menuItem("Счета..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_1);
-            menuItem.setOnAction(_ -> getController(AccountWindowController.class));
-        });
-        var cardsMenuItem = apply(menuItem("Карты..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_2);
-            menuItem.setOnAction(_ -> getController(CardWindowController.class));
-        });
-        var statementMenuItem = apply(menuItem("Выписки..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_3);
-            menuItem.setOnAction(_ -> getController(StatementWindowController.class));
-        });
-        var requestsMenuItem = apply(menuItem("Запросы..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_4);
-            menuItem.setOnAction(_ -> getRequestController());
-        });
-        var chartsMenuItem = apply(menuItem("Доходы и расходы..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_5);
-            menuItem.setOnAction(_ -> getController(IncomesAndExpensesWindowController.class));
-        });
-        var currenciesMenuItem = apply(menuItem("Валюты..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_6);
-            menuItem.setOnAction(_ -> getController(CurrencyWindowController.class));
-        });
-        var categoriesMenuItem = apply(menuItem("Категории..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_7);
-            menuItem.setOnAction(_ -> getController(CategoryWindowController.class));
-        });
-        var contactsMenuItem = apply(menuItem("Контакты..."), menuItem -> {
-            menuItem.setAccelerator(SHORTCUT_8);
-            menuItem.setOnAction(_ -> getController(ContactListWindowController.class));
-        });
-
+        var requestsMenuItem = menuItem("Запросы...", _ -> getRequestController());
+        requestsMenuItem.setAccelerator(SHORTCUT_4);
         if (dbOpenProperty != null) {
-            accountsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            cardsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            statementMenuItem.disableProperty().bind(dbOpenProperty.not());
             requestsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            currenciesMenuItem.disableProperty().bind(dbOpenProperty.not());
-            categoriesMenuItem.disableProperty().bind(dbOpenProperty.not());
-            contactsMenuItem.disableProperty().bind(dbOpenProperty.not());
-            chartsMenuItem.disableProperty().bind(dbOpenProperty.not());
         }
 
+        var contactsMenuItem = controllerMenuItem("Контакты...", SHORTCUT_8, ContactListWindowController.class,
+                dbOpenProperty);
+
         var menu = menu("Окно",
-                transactionsMenuItem,
+                controllerMenuItem("Проводки...", SHORTCUT_0, MainWindowController.class, null),
                 new SeparatorMenuItem(),
-                accountsMenuItem,
-                cardsMenuItem,
+                controllerMenuItem("Счета...", SHORTCUT_1, AccountWindowController.class, dbOpenProperty),
+                controllerMenuItem("Карты...", SHORTCUT_2, CardWindowController.class, dbOpenProperty),
                 new SeparatorMenuItem(),
-                statementMenuItem,
+                controllerMenuItem("Выписки...", SHORTCUT_3, StatementWindowController.class, dbOpenProperty),
                 requestsMenuItem,
-                chartsMenuItem,
+                controllerMenuItem("Доходы и расходы...", SHORTCUT_5, IncomesAndExpensesWindowController.class,
+                        dbOpenProperty),
                 new SeparatorMenuItem(),
-                currenciesMenuItem,
-                categoriesMenuItem,
+                controllerMenuItem("Валюты...", SHORTCUT_6, CurrencyWindowController.class, dbOpenProperty),
+                controllerMenuItem("Категории...", SHORTCUT_7, CategoryWindowController.class, dbOpenProperty),
                 contactsMenuItem
         );
 
@@ -173,6 +133,17 @@ public class BaseController extends Controller {
         });
 
         return menu;
+    }
+
+    private MenuItem controllerMenuItem(String text, KeyCodeCombination accelerator,
+            Class<? extends BaseController> clazz, BooleanProperty dbOpenProperty)
+    {
+        var menuItem = menuItem(text, _ -> getController(clazz));
+        menuItem.setAccelerator(accelerator);
+        if (dbOpenProperty != null) {
+            menuItem.disableProperty().bind(dbOpenProperty.not());
+        }
+        return menuItem;
     }
 
     protected Menu createHelpMenu() {
@@ -217,21 +188,8 @@ public class BaseController extends Controller {
     }
 
     // Actions
-    protected static Action searchAction(Consumer<ActionEvent> handler) {
-        return actionBuilder("Поиск", handler)
-                .accelerator(SHORTCUT_F)
-                .build();
-    }
-
-    static Menu createMenu(String text, Collection<Action> actions) {
-        var menu = new Menu(text);
-        for (var action : actions) {
-            if (action == ACTION_SEPARATOR) {
-                menu.getItems().add(new SeparatorMenuItem());
-            } else {
-                menu.getItems().add(createMenuItem(action));
-            }
-        }
-        return menu;
+    protected static FxAction searchAction(EventHandler<ActionEvent> handler) {
+        return fxAction("Поиск").onAction(handler)
+                .accelerator(SHORTCUT_F);
     }
 }

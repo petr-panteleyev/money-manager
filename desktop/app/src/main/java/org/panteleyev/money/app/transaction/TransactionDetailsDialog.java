@@ -1,4 +1,4 @@
-// Copyright © 2019-2025 Petr Panteleyev
+// Copyright © 2019-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
@@ -13,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.app.RecordEditorCallback;
 import org.panteleyev.money.app.transaction.cells.TransactionDetailSumCell;
 import org.panteleyev.money.model.Account;
@@ -23,12 +24,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
@@ -57,35 +55,17 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
         calculateDelta();
 
         detailsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-        var w = detailsTable.widthProperty().subtract(20);
-        detailsTable.getColumns().setAll(List.of(
-                apply(tableStringColumn("Счет получателя"), c -> {
-                    c.valueConverter(d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""));
-                    c.widthBinding(w.multiply(0.3));
-                }),
-                apply(tableStringColumn("Комментарий"), c -> {
-                    c.valueConverter(TransactionDetail::comment);
-                    c.widthBinding(w.multiply(0.6));
-                }),
-                apply(tableObjectColumn("Сумма"), c -> {
-                    c.setCellFactory(_ -> new TransactionDetailSumCell());
-                    c.widthBinding(w.multiply(0.1));
-                })
-        ));
+        createTableColumns(detailsTable);
 
         detailsTable.setItems(details);
 
-        var content = new BorderPane();
-        content.setCenter(detailsTable);
+        var content = new BorderPane(detailsTable);
         if (!readOnly) {
-            content.setBottom(vBox(BIG_SPACING,
-                    apply(hBox(BIG_SPACING,
-                            label("Разница:"),
-                            deltaLabel), box -> VBox.setMargin(box, new Insets(BIG_SPACING, 0, 0, 0))),
-                    detailEditor
-            ));
+            var deltaBox = hBox(BIG_SPACING, label("Разница:"), deltaLabel);
+            VBox.setMargin(deltaBox, new Insets(BIG_SPACING, 0, 0, 0));
+            content.setBottom(vBox(BIG_SPACING, deltaBox, detailEditor));
         }
+
         getDialogPane().setContent(content);
         getDialogPane().getButtonTypes().add(ButtonType.OK);
         getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
@@ -107,6 +87,23 @@ public final class TransactionDetailsDialog extends BaseDialog<List<TransactionD
         setResizable(true);
         getDialogPane().setPrefWidth(800);
         getDialogPane().setPrefHeight(400);
+    }
+
+    private static void createTableColumns(TableView<TransactionDetail> tableView) {
+        var w = tableView.widthProperty().subtract(20);
+
+        var creditAccountColumn = TableFactory.<TransactionDetail>tableStringColumn("Счет получателя");
+        creditAccountColumn.valueConverter(
+                d -> cache().getAccount(d.accountCreditedUuid()).map(Account::name).orElse(""));
+        creditAccountColumn.widthBinding(w.multiply(0.3));
+        var commentColumn = TableFactory.<TransactionDetail>tableStringColumn("Комментарий");
+        commentColumn.valueConverter(TransactionDetail::comment);
+        commentColumn.widthBinding(w.multiply(0.6));
+        var sumColumn = TableFactory.<TransactionDetail>tableObjectColumn("Сумма");
+        sumColumn.setCellFactory(_ -> new TransactionDetailSumCell());
+        sumColumn.widthBinding(w.multiply(0.1));
+
+        tableView.getColumns().setAll(List.of(creditAccountColumn, commentColumn, sumColumn));
     }
 
     private void calculateDelta() {

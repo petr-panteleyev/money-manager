@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
@@ -70,10 +70,9 @@ import static javafx.scene.control.Alert.AlertType.WARNING;
 import static javafx.scene.control.ButtonType.NO;
 import static javafx.scene.control.ButtonType.OK;
 import static javafx.scene.control.ButtonType.YES;
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.panteleyev.freedesktop.Utility.isLinux;
 import static org.panteleyev.freedesktop.entry.DesktopEntryBuilder.localeString;
-import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.FxAction.createMenu;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
@@ -150,74 +149,64 @@ public class MainWindowController extends BaseController implements TransactionT
     }
 
     private MenuBar createMainMenu() {
-        return apply(menuBar(
+        var importMenuItem = menuItem("Импорт...", _ -> onImport());
+        importMenuItem.setAccelerator(SHORTCUT_ALT_I);
+        importMenuItem.disableProperty().bind(dbOpenProperty.not());
+        var exportMenuItem = menuItem("Экспорт...", _ -> xmlDump());
+        exportMenuItem.setAccelerator(SHORTCUT_ALT_E);
+        exportMenuItem.disableProperty().bind(dbOpenProperty.not());
+        var reportMenuItem = menuItem("Отчет...", _ -> onReport());
+        reportMenuItem.setAccelerator(SHORTCUT_ALT_R);
+        reportMenuItem.disableProperty().bind(dbOpenProperty.not());
+        var currentMonthMenuItem = menuItem("Текущий месяц", _ -> onCurrentMonth());
+        currentMonthMenuItem.setAccelerator(SHORTCUT_BACK_SLASH);
+        var nextMonthMenuItem = menuItem("Следующий месяц", _ -> onNextMonth());
+        nextMonthMenuItem.setAccelerator(SHORTCUT_CLOSE_BRACKET);
+        var prevMonthMenuItem = menuItem("Предыдущий месяц", _ -> onPrevMonth());
+        prevMonthMenuItem.setAccelerator(SHORTCUT_OPEN_BRACKET);
+        var profilesMenuItem = menuItem("Профили...", _ -> profileManager.getEditor().showAndWait());
+        profilesMenuItem.setAccelerator(SHORTCUT_ALT_P);
+        var iconsMenuItem = menuItem("Значки...", _ -> onIconWindow());
+        iconsMenuItem.disableProperty().bind(dbOpenProperty.not());
+        var optionsMenuItem = menuItem("Настройки...", _ -> onOptions());
+        optionsMenuItem.setAccelerator(SHORTCUT_ALT_S);
+
+        return menuBar(
                 menu("Файл",
                         menuItem("Соединение...", _ -> onOpenConnection()),
                         new SeparatorMenuItem(),
-                        apply(menuItem("Импорт..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_I);
-                            menuItem.setOnAction(_ -> onImport());
-                            menuItem.disableProperty().bind(dbOpenProperty.not());
-                        }),
-                        apply(menuItem("Экспорт..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_E);
-                            menuItem.setOnAction(_ -> xmlDump());
-                            menuItem.disableProperty().bind(dbOpenProperty.not());
-                        }),
+                        importMenuItem,
+                        exportMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem("Отчет..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_R);
-                            menuItem.setOnAction(_ -> onReport());
-                            menuItem.disableProperty().bind(dbOpenProperty.not());
-                        }),
+                        reportMenuItem,
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE),
+                        ACTION_CLOSE.createMenuItem(),
                         new SeparatorMenuItem(),
                         menuItem("Выход", _ -> onExit())
                 ),
                 createMenu("Правка", transactionTable.getActions()),
                 menu("Вид",
-                        apply(menuItem("Текущий месяц"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_BACK_SLASH);
-                            menuItem.setOnAction(_ -> onCurrentMonth());
-                        }),
+                        currentMonthMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem("Следующий месяц"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_CLOSE_BRACKET);
-                            menuItem.setOnAction(_ -> onNextMonth());
-                        }),
-                        apply(menuItem("Предыдущий месяц"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_OPEN_BRACKET);
-                            menuItem.setOnAction(_ -> onPrevMonth());
-                        })
+                        nextMonthMenuItem,
+                        prevMonthMenuItem
                 ),
                 menu("Сервис",
-                        apply(menuItem("Профили..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_P);
-                            menuItem.setOnAction(_ -> profileManager.getEditor().showAndWait());
-                        }),
+                        profilesMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem("Значки..."), menuItem -> {
-                            menuItem.setOnAction(_ -> onIconWindow());
-                            menuItem.disableProperty().bind(dbOpenProperty.not());
-                        }),
+                        iconsMenuItem,
                         new SeparatorMenuItem(),
-                        apply(menuItem("Настройки..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_S);
-                            menuItem.setOnAction(_ -> onOptions());
-                        }),
+                        optionsMenuItem,
                         isLinux() ? new SeparatorMenuItem() : null,
                         isLinux() ? menuItem("Создать ярлык приложения", _ -> onCreateDesktopEntry()) : null
                 ),
                 createPortfolioMenu(dbOpenProperty),
                 createWindowMenu(dbOpenProperty), createHelpMenu()
-        ), mb -> mb.setUseSystemMenuBar(true));
+        );
     }
 
     private void initialize() {
         self.setTop(createMainMenu());
-
-        var transactionTab = new BorderPane();
 
         monthFilterBox.setOnAction(_ -> onMonthChanged());
         monthFilterBox.setFocusTraversable(false);
@@ -225,26 +214,22 @@ public class MainWindowController extends BaseController implements TransactionT
         var transactionCountLabel = label("");
         transactionCountLabel.textProperty().bind(transactionTable.listSizeProperty().asString());
 
-        var hBox = apply(hBox(5.0,
-                monthFilterBox,
-                yearSpinner,
-                apply(new Region(), r -> HBox.setHgrow(r, Priority.ALWAYS)),
-                label("Transactions:"),
-                transactionCountLabel
-        ), b -> b.setAlignment(Pos.CENTER_LEFT));
+        var filler = new Region();
+        HBox.setHgrow(filler, Priority.ALWAYS);
 
-        transactionTab.setTop(hBox);
-        BorderPane.setMargin(hBox, BIG_INSETS);
+        var toolBar = hBox(5.0, monthFilterBox, yearSpinner, filler,
+                label("Транзакций:"), transactionCountLabel);
+        toolBar.setAlignment(Pos.CENTER_LEFT);
+        BorderPane.setMargin(toolBar, BIG_INSETS);
 
-        transactionTab.setCenter(transactionTable);
+        var transactionTab = new BorderPane(transactionTable, toolBar, null, null, null);
 
         for (int i = 1; i <= 12; i++) {
             monthFilterBox.getItems()
                     .add(Month.of(i).getDisplayName(TextStyle.FULL_STANDALONE, Locale.getDefault()));
         }
 
-        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory = new SpinnerValueFactory
-                .IntegerSpinnerValueFactory(1970, 2050);
+        var valueFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1970, 2050);
         yearSpinner.setValueFactory(valueFactory);
         yearSpinner.valueProperty().addListener((_, _, _) -> Platform.runLater(this::reloadTransactions));
         yearSpinner.setFocusTraversable(false);

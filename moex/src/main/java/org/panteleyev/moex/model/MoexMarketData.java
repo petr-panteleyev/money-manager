@@ -1,7 +1,5 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.moex.model;
 
 import java.math.BigDecimal;
@@ -15,6 +13,7 @@ public record MoexMarketData(
         BigDecimal last,
         BigDecimal marketPrice,
         BigDecimal marketPriceToday,
+        BigDecimal prevLegalClosePrice,
         BigDecimal accruedInterest,
         Integer couponPeriod
 ) {
@@ -27,6 +26,7 @@ public record MoexMarketData(
         private BigDecimal last;
         private BigDecimal marketPrice;
         private BigDecimal marketPriceToday;
+        private BigDecimal prevLegalClosePrice;
         private BigDecimal accruedInterest;
         private Integer couponPeriod;
 
@@ -40,6 +40,7 @@ public record MoexMarketData(
                     last,
                     marketPrice,
                     marketPriceToday,
+                    prevLegalClosePrice,
                     accruedInterest,
                     couponPeriod
             );
@@ -86,6 +87,11 @@ public record MoexMarketData(
 
         public Builder marketPriceToday(BigDecimal marketPriceToday) {
             this.marketPriceToday = marketPriceToday;
+            return this;
+        }
+
+        public Builder prevLegalClosePrice(BigDecimal prevLegalClosePrice) {
+            this.prevLegalClosePrice = prevLegalClosePrice;
             return this;
         }
 

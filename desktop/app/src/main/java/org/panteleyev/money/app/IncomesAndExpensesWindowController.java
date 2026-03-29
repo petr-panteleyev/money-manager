@@ -1,4 +1,4 @@
-// Copyright © 2020-2025 Petr Panteleyev
+// Copyright © 2020-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
@@ -11,6 +11,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.BorderPane;
+import org.panteleyev.fx.factories.TreeTableFactory;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
 import org.panteleyev.money.model.Category;
@@ -33,8 +34,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.groupingBy;
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.ButtonFactory.button;
 import static org.panteleyev.fx.factories.LabelFactory.label;
@@ -42,7 +41,6 @@ import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.fx.factories.TreeTableFactory.treeItem;
-import static org.panteleyev.fx.factories.TreeTableFactory.treeTableObjectColumn;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.settings;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
@@ -141,8 +139,8 @@ class IncomesAndExpensesWindowController extends BaseController {
     private final Label expenseValueText = new Label();
     private final Label balanceValueText = new Label();
 
-    private final TreeItem<TreeNode> expenseRoot = apply(treeItem(), item -> item.setExpanded(true));
-    private final TreeItem<TreeNode> incomeRoot = apply(treeItem(), item -> item.setExpanded(true));
+    private final TreeItem<TreeNode> expenseRoot = expandedTreeItem(null);
+    private final TreeItem<TreeNode> incomeRoot = expandedTreeItem(null);
 
     public IncomesAndExpensesWindowController() {
         setupReportTable();
@@ -183,7 +181,7 @@ class IncomesAndExpensesWindowController extends BaseController {
                 menu("Файл",
                         menuItem("Отчет...", _ -> onReport()),
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 createWindowMenu(),
                 createHelpMenu()
@@ -251,18 +249,14 @@ class IncomesAndExpensesWindowController extends BaseController {
                 .sorted(Comparator.comparing(e -> e.getKey().name()))
                 .forEach(categoryMapEntry -> {
                     var category = categoryMapEntry.getKey();
-                    var categoryRoot =
-                            apply(treeItem(new TreeNode(category.name(), catSum.get(category.uuid()))),
-                                    item -> item.setExpanded(true));
+                    var categoryRoot = expandedTreeItem(new TreeNode(category.name(), catSum.get(category.uuid())));
                     root.getChildren().add(categoryRoot);
 
                     categoryMapEntry.getValue().entrySet().stream()
                             .sorted(Comparator.comparing(accountMapEntry -> accountMapEntry.getKey().name()))
                             .forEach(accountMapEntry -> {
                                 var account = accountMapEntry.getKey();
-                                var accountRoot =
-                                        apply(treeItem(new TreeNode(account.name(), accSum.get(account.uuid()))),
-                                                item -> item.setExpanded(false));
+                                var accountRoot = treeItem(new TreeNode(account.name(), accSum.get(account.uuid())));
                                 categoryRoot.getChildren().add(accountRoot);
 
                                 accountMapEntry.getValue().entrySet().stream()
@@ -273,9 +267,7 @@ class IncomesAndExpensesWindowController extends BaseController {
                                                     .map(Transaction::amount)
                                                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                                            accountRoot.getChildren().add(
-                                                    apply(treeItem(new TreeNode(name, sum)),
-                                                            item -> item.setExpanded(false)));
+                                            accountRoot.getChildren().add(treeItem(new TreeNode(name, sum)));
                                         });
                             });
                 });
@@ -288,16 +280,16 @@ class IncomesAndExpensesWindowController extends BaseController {
         reportTable.setShowRoot(false);
 
         var w = reportTable.widthProperty().subtract(20);
-        reportTable.getColumns().addAll(List.of(
-                apply(treeTableObjectColumn(""), c -> {
-                    c.setCellFactory(_ -> new NodeTextCell());
-                    c.widthBinding(w.multiply(0.85));
-                }),
-                apply(treeTableObjectColumn(""), c -> {
-                    c.setCellFactory(_ -> new NodeAmountCell());
-                    c.widthBinding(w.multiply(0.15));
-                })
-        ));
+
+        var textColumn = TreeTableFactory.<TreeNode>treeTableObjectColumn("");
+        textColumn.setCellFactory(_ -> new NodeTextCell());
+        textColumn.widthBinding(w.multiply(0.85));
+
+        var amountColumn = TreeTableFactory.<TreeNode>treeTableObjectColumn("");
+        amountColumn.setCellFactory(_ -> new NodeAmountCell());
+        amountColumn.widthBinding(w.multiply(0.15));
+
+        reportTable.getColumns().addAll(List.of(textColumn, amountColumn));
     }
 
     private void onReport() {
@@ -342,5 +334,11 @@ class IncomesAndExpensesWindowController extends BaseController {
         }
 
         return map;
+    }
+
+    private static <T> TreeItem<T> expandedTreeItem(T value) {
+        var item = treeItem(value);
+        item.setExpanded(true);
+        return item;
     }
 }

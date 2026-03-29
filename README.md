@@ -8,13 +8,13 @@
 
 ```shell script
 export JAVA_HOME=/path/to/jdk25
-./mvnw clean install
+mvn clean install
 ```
 
 ## Как запустить
 
 ```shell script
-./mvnw -pl desktop/app exec:exec@run
+mvn -pl desktop/app exec:exec@run
 ```
 
 Чтобы открыть конкретный профиль соединения добавьте ```-Dmoney.profile=<profile>``` к командной строке.
@@ -22,7 +22,7 @@ export JAVA_HOME=/path/to/jdk25
 ## Установка
 
 ```shell script
-./mvnw -pl desktop/app jpackage:jpackage
+mvn -pl desktop/app jpackage:jpackage
 ```
 
 Пакет для установки будет находиться в каталоге ```desktop/app/target/dist```.

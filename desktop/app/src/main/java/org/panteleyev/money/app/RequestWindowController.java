@@ -1,4 +1,4 @@
-// Copyright © 2019-2025 Petr Panteleyev
+// Copyright © 2019-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
@@ -35,9 +35,8 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 
 import static javafx.scene.layout.Priority.ALWAYS;
-import static org.controlsfx.control.action.ActionUtils.createMenuItem;
 import static org.controlsfx.control.textfield.TextFields.bindAutoCompletion;
-import static org.panteleyev.functional.Scope.apply;
+import static org.panteleyev.fx.FxAction.createMenu;
 import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
@@ -87,16 +86,18 @@ class RequestWindowController extends BaseController {
                 uncheckedPredicate
         ));
 
+        var filler = new Region();
+        HBox.setHgrow(filler, ALWAYS);
+
         var filterBox = hBox(BIG_SPACING,
                 account == null ? accBox : SKIP,
                 transactionFilterBox,
                 label("Контрагент:"),
                 contactFilterBox.getTextField(),
                 uncheckedOnlyCheckBox,
-                apply(new Region(), r -> HBox.setHgrow(r, ALWAYS)),
+                filler,
                 label("Сумма:"),
-                sumField
-        );
+                sumField);
 
         filterBox.setAlignment(Pos.CENTER_LEFT);
         BorderPane.setMargin(filterBox, BIG_INSETS);
@@ -151,24 +152,21 @@ class RequestWindowController extends BaseController {
     }
 
     private MenuBar createMenuBar() {
+        var reportMenuItem = menuItem("Отчет...", _ -> onReport());
+        reportMenuItem.setAccelerator(SHORTCUT_ALT_R);
+        var resetFilterMenuItem = menuItem("Сбросить фильтр", _ -> resetFilter());
+        resetFilterMenuItem.setAccelerator(SHORTCUT_ALT_C);
+
         return menuBar(
                 menu("Файл",
-                        apply(menuItem("Отчет..."), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_R);
-                            menuItem.setOnAction(_ -> onReport());
-                        }),
+                        reportMenuItem,
                         new SeparatorMenuItem(),
-                        createMenuItem(ACTION_CLOSE)
+                        ACTION_CLOSE.createMenuItem()
                 ),
                 createMenu("Правка", table.getActions()),
-                menu("Вид",
-                        apply(menuItem("Сбросить фильтр"), menuItem -> {
-                            menuItem.setAccelerator(SHORTCUT_ALT_C);
-                            menuItem.setOnAction(_ -> resetFilter());
-                        }),
-                        createWindowMenu(),
-                        createHelpMenu()
-                )
+                menu("Вид", resetFilterMenuItem),
+                createWindowMenu(),
+                createHelpMenu()
         );
     }
 

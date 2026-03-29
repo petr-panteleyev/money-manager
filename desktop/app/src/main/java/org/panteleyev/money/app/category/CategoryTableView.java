@@ -1,9 +1,10 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.category;
 
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableView;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.category.cells.CategoryNameCell;
 import org.panteleyev.money.app.category.cells.CategoryTypeCell;
@@ -11,34 +12,30 @@ import org.panteleyev.money.model.Category;
 
 import java.util.List;
 
-import static org.panteleyev.functional.Scope.apply;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
-
 final class CategoryTableView extends TableView<Category> {
     public CategoryTableView(SortedList<Category> list) {
         super(list);
 
         var w = widthProperty().subtract(20);
-        getColumns().setAll(List.of(
-                apply(tableObjectColumn("Тип"), c -> {
-                    c.setCellFactory(_ -> new CategoryTypeCell());
-                    c.comparator(Comparators.categoriesByType().thenComparing(Comparators.categoriesByName()));
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                apply(tableObjectColumn("Название"), c -> {
-                    c.setCellFactory(_ -> new CategoryNameCell());
-                    c.comparator(Comparators.categoriesByName());
-                    c.widthBinding(w.multiply(0.4));
-                }),
-                apply(tableStringColumn("Комментарий"), c -> {
-                    c.valueConverter(Category::comment);
-                    c.widthBinding(w.multiply(0.4));
-                })
-        ));
+
+        var typeColumn = TableFactory.<Category>tableObjectColumn("Тип");
+        typeColumn.setCellFactory(_ -> new CategoryTypeCell());
+        typeColumn.comparator(Comparators.categoriesByType().thenComparing(Comparators.categoriesByName()));
+        typeColumn.widthBinding(w.multiply(0.2));
+
+        var nameColumn = TableFactory.<Category>tableObjectColumn("Название");
+        nameColumn.setCellFactory(_ -> new CategoryNameCell());
+        nameColumn.comparator(Comparators.categoriesByName());
+        nameColumn.widthBinding(w.multiply(0.4));
+
+        var commentColumn = TableFactory.<Category>tableStringColumn("Комментарий");
+        commentColumn.valueConverter(Category::comment);
+        commentColumn.widthBinding(w.multiply(0.4));
+
+        getColumns().setAll(List.of(typeColumn, nameColumn, commentColumn));
 
         list.comparatorProperty().bind(comparatorProperty());
-        getSortOrder().add(getColumns().getFirst());
+        getSortOrder().add(typeColumn);
         sort();
     }
 }

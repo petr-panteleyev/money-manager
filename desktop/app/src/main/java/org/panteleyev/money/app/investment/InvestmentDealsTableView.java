@@ -1,11 +1,11 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import org.panteleyev.fx.PredicateProperty;
+import org.panteleyev.fx.factories.TableFactory;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAccountingDateCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentAciCell;
@@ -22,98 +22,84 @@ import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityTypeCell;
 import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.List;
-import java.util.function.Predicate;
 
-import static org.panteleyev.functional.Scope.apply;
-import static org.panteleyev.fx.factories.TableFactory.tableObjectColumn;
-import static org.panteleyev.fx.factories.TableFactory.tableStringColumn;
 import static org.panteleyev.money.app.Comparators.investmentDealByDealDate;
-import static org.panteleyev.money.app.GlobalContext.cache;
 
 final class InvestmentDealsTableView extends TableView<InvestmentDeal> {
-    private final FilteredList<InvestmentDeal> filteredList = new FilteredList<>(cache().getInvestmentDeals());
-    private final PredicateProperty<InvestmentDeal> dealPredicateProperty = new PredicateProperty<>(_ -> false);
-
     public InvestmentDealsTableView(FilteredList<InvestmentDeal> list) {
         var w = widthProperty().subtract(20);
 
-        TableColumn<InvestmentDeal, InvestmentDeal> dealDateColumn = apply(tableObjectColumn("Дата заключ."), c -> {
-            c.setCellFactory(_ -> new InvestmentDealDateCell());
-            c.comparator(investmentDealByDealDate());
-            c.widthBinding(w.multiply(0.05));
-        });
+        var accountColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Счёт");
+        accountColumn.setCellFactory(_ -> new InvestmentAccountCell());
+        accountColumn.widthBinding(w.multiply(0.05));
+
+        var dealColumn = TableFactory.<InvestmentDeal>tableStringColumn("Сделка");
+        dealColumn.valueConverter(InvestmentDeal::dealNumber);
+        dealColumn.widthBinding(w.multiply(0.05));
+
+        var dealDateColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Дата заключ.");
+        dealDateColumn.setCellFactory(_ -> new InvestmentDealDateCell());
+        dealDateColumn.comparator(investmentDealByDealDate());
+        dealDateColumn.widthBinding(w.multiply(0.05));
+
+        var accountingDateColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Дата расчёта");
+        accountingDateColumn.setCellFactory(_ -> new InvestmentAccountingDateCell());
+        accountingDateColumn.widthBinding(w.multiply(0.05));
+
+        var securityColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Инструмент");
+        securityColumn.setCellFactory(_ -> new InvestmentSecurityCell());
+        securityColumn.widthBinding(w.multiply(0.08));
+
+        var nameColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Название");
+        nameColumn.setCellFactory(_ -> new InvestmentSecurityNameCell());
+        nameColumn.widthBinding(w.multiply(0.2));
+
+        var typeColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Тип");
+        typeColumn.setCellFactory(_ -> new InvestmentSecurityTypeCell());
+        typeColumn.widthBinding(w.multiply(0.15));
+
+        var amountColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Кол-во");
+        amountColumn.setCellFactory(_ -> new InvestmentSecurityAmountCell());
+        amountColumn.widthBinding(w.multiply(0.05));
+
+        var priceColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Цена");
+        priceColumn.setCellFactory(_ -> new InvestmentPriceCell());
+        priceColumn.widthBinding(w.multiply(0.05));
+
+        var aciColumn = TableFactory.<InvestmentDeal>tableObjectColumn("НКД");
+        aciColumn.setCellFactory(_ -> new InvestmentAciCell());
+        aciColumn.widthBinding(w.multiply(0.05));
+
+        var volumeColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Объём сделки");
+        volumeColumn.setCellFactory(_ -> new InvestmentDealVolumeCell());
+        volumeColumn.widthBinding(w.multiply(0.05));
+
+        var exchangeFeeColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Комм. биржи");
+        exchangeFeeColumn.setCellFactory(_ -> new InvestmentExchangeFeeCell());
+        exchangeFeeColumn.widthBinding(w.multiply(0.05));
+
+        var brokerFeeColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Комм. брокера");
+        brokerFeeColumn.setCellFactory(_ -> new InvestmentBrokerFeeCell());
+        brokerFeeColumn.widthBinding(w.multiply(0.05));
+
+        var totalColumn = TableFactory.<InvestmentDeal>tableObjectColumn("Общая сумма");
+        totalColumn.setCellFactory(_ -> new InvestmentAmountCell());
+        totalColumn.widthBinding(w.multiply(0.05));
 
         getColumns().setAll(List.of(
-                apply(tableObjectColumn("Счёт"), c -> {
-                    c.setCellFactory(_ -> new InvestmentAccountCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableStringColumn("Сделка"), c -> {
-                    c.valueConverter(InvestmentDeal::dealNumber);
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                dealDateColumn,
-                apply(tableObjectColumn("Дата расчёта"), c -> {
-                    c.setCellFactory(_ -> new InvestmentAccountingDateCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Инструмент"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSecurityCell());
-                    c.widthBinding(w.multiply(0.08));
-                }),
-                apply(tableObjectColumn("Название"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSecurityNameCell());
-                    c.widthBinding(w.multiply(0.2));
-                }),
-                apply(tableObjectColumn("Тип"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSecurityTypeCell());
-                    c.widthBinding(w.multiply(0.15));
-                }),
-                apply(tableObjectColumn("Кол-во"), c -> {
-                    c.setCellFactory(_ -> new InvestmentSecurityAmountCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Цена"), c -> {
-                    c.setCellFactory(_ -> new InvestmentPriceCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("НКД"), c -> {
-                    c.setCellFactory(_ -> new InvestmentAciCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Объём сделки"), c -> {
-                    c.setCellFactory(_ -> new InvestmentDealVolumeCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Комм. биржи"), c -> {
-                    c.setCellFactory(_ -> new InvestmentExchangeFeeCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Комм. брокера"), c -> {
-                    c.setCellFactory(_ -> new InvestmentBrokerFeeCell());
-                    c.widthBinding(w.multiply(0.05));
-                }),
-                apply(tableObjectColumn("Общая сумма"), c -> {
-                    c.setCellFactory(_ -> new InvestmentAmountCell());
-                    c.widthBinding(w.multiply(0.05));
-                })
-        ));
+                accountColumn, dealColumn, dealDateColumn, accountingDateColumn,
+                securityColumn, nameColumn, typeColumn, amountColumn,
+                priceColumn, aciColumn, volumeColumn, exchangeFeeColumn,
+                brokerFeeColumn,
+                totalColumn));
 
-        filteredList.predicateProperty().bind(dealPredicateProperty);
-
-        var sortedList = filteredList.sorted();
+        var sortedList = list.sorted();
         sortedList.comparatorProperty().bind(comparatorProperty());
         setItems(sortedList);
 
-        getSortOrder().addAll(List.of(
-                dealDateColumn
-        ));
+        getSortOrder().add(dealDateColumn);
         dealDateColumn.setSortType(TableColumn.SortType.DESCENDING);
 
         sort();
-    }
-
-    public void setTransactionFilter(Predicate<InvestmentDeal> filter) {
-        dealPredicateProperty.set(filter);
     }
 }

@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
@@ -41,7 +41,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.Controller.SKIP;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
@@ -89,7 +88,6 @@ class AccountDialog extends BaseDialog<Account> {
                 }
             };
 
-
     private final ValidationSupport validation = new ValidationSupport();
 
     private final TextField nameEdit = new TextField();
@@ -98,8 +96,7 @@ class AccountDialog extends BaseDialog<Account> {
     private final TextField commentEdit = new TextField();
     private final TextField accountNumberEdit = new TextField();
 
-    private final ComboBox<CategoryType> typeComboBox = apply(comboBox(CategoryType.asList(),
-            _ -> comboBoxListCell(Bundles::translate)), cb -> cb.setOnAction(_ -> onCategoryTypeSelected()));
+    private final ComboBox<CategoryType> typeComboBox = typeComboBox();
     private final ComboBox<Category> categoryComboBox = new ComboBox<>();
     private final TextField currencyEdit = new TextField();
     private final MenuButton currencyMenuButton = new MenuButton();
@@ -256,6 +253,12 @@ class AccountDialog extends BaseDialog<Account> {
         createDefaultButtons(UI, validation.invalidProperty());
 
         Platform.runLater(this::createValidationSupport);
+    }
+
+    private ComboBox<CategoryType> typeComboBox() {
+        var cb = comboBox(CategoryType.asList(), _ -> comboBoxListCell(Bundles::translate));
+        cb.setOnAction(_ -> onCategoryTypeSelected());
+        return cb;
     }
 
     private void onCategoryTypeSelected() {

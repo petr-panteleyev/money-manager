@@ -1,7 +1,5 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.rest;
 
 import io.restassured.RestAssured;
@@ -30,6 +28,7 @@ public abstract class BaseControllerTest extends BaseSpringBootTest {
     public void init() {
         RestAssured.baseURI = "http://localhost:" + port;
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+        RestAssured.urlEncodingEnabled = false;
     }
 
     protected <T> void insertAndCheck(T insert, Class<T> clazz, Class<T[]> arrayClass, String api,
