@@ -12,7 +12,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>26.3.1</revision>
+        <revision>26.5.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -28,15 +28,15 @@
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>26</javaFxVersion>
-        <javaFxHelpersVersion>2.4.2</javaFxHelpersVersion>
+        <javaFxVersion>26.0.1</javaFxVersion>
+        <javaFxHelpersVersion>2.5.2</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
         <controlsFxVersion>11.2.2</controlsFxVersion>
-        <commonsIoVersion>2.18.0</commonsIoVersion>
+        <commonsIoVersion>2.22.0</commonsIoVersion>
         <commonsCsvVersion>1.14.1</commonsCsvVersion>
-        <jsoupVersion>1.22.1</jsoupVersion>
-        <postgresVersion>42.7.3</postgresVersion>
+        <jsoupVersion>1.22.2</jsoupVersion>
+        <postgresVersion>42.7.11</postgresVersion>
         <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.14.1</jacksonVersion>
         <apachePoiVersion>5.5.1</apachePoiVersion>
