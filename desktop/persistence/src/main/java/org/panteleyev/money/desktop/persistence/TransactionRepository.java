@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
 import org.panteleyev.money.model.CategoryType;
@@ -26,12 +24,12 @@ final class TransactionRepository extends Repository<Transaction> {
                     comment, checked, acc_debited_uuid, acc_credited_uuid, acc_debited_type,
                     acc_credited_type, acc_debited_category_uuid, acc_credited_category_uuid, contact_uuid,
                     invoice_number, parent_uuid, detailed,
-                    statement_date, card_uuid, created, modified, uuid
+                    statement_date, card_uuid, location, created, modified, uuid
                 ) VALUES (
                     ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
-                    ?, ?, ?,
+                    ?, ?, ?, ?,
                     ?, ?, ?, ?, ?
                 )
                 """;
@@ -59,6 +57,7 @@ final class TransactionRepository extends Repository<Transaction> {
                     detailed = ?,
                     statement_date = ?,
                     card_uuid = ?,
+                    location = ?,
                     created = ?,
                     modified = ?
                 WHERE uuid = ?
@@ -87,6 +86,7 @@ final class TransactionRepository extends Repository<Transaction> {
                 rs.getBoolean("detailed"),
                 getLocalDate(rs, "statement_date"),
                 getUuid(rs, "card_uuid"),
+                rs.getString("location"),
                 rs.getLong("created"),
                 rs.getLong("modified")
         );
@@ -113,6 +113,7 @@ final class TransactionRepository extends Repository<Transaction> {
         st.setBoolean(index++, transaction.detailed());
         setLocalDate(st, index++, transaction.statementDate());
         setUuid(st, index++, transaction.cardUuid());
+        st.setString(index++, transaction.location());
         st.setLong(index++, transaction.created());
         st.setLong(index++, transaction.modified());
         setUuid(st, index, transaction.uuid());

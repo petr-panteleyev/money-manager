@@ -1,7 +1,5 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
 import org.panteleyev.money.backend.domain.AccountEntity;
@@ -294,6 +292,7 @@ public class EntityToDtoConverter {
         dto.setDetailed(entity.isDetailed());
         dto.setStatementDate(entity.getStatementDate());
         dto.setCardUuid(entity.getCard() == null ? null : entity.getCard().getUuid());
+        dto.setLocation(entity.getLocation());
         dto.setCreated(entity.getCreated());
         dto.setModified(entity.getModified());
         return dto;
@@ -334,6 +333,7 @@ public class EntityToDtoConverter {
                 .setDetailed(dto.getDetailed())
                 .setStatementDate(dto.getStatementDate())
                 .setCard(card)
+                .setLocation(dto.getLocation())
                 .setCreated(dto.getCreated())
                 .setModified(dto.getModified());
     }

@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 
@@ -43,6 +41,7 @@ public class TestTransaction {
         var detailed = BaseTestUtils.randomBoolean();
         var statementDate = LocalDate.now();
         var cardUuid = UUID.randomUUID();
+        var location = BaseTestUtils.randomString();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -68,6 +67,7 @@ public class TestTransaction {
                                 .detailed(detailed)
                                 .statementDate(statementDate)
                                 .cardUuid(cardUuid)
+                                .location(location)
                                 .created(created)
                                 .modified(modified)
                                 .build(),
@@ -77,7 +77,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, invoiceNumber, parentUuid,
-                                detailed, statementDate, cardUuid, created, modified
+                                detailed, statementDate, cardUuid, location, created, modified
                         )
                 ),
                 Arguments.of(
@@ -87,7 +87,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, null, null,
-                                detailed, null, cardUuid, created, modified
+                                detailed, null, cardUuid, location, created, modified
                         ),
                         new Transaction(
                                 uuid, amount, creditAmount, transactionDate,
@@ -95,7 +95,7 @@ public class TestTransaction {
                                 accountDebitedType, accountCreditedType,
                                 accountDebitedCategoryUuid, accountCreditedCategoryUuid,
                                 contactUuid, "", null,
-                                detailed, null, cardUuid, created, modified
+                                detailed, null, cardUuid, location, created, modified
                         )
                 )
         );

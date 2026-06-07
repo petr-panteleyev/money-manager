@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.commons;
 
 import javafx.collections.FXCollections;
@@ -278,6 +276,13 @@ public class DataCache {
     public Set<String> getUniqueTransactionComments() {
         return getTransactions().stream()
                 .map(Transaction::comment)
+                .filter(c -> !c.isEmpty())
+                .collect(Collectors.toSet());
+    }
+
+    public Set<String> getUniqueTransactionLocations() {
+        return getTransactions().stream()
+                .map(Transaction::location)
                 .filter(c -> !c.isEmpty())
                 .collect(Collectors.toSet());
     }

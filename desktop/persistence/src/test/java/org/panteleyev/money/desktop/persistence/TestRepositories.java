@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
 import org.junit.jupiter.api.AfterAll;
@@ -43,8 +41,6 @@ public class TestRepositories extends BaseDaoTest {
     private static final UUID CONTACT_UUID = UUID.randomUUID();
     private static final UUID ACCOUNT_UUID = UUID.randomUUID();
     private static final UUID TRANSACTION_UUID = UUID.randomUUID();
-    private static final UUID DOCUMENT_UUID = UUID.randomUUID();
-    private static final UUID PERIODIC_PAYMENT_UUID = UUID.randomUUID();
     private static final UUID CARD_UUID = UUID.randomUUID();
     private static final UUID INVESTMENT_UUID = UUID.randomUUID();
     private static final UUID EXCHANGE_SECURITY_SPLIT_UUID = UUID.randomUUID();
@@ -348,6 +344,7 @@ public class TestRepositories extends BaseDaoTest {
                 BaseTestUtils.randomBoolean(),
                 LocalDate.now(),
                 CARD_UUID,
+                BaseTestUtils.randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -372,6 +369,7 @@ public class TestRepositories extends BaseDaoTest {
                 BaseTestUtils.randomBoolean(),
                 LocalDate.now(),
                 null,
+                BaseTestUtils.randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );

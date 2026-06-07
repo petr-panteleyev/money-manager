@@ -141,11 +141,13 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private final Label debitedCategoryLabel = new Label();
     private final Label creditedCategoryLabel = new Label();
     private final DatePicker statementDatePicker = new DatePicker();
+    private final TextField locationEdit = new TextField();
 
     private final MenuButton typeMenuButton = new MenuButton();
     private final MenuButton debitedMenuButton = new MenuButton();
     private final MenuButton creditedMenuButton = new MenuButton();
     private final MenuButton contactMenuButton = new MenuButton();
+    private final MenuButton locationMenuButton = new MenuButton();
 
     private Transaction.Builder builder = new Transaction.Builder();
 
@@ -156,6 +158,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private final Set<Account> creditedSuggestions = new TreeSet<>();
     private final Set<Account> creditedSuggestionsAll = new TreeSet<>();
     private final Set<String> commentSuggestions = new TreeSet<>();
+    private final Set<String> locationSuggestions = new TreeSet<>();
     private final ComboBox<Card> cardComboBox = new ComboBox<>();
 
     private final ValidationSupport validation = new ValidationSupport();
@@ -187,6 +190,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         debitedMenuButton.setFocusTraversable(false);
         creditedMenuButton.setFocusTraversable(false);
         contactMenuButton.setFocusTraversable(false);
+        locationMenuButton.setFocusTraversable(false);
 
         debitedAccountEdit.setPrefColumnCount(40);
         creditAmountEdit.setDisable(true);
@@ -207,6 +211,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         TextFields.bindAutoCompletion(contactEdit, new NamedCompletionProvider<>(contactSuggestions),
                 CONTACT_TO_STRING);
         TextFields.bindAutoCompletion(commentEdit, new StringCompletionProvider(commentSuggestions));
+        TextFields.bindAutoCompletion(locationEdit, new StringCompletionProvider(locationSuggestions));
 
         creditedAccountEdit.focusedProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue && !newValue) {
@@ -230,6 +235,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         setupAccountMenus();
         setupContactMenu();
         setupComments();
+        setupLocations();
 
         createDefaultButtons(UI);
 
@@ -285,6 +291,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         commentEdit.setText(transaction.comment());
         checkedCheckBox.setSelected(transaction.checked());
         invoiceNumberEdit.setText(transaction.invoiceNumber());
+        locationEdit.setText(transaction.location());
 
         // Rate
         var debitedCurrencyUuid = accDebited.map(Account::currencyUuid).orElse(null);
@@ -344,6 +351,9 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                 hBox(0, contactEdit, contactMenuButton));
         HBox.setHgrow(contactBox, ALWAYS);
 
+        var locationBox = vBox(SMALL_SPACING, label("Место"), locationEdit);
+        HBox.setHgrow(locationBox, ALWAYS);
+
         var commentBox = vBox(SMALL_SPACING, label("Комментарий"), commentEdit);
         HBox.setHgrow(commentBox, ALWAYS);
 
@@ -363,6 +373,7 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
                         cardBox,
                         creditedAccountBox,
                         contactBox,
+                        locationBox,
                         commentBox,
                         vBox(SMALL_SPACING, label("Счёт"), invoiceNumberEdit),
                         vBox(SMALL_SPACING, label("Дата по выписке"), statementDatePicker)));
@@ -581,7 +592,8 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         builder.comment(commentEdit.getText())
                 .checked(checkedCheckBox.isSelected())
                 .invoiceNumber(invoiceNumberEdit.getText())
-                .statementDate(statementDatePicker.getValue());
+                .statementDate(statementDatePicker.getValue())
+                .location(locationEdit.getText());
 
         var card = cardComboBox.getValue();
         builder.cardUuid(card == null ? null : card.uuid());
@@ -781,6 +793,11 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
     private void setupComments() {
         commentSuggestions.clear();
         commentSuggestions.addAll(cache.getUniqueTransactionComments());
+    }
+
+    private void setupLocations() {
+        locationSuggestions.clear();
+        locationSuggestions.addAll(cache.getUniqueTransactionLocations());
     }
 
     private void updateCategoryLabel(Label label, Account account) {

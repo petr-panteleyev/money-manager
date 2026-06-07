@@ -1,7 +1,5 @@
-<!--
-  Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
-  SPDX-License-Identifier: BSD-2-Clause
-  -->
+<!-- Copyright © 2017-2026 Petr Panteleyev -->
+<!-- SPDX-License-Identifier: BSD-2-Clause -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <xsd:annotation>
@@ -331,6 +329,7 @@
         <xsd:attribute name="detailed" type="xsd:boolean"/>
         <xsd:attribute name="statementDate" type="LocalDate"/>
         <xsd:attribute name="cardUuid" type="UUID"/>
+        <xsd:attribute name="location" type="xsd:string"/>
     </xsd:complexType>
 
     <xsd:complexType name="MoneyDocument">

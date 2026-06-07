@@ -1,7 +1,5 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Column;
@@ -39,6 +37,7 @@ public class TransactionEntity implements MoneyEntity {
     private boolean detailed;
     private LocalDate statementDate;
     private CardEntity card;
+    private String location;
     private long created;
     private long modified;
 
@@ -249,6 +248,15 @@ public class TransactionEntity implements MoneyEntity {
 
     public TransactionEntity setModified(long modified) {
         this.modified = modified;
+        return this;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public TransactionEntity setLocation(String location) {
+        this.location = location;
         return this;
     }
 

@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 import java.math.BigDecimal;
@@ -28,6 +26,7 @@ public record Transaction(
         boolean detailed,
         LocalDate statementDate,
         UUID cardUuid,
+        String location,
         long created,
         long modified
 ) implements MoneyRecord {
@@ -67,6 +66,7 @@ public record Transaction(
 
         comment = MoneyRecord.normalize(comment);
         invoiceNumber = MoneyRecord.normalize(invoiceNumber);
+        location = MoneyRecord.normalize(location);
 
         amount = MoneyRecord.normalize(amount, BigDecimal.ZERO);
         creditAmount = MoneyRecord.normalize(creditAmount, BigDecimal.ZERO);
@@ -130,6 +130,7 @@ public record Transaction(
         private String newContactName;
         private LocalDate statementDate;
         private UUID cardUuid;
+        private String location;
 
         public Builder() {
         }
@@ -160,6 +161,7 @@ public record Transaction(
             this.uuid = t.uuid();
             this.statementDate = t.statementDate();
             this.cardUuid = t.cardUuid();
+            this.location = t.location;
         }
 
         public UUID getUuid() {
@@ -249,6 +251,11 @@ public record Transaction(
             return this;
         }
 
+        public Builder location(String location) {
+            this.location = location;
+            return this;
+        }
+
         public Builder created(long created) {
             this.created = created;
             return this;
@@ -294,7 +301,8 @@ public record Transaction(
                     checked, accountDebitedUuid, accountCreditedUuid,
                     accountDebitedType, accountCreditedType,
                     accountDebitedCategoryUuid, accountCreditedCategoryUuid, contactUuid,
-                    invoiceNumber, parentUuid, detailed, statementDate, cardUuid, created, modified);
+                    invoiceNumber, parentUuid, detailed, statementDate, cardUuid,
+                    location, created, modified);
         }
     }
 }

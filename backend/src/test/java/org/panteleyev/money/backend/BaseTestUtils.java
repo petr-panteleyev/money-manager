@@ -1,7 +1,5 @@
-/*
- Copyright © 2021-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend;
 
 import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
@@ -226,6 +224,7 @@ public final class BaseTestUtils {
         dto.setDetailed(randomBoolean());
         dto.setStatementDate(LocalDate.now());
         dto.setCardUuid(card == null ? null : card.getUuid());
+        dto.setLocation(randomString());
         dto.setCreated(created);
         dto.setModified(modified);
         return dto;

@@ -111,6 +111,7 @@ components:
         - invoiceNumber
         - detailed
         - statementDate
+        - location
         - created
         - modified
       properties:
@@ -154,6 +155,8 @@ components:
           format: date
         cardUuid:
           type: uuid
+        location:
+          type: string
         created:
           type: long
         modified:
