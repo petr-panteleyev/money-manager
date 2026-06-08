@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction.cells;
 
 import javafx.scene.control.TableCell;
@@ -13,19 +11,27 @@ import static org.panteleyev.money.app.GlobalContext.cache;
 public class TransactionContactCell extends TableCell<Transaction, Transaction> {
 
     @Override
-    public void updateItem(Transaction transaction, boolean empty) {
+    protected void updateItem(Transaction transaction, boolean empty) {
         super.updateItem(transaction, empty);
 
-        setText("");
-        setGraphic(null);
-
         if (empty || transaction == null) {
+            clear();
             return;
         }
 
-        cache().getContact(transaction.contactUuid()).ifPresent(contact -> {
-            setText(contact.name());
+        cache().getContact(transaction.contactUuid()).ifPresentOrElse(contact -> {
+            var contactName = contact.name();
+            var location = transaction.location();
+            if (!contactName.isBlank() && !location.isBlank()) {
+                contactName += ", " + location;
+            }
+            setText(contactName);
             setGraphic(IconManager.getImageView(contact.iconUuid()));
-        });
+        }, this::clear);
+    }
+
+    private void clear() {
+        setText("");
+        setGraphic(null);
     }
 }

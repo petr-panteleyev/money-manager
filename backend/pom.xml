@@ -17,7 +17,7 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>26.6.1</revision>
+        <revision>26.6.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>25</java.version>
         <maven.compiler.release>25</maven.compiler.release>

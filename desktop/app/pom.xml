@@ -267,8 +267,6 @@
                     <removeDestination>true</removeDestination>
                     <javaOptions>
                         <option>-XX:NewRatio=1</option>
-                        <option>-Xms500m</option>
-                        <option>-Xmx500m</option>
                         <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
@@ -292,8 +290,6 @@
                             <longModulepath>false</longModulepath>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-Xms500m</argument>
-                                <argument>-Xmx500m</argument>
                                 <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
