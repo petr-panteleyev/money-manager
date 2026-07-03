@@ -2,4 +2,4 @@
 
 # Copyright © 2026 Petr Panteleyev
 # SPDX-License-Identifier: BSD-2-Clause
-mvn -pl desktop/app jpackage:jpackage
+mvn clean install -am -pl desktop/app

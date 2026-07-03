@@ -11,15 +11,9 @@ fi
 LAUNCH_DIR=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 INSTALL_DIR=$(realpath -m "$1")/money-manager
 
-echo -n "Removing $INSTALL_DIR... "
-rm -rf $INSTALL_DIR
-echo "done"
-
-echo -n "Creating $INSTALL_DIR... "
-mkdir -p $INSTALL_DIR
-echo "done"
-
 echo -n "Installing into $INSTALL_DIR... "
+mkdir -p $INSTALL_DIR
+rm -rf $INSTALL_DIR/*
 cp -r $LAUNCH_DIR/../desktop/app/target/dist/Money\ Manager/* $INSTALL_DIR
 echo "done"
 

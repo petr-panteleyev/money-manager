@@ -12,7 +12,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>26.6.2</revision>
+        <revision>26.7.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -24,7 +24,7 @@
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
         <mavenExecPluginVersion>3.6.2</mavenExecPluginVersion>
-        <jpackageMavenPluginVersion>1.7.4</jpackageMavenPluginVersion>
+        <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <!-- Dependencies -->
@@ -40,8 +40,8 @@
         <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.22.0</jacksonVersion>
         <apachePoiVersion>5.5.1</apachePoiVersion>
-        <jUnitVersion>6.1.0</jUnitVersion>
-        <liquibaseVersion>4.20.0</liquibaseVersion>
+        <jUnitVersion>6.1.1</jUnitVersion>
+        <liquibaseVersion>5.0.3</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
     </properties>
 
