@@ -9,88 +9,28 @@ import org.panteleyev.money.backend.domain.ContactEntity;
 import org.panteleyev.money.backend.domain.CurrencyEntity;
 import org.panteleyev.money.backend.domain.IconEntity;
 import org.panteleyev.money.backend.domain.TransactionEntity;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
-import org.panteleyev.money.backend.openapi.dto.CardFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CardFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.CardType;
-import org.panteleyev.money.backend.openapi.dto.CategoryFlatDto;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
-import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CategoryFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.ContactFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.ContactType;
-import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
-import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.IconFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.TransactionType;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EntityToDtoConverter {
 
-    // Account
-
-    public AccountFlatDto entityToFlatDto(AccountEntity entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        var dto = new AccountFlatDto();
-        dto.setUuid(entity.getUuid());
-        dto.setName(entity.getName());
-        dto.setComment(entity.getComment());
-        dto.setAccountNumber(entity.getAccountNumber());
-        dto.setOpeningBalance(entity.getOpeningBalance());
-        dto.setAccountLimit(entity.getAccountLimit());
-        dto.setCurrencyRate(entity.getCurrencyRate());
-        dto.setType(CategoryType.fromValue(entity.getCategory().getType()));
-        dto.setCategoryUuid(entity.getCategory().getUuid());
-        dto.setCurrencyUuid(entity.getCurrency() == null ? null : entity.getCurrency().getUuid());
-        dto.setSecurityUuid(null); // TODO: Fix later
-        dto.setEnabled(entity.isEnabled());
-        dto.setInterest(entity.getInterest());
-        dto.setClosingDate(entity.getClosingDate());
-        dto.setIconUuid(entity.getIcon() == null ? null : entity.getIcon().getUuid());
-        dto.setTotal(entity.getTotal());
-        dto.setTotalWaiting(entity.getTotalWaiting());
-        dto.setCreated(entity.getCreated());
-        dto.setModified(entity.getModified());
-        return dto;
-    }
-
-    public AccountEntity dtoToEntity(AccountFlatDto dto, CategoryEntity category, CurrencyEntity currency,
-            IconEntity icon)
-    {
-        if (dto == null) {
-            return null;
-        }
-        return new AccountEntity()
-                .setUuid(dto.getUuid())
-                .setName(dto.getName())
-                .setComment(dto.getComment())
-                .setAccountNumber(dto.getAccountNumber())
-                .setOpeningBalance(dto.getOpeningBalance())
-                .setAccountLimit(dto.getAccountLimit())
-                .setCurrencyRate(dto.getCurrencyRate())
-                .setType(category.getType())
-                .setCategory(category)
-                .setCurrency(currency)
-                // TODO: exchange security
-                .setEnabled(dto.getEnabled())
-                .setInterest(dto.getInterest())
-                .setClosingDate(dto.getClosingDate())
-                .setIcon(icon)
-                .setTotal(dto.getTotal())
-                .setTotalWaiting(dto.getTotalWaiting())
-                .setCreated(dto.getCreated())
-                .setModified(dto.getModified());
-    }
-
     // Card
 
-    public CardFlatDto entityToFlatDto(CardEntity entity) {
+    public CardFlatDTO entityToFlatDto(CardEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        var dto = new CardFlatDto();
+        var dto = new CardFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setAccountUuid(entity.getAccount() == null ? null : entity.getAccount().getUuid());
         dto.setType(CardType.fromValue(entity.getType()));
@@ -103,7 +43,7 @@ public class EntityToDtoConverter {
         return dto;
     }
 
-    public CardEntity dtoToEntity(CardFlatDto dto, AccountEntity accountEntity) {
+    public CardEntity dtoToEntity(CardFlatDTO dto, AccountEntity accountEntity) {
         if (dto == null) {
             return null;
         }
@@ -121,11 +61,11 @@ public class EntityToDtoConverter {
 
     // Icon
 
-    public IconFlatDto entityToFlatDto(IconEntity entity) {
+    public IconFlatDTO entityToFlatDto(IconEntity entity) {
         if (entity == null) {
             return null;
         }
-        var dto = new IconFlatDto();
+        var dto = new IconFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setName(entity.getName());
         dto.setBytes(entity.getBytes());
@@ -134,7 +74,7 @@ public class EntityToDtoConverter {
         return dto;
     }
 
-    public IconEntity dtoToEntity(IconFlatDto dto) {
+    public IconEntity dtoToEntity(IconFlatDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -148,23 +88,23 @@ public class EntityToDtoConverter {
 
     // Category
 
-    public CategoryFlatDto entityToFlatDto(CategoryEntity entity) {
+    public CategoryFlatDTO entityToFlatDto(CategoryEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        var dto = new CategoryFlatDto();
+        var dto = new CategoryFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setName(entity.getName());
         dto.setComment(entity.getComment());
-        dto.setType(CategoryType.fromValue(entity.getType()));
+        dto.setType(entity.getType());
         dto.setIconUuid(entity.getIcon() == null ? null : entity.getIcon().getUuid());
         dto.setCreated(entity.getCreated());
         dto.setModified(entity.getModified());
         return dto;
     }
 
-    public CategoryEntity dtoToEntity(CategoryFlatDto dto, IconEntity icon) {
+    public CategoryEntity dtoToEntity(CategoryFlatDTO dto, IconEntity icon) {
         if (dto == null) {
             return null;
         }
@@ -172,7 +112,7 @@ public class EntityToDtoConverter {
                 .setUuid(dto.getUuid())
                 .setName(dto.getName())
                 .setComment(dto.getComment())
-                .setType(dto.getType().name())
+                .setType(dto.getType())
                 .setIcon(icon)
                 .setCreated(dto.getCreated())
                 .setModified(dto.getModified());
@@ -180,12 +120,12 @@ public class EntityToDtoConverter {
 
     // Contact
 
-    public ContactFlatDto entityToFlatDto(ContactEntity entity) {
+    public ContactFlatDTO entityToFlatDto(ContactEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        var dto = new ContactFlatDto();
+        var dto = new ContactFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setName(entity.getName());
         dto.setType(ContactType.fromValue(entity.getType()));
@@ -204,7 +144,7 @@ public class EntityToDtoConverter {
         return dto;
     }
 
-    public ContactEntity dtoToEntity(ContactFlatDto dto, IconEntity icon) {
+    public ContactEntity dtoToEntity(ContactFlatDTO dto, IconEntity icon) {
         if (dto == null) {
             return null;
         }
@@ -228,12 +168,12 @@ public class EntityToDtoConverter {
 
     // Currency
 
-    public CurrencyFlatDto entityToFlatDto(CurrencyEntity entity) {
+    public CurrencyFlatDTO entityToFlatDto(CurrencyEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        var dto = new CurrencyFlatDto();
+        var dto = new CurrencyFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setSymbol(entity.getSymbol());
         dto.setDescription(entity.getDescription());
@@ -249,7 +189,7 @@ public class EntityToDtoConverter {
         return dto;
     }
 
-    public CurrencyEntity dtoToEntity(CurrencyFlatDto dto) {
+    public CurrencyEntity dtoToEntity(CurrencyFlatDTO dto) {
         return new CurrencyEntity()
                 .setUuid(dto.getUuid())
                 .setSymbol(dto.getSymbol())
@@ -267,12 +207,12 @@ public class EntityToDtoConverter {
 
     // Transaction
 
-    public TransactionFlatDto entityToFlatDto(TransactionEntity entity) {
+    public TransactionFlatDTO entityToFlatDto(TransactionEntity entity) {
         if (entity == null) {
             return null;
         }
 
-        var dto = new TransactionFlatDto();
+        var dto = new TransactionFlatDTO();
         dto.setUuid(entity.getUuid());
         dto.setAmount(entity.getAmount());
         dto.setCreditAmount(entity.getCreditAmount());
@@ -280,8 +220,8 @@ public class EntityToDtoConverter {
         dto.setType(TransactionType.fromValue(entity.getType()));
         dto.setComment(entity.getComment());
         dto.setChecked(entity.isChecked());
-        dto.setAccountDebitedType(CategoryType.fromValue(entity.getAccountDebitedType()));
-        dto.setAccountCreditedType(CategoryType.fromValue(entity.getAccountCreditedType()));
+        dto.setAccountDebitedType(entity.getAccountDebitedType());
+        dto.setAccountCreditedType(entity.getAccountCreditedType());
         dto.setAccountDebitedUuid(entity.getAccountDebited().getUuid());
         dto.setAccountCreditedUuid(entity.getAccountCredited().getUuid());
         dto.setAccountDebitedCategoryUuid(entity.getAccountDebitedCategory().getUuid());
@@ -299,7 +239,7 @@ public class EntityToDtoConverter {
     }
 
     public TransactionEntity dtoToEntity(
-            TransactionFlatDto dto,
+            TransactionFlatDTO dto,
             AccountEntity accountDebited,
             AccountEntity accountCredited,
             ContactEntity contact,

@@ -11,3 +11,5 @@ target/
 *.ipr
 out/
 .run/
+
+_merged_spec.yaml

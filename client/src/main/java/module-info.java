@@ -1,7 +1,5 @@
-/*
- Copyright © 2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 module money.manager.client {
     requires java.net.http;
 
@@ -10,8 +8,10 @@ module money.manager.client {
     requires com.fasterxml.jackson.datatype.jsr310;
     requires com.fasterxml.jackson.datatype.jdk8;
 
-    requires org.panteleyev.money.model;
+    requires jakarta.annotation;
+    requires org.jspecify;
 
     exports org.panteleyev.money.client;
-    exports org.panteleyev.money.client.dto;
+    exports org.panteleyev.money.dto;
+    exports org.panteleyev.money.client.openapi.dto;
 }

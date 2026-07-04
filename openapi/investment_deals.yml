@@ -1,0 +1,181 @@
+openapi: "3.0.0"
+
+info:
+  title: Значки
+  version: 1.0.0
+
+paths:
+  /api/v1/investment-deals:
+    get:
+      tags:
+        - "investment-deals, v1"
+      summary: Получить все инвестиционные сделки
+      operationId: getInvestmentDeals
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvestmentDealFlatDTO'
+
+  /api/v1/investment-deals/stream:
+    get:
+      tags:
+        - "investment-deals, v1"
+      summary: Получить все инвестиционные сделки в потоке
+      operationId: getInvestmentDealsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/investment-deals/{uuid}:
+    get:
+      tags:
+        - "investment-deals, v1"
+      summary: Получить инвестиционную сделку
+      operationId: getInvestmentDealByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestmentDealFlatDTO'
+        "404":
+          description: Инвестиционная сделка не найдена
+    put:
+      tags:
+        - "investment-deals, v1"
+      summary: Записать инвестиционную сделку
+      operationId: putInvestmentDeal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestmentDealFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestmentDealFlatDTO'
+
+components:
+  schemas:
+    InvestmentMarketType:
+      type: string
+      enum:
+        - "-"
+        - "Фондовый рынок"
+      x-enum-varnames:
+        - UNKNOWN
+        - STOCK_MARKET
+
+    InvestmentOperationType:
+      type: string
+      enum:
+        - "-"
+        - "Покупка"
+        - "Продажа"
+      x-enum-varnames:
+        - UNKNOWN
+        - PURCHASE
+        - SELL
+
+    InvestmentDealType:
+      type: string
+      enum:
+        - "-"
+        - "Обычная"
+      x-enum-varnames:
+        - UNKNOWN
+        - NORMAL
+
+    InvestmentDealFlatDTO:
+      type: object
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - accountUuid
+        - dealNumber
+        - dealDate
+        - accountingDate
+        - marketType
+        - operationType
+        - securityAmount
+        - price
+        - aci
+        - dealVolume
+        - rate
+        - exchangeFee
+        - brokerFee
+        - amount
+        - dealType
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        accountUuid:
+          type: string
+          format: uuid
+        securityUuid:
+          type: string
+          format: uuid
+        currencyUuid:
+          type: string
+          format: uuid
+        dealNumber:
+          type: string
+        dealDate:
+          type: string
+          format: date-time
+        accountingDate:
+          type: string
+          format: date-time
+        marketType:
+          $ref: '#/components/schemas/InvestmentMarketType'
+        operationType:
+          $ref: '#/components/schemas/InvestmentOperationType'
+        securityAmount:
+          type: integer
+        price:
+          type: number
+        aci:
+          type: number
+        dealVolume:
+          type: number
+        rate:
+          type: number
+        exchangeFee:
+          type: number
+        brokerFee:
+          type: number
+        amount:
+          type: number
+        dealType:
+          $ref: '#/components/schemas/InvestmentDealType'
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64

@@ -1,0 +1,119 @@
+openapi: "3.0.0"
+
+info:
+  title: Категории
+  version: 1.0.0
+
+paths:
+  /api/v1/categories:
+    get:
+      tags:
+        - "categories, v1"
+      summary: Получить все категории
+      operationId: getCategories
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryFlatDTO'
+  /api/v1/categories/stream:
+    get:
+      tags:
+        - "categories, v1"
+      summary: Получить все категории в потоке
+      operationId: getCategoriesAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /api/v1/categories/{uuid}:
+    get:
+      tags:
+        - "categories, v1"
+      summary: Получить категорию
+      operationId: getCategoryByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryFlatDTO'
+        "404":
+          description: Категория не найдена
+    put:
+      tags:
+        - "categories, v1"
+      summary: Записать категорию
+      operationId: putCategory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryFlatDTO'
+
+components:
+  schemas:
+    CategoryType:
+      type: string
+      description: Тип категории
+      enum:
+        - BANKS_AND_CASH
+        - INCOMES
+        - EXPENSES
+        - DEBTS
+        - PORTFOLIO
+        - ASSETS
+        - STARTUP
+    CategoryFlatDTO:
+      type: object
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - name
+        - comment
+        - type
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        comment:
+          type: string
+        type:
+          $ref: '#/components/schemas/CategoryType'
+        iconUuid:
+          type: string
+          format: uuid
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64

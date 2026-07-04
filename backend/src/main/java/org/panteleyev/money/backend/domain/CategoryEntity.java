@@ -1,18 +1,20 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.panteleyev.money.backend.openapi.dto.CategoryType;
 
 import java.util.Objects;
 import java.util.UUID;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity(name = "Category")
 @Table(name = "category")
@@ -20,7 +22,7 @@ public class CategoryEntity implements MoneyEntity {
     private UUID uuid;
     private String name;
     private String comment;
-    private String type;
+    private CategoryType type;
     private IconEntity icon;
     private long created;
     private long modified;
@@ -57,11 +59,12 @@ public class CategoryEntity implements MoneyEntity {
         return this;
     }
 
-    public String getType() {
+    @Enumerated(STRING)
+    public CategoryType getType() {
         return type;
     }
 
-    public CategoryEntity setType(String type) {
+    public CategoryEntity setType(CategoryType type) {
         this.type = type;
         return this;
     }

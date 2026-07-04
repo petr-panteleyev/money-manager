@@ -30,3 +30,7 @@ mvn -pl desktop/app jpackage:jpackage
 ## Поддержка
 
 Поддержка данного приложения не осуществляется.
+
+## Использование AI
+
+[GigaCode](https://gitverse.ru/features/gigacode/) был использован для генерации некоторых тестов.

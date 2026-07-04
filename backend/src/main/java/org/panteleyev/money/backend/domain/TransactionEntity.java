@@ -4,16 +4,20 @@ package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.panteleyev.money.backend.openapi.dto.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity(name = "Transaction")
 @Table(name = "transaction")
@@ -25,8 +29,8 @@ public class TransactionEntity implements MoneyEntity {
     private String type;
     private String comment;
     private boolean checked;
-    private String accountDebitedType;
-    private String accountCreditedType;
+    private CategoryType accountDebitedType;
+    private CategoryType accountCreditedType;
     private AccountEntity accountDebited;
     private AccountEntity accountCredited;
     private CategoryEntity accountDebitedCategory;
@@ -110,21 +114,23 @@ public class TransactionEntity implements MoneyEntity {
     }
 
     @Column(name = "acc_debited_type", nullable = false)
-    public String getAccountDebitedType() {
+    @Enumerated(STRING)
+    public CategoryType getAccountDebitedType() {
         return accountDebitedType;
     }
 
-    public TransactionEntity setAccountDebitedType(String accountDebitedType) {
+    public TransactionEntity setAccountDebitedType(CategoryType accountDebitedType) {
         this.accountDebitedType = accountDebitedType;
         return this;
     }
 
     @Column(name = "acc_credited_type", nullable = false)
-    public String getAccountCreditedType() {
+    @Enumerated(STRING)
+    public CategoryType getAccountCreditedType() {
         return accountCreditedType;
     }
 
-    public TransactionEntity setAccountCreditedType(String accountCreditedType) {
+    public TransactionEntity setAccountCreditedType(CategoryType accountCreditedType) {
         this.accountCreditedType = accountCreditedType;
         return this;
     }

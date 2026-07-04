@@ -1,0 +1,153 @@
+openapi: "3.0.0"
+
+info:
+  title: Ценные бумаги
+  version: 1.0.0
+
+paths:
+  /api/v1/exchange-securities:
+    get:
+      tags:
+        - "exchange-securities, v1"
+      summary: Получить все ценные бумаги
+      operationId: getExchangeSecurities
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExchangeSecurityFlatDTO'
+
+  /api/v1/exchange-securities/stream:
+    get:
+      tags:
+        - "exchange-securities, v1"
+      summary: Получить все ценные бумаги в потоке
+      operationId: getExchangeSecuritiesAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/exchange-securities/{uuid}:
+    get:
+      tags:
+        - "exchange-securities, v1"
+      summary: Получить ценную бумагу
+      operationId: getExchangeSecurityByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeSecurityFlatDTO'
+        "404":
+          description: Ценная бумага не найдена
+    put:
+      tags:
+        - "exchange-securities, v1"
+      summary: Записать ценную бумагу
+      operationId: putExchangeSecurity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeSecurityFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeSecurityFlatDTO'
+
+components:
+  schemas:
+    ExchangeSecurityFlatDTO:
+      type: object
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - secId
+        - name
+        - shortName
+        - isin
+        - regNumber
+        - faceValue
+        - issueDate
+        - groupType
+        - groupName
+        - type
+        - typeName
+        - marketValue
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        secId:
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        isin:
+          type: string
+        regNumber:
+          type: string
+        faceValue:
+          type: number
+        issueDate:
+          type: string
+          format: date
+        matDate:
+          type: string
+          format: date
+        daysToRedemption:
+          type: integer
+        groupType:
+          type: string
+        groupName:
+          type: string
+        type:
+          type: string
+        typeName:
+          type: string
+        marketValue:
+          type: number
+        couponValue:
+          type: number
+        couponPercent:
+          type: number
+        couponDate:
+          type: string
+          format: date
+        couponFrequency:
+          type: integer
+        accruedInterest:
+          type: number
+        couponPeriod:
+          type: integer
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64

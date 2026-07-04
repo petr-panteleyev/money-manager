@@ -1,6 +1,0 @@
-ExchangeSecuritySplitType:
-  type: string
-  description: Тип сплита ценной бумаги
-  enum:
-    - SPLIT
-    - REVERSE_SPLIT

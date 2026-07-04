@@ -1,0 +1,124 @@
+openapi: "3.0.0"
+
+info:
+  title: Карты
+  version: 1.0.0
+
+paths:
+  /api/v1/cards:
+    get:
+      tags:
+        - "cards, v1"
+      summary: Получить все карты
+      operationId: getCards
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardFlatDTO'
+  /api/v1/cards/stream:
+    get:
+      tags:
+        - "cards, v1"
+      summary: Получить все карты в потоке
+      operationId: getCardsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /api/v1/cards/{uuid}:
+    get:
+      tags:
+        - "cards, v1"
+      summary: Получить карту
+      operationId: getCardByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFlatDTO'
+        "404":
+          description: Карта не найдена
+    put:
+      tags:
+        - "cards, v1"
+      summary: Записать карту
+      operationId: putCard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardFlatDTO'
+
+components:
+  schemas:
+    CardType:
+      type: string
+      enum:
+        - NONE
+        - VISA
+        - MASTERCARD
+        - MIR
+        - AMEX
+    CardFlatDTO:
+      type: object
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - accountUuid
+        - type
+        - number
+        - expiration
+        - comment
+        - enabled
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        accountUuid:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/CardType'
+        number:
+          type: string
+        expiration:
+          type: string
+          format: date
+        comment:
+          type: string
+        enabled:
+          type: boolean
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64

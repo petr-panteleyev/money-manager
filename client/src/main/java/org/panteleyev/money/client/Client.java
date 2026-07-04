@@ -1,10 +1,8 @@
-/*
- Copyright © 2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.client;
 
-import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.dto.MoneyDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,7 +18,7 @@ import static java.net.HttpURLConnection.HTTP_ACCEPTED;
 import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static java.net.HttpURLConnection.HTTP_OK;
 
-class Client<T extends MoneyRecord> {
+class Client<T extends MoneyDTO> {
     private static final String APPLICATION_JSON = "application/json";
     private static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
 
@@ -101,7 +99,7 @@ class Client<T extends MoneyRecord> {
     }
 
     public T put(T record) {
-        var request = HttpRequest.newBuilder(URI.create(url.toString() + "/" + record.uuid().toString()))
+        var request = HttpRequest.newBuilder(URI.create(url.toString() + "/" + record.getUuid().toString()))
                 .PUT(HttpRequest.BodyPublishers.ofByteArray(jsonHandler.convert(record)))
                 .setHeader("Content-Type", APPLICATION_JSON)
                 .setHeader("Accept", APPLICATION_JSON)

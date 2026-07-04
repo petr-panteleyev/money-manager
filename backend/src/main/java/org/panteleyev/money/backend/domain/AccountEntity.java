@@ -1,21 +1,23 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.panteleyev.money.backend.openapi.dto.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity(name = "Account")
 @Table(name = "account")
@@ -27,9 +29,10 @@ public class AccountEntity implements MoneyEntity {
     private BigDecimal openingBalance;
     private BigDecimal accountLimit;
     private BigDecimal currencyRate;
-    private String type;
+    private CategoryType type;
     private CategoryEntity category;
     private CurrencyEntity currency;
+    private ExchangeSecurityEntity security;
     private boolean enabled;
     private BigDecimal interest;
     private LocalDate closingDate;
@@ -110,11 +113,12 @@ public class AccountEntity implements MoneyEntity {
         return this;
     }
 
-    public String getType() {
+    @Enumerated(STRING)
+    public CategoryType getType() {
         return type;
     }
 
-    public AccountEntity setType(String type) {
+    public AccountEntity setType(CategoryType type) {
         this.type = type;
         return this;
     }
@@ -138,6 +142,17 @@ public class AccountEntity implements MoneyEntity {
 
     public AccountEntity setCurrency(CurrencyEntity currency) {
         this.currency = currency;
+        return this;
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "security_uuid")
+    public ExchangeSecurityEntity getSecurity() {
+        return security;
+    }
+
+    public AccountEntity setSecurity(ExchangeSecurityEntity security) {
+        this.security = security;
         return this;
     }
 
@@ -237,6 +252,7 @@ public class AccountEntity implements MoneyEntity {
                 && Objects.equals(type, that.type)
                 && Objects.equals(category, that.category)
                 && Objects.equals(currency, that.currency)
+                && Objects.equals(security, that.security)
                 && Objects.equals(interest, that.interest)
                 && Objects.equals(closingDate, that.closingDate)
                 && Objects.equals(icon, that.icon)

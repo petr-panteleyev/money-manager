@@ -30,4 +30,4 @@ management:
 
 openapi:
   mergedSpec:
-    base-path: /api/1.0.0
+    base-path: /

@@ -1,15 +1,16 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.panteleyev.money.backend.converter.AccountConverter;
 import org.panteleyev.money.backend.domain.AccountEntity;
 import org.panteleyev.money.backend.domain.TransactionEntity;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
+import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.backend.repository.CurrencyRepository;
+import org.panteleyev.money.backend.repository.ExchangeSecurityRepository;
 import org.panteleyev.money.backend.repository.IconRepository;
 import org.panteleyev.money.backend.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -25,36 +26,40 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static org.panteleyev.money.backend.util.JsonUtil.objectMapper;
 import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class AccountService {
+    private final ObjectMapper objectMapper;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final CurrencyRepository currencyRepository;
+    private final ExchangeSecurityRepository securityRepository;
     private final IconRepository iconRepository;
     private final TransactionRepository transactionRepository;
-    private final EntityToDtoConverter converter;
+    private final AccountConverter converter;
 
     public AccountService(
+            ObjectMapper objectMapper,
             AccountRepository accountRepository,
             CategoryRepository categoryRepository,
             CurrencyRepository currencyRepository,
+            ExchangeSecurityRepository securityRepository,
             IconRepository iconRepository,
             TransactionRepository transactionRepository,
-            EntityToDtoConverter converter
-    )
+            AccountConverter converter)
     {
+        this.objectMapper = objectMapper;
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
         this.currencyRepository = currencyRepository;
+        this.securityRepository = securityRepository;
         this.iconRepository = iconRepository;
         this.transactionRepository = transactionRepository;
         this.converter = converter;
     }
 
-    public List<AccountFlatDto> getAll() {
+    public List<AccountFlatDTO> getAll() {
         return accountRepository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
@@ -65,24 +70,26 @@ public class AccountService {
         }
     }
 
-    public Optional<AccountFlatDto> get(UUID uuid) {
+    public Optional<AccountFlatDTO> get(UUID uuid) {
         return accountRepository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public AccountFlatDto put(AccountFlatDto account) {
+    public AccountFlatDTO put(AccountFlatDTO account) {
         var category = categoryRepository.findById(account.getCategoryUuid()).orElseThrow();
         var currency = account.getCurrencyUuid() == null ?
                 null : currencyRepository.getReferenceById(account.getCurrencyUuid());
+        var security = account.getSecurityUuid() == null ?
+                null : securityRepository.getReferenceById(account.getSecurityUuid());
         var icon = account.getIconUuid() == null ?
                 null : iconRepository.getReferenceById(account.getIconUuid());
 
         return converter.entityToFlatDto(accountRepository.save(converter.dtoToEntity(
-                account, category, currency, icon
+                account, category, currency, security, icon
         )));
     }
 
     @Transactional
-    public Collection<AccountFlatDto> updateBalances(Collection<UUID> accountIds) {
+    public Collection<AccountFlatDTO> updateBalances(Collection<UUID> accountIds) {
         var toUpdate = new ArrayList<AccountEntity>(accountIds.size());
 
         accountRepository.findAllById(accountIds).forEach(entity -> {

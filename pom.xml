@@ -12,7 +12,7 @@
     <name>Parent</name>
 
     <properties>
-        <revision>26.7.1</revision>
+        <revision>26.7.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>25</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -27,6 +27,7 @@
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
+        <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
         <javaFxVersion>26.0.1</javaFxVersion>
         <javaFxHelpersVersion>2.5.2</javaFxHelpersVersion>
@@ -43,6 +44,8 @@
         <jUnitVersion>6.1.1</jUnitVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
         <testContainersVersion>1.17.3</testContainersVersion>
+        <jSpecifyVersion>1.0.0</jSpecifyVersion>
+        <jakartaAnnotationVersion>3.0.0</jakartaAnnotationVersion>
     </properties>
 
     <modules>
@@ -168,6 +171,17 @@
                 <artifactId>poi-ooxml</artifactId>
                 <version>${apachePoiVersion}</version>
             </dependency>
+            <!-- Misc -->
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>${jSpecifyVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${jakartaAnnotationVersion}</version>
+            </dependency>
             <!-- Test -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
@@ -243,6 +257,11 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>${mavenExecPluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>${openapiGeneratorMavenPluginVersion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

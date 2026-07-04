@@ -1,10 +1,9 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
-import org.panteleyev.money.backend.openapi.dto.CategoryFlatDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.panteleyev.money.backend.openapi.dto.CategoryFlatDTO;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.backend.repository.IconRepository;
 import org.springframework.stereotype.Service;
@@ -15,26 +14,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.panteleyev.money.backend.util.JsonUtil.objectMapper;
 import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class CategoryService {
+    private final ObjectMapper objectMapper;
     private final CategoryRepository repository;
     private final IconRepository iconRepository;
     private final EntityToDtoConverter converter;
 
     public CategoryService(
+            ObjectMapper objectMapper,
             CategoryRepository repository,
             IconRepository iconRepository,
             EntityToDtoConverter converter)
     {
+        this.objectMapper = objectMapper;
         this.repository = repository;
         this.iconRepository = iconRepository;
         this.converter = converter;
     }
 
-    public List<CategoryFlatDto> getAll() {
+    public List<CategoryFlatDTO> getAll() {
         return repository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
@@ -45,11 +46,11 @@ public class CategoryService {
         }
     }
 
-    public Optional<CategoryFlatDto> get(UUID uuid) {
+    public Optional<CategoryFlatDTO> get(UUID uuid) {
         return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
-    public CategoryFlatDto put(CategoryFlatDto category) {
+    public CategoryFlatDTO put(CategoryFlatDTO category) {
         var iconEntity = category.getIconUuid() == null ?
                 null : iconRepository.getReferenceById(category.getIconUuid());
         return converter.entityToFlatDto(repository.save(converter.dtoToEntity(category, iconEntity)));

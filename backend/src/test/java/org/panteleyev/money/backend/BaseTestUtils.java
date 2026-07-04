@@ -2,16 +2,23 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend;
 
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDto;
-import org.panteleyev.money.backend.openapi.dto.CardFlatDto;
+import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.CardFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.CardType;
-import org.panteleyev.money.backend.openapi.dto.CategoryFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CategoryFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.CategoryType;
-import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
+import org.panteleyev.money.backend.openapi.dto.ContactFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.ContactType;
-import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDto;
-import org.panteleyev.money.backend.openapi.dto.IconFlatDto;
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
+import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.ExchangeSecurityFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.backend.openapi.dto.IconFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.InvestmentDealFlatDTO;
+import org.panteleyev.money.backend.openapi.dto.InvestmentDealType;
+import org.panteleyev.money.backend.openapi.dto.InvestmentMarketType;
+import org.panteleyev.money.backend.openapi.dto.InvestmentOperationType;
+import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
 import org.panteleyev.money.backend.openapi.dto.TransactionType;
 
 import java.io.IOException;
@@ -19,6 +26,8 @@ import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 import java.util.UUID;
 
@@ -36,41 +45,38 @@ public final class BaseTestUtils {
         return RANDOM.nextBoolean();
     }
 
+    static int randomInt() {
+        return RANDOM.nextInt(Integer.MAX_VALUE);
+    }
+
     static BigDecimal randomBigDecimal() {
         return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
-    static CategoryType randomCategoryType() {
-        int index = RANDOM.nextInt(CategoryType.values().length);
-        return CategoryType.values()[index];
+    static LocalDate randomDate() {
+        return LocalDate.now();
     }
 
-    static CardType randomCardType() {
-        int index = RANDOM.nextInt(CardType.values().length);
-        return CardType.values()[index];
+    static LocalDateTime randomDateTime() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
-    static ContactType randomContactType() {
-        int index = RANDOM.nextInt(ContactType.values().length);
-        return ContactType.values()[index];
-    }
-
-    static TransactionType randomTransactionType() {
-        int index = RANDOM.nextInt(TransactionType.values().length);
-        return TransactionType.values()[index];
+    static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
+        var values = enumClass.getEnumConstants();
+        return values[RANDOM.nextInt(values.length)];
     }
 
     //
     // Icon
     //
 
-    public static IconFlatDto newIconFlatDto(UUID uuid, String name, long created, long updated) {
+    public static IconFlatDTO newIconFlatDto(UUID uuid, String name, long created, long updated) {
         try (var inputStream = BaseTestUtils.class.getResourceAsStream("/images/" + name)) {
             if (inputStream == null) {
                 throw new IllegalStateException("Cannot retrieve test resource");
             }
             var bytes = inputStream.readAllBytes();
-            var dto = new IconFlatDto();
+            var dto = new IconFlatDTO();
             dto.setUuid(uuid);
             dto.setName(name);
             dto.setBytes(bytes);
@@ -86,12 +92,12 @@ public final class BaseTestUtils {
     // Category
     //
 
-    public static CategoryFlatDto newCategoryFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
-        var dto = new CategoryFlatDto();
+    public static CategoryFlatDTO newCategoryFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
+        var dto = new CategoryFlatDTO();
         dto.setUuid(uuid);
         dto.setName(randomString());
         dto.setComment(randomString());
-        dto.setType(randomCategoryType());
+        dto.setType(randomEnum(CategoryType.class));
         dto.setIconUuid(iconUuid);
         dto.setCreated(created);
         dto.setModified(modified);
@@ -102,10 +108,10 @@ public final class BaseTestUtils {
     // Account
     //
 
-    public static AccountFlatDto newAccountFlatDto(UUID uuid, CategoryFlatDto category, CurrencyFlatDto currency,
-            IconFlatDto icon, long created, long modified)
+    public static AccountFlatDTO newAccountFlatDto(UUID uuid, CategoryFlatDTO category, CurrencyFlatDTO currency,
+            ExchangeSecurityFlatDTO security, IconFlatDTO icon, long created, long modified)
     {
-        var dto = new AccountFlatDto();
+        var dto = new AccountFlatDTO();
         dto.setUuid(uuid);
         dto.setName(randomString());
         dto.setComment(randomString());
@@ -116,7 +122,7 @@ public final class BaseTestUtils {
         dto.setType(category.getType());
         dto.setCategoryUuid(category.getUuid());
         dto.setCurrencyUuid(currency == null ? null : currency.getUuid());
-        // TODO: exchange security
+        dto.setSecurityUuid(security == null ? null : security.getUuid());
         dto.setEnabled(RANDOM.nextBoolean());
         dto.setInterest(randomBigDecimal());
         dto.setClosingDate(LocalDate.now());
@@ -132,11 +138,11 @@ public final class BaseTestUtils {
     // Card
     //
 
-    public static CardFlatDto newCardFlatDto(UUID uuid, UUID accountUuid, long created, long modified) {
-        var dto = new CardFlatDto();
+    public static CardFlatDTO newCardFlatDto(UUID uuid, UUID accountUuid, long created, long modified) {
+        var dto = new CardFlatDTO();
         dto.setUuid(uuid);
         dto.setAccountUuid(accountUuid);
-        dto.setType(randomCardType());
+        dto.setType(randomEnum(CardType.class));
         dto.setNumber(randomString());
         dto.setExpiration(LocalDate.now());
         dto.setComment(randomString());
@@ -150,8 +156,8 @@ public final class BaseTestUtils {
     // Currency
     //
 
-    public static CurrencyFlatDto newCurrencyFlatDto(UUID uuid, long created, long modified) {
-        var dto = new CurrencyFlatDto();
+    public static CurrencyFlatDTO newCurrencyFlatDto(UUID uuid, long created, long modified) {
+        var dto = new CurrencyFlatDTO();
         dto.setUuid(uuid);
         dto.setSymbol(randomString());
         dto.setDescription(randomString());
@@ -171,11 +177,11 @@ public final class BaseTestUtils {
     // Contact
     //
 
-    public static ContactFlatDto newContactFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
-        var dto = new ContactFlatDto();
+    public static ContactFlatDTO newContactFlatDto(UUID uuid, UUID iconUuid, long created, long modified) {
+        var dto = new ContactFlatDTO();
         dto.setUuid(uuid);
         dto.setName(randomString());
-        dto.setType(randomContactType());
+        dto.setType(randomEnum(ContactType.class));
         dto.setComment(randomString());
         dto.setPhone(randomString());
         dto.setMobile(randomString());
@@ -192,24 +198,108 @@ public final class BaseTestUtils {
     }
 
     //
-    // Transaction
+    // Exchange Security
     //
 
-    public static TransactionFlatDto newTransactionFlatDto(
+    public static ExchangeSecurityFlatDTO newExchangeSecurityFlatDto(UUID uuid, long created, long modified) {
+        return new ExchangeSecurityFlatDTO()
+                .uuid(uuid)
+                .secId(randomString())
+                .name(randomString())
+                .shortName(randomString())
+                .isin(randomString())
+                .regNumber(randomString())
+                .faceValue(randomBigDecimal())
+                .issueDate(randomDate())
+                .matDate(randomDate())
+                .daysToRedemption(randomInt())
+                .groupType(randomString())
+                .groupName(randomString())
+                .type(randomString())
+                .typeName(randomString())
+                .marketValue(randomBigDecimal())
+                .couponValue(randomBigDecimal())
+                .couponPercent(randomBigDecimal())
+                .couponDate(randomDate())
+                .couponFrequency(randomInt())
+                .accruedInterest(randomBigDecimal())
+                .couponPeriod(randomInt())
+                .created(created)
+                .modified(modified);
+    }
+
+    //
+    // Exchange Security Split
+    //
+
+    public static ExchangeSecuritySplitFlatDTO newExchangeSecuritySplitFlatDTO(UUID uuid, UUID securityUuid,
+            long created, long modified)
+    {
+        return new ExchangeSecuritySplitFlatDTO()
+                .uuid(uuid)
+                .securityUuid(securityUuid)
+                .splitType(randomEnum(ExchangeSecuritySplitType.class))
+                .splitDate(randomDate())
+                .rate(randomBigDecimal())
+                .comment(randomString())
+                .created(created)
+                .modified(modified);
+    }
+
+    //
+    // Investment Deal
+    //
+
+    public static InvestmentDealFlatDTO newInvestmentDealFlatDTO(
             UUID uuid,
-            AccountFlatDto debitedAccount,
-            AccountFlatDto creditedAccount,
-            ContactFlatDto contact,
-            CardFlatDto card,
+            UUID accountUuid,
+            UUID currencyUuid,
+            UUID securityUuid,
             long created,
             long modified)
     {
-        var dto = new TransactionFlatDto();
+        return new InvestmentDealFlatDTO()
+                .uuid(uuid)
+                .accountUuid(accountUuid)
+                .securityUuid(securityUuid)
+                .currencyUuid(currencyUuid)
+                .dealNumber(randomString())
+                .dealDate(randomDateTime())
+                .accountingDate(randomDateTime())
+                .marketType(randomEnum(InvestmentMarketType.class))
+                .operationType(randomEnum(InvestmentOperationType.class))
+                .securityAmount(randomInt())
+                .price(randomBigDecimal())
+                .aci(randomBigDecimal())
+                .dealVolume(randomBigDecimal())
+                .rate(randomBigDecimal())
+                .exchangeFee(randomBigDecimal())
+                .brokerFee(randomBigDecimal())
+                .amount(randomBigDecimal())
+                .dealType(randomEnum(InvestmentDealType.class))
+                .created(created)
+                .modified(modified);
+    }
+
+    //
+    // Transaction
+    //
+
+    public static TransactionFlatDTO newTransactionFlatDto(
+            UUID uuid,
+            AccountFlatDTO debitedAccount,
+            AccountFlatDTO creditedAccount,
+            ContactFlatDTO contact,
+            CardFlatDTO card,
+            long created,
+            long modified)
+    {
+        var dto = new TransactionFlatDTO();
         dto.setUuid(uuid);
         dto.setAmount(randomBigDecimal());
         dto.setCreditAmount(randomBigDecimal());
         dto.setTransactionDate(LocalDate.now());
-        dto.setType(randomTransactionType());
+        dto.setType(randomEnum(TransactionType.class));
         dto.setComment(randomString());
         dto.setChecked(randomBoolean());
         dto.setAccountDebitedUuid(debitedAccount.getUuid());

@@ -1,7 +1,5 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.util;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,13 +11,11 @@ import java.io.UncheckedIOException;
 import java.util.stream.Stream;
 
 public final class JsonUtil {
-    public static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static <T> void writeStreamAsJsonArray(
             ObjectMapper mapper,
             Stream<T> stream,
-            OutputStream outputStream
-    )
+            OutputStream outputStream)
     {
         try (var generator = mapper.getFactory().createGenerator(outputStream)) {
             generator.disable(JsonGenerator.Feature.AUTO_CLOSE_JSON_CONTENT)

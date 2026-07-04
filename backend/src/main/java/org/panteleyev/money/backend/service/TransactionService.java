@@ -1,10 +1,9 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CardRepository;
 import org.panteleyev.money.backend.repository.ContactRepository;
@@ -19,11 +18,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static org.panteleyev.money.backend.util.JsonUtil.objectMapper;
 import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class TransactionService {
+    private final ObjectMapper objectMapper;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final ContactRepository contactRepository;
@@ -31,12 +30,14 @@ public class TransactionService {
     private final EntityToDtoConverter converter;
 
     public TransactionService(
+            ObjectMapper objectMapper,
             TransactionRepository transactionRepository,
             AccountRepository accountRepository,
             ContactRepository contactRepository,
             CardRepository cardRepository,
             EntityToDtoConverter converter)
     {
+        this.objectMapper = objectMapper;
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.contactRepository = contactRepository;
@@ -44,12 +45,12 @@ public class TransactionService {
         this.converter = converter;
     }
 
-    public Optional<TransactionFlatDto> get(UUID uuid) {
+    public Optional<TransactionFlatDTO> get(UUID uuid) {
         return transactionRepository.findById(uuid).map(converter::entityToFlatDto);
     }
 
     @Transactional
-    public TransactionFlatDto put(TransactionFlatDto transaction) {
+    public TransactionFlatDTO put(TransactionFlatDTO transaction) {
         var accountDebited = accountRepository.findById(transaction.getAccountDebitedUuid()).orElseThrow();
         var accountCredited = accountRepository.findById(transaction.getAccountCreditedUuid()).orElseThrow();
         var contact = transaction.getContactUuid() == null ?
@@ -69,7 +70,7 @@ public class TransactionService {
         )));
     }
 
-    public List<TransactionFlatDto> getAll() {
+    public List<TransactionFlatDTO> getAll() {
         var l = transactionRepository.findAll();
         return transactionRepository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
@@ -81,7 +82,7 @@ public class TransactionService {
         }
     }
 
-    public List<TransactionFlatDto> getByYearAndMonth(int year, int month) {
+    public List<TransactionFlatDTO> getByYearAndMonth(int year, int month) {
         var dateFrom = LocalDate.of(year, month, 1);
         var dateTo = dateFrom.with(lastDayOfMonth());
 

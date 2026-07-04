@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.14</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
 
@@ -17,16 +17,19 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>26.7.1</revision>
+        <revision>26.7.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>25</java.version>
         <maven.compiler.release>25</maven.compiler.release>
         <!-- Plugins -->
+        <buildHelperMavenPluginVersion>3.6.1</buildHelperMavenPluginVersion>
         <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
         <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
+        <mavenFailSafePluginVersion>3.6.0-M1</mavenFailSafePluginVersion>
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
+        <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.7.11</postgresVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
@@ -133,11 +136,6 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.panteleyev.money</groupId>
-            <artifactId>money-manager-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -145,27 +143,28 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.12.0</version>
+                <version>${openapiGeneratorMavenPluginVersion}</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpecRootDirectory>
-                                ${project.basedir}/src/main/resources/openapi
-                            </inputSpecRootDirectory>
+                            <inputSpecRootDirectory>${project.basedir}/../openapi</inputSpecRootDirectory>
                             <generatorName>spring</generatorName>
                             <apiPackage>org.panteleyev.money.backend.openapi.api</apiPackage>
                             <modelPackage>org.panteleyev.money.backend.openapi.dto</modelPackage>
                             <typeMappings>
-                                <typeMapping>uuid=java.util.UUID</typeMapping>
+                                <typeMapping>string+uuid=UUID</typeMapping>
                                 <typeMapping>string+binary=StreamingResponseBody</typeMapping>
+                                <typeMapping>string+date-time=LocalDateTime</typeMapping>
                             </typeMappings>
                             <importMappings>
+                                <importMapping>UUID=java.util.UUID</importMapping>
                                 <importMapping>
                                     StreamingResponseBody=org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
                                 </importMapping>
+                                <importMapping>LocalDateTime=java.time.LocalDateTime</importMapping>
                             </importMappings>
                             <supportingFilesToGenerate>
                                 ApiUtil.java
@@ -176,8 +175,42 @@
                                 <openApiNullable>false</openApiNullable>
                                 <useBeanValidation>false</useBeanValidation>
                                 <useResponseEntity>true</useResponseEntity>
-<!--                                <useSwaggerUI>true</useSwaggerUI>-->
+                                <useTags>true</useTags>
+                                <!--                                <useSwaggerUI>true</useSwaggerUI>-->
                             </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${buildHelperMavenPluginVersion}</version>
+                <executions>
+                    <execution>
+                        <id>add-integration-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/integration-test/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-integration-test-resource</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>add-test-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>src/integration-test/resources</directory>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -204,6 +237,19 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${mavenSurefirePluginVersion}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${mavenFailSafePluginVersion}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -1,15 +1,13 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.client;
 
-import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.client.openapi.dto.AccountFlatDTO;
+import org.panteleyev.money.client.openapi.dto.CategoryFlatDTO;
+import org.panteleyev.money.client.openapi.dto.ContactFlatDTO;
+import org.panteleyev.money.client.openapi.dto.CurrencyFlatDTO;
+import org.panteleyev.money.client.openapi.dto.IconFlatDTO;
+import org.panteleyev.money.client.openapi.dto.TransactionFlatDTO;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -22,7 +20,7 @@ import java.util.function.Consumer;
 
 public class MoneyClient {
     private static final String CONTEXT_ROOT = "/money";
-    private static final String API_ROOT = "/api/1.0.0";
+    private static final String API_ROOT = "/api/v1";
 
     private static final String API_ICONS = "/icons";
     private static final String API_CURRENCIES = "/currencies";
@@ -32,12 +30,12 @@ public class MoneyClient {
     private static final String API_ACCOUNTS = "/accounts";
     private static final String API_TRANSACTIONS = "/transactions";
 
-    private final Client<Icon> iconClient;
-    private final Client<Currency> currencyClient;
-    private final Client<Contact> contactClient;
-    private final Client<Category> categoryClient;
-    private final Client<Account> accountClient;
-    private final Client<Transaction> transactionClient;
+    private final Client<IconFlatDTO> iconClient;
+    private final Client<CurrencyFlatDTO> currencyClient;
+    private final Client<ContactFlatDTO> contactClient;
+    private final Client<CategoryFlatDTO> categoryClient;
+    private final Client<AccountFlatDTO> accountClient;
+    private final Client<TransactionFlatDTO> transactionClient;
 
     /**
      * Money client builder.
@@ -94,118 +92,118 @@ public class MoneyClient {
                 .build();
 
         iconClient = new Client<>(URI.create(baseUrl + API_ICONS),
-                httpClient, Icon.class, streamingChunkSize);
+                httpClient, IconFlatDTO.class, streamingChunkSize);
         currencyClient = new Client<>(URI.create(baseUrl + API_CURRENCIES),
-                httpClient, Currency.class, streamingChunkSize);
+                httpClient, CurrencyFlatDTO.class, streamingChunkSize);
         contactClient = new Client<>(URI.create(baseUrl + API_CONTACTS),
-                httpClient, Contact.class, streamingChunkSize);
+                httpClient, ContactFlatDTO.class, streamingChunkSize);
         categoryClient = new Client<>(URI.create(baseUrl + API_CATEGORIES),
-                httpClient, Category.class, streamingChunkSize);
+                httpClient, CategoryFlatDTO.class, streamingChunkSize);
         accountClient = new Client<>(URI.create(baseUrl + API_ACCOUNTS),
-                httpClient, Account.class, streamingChunkSize);
+                httpClient, AccountFlatDTO.class, streamingChunkSize);
         transactionClient = new Client<>(URI.create(baseUrl + API_TRANSACTIONS),
-                httpClient, Transaction.class, streamingChunkSize);
+                httpClient, TransactionFlatDTO.class, streamingChunkSize);
     }
 
     /* Icons */
-    public List<Icon> getIcons() {
+    public List<IconFlatDTO> getIcons() {
         return iconClient.getAll();
     }
 
-    public void consumeIconStream(Consumer<List<Icon>> listConsumer) {
+    public void consumeIconStream(Consumer<List<IconFlatDTO>> listConsumer) {
         iconClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Icon> getIcon(UUID uuid) {
+    public Optional<IconFlatDTO> getIcon(UUID uuid) {
         return iconClient.get(uuid);
     }
 
-    public Icon putIcon(Icon icon) {
+    public IconFlatDTO putIcon(IconFlatDTO icon) {
         return iconClient.put(icon);
     }
 
     /* Currencies */
-    public List<Currency> getCurrencies() {
+    public List<CurrencyFlatDTO> getCurrencies() {
         return currencyClient.getAll();
     }
 
-    public void consumeCurrencyStream(Consumer<List<Currency>> listConsumer) {
+    public void consumeCurrencyStream(Consumer<List<CurrencyFlatDTO>> listConsumer) {
         currencyClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Currency> getCurrency(UUID uuid) {
+    public Optional<CurrencyFlatDTO> getCurrency(UUID uuid) {
         return currencyClient.get(uuid);
     }
 
-    public Currency putCurrency(Currency currency) {
+    public CurrencyFlatDTO putCurrency(CurrencyFlatDTO currency) {
         return currencyClient.put(currency);
     }
 
     /* Contacts */
-    public List<Contact> getContacts() {
+    public List<ContactFlatDTO> getContacts() {
         return contactClient.getAll();
     }
 
-    public void consumeContactStream(Consumer<List<Contact>> listConsumer) {
+    public void consumeContactStream(Consumer<List<ContactFlatDTO>> listConsumer) {
         contactClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Contact> getContact(UUID uuid) {
+    public Optional<ContactFlatDTO> getContact(UUID uuid) {
         return contactClient.get(uuid);
     }
 
-    public Contact putContact(Contact contact) {
+    public ContactFlatDTO putContact(ContactFlatDTO contact) {
         return contactClient.put(contact);
     }
 
     /* Categories */
-    public List<Category> getCategories() {
+    public List<CategoryFlatDTO> getCategories() {
         return categoryClient.getAll();
     }
 
-    public void consumeCategoryStream(Consumer<List<Category>> listConsumer) {
+    public void consumeCategoryStream(Consumer<List<CategoryFlatDTO>> listConsumer) {
         categoryClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Category> getCategory(UUID uuid) {
+    public Optional<CategoryFlatDTO> getCategory(UUID uuid) {
         return categoryClient.get(uuid);
     }
 
-    public Category putCategory(Category category) {
+    public CategoryFlatDTO putCategory(CategoryFlatDTO category) {
         return categoryClient.put(category);
     }
 
     /* Accounts */
-    public List<Account> getAccounts() {
+    public List<AccountFlatDTO> getAccounts() {
         return accountClient.getAll();
     }
 
-    public void consumeAccountStream(Consumer<List<Account>> listConsumer) {
+    public void consumeAccountStream(Consumer<List<AccountFlatDTO>> listConsumer) {
         accountClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Account> getAccount(UUID uuid) {
+    public Optional<AccountFlatDTO> getAccount(UUID uuid) {
         return accountClient.get(uuid);
     }
 
-    public Account putAccount(Account account) {
+    public AccountFlatDTO putAccount(AccountFlatDTO account) {
         return accountClient.put(account);
     }
 
     /* Transactions */
-    public List<Transaction> getTransactions() {
+    public List<TransactionFlatDTO> getTransactions() {
         return transactionClient.getAll();
     }
 
-    public void consumeTransactionStream(Consumer<List<Transaction>> listConsumer) {
+    public void consumeTransactionStream(Consumer<List<TransactionFlatDTO>> listConsumer) {
         transactionClient.getAllAsStream(listConsumer);
     }
 
-    public Optional<Transaction> getTransaction(UUID uuid) {
+    public Optional<TransactionFlatDTO> getTransaction(UUID uuid) {
         return transactionClient.get(uuid);
     }
 
-    public Transaction putTransaction(Transaction transaction) {
+    public TransactionFlatDTO putTransaction(TransactionFlatDTO transaction) {
         return transactionClient.put(transaction);
     }
 }

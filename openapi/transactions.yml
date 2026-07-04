@@ -1,0 +1,182 @@
+openapi: "3.0.0"
+
+info:
+  title: Проводки
+  version: 1.0.0
+
+paths:
+  /api/v1/transactions:
+    get:
+      tags:
+        - "transactions, v1"
+      summary: Получить все проводки
+      operationId: getTransactions
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionFlatDTO'
+  /api/v1/transactions/stream:
+    get:
+      tags:
+        - "transactions, v1"
+      summary: Получить все проводки в потоке
+      operationId: getTransactionsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /api/v1/transactions/{uuid}:
+    get:
+      tags:
+        - "transactions, v1"
+      summary: Получить проводку
+      operationId: getTransactionByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionFlatDTO'
+        "404":
+          description: Проводка не найдена
+    put:
+      tags:
+        - "transactions, v1"
+      summary: Записать проводку
+      operationId: putTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionFlatDTO'
+
+components:
+  schemas:
+    TransactionType:
+      type: string
+      description: Тип проводки
+      enum:
+        - CARD_PAYMENT
+        - SBP_PAYMENT
+        - CASH_PURCHASE
+        - CHEQUE
+        - WITHDRAWAL
+        - CACHIER
+        - DEPOSIT
+        - TRANSFER
+        - SBP_TRANSFER
+        - INTEREST
+        - DIVIDEND
+        - DIRECT_BILLING
+        - CHARGE
+        - FEE
+        - INCOME
+        - PURCHASE
+        - SALE
+        - REFUND
+        - UNDEFINED
+    TransactionFlatDTO:
+      type: object
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - amount
+        - creditAmount
+        - transactionDate
+        - type
+        - comment
+        - checked
+        - accountDebitedUuid
+        - accountCreditedUuid
+        - accountDebitedType
+        - accountCreditedType
+        - accountDebitedCategoryUuid
+        - accountCreditedCategoryUuid
+        - invoiceNumber
+        - detailed
+        - statementDate
+        - location
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+        creditAmount:
+          type: number
+        transactionDate:
+          type: string
+          format: date
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        comment:
+          type: string
+        checked:
+          type: boolean
+        accountDebitedUuid:
+          type: string
+          format: uuid
+        accountCreditedUuid:
+          type: string
+          format: uuid
+        accountDebitedType:
+          $ref: './categories.yml#/components/schemas/CategoryType'
+        accountCreditedType:
+          $ref: './categories.yml#/components/schemas/CategoryType'
+        accountDebitedCategoryUuid:
+          type: string
+          format: uuid
+        accountCreditedCategoryUuid:
+          type: string
+          format: uuid
+        contactUuid:
+          type: string
+          format: uuid
+        invoiceNumber:
+          type: string
+        parentUuid:
+          type: string
+          format: uuid
+        detailed:
+          type: boolean
+        statementDate:
+          type: string
+          format: date
+        cardUuid:
+          type: string
+          format: uuid
+        location:
+          type: string
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64

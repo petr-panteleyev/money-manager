@@ -1,10 +1,9 @@
-/*
- Copyright © 2022-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
-import org.panteleyev.money.backend.openapi.dto.ContactFlatDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.panteleyev.money.backend.openapi.dto.ContactFlatDTO;
 import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.backend.repository.IconRepository;
 import org.springframework.stereotype.Service;
@@ -15,24 +14,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.panteleyev.money.backend.util.JsonUtil.objectMapper;
 import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class ContactService {
+    private final ObjectMapper objectMapper;
     private final ContactRepository repository;
     private final IconRepository iconRepository;
     private final EntityToDtoConverter converter;
 
-    public ContactService(ContactRepository repository, IconRepository iconRepository,
+    public ContactService(
+            ObjectMapper objectMapper,
+            ContactRepository repository,
+            IconRepository iconRepository,
             EntityToDtoConverter converter)
     {
+        this.objectMapper = objectMapper;
         this.repository = repository;
         this.iconRepository = iconRepository;
         this.converter = converter;
     }
 
-    public List<ContactFlatDto> getAll() {
+    public List<ContactFlatDTO> getAll() {
         return repository.findAll().stream().map(converter::entityToFlatDto).toList();
     }
 
@@ -43,12 +46,12 @@ public class ContactService {
         }
     }
 
-    public Optional<ContactFlatDto> get(UUID uuid) {
+    public Optional<ContactFlatDTO> get(UUID uuid) {
         return repository.findById(uuid).map(converter::entityToFlatDto);
     }
 
     @Transactional
-    public ContactFlatDto put(ContactFlatDto contact) {
+    public ContactFlatDTO put(ContactFlatDTO contact) {
         var iconEntity = contact.getIconUuid() == null ?
                 null : iconRepository.getReferenceById(contact.getIconUuid());
         return converter.entityToFlatDto(repository.save(converter.dtoToEntity(contact, iconEntity)));

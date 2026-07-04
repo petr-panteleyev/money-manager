@@ -1,0 +1,123 @@
+openapi: "3.0.0"
+
+info:
+  title: Ценные бумаги
+  version: 1.0.0
+
+paths:
+  /api/v1/exchange-security-splits:
+    get:
+      tags:
+        - "exchange-security-splits, v1"
+      summary: Получить все сплиты ценных бумаг
+      operationId: getExchangeSecuritySplits
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExchangeSecuritySplitFlatDTO'
+  /api/v1/exchange-security-splits/stream:
+    get:
+      tags:
+        - "exchange-security-splits, v1"
+      summary: Получить все сплиты ценных бумаг в потоке
+      operationId: getExchangeSecuritySplitsAsStream
+      responses:
+        "202":
+          description: Успешный ответ
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /api/v1/exchange-security-splits/{uuid}:
+    get:
+      tags:
+        - "exchange-security-splits, v1"
+      summary: Получить сплит ценных бумаг
+      operationId: getExchangeSecuritySplitByUuid
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeSecuritySplitFlatDTO'
+        "404":
+          description: Сплит ценных бумаг не найден
+    put:
+      tags:
+        - "exchange-security-splits, v1"
+      summary: Записать сплит ценных бумаг
+      operationId: putExchangeSecuritySplit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeSecuritySplitFlatDTO'
+      responses:
+        "200":
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeSecuritySplitFlatDTO'
+        "404":
+          description: Сплит ценных бумаг не найден
+
+
+components:
+  schemas:
+    ExchangeSecuritySplitType:
+      type: string
+      description: Тип сплита ценной бумаги
+      enum:
+        - SPLIT
+        - REVERSE_SPLIT
+    ExchangeSecuritySplitFlatDTO:
+      type: object
+      description: Сплит ценной бумаги
+      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
+      required:
+        - uuid
+        - securityUuid
+        - splitType
+        - splitDate
+        - rate
+        - comment
+        - created
+        - modified
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        securityUuid:
+          type: string
+          format: uuid
+        splitType:
+          $ref: '#/components/schemas/ExchangeSecuritySplitType'
+        splitDate:
+          type: string
+          format: date
+        rate:
+          type: number
+        comment:
+          type: string
+        created:
+          type: integer
+          format: int64
+        modified:
+          type: integer
+          format: int64
