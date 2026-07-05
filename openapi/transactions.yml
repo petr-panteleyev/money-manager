@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TransactionFlatDTO'
-  /api/v1/transactions/stream:
-    get:
-      tags:
-        - "transactions, v1"
-      summary: Получить все проводки в потоке
-      operationId: getTransactionsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/transactions/{uuid}:
     get:
       tags:

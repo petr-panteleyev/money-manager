@@ -2,21 +2,19 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.panteleyev.money.backend.converter.AccountConverter;
 import org.panteleyev.money.backend.domain.AccountEntity;
 import org.panteleyev.money.backend.domain.TransactionEntity;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CategoryRepository;
 import org.panteleyev.money.backend.repository.CurrencyRepository;
 import org.panteleyev.money.backend.repository.ExchangeSecurityRepository;
 import org.panteleyev.money.backend.repository.IconRepository;
 import org.panteleyev.money.backend.repository.TransactionRepository;
+import org.panteleyev.money.dto.AccountFlatDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,11 +24,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
-
 @Service
 public class AccountService {
-    private final ObjectMapper objectMapper;
     private final AccountRepository accountRepository;
     private final CategoryRepository categoryRepository;
     private final CurrencyRepository currencyRepository;
@@ -40,7 +35,6 @@ public class AccountService {
     private final AccountConverter converter;
 
     public AccountService(
-            ObjectMapper objectMapper,
             AccountRepository accountRepository,
             CategoryRepository categoryRepository,
             CurrencyRepository currencyRepository,
@@ -49,7 +43,6 @@ public class AccountService {
             TransactionRepository transactionRepository,
             AccountConverter converter)
     {
-        this.objectMapper = objectMapper;
         this.accountRepository = accountRepository;
         this.categoryRepository = categoryRepository;
         this.currencyRepository = currencyRepository;
@@ -61,13 +54,6 @@ public class AccountService {
 
     public List<AccountFlatDTO> getAll() {
         return accountRepository.findAll().stream().map(converter::entityToFlatDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public void streamAll(OutputStream out) {
-        try (var stream = accountRepository.streamAll()) {
-            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
-        }
     }
 
     public Optional<AccountFlatDTO> get(UUID uuid) {

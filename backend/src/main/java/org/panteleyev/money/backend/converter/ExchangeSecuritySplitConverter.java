@@ -3,7 +3,7 @@
 package org.panteleyev.money.backend.converter;
 
 import org.panteleyev.money.backend.domain.ExchangeSecuritySplitEntity;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecuritySplitFlatDTO;
 import org.springframework.stereotype.Component;
 
 @Component

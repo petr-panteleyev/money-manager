@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/IconFlatDTO'
-  /api/v1/icons/stream:
-    get:
-      tags:
-        - "icons, v1"
-      summary: Получить все значки в потоке
-      operationId: getIconsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/icons/{uuid}:
     get:
       tags:

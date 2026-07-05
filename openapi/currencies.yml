@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CurrencyFlatDTO'
-  /api/v1/currencies/stream:
-    get:
-      tags:
-        - "currencies, v1"
-      summary: Получить все валюты в потоке
-      operationId: getCurrenciesAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/currencies/{uuid}:
     get:
       tags:

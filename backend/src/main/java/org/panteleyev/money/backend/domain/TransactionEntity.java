@@ -10,7 +10,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -26,7 +27,7 @@ public class TransactionEntity implements MoneyEntity {
     private BigDecimal amount;
     private BigDecimal creditAmount;
     private LocalDate transactionDate;
-    private String type;
+    private TransactionType type;
     private String comment;
     private boolean checked;
     private CategoryType accountDebitedType;
@@ -86,11 +87,12 @@ public class TransactionEntity implements MoneyEntity {
         return this;
     }
 
-    public String getType() {
+    @Enumerated(STRING)
+    public TransactionType getType() {
         return type;
     }
 
-    public TransactionEntity setType(String type) {
+    public TransactionEntity setType(TransactionType type) {
         this.type = type;
         return this;
     }

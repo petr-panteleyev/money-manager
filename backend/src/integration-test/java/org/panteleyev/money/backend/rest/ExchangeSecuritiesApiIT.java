@@ -3,7 +3,7 @@
 package org.panteleyev.money.backend.rest;
 
 import org.junit.jupiter.api.Test;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecurityFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecurityFlatDTO;
 
 import java.util.UUID;
 

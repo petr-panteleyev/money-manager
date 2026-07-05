@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ExchangeSecuritySplitFlatDTO'
-  /api/v1/exchange-security-splits/stream:
-    get:
-      tags:
-        - "exchange-security-splits, v1"
-      summary: Получить все сплиты ценных бумаг в потоке
-      operationId: getExchangeSecuritySplitsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/exchange-security-splits/{uuid}:
     get:
       tags:

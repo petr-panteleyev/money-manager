@@ -5,7 +5,7 @@ package org.panteleyev.money.backend.converter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.money.backend.domain.ExchangeSecurityEntity;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecurityFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecurityFlatDTO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

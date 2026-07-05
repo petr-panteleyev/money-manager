@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.CurrenciesV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDTO;
 import org.panteleyev.money.backend.service.CurrencyService;
+import org.panteleyev.money.dto.CurrencyFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +32,5 @@ public class CurrenciesV1ApiImpl implements CurrenciesV1ApiDelegate {
     @Override
     public ResponseEntity<CurrencyFlatDTO> putCurrency(CurrencyFlatDTO currency) {
         return ResponseEntity.ok(service.put(currency));
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getCurrenciesAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

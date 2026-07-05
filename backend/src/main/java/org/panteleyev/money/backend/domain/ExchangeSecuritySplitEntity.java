@@ -8,7 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

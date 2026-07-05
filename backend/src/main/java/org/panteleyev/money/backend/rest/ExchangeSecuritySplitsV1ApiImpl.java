@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.ExchangeSecuritySplitsV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitFlatDTO;
 import org.panteleyev.money.backend.service.ExchangeSecuritySplitV1Service;
+import org.panteleyev.money.dto.ExchangeSecuritySplitFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +22,6 @@ public class ExchangeSecuritySplitsV1ApiImpl implements ExchangeSecuritySplitsV1
     @Override
     public ResponseEntity<List<ExchangeSecuritySplitFlatDTO>> getExchangeSecuritySplits() {
         return ResponseEntity.ok(service.getAll());
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getExchangeSecuritySplitsAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 
     @Override

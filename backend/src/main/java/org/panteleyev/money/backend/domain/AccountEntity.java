@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
+import org.panteleyev.money.dto.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -11,7 +11,8 @@ module money.manager.client {
     requires jakarta.annotation;
     requires org.jspecify;
 
+    requires transitive org.panteleyev.functional;
+    requires org.panteleyev.money.dto;
+
     exports org.panteleyev.money.client;
-    exports org.panteleyev.money.dto;
-    exports org.panteleyev.money.client.openapi.dto;
 }

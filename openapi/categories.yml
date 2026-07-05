@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CategoryFlatDTO'
-  /api/v1/categories/stream:
-    get:
-      tags:
-        - "categories, v1"
-      summary: Получить все категории в потоке
-      operationId: getCategoriesAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/categories/{uuid}:
     get:
       tags:

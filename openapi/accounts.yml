@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AccountFlatDTO'
-  /api/v1/accounts/stream:
-    get:
-      tags:
-        - "accounts, v1"
-      summary: Получить все счета в потоке
-      operationId: getAccountsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/accounts/{uuid}:
     get:
       tags:

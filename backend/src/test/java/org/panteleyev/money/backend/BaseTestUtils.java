@@ -2,24 +2,24 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend;
 
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CardFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CardType;
-import org.panteleyev.money.backend.openapi.dto.CategoryFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
-import org.panteleyev.money.backend.openapi.dto.ContactFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.ContactType;
-import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecurityFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitType;
-import org.panteleyev.money.backend.openapi.dto.IconFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentMarketType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentOperationType;
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.TransactionType;
+import org.panteleyev.money.dto.AccountFlatDTO;
+import org.panteleyev.money.dto.CardFlatDTO;
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryFlatDTO;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.ContactFlatDTO;
+import org.panteleyev.money.dto.ContactType;
+import org.panteleyev.money.dto.CurrencyFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecurityFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecuritySplitFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.IconFlatDTO;
+import org.panteleyev.money.dto.InvestmentDealFlatDTO;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
+import org.panteleyev.money.dto.TransactionFlatDTO;
+import org.panteleyev.money.dto.TransactionType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

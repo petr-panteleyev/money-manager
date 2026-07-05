@@ -2,42 +2,37 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
+import org.panteleyev.money.backend.converter.TransactionConverter;
 import org.panteleyev.money.backend.repository.AccountRepository;
 import org.panteleyev.money.backend.repository.CardRepository;
 import org.panteleyev.money.backend.repository.ContactRepository;
 import org.panteleyev.money.backend.repository.TransactionRepository;
+import org.panteleyev.money.dto.TransactionFlatDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.OutputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static org.panteleyev.money.backend.util.JsonUtil.writeStreamAsJsonArray;
 
 @Service
 public class TransactionService {
-    private final ObjectMapper objectMapper;
     private final TransactionRepository transactionRepository;
     private final AccountRepository accountRepository;
     private final ContactRepository contactRepository;
     private final CardRepository cardRepository;
-    private final EntityToDtoConverter converter;
+    private final TransactionConverter converter;
 
     public TransactionService(
-            ObjectMapper objectMapper,
             TransactionRepository transactionRepository,
             AccountRepository accountRepository,
             ContactRepository contactRepository,
             CardRepository cardRepository,
-            EntityToDtoConverter converter)
+            TransactionConverter converter)
     {
-        this.objectMapper = objectMapper;
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.contactRepository = contactRepository;
@@ -73,13 +68,6 @@ public class TransactionService {
     public List<TransactionFlatDTO> getAll() {
         var l = transactionRepository.findAll();
         return transactionRepository.findAll().stream().map(converter::entityToFlatDto).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public void streamAll(OutputStream out) {
-        try (var stream = transactionRepository.streamAll()) {
-            writeStreamAsJsonArray(objectMapper, stream.map(converter::entityToFlatDto), out);
-        }
     }
 
     public List<TransactionFlatDTO> getByYearAndMonth(int year, int month) {

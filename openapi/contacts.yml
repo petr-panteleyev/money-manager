@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ContactFlatDTO'
-  /api/v1/contacts/stream:
-    get:
-      tags:
-        - "contacts, v1"
-      summary: Получить все контакты в потоке
-      operationId: getContactsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/contacts/{uuid}:
     get:
       tags:

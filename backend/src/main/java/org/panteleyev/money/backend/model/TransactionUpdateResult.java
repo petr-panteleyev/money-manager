@@ -1,14 +1,12 @@
-/*
- Copyright © 2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.model;
 
-import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.dto.ContactFlatDTO;
+import org.panteleyev.money.dto.TransactionFlatDTO;
 
 public record TransactionUpdateResult(
-        Transaction transaction,
-        Contact contact
+        TransactionFlatDTO transaction,
+        ContactFlatDTO contact
 ) {
 }

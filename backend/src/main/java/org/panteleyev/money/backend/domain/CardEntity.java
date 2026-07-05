@@ -1,15 +1,16 @@
-/*
- Copyright © 2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2025-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import org.panteleyev.money.dto.CardType;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class CardEntity implements MoneyEntity {
     private UUID uuid;
     private AccountEntity account;
-    private String type;
+    private CardType type;
     private String number;
     private LocalDate expiration;
     private String comment;
@@ -52,11 +53,12 @@ public class CardEntity implements MoneyEntity {
         return this;
     }
 
-    public String getType() {
+    @Enumerated(EnumType.STRING)
+    public CardType getType() {
         return type;
     }
 
-    public CardEntity setType(String type) {
+    public CardEntity setType(CardType type) {
         this.type = type;
         return this;
     }

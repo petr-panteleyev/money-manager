@@ -3,11 +3,11 @@
 package org.panteleyev.money.backend.rest;
 
 import org.junit.jupiter.api.Test;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CardFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CategoryFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CurrencyFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.IconFlatDTO;
+import org.panteleyev.money.dto.AccountFlatDTO;
+import org.panteleyev.money.dto.CardFlatDTO;
+import org.panteleyev.money.dto.CategoryFlatDTO;
+import org.panteleyev.money.dto.CurrencyFlatDTO;
+import org.panteleyev.money.dto.IconFlatDTO;
 
 import java.util.UUID;
 

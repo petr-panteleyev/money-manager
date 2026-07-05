@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.CardsV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.CardFlatDTO;
 import org.panteleyev.money.backend.service.CardService;
+import org.panteleyev.money.dto.CardFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +32,5 @@ public class CardsV1ApiImpl implements CardsV1ApiDelegate {
     @Override
     public ResponseEntity<CardFlatDTO> putCard(CardFlatDTO category) {
         return ResponseEntity.ok(service.put(category));
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getCardsAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

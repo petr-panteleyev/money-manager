@@ -11,9 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentMarketType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentOperationType;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

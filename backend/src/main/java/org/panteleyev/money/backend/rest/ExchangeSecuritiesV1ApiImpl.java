@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.ExchangeSecuritiesV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecurityFlatDTO;
 import org.panteleyev.money.backend.service.ExchangeSecurityV1Service;
+import org.panteleyev.money.dto.ExchangeSecurityFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,11 +22,6 @@ public class ExchangeSecuritiesV1ApiImpl implements ExchangeSecuritiesV1ApiDeleg
     @Override
     public ResponseEntity<List<ExchangeSecurityFlatDTO>> getExchangeSecurities() {
         return ResponseEntity.ok(service.getAll());
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getExchangeSecuritiesAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 
     @Override

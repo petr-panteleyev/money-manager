@@ -9,8 +9,8 @@ import org.panteleyev.money.backend.domain.CategoryEntity;
 import org.panteleyev.money.backend.domain.CurrencyEntity;
 import org.panteleyev.money.backend.domain.ExchangeSecurityEntity;
 import org.panteleyev.money.backend.domain.IconEntity;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
+import org.panteleyev.money.dto.AccountFlatDTO;
+import org.panteleyev.money.dto.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -34,12 +34,12 @@ class AccountConverterTest {
     private static final UUID ICON_UUID = UUID.randomUUID();
 
     private static AccountEntity createEntity() {
-        return createEntity(TEST_CREATED, TEST_MODIFIED, true, true, true, true);
+        return createEntity(TEST_CREATED, TEST_MODIFIED, true, true, true);
     }
 
     private static AccountEntity createEntity(long created, long modified,
-                                               boolean withCategory, boolean withCurrency,
-                                               boolean withSecurity, boolean withIcon) {
+            boolean withCurrency, boolean withSecurity, boolean withIcon)
+    {
         var entity = new AccountEntity();
         entity.setUuid(ACCOUNT_UUID);
         entity.setName("Test Account");
@@ -49,9 +49,7 @@ class AccountConverterTest {
         entity.setAccountLimit(BigDecimal.valueOf(50000.00));
         entity.setCurrencyRate(BigDecimal.valueOf(1.0));
         entity.setType(CategoryType.BANKS_AND_CASH);
-        if (withCategory) {
-            entity.setCategory(createCategory());
-        }
+        entity.setCategory(createCategory());
         if (withCurrency) {
             entity.setCurrency(createCurrency());
         }
@@ -72,33 +70,28 @@ class AccountConverterTest {
     }
 
     private static AccountFlatDTO createDto() {
-        return createDto(TEST_CREATED, TEST_MODIFIED, true, true, true, true);
-    }
-
-    private static AccountFlatDTO createDto(long created, long modified) {
-        return createDto(created, modified, true, true, true, true);
+        return createDto(TEST_CREATED, TEST_MODIFIED, true, true, true);
     }
 
     private static AccountFlatDTO createDto(long created, long modified,
-                                            boolean withCategory, boolean withCurrency,
-                                            boolean withSecurity, boolean withIcon) {
-        var dto = new AccountFlatDTO(
-                ACCOUNT_UUID,
-                "Test Account",
-                "Test Comment",
-                "40817810123456789012",
-                BigDecimal.valueOf(10000.00),
-                BigDecimal.valueOf(50000.00),
-                BigDecimal.valueOf(1.0),
-                CategoryType.BANKS_AND_CASH,
-                withCategory ? CATEGORY_UUID : null,
-                Boolean.TRUE,
-                BigDecimal.valueOf(5.5),
-                BigDecimal.valueOf(15000.00),
-                BigDecimal.valueOf(500.00),
-                created,
-                modified
-        );
+            boolean withCurrency, boolean withSecurity, boolean withIcon)
+    {
+        var dto = new AccountFlatDTO()
+                .uuid(ACCOUNT_UUID)
+                .name("Test Account")
+                .comment("Test Comment")
+                .accountNumber("40817810123456789012")
+                .openingBalance(BigDecimal.valueOf(10000.00))
+                .accountLimit(BigDecimal.valueOf(50000.00))
+                .currencyRate(BigDecimal.valueOf(1.0))
+                .type(CategoryType.BANKS_AND_CASH)
+                .categoryUuid(CATEGORY_UUID)
+                .enabled(true)
+                .interest(BigDecimal.valueOf(5.5))
+                .total(BigDecimal.valueOf(15000.00))
+                .totalWaiting(BigDecimal.valueOf(500.00))
+                .created(created)
+                .modified(modified);
         if (withCurrency) {
             dto.setCurrencyUuid(CURRENCY_UUID);
         }
@@ -307,16 +300,16 @@ class AccountConverterTest {
 
     private static Object[] provideDealsWithNullableDependencies() {
         // Entity without currency, security and icon
-        var entity1 = createEntity(TEST_CREATED, TEST_MODIFIED, true, false, false, false);
-        var dto1 = createDto(TEST_CREATED, TEST_MODIFIED, true, false, false, false);
+        var entity1 = createEntity(TEST_CREATED, TEST_MODIFIED, false, false, false);
+        var dto1 = createDto(TEST_CREATED, TEST_MODIFIED, false, false, false);
 
         // Entity without currency and icon
-        var entity2 = createEntity(TEST_CREATED, TEST_MODIFIED, true, false, true, false);
-        var dto2 = createDto(TEST_CREATED, TEST_MODIFIED, true, false, true, false);
+        var entity2 = createEntity(TEST_CREATED, TEST_MODIFIED, false, true, false);
+        var dto2 = createDto(TEST_CREATED, TEST_MODIFIED, false, true, false);
 
         // Entity without security and icon
-        var entity3 = createEntity(TEST_CREATED, TEST_MODIFIED, true, true, false, false);
-        var dto3 = createDto(TEST_CREATED, TEST_MODIFIED, true, true, false, false);
+        var entity3 = createEntity(TEST_CREATED, TEST_MODIFIED, true, false, false);
+        var dto3 = createDto(TEST_CREATED, TEST_MODIFIED, true, false, false);
 
         return new Object[]{
                 new Object[]{entity1, dto1},

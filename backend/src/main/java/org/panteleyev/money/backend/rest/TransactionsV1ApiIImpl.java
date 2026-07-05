@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.TransactionsV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.TransactionFlatDTO;
 import org.panteleyev.money.backend.service.TransactionService;
+import org.panteleyev.money.dto.TransactionFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +32,5 @@ public class TransactionsV1ApiIImpl implements TransactionsV1ApiDelegate {
     @Override
     public ResponseEntity<TransactionFlatDTO> putTransaction(TransactionFlatDTO transaction) {
         return ResponseEntity.ok(service.put(transaction));
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getTransactionsAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

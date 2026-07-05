@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.IconsV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.IconFlatDTO;
 import org.panteleyev.money.backend.service.IconService;
+import org.panteleyev.money.dto.IconFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +32,5 @@ public class IconsV1ApiImpl implements IconsV1ApiDelegate {
     @Override
     public ResponseEntity<IconFlatDTO> putIcon(IconFlatDTO icon) {
         return ResponseEntity.ok(service.put(icon));
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getIconsAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

@@ -1,12 +1,10 @@
-/*
- Copyright © 2022 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2022-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.backend.model;
 
-import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.Transaction;
+import org.panteleyev.money.dto.AccountFlatDTO;
+import org.panteleyev.money.dto.ContactFlatDTO;
+import org.panteleyev.money.dto.TransactionFlatDTO;
 
 import java.util.Collection;
 
@@ -19,8 +17,8 @@ import java.util.Collection;
  * @param accounts    affected accounts, at least one
  */
 public record TransactionOperationResult(
-        Transaction transaction,
-        Contact contact,
-        Collection<Account> accounts
+        TransactionFlatDTO transaction,
+        ContactFlatDTO contact,
+        Collection<AccountFlatDTO> accounts
 ) {
 }

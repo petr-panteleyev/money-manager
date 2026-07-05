@@ -5,8 +5,8 @@ package org.panteleyev.money.backend.converter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.money.backend.domain.ExchangeSecuritySplitEntity;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.ExchangeSecuritySplitFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -6,7 +6,7 @@ import org.panteleyev.money.backend.domain.AccountEntity;
 import org.panteleyev.money.backend.domain.CurrencyEntity;
 import org.panteleyev.money.backend.domain.ExchangeSecurityEntity;
 import org.panteleyev.money.backend.domain.InvestmentDealEntity;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealFlatDTO;
+import org.panteleyev.money.dto.InvestmentDealFlatDTO;
 import org.springframework.stereotype.Component;
 
 @Component

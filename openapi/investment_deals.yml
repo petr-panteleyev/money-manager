@@ -21,21 +21,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/InvestmentDealFlatDTO'
 
-  /api/v1/investment-deals/stream:
-    get:
-      tags:
-        - "investment-deals, v1"
-      summary: Получить все инвестиционные сделки в потоке
-      operationId: getInvestmentDealsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-
   /api/v1/investment-deals/{uuid}:
     get:
       tags:

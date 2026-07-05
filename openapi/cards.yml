@@ -20,20 +20,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CardFlatDTO'
-  /api/v1/cards/stream:
-    get:
-      tags:
-        - "cards, v1"
-      summary: Получить все карты в потоке
-      operationId: getCardsAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
+
   /api/v1/cards/{uuid}:
     get:
       tags:

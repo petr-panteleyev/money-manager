@@ -8,11 +8,11 @@ import org.panteleyev.money.backend.domain.AccountEntity;
 import org.panteleyev.money.backend.domain.CurrencyEntity;
 import org.panteleyev.money.backend.domain.ExchangeSecurityEntity;
 import org.panteleyev.money.backend.domain.InvestmentDealEntity;
-import org.panteleyev.money.backend.openapi.dto.CategoryType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealFlatDTO;
-import org.panteleyev.money.backend.openapi.dto.InvestmentDealType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentMarketType;
-import org.panteleyev.money.backend.openapi.dto.InvestmentOperationType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.InvestmentDealFlatDTO;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

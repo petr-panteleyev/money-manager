@@ -3,11 +3,10 @@
 package org.panteleyev.money.backend.rest;
 
 import org.panteleyev.money.backend.openapi.api.AccountsV1ApiDelegate;
-import org.panteleyev.money.backend.openapi.dto.AccountFlatDTO;
 import org.panteleyev.money.backend.service.AccountService;
+import org.panteleyev.money.dto.AccountFlatDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,10 +32,5 @@ public class AccountsV1ApiImpl implements AccountsV1ApiDelegate {
     @Override
     public ResponseEntity<AccountFlatDTO> putAccount(AccountFlatDTO account) {
         return ResponseEntity.ok(service.put(account));
-    }
-
-    @Override
-    public ResponseEntity<StreamingResponseBody> getAccountsAsStream() {
-        return ResponseEntity.accepted().body(service::streamAll);
     }
 }

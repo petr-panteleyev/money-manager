@@ -21,21 +21,6 @@ paths:
                 items:
                   $ref: '#/components/schemas/ExchangeSecurityFlatDTO'
 
-  /api/v1/exchange-securities/stream:
-    get:
-      tags:
-        - "exchange-securities, v1"
-      summary: Получить все ценные бумаги в потоке
-      operationId: getExchangeSecuritiesAsStream
-      responses:
-        "202":
-          description: Успешный ответ
-          content:
-            application/octet-stream:
-              schema:
-                type: string
-                format: binary
-
   /api/v1/exchange-securities/{uuid}:
     get:
       tags:
