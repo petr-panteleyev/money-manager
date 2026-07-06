@@ -1,10 +1,10 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
-package org.panteleyev.money.model.investment;
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
+package org.panteleyev.money.model;
 
-import org.panteleyev.money.model.MoneyRecord;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

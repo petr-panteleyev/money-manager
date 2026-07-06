@@ -16,8 +16,8 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.desktop.commons.DataCache;
+import org.panteleyev.money.dto.ContactType;
 import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Icon;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 final class ContactDialog extends BaseDialog<Contact> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ComboBox<ContactType> typeBox = comboBox(ContactType.asList(),
+    private final ComboBox<ContactType> typeBox = comboBox(List.of(ContactType.values()),
             _ -> comboBoxListCell(Bundles::translate));
     private final TextField nameField = new TextField();
     private final TextField phoneField = new TextField();

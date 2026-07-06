@@ -22,7 +22,7 @@ import org.panteleyev.moex.model.MoexSecurity;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.cells.ExchangeSecurityValueCell;
 import org.panteleyev.money.app.exchange.cells.ExchangeTypeCell;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecurity;
 
 import java.math.BigDecimal;
 import java.util.Comparator;

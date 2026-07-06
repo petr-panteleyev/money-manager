@@ -8,26 +8,34 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.ContactType;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
+import org.panteleyev.money.dto.TransactionType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecuritySplit;
+import org.panteleyev.money.model.InvestmentDeal;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
-import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.panteleyev.money.model.investment.InvestmentDealType;
-import org.panteleyev.money.model.investment.InvestmentMarketType;
-import org.panteleyev.money.model.investment.InvestmentOperationType;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomBoolean;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomEnum;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomString;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestRepositories extends BaseDaoTest {
@@ -72,9 +80,9 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Category(
                 CATEGORY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomCategoryType(),
+                randomString(),
+                randomString(),
+                randomEnum(CategoryType.class),
                 ICON_UUID,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -82,9 +90,9 @@ public class TestRepositories extends BaseDaoTest {
 
         var update = new Category(
                 CATEGORY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomCategoryType(),
+                randomString(),
+                randomString(),
+                randomEnum(CategoryType.class),
                 null,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -100,30 +108,30 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Currency(
                 CURRENCY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBoolean(),
+                randomBoolean(),
+                randomBigDecimal(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomBoolean(),
+                randomBoolean(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
 
         var update = new Currency(
                 CURRENCY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBoolean(),
+                randomBoolean(),
+                randomBigDecimal(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomBoolean(),
+                randomBoolean(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -138,25 +146,25 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new ExchangeSecurity(
                 EXCHANGE_SECURITY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
                 LocalDate.now(),
                 LocalDate.now(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 LocalDate.now(),
                 BaseTestUtils.randomInt(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
                 BaseTestUtils.randomInt(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -164,20 +172,20 @@ public class TestRepositories extends BaseDaoTest {
 
         var update = new ExchangeSecurity(
                 EXCHANGE_SECURITY_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
                 LocalDate.now(),
                 null,
                 null,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
                 null,
                 null,
                 null,
@@ -198,17 +206,17 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Contact(
                 CONTACT_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomContactType(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
+                randomString(),
+                randomEnum(ContactType.class),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
                 ICON_UUID,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -216,17 +224,17 @@ public class TestRepositories extends BaseDaoTest {
 
         var update = new Contact(
                 CONTACT_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomContactType(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
+                randomString(),
+                randomEnum(ContactType.class),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomString(),
                 null,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -242,44 +250,44 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Account(
                 ACCOUNT_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomCategoryType(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomEnum(CategoryType.class),
                 CATEGORY_UUID,
                 CURRENCY_UUID,
                 EXCHANGE_SECURITY_UUID,
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBoolean(),
+                randomBigDecimal(),
                 LocalDate.now(),
                 ICON_UUID,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
 
         var update = new Account(
                 ACCOUNT_UUID,
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomCategoryType(),
+                randomString(),
+                randomString(),
+                randomString(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomEnum(CategoryType.class),
                 CATEGORY_UUID,
                 null,
                 null,
-                BaseTestUtils.randomBoolean(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBoolean(),
+                randomBigDecimal(),
                 LocalDate.now(),
                 null,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -295,11 +303,11 @@ public class TestRepositories extends BaseDaoTest {
         var insert = new Card(
                 CARD_UUID,
                 ACCOUNT_UUID,
-                BaseTestUtils.randomCardType(),
-                BaseTestUtils.randomString(),
+                randomEnum(CardType.class),
+                randomString(),
                 LocalDate.now(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBoolean(),
+                randomString(),
+                randomBoolean(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -307,11 +315,11 @@ public class TestRepositories extends BaseDaoTest {
         var update = new Card(
                 CARD_UUID,
                 ACCOUNT_UUID,
-                BaseTestUtils.randomCardType(),
-                BaseTestUtils.randomString(),
+                randomEnum(CardType.class),
+                randomString(),
                 LocalDate.now(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBoolean(),
+                randomString(),
+                randomBoolean(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -326,50 +334,50 @@ public class TestRepositories extends BaseDaoTest {
 
         var insert = new Transaction(
                 TRANSACTION_UUID,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 LocalDate.now(),
-                BaseTestUtils.randomTransactionType(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBoolean(),
+                randomEnum(TransactionType.class),
+                randomString(),
+                randomBoolean(),
                 ACCOUNT_UUID,
                 ACCOUNT_UUID,
-                BaseTestUtils.randomCategoryType(),
-                BaseTestUtils.randomCategoryType(),
+                randomEnum(CategoryType.class),
+                randomEnum(CategoryType.class),
                 CATEGORY_UUID,
                 CATEGORY_UUID,
                 CONTACT_UUID,
-                BaseTestUtils.randomString(),
+                randomString(),
                 null,
-                BaseTestUtils.randomBoolean(),
+                randomBoolean(),
                 LocalDate.now(),
                 CARD_UUID,
-                BaseTestUtils.randomString(),
+                randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
 
         var update = new Transaction(
                 TRANSACTION_UUID,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 LocalDate.now(),
-                BaseTestUtils.randomTransactionType(),
-                BaseTestUtils.randomString(),
-                BaseTestUtils.randomBoolean(),
+                randomEnum(TransactionType.class),
+                randomString(),
+                randomBoolean(),
                 ACCOUNT_UUID,
                 ACCOUNT_UUID,
-                BaseTestUtils.randomCategoryType(),
-                BaseTestUtils.randomCategoryType(),
+                randomEnum(CategoryType.class),
+                randomEnum(CategoryType.class),
                 CATEGORY_UUID,
                 CATEGORY_UUID,
                 null,
-                BaseTestUtils.randomString(),
+                randomString(),
                 TRANSACTION_UUID,
-                BaseTestUtils.randomBoolean(),
+                randomBoolean(),
                 LocalDate.now(),
                 null,
-                BaseTestUtils.randomString(),
+                randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -387,19 +395,19 @@ public class TestRepositories extends BaseDaoTest {
                 ACCOUNT_UUID,
                 null,
                 null,
-                BaseTestUtils.randomString(),
+                randomString(),
                 BaseTestUtils.randomLocalDateTime(),
                 BaseTestUtils.randomLocalDateTime(),
                 InvestmentMarketType.STOCK_MARKET,
                 InvestmentOperationType.PURCHASE,
                 10,
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
+                randomBigDecimal(),
                 InvestmentDealType.NORMAL,
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
@@ -443,8 +451,8 @@ public class TestRepositories extends BaseDaoTest {
                 EXCHANGE_SECURITY_UUID,
                 ExchangeSecuritySplitType.REVERSE_SPLIT,
                 LocalDate.now(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomString(),
+                randomBigDecimal(),
+                randomString(),
                 System.currentTimeMillis(),
                 System.currentTimeMillis()
         );
@@ -454,8 +462,8 @@ public class TestRepositories extends BaseDaoTest {
                 EXCHANGE_SECURITY_UUID,
                 ExchangeSecuritySplitType.REVERSE_SPLIT,
                 LocalDate.now(),
-                BaseTestUtils.randomBigDecimal(),
-                BaseTestUtils.randomString(),
+                randomBigDecimal(),
+                randomString(),
                 insert.created(),
                 System.currentTimeMillis()
         );

@@ -20,9 +20,10 @@ import org.controlsfx.validation.Validator;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
 import org.panteleyev.fx.factories.TableFactory;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
+import org.panteleyev.money.app.Bundles;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecuritySplit;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +36,7 @@ import static org.panteleyev.fx.factories.BoxFactory.hBox;
 import static org.panteleyev.fx.factories.BoxFactory.vBox;
 import static org.panteleyev.fx.factories.ButtonFactory.button;
 import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
+import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
 import static org.panteleyev.money.app.Constants.FULL_DATE_FORMAT;
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.GlobalContext.dao;
@@ -44,7 +46,8 @@ import static org.panteleyev.money.app.Styles.BIG_SPACING;
 public class ExchangeSecuritySplitsDialog extends BaseDialog<ExchangeSecuritySplit> {
     private final TableView<ExchangeSecuritySplit> table;
 
-    private final ComboBox<ExchangeSecuritySplitType> typeComboBox = comboBox(ExchangeSecuritySplitType.values());
+    private final ComboBox<ExchangeSecuritySplitType> typeComboBox =
+            comboBox(List.of(ExchangeSecuritySplitType.values()), _ -> comboBoxListCell(Bundles::translate));
     private final DatePicker datePicker = new DatePicker();
     private final TextField rateEdit = new TextField();
 

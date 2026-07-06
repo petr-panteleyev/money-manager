@@ -1,7 +1,5 @@
-/*
- Copyright © 2018-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2018-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.export;
 
 import org.panteleyev.commons.xml.StartElementWrapper;
@@ -11,11 +9,11 @@ import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecuritySplit;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.InvestmentDeal;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.ArrayList;
 import java.util.List;

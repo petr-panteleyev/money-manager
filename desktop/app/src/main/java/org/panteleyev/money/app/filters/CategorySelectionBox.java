@@ -1,7 +1,5 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
 import javafx.application.Platform;
@@ -16,10 +14,10 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.Bundles;
+import org.panteleyev.money.desktop.commons.ReadOnlyStringConverter;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.desktop.commons.ReadOnlyStringConverter;
 
 import java.util.EnumSet;
 import java.util.Optional;

@@ -1,8 +1,9 @@
-/*
- Copyright © 2021-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
+
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,29 +33,9 @@ final class BaseTestUtils {
         return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
-    static CategoryType randomCategoryType() {
-        int index = RANDOM.nextInt(CategoryType.values().length);
-        return CategoryType.values()[index];
-    }
-
-    static CardType randomCardType() {
-        int index = RANDOM.nextInt(CardType.values().length);
-        return CardType.values()[index];
-    }
-
-    static ContactType randomContactType() {
-        int index = RANDOM.nextInt(ContactType.values().length);
-        return ContactType.values()[index];
-    }
-
-    static TransactionType randomTransactionType() {
-        while (true) {
-            int index = RANDOM.nextInt(TransactionType.values().length);
-            var type = TransactionType.values()[index];
-            if (!type.isSeparator()) {
-                return type;
-            }
-        }
+    static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
+        var values = enumClass.getEnumConstants();
+        return values[RANDOM.nextInt(values.length)];
     }
 
     static Currency newCurrency() {
@@ -87,13 +68,13 @@ final class BaseTestUtils {
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
                 .transactionDate(LocalDate.now())
-                .type(randomTransactionType())
+                .type(randomEnum(TransactionType.class))
                 .comment(UUID.randomUUID().toString())
                 .checked(RANDOM.nextBoolean())
                 .accountDebitedUuid(UUID.randomUUID())
                 .accountCreditedUuid(UUID.randomUUID())
-                .accountDebitedType(randomCategoryType())
-                .accountCreditedType(randomCategoryType())
+                .accountDebitedType(randomEnum(CategoryType.class))
+                .accountCreditedType(randomEnum(CategoryType.class))
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())

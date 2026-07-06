@@ -1,7 +1,5 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
 import javafx.embed.swing.JFXPanel;
@@ -10,8 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.money.app.account.cells.AccountClosingDateCell;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
-import org.panteleyev.money.model.CategoryType;
 
 import java.time.LocalDate;
 import java.util.List;

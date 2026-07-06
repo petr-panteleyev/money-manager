@@ -1,4 +1,4 @@
-// Copyright © 2017-2025 Petr Panteleyev
+// Copyright © 2017-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.category;
 
@@ -14,8 +14,8 @@ import org.panteleyev.fx.Controller;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.icons.IconManager;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Icon;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import static org.panteleyev.money.app.icons.IconManager.EMPTY_ICON;
 final class CategoryDialog extends BaseDialog<Category> {
     private final ValidationSupport validation = new ValidationSupport();
 
-    private final ComboBox<CategoryType> typeComboBox = comboBox(CategoryType.asList(),
+    private final ComboBox<CategoryType> typeComboBox = comboBox(List.of(CategoryType.values()),
             _ -> comboBoxListCell(Bundles::translate));
     private final TextField nameEdit = new TextField();
     private final TextField commentEdit = new TextField();

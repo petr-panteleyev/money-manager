@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
-import org.panteleyev.money.model.CategoryType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.TransactionType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

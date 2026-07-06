@@ -19,8 +19,8 @@ import org.panteleyev.fx.factories.TextFieldFactory;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ import static org.panteleyev.money.app.Styles.BIG_INSETS;
 import static org.panteleyev.money.app.Styles.BIG_SPACING;
 
 public final class CategoryWindowController extends BaseController {
-    private final ComboBox<CategoryType> typeBox = comboBox(CategoryType.asList(),
+    private final ComboBox<CategoryType> typeBox = comboBox(List.of(CategoryType.values()),
             _ -> comboBoxListCell("Все типы", Bundles::translate));
     private final TextField searchField = TextFieldFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 

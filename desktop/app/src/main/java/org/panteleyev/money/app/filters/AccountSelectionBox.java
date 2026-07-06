@@ -1,4 +1,4 @@
-// Copyright © 2018-2025 Petr Panteleyev
+// Copyright © 2018-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
@@ -12,11 +12,12 @@ import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.Comparators;
 import org.panteleyev.money.app.Predicates;
 import org.panteleyev.money.app.transaction.TransactionPredicate;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -33,7 +34,7 @@ import static org.panteleyev.money.app.transaction.TransactionPredicate.transact
 
 public class AccountSelectionBox extends HBox {
     private final ComboBox<CategoryType> categoryTypeBox =
-            comboBox(CategoryType.asList(), _ -> comboBoxListCell("Все типы", Bundles::translate));
+            comboBox(List.of(CategoryType.values()), _ -> comboBoxListCell("Все типы", Bundles::translate));
 
     private final FilteredList<Category> filteredCategories = cache().getCategories().filtered(_ -> true);
     private final ComboBox<Category> categoryBox = comboBox(

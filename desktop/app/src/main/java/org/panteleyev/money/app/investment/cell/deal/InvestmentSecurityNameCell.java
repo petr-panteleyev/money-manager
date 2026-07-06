@@ -1,12 +1,10 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment.cell.deal;
 
 import javafx.scene.control.TableCell;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 

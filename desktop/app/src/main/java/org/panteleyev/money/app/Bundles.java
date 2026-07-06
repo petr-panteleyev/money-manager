@@ -1,14 +1,14 @@
-/*
- Copyright © 2020-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import org.panteleyev.money.app.investment.InvestmentDealPredicate;
 import org.panteleyev.money.app.transaction.TransactionPredicate;
-import org.panteleyev.money.model.CategoryType;
-import org.panteleyev.money.model.ContactType;
-import org.panteleyev.money.model.TransactionType;
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.ContactType;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.TransactionType;
 
 import java.time.Month;
 import java.time.format.TextStyle;
@@ -29,6 +29,14 @@ public final class Bundles {
             CategoryType.STARTUP, "Стартап"
     ));
 
+    private static final Map<CardType, String> CARD_TYPE_STRINGS = new EnumMap<>(Map.of(
+            CardType.NONE, "-",
+            CardType.VISA, "VISA",
+            CardType.MASTERCARD, "MasterCard",
+            CardType.MIR, "Мир",
+            CardType.AMEX, "American Express"
+    ));
+
     private static final Map<ContactType, String> CONTACT_TYPE_STRINGS = new EnumMap<>(Map.of(
             ContactType.PERSONAL, "Личное",
             ContactType.CLIENT, "Клиент",
@@ -36,6 +44,11 @@ public final class Bundles {
             ContactType.EMPLOYEE, "Сотрудник",
             ContactType.EMPLOYER, "Работодатель",
             ContactType.SERVICE, "Услуга"
+    ));
+
+    private static final Map<ExchangeSecuritySplitType, String> SECURITY_SPLIT_TYPE_STRINGS = new EnumMap<>(Map.of(
+            ExchangeSecuritySplitType.SPLIT, "Сплит",
+            ExchangeSecuritySplitType.REVERSE_SPLIT, "Обратный сплит"
     ));
 
     private static final Map<TransactionType, String> TRANSACTION_TYPE_STRINGS = new EnumMap<>(Map.ofEntries(
@@ -84,8 +97,16 @@ public final class Bundles {
         return CATEGORY_TYPE_STRINGS.get(type);
     }
 
+    public static String translate(CardType type) {
+        return CARD_TYPE_STRINGS.get(type);
+    }
+
     public static String translate(ContactType type) {
         return CONTACT_TYPE_STRINGS.get(type);
+    }
+
+    public static String translate(ExchangeSecuritySplitType type) {
+        return SECURITY_SPLIT_TYPE_STRINGS.get(type);
     }
 
     public static String translate(TransactionType type) {

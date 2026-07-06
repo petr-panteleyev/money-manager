@@ -19,7 +19,7 @@ import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityAmountCel
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityNameCell;
 import org.panteleyev.money.app.investment.cell.deal.InvestmentSecurityTypeCell;
-import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.util.List;
 

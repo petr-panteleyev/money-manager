@@ -19,7 +19,7 @@ import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryInstrum
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryPercentageCell;
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryRow;
 import org.panteleyev.money.app.investment.cell.summary.InvestmentSummaryTotalValueCell;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecurity;
 
 import java.math.BigDecimal;
 import java.util.List;

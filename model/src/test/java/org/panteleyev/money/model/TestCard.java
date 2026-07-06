@@ -1,13 +1,12 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.money.dto.CardType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,14 +16,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.model.BaseTestUtils.randomBoolean;
-import static org.panteleyev.money.model.BaseTestUtils.randomCardType;
+import static org.panteleyev.money.model.BaseTestUtils.randomEnum;
 import static org.panteleyev.money.model.BaseTestUtils.randomString;
 
 public class TestCard {
     public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
         var accountUuid = UUID.randomUUID();
-        var type = randomCardType();
+        var type = randomEnum(CardType.class);
         var number = randomString();
         var expiration = LocalDate.now();
         var comment = randomString();
@@ -69,7 +68,7 @@ public class TestCard {
     public void testEquals() {
         var uuid = UUID.randomUUID();
         var accountUuid = UUID.randomUUID();
-        var type = randomCardType();
+        var type = randomEnum(CardType.class);
         var number = randomString();
         var expiration = LocalDate.now();
         var comment = randomString();
@@ -109,7 +108,7 @@ public class TestCard {
         var original = new Card.Builder()
                 .uuid(UUID.randomUUID())
                 .accountUuid(UUID.randomUUID())
-                .type(randomCardType())
+                .type(randomEnum(CardType.class))
                 .number(randomString())
                 .expiration(LocalDate.now())
                 .comment(randomString())

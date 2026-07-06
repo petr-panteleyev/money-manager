@@ -1,11 +1,9 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import javafx.scene.image.Image;
-import org.panteleyev.money.model.CardType;
+import org.panteleyev.money.dto.CardType;
 
 import static org.panteleyev.money.app.icons.IconManager.ICON_SIZE;
 

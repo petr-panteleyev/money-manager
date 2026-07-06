@@ -1,11 +1,9 @@
-/*
- Copyright © 2021-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2021-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
+import org.panteleyev.money.dto.CardType;
 import org.panteleyev.money.model.Card;
-import org.panteleyev.money.model.CardType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

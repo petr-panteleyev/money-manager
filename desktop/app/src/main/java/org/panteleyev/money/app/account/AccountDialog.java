@@ -25,12 +25,12 @@ import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.icons.IconManager;
 import org.panteleyev.money.desktop.commons.DataCache;
 import org.panteleyev.money.desktop.commons.ReadOnlyNamedConverter;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.ExchangeSecurity;
 import org.panteleyev.money.model.Icon;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
 
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -256,7 +256,7 @@ class AccountDialog extends BaseDialog<Account> {
     }
 
     private ComboBox<CategoryType> typeComboBox() {
-        var cb = comboBox(CategoryType.asList(), _ -> comboBoxListCell(Bundles::translate));
+        var cb = comboBox(List.of(CategoryType.values()), _ -> comboBoxListCell(Bundles::translate));
         cb.setOnAction(_ -> onCategoryTypeSelected());
         return cb;
     }

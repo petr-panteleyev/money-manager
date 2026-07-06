@@ -1,8 +1,8 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
+
+import org.panteleyev.money.dto.CardType;
 
 import java.time.LocalDate;
 import java.util.UUID;

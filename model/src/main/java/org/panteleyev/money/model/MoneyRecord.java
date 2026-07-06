@@ -1,12 +1,6 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
-
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

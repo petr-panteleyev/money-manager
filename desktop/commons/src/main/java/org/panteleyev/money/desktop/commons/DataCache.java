@@ -4,18 +4,18 @@ package org.panteleyev.money.desktop.commons;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecuritySplit;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.InvestmentDeal;
 import org.panteleyev.money.model.MoneyRecord;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.math.BigDecimal;
 import java.util.Collection;

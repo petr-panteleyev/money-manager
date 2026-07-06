@@ -1,7 +1,5 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
 import org.panteleyev.money.app.investment.InvestmentSummaryTreeData;
@@ -10,9 +8,9 @@ import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
 import org.panteleyev.money.model.Contact;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
 
 import java.util.Comparator;
 

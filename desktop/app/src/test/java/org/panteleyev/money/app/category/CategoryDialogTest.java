@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.category;
 
 import javafx.application.Platform;
@@ -9,8 +7,8 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,13 +17,13 @@ import java.util.concurrent.BlockingQueue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.panteleyev.money.test.BaseTestUtils.randomCategoryType;
+import static org.panteleyev.money.test.BaseTestUtils.randomEnum;
 
 public class CategoryDialogTest {
     private static final String CATEGORY_NAME = UUID.randomUUID().toString();
     private static final String CATEGORY_COMMENT = UUID.randomUUID().toString();
-    private static final CategoryType CATEGORY_TYPE = randomCategoryType();
-    private static final CategoryType CATEGORY_TYPE_NEW = randomCategoryType();
+    private static final CategoryType CATEGORY_TYPE = randomEnum(CategoryType.class);
+    private static final CategoryType CATEGORY_TYPE_NEW = randomEnum(CategoryType.class);
 
     private final static Category CATEGORY = new Category.Builder()
             .name(UUID.randomUUID().toString())

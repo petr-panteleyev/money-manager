@@ -1,4 +1,4 @@
-// Copyright © 2023-2025 Petr Panteleyev
+// Copyright © 2023-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.card;
 
@@ -16,14 +16,15 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
+import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.Images;
 import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
-import org.panteleyev.money.model.CardType;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Named;
 
 import java.time.LocalDate;
@@ -57,8 +58,8 @@ final class CardDialog extends BaseDialog<Card> {
     private final CheckBox enabledCheckBox = new CheckBox("Активна");
     private final DatePicker expritationDatePicker = new DatePicker();
 
-    private final ComboBox<CardType> typeComboBox = comboBox(CardType.asList(), _ -> comboBoxListCell("-",
-            Object::toString, Images::getCardTypeIcon, null
+    private final ComboBox<CardType> typeComboBox = comboBox(List.of(CardType.values()), _ -> comboBoxListCell("-",
+            Bundles::translate, Images::getCardTypeIcon, null
     ));
 
     private final Set<Account> accountSuggestions = new TreeSet<>();

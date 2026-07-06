@@ -1,20 +1,17 @@
-/*
- Copyright © 2024-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.panteleyev.money.model.investment.InvestmentDealType;
-import org.panteleyev.money.model.investment.InvestmentMarketType;
-import org.panteleyev.money.model.investment.InvestmentOperationType;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
+import static org.panteleyev.money.app.investment.ParserUtil.parseInvestmentOperationType;
 
 public class SberbankBrokerHtmlReportParser {
     private static final String DEAL_COMPLETED = "И";
@@ -124,7 +122,7 @@ public class SberbankBrokerHtmlReportParser {
                         .accountingDate(LocalDate.parse(row.get(CELL_INDEX_ACCOUNTING_DATE).text(),
                                 DATE_FORMATTER).atStartOfDay())
                         .marketType(InvestmentMarketType.STOCK_MARKET) // TODO: parse from table
-                        .operationType(InvestmentOperationType.fromTitle(row.get(CELL_INDEX_OPERATION_TYPE).text()))
+                        .operationType(parseInvestmentOperationType(row.get(CELL_INDEX_OPERATION_TYPE).text()))
                         .securityAmount(Integer.parseInt(
                                 row.get(CELL_INDEX_SECURITY_AMOUNT).text()
                                         .replace(" ", "")

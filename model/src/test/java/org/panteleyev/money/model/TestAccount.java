@@ -1,13 +1,12 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.money.dto.CategoryType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,6 +15,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.RANDOM;
+import static org.panteleyev.money.model.BaseTestUtils.randomBigDecimal;
+import static org.panteleyev.money.model.BaseTestUtils.randomEnum;
 
 public class TestAccount {
 
@@ -24,19 +26,19 @@ public class TestAccount {
         var name = BaseTestUtils.randomString();
         var comment = BaseTestUtils.randomString();
         var accountNumber = BaseTestUtils.randomString();
-        var openingBalance = BaseTestUtils.randomBigDecimal();
-        var accountLimit = BaseTestUtils.randomBigDecimal();
-        var currencyRate = BaseTestUtils.randomBigDecimal();
-        var type = BaseTestUtils.randomCategoryType();
+        var openingBalance = randomBigDecimal();
+        var accountLimit = randomBigDecimal();
+        var currencyRate = randomBigDecimal();
+        var type = randomEnum(CategoryType.class);
         var categoryUuid = UUID.randomUUID();
         var currencyUuid = UUID.randomUUID();
         var securityUuid = UUID.randomUUID();
         var enabled = BaseTestUtils.randomBoolean();
-        var interest = BaseTestUtils.randomBigDecimal();
+        var interest = randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
-        var total = BaseTestUtils.randomBigDecimal();
-        var totalWaiting = BaseTestUtils.randomBigDecimal();
+        var total = randomBigDecimal();
+        var totalWaiting = randomBigDecimal();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
 
@@ -100,14 +102,14 @@ public class TestAccount {
         var name = UUID.randomUUID().toString();
         var comment = UUID.randomUUID().toString();
         var accountNumber = UUID.randomUUID().toString();
-        var opening = BaseTestUtils.randomBigDecimal();
-        var limit = BaseTestUtils.randomBigDecimal();
-        var rate = BaseTestUtils.randomBigDecimal();
-        var type = BaseTestUtils.randomCategoryType();
+        var opening = randomBigDecimal();
+        var limit = randomBigDecimal();
+        var rate = randomBigDecimal();
+        var type = randomEnum(CategoryType.class);
         var categoryUuid = UUID.randomUUID();
         var currencyUuid = UUID.randomUUID();
-        var enabled = BaseTestUtils.RANDOM.nextBoolean();
-        var interest = BaseTestUtils.randomBigDecimal();
+        var enabled = RANDOM.nextBoolean();
+        var interest = randomBigDecimal();
         var closingDate = LocalDate.now();
         var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
@@ -188,14 +190,14 @@ public class TestAccount {
                 .name(UUID.randomUUID().toString())
                 .comment(UUID.randomUUID().toString())
                 .accountNumber(UUID.randomUUID().toString())
-                .openingBalance(BaseTestUtils.randomBigDecimal())
-                .accountLimit(BaseTestUtils.randomBigDecimal())
-                .currencyRate(BaseTestUtils.randomBigDecimal())
-                .type(BaseTestUtils.randomCategoryType())
+                .openingBalance(randomBigDecimal())
+                .accountLimit(randomBigDecimal())
+                .currencyRate(randomBigDecimal())
+                .type(randomEnum(CategoryType.class))
                 .categoryUuid(UUID.randomUUID())
                 .currencyUuid(UUID.randomUUID())
-                .enabled(BaseTestUtils.RANDOM.nextBoolean())
-                .interest(BaseTestUtils.randomBigDecimal())
+                .enabled(RANDOM.nextBoolean())
+                .interest(randomBigDecimal())
                 .closingDate(LocalDate.now())
                 .iconUuid(UUID.randomUUID())
                 .uuid(UUID.randomUUID())

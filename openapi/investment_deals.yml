@@ -66,36 +66,38 @@ components:
   schemas:
     InvestmentMarketType:
       type: string
+      description: |-
+        Тип рынка:
+        - UNKNOWN - Неизвестный тип рынка
+        - STOCK_MARKET - Фондовый рынок
       enum:
-        - "-"
-        - "Фондовый рынок"
-      x-enum-varnames:
         - UNKNOWN
         - STOCK_MARKET
 
     InvestmentOperationType:
       type: string
+      description: |-
+        Тип операции:
+        - UNKNOWN - Неизвестный тип операции
+        - PURCHASE - Покупка
+        - SELL - Продажа
       enum:
-        - "-"
-        - "Покупка"
-        - "Продажа"
-      x-enum-varnames:
         - UNKNOWN
         - PURCHASE
         - SELL
 
     InvestmentDealType:
       type: string
+      description: |-
+        Тип сделки:
+        - UNKNOWN - Неизвестный тип сделки
+        - NORMAL - Обычная сделка
       enum:
-        - "-"
-        - "Обычная"
-      x-enum-varnames:
         - UNKNOWN
         - NORMAL
 
     InvestmentDealFlatDTO:
       type: object
-      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
       required:
         - uuid
         - accountUuid

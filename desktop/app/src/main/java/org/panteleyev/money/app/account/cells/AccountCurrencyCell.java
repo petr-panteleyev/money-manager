@@ -1,13 +1,11 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account.cells;
 
 import javafx.scene.control.TableCell;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecurity;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.model.BaseTestUtils.RANDOM;
 import static org.panteleyev.money.model.BaseTestUtils.randomBigDecimal;
-import static org.panteleyev.money.model.BaseTestUtils.randomCategoryType;
-import static org.panteleyev.money.model.BaseTestUtils.randomTransactionType;
+import static org.panteleyev.money.model.BaseTestUtils.randomEnum;
 
 public class TestTransaction {
 
@@ -26,13 +27,13 @@ public class TestTransaction {
         var amount = randomBigDecimal();
         var creditAmount = randomBigDecimal();
         var transactionDate = LocalDate.now();
-        var type = randomTransactionType();
+        var type = randomEnum(TransactionType.class);
         var comment = BaseTestUtils.randomString();
         var checked = BaseTestUtils.randomBoolean();
         var accountDebitedUuid = UUID.randomUUID();
         var accountCreditedUuid = UUID.randomUUID();
-        var accountDebitedType = randomCategoryType();
-        var accountCreditedType = randomCategoryType();
+        var accountDebitedType = randomEnum(CategoryType.class);
+        var accountCreditedType = randomEnum(CategoryType.class);
         var accountDebitedCategoryUuid = UUID.randomUUID();
         var accountCreditedCategoryUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
@@ -114,13 +115,13 @@ public class TestTransaction {
         var amount = randomBigDecimal();
         var creditAmount = randomBigDecimal();
         var transactionDate = LocalDate.now();
-        var type = randomTransactionType();
+        var type = randomEnum(TransactionType.class);
         var comment = UUID.randomUUID().toString();
         var checked = RANDOM.nextBoolean();
         var accountDebitedUuid = UUID.randomUUID();
         var accountCreditedUuid = UUID.randomUUID();
-        var accountDebitedType = randomCategoryType();
-        var accountCreditedType = randomCategoryType();
+        var accountDebitedType = randomEnum(CategoryType.class);
+        var accountCreditedType = randomEnum(CategoryType.class);
         var accountDebitedCategoryUuid = UUID.randomUUID();
         var accountCreditedCategoryUuid = UUID.randomUUID();
         var contactUuid = UUID.randomUUID();
@@ -188,13 +189,13 @@ public class TestTransaction {
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
                 .transactionDate(LocalDate.now())
-                .type(randomTransactionType())
+                .type(randomEnum(TransactionType.class))
                 .comment(BaseTestUtils.randomString())
                 .checked(BaseTestUtils.randomBoolean())
                 .accountDebitedUuid(UUID.randomUUID())
                 .accountCreditedUuid(UUID.randomUUID())
-                .accountDebitedType(randomCategoryType())
-                .accountCreditedType(randomCategoryType())
+                .accountDebitedType(randomEnum(CategoryType.class))
+                .accountCreditedType(randomEnum(CategoryType.class))
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())

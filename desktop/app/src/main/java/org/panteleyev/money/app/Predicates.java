@@ -1,14 +1,12 @@
-/*
- Copyright © 2020-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2020-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app;
 
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.ContactType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.ContactType;
 
 import java.util.Collection;
 import java.util.Objects;

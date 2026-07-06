@@ -1,9 +1,7 @@
-/*
- Copyright © 2017-2023 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 module org.panteleyev.money.model {
     exports org.panteleyev.money.model;
-    exports org.panteleyev.money.model.exchange;
-    exports org.panteleyev.money.model.investment;
+
+    requires transitive org.panteleyev.money.dto;
 }

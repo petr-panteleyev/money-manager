@@ -1,10 +1,8 @@
-/*
- Copyright © 2023-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecurity;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

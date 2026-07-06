@@ -1,19 +1,17 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.panteleyev.money.model.investment.InvestmentDealType;
-import org.panteleyev.money.model.investment.InvestmentMarketType;
-import org.panteleyev.money.model.investment.InvestmentOperationType;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +25,7 @@ import java.util.Objects;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.investment.ExcelUtil.getCellValueAsString;
+import static org.panteleyev.money.app.investment.ParserUtil.parseInvestmentOperationType;
 
 public class RaiffeisenBrokerReportParser {
     private static final String COMPLETE_DEALS = "Исполненные сделки";
@@ -120,7 +119,7 @@ public class RaiffeisenBrokerReportParser {
                             .findAny()
                             .orElse(null);
 
-                    var operationType = InvestmentOperationType.fromTitle(columnValues.get(CELL_INDEX_OPERATION_TYPE).toString());
+                    var operationType = parseInvestmentOperationType(columnValues.get(CELL_INDEX_OPERATION_TYPE).toString());
                     var exchangeFee = (BigDecimal) columnValues.get(CELL_INDEX_EXCHANGE_FEE);
                     var brokerFee = (BigDecimal) columnValues.get(CELL_INDEX_BROKER_FEE);
                     var dealVolume = (BigDecimal) columnValues.get(CELL_INDEX_DEAL_VOLUME);

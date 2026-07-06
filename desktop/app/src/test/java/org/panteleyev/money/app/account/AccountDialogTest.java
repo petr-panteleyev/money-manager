@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.account;
 
 import javafx.application.Platform;
@@ -10,9 +8,9 @@ import javafx.scene.control.ButtonType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.panteleyev.money.desktop.commons.DataCache;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Currency;
 
 import java.math.BigDecimal;

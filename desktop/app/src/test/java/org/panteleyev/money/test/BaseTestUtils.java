@@ -1,27 +1,25 @@
-/*
- Copyright © 2017-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.test;
 
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.ContactType;
+import org.panteleyev.money.dto.ExchangeSecuritySplitType;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
+import org.panteleyev.money.dto.InvestmentOperationType;
+import org.panteleyev.money.dto.TransactionType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
-import org.panteleyev.money.model.CardType;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.ContactType;
 import org.panteleyev.money.model.Currency;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecuritySplit;
 import org.panteleyev.money.model.Icon;
+import org.panteleyev.money.model.InvestmentDeal;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.TransactionType;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplit;
-import org.panteleyev.money.model.exchange.ExchangeSecuritySplitType;
-import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.panteleyev.money.model.investment.InvestmentDealType;
-import org.panteleyev.money.model.investment.InvestmentMarketType;
-import org.panteleyev.money.model.investment.InvestmentOperationType;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -70,33 +68,13 @@ public final class BaseTestUtils {
         return BigDecimal.valueOf(RANDOM.nextDouble()).setScale(6, RoundingMode.HALF_UP);
     }
 
-    public static CategoryType randomCategoryType() {
-        int index = RANDOM.nextInt(CategoryType.values().length);
-        return CategoryType.values()[index];
-    }
-
-    public static CardType randomCardType() {
-        int index = RANDOM.nextInt(CardType.values().length);
-        return CardType.values()[index];
-    }
-
-    public static ContactType randomContactType() {
-        int index = RANDOM.nextInt(ContactType.values().length);
-        return ContactType.values()[index];
+    public static <T extends Enum<T>> T randomEnum(Class<T> enumClass) {
+        var values = enumClass.getEnumConstants();
+        return values[RANDOM.nextInt(values.length)];
     }
 
     public static LocalDateTime randomLocalDateTime() {
         return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-    }
-
-    public static TransactionType randomTransactionType() {
-        while (true) {
-            int index = RANDOM.nextInt(TransactionType.values().length);
-            var type = TransactionType.values()[index];
-            if (!type.isSeparator()) {
-                return type;
-            }
-        }
     }
 
     public static Account newAccount(Category category, Currency currency) {
@@ -139,7 +117,7 @@ public final class BaseTestUtils {
     }
 
     public static Category newCategory() {
-        return newCategory(UUID.randomUUID(), randomCategoryType());
+        return newCategory(UUID.randomUUID(), randomEnum(CategoryType.class));
     }
 
     public static Category newCategory(Icon icon) {
@@ -147,11 +125,11 @@ public final class BaseTestUtils {
     }
 
     public static Category newCategory(UUID uuid) {
-        return newCategory(uuid, randomCategoryType());
+        return newCategory(uuid, randomEnum(CategoryType.class));
     }
 
     public static Category newCategory(UUID uuid, UUID iconUuid) {
-        return newCategory(uuid, randomCategoryType(), iconUuid);
+        return newCategory(uuid, randomEnum(CategoryType.class), iconUuid);
     }
 
     public static Category newCategory(UUID uuid, CategoryType type) {
@@ -249,7 +227,7 @@ public final class BaseTestUtils {
     public static Contact newContact(UUID uuid, UUID iconUuid) {
         return new Contact.Builder()
                 .name(randomString())
-                .type(randomContactType())
+                .type(randomEnum(ContactType.class))
                 .phone(randomString())
                 .mobile(randomString())
                 .email(randomString())
@@ -268,7 +246,7 @@ public final class BaseTestUtils {
     public static Contact newContact(String name) {
         return new Contact.Builder()
                 .name(name)
-                .type(randomContactType())
+                .type(randomEnum(ContactType.class))
                 .phone(randomString())
                 .mobile(randomString())
                 .email(randomString())
@@ -294,13 +272,13 @@ public final class BaseTestUtils {
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
                 .transactionDate(LocalDate.now())
-                .type(randomTransactionType())
+                .type(randomEnum(TransactionType.class))
                 .comment(randomString())
                 .checked(RANDOM.nextBoolean())
                 .accountDebitedUuid(UUID.randomUUID())
                 .accountCreditedUuid(UUID.randomUUID())
-                .accountDebitedType(randomCategoryType())
-                .accountCreditedType(randomCategoryType())
+                .accountDebitedType(randomEnum(CategoryType.class))
+                .accountCreditedType(randomEnum(CategoryType.class))
                 .accountDebitedCategoryUuid(UUID.randomUUID())
                 .accountCreditedCategoryUuid(UUID.randomUUID())
                 .contactUuid(UUID.randomUUID())
@@ -314,7 +292,7 @@ public final class BaseTestUtils {
                 .amount(randomBigDecimal())
                 .creditAmount(randomBigDecimal())
                 .transactionDate(LocalDate.now())
-                .type(randomTransactionType())
+                .type(randomEnum(TransactionType.class))
                 .comment(randomString())
                 .checked(RANDOM.nextBoolean())
                 .accountDebitedUuid(accountDebited.uuid())
@@ -352,7 +330,7 @@ public final class BaseTestUtils {
         return new Card.Builder()
                 .uuid(UUID.randomUUID())
                 .accountUuid(account.uuid())
-                .type(randomCardType())
+                .type(randomEnum(CardType.class))
                 .number(randomString())
                 .expiration(LocalDate.now())
                 .comment(randomString())

@@ -64,9 +64,76 @@ paths:
 
 components:
   schemas:
+    ExchangeSecurityGroup:
+      type: string
+      description: |-
+        Группа ценных бумаг:
+        - STOCK_INDEX - Индексы
+        - STOCK_SHARES - Акции
+        - STOCK_BONDS - Облигации
+        - CURRENCY_SELT - Валюта
+        - FUTURES_FORTS - Фьючерсы
+        - FUTURES_OPTIONS - Опционы
+        - STOCK_DR - Депозитарные расписки
+        - STOCK_FOREIGN_SHARES - Иностранные ц.б.
+        - STOCK_EUROBOND - Еврооблигации
+        - STOCK_PPIF - Паи ПИФов
+        - STOCK_ETF - Биржевые фонды
+        - CURRENCY_METAL - Драгоценные металлы
+        - STOCK_QNV - Квал. инвесторы
+        - STOCK_GCC - Клиринговые сертификаты участия
+        - STOCK_DEPOSIT - Депозиты с ЦК
+        - CURRENCY_FUTURES - Валютный фьючерс
+        - CURRENCY_INDICES - Валютные фиксинги
+        - STOCK_MORTGAGE - Ипотечный сертификат
+        - OTHER - Другое
+      enum:
+        - STOCK_INDEX
+        - STOCK_SHARES
+        - STOCK_BONDS
+        - CURRENCY_SELT
+        - FUTURES_FORTS
+        - FUTURES_OPTIONS
+        - STOCK_DR
+        - STOCK_FOREIGN_SHARES
+        - STOCK_EUROBOND
+        - STOCK_PPIF
+        - STOCK_ETF
+        - CURRENCY_METAL
+        - STOCK_QNV
+        - STOCK_GCC
+        - STOCK_DEPOSIT
+        - CURRENCY_FUTURES
+        - CURRENCY_INDICES
+        - STOCK_MORTGAGE
+        - OTHER
+
+    ExchangeSecurityType:
+      type: string
+      description: |-
+        Тип ценной бумаги:
+        - COMMON_SHARE - Акция обыкновенная (STOCK_SHARES)
+        - PREFERRED_SHARE - Акция привилегированная (STOCK_SHARES)
+        - OFZ_BOND - Государственная облигация (STOCK_BONDS)
+        - CORPORATE_BOND - Корпоративная облигация (STOCK_BONDS)
+        - EXCHANGE_BOND - Биржевая облигация (STOCK_BONDS)
+        - PUBLIC_PPIF - Пай открытого ПИФа (STOCK_PPIF)
+        - ETF_PPIF - ETF (STOCK_ETF)
+        - EXCHANGE_PPIF - Пай биржевого ПИФа (STOCK_PPIF)
+        - OTHER - Другое (OTHER)
+      enum:
+        - COMMON_SHARE
+        - PREFERRED_SHARE
+        - OFZ_BOND
+        - CORPORATE_BOND
+        - EXCHANGE_BOND
+        - PUBLIC_PPIF
+        - ETF_PPIF
+        - EXCHANGE_PPIF
+        - OTHER
+
     ExchangeSecurityFlatDTO:
       type: object
-      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
       required:
         - uuid
         - secId

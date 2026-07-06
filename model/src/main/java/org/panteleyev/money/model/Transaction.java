@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;

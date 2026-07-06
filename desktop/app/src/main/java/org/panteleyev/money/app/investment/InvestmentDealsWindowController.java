@@ -13,7 +13,7 @@ import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.filters.ExchangeSecuritySelectionBox;
 import org.panteleyev.money.app.filters.InvestmentDealFilterBox;
-import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.io.FileInputStream;
 import java.io.IOException;

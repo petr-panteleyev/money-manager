@@ -1,4 +1,4 @@
-// Copyright © 2019-2025 Petr Panteleyev
+// Copyright © 2019-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
@@ -28,9 +28,9 @@ import org.panteleyev.money.app.Styles;
 import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.desktop.commons.DataCache;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Named;
 import org.panteleyev.money.model.TransactionDetail;
 

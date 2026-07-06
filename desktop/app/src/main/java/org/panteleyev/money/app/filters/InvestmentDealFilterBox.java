@@ -1,4 +1,4 @@
-// Copyright © 2024-2025 Petr Panteleyev
+// Copyright © 2024-2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
@@ -13,7 +13,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.money.app.investment.InvestmentDealPredicate;
-import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.time.LocalDate;
 import java.util.Collection;

@@ -36,19 +36,20 @@ import org.panteleyev.money.app.util.NamedCompletionProvider;
 import org.panteleyev.money.app.util.NamedToStringConverter;
 import org.panteleyev.money.app.util.StringCompletionProvider;
 import org.panteleyev.money.desktop.commons.DataCache;
+import org.panteleyev.money.dto.CategoryType;
+import org.panteleyev.money.dto.TransactionType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Named;
 import org.panteleyev.money.model.Transaction;
-import org.panteleyev.money.model.TransactionType;
 import org.panteleyev.money.statements.StatementRecord;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,33 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
 
     private static final NamedToStringConverter<Contact> CONTACT_TO_STRING = new NamedToStringConverter<>();
     private static final NamedToStringConverter<Account> ACCOUNT_TO_STRING = new NamedToStringConverter<>();
+
+    private static final List<Object> TYPE_MENU_ITEMS = Arrays.asList(
+            TransactionType.CARD_PAYMENT,
+            TransactionType.SBP_PAYMENT,
+            TransactionType.CASH_PURCHASE,
+            TransactionType.CHEQUE,
+            Boolean.TRUE,
+            TransactionType.WITHDRAWAL,
+            TransactionType.CACHIER,
+            TransactionType.DEPOSIT,
+            TransactionType.TRANSFER,
+            TransactionType.SBP_TRANSFER,
+            Boolean.TRUE,
+            TransactionType.INTEREST,
+            TransactionType.DIVIDEND,
+            Boolean.TRUE,
+            TransactionType.DIRECT_BILLING,
+            TransactionType.CHARGE,
+            TransactionType.FEE,
+            Boolean.TRUE,
+            TransactionType.INCOME,
+            TransactionType.PURCHASE,
+            TransactionType.SALE,
+            Boolean.TRUE,
+            TransactionType.REFUND,
+            TransactionType.UNDEFINED
+    );
 
     private static class TransactionTypeCompletionProvider extends BaseCompletionProvider<TransactionType> {
         TransactionTypeCompletionProvider(Set<TransactionType> set) {
@@ -718,12 +746,12 @@ public final class TransactionDialog extends BaseDialog<Transaction.Builder> {
         typeMenuButton.getItems().clear();
         typeSuggestions.clear();
 
-        TransactionType.valuesAsList().forEach(x -> {
-            if (x.isSeparator()) {
-                typeMenuButton.getItems().add(new SeparatorMenuItem());
+        TYPE_MENU_ITEMS.forEach(item -> {
+            if (item instanceof TransactionType type) {
+                typeMenuButton.getItems().add(menuItem(translate(type), _ -> onTransactionTypeSelected(type)));
+                typeSuggestions.add(type);
             } else {
-                typeMenuButton.getItems().add(menuItem(translate(x), _ -> onTransactionTypeSelected(x)));
-                typeSuggestions.add(x);
+                typeMenuButton.getItems().add(new SeparatorMenuItem());
             }
         });
     }

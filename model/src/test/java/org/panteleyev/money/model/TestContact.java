@@ -1,35 +1,36 @@
-/*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.money.dto.ContactType;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.randomEnum;
+import static org.panteleyev.money.model.BaseTestUtils.randomString;
 
 public class TestContact {
 
     public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var name = BaseTestUtils.randomString();
-        var type = BaseTestUtils.randomContactType();
-        var phone = BaseTestUtils.randomString();
-        var mobile = BaseTestUtils.randomString();
-        var email = BaseTestUtils.randomString();
-        var web = BaseTestUtils.randomString();
-        var comment = BaseTestUtils.randomString();
-        var street = BaseTestUtils.randomString();
-        var city = BaseTestUtils.randomString();
-        var country = BaseTestUtils.randomString();
-        var zip = BaseTestUtils.randomString();
+        var name = randomString();
+        var type = randomEnum(ContactType.class);
+        var phone = randomString();
+        var mobile = randomString();
+        var email = randomString();
+        var web = randomString();
+        var comment = randomString();
+        var street = randomString();
+        var city = randomString();
+        var country = randomString();
+        var zip = randomString();
         var iconUuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = System.currentTimeMillis();
@@ -84,17 +85,17 @@ public class TestContact {
 
     @Test
     public void testEquals() {
-        var name = BaseTestUtils.randomString();
-        var type = BaseTestUtils.randomContactType();
-        var phone = BaseTestUtils.randomString();
-        var mobile = BaseTestUtils.randomString();
-        var email = BaseTestUtils.randomString();
-        var web = BaseTestUtils.randomString();
-        var comment = BaseTestUtils.randomString();
-        var street = BaseTestUtils.randomString();
-        var city = BaseTestUtils.randomString();
-        var country = BaseTestUtils.randomString();
-        var zip = BaseTestUtils.randomString();
+        var name = randomString();
+        var type = randomEnum(ContactType.class);
+        var phone = randomString();
+        var mobile = randomString();
+        var email = randomString();
+        var web = randomString();
+        var comment = randomString();
+        var street = randomString();
+        var city = randomString();
+        var country = randomString();
+        var zip = randomString();
         var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
@@ -143,17 +144,17 @@ public class TestContact {
     @Test
     public void testCopy() {
         var original = new Contact.Builder()
-                .name(BaseTestUtils.randomString())
-                .type(BaseTestUtils.randomContactType())
-                .phone(BaseTestUtils.randomString())
-                .mobile(BaseTestUtils.randomString())
-                .email(BaseTestUtils.randomString())
-                .web(BaseTestUtils.randomString())
-                .comment(BaseTestUtils.randomString())
-                .street(BaseTestUtils.randomString())
-                .city(BaseTestUtils.randomString())
-                .country(BaseTestUtils.randomString())
-                .zip(BaseTestUtils.randomString())
+                .name(randomString())
+                .type(randomEnum(ContactType.class))
+                .phone(randomString())
+                .mobile(randomString())
+                .email(randomString())
+                .web(randomString())
+                .comment(randomString())
+                .street(randomString())
+                .city(randomString())
+                .country(randomString())
+                .zip(randomString())
                 .iconUuid(UUID.randomUUID())
                 .uuid(UUID.randomUUID())
                 .created(System.currentTimeMillis())

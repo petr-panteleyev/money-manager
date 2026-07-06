@@ -76,7 +76,6 @@ components:
     ExchangeSecuritySplitFlatDTO:
       type: object
       description: Сплит ценной бумаги
-      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
       required:
         - uuid
         - securityUuid

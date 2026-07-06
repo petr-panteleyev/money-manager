@@ -1,10 +1,8 @@
-/*
- Copyright © 2017-2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.transaction;
 
-import org.panteleyev.money.model.CategoryType;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Transaction;
 
 import java.time.LocalDate;

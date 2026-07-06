@@ -14,8 +14,8 @@ import javafx.scene.layout.BorderPane;
 import org.panteleyev.fx.factories.TreeTableFactory;
 import org.panteleyev.money.app.dialogs.ReportFileDialog;
 import org.panteleyev.money.app.filters.TransactionFilterBox;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Contact;
 import org.panteleyev.money.model.Transaction;
 

@@ -16,10 +16,14 @@ import org.panteleyev.money.client.openapi.api.TransactionsV1Api;
 import org.panteleyev.money.client.openapi.invoker.ApiException;
 import org.panteleyev.money.client.openapi.invoker.Configuration;
 import org.panteleyev.money.dto.AccountFlatDTO;
+import org.panteleyev.money.dto.CardFlatDTO;
 import org.panteleyev.money.dto.CategoryFlatDTO;
 import org.panteleyev.money.dto.ContactFlatDTO;
 import org.panteleyev.money.dto.CurrencyFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecurityFlatDTO;
+import org.panteleyev.money.dto.ExchangeSecuritySplitFlatDTO;
 import org.panteleyev.money.dto.IconFlatDTO;
+import org.panteleyev.money.dto.InvestmentDealFlatDTO;
 import org.panteleyev.money.dto.TransactionFlatDTO;
 
 import java.time.Duration;
@@ -51,7 +55,7 @@ public class MoneyClient {
      */
     public static class Builder {
         private String serverUrl;
-        private int timeout = 10;
+        private Duration timeout = Duration.ofMillis(1000);
 
         /**
          * Defines server URL.
@@ -65,12 +69,12 @@ public class MoneyClient {
         }
 
         /**
-         * Defines HTTP connect timeout in seconds.
+         * Defines HTTP connect timeout.
          *
-         * @param timeout timeout in seconds
+         * @param timeout timeout
          * @return this
          */
-        public Builder withConnectTimeout(int timeout) {
+        public Builder withConnectTimeout(Duration timeout) {
             this.timeout = timeout;
             return this;
         }
@@ -81,11 +85,11 @@ public class MoneyClient {
         }
     }
 
-    private MoneyClient(String serverUrl, int connectTimeout) {
+    private MoneyClient(String serverUrl, Duration connectTimeout) {
         var defaultClient = Configuration.getDefaultApiClient();
         defaultClient.updateBaseUri(serverUrl);
         defaultClient.setBasePath(CONTEXT_ROOT);
-        defaultClient.setConnectTimeout(Duration.ofMillis(connectTimeout));
+        defaultClient.setConnectTimeout(connectTimeout);
 
         accountsV1Api = new AccountsV1Api(defaultClient);
         cardsV1Api = new CardsV1Api(defaultClient);
@@ -99,43 +103,31 @@ public class MoneyClient {
         transactionsV1Api = new TransactionsV1Api(defaultClient);
     }
 
-    /* Icons */
-    public Either<ClientError, List<IconFlatDTO>> getIcons() {
-        return call(iconsV1Api::getIcons);
+
+    /* Accounts */
+    public Either<ClientError, List<AccountFlatDTO>> getAccounts() {
+        return call(accountsV1Api::getAccounts);
     }
 
-    public Either<ClientError, IconFlatDTO> getIcon(UUID uuid) {
-        return call(() -> iconsV1Api.getIconByUuid(uuid));
+    public Either<ClientError, AccountFlatDTO> getAccount(UUID uuid) {
+        return call(() -> accountsV1Api.getAccountByUuid(uuid));
     }
 
-    public Either<ClientError, IconFlatDTO> putIcon(IconFlatDTO icon) {
-        return call(() -> iconsV1Api.putIcon(icon));
+    public Either<ClientError, AccountFlatDTO> putAccount(AccountFlatDTO dto) {
+        return call(() -> accountsV1Api.putAccount(dto));
     }
 
-    /* Currencies */
-    public Either<ClientError, List<CurrencyFlatDTO>> getCurrencies() {
-        return call(currenciesV1Api::getCurrencies);
+    /* Cards */
+    public Either<ClientError, List<CardFlatDTO>> getCards() {
+        return call(cardsV1Api::getCards);
     }
 
-    public Either<ClientError, CurrencyFlatDTO> getCurrency(UUID uuid) {
-        return call(() -> currenciesV1Api.getCurrencyByUuid(uuid));
+    public Either<ClientError, CardFlatDTO> getCard(UUID uuid) {
+        return call(() -> cardsV1Api.getCardByUuid(uuid));
     }
 
-    public Either<ClientError, CurrencyFlatDTO> putCurrency(CurrencyFlatDTO currency) {
-        return call(() -> currenciesV1Api.putCurrency(currency));
-    }
-
-    /* Contacts */
-    public Either<ClientError, List<ContactFlatDTO>> getContacts() {
-        return call(contactsV1Api::getContacts);
-    }
-
-    public Either<ClientError, ContactFlatDTO> getContact(UUID uuid) {
-        return call(() -> contactsV1Api.getContactByUuid(uuid));
-    }
-
-    public Either<ClientError, ContactFlatDTO> putContact(ContactFlatDTO contact) {
-        return call(() -> contactsV1Api.putContact(contact));
+    public Either<ClientError, CardFlatDTO> putCard(CardFlatDTO dto) {
+        return call(() -> cardsV1Api.putCard(dto));
     }
 
     /* Categories */
@@ -147,21 +139,88 @@ public class MoneyClient {
         return call(() -> categoriesV1Api.getCategoryByUuid(uuid));
     }
 
-    public Either<ClientError, CategoryFlatDTO> putCategory(CategoryFlatDTO category) {
-        return call(() -> categoriesV1Api.putCategory(category));
+    public Either<ClientError, CategoryFlatDTO> putCategory(CategoryFlatDTO dto) {
+        return call(() -> categoriesV1Api.putCategory(dto));
     }
 
-    /* Accounts */
-    public Either<ClientError, List<AccountFlatDTO>> getAccounts() {
-        return call(accountsV1Api::getAccounts);
+    /* Contacts */
+    public Either<ClientError, List<ContactFlatDTO>> getContacts() {
+        return call(contactsV1Api::getContacts);
     }
 
-    public Either<ClientError, AccountFlatDTO> getAccount(UUID uuid) {
-        return call(() -> accountsV1Api.getAccountByUuid(uuid));
+    public Either<ClientError, ContactFlatDTO> getContact(UUID uuid) {
+        return call(() -> contactsV1Api.getContactByUuid(uuid));
     }
 
-    public Either<ClientError, AccountFlatDTO> putAccount(AccountFlatDTO account) {
-        return call(() -> accountsV1Api.putAccount(account));
+    public Either<ClientError, ContactFlatDTO> putContact(ContactFlatDTO dto) {
+        return call(() -> contactsV1Api.putContact(dto));
+    }
+
+    /* Currencies */
+    public Either<ClientError, List<CurrencyFlatDTO>> getCurrencies() {
+        return call(currenciesV1Api::getCurrencies);
+    }
+
+    public Either<ClientError, CurrencyFlatDTO> getCurrency(UUID uuid) {
+        return call(() -> currenciesV1Api.getCurrencyByUuid(uuid));
+    }
+
+    public Either<ClientError, CurrencyFlatDTO> putCurrency(CurrencyFlatDTO dto) {
+        return call(() -> currenciesV1Api.putCurrency(dto));
+    }
+
+    /* Exchange Securities */
+    public Either<ClientError, List<ExchangeSecurityFlatDTO>> getExchangeSecurities() {
+        return call(exchangeSecuritiesV1Api::getExchangeSecurities);
+    }
+
+    public Either<ClientError, ExchangeSecurityFlatDTO> getExchangeSecurity(UUID uuid) {
+        return call(() -> exchangeSecuritiesV1Api.getExchangeSecurityByUuid(uuid));
+    }
+
+    public Either<ClientError, ExchangeSecurityFlatDTO> putExchangeSecurity(ExchangeSecurityFlatDTO dto) {
+        return call(() -> exchangeSecuritiesV1Api.putExchangeSecurity(dto));
+    }
+
+    /* Exchange Security Splits */
+    public Either<ClientError, List<ExchangeSecuritySplitFlatDTO>> getExchangeSecuritySplits() {
+        return call(exchangeSecuritySplitsV1Api::getExchangeSecuritySplits);
+    }
+
+    public Either<ClientError, ExchangeSecuritySplitFlatDTO> getExchangeSecuritySplit(UUID uuid) {
+        return call(() -> exchangeSecuritySplitsV1Api.getExchangeSecuritySplitByUuid(uuid));
+    }
+
+    public Either<ClientError, ExchangeSecuritySplitFlatDTO> putExchangeSecuritySplit(
+            ExchangeSecuritySplitFlatDTO dto)
+    {
+        return call(() -> exchangeSecuritySplitsV1Api.putExchangeSecuritySplit(dto));
+    }
+
+    /* Icons */
+    public Either<ClientError, List<IconFlatDTO>> getIcons() {
+        return call(iconsV1Api::getIcons);
+    }
+
+    public Either<ClientError, IconFlatDTO> getIcon(UUID uuid) {
+        return call(() -> iconsV1Api.getIconByUuid(uuid));
+    }
+
+    public Either<ClientError, IconFlatDTO> putIcon(IconFlatDTO dto) {
+        return call(() -> iconsV1Api.putIcon(dto));
+    }
+
+    /* Investment Deals */
+    public Either<ClientError, List<InvestmentDealFlatDTO>> getInvestmentDeals() {
+        return call(investmentDealsV1Api::getInvestmentDeals);
+    }
+
+    public Either<ClientError, InvestmentDealFlatDTO> getInvestmentDeal(UUID uuid) {
+        return call(() -> investmentDealsV1Api.getInvestmentDealByUuid(uuid));
+    }
+
+    public Either<ClientError, InvestmentDealFlatDTO> putInvestmentDeal(InvestmentDealFlatDTO dto) {
+        return call(() -> investmentDealsV1Api.putInvestmentDeal(dto));
     }
 
     /* Transactions */
@@ -173,8 +232,8 @@ public class MoneyClient {
         return call(() -> transactionsV1Api.getTransactionByUuid(uuid));
     }
 
-    public Either<ClientError, TransactionFlatDTO> putTransaction(TransactionFlatDTO transaction) {
-        return call(() -> transactionsV1Api.putTransaction(transaction));
+    public Either<ClientError, TransactionFlatDTO> putTransaction(TransactionFlatDTO dto) {
+        return call(() -> transactionsV1Api.putTransaction(dto));
     }
 
     //
@@ -186,15 +245,5 @@ public class MoneyClient {
             return Either.left(new ClientError(ex.getCode(), ex.getMessage()));
         }
     }
-
-    static void main(String[] args) {
-        var client = new MoneyClient("http://localhost:1705", 1000);
-        var either = client.getAccounts();
-        either.onRight(list -> {
-            var element = list.getFirst();
-            System.out.println(list);
-        });
-    }
-
 }
 

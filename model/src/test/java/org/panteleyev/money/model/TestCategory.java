@@ -1,13 +1,12 @@
-/*
- Copyright © 2017-2022 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2017-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.panteleyev.money.dto.CategoryType;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,14 +14,16 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.panteleyev.money.model.BaseTestUtils.randomEnum;
+import static org.panteleyev.money.model.BaseTestUtils.randomString;
 
 public class TestCategory {
 
     public static List<Arguments> testBuildDataProvider() {
         var uuid = UUID.randomUUID();
-        var name = BaseTestUtils.randomString();
-        var comment = BaseTestUtils.randomString();
-        var type = BaseTestUtils.randomCategoryType();
+        var name = randomString();
+        var comment = randomString();
+        var type = randomEnum(CategoryType.class);
         var iconUuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
         var modified = created + 1000;
@@ -57,9 +58,9 @@ public class TestCategory {
 
     @Test
     public void testEquals() {
-        var name = UUID.randomUUID().toString();
-        var comment = UUID.randomUUID().toString();
-        var type = BaseTestUtils.randomCategoryType();
+        var name = randomString();
+        var comment = randomString();
+        var type = randomEnum(CategoryType.class);
         var iconUuid = UUID.randomUUID();
         var uuid = UUID.randomUUID();
         var created = System.currentTimeMillis();
@@ -91,9 +92,9 @@ public class TestCategory {
     @Test
     public void testCopy() {
         var original = new Category.Builder()
-                .name(BaseTestUtils.randomString())
-                .comment(BaseTestUtils.randomString())
-                .type(BaseTestUtils.randomCategoryType())
+                .name(randomString())
+                .comment(randomString())
+                .type(randomEnum(CategoryType.class))
                 .iconUuid(UUID.randomUUID())
                 .uuid(UUID.randomUUID())
                 .created(System.currentTimeMillis())

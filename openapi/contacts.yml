@@ -73,7 +73,6 @@ components:
         - SERVICE
     ContactFlatDTO:
       type: object
-      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
       required:
         - uuid
         - name

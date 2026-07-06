@@ -1,7 +1,5 @@
-/*
- Copyright © 2019-2023 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2019-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.contact;
 
 import javafx.application.Platform;
@@ -9,6 +7,7 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.ButtonType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.panteleyev.money.dto.ContactType;
 import org.panteleyev.money.model.Contact;
 
 import java.util.UUID;
@@ -18,14 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.panteleyev.money.app.GlobalContext.cache;
-import static org.panteleyev.money.test.BaseTestUtils.randomContactType;
+import static org.panteleyev.money.test.BaseTestUtils.randomEnum;
 import static org.panteleyev.money.test.BaseTestUtils.randomString;
 
 public class ContactDialogTest {
     private final static Contact CONTACT = new Contact.Builder()
             .uuid(UUID.randomUUID())
             .name(randomString())
-            .type(randomContactType())
+            .type(randomEnum(ContactType.class))
             .phone(randomString())
             .mobile(randomString())
             .email(randomString())

@@ -1,7 +1,5 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.filters;
 
 import javafx.geometry.Pos;
@@ -10,8 +8,8 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.HBox;
 import org.panteleyev.fx.PredicateProperty;
 import org.panteleyev.fx.ReadOnlyStringConverter;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.util.Objects;
 

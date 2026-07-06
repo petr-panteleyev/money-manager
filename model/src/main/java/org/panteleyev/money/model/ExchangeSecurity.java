@@ -1,10 +1,6 @@
-/*
- Copyright © 2023 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
-package org.panteleyev.money.model.exchange;
-
-import org.panteleyev.money.model.MoneyRecord;
+// Copyright © 2023-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
+package org.panteleyev.money.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

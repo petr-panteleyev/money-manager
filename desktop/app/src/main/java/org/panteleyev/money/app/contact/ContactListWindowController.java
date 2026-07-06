@@ -17,9 +17,10 @@ import org.panteleyev.fx.factories.TextFieldFactory;
 import org.panteleyev.money.app.BaseController;
 import org.panteleyev.money.app.Bundles;
 import org.panteleyev.money.app.actions.CrudActionsHolder;
+import org.panteleyev.money.dto.ContactType;
 import org.panteleyev.money.model.Contact;
-import org.panteleyev.money.model.ContactType;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -38,7 +39,7 @@ import static org.panteleyev.money.app.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.money.app.Styles.BIG_INSETS;
 
 public final class ContactListWindowController extends BaseController {
-    private final ComboBox<ContactType> typeBox = comboBox(ContactType.asList(),
+    private final ComboBox<ContactType> typeBox = comboBox(List.of(ContactType.values()),
             _ -> comboBoxListCell("Все типы", Bundles::translate));
     private final TextField searchField = TextFieldFactory.searchField(SEARCH_FIELD_FACTORY, _ -> updatePredicate());
 

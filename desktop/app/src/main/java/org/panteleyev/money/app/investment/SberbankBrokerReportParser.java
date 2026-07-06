@@ -1,20 +1,17 @@
-/*
- Copyright © 2024 Petr Panteleyev <petr-panteleyev@yandex.ru>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2024-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.app.investment;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.panteleyev.money.dto.InvestmentDealType;
+import org.panteleyev.money.dto.InvestmentMarketType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Currency;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
-import org.panteleyev.money.model.investment.InvestmentDeal;
-import org.panteleyev.money.model.investment.InvestmentDealType;
-import org.panteleyev.money.model.investment.InvestmentMarketType;
-import org.panteleyev.money.model.investment.InvestmentOperationType;
+import org.panteleyev.money.model.ExchangeSecurity;
+import org.panteleyev.money.model.InvestmentDeal;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,10 +20,12 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.panteleyev.money.app.GlobalContext.cache;
 import static org.panteleyev.money.app.investment.ExcelUtil.getCellValueAsString;
+import static org.panteleyev.money.app.investment.ParserUtil.parseInvestmentOperationType;
 
 public class SberbankBrokerReportParser {
     private final static String DEALS_SHEET_NAME = "Сделки";
@@ -48,6 +47,14 @@ public class SberbankBrokerReportParser {
     private static final int CELL_INDEX_BROKER_FEE = 15;
     private static final int CELL_INDEX_AMOUNT = 16;
     private static final int CELL_INDEX_DEAL_TYPE = 17;
+
+    private static final Map<String, InvestmentMarketType> INVESTMENT_MARKET_TYPE_MAP = Map.of(
+            "Фондовый рынок", InvestmentMarketType.STOCK_MARKET
+    );
+
+    private static final Map<String, InvestmentDealType> INVESTMENT_DEAL_TYPE_MAP = Map.of(
+            "Обычная", InvestmentDealType.NORMAL
+    );
 
     public List<InvestmentDeal> parse(InputStream inputStream) {
         var result = new ArrayList<InvestmentDeal>();
@@ -117,8 +124,9 @@ public class SberbankBrokerReportParser {
                         .dealNumber(getCellValueAsString(row.getCell(CELL_INDEX_DEAL_NUMBER)))
                         .dealDate((LocalDateTime) columnValues.get(CELL_INDEX_DEAL_DATE))
                         .accountingDate((LocalDateTime) columnValues.get(CELL_INDEX_ACCOUNTING_DATE))
-                        .marketType(InvestmentMarketType.fromTitle(columnValues.get(CELL_INDEX_MARKET_TYPE_TYPE).toString()))
-                        .operationType(InvestmentOperationType.fromTitle(columnValues.get(CELL_INDEX_OPERATION_TYPE).toString()))
+                        .marketType(parseMarketType(columnValues.get(CELL_INDEX_MARKET_TYPE_TYPE).toString()))
+                        .operationType(parseInvestmentOperationType(
+                                columnValues.get(CELL_INDEX_OPERATION_TYPE).toString()))
                         .securityAmount(((BigDecimal) columnValues.get(CELL_INDEX_SECURITY_AMOUNT)).intValue())
                         .price((BigDecimal) columnValues.get(CELL_INDEX_PRICE))
                         .aci((BigDecimal) columnValues.get(CELL_INDEX_ACI))
@@ -126,8 +134,8 @@ public class SberbankBrokerReportParser {
                         .rate((BigDecimal) columnValues.get(CELL_INDEX_RATE))
                         .exchangeFee((BigDecimal) columnValues.get(CELL_INDEX_EXCHANGE_FEE))
                         .brokerFee((BigDecimal) columnValues.get(CELL_INDEX_BROKER_FEE))
-                        .amount((BigDecimal)columnValues.get(CELL_INDEX_AMOUNT))
-                        .dealType(InvestmentDealType.fromTitle(columnValues.get(CELL_INDEX_DEAL_TYPE).toString()))
+                        .amount((BigDecimal) columnValues.get(CELL_INDEX_AMOUNT))
+                        .dealType(parseDealType(columnValues.get(CELL_INDEX_DEAL_TYPE).toString()))
                         .build();
                 result.add(investment);
             }
@@ -150,5 +158,15 @@ public class SberbankBrokerReportParser {
             }
             default -> "";
         };
+    }
+
+    private static InvestmentMarketType parseMarketType(String title) {
+        var type = INVESTMENT_MARKET_TYPE_MAP.get(title);
+        return type != null ? type : InvestmentMarketType.UNKNOWN;
+    }
+
+    private static InvestmentDealType parseDealType(String title) {
+        var type = INVESTMENT_DEAL_TYPE_MAP.get(title);
+        return type != null ? type : InvestmentDealType.UNKNOWN;
     }
 }

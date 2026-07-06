@@ -89,7 +89,6 @@ components:
         - UNDEFINED
     TransactionFlatDTO:
       type: object
-      x-implements: ['org.panteleyev.money.dto.MoneyDTO']
       required:
         - uuid
         - amount

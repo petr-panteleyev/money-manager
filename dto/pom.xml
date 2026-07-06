@@ -55,6 +55,7 @@
                             <generateModels>true</generateModels>
                             <generateModelTests>false</generateModelTests>
                             <modelPackage>org.panteleyev.money.dto</modelPackage>
+                            <invokerPackage>org.panteleyev.money.dto.invoker</invokerPackage>
 
                             <generateApis>false</generateApis>
 

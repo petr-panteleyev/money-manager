@@ -1,17 +1,16 @@
-/*
- Copyright © 2018-2025 Petr Panteleyev <petr@panteleyev.org>
- SPDX-License-Identifier: BSD-2-Clause
- */
+// Copyright © 2018-2026 Petr Panteleyev
+// SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.money.desktop.persistence;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.panteleyev.money.dto.CardType;
+import org.panteleyev.money.dto.CategoryType;
 import org.panteleyev.money.model.Account;
 import org.panteleyev.money.model.Card;
 import org.panteleyev.money.model.Category;
-import org.panteleyev.money.model.CategoryType;
 import org.panteleyev.money.model.Transaction;
 
 import java.time.LocalDate;
@@ -19,6 +18,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomBoolean;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomEnum;
+import static org.panteleyev.money.desktop.persistence.BaseTestUtils.randomString;
 
 public class TestMoneyDAO extends BaseDaoTest {
     @BeforeAll
@@ -125,7 +127,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         dao.insertIcon(icon);
 
         var category = new Category.Builder()
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .type(CategoryType.BANKS_AND_CASH)
                 .uuid(UUID.randomUUID())
                 .build();
@@ -134,7 +136,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         var accountId = UUID.randomUUID();
 
         var account = new Account.Builder()
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .uuid(accountId)
                 .type(category.type())
                 .categoryUuid(category.uuid())
@@ -148,7 +150,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(account, retrieved.orElseThrow());
 
         var update = new Account.Builder(account)
-                .accountNumber(BaseTestUtils.randomString())
+                .accountNumber(randomString())
                 .build();
 
         dao.updateAccount(update);
@@ -162,7 +164,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         var repo = new TransactionRepository();
 
         var category = new Category.Builder()
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .type(CategoryType.BANKS_AND_CASH)
                 .uuid(UUID.randomUUID())
                 .build();
@@ -170,7 +172,7 @@ public class TestMoneyDAO extends BaseDaoTest {
 
         var account = new Account.Builder()
                 .uuid(UUID.randomUUID())
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .type(category.type())
                 .categoryUuid(category.uuid())
                 .accountNumber("123456")
@@ -198,7 +200,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(transaction, retrieved.orElseThrow());
 
         var update = new Transaction.Builder(transaction)
-                .comment(BaseTestUtils.randomString())
+                .comment(randomString())
                 .build();
 
         dao.updateTransaction(update);
@@ -212,7 +214,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         var repo = new CardRepository();
 
         var category = new Category.Builder()
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .type(CategoryType.BANKS_AND_CASH)
                 .uuid(UUID.randomUUID())
                 .build();
@@ -220,7 +222,7 @@ public class TestMoneyDAO extends BaseDaoTest {
 
         var account = new Account.Builder()
                 .uuid(UUID.randomUUID())
-                .name(BaseTestUtils.randomString())
+                .name(randomString())
                 .type(category.type())
                 .categoryUuid(category.uuid())
                 .accountNumber("123456")
@@ -230,11 +232,11 @@ public class TestMoneyDAO extends BaseDaoTest {
         var card = new Card.Builder()
                 .uuid(UUID.randomUUID())
                 .accountUuid(account.uuid())
-                .type(BaseTestUtils.randomCardType())
-                .number(BaseTestUtils.randomString())
+                .type(randomEnum(CardType.class))
+                .number(randomString())
                 .expiration(LocalDate.now())
-                .comment(BaseTestUtils.randomString())
-                .enabled(BaseTestUtils.randomBoolean())
+                .comment(randomString())
+                .enabled(randomBoolean())
                 .build();
 
         dao.insertCard(card);
@@ -243,7 +245,7 @@ public class TestMoneyDAO extends BaseDaoTest {
         assertEquals(card, retrieved.orElseThrow());
 
         var update = new Card.Builder(card)
-                .comment(BaseTestUtils.randomString())
+                .comment(randomString())
                 .build();
 
         dao.updateCard(update);

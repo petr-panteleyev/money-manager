@@ -10,6 +10,7 @@ open module org.panteleyev.money.desktop.persistence {
     requires javafx.controls;
 
     requires org.panteleyev.money.model;
+    requires org.panteleyev.money.dto;
     requires org.panteleyev.money.desktop.commons;
     requires org.panteleyev.money.desktop.export;
 }

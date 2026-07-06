@@ -6,7 +6,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.GridPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.Controller;
-import org.panteleyev.money.model.exchange.ExchangeSecurity;
+import org.panteleyev.money.model.ExchangeSecurity;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
