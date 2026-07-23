@@ -31,7 +31,7 @@
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.7.11</postgresVersion>
+        <postgresVersion>42.7.12</postgresVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
         <springDocsVersion>2.8.8</springDocsVersion>
         <restAssuredVersion>5.4.0</restAssuredVersion>
