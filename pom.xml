@@ -40,7 +40,7 @@
         <jsoupVersion>1.22.2</jsoupVersion>
         <postgresVersion>42.7.11</postgresVersion>
         <freemarkerVersion>2.3.33</freemarkerVersion>
-        <jacksonVersion>2.22.0</jacksonVersion>
+        <jacksonVersion>2.22.1</jacksonVersion>
         <apachePoiVersion>5.5.1</apachePoiVersion>
         <jUnitVersion>6.1.1</jUnitVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
