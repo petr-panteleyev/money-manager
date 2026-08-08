@@ -37,7 +37,7 @@
         <controlsFxVersion>11.2.2</controlsFxVersion>
         <commonsIoVersion>2.22.0</commonsIoVersion>
         <commonsCsvVersion>1.14.1</commonsCsvVersion>
-        <jsoupVersion>1.22.2</jsoupVersion>
+        <jsoupVersion>1.23.1</jsoupVersion>
         <postgresVersion>42.7.11</postgresVersion>
         <freemarkerVersion>2.3.33</freemarkerVersion>
         <jacksonVersion>2.22.0</jacksonVersion>
