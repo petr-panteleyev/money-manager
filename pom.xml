@@ -39,7 +39,7 @@
         <commonsCsvVersion>1.14.1</commonsCsvVersion>
         <jsoupVersion>1.22.2</jsoupVersion>
         <postgresVersion>42.7.11</postgresVersion>
-        <freemarkerVersion>2.3.33</freemarkerVersion>
+        <freemarkerVersion>2.3.35</freemarkerVersion>
         <jacksonVersion>2.22.0</jacksonVersion>
         <apachePoiVersion>5.5.1</apachePoiVersion>
         <jUnitVersion>6.1.1</jUnitVersion>
