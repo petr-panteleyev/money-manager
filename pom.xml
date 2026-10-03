@@ -12,14 +12,14 @@
     <name>Parent</name>
 
     <properties>
-        <revision>26.7.4</revision>
+        <revision>26.10.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>25</maven.compiler.release>
+        <maven.compiler.release>27</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
         <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.16.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenDependencyPluginVersion>3.9.0</mavenDependencyPluginVersion>
@@ -27,9 +27,9 @@
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
         <mavenCleanPluginVersion>3.5.0</mavenCleanPluginVersion>
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
-        <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
+        <openapiGeneratorMavenPluginVersion>7.25.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>26.0.1</javaFxVersion>
+        <javaFxVersion>27</javaFxVersion>
         <javaFxHelpersVersion>2.5.2</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.0</javaFreeDesktopVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
@@ -38,13 +38,13 @@
         <commonsIoVersion>2.22.0</commonsIoVersion>
         <commonsCsvVersion>1.14.1</commonsCsvVersion>
         <jsoupVersion>1.22.2</jsoupVersion>
-        <postgresVersion>42.7.11</postgresVersion>
-        <freemarkerVersion>2.3.33</freemarkerVersion>
+        <postgresVersion>42.7.12</postgresVersion>
+        <freemarkerVersion>2.3.35</freemarkerVersion>
         <jacksonVersion>2.22.0</jacksonVersion>
         <apachePoiVersion>5.5.1</apachePoiVersion>
         <jUnitVersion>6.1.1</jUnitVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
-        <testContainersVersion>1.17.3</testContainersVersion>
+        <testContainersVersion>2.0.5</testContainersVersion>
         <jSpecifyVersion>1.0.0</jSpecifyVersion>
         <jakartaAnnotationVersion>3.0.0</jakartaAnnotationVersion>
     </properties>

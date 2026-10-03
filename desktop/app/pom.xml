@@ -267,7 +267,6 @@
                     <removeDestination>true</removeDestination>
                     <javaOptions>
                         <option>-XX:NewRatio=1</option>
-                        <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
                         <option>--add-exports</option>
@@ -290,7 +289,6 @@
                             <longModulepath>false</longModulepath>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <argument>--add-exports</argument>

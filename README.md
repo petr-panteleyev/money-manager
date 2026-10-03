@@ -4,10 +4,10 @@
 
 ## Как собрать
 
-Для сборки проекта требуется JDK 25+.
+Для сборки проекта требуется JDK 27+.
 
 ```shell script
-export JAVA_HOME=/path/to/jdk25
+export JAVA_HOME=/path/to/jdk27
 mvn clean install
 ```
 

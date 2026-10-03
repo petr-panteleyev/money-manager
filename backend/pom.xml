@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.16</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
 
@@ -17,26 +17,26 @@
     <name>Money Manager Backend</name>
 
     <properties>
-        <revision>26.7.4</revision>
+        <revision>26.10.1</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>25</java.version>
-        <maven.compiler.release>25</maven.compiler.release>
+        <java.version>27</java.version>
+        <maven.compiler.release>27</maven.compiler.release>
         <!-- Plugins -->
         <buildHelperMavenPluginVersion>3.6.1</buildHelperMavenPluginVersion>
         <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
-        <mavenCompilerPluginVersion>3.15.0</mavenCompilerPluginVersion>
+        <mavenCompilerPluginVersion>3.16.0</mavenCompilerPluginVersion>
         <mavenJarPluginVersion>3.5.0</mavenJarPluginVersion>
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenFailSafePluginVersion>3.6.0-M1</mavenFailSafePluginVersion>
         <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>
-        <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
+        <openapiGeneratorMavenPluginVersion>7.25.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
-        <postgresVersion>42.7.11</postgresVersion>
+        <postgresVersion>42.7.12</postgresVersion>
         <liquibaseVersion>5.0.3</liquibaseVersion>
         <springDocsVersion>2.8.8</springDocsVersion>
         <restAssuredVersion>5.4.0</restAssuredVersion>
         <hamcrestVersion>2.2</hamcrestVersion>
-        <testContainersVersion>1.17.3</testContainersVersion>
+        <testContainersVersion>2.0.5</testContainersVersion>
     </properties>
 
     <dependencyManagement>
@@ -128,12 +128,12 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>testcontainers-postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -272,23 +272,20 @@
                 <artifactId>jpackage-maven-plugin</artifactId>
                 <version>${jpackageMavenPluginVersion}</version>
                 <configuration>
+                    <type>APP_IMAGE</type>
                     <name>Money Manager Backend</name>
                     <appVersion>${project.version}</appVersion>
                     <vendor>panteleyev.org</vendor>
                     <runtimeImage>${java.home}</runtimeImage>
                     <input>${project.build.directory}/jar</input>
                     <mainJar>money-manager-backend-${project.version}.jar</mainJar>
-                    <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
+                    <mainClass>org.springframework.boot.loader.launch.JarLauncher</mainClass>
                     <destination>target/dist</destination>
+                    <removeDestination>true</removeDestination>
+                    <arguments>
+                        <argument>--spring.profiles.active=prod</argument>
+                    </arguments>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>linux</id>
-                        <configuration>
-                            <type>APP_IMAGE</type>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
